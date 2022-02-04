@@ -1,3 +1,4 @@
+import 'package:flutter_svg/svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -13,12 +14,9 @@ class SignUpScreen extends HookConsumerWidget {
   SignUpScreen({Key? key}) : super(key: key);
 
   final GlobalKey<FormState> _key = GlobalKey();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController retypePasswordController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,206 +26,198 @@ class SignUpScreen extends HookConsumerWidget {
         width: size.width,
         height: size.height,
         color: AppColors.white,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16.0, top: 50.0, bottom: 25.0),
-            child: Form(
-              key: _key,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () => NavigationService.goBack(),
-                    child: const Icon(Icons.close),
-                  ),
-                  const SizedBox(height: 70),
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
+        child: CustomScrollView(slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 25.0, right: 25.0, top: 110.0, bottom: 20.0),
+              child: Form(
+                key: _key,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Expanded(child: SizedBox()),
+                    SvgPicture.asset(
+                      'assets/svgs/Logo.svg',
+                      width: size.width * 0.4,
+                    ),
+                    const SizedBox(height: 40),
+                    const Text(
+                      'Create an Account',
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    const Text(
+                      'Sign up and own an account',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.textColor,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Username',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.textFieldLabelColor,
+                        ),
+                      ),
+                    ),
+                    CustomTextField(
+                      hintText: 'Enter your username',
+                      keyboardType: TextInputType.name,
+                      textCapitalization: TextCapitalization.sentences,
+                      validator: (value) => Validator.validateName(value ?? ""),
+                      controller: _usernameController,
+                    ),
+                    const SizedBox(height: 16),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Email',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.textFieldLabelColor,
+                        ),
+                      ),
+                    ),
+                    CustomTextField(
+                      hintText: 'Enter your email',
+                      keyboardType: TextInputType.name,
+                      textCapitalization: TextCapitalization.sentences,
+                      validator: (value) =>
+                          Validator.validateEmail(value ?? ""),
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 16),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Password (6 or more characters)',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: AppColors.textFieldLabelColor,
+                        ),
+                      ),
+                    ),
+                    CustomTextField(
+                      hintText: '********',
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      controller: _passwordController,
+                      textCapitalization: TextCapitalization.none,
+                      validator: (value) =>
+                          Validator.validatePassword(value ?? ""),
+                      suffixIcon: const Icon(
+                        Icons.visibility_off_outlined,
+                        color: AppColors.textFieldLabelColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: RichText(
+                        textScaleFactor: 0.75,
+                        text: const TextSpan(
+                          text: "By continuing, you agree to our ",
+                          style: TextStyle(
+                            color: AppColors.textColor,
+                            fontSize: 15,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'User Agreement ',
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'and ',
+                              style: TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '.',
+                              style: TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    CustomButton(
+                      label: 'CREATE YOUR ACCOUNT',
                       color: AppColors.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Open a Egowave account with a few details.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  const Text(
-                    'First name',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: 'Enter your first name',
-                    keyboardType: TextInputType.name,
-                    textCapitalization: TextCapitalization.sentences,
-                    validator: (value) =>
-                        Validator.fullNameValidate(value ?? ""),
-                    controller: firstNameController,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Last name',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: 'Enter your last name',
-                    keyboardType: TextInputType.name,
-                    textCapitalization: TextCapitalization.sentences,
-                    validator: (value) =>
-                        Validator.fullNameValidate(value ?? ""),
-                    controller: lastNameController,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Email',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: 'Enter your email',
-                    keyboardType: TextInputType.emailAddress,
-                    textCapitalization: TextCapitalization.none,
-                    validator: (value) => Validator.validateEmail(value ?? ""),
-                    controller: emailController,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Phone number',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: '0801 234 5678',
-                    maxLength: 11,
-                    keyboardType: TextInputType.number,
-                    textCapitalization: TextCapitalization.none,
-                    controller: phoneNumberController,
-                    validator: (value) =>
-                        Validator.validatePhoneNumber(value ?? ""),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Password',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: '******',
-                    obscureText: true,
-                    maxLength: 6,
-                    keyboardType: TextInputType.number,
-                    textCapitalization: TextCapitalization.none,
-                    controller: passwordController,
-                    validator: (value) =>
-                        Validator.validatePassword1(value ?? ""),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Retype password',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CustomTextField(
-                    hintText: '******',
-                    obscureText: true,
-                    maxLength: 6,
-                    keyboardType: TextInputType.number,
-                    textCapitalization: TextCapitalization.none,
-                    controller: retypePasswordController,
-                    validator: (value) =>
-                        Validator.validatePassword1(value ?? ""),
-                  ),
-                  const SizedBox(height: 20),
-                  CustomButton(
-                    label: 'CREATE YOUR ACCOUNT',
-                    color: AppColors.primaryColor,
-                    onPressed: () {
-                      if (_key.currentState!.validate()) {
-                        if (passwordController.text ==
-                            retypePasswordController.text) {
-                          ref.read(authNotifierProvider.notifier).register(
-                                context: context,
-                                email: emailController.text.trim(),
-                                firstName: firstNameController.text.trim(),
-                                lastName: lastNameController.text.trim(),
-                                password: passwordController.text,
-                              );
+                      onPressed: () {
+                        if (_key.currentState!.validate()) {
                         } else {
                           return;
                         }
-                      } else {
-                        return;
-                      }
-                    },
-                    size: size,
-                    textColor: AppColors.white,
-                    borderSide: BorderSide.none,
-                  ),
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      NavigationService.navigateTo(LoginScreen.id);
-                    },
-                    child: RichText(
-                      textScaleFactor: 0.8,
-                      text: const TextSpan(
-                        text: "Do you already have an Egowave acccount? ",
-                        style: TextStyle(
-                          color: AppColors.textColor,
-                          fontSize: 15,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Sign in here',
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      },
+                      size: size,
+                      textColor: AppColors.white,
+                      borderSide: BorderSide.none,
+                    ),
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        NavigationService.navigateTo(LoginScreen.id);
+                      },
+                      child: RichText(
+                        textScaleFactor: 0.8,
+                        text: const TextSpan(
+                          text: "Already have an acccount? ",
+                          style: TextStyle(
+                            color: AppColors.textColor,
+                            fontSize: 15,
                           ),
-                        ],
+                          children: [
+                            TextSpan(
+                              text: 'Login',
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    const Expanded(child: SizedBox())
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        ]),
       ),
     );
   }
