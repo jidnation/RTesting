@@ -2,7 +2,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/providers/auth.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/auth/signup_screen.dart';
 import 'package:reach_me/utils/constants.dart';
@@ -172,6 +171,37 @@ class LoginScreen extends HookConsumerWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.black,
+                                  thickness: 0.5,
+                                  height: 0.5,
+                                  endIndent: 18.0)),
+                          Text('OR',
+                              style: TextStyle(
+                                  color: AppColors.textColor, fontSize: 9.5)),
+                          Expanded(
+                              child: Divider(
+                                  color: AppColors.black,
+                                  thickness: 0.5,
+                                  height: 0.5,
+                                  indent: 18.0)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      CustomButton(
+                          label: 'Continue with Google',
+                          prefix: 'assets/svgs/google.svg',
+                          color: AppColors.white,
+                          onPressed: () {},
+                          size: size,
+                          textColor: AppColors.primaryColor,
+                          borderSide: const BorderSide(
+                              width: 1, color: AppColors.primaryColor)),
                       const Expanded(child: SizedBox())
                     ],
                   ),

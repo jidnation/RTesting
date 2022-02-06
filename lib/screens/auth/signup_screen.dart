@@ -2,7 +2,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/providers/auth.dart';
 import 'package:reach_me/screens/auth/login_screen.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/validator.dart';
@@ -31,7 +30,7 @@ class SignUpScreen extends HookConsumerWidget {
             hasScrollBody: false,
             child: Padding(
               padding: const EdgeInsets.only(
-                  left: 25.0, right: 25.0, top: 110.0, bottom: 20.0),
+                  left: 25.0, right: 25.0, top: 40.0, bottom: 20.0),
               child: Form(
                 key: _key,
                 child: Column(
@@ -211,6 +210,37 @@ class SignUpScreen extends HookConsumerWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Expanded(
+                            child: Divider(
+                                color: AppColors.black,
+                                thickness: 0.5,
+                                height: 0.5,
+                                endIndent: 18.0)),
+                        Text('OR',
+                            style: TextStyle(
+                                color: AppColors.textColor, fontSize: 9.5)),
+                        Expanded(
+                            child: Divider(
+                                color: AppColors.black,
+                                thickness: 0.5,
+                                height: 0.5,
+                                indent: 18.0)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomButton(
+                        label: 'Continue with Google',
+                        prefix: 'assets/svgs/google.svg',
+                        color: AppColors.white,
+                        onPressed: () {},
+                        size: size,
+                        textColor: AppColors.primaryColor,
+                        borderSide: const BorderSide(
+                            width: 1, color: AppColors.primaryColor)),
                     const Expanded(child: SizedBox())
                   ],
                 ),

@@ -62,98 +62,95 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: widget.bgColor,
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light,
-        child: SafeArea(
-          child: SizedBox(
-            height: size.height,
-            width: size.width,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical:8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        widget.skipClicked!("Skip Tapped");
-                      },
-                      child: const Text(
-                        'SKIP',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.black,
-                          fontSize: 17.0,
-                        ),
+      body: SafeArea(
+        child: SizedBox(
+          height: size.height,
+          width: size.width,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical:8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      widget.skipClicked!("Skip Tapped");
+                    },
+                    child: const Text(
+                      'SKIP',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black,
+                        fontSize: 17.0,
                       ),
                     ),
                   ),
-                  Container(
-                    height: size.height * 0.7,
-                    color: Colors.transparent,
-                    child: PageView(
-                        physics: const ClampingScrollPhysics(),
-                        controller: _pageController,
-                        onPageChanged: (int page) {
-                          setState(() {
-                            _currentPage = page;
-                          });
-                        },
-                        children: buildOnboardingPages()),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: FractionalOffset.bottomLeft,
-                          child: Row(
-                            children: _buildPageIndicator(),
-                          ),
+                ),
+                Container(
+                  height: size.height * 0.7,
+                  color: Colors.transparent,
+                  child: PageView(
+                      physics: const ClampingScrollPhysics(),
+                      controller: _pageController,
+                      onPageChanged: (int page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
+                      children: buildOnboardingPages()),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: FractionalOffset.bottomLeft,
+                        child: Row(
+                          children: _buildPageIndicator(),
                         ),
                       ),
-                      _currentPage != widget.pages!.length - 1
-                          ? Align(
-                              alignment: FractionalOffset.bottomRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 20, bottom: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _pageController.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.ease,
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 45.0,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 40, vertical: 8),
-                                    decoration: BoxDecoration(
-                                        color: widget.themeColor,
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(6.0))),
-                                    child: const Center(
-                                      child: Text(
-                                        'NEXT',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
+                    ),
+                    _currentPage != widget.pages!.length - 1
+                        ? Align(
+                            alignment: FractionalOffset.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20, bottom: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _pageController.nextPage(
+                                    duration:
+                                        const Duration(milliseconds: 500),
+                                    curve: Curves.ease,
+                                  );
+                                },
+                                child: Container(
+                                  height: 45.0,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 8),
+                                  decoration: BoxDecoration(
+                                      color: widget.themeColor,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(6.0))),
+                                  child: const Center(
+                                    child: Text(
+                                      'NEXT',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.0,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
                               ),
-                            )
-                          : const Text(''),
-                    ],
-                  ),
-                ],
-              ),
+                            ),
+                          )
+                        : const Text(''),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
