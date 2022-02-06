@@ -26,8 +26,7 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
     _controller.forward();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        print(status);
-        //NavigationService.navigateToReplace(OnboardingScreen.id);
+        NavigationService.navigateToReplace(OnboardingScreen.id);
       }
     });
   }
@@ -84,7 +83,7 @@ class SplashScreen extends StatelessWidget {
                             width: animation.secondContainerWidth.value,
                             height: animation.secondContainerHeight.value,
                             decoration: const BoxDecoration(
-                              color: Color(0x1277B612),
+                              color: Color(0x120077B6),
                             ),
                           ),
                         ),
@@ -98,18 +97,8 @@ class SplashScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const SizedBox(),
-                            const Center(
-                              child: GradientSvg(
-                                svg: 'assets/svgs/Logo.svg',
-                                size: 160,
-                                gradient: LinearGradient(colors: [
-                                  AppColors.primaryColor,
-                                  AppColors.secondaryColor
-                                ], stops: [
-                                  0,
-                                  100
-                                ], transform: GradientRotation(pi / 2)),
-                              ),
+                            Center(
+                              child: SvgPicture.asset('assets/svgs/Logo.svg'),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 40.0),
@@ -239,30 +228,31 @@ class SineCurve extends Curve {
   }
 }
 
-class GradientSvg extends StatelessWidget {
-  const GradientSvg({
-    Key? key,
-    required this.svg,
-    required this.size,
-    required this.gradient,
-  }) : super(key: key);
+//SHADER TO MASK COLOUR OF SVG IMAGE
+// class GradientSvg extends StatelessWidget {
+//   const GradientSvg({
+//     Key? key,
+//     required this.svg,
+//     required this.size,
+//     required this.gradient,
+//   }) : super(key: key);
 
-  final String svg;
-  final double size;
-  final Gradient gradient;
+//   final String svg;
+//   final double size;
+//   final Gradient gradient;
 
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      child: SizedBox(
-        width: size * 1.2,
-        height: size * 1.2,
-        child: SvgPicture.asset(svg),
-      ),
-      shaderCallback: (Rect bounds) {
-        final Rect rect = Rect.fromLTRB(0, 0, size, size);
-        return gradient.createShader(rect);
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return ShaderMask(
+//       child: SizedBox(
+//         width: size * 1.2,
+//         height: size * 1.2,
+//         child: SvgPicture.asset(svg),
+//       ),
+//       shaderCallback: (Rect bounds) {
+//         final Rect rect = Rect.fromLTRB(0, 0, size, size);
+//         return gradient.createShader(rect);
+//       },
+//     );
+//   }
+// }

@@ -1,15 +1,16 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class EgoWaveOnboardingScreen extends StatefulWidget {
+class RMOnboardingScreen extends StatefulWidget {
   final List<RMOnboardingModel>? pages;
   final Color? bgColor;
   final Color? themeColor;
   final ValueChanged<String>? skipClicked;
   final ValueChanged<String>? getStartedClicked;
 
-  const EgoWaveOnboardingScreen({
+  const RMOnboardingScreen({
     Key? key,
     this.pages,
     this.bgColor,
@@ -19,10 +20,10 @@ class EgoWaveOnboardingScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  EgoWaveOnboardingScreenState createState() => EgoWaveOnboardingScreenState();
+  RMOnboardingScreenState createState() => RMOnboardingScreenState();
 }
 
-class EgoWaveOnboardingScreenState extends State<EgoWaveOnboardingScreen> {
+class RMOnboardingScreenState extends State<RMOnboardingScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
 
@@ -61,101 +62,95 @@ class EgoWaveOnboardingScreenState extends State<EgoWaveOnboardingScreen> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: widget.bgColor,
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: SizedBox(
-              height: size.height,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 40.0, horizontal: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          widget.skipClicked!("Skip Tapped");
-                        },
-                        child: const Text(
-                          'SKIP',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black,
-                            fontSize: 15.0,
-                          ),
+      body: SafeArea(
+        child: SizedBox(
+          height: size.height,
+          width: size.width,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical:8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      widget.skipClicked!("Skip Tapped");
+                    },
+                    child: const Text(
+                      'SKIP',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black,
+                        fontSize: 17.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: size.height * 0.7,
+                  color: Colors.transparent,
+                  child: PageView(
+                      physics: const ClampingScrollPhysics(),
+                      controller: _pageController,
+                      onPageChanged: (int page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
+                      children: buildOnboardingPages()),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: FractionalOffset.bottomLeft,
+                        child: Row(
+                          children: _buildPageIndicator(),
                         ),
                       ),
                     ),
-                    Container(
-                      height: 600,
-                      color: Colors.transparent,
-                      child: PageView(
-                          physics: const ClampingScrollPhysics(),
-                          controller: _pageController,
-                          onPageChanged: (int page) {
-                            setState(() {
-                              _currentPage = page;
-                            });
-                          },
-                          children: buildOnboardingPages()),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: FractionalOffset.bottomLeft,
-                            child: Row(
-                              children: _buildPageIndicator(),
-                            ),
-                          ),
-                        ),
-                        _currentPage != widget.pages!.length - 1
-                            ? Align(
-                                alignment: FractionalOffset.bottomRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 20, bottom: 10),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _pageController.nextPage(
-                                        duration:
-                                            const Duration(milliseconds: 500),
-                                        curve: Curves.ease,
-                                      );
-                                    },
-                                    child: Container(
-                                      height: 45.0,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 40, vertical: 8),
-                                      decoration: BoxDecoration(
-                                          color: widget.themeColor,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(6.0))),
-                                      child: const Center(
-                                        child: Text(
-                                          'NEXT',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
+                    _currentPage != widget.pages!.length - 1
+                        ? Align(
+                            alignment: FractionalOffset.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20, bottom: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _pageController.nextPage(
+                                    duration:
+                                        const Duration(milliseconds: 500),
+                                    curve: Curves.ease,
+                                  );
+                                },
+                                child: Container(
+                                  height: 45.0,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 8),
+                                  decoration: BoxDecoration(
+                                      color: widget.themeColor,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(6.0))),
+                                  child: const Center(
+                                    child: Text(
+                                      'NEXT',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.0,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
-                              )
-                            : const Text(''),
-                      ],
-                    ),
+                              ),
+                            ),
+                          )
+                        : const Text(''),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -170,32 +165,34 @@ class EgoWaveOnboardingScreenState extends State<EgoWaveOnboardingScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Center(
-            child: Image(
-              image: AssetImage(page.imagePath),
+            child: SvgPicture.asset(
+              page.imagePath,
               height: 350,
               width: 350,
             ),
           ),
           const SizedBox(height: 20.0),
-          Text(
+          page.title != '' ?Text(
             page.title,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w400,
               color: page.titleColor,
-              fontSize: 30,
+              fontSize: 28,
             ),
-          ),
-          const SizedBox(height: 12.0),
+          ) : const SizedBox(height: 5.0),
+          const SizedBox(height: 4.0),
           Text(
             page.description,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.normal,
               height: 1.5,
               color: page.descripColor,
-              fontSize: 17,
+              fontSize: 16,
             ),
           ),
         ],

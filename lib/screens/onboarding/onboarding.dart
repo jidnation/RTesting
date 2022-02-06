@@ -1,7 +1,7 @@
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/screens/auth/login_screen.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_screen.dart';
-import 'package:reach_me/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/utils/constants.dart';
 
@@ -11,40 +11,40 @@ class OnboardingScreen extends StatelessWidget {
 
   final List<RMOnboardingModel>? pages = [
     RMOnboardingModel(
-        title: 'Save money',
-        description:
-            'We help you meet your savings target monthly and our emergency plans enable you save for multiple purposes',
+        title: 'Welcome to ReachMe',
+        description: 'Start connecting to your world.',
         titleColor: const Color(0xFF001533),
-        descripColor: const Color(0xFF001533),
-        imagePath: 'assets/gifs/save.gif'),
+        descripColor: const Color(0xFF767474),
+        imagePath: 'assets/svgs/illustration1.svg'),
     RMOnboardingModel(
-        title: 'Withdraw your money',
-        description:
-            'With just your phone number, you can withdraw your funds at any point in time from any BankMe agent close to you.',
+        title: '',
+        description: 'Enjoy a better Visual and Audio\nCommunication',
         titleColor: const Color(0xFF001533),
-        descripColor: const Color(0xFF001533),
-        imagePath: 'assets/gifs/withdraw.gif'),
+        descripColor: const Color(0xFF767474),
+        imagePath: 'assets/svgs/illustration2.svg'),
     RMOnboardingModel(
-        title: 'Invest your money',
-        description:
-            'Get access to risk free investments that will multiply your income and pay high returns in few months',
+        title: '',
+        description: 'Better High-Level Security',
         titleColor: const Color(0xFF001533),
-        descripColor: const Color(0xFF001533),
-        imagePath: 'assets/gifs/investment.gif'),
+        descripColor: const Color(0xFF767474),
+        imagePath: 'assets/svgs/illustration3.svg'),
   ];
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Center(
-        child: EgoWaveOnboardingScreen(
-          bgColor: Colors.white,
+      body: SizedBox(
+        height: size.height,
+        width: size.width,
+        child: RMOnboardingScreen(
+          bgColor: AppColors.white,
           themeColor: AppColors.primaryColor,
           pages: pages,
           skipClicked: (value) {
-            NavigationService.navigateTo(WelcomeScreen.id);
+            NavigationService.navigateTo(LoginScreen.id);
           },
           getStartedClicked: (value) {
-            NavigationService.navigateTo(WelcomeScreen.id);
+            NavigationService.navigateTo(LoginScreen.id);
           },
         ),
       ),

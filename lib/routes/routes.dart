@@ -13,7 +13,6 @@ import 'package:reach_me/screens/auth/signup_screen.dart';
 import 'package:reach_me/screens/splash_screen.dart';
 import 'package:reach_me/routes/page_route.dart';
 import 'package:reach_me/screens/auth/verify_account.dart';
-import 'package:reach_me/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
 class RMRouter {
@@ -24,9 +23,6 @@ class RMRouter {
 
       case OnboardingScreen.id:
         return RMPageRoute(builder: (_) => OnboardingScreen());
-
-      case WelcomeScreen.id:
-        return RMPageRoute(builder: (_) => const WelcomeScreen());
 
       case SignUpScreen.id:
         return RMPageRoute(builder: (_) => SignUpScreen());
