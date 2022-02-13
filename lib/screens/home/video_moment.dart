@@ -2,10 +2,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class PortfolioScreen extends StatelessWidget {
- static const String id = 'portfolio_screen';
+class VideoMomentScreen extends StatelessWidget {
+ static const String id = 'video_moment_screen';
 
-  const PortfolioScreen({Key? key}) : super(key: key);
+  const VideoMomentScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/auth/signup_screen.dart';
+import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/validator.dart';
 import 'package:flutter/material.dart';
@@ -197,7 +198,9 @@ class LoginScreen extends HookConsumerWidget {
                           label: 'Continue with Google',
                           prefix: 'assets/svgs/google.svg',
                           color: AppColors.white,
-                          onPressed: () {},
+                          onPressed: () {
+                            NavigationService.navigateTo(HomeScreen.id);
+                          },
                           size: size,
                           textColor: AppColors.primaryColor,
                           borderSide: const BorderSide(

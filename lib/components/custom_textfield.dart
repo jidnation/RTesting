@@ -49,3 +49,56 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
+class CustomRoundTextField extends StatelessWidget {
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final String? hintText;
+  final String? Function(String?)? validator;
+  final TextEditingController? controller;
+  final TextCapitalization textCapitalization;
+  final int? maxLength;
+  final Widget? suffixIcon;
+
+  const CustomRoundTextField(
+      {Key? key,
+      this.keyboardType,
+      this.hintText,
+      this.obscureText = false,
+      this.validator,
+      this.maxLength = 30,
+      this.controller,
+      this.suffixIcon,
+      required this.textCapitalization})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      controller: controller,
+      autocorrect: false,
+      textCapitalization: textCapitalization,
+      validator: validator,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(maxLength),
+      ],
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 15),
+        filled: true,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        fillColor: AppColors.greyShade8,
+        suffixIcon: suffixIcon,
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(54)),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(54)),
+      ),
+    );
+  }
+}

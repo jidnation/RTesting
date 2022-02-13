@@ -1,12 +1,13 @@
 import 'package:reach_me/screens/auth/verify_account_success.dart';
-import 'package:reach_me/screens/home/account_screen.dart';
-import 'package:reach_me/screens/home/dashboard.dart';
+import 'package:reach_me/screens/home/account.dart';
+import 'package:reach_me/screens/home/chats_list_screen.dart';
+import 'package:reach_me/screens/home/timeline.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/screens/auth/login_screen.dart';
-import 'package:reach_me/screens/home/portfolio_screen.dart';
-import 'package:reach_me/screens/home/rewards_screen.dart';
-import 'package:reach_me/screens/home/savings_screen.dart';
+import 'package:reach_me/screens/home/video_moment.dart';
+import 'package:reach_me/screens/home/notification.dart';
+import 'package:reach_me/screens/home/search.dart';
 import 'package:reach_me/screens/onboarding/onboarding.dart';
 import 'package:reach_me/screens/auth/reset_password.dart';
 import 'package:reach_me/screens/auth/signup_screen.dart';
@@ -50,20 +51,23 @@ class RMRouter {
       case HomeScreen.id:
         return RMPageRoute(builder: (_) => const HomeScreen());
 
-      case DashboardScreen.id:
-        return RMPageRoute(builder: (_) => const DashboardScreen());
+      case TimelineScreen.id:
+        return RMPageRoute(builder: (_) => const TimelineScreen());
+        
+      case ChatsListScreen.id:
+        return RMPageRoute(builder: (_) => const ChatsListScreen());
 
-      case SavingScreen.id:
-        return RMPageRoute(builder: (_) => const SavingScreen());
+      case SearchScreen.id:
+        return RMPageRoute(builder: (_) => const SearchScreen());
 
-      case RewardsScreen.id:
-        return RMPageRoute(builder: (_) => const RewardsScreen());
+      case VideoMomentScreen.id:
+        return RMPageRoute(builder: (_) => const VideoMomentScreen());
+
+      case NotificationsScreen.id:
+        return RMPageRoute(builder: (_) => const NotificationsScreen());
 
       case AccountScreen.id:
         return RMPageRoute(builder: (_) => const AccountScreen());
-
-      case PortfolioScreen.id:
-        return RMPageRoute(builder: (_) => const PortfolioScreen());
 
       // case '/main-page':
       //   dynamic args = settings.arguments ?? {"index": 0};
