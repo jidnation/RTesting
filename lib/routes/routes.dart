@@ -1,6 +1,9 @@
 import 'package:reach_me/screens/auth/verify_account_success.dart';
 import 'package:reach_me/screens/home/account.dart';
 import 'package:reach_me/screens/home/chats_list_screen.dart';
+import 'package:reach_me/screens/home/edit_profile_screen.dart';
+import 'package:reach_me/screens/home/msg_chat_interface.dart';
+import 'package:reach_me/screens/home/personal_info_settings.dart';
 import 'package:reach_me/screens/home/timeline.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
@@ -68,6 +71,17 @@ class RMRouter {
 
       case AccountScreen.id:
         return RMPageRoute(builder: (_) => const AccountScreen());
+
+      case EditProfileScreen.id:
+        return RMPageRoute(builder: (_) => const EditProfileScreen());
+
+      case PersonalInfoSettings.id:
+        return RMPageRoute(builder: (_) => const PersonalInfoSettings());
+
+      case MsgChatInterface.id:
+        return RMPageRoute(builder: (_) => const MsgChatInterface());
+      
+
 
       // case '/main-page':
       //   dynamic args = settings.arguments ?? {"index": 0};

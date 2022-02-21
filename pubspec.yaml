@@ -46,6 +46,8 @@ dependencies:
   json_annotation: ^4.4.0
   equatable: ^2.0.3
   flutter_svg: ^1.0.3
+  readmore: ^2.1.0
+  bubble: ^1.2.1
 
 dev_dependencies:
   flutter_test:

@@ -109,54 +109,51 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _currentPage != widget.pages!.length - 1
-                          ? Align(
-                              alignment: FractionalOffset.bottomLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  bottom: 10,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    widget.skipClicked!("Skip Tapped");
-                                  },
-                                  child: const Text(
-                                    'Skip',
-                                    style: TextStyle(
-                                        color: AppColors.greyShade3,
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : const Text(''),
-                      _currentPage != widget.pages!.length - 1
-                          ? Align(
-                              alignment: FractionalOffset.bottomRight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 20, bottom: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _pageController.nextPage(
+                      Align(
+                        alignment: FractionalOffset.bottomLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            bottom: 10,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              widget.skipClicked!("Skip Tapped");
+                            },
+                            child: const Text(
+                              'Skip',
+                              style: TextStyle(
+                                  color: AppColors.greyShade3,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: FractionalOffset.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20, bottom: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              _currentPage != widget.pages!.length - 1
+                                  ? _pageController.nextPage(
                                       duration:
                                           const Duration(milliseconds: 500),
                                       curve: Curves.ease,
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Next',
-                                    style: TextStyle(
-                                        color: AppColors.primaryColor,
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : const Text(''),
+                                    )
+                                  : _getStartedTapped();
+                            },
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -165,9 +162,6 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           ),
         ),
       ),
-      bottomSheet: _currentPage == widget.pages!.length - 1
-          ? _showGetStartedButton()
-          : const Text(''),
     );
   }
 

@@ -34,10 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+ final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
       drawer: Drawer(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

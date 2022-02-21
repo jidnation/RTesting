@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/home/timeline.dart';
+import 'package:reach_me/screens/home/msg_chat_interface.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -217,7 +217,9 @@ class ChatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        NavigationService.navigateTo(MsgChatInterface.id);
+      },
       style: TextButton.styleFrom(
         padding: const EdgeInsets.all(10),
       ),

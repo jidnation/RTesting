@@ -11,6 +11,9 @@ class CustomTextField extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final int? maxLength;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
+  final bool autocorrect;
+  final bool isDense;
 
   const CustomTextField(
       {Key? key,
@@ -20,7 +23,10 @@ class CustomTextField extends StatelessWidget {
       this.validator,
       this.maxLength = 30,
       this.controller,
+      this.prefixIcon,
+      this.autocorrect = false,
       this.suffixIcon,
+      this.isDense = false,
       required this.textCapitalization})
       : super(key: key);
 
@@ -30,17 +36,19 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
-      autocorrect: false,
+      autocorrect: autocorrect,
       textCapitalization: textCapitalization,
       validator: validator,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
       ],
       decoration: InputDecoration(
+        isDense: isDense,
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 13),
         filled: false,
         suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
         enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.black, width: 0.5)),
         focusedBorder: const UnderlineInputBorder(
@@ -57,7 +65,8 @@ class CustomRoundTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextEditingController? controller;
   final TextCapitalization textCapitalization;
-  final int? maxLength;
+
+  final Widget? prefixIcon;
   final Widget? suffixIcon;
 
   const CustomRoundTextField(
@@ -66,8 +75,8 @@ class CustomRoundTextField extends StatelessWidget {
       this.hintText,
       this.obscureText = false,
       this.validator,
-      this.maxLength = 30,
       this.controller,
+      this.prefixIcon,
       this.suffixIcon,
       required this.textCapitalization})
       : super(key: key);
@@ -75,15 +84,14 @@ class CustomRoundTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      minLines: 1,
+      maxLines: 5,
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
       autocorrect: false,
       textCapitalization: textCapitalization,
       validator: validator,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(maxLength),
-      ],
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 15),
@@ -92,6 +100,7 @@ class CustomRoundTextField extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         fillColor: AppColors.greyShade8,
         suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(54)),

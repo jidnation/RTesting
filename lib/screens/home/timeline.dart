@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/home/chats_list_screen.dart';
+import 'package:reach_me/screens/home/home_screen.dart';
+import 'package:reach_me/screens/home/view_comments.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -37,7 +40,9 @@ class TimelineScreen extends StatelessWidget {
         elevation: 4,
         centerTitle: true,
         leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              
+            },
             icon: Container(
                 width: 30,
                 height: 30,
@@ -319,7 +324,10 @@ class ReacherCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          NavigationService.navigateTransparentRoute(
+                              context, const ViewCommentsScreen(), 0, 1);
+                        },
                         padding: const EdgeInsets.all(0),
                         constraints: const BoxConstraints(),
                         icon: SvgPicture.asset('assets/svgs/comments.svg'),
@@ -511,32 +519,6 @@ Future showKebabBottomSheet(BuildContext context) {
               const SizedBox(height: 20),
             ]));
       });
-}
-
-class KebabBottomTextButton extends StatelessWidget {
-  const KebabBottomTextButton({Key? key, required this.label, this.onPressed})
-      : super(key: key);
-
-  final String label;
-  final void Function()? onPressed;
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 15),
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(label,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppColors.black,
-                fontWeight: FontWeight.w400,
-              )),
-        ));
-  }
 }
 
 class DemoSourceEntity {
