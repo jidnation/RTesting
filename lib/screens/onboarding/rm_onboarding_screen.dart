@@ -3,6 +3,7 @@ import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/utils/constants.dart';
+import 'package:reach_me/utils/extensions.dart';
 
 class RMOnboardingScreen extends StatefulWidget {
   final List<RMOnboardingModel>? pages;
@@ -76,8 +77,9 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 20),
-                Expanded(
-                  flex: 6,
+                SizedBox(
+                  height: size.height * 0.6,
+                  width: size.width,
                   child: Container(
                     color: Colors.transparent,
                     child: PageView(
@@ -91,71 +93,64 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                         children: buildOnboardingPages()),
                   ),
                 ),
-                Expanded(
-                  flex: 1,
+                Align(
+                  alignment: Alignment.center,
                   child: Align(
-                    alignment: Alignment.center,
-                    child: Align(
-                      alignment: FractionalOffset.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: _buildPageIndicator(),
-                      ),
+                    alignment: FractionalOffset.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: _buildPageIndicator(),
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: FractionalOffset.bottomLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 20,
-                            bottom: 10,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              widget.skipClicked!("Skip Tapped");
-                            },
-                            child: const Text(
-                              'Skip',
-                              style: TextStyle(
-                                  color: AppColors.greyShade3,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: FractionalOffset.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          bottom: 10,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            widget.skipClicked!("Skip Tapped");
+                          },
+                          child: const Text(
+                            'Skip',
+                            style: TextStyle(
+                                color: AppColors.greyShade3,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600),
+                          ).paddingAll(10),
                         ),
                       ),
-                      Align(
-                        alignment: FractionalOffset.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 20, bottom: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              _currentPage != widget.pages!.length - 1
-                                  ? _pageController.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.ease,
-                                    )
-                                  : _getStartedTapped();
-                            },
-                            child: const Text(
-                              'Next',
-                              style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
+                    ),
+                    Align(
+                      alignment: FractionalOffset.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20, bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            _currentPage != widget.pages!.length - 1
+                                ? _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.ease,
+                                  )
+                                : _getStartedTapped();
+                          },
+                          child: const Text(
+                            'Next',
+                            style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600),
+                          ).paddingAll(10),
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ],
             ),
@@ -173,28 +168,29 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
         Center(
           child: SvgPicture.asset(
             page.imagePath,
-            height: 350,
-            width: 350,
+            height: page.imagePath == 'assets/svgs/illustration 3-new.svg'
+                ? 190
+                : 220,
+            width: 220,
           ),
         ),
-        const SizedBox(height: 20.0),
+        const SizedBox(height: 96.0),
         page.title != ''
             ? Text(
                 page.title,
                 style: TextStyle(
-                  fontWeight: FontWeight.w400,
+                  fontWeight: FontWeight.w600,
                   color: page.titleColor,
-                  fontSize: 28,
+                  fontSize: 25,
                 ),
               )
             : const SizedBox(height: 5.0),
-        const SizedBox(height: 4.0),
+        const SizedBox(height: 6.0),
         Text(
           page.description,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.normal,
-            height: 1.5,
+            fontWeight: FontWeight.w400,
             color: page.descripColor,
             fontSize: 16,
           ),

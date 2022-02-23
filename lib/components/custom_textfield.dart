@@ -65,9 +65,12 @@ class CustomRoundTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextEditingController? controller;
   final TextCapitalization textCapitalization;
-
+  final BorderSide enabledBorderSide;
+  final BorderSide focusedBorderSide;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final bool isFilled;
+  final double borderRadius;
 
   const CustomRoundTextField(
       {Key? key,
@@ -77,7 +80,11 @@ class CustomRoundTextField extends StatelessWidget {
       this.validator,
       this.controller,
       this.prefixIcon,
+      this.enabledBorderSide = BorderSide.none,
+      this.focusedBorderSide = BorderSide.none,
       this.suffixIcon,
+      this.isFilled = true,
+      this.borderRadius = 54,
       required this.textCapitalization})
       : super(key: key);
 
@@ -95,18 +102,18 @@ class CustomRoundTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 15),
-        filled: true,
+        filled: isFilled,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         fillColor: AppColors.greyShade8,
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(54)),
+            borderSide: enabledBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(54)),
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
       ),
     );
   }

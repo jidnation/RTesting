@@ -40,8 +40,8 @@ class SignUpScreen extends HookConsumerWidget {
                   children: [
                     const Expanded(child: SizedBox()),
                     SvgPicture.asset(
-                      'assets/svgs/Logo.svg',
-                      width: size.width * 0.4,
+                      'assets/svgs/logo-new.svg',
+                      width: size.width * 0.15,
                     ),
                     const SizedBox(height: 40),
                     const Text(
@@ -173,7 +173,7 @@ class SignUpScreen extends HookConsumerWidget {
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
-                      label: 'CREATE YOUR ACCOUNT',
+                      label: 'Done',
                       color: AppColors.primaryColor,
                       onPressed: () {
                         if (_key.currentState!.validate()) {
@@ -184,32 +184,6 @@ class SignUpScreen extends HookConsumerWidget {
                       size: size,
                       textColor: AppColors.white,
                       borderSide: BorderSide.none,
-                    ),
-                    const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () {
-                        NavigationService.navigateTo(LoginScreen.id);
-                      },
-                      child: RichText(
-                        textScaleFactor: 0.8,
-                        text: const TextSpan(
-                          text: "Already have an acccount? ",
-                          style: TextStyle(
-                            color: AppColors.textColor,
-                            fontSize: 15,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Login',
-                              style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -244,7 +218,34 @@ class SignUpScreen extends HookConsumerWidget {
                         textColor: AppColors.primaryColor,
                         borderSide: const BorderSide(
                             width: 1, color: AppColors.primaryColor)),
-                    const Expanded(child: SizedBox())
+                    const Expanded(child: SizedBox()),
+                    GestureDetector(
+                      onTap: () {
+                        NavigationService.navigateTo(LoginScreen.id);
+                      },
+                      child: RichText(
+                        textScaleFactor: 0.8,
+                        text: const TextSpan(
+                          text: "Already have an acccount? ",
+                          style: TextStyle(
+                            color: AppColors.textColor,
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Login',
+                              style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontFamily: 'Poppins',
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

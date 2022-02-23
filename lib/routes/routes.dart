@@ -1,3 +1,4 @@
+import 'package:reach_me/screens/auth/otp_screen.dart';
 import 'package:reach_me/screens/auth/verify_account_success.dart';
 import 'package:reach_me/screens/home/account.dart';
 import 'package:reach_me/screens/home/chats_list_screen.dart';
@@ -14,6 +15,7 @@ import 'package:reach_me/screens/home/search.dart';
 import 'package:reach_me/screens/onboarding/onboarding.dart';
 import 'package:reach_me/screens/auth/reset_password.dart';
 import 'package:reach_me/screens/auth/signup_screen.dart';
+import 'package:reach_me/screens/onboarding/welcome_screen.dart';
 import 'package:reach_me/screens/splash_screen.dart';
 import 'package:reach_me/routes/page_route.dart';
 import 'package:reach_me/screens/auth/verify_account.dart';
@@ -28,6 +30,9 @@ class RMRouter {
       case OnboardingScreen.id:
         return RMPageRoute(builder: (_) => OnboardingScreen());
 
+      case WelcomeScreen.id:
+        return RMPageRoute(builder: (_) => const WelcomeScreen());
+
       case SignUpScreen.id:
         return RMPageRoute(builder: (_) => SignUpScreen());
 
@@ -36,6 +41,9 @@ class RMRouter {
 
       case ForgotPasswordScreen.id:
         return RMPageRoute(builder: (_) => ForgotPasswordScreen());
+
+      case OtpScreen.id:
+        return RMPageRoute(builder: (_) => OtpScreen());
 
       case VerifyAccountScreen.id:
         dynamic args = settings.arguments;
@@ -56,7 +64,7 @@ class RMRouter {
 
       case TimelineScreen.id:
         return RMPageRoute(builder: (_) => const TimelineScreen());
-        
+
       case ChatsListScreen.id:
         return RMPageRoute(builder: (_) => const ChatsListScreen());
 
@@ -80,8 +88,6 @@ class RMRouter {
 
       case MsgChatInterface.id:
         return RMPageRoute(builder: (_) => const MsgChatInterface());
-      
-
 
       // case '/main-page':
       //   dynamic args = settings.arguments ?? {"index": 0};

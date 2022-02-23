@@ -1,8 +1,11 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/providers/auth.dart';
+import 'package:reach_me/screens/auth/otp_screen.dart';
 import 'package:reach_me/utils/constants.dart';
+import 'package:reach_me/utils/extensions.dart';
 import 'package:reach_me/utils/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,73 +20,79 @@ class ForgotPasswordScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        width: size.width,
-        height: size.height,
-        color: AppColors.white,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              left: 16.0, right: 16.0, top: 50.0, bottom: 25.0),
+        body: SafeArea(
+      child: SizedBox(
+          height: size.height,
+          width: size.width,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => NavigationService.goBack(),
-                child: const Icon(Icons.close),
-              ),
-              const SizedBox(height: 70),
-              const Text(
-                "Forgot Password",
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Center(
+                child: SvgPicture.asset(
+                  'assets/svgs/illustration 5-new.svg',
+                  height: 186,
+                  width: 290,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 25.0),
               const Text(
-                'Please enter your email address to recover your password.',
+                'Forgot Password?',
                 style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textColor,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryColor,
+                  fontSize: 25,
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              const Text(
+                'Don’t worry! it happens. Please enter\nthe address associated with your account.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF1B1B1A),
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 40),
-              const Text(
-                'Email address',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.bold,
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Email',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.greyShade2,
+                    fontSize: 13,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              CustomTextField(
+              ).paddingSymmetric(h: 45),
+              const SizedBox(height: 5),
+              const CustomRoundTextField(
+                borderRadius: 8,
+                isFilled: false,
                 hintText: 'abc@example.com',
-                keyboardType: TextInputType.emailAddress,
                 textCapitalization: TextCapitalization.none,
-                controller: _emailController,
-                validator: (value) => Validator.validateEmail(value ?? ""),
-              ),
-              const SizedBox(height: 16),
-              const Expanded(child: SizedBox()),
+                focusedBorderSide:
+                    BorderSide(width: 1, color: AppColors.primaryColor),
+                enabledBorderSide:
+                    BorderSide(width: 1, color: AppColors.greyShade5),
+              ).paddingSymmetric(h: 45),
+              const SizedBox(height: 34),
               CustomButton(
-                label: 'RECOVER PASSWORD',
-                color: AppColors.primaryColor,
-                onPressed: () {
-                  ref.read(authNotifierProvider.notifier).forgotPassword(
-                      context,
-                      email: _emailController.text.trim());
-                },
-                size: size,
-                textColor: AppColors.white,
-                borderSide: BorderSide.none,
-              ),
+                      label: 'Send',
+                      color: AppColors.primaryColor,
+                      onPressed: () {
+                        NavigationService.navigateTo(OtpScreen.id);
+                      },
+                      size: size,
+                      textColor: AppColors.white,
+                      borderSide: BorderSide.none)
+                  .paddingSymmetric(h: 45),
               const SizedBox(height: 20),
             ],
-          ),
-        ),
-      ),
-    );
+          )),
+    ));
   }
 }
