@@ -71,6 +71,8 @@ class CustomRoundTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool isFilled;
   final double borderRadius;
+  final TextStyle hintStyle;
+  final TextStyle textStyle;
 
   const CustomRoundTextField(
       {Key? key,
@@ -85,6 +87,8 @@ class CustomRoundTextField extends StatelessWidget {
       this.suffixIcon,
       this.isFilled = true,
       this.borderRadius = 54,
+      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 15),
+      this.textStyle = const TextStyle(color: AppColors.black, fontSize: 15),
       required this.textCapitalization})
       : super(key: key);
 
@@ -93,6 +97,7 @@ class CustomRoundTextField extends StatelessWidget {
     return TextFormField(
       minLines: 1,
       maxLines: 5,
+      style: textStyle,
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
@@ -101,7 +106,7 @@ class CustomRoundTextField extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 15),
+        hintStyle: hintStyle,
         filled: isFilled,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 10),

@@ -53,7 +53,7 @@ class TimelineScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ))),
-        title: SvgPicture.asset('assets/svgs/Logo.svg', width: 100, height: 25),
+      //  title: SvgPicture.asset('assets/svgs/Logo.svg', width: 100, height: 25),
         actions: [
           IconButton(
             icon: SvgPicture.asset('assets/svgs/Vector.svg',

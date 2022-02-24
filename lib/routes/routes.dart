@@ -4,12 +4,12 @@ import 'package:reach_me/screens/chat/chats_list_screen.dart';
 import 'package:reach_me/screens/account/edit_profile_screen.dart';
 import 'package:reach_me/screens/chat/msg_chat_interface.dart';
 import 'package:reach_me/screens/account/personal_info_settings.dart';
-import 'package:reach_me/screens/home/timeline.dart';
+import 'package:reach_me/screens/timeline/timeline.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/screens/auth/login_screen.dart';
 import 'package:reach_me/screens/home/video_moment.dart';
-import 'package:reach_me/screens/home/notification.dart';
+import 'package:reach_me/screens/activity/presentation/notification.dart';
 import 'package:reach_me/screens/home/search.dart';
 import 'package:reach_me/screens/onboarding/onboarding.dart';
 import 'package:reach_me/screens/auth/reset_password.dart';
@@ -18,6 +18,10 @@ import 'package:reach_me/screens/onboarding/welcome_screen.dart';
 import 'package:reach_me/screens/splash_screen.dart';
 import 'package:reach_me/routes/page_route.dart';
 import 'package:flutter/material.dart';
+import 'package:reach_me/screens/video-call/video_call_screen.dart';
+import 'package:reach_me/screens/video-call/video_calling_screen.dart';
+import 'package:reach_me/screens/voice-call/voice_call_screen.dart';
+import 'package:reach_me/screens/voice-call/voice_calling_screen.dart';
 
 class RMRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -86,6 +90,18 @@ class RMRouter {
 
       case MsgChatInterface.id:
         return RMPageRoute(builder: (_) => const MsgChatInterface());
+
+      case VoiceCallScreen.id:
+        return RMPageRoute(builder: (_) => const VoiceCallScreen());
+
+       case VoiceCallingScreen.id:
+        return RMPageRoute(builder: (_) => const VoiceCallingScreen());
+        
+      case VideoCallScreen.id:
+        return RMPageRoute(builder: (_) => const VideoCallScreen());
+
+      case VideoCallingScreen.id:
+        return RMPageRoute(builder: (_) => const VideoCallingScreen());
 
       // case '/main-page':
       //   dynamic args = settings.arguments ?? {"index": 0};

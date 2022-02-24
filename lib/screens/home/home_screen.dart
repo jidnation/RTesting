@@ -1,8 +1,8 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/screens/account/account.dart';
-import 'package:reach_me/screens/home/timeline.dart';
+import 'package:reach_me/screens/timeline/timeline.dart';
 import 'package:reach_me/screens/home/video_moment.dart';
-import 'package:reach_me/screens/home/notification.dart';
+import 'package:reach_me/screens/activity/presentation/notification.dart';
 import 'package:reach_me/screens/home/search.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:flutter/material.dart';

@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final Size size;
   final String prefix;
   final EdgeInsetsGeometry? padding;
+  final double labelFontSize;
   const CustomButton({
     Key? key,
     required this.label,
@@ -20,6 +21,7 @@ class CustomButton extends StatelessWidget {
     required this.borderSide,
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
     this.prefix = '',
+    this.labelFontSize = 15,
   }) : super(key: key);
 
   @override
@@ -41,7 +43,7 @@ class CustomButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: labelFontSize,
                 color: textColor,
                 fontWeight: FontWeight.w600,
               ),

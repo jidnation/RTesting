@@ -1,5 +1,6 @@
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/bottom_sheet_list_tile.dart';
@@ -8,7 +9,11 @@ import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/chat/chats_list_screen.dart';
+import 'package:reach_me/screens/chat/widgets/bottom_sheet.dart';
+import 'package:reach_me/screens/chat/widgets/msg_bubble.dart';
 import 'package:reach_me/screens/home/view_comments.dart';
+import 'package:reach_me/screens/video-call/video_call_screen.dart';
+import 'package:reach_me/screens/voice-call/voice_call_screen.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -26,6 +31,13 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      _controller.animateTo(
+        _controller.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 10),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
@@ -85,7 +97,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             width: 40,
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/video call.svg'),
-              onPressed: () {},
+              onPressed: () {
+                NavigationService.navigateTo(VideoCallScreen.id);
+              },
               splashRadius: 20,
             ),
           ),
@@ -95,7 +109,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             width: 30,
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/voice call.svg'),
-              onPressed: () {},
+              onPressed: () {
+                NavigationService.navigateTo(VoiceCallScreen.id);
+              },
               splashRadius: 20,
             ),
           ),
@@ -124,7 +140,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      const ProfilePicture(height: 100, width: 100),
+                      const ProfilePicture(height: 80, width: 80),
                       const SizedBox(height: 5),
                       const Text('Rooney Brown',
                           style: TextStyle(
@@ -188,11 +204,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                             "English actor, typecast as the antihro, Born in shirebrook, Derbyshire",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: AppColors.greyShade2,
                                 fontWeight: FontWeight.w400),
                           )),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
                       SizedBox(
                           width: 130,
                           height: 41,
@@ -229,6 +245,30 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                 ),
                 MsgBubble(
                   size: size,
+                  isMe: false,
+                  label: 'Fine, thank you, and you?',
+                  timeStamp: '5:01 AM',
+                ),
+                MsgBubble(
+                  size: size,
+                  isMe: true,
+                  label: 'I am good',
+                  timeStamp: '5:01 AM',
+                ),
+                MsgBubble(
+                  size: size,
+                  isMe: false,
+                  label: 'Fine, thank you, and you?',
+                  timeStamp: '5:01 AM',
+                ),
+                MsgBubble(
+                  size: size,
+                  isMe: true,
+                  label: 'I am good',
+                  timeStamp: '5:01 AM',
+                ),
+                MsgBubble(
+                  size: size,
                   isMe: true,
                   label: 'Hello ReachMe, How are you doing today?',
                   timeStamp: '5:01 AM',
@@ -243,6 +283,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                 child: CustomRoundTextField(
                   textCapitalization: TextCapitalization.sentences,
                   hintText: 'Type Message...',
+                  hintStyle:
+                      const TextStyle(color: Color(0xFF666666), fontSize: 12),
                   prefixIcon: GestureDetector(
                     onTap: () {},
                     child: SvgPicture.asset(
@@ -254,23 +296,27 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          print('tapped camera icon');
+                        },
                         child: SvgPicture.asset(
                           'assets/svgs/camera icon blue.svg',
-                          width: 28,
-                          height: 22,
+                          width: 24,
+                          height: 18,
                         ),
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 15),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          print('tapped attach icon');
+                        },
                         child: SvgPicture.asset(
                           'assets/svgs/attach_svg.svg',
-                          width: 28,
-                          height: 22,
+                          width: 24,
+                          height: 18,
                         ),
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 15),
                     ],
                   ),
                 ),
@@ -279,110 +325,17 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               GestureDetector(
                   onTap: () {},
                   child: Container(
-                      padding: const EdgeInsets.all(9),
+                      padding: const EdgeInsets.all(7),
                       decoration: const BoxDecoration(
                         color: AppColors.primaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: SvgPicture.asset('assets/svgs/mic.svg',
-                          width: 30, height: 30)))
+                          width: 25, height: 25)))
             ],
           )
         ],
       ).paddingOnly(r: 15, l: 15, b: 15),
     );
   }
-}
-
-class MsgBubble extends StatelessWidget {
-  const MsgBubble({
-    Key? key,
-    required this.isMe,
-    required this.label,
-    required this.size,
-    required this.timeStamp,
-  }) : super(key: key);
-
-  final Size size;
-  final bool isMe;
-  final String label;
-  final String timeStamp;
-
-  @override
-  Widget build(BuildContext context) {
-    return Bubble(
-      margin: const BubbleEdges.only(top: 10),
-      alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-      nip: isMe ? BubbleNip.rightTop : BubbleNip.leftTop,
-      color: AppColors.white,
-      borderColor: const Color(0xFFE1E1E1),
-      borderWidth: 2,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: size.width / 1.5),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          textBaseline: TextBaseline.ideographic,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              child: Text(
-                label,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textColor2,
-                ),
-              ),
-            ),
-            const SizedBox(width: 5),
-            Align(
-                alignment: Alignment.bottomRight,
-                child: Text(
-                  timeStamp,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textColor2),
-                )),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Future showKebabBottomSheet(BuildContext context) {
-  return showModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) {
-        return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.greyShade7,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-            ),
-            child: ListView(shrinkWrap: true, children: [
-              Center(
-                child: Container(
-                    height: 4,
-                    width: 58,
-                    decoration: BoxDecoration(
-                        color: AppColors.greyShade4,
-                        borderRadius: BorderRadius.circular(40))),
-              ).paddingOnly(t: 23),
-              const SizedBox(height: 20),
-              KebabBottomTextButton(label: 'Mute message', onPressed: () {}),
-              KebabBottomTextButton(label: 'Clear chat', onPressed: () {}),
-              KebabBottomTextButton(label: 'Search', onPressed: () {}),
-              KebabBottomTextButton(label: 'Report', onPressed: () {}),
-              KebabBottomTextButton(label: 'Restrict', onPressed: () {}),
-              KebabBottomTextButton(label: 'Block', onPressed: () {}),
-              const SizedBox(height: 20),
-            ]));
-      });
 }
