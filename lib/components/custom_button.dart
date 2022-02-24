@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final BorderSide borderSide;
   final Size size;
   final String prefix;
+  final EdgeInsetsGeometry? padding;
   const CustomButton({
     Key? key,
     required this.label,
@@ -17,6 +18,7 @@ class CustomButton extends StatelessWidget {
     required this.size,
     required this.textColor,
     required this.borderSide,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
     this.prefix = '',
   }) : super(key: key);
 
@@ -27,7 +29,7 @@ class CustomButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+            padding: padding,
             backgroundColor: color,
             side: borderSide,
             shadowColor: const Color(0xFF323247)),

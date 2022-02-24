@@ -4,6 +4,7 @@ import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/auth/signup_screen.dart';
+import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/validator.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +41,8 @@ class LoginScreen extends HookConsumerWidget {
                     children: [
                       const Expanded(child: SizedBox()),
                       SvgPicture.asset(
-                        'assets/svgs/Logo.svg',
-                        width: size.width * 0.4,
+                        'assets/svgs/logo-new.svg',
+                        width: size.width * 0.15,
                       ),
                       const SizedBox(height: 40),
                       const Text(
@@ -98,8 +99,7 @@ class LoginScreen extends HookConsumerWidget {
                       CustomTextField(
                         hintText: '********',
                         obscureText: true,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
+                        keyboardType: TextInputType.text,
                         controller: _passwordController,
                         textCapitalization: TextCapitalization.none,
                         validator: (value) =>
@@ -130,7 +130,7 @@ class LoginScreen extends HookConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                       CustomButton(
-                        label: 'LOG IN',
+                        label: 'Done',
                         color: AppColors.primaryColor,
                         onPressed: () {
                           if (_key.currentState!.validate()) {
@@ -145,31 +145,6 @@ class LoginScreen extends HookConsumerWidget {
                         size: size,
                         textColor: AppColors.white,
                         borderSide: BorderSide.none,
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () =>
-                            NavigationService.navigateTo(SignUpScreen.id),
-                        child: RichText(
-                          textScaleFactor: 0.8,
-                          text: const TextSpan(
-                            text: "Don't have an acccount? ",
-                            style: TextStyle(
-                              color: AppColors.textColor,
-                              fontSize: 15,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Sign up',
-                                style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -197,12 +172,40 @@ class LoginScreen extends HookConsumerWidget {
                           label: 'Continue with Google',
                           prefix: 'assets/svgs/google.svg',
                           color: AppColors.white,
-                          onPressed: () {},
+                          onPressed: () {
+                            NavigationService.navigateTo(HomeScreen.id);
+                          },
                           size: size,
                           textColor: AppColors.primaryColor,
                           borderSide: const BorderSide(
                               width: 1, color: AppColors.primaryColor)),
-                      const Expanded(child: SizedBox())
+                      const Expanded(child: SizedBox()),
+                      GestureDetector(
+                        onTap: () =>
+                            NavigationService.navigateTo(SignUpScreen.id),
+                        child: RichText(
+                          textScaleFactor: 0.8,
+                          text: const TextSpan(
+                            text: "Don't have an acccount? ",
+                            style: TextStyle(
+                              color: AppColors.textColor,
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Sign up',
+                                style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: 15,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

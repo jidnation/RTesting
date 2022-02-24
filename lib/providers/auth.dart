@@ -149,8 +149,6 @@ class AuthServiceNotifier extends StateNotifier<ResultState> {
 
     ApiResult apiResult = await authServiceRepository.login(params);
 
-  
-
     apiResult.when(
       success: (data) {
         state = ResultState.data(data: data);
@@ -189,12 +187,10 @@ class AuthServiceNotifier extends StateNotifier<ResultState> {
 
     ApiResult apiResult = await authServiceRepository.forgotPassword(params);
 
-  
-
     apiResult.when(
       success: (data) {
         state = ResultState.data(data: data);
-       //String message = data["message"];
+        //String message = data["message"];
         String email = data["body"]["email"];
         String resetToken = data["body"]["resetToken"];
 

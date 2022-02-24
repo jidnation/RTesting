@@ -1,7 +1,9 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/utils/constants.dart';
+import 'package:reach_me/utils/extensions.dart';
 import 'package:reach_me/utils/validator.dart';
 import 'package:flutter/material.dart';
 
@@ -13,88 +15,64 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        width: size.width,
-        height: size.height,
-        color: AppColors.white,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              left: 16.0, right: 16.0, top: 50.0, bottom: 25.0),
+        body: SafeArea(
+      child: SizedBox(
+          height: size.height,
+          width: size.width,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => NavigationService.goBack(),
-                child: const Icon(Icons.close),
-              ),
-              const SizedBox(height: 70),
-              const Text(
-                "Reset Password",
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Center(
+                child: SvgPicture.asset(
+                  'assets/svgs/illustration 8-new.svg',
+                  height: 186,
+                  width: 290,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 60.0),
               const Text(
-                'Please enter your new password to continue',
+                'Reset Password',
                 style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textColor,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryColor,
+                  fontSize: 25,
                 ),
               ),
               const SizedBox(height: 40),
-              const Text(
-                'New password',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
               CustomTextField(
-                hintText: '********',
+                hintText: 'Enter new password',
                 obscureText: true,
-                keyboardType: TextInputType.visiblePassword,
+                keyboardType: TextInputType.text,
+                //controller: _passwordController,
                 textCapitalization: TextCapitalization.none,
                 validator: (value) => Validator.validatePassword(value ?? ""),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Repeat password',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textColor,
-                  fontWeight: FontWeight.bold,
+                suffixIcon: const Icon(
+                  Icons.visibility_off_outlined,
+                  color: AppColors.textFieldLabelColor,
                 ),
-              ),
-              const SizedBox(height: 10),
+              ).paddingSymmetric(h: 45.0),
+              const SizedBox(height: 30),
               CustomTextField(
-                hintText: '********',
+                hintText: 'Confirm new password',
                 obscureText: true,
-                keyboardType: TextInputType.visiblePassword,
+                keyboardType: TextInputType.text,
+                //controller: _passwordController,
                 textCapitalization: TextCapitalization.none,
                 validator: (value) => Validator.validatePassword(value ?? ""),
-              ),
-              const SizedBox(height: 16),
-              const Expanded(child: SizedBox()),
+              ).paddingSymmetric(h: 45.0),
+              const SizedBox(height: 40),
               CustomButton(
-                label: 'CHANGE PASSWORD',
+                label: 'Reset',
                 color: AppColors.primaryColor,
-                onPressed: () {
-                  // NavigationService.navigateTo(VerifyAccountScreen.id);
-                },
+                onPressed: () {},
                 size: size,
                 textColor: AppColors.white,
                 borderSide: BorderSide.none,
-              ),
-              const SizedBox(height: 20),
+              ).paddingSymmetric(h: 45.0),
             ],
-          ),
-        ),
-      ),
-    );
+          )),
+    ));
   }
 }

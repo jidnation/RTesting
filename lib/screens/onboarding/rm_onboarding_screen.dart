@@ -1,7 +1,8 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:reach_me/utils/constants.dart';
+import 'package:reach_me/utils/extensions.dart';
 
 class RMOnboardingScreen extends StatefulWidget {
   final List<RMOnboardingModel>? pages;
@@ -46,13 +47,14 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
 
   Widget _indicator(bool isActive) {
     return AnimatedContainer(
+      alignment: Alignment.center,
       duration: const Duration(milliseconds: 150),
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-      height: 12.0,
-      width: isActive ? 34.0 : 12.0,
+      margin: const EdgeInsets.symmetric(horizontal: 4.9),
+      height: 3.4,
+      width: 20.0,
       decoration: BoxDecoration(
         color: isActive ? widget.themeColor : const Color(0xFFC4C4C4),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
       ),
     );
   }
@@ -67,87 +69,86 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           height: size.height,
           width: size.width,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical:8.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      widget.skipClicked!("Skip Tapped");
-                    },
-                    child: const Text(
-                      'SKIP',
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
-                        fontSize: 17.0,
-                      ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: size.height * 0.6,
+                  width: size.width,
+                  child: Container(
+                    color: Colors.transparent,
+                    child: PageView(
+                        physics: const ClampingScrollPhysics(),
+                        controller: _pageController,
+                        onPageChanged: (int page) {
+                          setState(() {
+                            _currentPage = page;
+                          });
+                        },
+                        children: buildOnboardingPages()),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Align(
+                    alignment: FractionalOffset.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: _buildPageIndicator(),
                     ),
                   ),
                 ),
-                Container(
-                  height: size.height * 0.7,
-                  color: Colors.transparent,
-                  child: PageView(
-                      physics: const ClampingScrollPhysics(),
-                      controller: _pageController,
-                      onPageChanged: (int page) {
-                        setState(() {
-                          _currentPage = page;
-                        });
-                      },
-                      children: buildOnboardingPages()),
-                ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Align(
-                        alignment: FractionalOffset.bottomLeft,
-                        child: Row(
-                          children: _buildPageIndicator(),
+                    Align(
+                      alignment: FractionalOffset.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          bottom: 10,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            widget.skipClicked!("Skip Tapped");
+                          },
+                          child: const Text(
+                            'Skip',
+                            style: TextStyle(
+                                color: AppColors.greyShade3,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600),
+                          ).paddingAll(10),
                         ),
                       ),
                     ),
-                    _currentPage != widget.pages!.length - 1
-                        ? Align(
-                            alignment: FractionalOffset.bottomRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 20, bottom: 10),
-                              child: GestureDetector(
-                                onTap: () {
-                                  _pageController.nextPage(
-                                    duration:
-                                        const Duration(milliseconds: 500),
+                    Align(
+                      alignment: FractionalOffset.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20, bottom: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            _currentPage != widget.pages!.length - 1
+                                ? _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 500),
                                     curve: Curves.ease,
-                                  );
-                                },
-                                child: Container(
-                                  height: 45.0,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 8),
-                                  decoration: BoxDecoration(
-                                      color: widget.themeColor,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(6.0))),
-                                  child: const Center(
-                                    child: Text(
-                                      'NEXT',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        : const Text(''),
+                                  )
+                                : _getStartedTapped();
+                          },
+                          child: const Text(
+                            'Next',
+                            style: TextStyle(
+                                color: AppColors.primaryColor,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600),
+                          ).paddingAll(10),
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ],
@@ -155,75 +156,46 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           ),
         ),
       ),
-      bottomSheet: _currentPage == widget.pages!.length - 1
-          ? _showGetStartedButton()
-          : const Text(''),
     );
   }
 
   Widget _showPageData(RMOnboardingModel page) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Center(
-            child: SvgPicture.asset(
-              page.imagePath,
-              height: 350,
-              width: 350,
-            ),
-          ),
-          const SizedBox(height: 20.0),
-          page.title != '' ?Text(
-            page.title,
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              color: page.titleColor,
-              fontSize: 28,
-            ),
-          ) : const SizedBox(height: 5.0),
-          const SizedBox(height: 4.0),
-          Text(
-            page.description,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.normal,
-              height: 1.5,
-              color: page.descripColor,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _showGetStartedButton() {
-    final GestureDetector loginButtonWithGesture = GestureDetector(
-      onTap: _getStartedTapped,
-      child: Container(
-        height: 50.0,
-        decoration: BoxDecoration(
-            color: widget.themeColor,
-            borderRadius: const BorderRadius.all(Radius.circular(6.0))),
-        child: const Center(
-          child: Text(
-            'GET STARTED',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.w500),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Center(
+          child: SvgPicture.asset(
+            page.imagePath,
+            height: page.imagePath == 'assets/svgs/illustration 3-new.svg'
+                ? 190
+                : 220,
+            width: 220,
           ),
         ),
-      ),
+        const SizedBox(height: 96.0),
+        page.title != ''
+            ? Text(
+                page.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: page.titleColor,
+                  fontSize: 25,
+                ),
+              )
+            : const SizedBox(height: 5.0),
+        const SizedBox(height: 6.0),
+        Text(
+          page.description,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            color: page.descripColor,
+            fontSize: 16,
+          ),
+        ),
+      ],
     );
-
-    return Padding(
-        padding: const EdgeInsets.only(
-            left: 20.0, right: 20.0, top: 5.0, bottom: 30.0),
-        child: loginButtonWithGesture);
   }
 
   void _getStartedTapped() {
