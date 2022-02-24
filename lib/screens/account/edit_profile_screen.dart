@@ -4,7 +4,7 @@ import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/components/list_tile_switch.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/home/personal_info_settings.dart';
+import 'package:reach_me/screens/account/personal_info_settings.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 import 'package:reach_me/utils/validator.dart';

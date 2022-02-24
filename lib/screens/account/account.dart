@@ -5,7 +5,7 @@ import 'package:reach_me/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/home/edit_profile_screen.dart';
+import 'package:reach_me/screens/account/edit_profile_screen.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/screens/home/timeline.dart' hide showKebabBottomSheet;
 import 'package:reach_me/utils/constants.dart';

@@ -112,8 +112,7 @@ class SignUpScreen extends HookConsumerWidget {
                     CustomTextField(
                       hintText: '********',
                       obscureText: true,
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
+                      keyboardType: TextInputType.text,
                       controller: _passwordController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>

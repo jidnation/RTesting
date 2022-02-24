@@ -7,7 +7,7 @@ import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/home/chats_list_screen.dart';
+import 'package:reach_me/screens/chat/chats_list_screen.dart';
 import 'package:reach_me/screens/home/view_comments.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';

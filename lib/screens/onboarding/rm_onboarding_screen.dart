@@ -1,7 +1,6 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -197,32 +196,6 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
         ),
       ],
     );
-  }
-
-  Widget _showGetStartedButton() {
-    final GestureDetector loginButtonWithGesture = GestureDetector(
-      onTap: _getStartedTapped,
-      child: Container(
-        height: 50.0,
-        decoration: BoxDecoration(
-            color: widget.themeColor,
-            borderRadius: const BorderRadius.all(Radius.circular(6.0))),
-        child: const Center(
-          child: Text(
-            'GET STARTED',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.w500),
-          ),
-        ),
-      ),
-    );
-
-    return Padding(
-        padding: const EdgeInsets.only(
-            left: 20.0, right: 20.0, top: 5.0, bottom: 30.0),
-        child: loginButtonWithGesture);
   }
 
   void _getStartedTapped() {

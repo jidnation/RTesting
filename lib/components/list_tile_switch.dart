@@ -112,7 +112,9 @@ class CupertinoSwitchListTile extends StatelessWidget {
           trailing: control,
           isThreeLine: isThreeLine,
           dense: dense,
+          // ignore: unnecessary_null_comparison
           enabled: onChanged != null,
+          // ignore: unnecessary_null_comparison
           onTap: onChanged != null
               ? () {
                   onChanged(!value);

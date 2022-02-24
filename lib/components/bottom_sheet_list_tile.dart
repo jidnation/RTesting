@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:reach_me/utils/constants.dart';
-import 'package:reach_me/utils/extensions.dart';
 
 class KebabBottomTextButton extends StatelessWidget {
   const KebabBottomTextButton({Key? key, required this.label, this.onPressed})

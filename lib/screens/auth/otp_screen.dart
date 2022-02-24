@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/auth/reset_password.dart';
 import 'package:reach_me/utils/constants.dart';
 
 class OtpScreen extends StatelessWidget {
+  static const String id = 'otp_screen';
+
   final String? token;
   final String? uid;
-  static const String id = 'otp_screen';
+
+  //pin input
   late final String? altPin;
   final TextEditingController _pinPutController = TextEditingController();
   final FocusNode _pinPutFocusNode = FocusNode();
@@ -25,96 +28,91 @@ class OtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        width: size.width,
-        height: size.height,
-        color: AppColors.white,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              left: 16.0, right: 16.0, top: 50.0, bottom: 25.0),
+        body: SafeArea(
+      child: SizedBox(
+          height: size.height,
+          width: size.width,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () => NavigationService.goBack(),
-                child: const Icon(Icons.close),
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Center(
+                child: SvgPicture.asset(
+                  'assets/svgs/illustration 6-new.svg',
+                  height: 186,
+                  width: 290,
+                ),
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 60.0),
               const Text(
-                "Verify Account",
+                'Enter OTP',
                 style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.primaryColor,
+                  fontSize: 25,
                 ),
               ),
-              const SizedBox(height: 24),
-              RichText(
-                textScaleFactor: 0.8,
-                text: TextSpan(
-                  text: "Please enter the ",
-                  style: const TextStyle(
-                    color: AppColors.textColor,
-                    fontSize: 15,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'CODE $token ',
-                      style: const TextStyle(
-                        color: AppColors.textColor,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const TextSpan(
-                      text: 'sent to your email in the boxes below.',
-                      style: TextStyle(
-                        color: AppColors.textColor,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8.0),
+              const Text(
+                'An 4 digit code has been sent to your email: stanqicha@gmail.com',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF1B1B1A),
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 40),
               Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 45.0),
                 child: PinPut(
-                    fieldsCount: 6,
+                    fieldsCount: 4,
+                    separator: const SizedBox(width: 15.0),
+                    mainAxisSize: MainAxisSize.max,
+                    fieldsAlignment: MainAxisAlignment.spaceEvenly,
                     onSubmit: (String pin) =>
                         {NavigationService.navigateTo(ResetPasswordScreen.id)},
                     focusNode: _pinPutFocusNode,
                     controller: _pinPutController,
-                    submittedFieldDecoration: _pinPutDecoration.copyWith(
-                        borderRadius: BorderRadius.circular(20.0)),
+                    submittedFieldDecoration: _pinPutDecoration.copyWith(),
                     selectedFieldDecoration: _pinPutDecoration,
                     followingFieldDecoration: _pinPutDecoration.copyWith(
-                      borderRadius: BorderRadius.circular(5.0),
                       border: Border.all(color: const Color(0xFFF2EFEF)),
                     ),
                     cursor: const Text('|'),
                     withCursor: true,
-                    initialValue: '*',
-                    preFilledWidget: const Text('*')),
+                    initialValue: '',
+                    preFilledWidget: const Text('')),
               ),
-              const SizedBox(height: 16),
-              const Expanded(child: SizedBox()),
-              CustomButton(
-                label: 'VERIFY ACCOUNT',
-                color: AppColors.primaryColor,
-                onPressed: () {
-                  NavigationService.navigateTo(ResetPasswordScreen.id);
-                },
-                size: size,
-                textColor: AppColors.white,
-                borderSide: BorderSide.none,
+              const SizedBox(height: 40),
+              GestureDetector(
+                onTap: () {},
+                child: RichText(
+                  textScaleFactor: 0.8,
+                  text: const TextSpan(
+                    text: "Didn't receive a code? ",
+                    style: TextStyle(
+                      color: AppColors.textColor,
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Resend',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 15,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
             ],
-          ),
-        ),
-      ),
-    );
+          )),
+    ));
   }
 }

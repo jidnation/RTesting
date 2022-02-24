@@ -1,5 +1,4 @@
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/auth/login_screen.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_model.dart';
 import 'package:reach_me/screens/onboarding/rm_onboarding_screen.dart';
 import 'package:flutter/material.dart';
