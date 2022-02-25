@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:reach_me/components/profile_picture.dart';
-import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/utils/constants.dart';
 
 class VoiceCallingScreen extends StatelessWidget {

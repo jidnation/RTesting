@@ -6,6 +6,7 @@ import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/account/edit_profile_screen.dart';
+import 'package:reach_me/screens/account/starred_profile.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
 import 'package:reach_me/screens/timeline/timeline.dart' hide showKebabBottomSheet;
 import 'package:reach_me/utils/constants.dart';
@@ -93,7 +94,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 icon: SvgPicture.asset('assets/svgs/more-vertical.svg',
                     color: AppColors.white),
                 onPressed: () async {
-                  await showKebabBottomSheet(context);
+                  await showKebabBottomSheets(context);
                 },
                 splashRadius: 20,
               )
@@ -474,6 +475,42 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 }
 
+Future showKebabBottomSheets(BuildContext context) {
+  return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.greyShade7,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              ),
+            ),
+            child: ListView(shrinkWrap: true, children: [
+              Center(
+                child: Container(
+                    height: 4,
+                    width: 58,
+                    decoration: BoxDecoration(
+                        color: AppColors.greyShade4,
+                        borderRadius: BorderRadius.circular(40))),
+              ).paddingOnly(t: 23),
+              const SizedBox(height: 20),
+              KebabBottomTextButton(label: 'Dictionary', onPressed: () {}),
+              KebabBottomTextButton(label: 'Abbreviation', onPressed: () {}),
+              KebabBottomTextButton(label: 'Starred Profile', onPressed: () {
+                NavigationService.navigateTo(StarredProfileScreen.id);
+              }),
+              KebabBottomTextButton(label: 'QR Code', onPressed: () {}),
+              KebabBottomTextButton(label: 'Saved Post', onPressed: () {}),
+              KebabBottomTextButton(label: 'Share Profile', onPressed: () {}),
+              KebabBottomTextButton(label: 'More', onPressed: () {}),
+              const SizedBox(height: 20),
+            ]));
+      });
+}
 Future showKebabBottomSheet(BuildContext context) {
   return showModalBottomSheet(
       backgroundColor: Colors.transparent,

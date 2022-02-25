@@ -1,3 +1,4 @@
+import 'package:reach_me/screens/account/starred_profile.dart';
 import 'package:reach_me/screens/auth/otp_screen.dart';
 import 'package:reach_me/screens/account/account.dart';
 import 'package:reach_me/screens/chat/chats_list_screen.dart';
@@ -87,6 +88,9 @@ class RMRouter {
 
       case PersonalInfoSettings.id:
         return RMPageRoute(builder: (_) => const PersonalInfoSettings());
+
+      case StarredProfileScreen.id:
+        return RMPageRoute(builder: (_) => const StarredProfileScreen());
 
       case MsgChatInterface.id:
         return RMPageRoute(builder: (_) => const MsgChatInterface());

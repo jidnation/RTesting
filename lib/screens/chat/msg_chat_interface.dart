@@ -1,17 +1,14 @@
-import 'package:bubble/bubble.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:reach_me/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/custom_textfield.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/chat/chats_list_screen.dart';
 import 'package:reach_me/screens/chat/widgets/bottom_sheet.dart';
 import 'package:reach_me/screens/chat/widgets/msg_bubble.dart';
-import 'package:reach_me/screens/home/view_comments.dart';
 import 'package:reach_me/screens/video-call/video_call_screen.dart';
 import 'package:reach_me/screens/voice-call/voice_call_screen.dart';
 import 'package:reach_me/utils/constants.dart';
