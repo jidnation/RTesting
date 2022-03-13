@@ -51,6 +51,7 @@ class Validator {
     } else if (!regExp.hasMatch(fullName)) {
       return 'Please enter valid full name';
     }
+    return null;
   }
 
   static String? validateText(String value) {

@@ -5,7 +5,6 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/auth/verify_account.dart';
 import 'package:reach_me/screens/auth/verify_account_success.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reach_me/core/result_state.dart';

@@ -1,10 +1,15 @@
-import 'package:reach_me/screens/account/starred_profile.dart';
+import 'package:reach_me/screens/account/views/abbreviation.dart';
+import 'package:reach_me/screens/account/views/dictionary.dart';
+import 'package:reach_me/screens/account/views/qr_code.dart';
+import 'package:reach_me/screens/account/views/saved_post.dart';
+import 'package:reach_me/screens/account/views/scan_qr_code.dart';
+import 'package:reach_me/screens/account/views/starred_profile.dart';
 import 'package:reach_me/screens/auth/otp_screen.dart';
-import 'package:reach_me/screens/account/account.dart';
+import 'package:reach_me/screens/account/views/account.dart';
 import 'package:reach_me/screens/chat/chats_list_screen.dart';
-import 'package:reach_me/screens/account/edit_profile_screen.dart';
+import 'package:reach_me/screens/account/views/edit_profile_screen.dart';
 import 'package:reach_me/screens/chat/msg_chat_interface.dart';
-import 'package:reach_me/screens/account/personal_info_settings.dart';
+import 'package:reach_me/screens/account/views/personal_info_settings.dart';
 import 'package:reach_me/screens/timeline/timeline.dart';
 import 'package:reach_me/screens/auth/forgot_password.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
@@ -66,13 +71,13 @@ class RMRouter {
         return RMPageRoute(builder: (_) => const HomeScreen());
 
       case TimelineScreen.id:
-        return RMPageRoute(builder: (_) => const TimelineScreen());
+        return RMPageRoute(builder: (_) =>  TimelineScreen());
 
       case ChatsListScreen.id:
         return RMPageRoute(builder: (_) => const ChatsListScreen());
 
       case SearchScreen.id:
-        return RMPageRoute(builder: (_) => const SearchScreen());
+        return RMPageRoute(builder: (_) =>  SearchScreen());
 
       case VideoMomentScreen.id:
         return RMPageRoute(builder: (_) => const VideoMomentScreen());
@@ -106,6 +111,21 @@ class RMRouter {
 
       case VideoCallingScreen.id:
         return RMPageRoute(builder: (_) => const VideoCallingScreen());
+
+      case SavedPostScreen.id:
+        return RMPageRoute(builder: (_) => const SavedPostScreen());
+
+      case QRCodeScreen.id:
+        return RMPageRoute(builder: (_) => const QRCodeScreen());
+
+      case ScanQRCodeScreen.id:
+        return RMPageRoute(builder: (_) => const ScanQRCodeScreen());
+
+      case Dictionary.id:
+        return RMPageRoute(builder: (_) => const Dictionary());
+
+      case Abbreviation.id:
+        return RMPageRoute(builder: (_) => const Abbreviation());
 
       // case '/main-page':
       //   dynamic args = settings.arguments ?? {"index": 0};

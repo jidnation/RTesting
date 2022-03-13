@@ -3,9 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/activity/widgets/month_notification_item.dart';
-import 'package:reach_me/screens/activity/widgets/new_notification_item.dart';
-import 'package:reach_me/screens/activity/widgets/week_notification_item.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -32,12 +29,13 @@ class StarredProfileScreen extends StatelessWidget {
           title: const Text(
             'Starred Profile',
             style: TextStyle(
-                fontSize: 28,
+                fontSize: 22,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textColor2),
           ),
         ),
         body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

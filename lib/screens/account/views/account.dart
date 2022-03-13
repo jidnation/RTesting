@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:reach_me/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/components/custom_button.dart';
 import 'package:reach_me/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/screens/account/edit_profile_screen.dart';
-import 'package:reach_me/screens/account/starred_profile.dart';
+import 'package:reach_me/screens/account/views/edit_profile_screen.dart';
+import 'package:reach_me/screens/account/widgets/bottom_sheets.dart';
+import 'package:reach_me/screens/account/widgets/comment_reacher_card.dart';
 import 'package:reach_me/screens/home/home_screen.dart';
-import 'package:reach_me/screens/timeline/timeline.dart' hide showKebabBottomSheet;
+import 'package:reach_me/screens/timeline/timeline.dart'
+    hide showKebabBottomSheet;
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
@@ -94,7 +95,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 icon: SvgPicture.asset('assets/svgs/more-vertical.svg',
                     color: AppColors.white),
                 onPressed: () async {
-                  await showKebabBottomSheets(context);
+                  await showKebabBottomSheet(context);
                 },
                 splashRadius: 20,
               )
@@ -297,132 +298,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         shrinkWrap: true,
                         children: [
                           const SizedBox(height: 14),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Container(
-                              width: size.width,
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(25),
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: AppColors.blackShade4,
-                                      offset: Offset(0, 4),
-                                      blurRadius: 8,
-                                      spreadRadius: 0)
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            clipBehavior: Clip.hardEdge,
-                                            child: Image.asset(
-                                                'assets/images/user.png',
-                                                fit: BoxFit.fill),
-                                            decoration: const BoxDecoration(
-                                                shape: BoxShape.circle),
-                                          ).paddingOnly(l: 15, t: 10),
-                                          const SizedBox(width: 9),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const Text('Rooney Brown',
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: AppColors
-                                                              .textColor2)),
-                                                  const SizedBox(width: 3),
-                                                  SvgPicture.asset(
-                                                      'assets/svgs/verified.svg')
-                                                ],
-                                              ),
-                                              RichText(
-                                                text: const TextSpan(
-                                                    text: 'Comments on ',
-                                                    style: TextStyle(
-                                                      fontSize: 9,
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color:
-                                                          AppColors.textColor4,
-                                                      height: 1,
-                                                    ),
-                                                    children: [
-                                                      TextSpan(
-                                                          text: '@tayy_dev',
-                                                          style: TextStyle(
-                                                            fontSize: 9,
-                                                            color: AppColors
-                                                                .primaryColor,
-                                                            fontFamily:
-                                                                'Poppins',
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            height: 1,
-                                                          ))
-                                                    ]),
-                                              ),
-                                              const SizedBox(height: 3),
-                                              const Text(
-                                                '22 Jan',
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontFamily: 'Poppins',
-                                                  fontWeight: FontWeight.w400,
-                                                  color: AppColors.textColor4,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            ],
-                                          ).paddingOnly(t: 10),
-                                        ],
-                                      ),
-                                      IconButton(
-                                          onPressed: () async {
-                                            await showKebabBottomSheet(context);
-                                          },
-                                          iconSize: 19,
-                                          padding: const EdgeInsets.all(0),
-                                          icon: SvgPicture.asset(
-                                              'assets/svgs/more-vertical.svg'))
-                                    ],
-                                  ),
-                                  Flexible(
-                                    child: const Text(
-                                      "Someone said “when you become independent, you’ld understand why the prodigal son came back home”",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ).paddingSymmetric(v: 10, h: 15),
-                                  ),
-                                  const SizedBox(height: 20)
-                                ],
-                              ),
-                            ),
-                          )
+                          CommentReacherCard(size: size)
                         ],
                       ),
                       ListView(
@@ -473,70 +349,4 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
     );
   }
-}
-
-Future showKebabBottomSheets(BuildContext context) {
-  return showModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) {
-        return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.greyShade7,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-            ),
-            child: ListView(shrinkWrap: true, children: [
-              Center(
-                child: Container(
-                    height: 4,
-                    width: 58,
-                    decoration: BoxDecoration(
-                        color: AppColors.greyShade4,
-                        borderRadius: BorderRadius.circular(40))),
-              ).paddingOnly(t: 23),
-              const SizedBox(height: 20),
-              KebabBottomTextButton(label: 'Dictionary', onPressed: () {}),
-              KebabBottomTextButton(label: 'Abbreviation', onPressed: () {}),
-              KebabBottomTextButton(label: 'Starred Profile', onPressed: () {
-                NavigationService.navigateTo(StarredProfileScreen.id);
-              }),
-              KebabBottomTextButton(label: 'QR Code', onPressed: () {}),
-              KebabBottomTextButton(label: 'Saved Post', onPressed: () {}),
-              KebabBottomTextButton(label: 'Share Profile', onPressed: () {}),
-              KebabBottomTextButton(label: 'More', onPressed: () {}),
-              const SizedBox(height: 20),
-            ]));
-      });
-}
-Future showKebabBottomSheet(BuildContext context) {
-  return showModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      context: context,
-      builder: (context) {
-        return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.greyShade7,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-              ),
-            ),
-            child: ListView(shrinkWrap: true, children: [
-              Center(
-                child: Container(
-                    height: 4,
-                    width: 58,
-                    decoration: BoxDecoration(
-                        color: AppColors.greyShade4,
-                        borderRadius: BorderRadius.circular(40))),
-              ).paddingOnly(t: 23),
-              const SizedBox(height: 20),
-              KebabBottomTextButton(label: 'Delete comment', onPressed: () {}),
-              KebabBottomTextButton(label: 'Share', onPressed: () {}),
-              const SizedBox(height: 20),
-            ]));
-      });
 }

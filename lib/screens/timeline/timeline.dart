@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,42 +7,52 @@ import 'package:reach_me/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/screens/chat/chats_list_screen.dart';
 import 'package:reach_me/screens/home/view_comments.dart';
+import 'package:reach_me/components/media_card.dart';
+import 'package:reach_me/screens/home/widgets/app_drawer.dart';
 import 'package:reach_me/utils/constants.dart';
 import 'package:reach_me/utils/extensions.dart';
 
 class TimelineScreen extends StatelessWidget {
   static const String id = "timeline_screen";
+  TimelineScreen({Key? key}) : super(key: key);
 
-  const TimelineScreen({Key? key}) : super(key: key);
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List<DemoSourceEntity> sourceList = [
+    DemoSourceEntity(0, 'image', 'http://file.jinxianyun.com/inter_06.jpg'),
+    DemoSourceEntity(1, 'image', 'http://file.jinxianyun.com/inter_05.jpg'),
+    DemoSourceEntity(2, 'image', 'http://file.jinxianyun.com/inter_02.jpg'),
+    DemoSourceEntity(3, 'image', 'http://file.jinxianyun.com/inter_03.gif'),
+    DemoSourceEntity(4, 'video', 'http://file.jinxianyun.com/inter_04.mp4',
+        previewUrl: 'http://file.jinxianyun.com/inter_04_pre.png'),
+    DemoSourceEntity(5, 'video',
+        'http://file.jinxianyun.com/6438BF272694486859D5DE899DD2D823.mp4',
+        previewUrl: 'http://file.jinxianyun.com/102.png'),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    List<DemoSourceEntity> sourceList = [
-      DemoSourceEntity(0, 'image', 'http://file.jinxianyun.com/inter_06.jpg'),
-      DemoSourceEntity(1, 'image', 'http://file.jinxianyun.com/inter_05.jpg'),
-      DemoSourceEntity(2, 'image', 'http://file.jinxianyun.com/inter_02.jpg'),
-      DemoSourceEntity(3, 'image', 'http://file.jinxianyun.com/inter_03.gif'),
-      DemoSourceEntity(4, 'video', 'http://file.jinxianyun.com/inter_04.mp4',
-          previewUrl: 'http://file.jinxianyun.com/inter_04_pre.png'),
-      DemoSourceEntity(5, 'video',
-          'http://file.jinxianyun.com/6438BF272694486859D5DE899DD2D823.mp4',
-          previewUrl: 'http://file.jinxianyun.com/102.png'),
-    ];
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
+      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.white,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.white,
-          statusBarIconBrightness: Brightness.dark, // For Android (dark icons)
-          statusBarBrightness: Brightness.light, // For iOS (dark icons)
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness:
+              Platform.isAndroid ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.grey,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
         shadowColor: const Color(0x1A000000),
         elevation: 4,
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
-              
+              scaffoldKey.currentState!.openDrawer();
             },
             icon: Container(
                 width: 30,
@@ -53,7 +65,7 @@ class TimelineScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ))),
-      //  title: SvgPicture.asset('assets/svgs/Logo.svg', width: 100, height: 25),
+        //  title: SvgPicture.asset('assets/svgs/Logo.svg', width: 100, height: 25),
         actions: [
           IconButton(
             icon: SvgPicture.asset('assets/svgs/Vector.svg',
@@ -256,38 +268,7 @@ class ReacherCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Flexible(
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 152,
-                        width: 152,
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          image: const DecorationImage(
-                              image: AssetImage('assets/images/post.png'),
-                              fit: BoxFit.fitHeight),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: size.width * 0.12,
-                        left: size.width * 0.12,
-                        child: Container(
-                          decoration: const BoxDecoration(boxShadow: [
-                            BoxShadow(
-                                color: Color(0x80000000),
-                                offset: Offset(0, 0),
-                                blurRadius: 7,
-                                spreadRadius: 0)
-                          ]),
-                          child: SvgPicture.asset('assets/svgs/video play.svg',
-                              color: AppColors.white,
-                              height: size.width * 0.15,
-                              width: size.width * 0.15),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: MediaCard(size: size),
                 ),
               ],
             ).paddingOnly(r: 16, l: 16, b: 16, t: 10),

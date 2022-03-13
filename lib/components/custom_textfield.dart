@@ -89,7 +89,7 @@ class CustomRoundTextField extends StatelessWidget {
       this.borderRadius = 54,
       this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 15),
       this.textStyle = const TextStyle(color: AppColors.black, fontSize: 15),
-      required this.textCapitalization})
+      this.textCapitalization = TextCapitalization.none})
       : super(key: key);
 
   @override
