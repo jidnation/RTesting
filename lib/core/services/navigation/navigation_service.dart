@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reach_me/routes/page_route.dart';
+import 'package:reach_me/core/routes/page_route.dart';
 // import 'package:injectable/injectable.dart';
 
 // @singleton

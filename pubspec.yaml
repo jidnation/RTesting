@@ -48,6 +48,7 @@ dependencies:
   flutter_svg: ^1.0.3
   readmore: ^2.1.0
   bubble: ^1.2.1
+  graphql_flutter: ^5.0.1
 
 dev_dependencies:
   flutter_test:
