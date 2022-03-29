@@ -1,5 +1,6 @@
-import 'package:reach_me/helper/endpoints.dart';
+
 import 'package:dio/dio.dart';
+import 'package:reach_me/core/helper/endpoints.dart';
 
 class ApiClient {
   static const String _baseUrl = Endpoints.baseUrl;
