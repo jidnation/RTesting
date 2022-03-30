@@ -1,3 +1,4 @@
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
@@ -8,18 +9,17 @@ import 'package:reach_me/features/home/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LoginScreen extends HookConsumerWidget {
+class LoginScreen extends HookWidget {
   static const String id = 'login_screen';
   LoginScreen({Key? key}) : super(key: key);
 
   final GlobalKey<FormState> _key = GlobalKey();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final _emailController = useTextEditingController();
+    final _passwordController = useTextEditingController();
     var size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: AppColors.white,

@@ -10,7 +10,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class EditProfileScreen extends HookWidget {
+class EditProfileScreen extends StatelessWidget {
   static const String id = "edit_profile_screen";
   const EditProfileScreen({Key? key}) : super(key: key);
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class EWSnackBar {
+class RMSnackBar {
   static showSuccessSnackBar(BuildContext context,
       {required String message,
       int milliseconds = 10000,

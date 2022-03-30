@@ -1,15 +1,9 @@
-
 import 'package:dio/dio.dart';
-import 'package:reach_me/core/helper/endpoints.dart';
 
 class ApiClient {
-  static const String _baseUrl = Endpoints.baseUrl;
+  static const String _baseUrl = 'Endpoints.baseUrl';
   final Dio _dio;
-  ApiClient({Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
-              baseUrl: _baseUrl,
-            ));
+  ApiClient({Dio? dio}) : _dio = dio ?? Dio(BaseOptions(baseUrl: _baseUrl));
 
   Future<dynamic> get(String url, {Map<String, dynamic>? params}) async {
     try {

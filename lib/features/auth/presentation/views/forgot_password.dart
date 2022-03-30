@@ -6,16 +6,16 @@ import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ForgotPasswordScreen extends HookConsumerWidget {
+
+class ForgotPasswordScreen extends StatelessWidget {
   static const String id = 'forgot_password';
   const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   //final TextEditingController _emailController = TextEditingController();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         body: SafeArea(
