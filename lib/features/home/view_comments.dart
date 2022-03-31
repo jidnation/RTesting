@@ -32,7 +32,7 @@ class ViewCommentsScreen extends StatelessWidget {
               width: 19,
               height: 12,
             ),
-            onPressed: () => NavigationService.goBack(),
+            onPressed: () => RouteNavigators.pop(context),
           ),
           title: const Text('Comments',
               style: TextStyle(

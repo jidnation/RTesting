@@ -70,88 +70,90 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           width: size.width,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: size.height * 0.6,
-                  width: size.width,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: PageView(
-                        physics: const ClampingScrollPhysics(),
-                        controller: _pageController,
-                        onPageChanged: (int page) {
-                          setState(() {
-                            _currentPage = page;
-                          });
-                        },
-                        children: buildOnboardingPages()),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Align(
-                    alignment: FractionalOffset.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: _buildPageIndicator(),
+            child: Center(
+              child: ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: size.height * 0.6,
+                    width: size.width,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: PageView(
+                          physics: const ClampingScrollPhysics(),
+                          controller: _pageController,
+                          onPageChanged: (int page) {
+                            setState(() {
+                              _currentPage = page;
+                            });
+                          },
+                          children: buildOnboardingPages()),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: FractionalOffset.bottomLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 20,
-                          bottom: 10,
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            widget.skipClicked!("Skip Tapped");
-                          },
-                          child: const Text(
-                            'Skip',
-                            style: TextStyle(
-                                color: AppColors.greyShade3,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600),
-                          ).paddingAll(10),
-                        ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Align(
+                      alignment: FractionalOffset.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: _buildPageIndicator(),
                       ),
                     ),
-                    Align(
-                      alignment: FractionalOffset.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 20, bottom: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            _currentPage != widget.pages!.length - 1
-                                ? _pageController.nextPage(
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.ease,
-                                  )
-                                : _getStartedTapped();
-                          },
-                          child: const Text(
-                            'Next',
-                            style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600),
-                          ).paddingAll(10),
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: FractionalOffset.bottomLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            bottom: 10,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              widget.skipClicked!("Skip Tapped");
+                            },
+                            child: const Text(
+                              'Skip',
+                              style: TextStyle(
+                                  color: AppColors.greyShade3,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600),
+                            ).paddingAll(10),
+                          ),
                         ),
                       ),
-                    )
-                  ],
-                ),
-              ],
+                      Align(
+                        alignment: FractionalOffset.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20, bottom: 10),
+                          child: GestureDetector(
+                            onTap: () {
+                              _currentPage != widget.pages!.length - 1
+                                  ? _pageController.nextPage(
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.ease,
+                                    )
+                                  : _getStartedTapped();
+                            },
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(
+                                  color: AppColors.primaryColor,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600),
+                            ).paddingAll(10),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -19,8 +19,8 @@ class VideoCallScreen extends StatelessWidget {
         child: Stack(
           children: [
             GestureDetector(
-              onTap: (){
-                NavigationService.navigateTo(VideoCallingScreen.id);
+              onTap: () {
+                RouteNavigators.route(context, const VideoCallingScreen());
               },
               child: Container(
                 decoration: const BoxDecoration(

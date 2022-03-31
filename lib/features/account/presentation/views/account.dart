@@ -89,7 +89,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   height: 12,
                   color: AppColors.white,
                 ),
-                onPressed: () => NavigationService.navigateTo(HomeScreen.id),
+                onPressed: () =>
+                    RouteNavigators.route(context, const HomeScreen()),
               ),
               IconButton(
                 icon: SvgPicture.asset('assets/svgs/more-vertical.svg',
@@ -123,7 +124,6 @@ class _AccountScreenState extends State<AccountScreen> {
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollViewController.position.userScrollDirection ==
                 ScrollDirection.reverse) {
-        
               setState(() {
                 message = 'going down';
                 width = 50;
@@ -133,7 +133,6 @@ class _AccountScreenState extends State<AccountScreen> {
             } else {
               if (scrollViewController.position.userScrollDirection ==
                   ScrollDirection.forward) {
-      
                 setState(() {
                   message = 'going up';
 
@@ -254,17 +253,18 @@ class _AccountScreenState extends State<AccountScreen> {
                                 width: 130,
                                 height: 41,
                                 child: CustomButton(
-                                    label: 'Edit Profile',
-                                    color: AppColors.primaryColor,
-                                    onPressed: () {
-                                      NavigationService.navigateTo(
-                                          EditProfileScreen.id);
-                                    },
-                                    size: size,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 9, horizontal: 21),
-                                    textColor: AppColors.white,
-                                    borderSide: BorderSide.none)),
+                                  label: 'Edit Profile',
+                                  color: AppColors.primaryColor,
+                                  onPressed: () {
+                                    RouteNavigators.route(
+                                        context, const EditProfileScreen());
+                                  },
+                                  size: size,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 9, horizontal: 21),
+                                  textColor: AppColors.white,
+                                  borderSide: BorderSide.none,
+                                )),
                             const SizedBox(height: 15),
                           ],
                         ).paddingOnly(t: 50),

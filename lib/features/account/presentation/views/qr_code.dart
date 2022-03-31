@@ -20,7 +20,7 @@ class QRCodeScreen extends StatelessWidget {
         leading: IconButton(
             icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                 width: 19, height: 12, color: AppColors.black),
-            onPressed: () => NavigationService.goBack()),
+            onPressed: () => RouteNavigators.pop(context)),
         actions: [
           IconButton(
               icon: SvgPicture.asset('assets/svgs/share icon.svg',
@@ -40,8 +40,7 @@ class QRCodeScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                NavigationService.navigateTransparentRoute(
-                    context, const ScanQRCodeScreen(), 0, -1);
+                RouteNavigators.route(context, const ScanQRCodeScreen());
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

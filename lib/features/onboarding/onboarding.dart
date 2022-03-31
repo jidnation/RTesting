@@ -28,7 +28,6 @@ class OnboardingScreen extends StatelessWidget {
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
         imagePath: 'assets/svgs/illustration 3-new.svg'),
- 
   ];
   @override
   Widget build(BuildContext context) {
@@ -42,10 +41,10 @@ class OnboardingScreen extends StatelessWidget {
           themeColor: AppColors.primaryColor,
           pages: pages,
           skipClicked: (value) {
-            NavigationService.navigateTo(WelcomeScreen.id);
+            RouteNavigators.route(context, const WelcomeScreen());
           },
           getStartedClicked: (value) {
-            NavigationService.navigateTo(WelcomeScreen.id);
+            RouteNavigators.route(context, const WelcomeScreen());
           },
         ),
       ),

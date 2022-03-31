@@ -10,7 +10,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class EditProfileScreen extends HookWidget {
+class EditProfileScreen extends StatelessWidget {
   static const String id = "edit_profile_screen";
   const EditProfileScreen({Key? key}) : super(key: key);
 
@@ -46,7 +46,7 @@ class EditProfileScreen extends HookWidget {
                       height: 12,
                       color: AppColors.white,
                     ),
-                    onPressed: () => NavigationService.goBack()),
+                    onPressed: () => RouteNavigators.pop(context)),
                 IconButton(
                   icon: SvgPicture.asset('assets/svgs/more-vertical.svg',
                       color: AppColors.white),
@@ -218,7 +218,7 @@ class EditProfileScreen extends HookWidget {
                   trackColor: const Color(0xFFE9E8E8)),
               TextButton(
                 onPressed: () {
-                  NavigationService.navigateTo(PersonalInfoSettings.id);
+                  RouteNavigators.route(context, const PersonalInfoSettings());
                 },
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 child: Row(
@@ -241,5 +241,3 @@ class EditProfileScreen extends HookWidget {
     ));
   }
 }
-
-

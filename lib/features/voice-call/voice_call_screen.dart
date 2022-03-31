@@ -20,7 +20,7 @@ class VoiceCallScreen extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                NavigationService.navigateTo(VoiceCallingScreen.id);
+                RouteNavigators.route(context, const VoiceCallingScreen());
               },
               child: Container(
                 decoration: const BoxDecoration(

@@ -72,9 +72,8 @@ class TimelineScreen extends StatelessWidget {
             icon: SvgPicture.asset('assets/svgs/Vector.svg',
                 width: 25, height: 25),
             onPressed: () {
-              NavigationService.navigateTransparentRoute(
-                  context, const ChatsListScreen(), 1.0, 0.0);
-              // NavigationService.navigateTo(ChatsListScreen.id);
+              RouteNavigators.route(context, const ChatsListScreen());
+              // RouteNavigators.route(context,ChatsListScreen.id);
             },
           ),
         ],
@@ -306,8 +305,8 @@ class ReacherCard extends StatelessWidget {
                     Flexible(
                       child: IconButton(
                         onPressed: () {
-                          NavigationService.navigateTransparentRoute(
-                              context, const ViewCommentsScreen(), 0, 1);
+                          RouteNavigators.route(
+                              context, const ViewCommentsScreen());
                         },
                         padding: const EdgeInsets.all(0),
                         constraints: const BoxConstraints(),

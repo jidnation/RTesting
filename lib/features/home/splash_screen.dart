@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/onboarding/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -21,12 +22,13 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
   @override
   void initState() {
     super.initState();
+    globals.init();
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2000));
     _controller.forward();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        NavigationService.navigateToReplace(OnboardingScreen.id);
+        RouteNavigators.routeReplace(context, OnboardingScreen());
       }
     });
   }
@@ -98,7 +100,8 @@ class SplashScreen extends StatelessWidget {
                           children: [
                             const SizedBox(),
                             Center(
-                              child: SvgPicture.asset('assets/svgs/logo-new.svg'),
+                              child:
+                                  SvgPicture.asset('assets/svgs/logo-new.svg'),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 40.0),

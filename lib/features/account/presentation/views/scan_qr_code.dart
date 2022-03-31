@@ -19,7 +19,7 @@ class ScanQRCodeScreen extends StatelessWidget {
         leading: IconButton(
             icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                 width: 19, height: 12, color: AppColors.black),
-            onPressed: () => NavigationService.goBack()),
+            onPressed: () => RouteNavigators.pop(context)),
         actions: [
           IconButton(
               icon: SvgPicture.asset('assets/svgs/image.svg',
@@ -38,7 +38,7 @@ class ScanQRCodeScreen extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () => NavigationService.goBack(),
+              onPressed: () => RouteNavigators.pop(context),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,

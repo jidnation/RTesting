@@ -54,7 +54,7 @@ class VerifyAccountSuccess extends StatelessWidget {
                     label: 'CONTINUE TO LOG IN',
                     color: AppColors.secondaryColor,
                     onPressed: () {
-                      NavigationService.navigateTo(LoginScreen.id);
+                      RouteNavigators.route(context, LoginScreen());
                     },
                     size: size,
                     textColor: Colors.white,

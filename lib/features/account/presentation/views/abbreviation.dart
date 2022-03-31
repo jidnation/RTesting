@@ -21,7 +21,7 @@ class Abbreviation extends StatelessWidget {
                 height: 12,
                 color: AppColors.black,
               ),
-              onPressed: () => NavigationService.goBack()),
+              onPressed: () => RouteNavigators.pop(context)),
           backgroundColor: Colors.grey.shade50,
           centerTitle: true,
           elevation: 0,
@@ -116,7 +116,7 @@ class SearchAbbreviation extends StatelessWidget {
           leading: IconButton(
               icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                   color: AppColors.black, width: 19, height: 12),
-              onPressed: () => NavigationService.goBack()).paddingOnly(t: 10),
+              onPressed: () => RouteNavigators.pop(context)).paddingOnly(t: 10),
           title: const CustomRoundTextField(
             hintText: 'Search Abbreviation',
           ).paddingOnly(t: 10),
@@ -153,7 +153,7 @@ class RecentlyAddedAbbreviation extends StatelessWidget {
           leading: IconButton(
               icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                   width: 19, height: 12, color: AppColors.black),
-              onPressed: () => NavigationService.goBack()),
+              onPressed: () => RouteNavigators.pop(context)),
           backgroundColor: Colors.grey.shade50,
           centerTitle: true,
           elevation: 0,
@@ -243,7 +243,7 @@ class AbbreviationLibrary extends StatelessWidget {
           leading: IconButton(
               icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                   width: 19, height: 12, color: AppColors.black),
-              onPressed: () => NavigationService.goBack()),
+              onPressed: () => RouteNavigators.pop(context)),
           backgroundColor: Colors.grey.shade50,
           centerTitle: true,
           elevation: 0,

@@ -4,9 +4,8 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class VerifyAccountScreen extends HookConsumerWidget {
+class VerifyAccountScreen extends StatelessWidget {
   final String? token;
   final String? uid;
   static const String id = 'verify_account';
@@ -25,7 +24,7 @@ class VerifyAccountScreen extends HookConsumerWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, ) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
@@ -39,7 +38,7 @@ class VerifyAccountScreen extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () => NavigationService.goBack(),
+                onTap: () => RouteNavigators.pop(context),
                 child: const Icon(Icons.close),
               ),
               const SizedBox(height: 70),
@@ -126,12 +125,12 @@ class VerifyAccountScreen extends HookConsumerWidget {
                     //     .read(authNotifierProvider.notifier)
                     //     .verifyEmail(context, uid: uid, token: token);
                   } else {
-                    EWSnackBar.showErrorSnackBar(context,
+                    RMSnackBar.showErrorSnackBar(context,
                         message: 'Incorrect code',
                         milliseconds: 1000,
                         snackBarBehavior: SnackBarBehavior.fixed);
                   }
-                  // NavigationService.navigateTo(ResetPasswordScreen.id);
+                  // RouteNavigators.route(context,ResetPasswordScreen.id);
                 },
                 size: size,
                 textColor: AppColors.white,

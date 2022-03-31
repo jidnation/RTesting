@@ -34,7 +34,7 @@ class PersonalInfoSettings extends StatelessWidget {
                           height: 12,
                           color: AppColors.black,
                         ),
-                        onPressed: () => NavigationService.goBack()),
+                        onPressed: () => RouteNavigators.pop(context)),
                     const SizedBox(width: 15),
                     const Text('Personal Information',
                         style: TextStyle(

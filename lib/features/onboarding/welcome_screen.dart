@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                       label: 'Login',
                       color: AppColors.primaryColor,
                       onPressed: () {
-                        NavigationService.navigateTo(LoginScreen.id);
+                        RouteNavigators.route(context, LoginScreen());
                       },
                       size: size,
                       textColor: AppColors.white,
@@ -66,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                       label: 'Sign up',
                       color: AppColors.white,
                       onPressed: () {
-                        NavigationService.navigateTo(SignUpScreen.id);
+                        RouteNavigators.route(context, SignUpScreen());
                       },
                       size: size,
                       textColor: AppColors.primaryColor,

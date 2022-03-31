@@ -51,7 +51,7 @@ class SavedPostScreen extends StatelessWidget {
                   height: 12,
                   color: AppColors.black,
                 ),
-                onPressed: () => NavigationService.goBack()),
+                onPressed: () => RouteNavigators.pop(context)),
             backgroundColor: Colors.grey.shade50,
             centerTitle: true,
             elevation: 0,
