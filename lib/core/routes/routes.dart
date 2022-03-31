@@ -51,19 +51,10 @@ class RMRouter {
         return RMPageRoute(builder: (_) => const ForgotPasswordScreen());
 
       case OtpScreen.id:
-        dynamic args = settings.arguments;
-        return RMPageRoute(builder: (_) => OtpScreen(email: args['email']));
+        return RMPageRoute(builder: (_) => OtpScreen());
 
-      // case VerifyAccountScreen.id:
-      //   dynamic args = settings.arguments;
-      //   return RMPageRoute(
-      //       builder: (_) => VerifyAccountScreen(
-      //             token: args['token'],
-      //             uid: args['uid'],
-      //           ));
-
-      // case VerifyAccountSuccess.id:
-      //   return RMPageRoute(builder: (_) => const VerifyAccountSuccess());
+      case ResetPasswordOtpScreen.id:
+        return RMPageRoute(builder: (_) => ResetPasswordOtpScreen());
 
       case ResetPasswordScreen.id:
         return RMPageRoute(builder: (_) => const ResetPasswordScreen());
@@ -127,47 +118,6 @@ class RMRouter {
 
       case Abbreviation.id:
         return RMPageRoute(builder: (_) => const Abbreviation());
-
-      // case '/main-page':
-      //   dynamic args = settings.arguments ?? {"index": 0};
-      //   return EgoWavePageRoute(
-      //       builder: (_) => MainPage(
-      //             index: args['index'] ?? 0,
-      //           ));
-      //   break;
-      // case '/login':
-      //   return EgoWavePageRoute(builder: (_) => Signin());
-      // case '/personal-details-verification':
-      //   return EgoWavePageRoute(builder: (_) => PersonalDetailVerification());
-      // case '/kyc-completed':
-      //   dynamic args = settings.arguments ?? {"applied": false};
-      //   return EgoWavePageRoute(
-      //       builder: (_) =>
-      //           KYCCompletedScreen(applied: args['applied'] ?? false));
-      // case '/kyc-scan':
-      //   dynamic args = settings.arguments;
-      //   return EgoWavePageRoute(
-      //       builder: (_) => KYCScan(
-      //             cameras: args['cameras'],
-      //           ));
-      // case '/kyc-selfie-scan':
-      //   dynamic args = settings.arguments;
-      //   return EgoWavePageRoute(
-      //       builder: (_) => KYCSelfieScan(
-      //             cameras: args['cameras'],
-      //           ));
-      // case '/reset-pin':
-      //   return EgoWavePageRoute(builder: (_) => ResetPin());
-      // case '/confirm-pin':
-      //   dynamic args = settings.arguments;
-
-      //   return EgoWavePageRoute(
-      //       builder: (_) => ConfirmPin(
-      //             args['pin'],
-      //           ));
-
-      // case '/set-access-pin':
-      //   return EgoWavePageRoute(builder: (_) => SetAccessPin());
 
       default:
         return RMPageRoute(

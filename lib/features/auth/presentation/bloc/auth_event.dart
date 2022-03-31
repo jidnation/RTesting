@@ -32,9 +32,22 @@ class EmailVerificationEvent extends AuthEvent {
   EmailVerificationEvent({required this.email, required this.pin});
 }
 
-class RequestPasswordResetEvent extends AuthEvent {}
+class RequestPasswordResetEvent extends AuthEvent {
+  final String email;
+  RequestPasswordResetEvent({required this.email});
+}
 
-class ResetPasswordEvent extends AuthEvent {}
+class VerifyPasswordResetPinEvent extends AuthEvent {
+  final String? email;
+  final int? pin;
+  VerifyPasswordResetPinEvent({required this.email, required this.pin});
+}
+
+class ResetPasswordEvent extends AuthEvent {
+  final String? token;
+  final String? password;
+  ResetPasswordEvent({required this.token, required this.password});
+}
 
 class ResendOTPTokenEvent extends AuthEvent {}
 

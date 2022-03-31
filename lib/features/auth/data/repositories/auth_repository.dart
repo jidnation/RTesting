@@ -78,6 +78,43 @@ class AuthRepository {
     }
   }
 
+  Future<Either<String, bool>> initiatePasswordReset(
+      {required String? email}) async {
+    try {
+      final value =
+          await _authRemoteDataSource.initiatePasswordReset(email: email);
+      return Right(value);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, String>> verifyPasswordResetPin(
+      {required String? email, required int? pin}) async {
+    try {
+      final token = await _authRemoteDataSource.verifyPasswordResetPin(
+        email: email,
+        pin: pin,
+      );
+      return Right(token);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> resetPasswordWithToken(
+      {required String? token, required String? password}) async {
+    try {
+      final value = await _authRemoteDataSource.resetPasswordWithToken(
+        token: token,
+        password: password,
+      );
+      return Right(value);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, User>> login(
       {required String? email, required String password}) async {
     try {

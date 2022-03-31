@@ -6,8 +6,6 @@ import 'package:reach_me/core/helper/endpoints.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/graphql/logger_http_client.dart';
-import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 
 var auth = '';
 
@@ -56,7 +54,7 @@ class GraphQLApiClient {
 
           if (isUnauthorized) {
             //if user token has expired, redirect them to login & remove all stacked routes
-            NavigationService.navigatePopUntil(LoginScreen.id);
+            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
             return const GraphQLError(
                 message: "Your session has expired, please login again");
           }
@@ -93,7 +91,7 @@ class GraphQLApiClient {
 
         if (isUnauthorized) {
           //if user token has expired, redirect them to login & remove all stacked routes
-          NavigationService.navigatePopUntil(LoginScreen.id);
+          //RouteNavigators.navigatePopUntil(LoginScreen.id);
           return const GraphQLError(
               message: "Your session has expired, please login again");
         }

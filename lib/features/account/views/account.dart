@@ -89,11 +89,14 @@ class _AccountScreenState extends State<AccountScreen> {
                   height: 12,
                   color: AppColors.white,
                 ),
-                onPressed: () => NavigationService.navigateTo(HomeScreen.id),
+                onPressed: () =>
+                    RouteNavigators.route(context, const HomeScreen()),
               ),
               IconButton(
-                icon: SvgPicture.asset('assets/svgs/more-vertical.svg',
-                    color: AppColors.white),
+                icon: SvgPicture.asset(
+                  'assets/svgs/more-vertical.svg',
+                  color: AppColors.white,
+                ),
                 onPressed: () async {
                   await showKebabBottomSheet(context);
                 },
@@ -123,7 +126,6 @@ class _AccountScreenState extends State<AccountScreen> {
           onNotification: (ScrollNotification scrollInfo) {
             if (scrollViewController.position.userScrollDirection ==
                 ScrollDirection.reverse) {
-            
               setState(() {
                 message = 'going down';
                 width = 50;
@@ -133,7 +135,6 @@ class _AccountScreenState extends State<AccountScreen> {
             } else {
               if (scrollViewController.position.userScrollDirection ==
                   ScrollDirection.forward) {
-           
                 setState(() {
                   message = 'going up';
 
@@ -257,8 +258,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                     label: 'Edit Profile',
                                     color: AppColors.primaryColor,
                                     onPressed: () {
-                                      NavigationService.navigateTo(
-                                          EditProfileScreen.id);
+                                      RouteNavigators.route(
+                                          context, const EditProfileScreen());
                                     },
                                     size: size,
                                     padding: const EdgeInsets.symmetric(

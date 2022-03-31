@@ -21,8 +21,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phoneNumber: event.phoneNumber,
         );
         result.fold(
-          (l) => emit(AuthError(error: l)),
-          (r) => emit(AuthLoaded(message: r.id)),
+          (error) => emit(AuthError(error: error)),
+          (user) => emit(AuthRegisterLoaded()),
         );
       } on GraphQLError catch (e) {
         emit(AuthError(error: e.message));
@@ -34,8 +34,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final result = await _authRepository!
             .verifyAccount(email: event.email, pin: event.pin);
         result.fold(
-          (l) => emit(PinInvalid(error: l)),
-          (r) => emit(AuthEmailVerified(
+          (error) => emit(PinInvalid(error: error)),
+          (success) => emit(AuthEmailVerified(
               message: 'Your account has been verified successfully')),
         );
       } on GraphQLError catch (e) {
@@ -48,8 +48,68 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final result = await _authRepository!
             .login(email: event.email, password: event.password);
         result.fold(
-          (l) => emit(AuthError(error: l)),
-          (r) => emit(Authenticated(message: 'User logged in successfully')),
+          (error) => emit(AuthError(error: error)),
+          (success) =>
+              emit(Authenticated(message: 'User logged in successfully')),
+        );
+      } on GraphQLError catch (e) {
+        emit(AuthError(error: e.message));
+      }
+    }));
+    on<RequestPasswordResetEvent>(((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result =
+            await _authRepository!.initiatePasswordReset(email: event.email);
+        result.fold(
+          (error) => emit(AuthError(error: error)),
+          (value) {
+            if (!value) {
+              emit(AuthError(error: 'No user found with this email'));
+            } else {
+              emit(AuthSendResetPasswordEmail(
+                  message: 'Password reset link sent to your email'));
+            }
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(AuthError(error: e.message));
+      }
+    }));
+    on<VerifyPasswordResetPinEvent>(((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await _authRepository!
+            .verifyPasswordResetPin(email: event.email, pin: event.pin);
+        result.fold(
+          (error) => emit(PinInvalid(error: error)),
+          (token) => emit(VerifyResetPinSuccess(token: token)),
+        );
+      } on GraphQLError catch (e) {
+        emit(PinInvalid(error: e.message));
+      }
+    }));
+    on<ResetPasswordEvent>(((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final result = await _authRepository!.resetPasswordWithToken(
+          password: event.password,
+          token: event.token,
+        );
+        
+        result.fold(
+          (error) => emit(AuthError(error: error)),
+          (value) {
+            if (!value) {
+              emit(
+                AuthError(error: 'An error occured while resetting password'),
+              );
+            } else {
+              emit(AuthLoaded(
+                  message:
+                      'Your password has been reset successfully, please login.'));
+            }
+          },
         );
       } on GraphQLError catch (e) {
         emit(AuthError(error: e.message));

@@ -29,6 +29,11 @@ class AuthSendResetPasswordEmail extends AuthState {
   final String? message;
 }
 
+class VerifyResetPinSuccess extends AuthState {
+  VerifyResetPinSuccess({this.token});
+  final String? token;
+}
+
 class AuthResetPasswordLoaded extends AuthState {
   AuthResetPasswordLoaded({this.message});
   final String? message;
@@ -48,6 +53,7 @@ class PinVerified extends AuthState {
   PinVerified({this.message});
   final String? message;
 }
+
 class PinInvalid extends AuthState {
   PinInvalid({this.error});
   final String? error;

@@ -34,10 +34,9 @@ class SignUpScreen extends HookWidget {
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: globals.authBloc,
         listener: (context, state) {
-          if (state is AuthLoaded) {
-            NavigationService.navigateTo(OtpScreen.id, arguments: {
-              'email': _emailController.text.replaceAll(' ', ''),
-            });
+          if (state is AuthRegisterLoaded) {
+            RouteNavigators.route(context,
+                OtpScreen(email: _emailController.text.replaceAll(' ', '')));
           } else if (state is AuthError) {
             Console.log('AuthError', state.error);
             RMSnackBar.showErrorSnackBar(context, message: state.error);
@@ -276,7 +275,8 @@ class SignUpScreen extends HookWidget {
                               prefix: 'assets/svgs/google.svg',
                               color: AppColors.white,
                               onPressed: () {
-                                NavigationService.navigateTo(HomeScreen.id);
+                                RouteNavigators.route(
+                                    context, const HomeScreen());
                               },
                               size: size,
                               textColor: AppColors.primaryColor,
@@ -285,7 +285,7 @@ class SignUpScreen extends HookWidget {
                           const SizedBox(height: 20),
                           GestureDetector(
                             onTap: () {
-                              NavigationService.navigateTo(LoginScreen.id);
+                              RouteNavigators.route(context, LoginScreen());
                             },
                             child: RichText(
                               textScaleFactor: 0.8,

@@ -28,7 +28,7 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
     _controller.forward();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        NavigationService.navigateToReplace(OnboardingScreen.id);
+        RouteNavigators.routeReplace(context, OnboardingScreen());
       }
     });
   }

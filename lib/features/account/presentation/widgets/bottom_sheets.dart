@@ -34,25 +34,27 @@ Future showKebabBottomSheet(BuildContext context) {
               const SizedBox(height: 20),
               KebabBottomTextButton(
                   label: 'Dictionary',
-                  onPressed: () => NavigationService.navigateTo(Dictionary.id)),
+                  onPressed: () =>
+                      RouteNavigators.route(context, const Dictionary())),
               KebabBottomTextButton(
                   label: 'Abbreviation',
                   onPressed: () =>
-                      NavigationService.navigateTo(Abbreviation.id)),
+                      RouteNavigators.route(context, const Abbreviation())),
               KebabBottomTextButton(
                   label: 'Starred Profile',
                   onPressed: () {
-                    NavigationService.navigateTo(StarredProfileScreen.id);
+                    RouteNavigators.route(
+                        context, const StarredProfileScreen());
                   }),
               KebabBottomTextButton(
                   label: 'QR Code',
                   onPressed: () {
-                    NavigationService.navigateTo(QRCodeScreen.id);
+                    RouteNavigators.route(context, const QRCodeScreen());
                   }),
               KebabBottomTextButton(
                   label: 'Saved Post',
                   onPressed: () {
-                    NavigationService.navigateTo(SavedPostScreen.id);
+                    RouteNavigators.route(context, const SavedPostScreen());
                   }),
               KebabBottomTextButton(label: 'Share Profile', onPressed: () {}),
               KebabBottomTextButton(label: 'More', onPressed: () {}),

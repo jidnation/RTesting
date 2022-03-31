@@ -38,7 +38,7 @@ class VerifyAccountScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () => NavigationService.goBack(),
+                onTap: () => RouteNavigators.pop(context),
                 child: const Icon(Icons.close),
               ),
               const SizedBox(height: 70),
@@ -130,7 +130,7 @@ class VerifyAccountScreen extends StatelessWidget {
                         milliseconds: 1000,
                         snackBarBehavior: SnackBarBehavior.fixed);
                   }
-                  // NavigationService.navigateTo(ResetPasswordScreen.id);
+                  // RouteNavigators.route(context,ResetPasswordScreen.id);
                 },
                 size: size,
                 textColor: AppColors.white,

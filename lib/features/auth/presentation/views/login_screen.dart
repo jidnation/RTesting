@@ -31,8 +31,7 @@ class LoginScreen extends HookWidget {
             bloc: globals.authBloc,
             listener: (context, state) {
               if (state is Authenticated) {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, HomeScreen.id, (route) => false);
+                RouteNavigators.routeNoWayHome(context, const HomeScreen());
               }
             },
             builder: (context, state) {
@@ -128,8 +127,8 @@ class LoginScreen extends HookWidget {
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: () => NavigationService.navigateTo(
-                                    ForgotPasswordScreen.id),
+                                onPressed: () => RouteNavigators.route(
+                                    context, const ForgotPasswordScreen()),
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 4.0, vertical: 0.0),
@@ -191,7 +190,8 @@ class LoginScreen extends HookWidget {
                                 prefix: 'assets/svgs/google.svg',
                                 color: AppColors.white,
                                 onPressed: () {
-                                  NavigationService.navigateTo(HomeScreen.id);
+                                  RouteNavigators.route(
+                                      context, const HomeScreen());
                                 },
                                 size: size,
                                 textColor: AppColors.primaryColor,
@@ -199,8 +199,8 @@ class LoginScreen extends HookWidget {
                                     width: 1, color: AppColors.primaryColor)),
                             const Expanded(child: SizedBox()),
                             GestureDetector(
-                              onTap: () =>
-                                  NavigationService.navigateTo(SignUpScreen.id),
+                              onTap: () => RouteNavigators.route(
+                                  context, SignUpScreen()),
                               child: RichText(
                                 textScaleFactor: 0.8,
                                 text: const TextSpan(

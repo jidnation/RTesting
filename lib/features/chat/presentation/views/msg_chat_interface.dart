@@ -59,7 +59,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             width: 19,
             height: 12,
           ),
-          onPressed: () => NavigationService.goBack(),
+          onPressed: () => RouteNavigators.pop(context),
         ),
         title: InkWell(
           onTap: () {},
@@ -95,7 +95,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/video call.svg'),
               onPressed: () {
-                NavigationService.navigateTo(VideoCallScreen.id);
+                RouteNavigators.route(context, const VideoCallScreen());
               },
               splashRadius: 20,
             ),
@@ -107,7 +107,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/voice call.svg'),
               onPressed: () {
-                NavigationService.navigateTo(VoiceCallScreen.id);
+                RouteNavigators.route(context, const VoiceCallScreen());
               },
               splashRadius: 20,
             ),

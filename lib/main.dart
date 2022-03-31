@@ -6,7 +6,6 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/routes/routes.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
-import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'dart:io';
@@ -43,7 +42,6 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'ReachMe',
-          navigatorKey: NavigationService.navigationKey,
           theme: ThemeData(
             fontFamily: 'Poppins',
             primarySwatch: Colors.blue,

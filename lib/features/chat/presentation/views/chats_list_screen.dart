@@ -29,7 +29,7 @@ class ChatsListScreen extends StatelessWidget {
             icon: SvgPicture.asset('assets/svgs/arrow-back.svg',
                 width: 19, height: 12),
             onPressed: () {
-              NavigationService.goBack();
+              RouteNavigators.pop(context);
             },
           ),
           actions: [
@@ -218,7 +218,7 @@ class ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        NavigationService.navigateTo(MsgChatInterface.id);
+        RouteNavigators.route(context, const MsgChatInterface());
       },
       style: TextButton.styleFrom(
         padding: const EdgeInsets.all(10),
