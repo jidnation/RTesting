@@ -45,14 +45,6 @@ class AuthRemoteDataSource {
     ) {
     id
     email
-    firstName
-    lastName
-    phone
-    token
-    updated_at
-    created_at
-    isActive
-    lastLogin
   }
 }''';
     try {
@@ -68,6 +60,60 @@ class AuthRemoteDataSource {
       }
       Console.log('create account resut', result.data);
       return User.fromJson(result.data!['createAccount']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<User> verifyAccount({required String? email, required int pin}) async {
+    const String q = r'''
+      query activateAccount($email: String!, $pin: Int!) {
+        activateAccount(email: $email, pin: $pin) {
+          id
+          email
+        }
+      }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'email': email,
+        'pin': pin,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('verify account', result.data);
+      return User.fromJson(result.data!['activateAccount']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<User> login({required String? email, required String password}) async {
+    const String q = r'''
+      query login($email: String!, $password: String) {
+      login(email: $email, password: $password) {
+        id
+        email
+        firstName
+        lastName
+        phone
+        token
+        updated_at
+        created_at
+        isActive
+        lastLogin
+      }
+    }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'email': email,
+        'password': password,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('login account', result.data);
+      return User.fromJson(result.data!['login']);
     } catch (e) {
       rethrow;
     }

@@ -17,7 +17,7 @@ class RMSnackBar {
         duration: Duration(milliseconds: milliseconds),
         content: SelectableText(
           message,
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

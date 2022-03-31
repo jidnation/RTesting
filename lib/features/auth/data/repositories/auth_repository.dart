@@ -67,6 +67,28 @@ class AuthRepository {
     }
   }
 
+  Future<Either<String, User>> verifyAccount(
+      {required String? email, required int pin}) async {
+    try {
+      final user =
+          await _authRemoteDataSource.verifyAccount(email: email, pin: pin);
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, User>> login(
+      {required String? email, required String password}) async {
+    try {
+      final user =
+          await _authRemoteDataSource.login(email: email, password: password);
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   // @override
   // Future<Either<String, User>> signInWithEmailAndPassword({
   //   required String email,

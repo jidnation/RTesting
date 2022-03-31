@@ -10,6 +10,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
+import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
 import 'package:reach_me/features/home/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/validator.dart';
@@ -26,15 +27,17 @@ class SignUpScreen extends HookWidget {
     var size = MediaQuery.of(context).size;
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
-    final _fNameController = useTextEditingController();
-    final _lNameController = useTextEditingController();
-    //final _phoneController = useTextEditingController();
+    final _fullNameController = useTextEditingController();
+    final _usernameController = useTextEditingController();
+    final _obscureText = useState(true);
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: globals.authBloc,
         listener: (context, state) {
           if (state is AuthLoaded) {
-            Console.log('AuthLoaded', state.message);
+            NavigationService.navigateTo(OtpScreen.id, arguments: {
+              'email': _emailController.text.replaceAll(' ', ''),
+            });
           } else if (state is AuthError) {
             Console.log('AuthError', state.error);
             RMSnackBar.showErrorSnackBar(context, message: state.error);
@@ -88,39 +91,39 @@ class SignUpScreen extends HookWidget {
                           const Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'First Name',
+                              'Username',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 13,
                                 color: AppColors.textFieldLabelColor,
                               ),
                             ),
                           ),
                           CustomTextField(
-                            hintText: 'Enter your first name',
+                            hintText: 'Enter your preferred username',
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.sentences,
                             validator: (value) =>
                                 Validator.validateName(value ?? ""),
-                            controller: _fNameController,
+                            controller: _usernameController,
                           ),
                           const SizedBox(height: 16),
                           const Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Last Name',
+                              'Full Name',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 13,
                                 color: AppColors.textFieldLabelColor,
                               ),
                             ),
                           ),
                           CustomTextField(
-                            hintText: 'Enter your last name',
+                            hintText: 'Enter your full name',
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.sentences,
                             validator: (value) =>
-                                Validator.validateName(value ?? ""),
-                            controller: _lNameController,
+                                Validator.fullNameValidate(value ?? ""),
+                            controller: _fullNameController,
                           ),
                           const SizedBox(height: 16),
                           const Align(
@@ -128,7 +131,7 @@ class SignUpScreen extends HookWidget {
                             child: Text(
                               'Email',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 13,
                                 color: AppColors.textFieldLabelColor,
                               ),
                             ),
@@ -147,22 +150,29 @@ class SignUpScreen extends HookWidget {
                             child: Text(
                               'Password (6 or more characters)',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 13,
                                 color: AppColors.textFieldLabelColor,
                               ),
                             ),
                           ),
                           CustomTextField(
                             hintText: '********',
-                            obscureText: true,
+                            obscureText: _obscureText.value,
                             keyboardType: TextInputType.text,
                             controller: _passwordController,
                             textCapitalization: TextCapitalization.none,
                             validator: (value) =>
                                 Validator.validatePassword(value ?? ""),
-                            suffixIcon: const Icon(
-                              Icons.visibility_off_outlined,
-                              color: AppColors.textFieldLabelColor,
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                _obscureText.value = !_obscureText.value;
+                              },
+                              child: Icon(
+                                _obscureText.value
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                color: AppColors.textFieldLabelColor,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -219,14 +229,16 @@ class SignUpScreen extends HookWidget {
                             color: AppColors.primaryColor,
                             onPressed: () {
                               if (_key.currentState!.validate()) {
+                                final firstName =
+                                    _fullNameController.text.split(' ').first;
+                                final lastName =
+                                    _fullNameController.text.split(' ').last;
                                 globals.authBloc!.add(RegisterUserEvent(
                                   email:
                                       _emailController.text.replaceAll(' ', ''),
                                   password: _passwordController.text,
-                                  firstName:
-                                      _fNameController.text.replaceAll(' ', ''),
-                                  lastName:
-                                      _lNameController.text.replaceAll(' ', ''),
+                                  firstName: firstName.replaceAll(' ', ''),
+                                  lastName: lastName.replaceAll(' ', ''),
                                 ));
                               } else {
                                 return;
@@ -270,7 +282,7 @@ class SignUpScreen extends HookWidget {
                               textColor: AppColors.primaryColor,
                               borderSide: const BorderSide(
                                   width: 1, color: AppColors.primaryColor)),
-                          const Expanded(child: SizedBox()),
+                          const SizedBox(height: 20),
                           GestureDetector(
                             onTap: () {
                               NavigationService.navigateTo(LoginScreen.id);

@@ -48,6 +48,10 @@ class PinVerified extends AuthState {
   PinVerified({this.message});
   final String? message;
 }
+class PinInvalid extends AuthState {
+  PinInvalid({this.error});
+  final String? error;
+}
 
 class AuthError extends AuthState {
   AuthError({this.error});

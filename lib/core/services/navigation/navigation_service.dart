@@ -43,6 +43,8 @@ class NavigationService {
       .currentState!
       .popUntil((route) => route.isFirst);
 
+ 
+
   static navigateTransparentRoute(
       BuildContext context, Widget route, double dx, double dy) async {
     return await Navigator.push(

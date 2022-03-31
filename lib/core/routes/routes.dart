@@ -51,7 +51,8 @@ class RMRouter {
         return RMPageRoute(builder: (_) => const ForgotPasswordScreen());
 
       case OtpScreen.id:
-        return RMPageRoute(builder: (_) => OtpScreen());
+        dynamic args = settings.arguments;
+        return RMPageRoute(builder: (_) => OtpScreen(email: args['email']));
 
       // case VerifyAccountScreen.id:
       //   dynamic args = settings.arguments;

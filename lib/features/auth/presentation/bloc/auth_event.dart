@@ -9,6 +9,7 @@ class RegisterUserEvent extends AuthEvent {
   final String firstName;
   final String lastName;
   final String? phoneNumber;
+
   RegisterUserEvent({
     required this.email,
     required this.password,
@@ -18,9 +19,18 @@ class RegisterUserEvent extends AuthEvent {
   });
 }
 
-class LoginUserEvent extends AuthEvent {}
+class LoginUserEvent extends AuthEvent {
+  final String email;
+  final String password;
 
-class EmailVerificationEvent extends AuthEvent {}
+  LoginUserEvent({required this.email, required this.password});
+}
+
+class EmailVerificationEvent extends AuthEvent {
+  final String? email;
+  final int pin;
+  EmailVerificationEvent({required this.email, required this.pin});
+}
 
 class RequestPasswordResetEvent extends AuthEvent {}
 
