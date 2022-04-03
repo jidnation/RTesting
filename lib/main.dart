@@ -9,7 +9,8 @@ import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'dart:io';
-import 'package:reach_me/features/home/splash_screen.dart';
+
+import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

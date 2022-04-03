@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 
-class AppDrawer extends StatefulWidget {
+class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
 
   @override
-  State<AppDrawer> createState() => _AppDrawerState();
-}
-
-class _AppDrawerState extends State<AppDrawer> {
-  bool showOtherItem = false;
-
-  @override
   Widget build(BuildContext context) {
+    final showOtherItem = useState<bool>(false);
     var size = MediaQuery.of(context).size;
     return Drawer(
       child: Column(
@@ -26,14 +23,18 @@ class _AppDrawerState extends State<AppDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
+                  const ImagePlaceholder(
                     width: 65,
                     height: 65,
-                    clipBehavior: Clip.hardEdge,
-                    child:
-                        Image.asset('assets/images/user.png', fit: BoxFit.fill),
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
                   ),
+                  // Container(
+                  //   width: 65,
+                  //   height: 65,
+                  //   clipBehavior: Clip.hardEdge,
+                  //   child:
+                  //       Image.asset('assets/images/user.png', fit: BoxFit.fill),
+                  //   decoration: const BoxDecoration(shape: BoxShape.circle),
+                  // ),
                   const SizedBox(height: 7),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,16 +44,17 @@ class _AppDrawerState extends State<AppDrawer> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           Text(
-                            'Rooney Brown',
-                            style: TextStyle(
+                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                .toTitleCase(),
+                            style: const TextStyle(
                               color: AppColors.textColor2,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(
+                          const Text(
                             '@RooneyBrown',
                             style: TextStyle(
                               color: Color(0xFF6C6A6A),
@@ -63,15 +65,11 @@ class _AppDrawerState extends State<AppDrawer> {
                         ],
                       ),
                       GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showOtherItem = !showOtherItem;
-                          });
-                        },
+                        onTap: () => showOtherItem.value = !showOtherItem.value,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Icon(
-                            showOtherItem
+                            showOtherItem.value
                                 ? Icons.keyboard_arrow_down
                                 : Icons.keyboard_arrow_up,
                             color: AppColors.primaryColor,
@@ -132,7 +130,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           Visibility(
-            visible: showOtherItem ? false : true,
+            visible: showOtherItem.value ? false : true,
             child: Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -153,7 +151,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           Visibility(
-            visible: showOtherItem,
+            visible: showOtherItem.value,
             child: Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,

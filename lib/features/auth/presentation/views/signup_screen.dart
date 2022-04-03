@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,7 +13,7 @@ import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
-import 'package:reach_me/features/home/home_screen.dart';
+import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter/material.dart';
@@ -238,7 +240,9 @@ class SignUpScreen extends HookWidget {
                                   password: _passwordController.text,
                                   firstName: firstName.replaceAll(' ', ''),
                                   lastName: lastName.replaceAll(' ', ''),
+                                  phoneNumber: Random.secure().nextInt(1000000000).toString(),
                                 ));
+                                
                               } else {
                                 return;
                               }
@@ -275,8 +279,8 @@ class SignUpScreen extends HookWidget {
                               prefix: 'assets/svgs/google.svg',
                               color: AppColors.white,
                               onPressed: () {
-                                RouteNavigators.route(
-                                    context, const HomeScreen());
+                                // RouteNavigators.route(
+                                //     context, const HomeScreen());
                               },
                               size: size,
                               textColor: AppColors.primaryColor,

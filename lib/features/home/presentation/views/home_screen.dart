@@ -1,51 +1,41 @@
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
-import 'package:reach_me/features/home/widgets/app_drawer.dart';
-import 'package:reach_me/features/timeline/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/video_moment.dart';
-import 'package:reach_me/features/activity/presentation/notification.dart';
-import 'package:reach_me/features/home/search.dart';
+import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/search.dart';
+import 'package:reach_me/features/home/presentation/views/timeline.dart';
+import 'package:reach_me/features/home/presentation/views/video_moment.dart';
+import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
+import 'package:reach_me/features/home/presentation/views/notification.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends HookWidget {
   static const String id = "home_screen";
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
-
-  setStateIfMounted(VoidCallback fn) {
-    if (mounted) {
-      setState(fn);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final _currentIndex = useState<int>(0);
+    useMemoized(() {
+      globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email));
+    });
     return Scaffold(
       drawer: const AppDrawer(),
       body: IndexedStack(
-        children: [
+        children: const [
           TimelineScreen(),
           SearchScreen(),
-          const VideoMomentScreen(),
-          const NotificationsScreen(),
-          const AccountScreen(),
+          VideoMomentScreen(),
+          NotificationsScreen(),
+          AccountScreen(),
         ],
-        index: _currentIndex,
+        index: _currentIndex.value,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setStateIfMounted(() {
-            _currentIndex = index;
-          });
-        },
+        currentIndex: _currentIndex.value,
+        onTap: (index) => _currentIndex.value = index,
         selectedItemColor: AppColors.primaryColor,
         unselectedItemColor: AppColors.blackShade3,
         showUnselectedLabels: false,
@@ -53,35 +43,35 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/svgs/home.svg',
-                color: _currentIndex == 0
+                color: _currentIndex.value == 0
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/svgs/search icon.svg',
-                color: _currentIndex == 1
+                color: _currentIndex.value == 1
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/svgs/media.svg',
-                color: _currentIndex == 2
+                color: _currentIndex.value == 2
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/svgs/notification icon.svg',
-                color: _currentIndex == 3
+                color: _currentIndex.value == 3
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset('assets/svgs/profile icon.svg',
-                color: _currentIndex == 4
+                color: _currentIndex.value == 4
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',

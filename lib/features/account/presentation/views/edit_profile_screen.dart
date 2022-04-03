@@ -4,20 +4,21 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/list_tile_switch.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends HookWidget {
   static const String id = "edit_profile_screen";
   const EditProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var showContactInfo = useState(false);
-    var showLocation = useState(false);
+    var showContactInfo = useState<bool>(false);
+    var showLocation = useState<bool>(false);
     var size = MediaQuery.of(context).size;
     return Scaffold(
         body: SingleChildScrollView(
@@ -128,7 +129,10 @@ class EditProfileScreen extends StatelessWidget {
               ),
               CustomTextField(
                 keyboardType: TextInputType.name,
-                textCapitalization: TextCapitalization.none,
+                textCapitalization: TextCapitalization.sentences,
+                hintText:
+                    (globals.user!.firstName! + ' ' + globals.user!.lastName!)
+                        .toTitleCase(),
                 validator: (value) => Validator.validateName(value ?? ""),
                 // controller: _emailController,
               ),
@@ -143,6 +147,7 @@ class EditProfileScreen extends StatelessWidget {
               CustomTextField(
                 keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.none,
+                hintText:  globals.user!.username ?? 'no username',
                 validator: (value) => Validator.validateName(value ?? ""),
                 // controller: _emailController,
               ),
@@ -162,24 +167,11 @@ class EditProfileScreen extends StatelessWidget {
                 // controller: _emailController,
               ),
               const SizedBox(height: 30),
-              const Text(
-                'Location',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: AppColors.textFieldLabelColor,
-                ),
-              ),
-              CustomTextField(
-                keyboardType: TextInputType.name,
-                textCapitalization: TextCapitalization.none,
-                validator: (value) => Validator.validateName(value ?? ""),
-                // controller: _emailController,
-              ),
-              const SizedBox(height: 30),
+             
               const Text(
                 'Profile Details',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textColor2,
                 ),

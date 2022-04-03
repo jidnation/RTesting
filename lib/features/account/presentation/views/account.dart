@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
+import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
-import 'package:reach_me/features/account/presentation/widgets/comment_reacher_card.dart';
-import 'package:reach_me/features/home/home_screen.dart';
-import 'package:reach_me/features/timeline/presentation/views/timeline.dart'
-    hide showKebabBottomSheet;
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
@@ -77,7 +77,7 @@ class _AccountScreenState extends State<AccountScreen> {
               width: size.width,
               padding: const EdgeInsets.only(top: 28),
               child: Image.network(
-                'https://i.pinimg.com/originals/5a/6f/fa/5a6ffa53e1874276e8f042e58510f7c5.jpg',
+                'https://wallpaperaccess.com/full/3956728.jpg',
                 fit: BoxFit.cover,
               ),
             ),
@@ -108,11 +108,15 @@ class _AccountScreenState extends State<AccountScreen> {
                 width: isGoingDown ? width : 100,
                 height: isGoingDown ? height : 100,
                 duration: const Duration(seconds: 1),
-                child: ProfilePicture(
+                child: ImagePlaceholder(
                   width: isGoingDown ? width : 100,
                   height: isGoingDown ? height : 100,
-                  border: Border.all(color: AppColors.white, width: 3.0),
                 ),
+                // child: ProfilePicture(
+                //   width: isGoingDown ? width : 100,
+                //   height: isGoingDown ? height : 100,
+                //   border: Border.all(color: AppColors.white, width: 3.0),
+                // ),
               ),
             ),
           ],
@@ -135,7 +139,6 @@ class _AccountScreenState extends State<AccountScreen> {
                   ScrollDirection.forward) {
                 setState(() {
                   message = 'going up';
-
                   width = 100;
                   height = 100;
                 });
@@ -152,16 +155,20 @@ class _AccountScreenState extends State<AccountScreen> {
                       [
                         Column(
                           children: [
-                            const Text('Jason Statham',
-                                style: TextStyle(
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2)),
-                            const Text('@jasonstatham',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2)),
+                            Text(
+                                ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                    .toTitleCase(),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor2,
+                                )),
+                            Text(globals.user!.username ?? '@username',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                )),
                             const SizedBox(height: 14),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -174,16 +181,16 @@ class _AccountScreenState extends State<AccountScreen> {
                                           CrossAxisAlignment.center,
                                       children: const [
                                         Text(
-                                          '2K',
+                                          '0',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 15,
                                               color: AppColors.textColor2,
                                               fontWeight: FontWeight.w600),
                                         ),
                                         Text(
                                           'Reachers',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 13,
                                               color: AppColors.greyShade2,
                                               fontWeight: FontWeight.w400),
                                         ),
@@ -196,16 +203,16 @@ class _AccountScreenState extends State<AccountScreen> {
                                           CrossAxisAlignment.center,
                                       children: const [
                                         Text(
-                                          '270',
+                                          '0',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 15,
                                               color: AppColors.textColor2,
                                               fontWeight: FontWeight.w600),
                                         ),
                                         Text(
                                           'Reaching',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 13,
                                               color: AppColors.greyShade2,
                                               fontWeight: FontWeight.w400),
                                         ),
@@ -218,16 +225,16 @@ class _AccountScreenState extends State<AccountScreen> {
                                           CrossAxisAlignment.center,
                                       children: const [
                                         Text(
-                                          '5',
+                                          '0',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 15,
                                               color: AppColors.textColor2,
                                               fontWeight: FontWeight.w600),
                                         ),
                                         Text(
                                           'Starring',
                                           style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 13,
                                               color: AppColors.greyShade2,
                                               fontWeight: FontWeight.w400),
                                         ),
@@ -237,24 +244,28 @@ class _AccountScreenState extends State<AccountScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
-                            const SizedBox(
+                            globals.user!.bio != null
+                                ? const SizedBox(height: 20)
+                                : const SizedBox.shrink(),
+                            SizedBox(
                                 width: 290,
                                 child: Text(
-                                  "English actor, typecast as the antihro, Born in shirebrook, Derbyshire",
+                                  globals.user!.bio ?? '',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 16,
+                                  style: const TextStyle(
+                                      fontSize: 13,
                                       color: AppColors.greyShade2,
                                       fontWeight: FontWeight.w400),
                                 )),
-                            const SizedBox(height: 20),
+                            globals.user!.bio != null
+                                ? const SizedBox(height: 20)
+                                : const SizedBox.shrink(),
                             SizedBox(
                                 width: 130,
                                 height: 41,
                                 child: CustomButton(
                                   label: 'Edit Profile',
-                                  color: AppColors.primaryColor,
+                                  color: AppColors.white,
                                   onPressed: () {
                                     RouteNavigators.route(
                                         context, const EditProfileScreen());
@@ -262,8 +273,9 @@ class _AccountScreenState extends State<AccountScreen> {
                                   size: size,
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 9, horizontal: 21),
-                                  textColor: AppColors.white,
-                                  borderSide: BorderSide.none,
+                                  textColor: AppColors.textColor2,
+                                  borderSide: const BorderSide(
+                                      color: AppColors.greyShade5),
                                 )),
                             const SizedBox(height: 15),
                           ],
@@ -293,54 +305,99 @@ class _AccountScreenState extends State<AccountScreen> {
                   ),
                   Expanded(
                     child: TabBarView(children: [
+                      //COMMENTS TAB
                       ListView(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
-                        children: [
-                          const SizedBox(height: 14),
-                          CommentReacherCard(size: size)
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(
+                              emptyText: 'You have made no comments so far!')
+                          //CommentReacherCard(size: size)
                         ],
                       ),
+
+                      //REACHES TAB
+
+                      // ListView(
+                      //   shrinkWrap: true,
+                      //   padding: EdgeInsets.zero,
+                      //   children: [
+                      //     const SizedBox(height: 14),
+                      //     ReacherCard(size: size),
+                      //   ],
+                      // ).paddingSymmetric(h: 14),
                       ListView(
-                        shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        children: [
-                          const SizedBox(height: 14),
-                          ReacherCard(size: size),
+                        shrinkWrap: true,
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(emptyText: 'You have no reaches so far!')
+                          //CommentReacherCard(size: size)
                         ],
-                      ).paddingSymmetric(h: 14),
+                      ),
+
+                      //SHOUTOUT TAB
+                      // ListView(
+                      //   shrinkWrap: true,
+                      //   padding: EdgeInsets.zero,
+                      //   children: [
+                      //     const SizedBox(height: 14),
+                      //     ReacherCard(size: size),
+                      //   ],
+                      // ).paddingSymmetric(h: 14),
                       ListView(
-                        shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        children: [
-                          const SizedBox(height: 14),
-                          ReacherCard(size: size),
+                        shrinkWrap: true,
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(
+                              emptyText: 'You have made no shoutouts so far!')
                         ],
-                      ).paddingSymmetric(h: 14),
+                      ),
+
+                      //SHOUTDOWN TAB
                       ListView(
-                        shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        children: [
-                          const SizedBox(height: 14),
-                          ReacherCard(size: size),
+                        shrinkWrap: true,
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(
+                              emptyText: 'You have made no shoutdown so far!')
                         ],
-                      ).paddingSymmetric(h: 14),
+                      ),
+
+                      //LIKES TAB
                       ListView(
-                        shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        children: [
-                          const SizedBox(height: 14),
-                          ReacherCard(size: size),
+                        shrinkWrap: true,
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(emptyText: 'You have no likes yet!')
+                          //CommentReacherCard(size: size)
                         ],
-                      ).paddingSymmetric(h: 14),
+                      ),
+
+                      //SHARES TAB
                       ListView(
-                        shrinkWrap: true,
                         padding: EdgeInsets.zero,
-                        children: [
-                          const SizedBox(height: 14),
-                          ReacherCard(size: size),
+                        shrinkWrap: true,
+                        children: const [
+                          SizedBox(height: 30),
+                          EmptyWidget(
+                              emptyText:
+                                  'You have not shared any reaches so far!')
+                          //CommentReacherCard(size: size)
                         ],
-                      ).paddingSymmetric(h: 14),
+                      ),
+                      // ListView(
+                      //   shrinkWrap: true,
+                      //   padding: EdgeInsets.zero,
+                      //   children: [
+                      //     const SizedBox(height: 14),
+                      //     ReacherCard(size: size),
+                      //   ],
+                      // ).paddingSymmetric(h: 14),
                     ]),
                   ),
                 ],

@@ -2,41 +2,37 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
+import 'package:reach_me/core/components/empty_state.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/home/view_comments.dart';
+import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/core/components/media_card.dart';
-import 'package:reach_me/features/home/widgets/app_drawer.dart';
+import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
 // ignore: must_be_immutable
-class TimelineScreen extends StatelessWidget {
+class TimelineScreen extends HookWidget {
   static const String id = "timeline_screen";
-  TimelineScreen({Key? key}) : super(key: key);
-
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
-  List<DemoSourceEntity> sourceList = [
-    DemoSourceEntity(0, 'image', 'http://file.jinxianyun.com/inter_06.jpg'),
-    DemoSourceEntity(1, 'image', 'http://file.jinxianyun.com/inter_05.jpg'),
-    DemoSourceEntity(2, 'image', 'http://file.jinxianyun.com/inter_02.jpg'),
-    DemoSourceEntity(3, 'image', 'http://file.jinxianyun.com/inter_03.gif'),
-    DemoSourceEntity(4, 'video', 'http://file.jinxianyun.com/inter_04.mp4',
-        previewUrl: 'http://file.jinxianyun.com/inter_04_pre.png'),
-    DemoSourceEntity(5, 'video',
-        'http://file.jinxianyun.com/6438BF272694486859D5DE899DD2D823.mp4',
-        previewUrl: 'http://file.jinxianyun.com/102.png'),
-  ];
+  const TimelineScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldKey =
+        useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     var size = MediaQuery.of(context).size;
+    Console.log("user data", globals.user!.toJson());
+    final changeState = useState<bool>(false);
     return Scaffold(
-      key: scaffoldKey,
+      key: scaffoldKey.value,
       drawer: const AppDrawer(),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         systemOverlayStyle: SystemUiOverlayStyle(
@@ -48,102 +44,123 @@ class TimelineScreen extends StatelessWidget {
           systemNavigationBarDividerColor: Colors.grey,
           systemNavigationBarIconBrightness: Brightness.dark,
         ),
-        shadowColor: const Color(0x1A000000),
-        elevation: 4,
-        centerTitle: true,
+        shadowColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
-            },
-            icon: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primaryColor,
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/user.png"),
-                    fit: BoxFit.cover,
-                  ),
-                ))),
-        //  title: SvgPicture.asset('assets/svgs/Logo.svg', width: 100, height: 25),
+          onPressed: () => scaffoldKey.value.currentState!.openDrawer(),
+          icon: const ImagePlaceholder(width: 35, height: 35),
+        ),
+        titleSpacing: 5,
+        leadingWidth: 70,
+        title: const Text('Reachme',
+            style: TextStyle(
+              color: AppColors.textColor2,
+              fontSize: 21,
+              fontWeight: FontWeight.w600,
+            )),
         actions: [
           IconButton(
-            icon: SvgPicture.asset('assets/svgs/Vector.svg',
-                width: 25, height: 25),
+            icon: SvgPicture.asset(
+              'assets/svgs/add_icon.svg',
+              width: 22,
+              height: 22,
+            ),
             onPressed: () {
               RouteNavigators.route(context, const ChatsListScreen());
-              // RouteNavigators.route(context,ChatsListScreen.id);
             },
           ),
+          //  const SizedBox(width: 15),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/svgs/msg_icon.svg',
+              width: 22,
+              height: 22,
+            ),
+            onPressed: () {
+              RouteNavigators.route(context, const ChatsListScreen());
+            },
+          ).paddingOnly(r: 16),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: AppColors.primaryColor,
-        child: SvgPicture.asset('assets/svgs/reach-icon.svg',
-            width: 25, height: 25),
-      ),
       body: SafeArea(
-        child: Container(
-          width: size.width,
-          height: size.height,
-          color: AppColors.white,
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: SizedBox(
-                    child: Row(
-                      children: [
-                        UserStory(
-                            size: size,
-                            isMe: true,
-                            isLive: false,
-                            username: 'Add Moment'),
-                        UserStory(
-                            size: size,
-                            isMe: false,
-                            isLive: false,
-                            username: 'John'),
-                        UserStory(
-                            size: size,
-                            isMe: false,
-                            isLive: true,
-                            username: 'Daniel'),
-                        UserStory(
-                            size: size,
-                            isMe: false,
-                            isLive: false,
-                            username: 'John'),
-                        UserStory(
-                            size: size,
-                            isMe: false,
-                            isLive: true,
-                            username: 'Daniel'),
-                        UserStory(
-                            size: size,
-                            isMe: false,
-                            isLive: false,
-                            username: 'John'),
-                      ],
-                    ),
-                  ).paddingOnly(l: 11),
-                ),
-                const SizedBox(height: 12),
-                const Divider(thickness: 0.5, color: AppColors.greyShade4),
-                const SizedBox(height: 5),
-                //ListView.builder(itemBuilder: itemBuilder)
-                ReacherCard(size: size),
-                ReacherCard(size: size),
-              ],
+        top: false,
+        child: GestureDetector(
+          onTap: () => changeState.value = !changeState.value,
+          child: Container(
+            width: size.width,
+            height: size.height,
+            color: const Color(0xFFF5F5F5),
+            child: Center(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: !changeState.value
+                    ? const EmptyWidget(
+                        emptyText:
+                            'Uh Oh! You currently have no posts,\nfollow some people to see their posts here.',
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: kToolbarHeight + 30),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: SizedBox(
+                              child: Row(
+                                children: [
+                                  UserStory(
+                                      size: size,
+                                      isMe: true,
+                                      isLive: false,
+                                      hasWatched: false,
+                                      username: 'Add Moment'),
+                                  UserStory(
+                                      size: size,
+                                      isMe: false,
+                                      isLive: false,
+                                      hasWatched: false,
+                                      username: 'John'),
+                                  UserStory(
+                                      size: size,
+                                      isMe: false,
+                                      isLive: true,
+                                      hasWatched: false,
+                                      username: 'Daniel'),
+                                  UserStory(
+                                      size: size,
+                                      isMe: false,
+                                      isLive: false,
+                                      hasWatched: true,
+                                      username: 'John'),
+                                  UserStory(
+                                      size: size,
+                                      isMe: false,
+                                      isLive: true,
+                                      hasWatched: false,
+                                      username: 'Daniel'),
+                                  UserStory(
+                                      size: size,
+                                      isMe: false,
+                                      isLive: false,
+                                      hasWatched: true,
+                                      username: 'John'),
+                                ],
+                              ),
+                            ).paddingOnly(l: 11),
+                          ),
+                          const SizedBox(height: 12),
+                          const Divider(
+                              thickness: 0.5, color: AppColors.greyShade4),
+                          const SizedBox(height: 5),
+                          //ListView.builder(itemBuilder: itemBuilder)
+                          ReacherCard(size: size),
+                          ReacherCard(size: size),
+                        ],
+                      ),
+              ).paddingOnly(t: 10),
             ),
-          ).paddingOnly(t: 10),
+          ),
         ),
       ),
     );
@@ -391,11 +408,13 @@ class UserStory extends StatelessWidget {
     required this.isLive,
     required this.isMe,
     required this.username,
+    required this.hasWatched,
   }) : super(key: key);
 
   final Size size;
   final bool isMe;
   final bool isLive;
+  final bool hasWatched;
   final String username;
 
   @override
@@ -406,23 +425,57 @@ class UserStory extends StatelessWidget {
       children: [
         Stack(
           children: [
-            Container(
-                width: 80,
-                height: 80,
-                clipBehavior: Clip.hardEdge,
-                child: Image.asset('assets/images/user.png', fit: BoxFit.fill),
-                decoration: const BoxDecoration(shape: BoxShape.circle)),
+            !hasWatched
+                ? Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: !isLive
+                          ? AppColors.primaryColor
+                          : const Color(0xFFDE0606),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFF5F5F5),
+                      ),
+                      child: Container(
+                          width: 70,
+                          height: 70,
+                          clipBehavior: Clip.hardEdge,
+                          child: Image.asset('assets/images/user.png',
+                              fit: BoxFit.fill),
+                          decoration:
+                              const BoxDecoration(shape: BoxShape.circle)),
+                    ),
+                  )
+                : Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFF5F5F5),
+                    ),
+                    child: Container(
+                        width: 70,
+                        height: 70,
+                        clipBehavior: Clip.hardEdge,
+                        child: Image.asset('assets/images/user.png',
+                            fit: BoxFit.fill),
+                        decoration:
+                            const BoxDecoration(shape: BoxShape.circle)),
+                  ),
             isMe
                 ? Positioned(
                     bottom: size.width * 0.01,
                     right: size.width * 0.008,
                     child: Container(
-                        width: 18,
-                        height: 18,
+                        width: 21,
+                        height: 21,
                         child: const Icon(
                           Icons.add,
                           color: AppColors.white,
-                          size: 13,
+                          size: 14,
                         ),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -436,21 +489,18 @@ class UserStory extends StatelessWidget {
                 : isLive
                     ? Positioned(
                         bottom: size.width * 0.0001,
-                        right: size.width * 0.065,
+                        right: size.width * 0.054,
                         child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            child: const Text('Live',
+                            padding: const EdgeInsets.symmetric(horizontal: 7),
+                            child: const Text('LIVE',
                                 style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 11,
+                                    letterSpacing: 1.1,
                                     fontWeight: FontWeight.w400,
                                     color: AppColors.white)),
                             decoration: BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 color: const Color(0xFFDE0606),
-                                border: Border.all(
-                                  color: AppColors.white,
-                                  width: 1,
-                                ),
                                 borderRadius: BorderRadius.circular(3))),
                       )
                     : const SizedBox.shrink(),

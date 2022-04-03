@@ -9,6 +9,18 @@ class User {
   String? id;
   bool? isActive;
   String? lastLogin;
+  String? userId;
+  String? bio;
+  DateTime? dateofBirth;
+  String? displayPicture;
+  String? gender;
+  String? location;
+  String? profilePicture;
+  String? profileSlug;
+  bool? showContact;
+  bool? showLocation;
+  String? userQR;
+  String? username;
 
   User({
     this.firstName,
@@ -21,6 +33,18 @@ class User {
     this.id,
     this.isActive,
     this.lastLogin,
+    this.userId,
+    this.bio,
+    this.dateofBirth,
+    this.displayPicture,
+    this.gender,
+    this.location,
+    this.profilePicture,
+    this.profileSlug,
+    this.showContact,
+    this.showLocation,
+    this.userQR,
+    this.username,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -34,18 +58,42 @@ class User {
         id: json["id"],
         isActive: json["isActive"],
         lastLogin: json["lastLogin"],
+        userId: json["userId"],
+        bio: json["bio"],
+        dateofBirth: DateTime.parse(json["dateofBirth"] ?? "2022-04-02 14:48:19.114636") ,
+        displayPicture: json["displayPicture"],
+        gender: json["gender"],
+        location: json["location"],
+        profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        showContact: json["showContact"],
+        showLocation: json["showLocation"],
+        userQR: json["userQR"],
+        username: json["username"],
       );
 
   Map<String, dynamic> toJson() => {
-        "first_name": firstName,
-        "last_name": lastName,
+        "firstName": firstName,
+        "lastName": lastName,
         "email": email,
         "phone": phone,
         "token": token,
-        "updated_at": updatedAt,
-        "created_at": createdAt,
+        "updatedAt": updatedAt,
+        "createdAt": createdAt,
         "id": id,
         "is_active": isActive,
-        "last_login": lastLogin,
+        "lastLogin": lastLogin,
+        "userId": userId,
+        "bio": bio,
+        "dateOfBirth": dateofBirth!.toIso8601String(),
+        "displayPicture": displayPicture,
+        "gender": gender,
+        "location": location,
+        "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "showContact": showContact,
+        "showLocation": showLocation,
+        "userQR": userQR,
+        "username": username,
       };
 }

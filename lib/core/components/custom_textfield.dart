@@ -14,6 +14,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final bool autocorrect;
   final bool isDense;
+  final bool readOnly;
 
   const CustomTextField(
       {Key? key,
@@ -27,12 +28,14 @@ class CustomTextField extends StatelessWidget {
       this.autocorrect = false,
       this.suffixIcon,
       this.isDense = false,
+      this.readOnly = false,
       required this.textCapitalization})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: readOnly,
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
@@ -48,6 +51,7 @@ class CustomTextField extends StatelessWidget {
         hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 13),
         filled: false,
         suffixIcon: suffixIcon,
+        
         prefixIcon: prefixIcon,
         enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.black, width: 0.5)),

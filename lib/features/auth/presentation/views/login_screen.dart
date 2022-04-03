@@ -9,10 +9,10 @@ import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/forgot_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
-import 'package:reach_me/features/home/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter/material.dart';
+import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 
 class LoginScreen extends HookWidget {
   static const String id = 'login_screen';
@@ -25,13 +25,15 @@ class LoginScreen extends HookWidget {
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
     var size = MediaQuery.of(context).size;
+
     return Scaffold(
         backgroundColor: AppColors.white,
         body: BlocConsumer<AuthBloc, AuthState>(
             bloc: globals.authBloc,
             listener: (context, state) {
               if (state is Authenticated) {
-                RouteNavigators.routeNoWayHome(context, const HomeScreen());
+                //TODO: CHANGE NAV TO HOME
+                RouteNavigators.route(context, const HomeScreen());
               }
             },
             builder: (context, state) {
@@ -190,8 +192,8 @@ class LoginScreen extends HookWidget {
                                 prefix: 'assets/svgs/google.svg',
                                 color: AppColors.white,
                                 onPressed: () {
-                                  RouteNavigators.route(
-                                      context, const HomeScreen());
+                                  // RouteNavigators.route(
+                                  //     context, const HomeScreen());
                                 },
                                 size: size,
                                 textColor: AppColors.primaryColor,

@@ -53,7 +53,7 @@ class AuthRemoteDataSource {
         'firstName': firstName,
         'lastName': lastName,
         'password': password,
-        'phone': '080335',
+        'phone': phoneNumber,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
