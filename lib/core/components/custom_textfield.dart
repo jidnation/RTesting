@@ -51,7 +51,6 @@ class CustomTextField extends StatelessWidget {
         hintStyle: const TextStyle(color: Color(0xFF666666), fontSize: 13),
         filled: false,
         suffixIcon: suffixIcon,
-        
         prefixIcon: prefixIcon,
         enabledBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: AppColors.black, width: 0.5)),
@@ -77,6 +76,10 @@ class CustomRoundTextField extends StatelessWidget {
   final double borderRadius;
   final TextStyle hintStyle;
   final TextStyle textStyle;
+  final int? maxLines;
+  final int? minLines;
+  final Color? fillColor;
+  final bool? isDense;
 
   const CustomRoundTextField(
       {Key? key,
@@ -91,16 +94,21 @@ class CustomRoundTextField extends StatelessWidget {
       this.suffixIcon,
       this.isFilled = true,
       this.borderRadius = 54,
-      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 15),
-      this.textStyle = const TextStyle(color: AppColors.black, fontSize: 15),
+      this.minLines = 1,
+      this.maxLines = 5,
+      this.isDense = false,
+      this.fillColor = const Color(0xFFF5F5F5),
+      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
+      this.textStyle =
+          const TextStyle(color: AppColors.textColor2, fontSize: 15),
       this.textCapitalization = TextCapitalization.none})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      minLines: 1,
-      maxLines: 5,
+      minLines: minLines,
+      maxLines: maxLines,
       style: textStyle,
       keyboardType: keyboardType,
       obscureText: obscureText,
@@ -112,9 +120,12 @@ class CustomRoundTextField extends StatelessWidget {
         hintText: hintText,
         hintStyle: hintStyle,
         filled: isFilled,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        fillColor: AppColors.greyShade8,
+        isDense: isDense,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 19,
+        ),
+        fillColor: fillColor,
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         enabledBorder: OutlineInputBorder(

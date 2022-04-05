@@ -196,7 +196,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                   children: <Widget>[
                     Center(
                       child: SvgPicture.asset(
-                        'assets/svgs/illustration 6-new.svg',
+                        'assets/svgs/otp.svg',
                         height: 186,
                         width: 290,
                       ),
@@ -212,7 +212,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'An 4 digit code has been sent to your email: $email',
+                      'An 6 digit code has been sent to your\nemail: $email',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,

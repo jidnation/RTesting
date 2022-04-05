@@ -34,6 +34,9 @@ class CustomButton extends StatelessWidget {
             padding: padding,
             backgroundColor: color,
             side: borderSide,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             shadowColor: const Color(0xFF323247)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

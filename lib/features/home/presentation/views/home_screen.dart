@@ -34,6 +34,7 @@ class HomeScreen extends HookWidget {
         index: _currentIndex.value,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex.value,
         onTap: (index) => _currentIndex.value = index,
         selectedItemColor: AppColors.primaryColor,
@@ -42,35 +43,35 @@ class HomeScreen extends HookWidget {
         showSelectedLabels: false,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/home.svg',
+            icon: SvgPicture.asset('assets/svgs/home-a.svg',
                 color: _currentIndex.value == 0
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/search icon.svg',
+            icon: SvgPicture.asset('assets/svgs/search.svg',
                 color: _currentIndex.value == 1
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/media.svg',
+            icon: SvgPicture.asset('assets/svgs/play.svg',
                 color: _currentIndex.value == 2
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/notification icon.svg',
+            icon: SvgPicture.asset('assets/svgs/notification.svg',
                 color: _currentIndex.value == 3
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/profile icon.svg',
+            icon: SvgPicture.asset('assets/svgs/profile.svg',
                 color: _currentIndex.value == 4
                     ? AppColors.primaryColor
                     : AppColors.blackShade3),

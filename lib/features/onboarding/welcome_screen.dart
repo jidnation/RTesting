@@ -15,8 +15,9 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-        body: SafeArea(
-      child: SizedBox(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SizedBox(
           height: size.height,
           width: size.width,
           child: Column(
@@ -26,7 +27,7 @@ class WelcomeScreen extends StatelessWidget {
             children: <Widget>[
               Center(
                 child: SvgPicture.asset(
-                  'assets/svgs/illustration 4-new.svg',
+                  'assets/svgs/Sign Up.svg',
                   height: 186,
                   width: 290,
                 ),
@@ -36,8 +37,8 @@ class WelcomeScreen extends StatelessWidget {
                 'Welcome Reacher',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primaryColor,
-                  fontSize: 25,
+                  color: AppColors.textColor2,
+                  fontSize: 20,
                 ),
               ),
               const SizedBox(height: 8.0),
@@ -46,35 +47,35 @@ class WelcomeScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF1B1B1A),
+                  color: Color(0xFF767474),
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 40),
               CustomButton(
-                      label: 'Login',
-                      color: AppColors.primaryColor,
-                      onPressed: () {
-                        RouteNavigators.route(context, LoginScreen());
-                      },
-                      size: size,
-                      textColor: AppColors.white,
-                      borderSide: BorderSide.none)
-                  .paddingSymmetric(h: 45),
+                label: 'Login',
+                color: AppColors.textColor2,
+                onPressed: () => RouteNavigators.route(context, LoginScreen()),
+                size: size,
+                textColor: AppColors.white,
+                borderSide: BorderSide.none,
+              ).paddingSymmetric(h: 45),
               const SizedBox(height: 20),
               CustomButton(
-                      label: 'Sign up',
-                      color: AppColors.white,
-                      onPressed: () {
-                        RouteNavigators.route(context, SignUpScreen());
-                      },
-                      size: size,
-                      textColor: AppColors.primaryColor,
-                      borderSide: const BorderSide(
-                          color: AppColors.primaryColor, width: 1))
-                  .paddingSymmetric(h: 45),
+                label: 'Sign up',
+                color: AppColors.white,
+                onPressed: () => RouteNavigators.route(context, SignUpScreen()),
+                size: size,
+                textColor: AppColors.textColor2,
+                borderSide: const BorderSide(
+                  color: AppColors.textColor2,
+                  width: 1,
+                ),
+              ).paddingSymmetric(h: 45),
             ],
-          )),
-    ));
+          ),
+        ),
+      ),
+    );
   }
 }

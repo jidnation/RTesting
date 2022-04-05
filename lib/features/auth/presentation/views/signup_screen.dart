@@ -61,116 +61,41 @@ class SignUpScreen extends HookWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 50),
                           SvgPicture.asset(
-                            'assets/svgs/logo-new.svg',
-                            width: size.width * 0.15,
+                            'assets/svgs/logo-blue.svg',
+                            width: 36,
                           ),
                           const SizedBox(height: 40),
                           const Text(
                             'Create an Account',
                             style: TextStyle(
-                              fontSize: 24.0,
+                              fontSize: 20.0,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColor,
+                              color: AppColors.textColor2,
                             ),
                           ),
                           const SizedBox(height: 7),
-                          const Text(
-                            'Sign up and own an account',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textColor,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Full Name',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textFieldLabelColor,
-                              ),
-                            ),
-                          ),
-                          CustomTextField(
-                            hintText: 'Enter your full name',
-                            keyboardType: TextInputType.name,
-                            textCapitalization: TextCapitalization.words,
-                            validator: (value) =>
-                                Validator.fullNameValidate(value ?? ""),
-                            controller: _fullNameController,
-                          ),
-                          const SizedBox(height: 16),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Email',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textFieldLabelColor,
-                              ),
-                            ),
-                          ),
-                          CustomTextField(
-                            hintText: 'Enter your email',
-                            keyboardType: TextInputType.emailAddress,
-                            textCapitalization: TextCapitalization.none,
-                            validator: (value) =>
-                                Validator.validateEmail(value ?? ""),
-                            controller: _emailController,
-                          ),
-                          const SizedBox(height: 16),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Password (6 or more characters)',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textFieldLabelColor,
-                              ),
-                            ),
-                          ),
-                          CustomTextField(
-                            hintText: '********',
-                            obscureText: _obscureText.value,
-                            keyboardType: TextInputType.text,
-                            controller: _passwordController,
-                            textCapitalization: TextCapitalization.none,
-                            validator: (value) =>
-                                Validator.validatePassword(value ?? ""),
-                            suffixIcon: GestureDetector(
-                              onTap: () {
-                                _obscureText.value = !_obscureText.value;
-                              },
-                              child: Icon(
-                                _obscureText.value
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: AppColors.textFieldLabelColor,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           Align(
-                            alignment: Alignment.centerLeft,
+                            alignment: Alignment.center,
                             child: RichText(
-                              textScaleFactor: 0.75,
+                              textScaleFactor: 0.8,
+                              textAlign: TextAlign.center,
                               text: const TextSpan(
-                                text: "By continuing, you agree to our ",
+                                text: "By continuing, you agree to our User\n ",
                                 style: TextStyle(
                                   color: AppColors.textColor,
                                   fontSize: 15,
+                                  fontFamily: 'Poppins',
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: 'User Agreement ',
+                                    text: 'Agreement ',
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontSize: 15,
                                       fontWeight: FontWeight.normal,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
                                   TextSpan(
@@ -179,6 +104,7 @@ class SignUpScreen extends HookWidget {
                                       color: AppColors.textColor,
                                       fontSize: 15,
                                       fontWeight: FontWeight.normal,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
                                   TextSpan(
@@ -187,6 +113,7 @@ class SignUpScreen extends HookWidget {
                                       color: AppColors.primaryColor,
                                       fontSize: 15,
                                       fontWeight: FontWeight.normal,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
                                   TextSpan(
@@ -195,16 +122,59 @@ class SignUpScreen extends HookWidget {
                                       color: AppColors.textColor,
                                       fontSize: 15,
                                       fontWeight: FontWeight.normal,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 40),
+                          CustomRoundTextField(
+                            hintText: 'Full name',
+                            keyboardType: TextInputType.name,
+                            textCapitalization: TextCapitalization.words,
+                            validator: (value) =>
+                                Validator.fullNameValidate(value ?? ""),
+                            controller: _fullNameController,
+                          ),
+                          const SizedBox(height: 16),
+                          CustomRoundTextField(
+                            hintText: 'Email',
+                            keyboardType: TextInputType.emailAddress,
+                            textCapitalization: TextCapitalization.none,
+                            validator: (value) =>
+                                Validator.validateEmail(value ?? ""),
+                            controller: _emailController,
+                          ),
+                          const SizedBox(height: 16),
+                          CustomRoundTextField(
+                            maxLines: 1,
+                            hintText: 'Password',
+                            obscureText: _obscureText.value,
+                            keyboardType: TextInputType.text,
+                            controller: _passwordController,
+                            textCapitalization: TextCapitalization.none,
+                            validator: (value) =>
+                                Validator.validatePassword(value ?? ""),
+                            suffixIcon: GestureDetector(
+                              onTap: () =>
+                                  _obscureText.value = !_obscureText.value,
+                              child: _obscureText.value
+                                  ? const Icon(
+                                      Icons.visibility_off_outlined,
+                                      color: AppColors.textFieldLabelColor,
+                                    )
+                                  : const Icon(
+                                      Icons.visibility,
+                                      color: AppColors.primaryColor,
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 40),
                           CustomButton(
                             label: 'Done',
-                            color: AppColors.primaryColor,
+                            color: AppColors.textColor2,
                             onPressed: () {
                               if (_key.currentState!.validate()) {
                                 final firstName =
@@ -231,21 +201,28 @@ class SignUpScreen extends HookWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: const [
                               Expanded(
-                                  child: Divider(
-                                      color: AppColors.black,
-                                      thickness: 0.5,
-                                      height: 0.5,
-                                      endIndent: 18.0)),
-                              Text('OR',
-                                  style: TextStyle(
-                                      color: AppColors.textColor,
-                                      fontSize: 9.5)),
+                                child: Divider(
+                                  color: AppColors.black,
+                                  thickness: 0.5,
+                                  height: 0.5,
+                                  endIndent: 18.0,
+                                ),
+                              ),
+                              Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: AppColors.textColor,
+                                  fontSize: 9.5,
+                                ),
+                              ),
                               Expanded(
-                                  child: Divider(
-                                      color: AppColors.black,
-                                      thickness: 0.5,
-                                      height: 0.5,
-                                      indent: 18.0)),
+                                child: Divider(
+                                  color: AppColors.black,
+                                  thickness: 0.5,
+                                  height: 0.5,
+                                  indent: 18.0,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 20),

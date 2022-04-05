@@ -12,41 +12,38 @@ class OnboardingScreen extends StatelessWidget {
   final List<RMOnboardingModel>? pages = [
     RMOnboardingModel(
         title: 'Welcome to ReachMe',
-        description: 'Start connecting to your world.',
+        description: 'Connect to your world, reach friends and family, chat in diverse languages, provide meanings to words and bring your culture to light',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
-        imagePath: 'assets/svgs/illustration 1-new.svg'),
+        imagePath: 'assets/svgs/onboarding-1.svg'),
     RMOnboardingModel(
-        title: 'Smooth and easy',
-        description: 'Enjoy a better Visual and Audio\nCommunication',
+        title: 'Enjoy audio features',
+        description: 'Post reaches, status and make comments in audio form',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
-        imagePath: 'assets/svgs/illustration 2-new.svg'),
+        imagePath: 'assets/svgs/onboarding-2.svg'),
     RMOnboardingModel(
-        title: 'Secure at all times',
-        description: 'Better High-Level Security',
+        title: 'Shoutout and Shoutdown posts',
+        description: 'Be in control of your reachme ecosystem, decide reaches that are legible to stay',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
-        imagePath: 'assets/svgs/illustration 3-new.svg'),
+        imagePath: 'assets/svgs/onboarding-3.svg'),
   ];
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SizedBox(
-        height: size.height,
-        width: size.width,
-        child: RMOnboardingScreen(
-          bgColor: AppColors.white,
-          themeColor: AppColors.primaryColor,
-          pages: pages,
-          skipClicked: (value) {
-            RouteNavigators.route(context, const WelcomeScreen());
-          },
-          getStartedClicked: (value) {
-            RouteNavigators.route(context, const WelcomeScreen());
-          },
-        ),
+      backgroundColor: Colors.white,
+      body: RMOnboardingScreen(
+        bgColor: AppColors.white,
+        themeColor: AppColors.primaryColor,
+        pages: pages,
+        skipClicked: (value) {
+          RouteNavigators.route(context, const WelcomeScreen());
+        },
+        getStartedClicked: (value) {
+          RouteNavigators.route(context, const WelcomeScreen());
+        },
       ),
     );
   }

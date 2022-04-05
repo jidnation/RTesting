@@ -50,11 +50,19 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
       alignment: Alignment.center,
       duration: const Duration(milliseconds: 150),
       margin: const EdgeInsets.symmetric(horizontal: 4.9),
-      height: 3.4,
-      width: 20.0,
+      height: 9,
+      width: isActive ? 15 : 9,
       decoration: BoxDecoration(
-        color: isActive ? widget.themeColor : const Color(0xFFC4C4C4),
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        color: isActive && _currentPage == 0
+            ? const Color(0xFF86D5FF)
+            : isActive && _currentPage == 1
+                ? const Color(0xFFFFCD4B)
+                : isActive && _currentPage == 2
+                    ? const Color(0xFFFF7676)
+                    : const Color(0xFFC4C4C4),
+        borderRadius:
+            isActive ? const BorderRadius.all(Radius.circular(12)) : null,
+        shape: isActive ? BoxShape.rectangle : BoxShape.circle,
       ),
     );
   }
@@ -62,101 +70,93 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: widget.bgColor,
-      body: SafeArea(
-        child: SizedBox(
-          height: size.height,
-          width: size.width,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Center(
-              child: ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: size.height * 0.6,
-                    width: size.width,
-                    child: Container(
-                      color: Colors.transparent,
-                      child: PageView(
-                          physics: const ClampingScrollPhysics(),
-                          controller: _pageController,
-                          onPageChanged: (int page) {
-                            setState(() {
-                              _currentPage = page;
-                            });
-                          },
-                          children: buildOnboardingPages()),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Align(
-                      alignment: FractionalOffset.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: _buildPageIndicator(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: FractionalOffset.bottomLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 20,
-                            bottom: 10,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              widget.skipClicked!("Skip Tapped");
-                            },
-                            child: const Text(
-                              'Skip',
-                              style: TextStyle(
-                                  color: AppColors.greyShade3,
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600),
-                            ).paddingAll(10),
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: FractionalOffset.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 20, bottom: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              _currentPage != widget.pages!.length - 1
-                                  ? _pageController.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.ease,
-                                    )
-                                  : _getStartedTapped();
-                            },
-                            child: const Text(
-                              'Next',
-                              style: TextStyle(
-                                  color: AppColors.primaryColor,
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600),
-                            ).paddingAll(10),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        children: <Widget>[
+          const SizedBox(height: 20),
+          SizedBox(
+            height: size.height * 0.5,
+            width: size.width,
+            child: Container(
+              color: Colors.transparent,
+              child: PageView(
+                  physics: const BouncingScrollPhysics(),
+                  controller: _pageController,
+                  onPageChanged: (int page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  children: buildOnboardingPages()),
+            ),
+          ),
+          SizedBox(height: size.height * 0.1),
+          Align(
+            alignment: Alignment.center,
+            child: Align(
+              alignment: FractionalOffset.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _buildPageIndicator(),
               ),
             ),
           ),
-        ),
+          SizedBox(height: size.height * 0.1),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Align(
+                alignment: FractionalOffset.bottomLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    bottom: 10,
+                  ),
+                  child: GestureDetector(
+                    onTap: () => widget.skipClicked!("Skip Tapped"),
+                    child: const Text(
+                      'Skip',
+                      style: TextStyle(
+                          color: AppColors.greyShade3,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600),
+                    ).paddingAll(14),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: FractionalOffset.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20, bottom: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      _currentPage != widget.pages!.length - 1
+                          ? _pageController.nextPage(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.ease,
+                            )
+                          : _getStartedTapped();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.textColor2,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600),
+                      ).paddingSymmetric(h: 14, v: 10),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -176,16 +176,14 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           ),
         ),
         const SizedBox(height: 96.0),
-        page.title != ''
-            ? Text(
-                page.title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: page.titleColor,
-                  fontSize: 25,
-                ),
-              )
-            : const SizedBox(height: 5.0),
+        Text(
+          page.title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: page.titleColor,
+            fontSize: 20,
+          ),
+        ),
         const SizedBox(height: 6.0),
         Text(
           page.description,
@@ -197,7 +195,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
           ),
         ),
       ],
-    );
+    ).paddingSymmetric(h: 20);
   }
 
   void _getStartedTapped() {
