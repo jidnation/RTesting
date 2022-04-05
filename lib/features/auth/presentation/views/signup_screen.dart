@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,7 +11,6 @@ import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
-import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +27,6 @@ class SignUpScreen extends HookWidget {
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
     final _fullNameController = useTextEditingController();
-    final _usernameController = useTextEditingController();
     final _obscureText = useState(true);
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -65,7 +61,7 @@ class SignUpScreen extends HookWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Expanded(child: SizedBox()),
+                          const SizedBox(height: 30),
                           SvgPicture.asset(
                             'assets/svgs/logo-new.svg',
                             width: size.width * 0.15,
@@ -92,25 +88,6 @@ class SignUpScreen extends HookWidget {
                           const Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Username',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textFieldLabelColor,
-                              ),
-                            ),
-                          ),
-                          CustomTextField(
-                            hintText: 'Enter your preferred username',
-                            keyboardType: TextInputType.name,
-                            textCapitalization: TextCapitalization.sentences,
-                            validator: (value) =>
-                                Validator.validateName(value ?? ""),
-                            controller: _usernameController,
-                          ),
-                          const SizedBox(height: 16),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
                               'Full Name',
                               style: TextStyle(
                                 fontSize: 13,
@@ -121,7 +98,7 @@ class SignUpScreen extends HookWidget {
                           CustomTextField(
                             hintText: 'Enter your full name',
                             keyboardType: TextInputType.name,
-                            textCapitalization: TextCapitalization.sentences,
+                            textCapitalization: TextCapitalization.words,
                             validator: (value) =>
                                 Validator.fullNameValidate(value ?? ""),
                             controller: _fullNameController,
@@ -240,9 +217,7 @@ class SignUpScreen extends HookWidget {
                                   password: _passwordController.text,
                                   firstName: firstName.replaceAll(' ', ''),
                                   lastName: lastName.replaceAll(' ', ''),
-                                  phoneNumber: Random.secure().nextInt(1000000000).toString(),
                                 ));
-                                
                               } else {
                                 return;
                               }

@@ -27,7 +27,7 @@ class TimelineScreen extends HookWidget {
     final scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     var size = MediaQuery.of(context).size;
-    Console.log("user data", globals.user!.toJson());
+    //Console.log("user data", globals.user!.toJson());
     final changeState = useState<bool>(false);
     return Scaffold(
       key: scaffoldKey.value,
@@ -151,9 +151,9 @@ class TimelineScreen extends HookWidget {
                           ),
                           const SizedBox(height: 12),
                           const Divider(
-                              thickness: 0.5, color: AppColors.greyShade4),
-                          const SizedBox(height: 5),
-                          //ListView.builder(itemBuilder: itemBuilder)
+                            thickness: 0.5,
+                            color: AppColors.greyShade4,
+                          ),
                           ReacherCard(size: size),
                           ReacherCard(size: size),
                         ],
@@ -178,19 +178,12 @@ class ReacherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(13.0),
       child: Container(
         width: size.width,
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
-          boxShadow: const [
-            BoxShadow(
-                color: AppColors.blackShade4,
-                offset: Offset(0, 4),
-                blurRadius: 8,
-                spreadRadius: 0)
-          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -204,11 +197,13 @@ class ReacherCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 33,
+                      height: 33,
                       clipBehavior: Clip.hardEdge,
-                      child: Image.asset('assets/images/user.png',
-                          fit: BoxFit.fill),
+                      child: Image.asset(
+                        'assets/images/user.png',
+                        fit: BoxFit.fill,
+                      ),
                       decoration: const BoxDecoration(shape: BoxShape.circle),
                     ).paddingOnly(l: 15, t: 10),
                     const SizedBox(width: 9),
@@ -221,19 +216,20 @@ class ReacherCard extends StatelessWidget {
                           children: [
                             const Text('Rooney Brown',
                                 style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textColor2)),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textColor2,
+                                )),
                             const SizedBox(width: 3),
                             SvgPicture.asset('assets/svgs/verified.svg')
                           ],
                         ),
                         const Text('Manchester, United Kingdom',
                             style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textColor2,
-                                height: 1)),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textColor2,
+                            )),
                       ],
                     ).paddingOnly(t: 10),
                   ],

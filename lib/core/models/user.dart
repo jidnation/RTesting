@@ -4,12 +4,8 @@ class User {
   String? email;
   String? phone;
   String? token;
-  String? updatedAt;
-  String? createdAt;
   String? id;
-  bool? isActive;
-  String? lastLogin;
-  String? userId;
+  String? authId;
   String? bio;
   DateTime? dateofBirth;
   String? displayPicture;
@@ -19,8 +15,11 @@ class User {
   String? profileSlug;
   bool? showContact;
   bool? showLocation;
-  String? userQR;
   String? username;
+  bool? verified;
+  int? nReachers;
+  int? nReaching;
+  int? nStaring;
 
   User({
     this.firstName,
@@ -28,12 +27,8 @@ class User {
     this.email,
     this.phone,
     this.token,
-    this.updatedAt,
-    this.createdAt,
     this.id,
-    this.isActive,
-    this.lastLogin,
-    this.userId,
+    this.authId,
     this.bio,
     this.dateofBirth,
     this.displayPicture,
@@ -43,24 +38,24 @@ class User {
     this.profileSlug,
     this.showContact,
     this.showLocation,
-    this.userQR,
     this.username,
+    this.verified,
+    this.nReachers,
+    this.nReaching,
+    this.nStaring,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json["_id"],
+        authId: json["authId"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         email: json["email"],
         phone: json["phone"],
         token: json["token"],
-        updatedAt: json["updatedAt"],
-        createdAt: json["createdAt"],
-        id: json["id"],
-        isActive: json["isActive"],
-        lastLogin: json["lastLogin"],
-        userId: json["userId"],
         bio: json["bio"],
-        dateofBirth: DateTime.parse(json["dateofBirth"] ?? "2022-04-02 14:48:19.114636") ,
+        dateofBirth:
+            DateTime.parse(json["dateofBirth"] ?? "2022-04-02 14:48:19.114636"),
         displayPicture: json["displayPicture"],
         gender: json["gender"],
         location: json["location"],
@@ -68,8 +63,11 @@ class User {
         profileSlug: json["profileSlug"],
         showContact: json["showContact"],
         showLocation: json["showLocation"],
-        userQR: json["userQR"],
+        nReachers: json["nReachers"],
+        nReaching: json["nReaching"],
+        nStaring: json["nStaring"],
         username: json["username"],
+        verified: json["verified"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -78,12 +76,8 @@ class User {
         "email": email,
         "phone": phone,
         "token": token,
-        "updatedAt": updatedAt,
-        "createdAt": createdAt,
-        "id": id,
-        "is_active": isActive,
-        "lastLogin": lastLogin,
-        "userId": userId,
+        "_id": id,
+        "authId": authId,
         "bio": bio,
         "dateOfBirth": dateofBirth!.toIso8601String(),
         "displayPicture": displayPicture,
@@ -93,7 +87,9 @@ class User {
         "profileSlug": profileSlug,
         "showContact": showContact,
         "showLocation": showLocation,
-        "userQR": userQR,
+        "nReachers": nReachers,
+        "nReaching": nReaching,
+        "nStaring": nStaring,
         "username": username,
       };
 }

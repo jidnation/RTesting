@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/loader.dart';
@@ -25,7 +26,7 @@ class LoginScreen extends HookWidget {
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
     var size = MediaQuery.of(context).size;
-
+    final _obscureText = useState(true);
     return Scaffold(
         backgroundColor: AppColors.white,
         body: BlocConsumer<AuthBloc, AuthState>(
@@ -34,6 +35,8 @@ class LoginScreen extends HookWidget {
               if (state is Authenticated) {
                 //TODO: CHANGE NAV TO HOME
                 RouteNavigators.route(context, const HomeScreen());
+              } else if (state is AuthError) {
+                RMSnackBar.showErrorSnackBar(context, message: state.error);
               }
             },
             builder: (context, state) {
@@ -97,10 +100,6 @@ class LoginScreen extends HookWidget {
                               validator: (value) =>
                                   Validator.validateEmail(value ?? ""),
                               controller: _emailController,
-                              suffixIcon: const Icon(
-                                Icons.check,
-                                color: AppColors.primaryColor,
-                              ),
                             ),
                             const SizedBox(height: 30),
                             const Align(
@@ -115,15 +114,24 @@ class LoginScreen extends HookWidget {
                             ),
                             CustomTextField(
                               hintText: '********',
-                              obscureText: true,
+                              obscureText: _obscureText.value,
                               keyboardType: TextInputType.text,
                               controller: _passwordController,
                               textCapitalization: TextCapitalization.none,
                               validator: (value) =>
                                   Validator.validatePassword(value ?? ""),
-                              suffixIcon: const Icon(
-                                Icons.visibility_off_outlined,
-                                color: AppColors.textFieldLabelColor,
+                              suffixIcon: GestureDetector(
+                                onTap: () =>
+                                    _obscureText.value = !_obscureText.value,
+                                child: _obscureText.value
+                                    ? const Icon(
+                                        Icons.visibility_off_outlined,
+                                        color: AppColors.textFieldLabelColor,
+                                      )
+                                    : const Icon(
+                                        Icons.visibility,
+                                        color: AppColors.primaryColor,
+                                      ),
                               ),
                             ),
                             Align(
@@ -192,8 +200,8 @@ class LoginScreen extends HookWidget {
                                 prefix: 'assets/svgs/google.svg',
                                 color: AppColors.white,
                                 onPressed: () {
-                                  // RouteNavigators.route(
-                                  //     context, const HomeScreen());
+                                  RouteNavigators.route(
+                                      context, const HomeScreen());
                                 },
                                 size: size,
                                 textColor: AppColors.primaryColor,

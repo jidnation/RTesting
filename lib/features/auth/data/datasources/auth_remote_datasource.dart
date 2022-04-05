@@ -1,7 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
-import 'package:reach_me/features/auth/data/models/user.dart';
+import 'package:reach_me/features/auth/data/models/login_response.dart';
 
 // abstract class IAuthRemoteDataSource {
 //   Future<User> createAccount({
@@ -19,12 +19,11 @@ class AuthRemoteDataSource {
   final GraphQLApiClient _client;
 
   //@override
-  Future<User> createAccount({
+  Future<LoginResponse> createAccount({
     required String email,
     required String firstName,
     required String lastName,
     required String password,
-    String? phoneNumber,
   }) async {
     const String q = r'''
     mutation createAccount(
@@ -32,7 +31,6 @@ class AuthRemoteDataSource {
     $firstName: String!
     $lastName: String!
     $password: String!
-    $phone: String
     ) {
     createAccount(
       data: {
@@ -40,7 +38,6 @@ class AuthRemoteDataSource {
         firstName: $firstName
         lastName: $lastName
         password: $password
-        phone: $phone
     }
     ) {
     id
@@ -53,19 +50,18 @@ class AuthRemoteDataSource {
         'firstName': firstName,
         'lastName': lastName,
         'password': password,
-        'phone': phoneNumber,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('create account resut', result.data);
-      return User.fromJson(result.data!['createAccount']);
+      Console.log('create account result', result.data);
+      return LoginResponse.fromJson(result.data!['createAccount']);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<User> verifyAccount({required String? email, required int pin}) async {
+  Future<LoginResponse> verifyAccount({required String? email, required int pin}) async {
     const String q = r'''
       query activateAccount($email: String!, $pin: Int!) {
         activateAccount(email: $email, pin: $pin) {
@@ -82,7 +78,7 @@ class AuthRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('verify account', result.data);
-      return User.fromJson(result.data!['activateAccount']);
+      return LoginResponse.fromJson(result.data!['activateAccount']);
     } catch (e) {
       rethrow;
     }
@@ -120,7 +116,6 @@ class AuthRemoteDataSource {
           verifyResetPin(email: $email, pin: $pin) 
         }''';
     try {
-
       final result = await _client.query(
         gql(q),
         variables: {'email': email, 'pin': pin},
@@ -165,7 +160,7 @@ class AuthRemoteDataSource {
     }
   }
 
-  Future<User> login({required String? email, required String password}) async {
+  Future<LoginResponse> login({required String? email, required String password}) async {
     const String q = r'''
       query login($email: String!, $password: String) {
       login(email: $email, password: $password) {
@@ -190,7 +185,7 @@ class AuthRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('login account', result.data);
-      return User.fromJson(result.data!['login']);
+      return LoginResponse.fromJson(result.data!['login']);
     } catch (e) {
       rethrow;
     }

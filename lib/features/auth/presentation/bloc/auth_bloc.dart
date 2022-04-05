@@ -14,13 +14,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterUserEvent>(((event, emit) async {
       emit(AuthLoading());
       try {
-        print(event.phoneNumber);
         final result = await _authRepository!.createAccount(
           email: event.email,
           firstName: event.firstName,
           lastName: event.lastName,
           password: event.password,
-          phoneNumber: event.phoneNumber,
         );
         result.fold(
           (error) => emit(AuthError(error: error)),
@@ -52,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         result.fold(
           (error) => emit(AuthError(error: error)),
           (user) {
-            globals.user = user;
+            globals.loginResponse = user;
             globals.token = user.token;
             emit(Authenticated(message: 'User logged in successfully'));
           },
