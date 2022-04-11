@@ -6,11 +6,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/empty_state.dart';
+import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
@@ -27,8 +30,8 @@ class TimelineScreen extends HookWidget {
     final scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     var size = MediaQuery.of(context).size;
-    //Console.log("user data", globals.user!.toJson());
     final changeState = useState<bool>(false);
+    Console.log('user', globals.token);
     return Scaffold(
       key: scaffoldKey.value,
       drawer: const AppDrawer(),
@@ -47,45 +50,53 @@ class TimelineScreen extends HookWidget {
         shadowColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => scaffoldKey.value.currentState!.openDrawer(),
-          icon: const ImagePlaceholder(width: 35, height: 35),
-        ),
+            onPressed: () => scaffoldKey.value.currentState!.openDrawer(),
+            icon: globals.user!.profilePicture == null
+                ? ImagePlaceholder(
+                    width: getScreenWidth(35),
+                    height: getScreenHeight(35),
+                  )
+                : ProfilePicture(
+                    width: getScreenWidth(35),
+                    height: getScreenHeight(35),
+                    border: Border.all(color: Colors.grey.shade50, width: 3.0),
+                  )),
         titleSpacing: 5,
-        leadingWidth: 70,
-        title: const Text('Reachme',
-            style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: 21,
-              fontWeight: FontWeight.w600,
-            )),
+        leadingWidth: getScreenWidth(70),
+        title: Text(
+          'Reachme',
+          style: TextStyle(
+            color: AppColors.textColor2,
+            fontSize: getScreenHeight(21),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         actions: [
           IconButton(
             icon: SvgPicture.asset(
-              'assets/svgs/add_icon.svg',
-              width: 22,
-              height: 22,
+              'assets/svgs/post.svg',
+              width: getScreenWidth(22),
+              height: getScreenHeight(22),
             ),
-            onPressed: () {
-              RouteNavigators.route(context, const ChatsListScreen());
-            },
+            onPressed: () => RouteNavigators.route(context, const PostReach()),
           ),
-          //  const SizedBox(width: 15),
           IconButton(
             icon: SvgPicture.asset(
-              'assets/svgs/msg_icon.svg',
-              width: 22,
-              height: 22,
+              'assets/svgs/message.svg',
+              width: getScreenWidth(22),
+              height: getScreenHeight(22),
             ),
-            onPressed: () {
-              RouteNavigators.route(context, const ChatsListScreen());
-            },
+            onPressed: () => RouteNavigators.route(
+              context,
+              const ChatsListScreen(),
+            ),
           ).paddingOnly(r: 16),
         ],
       ),
       body: SafeArea(
         top: false,
         child: GestureDetector(
-          onTap: () => changeState.value = !changeState.value,
+          //onTap: () => changeState.value = !changeState.value,
           child: Container(
             width: size.width,
             height: size.height,
@@ -94,10 +105,7 @@ class TimelineScreen extends HookWidget {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: !changeState.value
-                    ? const EmptyWidget(
-                        emptyText:
-                            'Uh Oh! You currently have no posts,\nfollow some people to see their posts here.',
-                      )
+                    ? const EmptyTimelineWidget()
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +157,7 @@ class TimelineScreen extends HookWidget {
                               ),
                             ).paddingOnly(l: 11),
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: getScreenHeight(12)),
                           const Divider(
                             thickness: 0.5,
                             color: AppColors.greyShade4,
@@ -178,7 +186,10 @@ class ReacherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(13.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 13,
+        vertical: 7,
+      ),
       child: Container(
         width: size.width,
         decoration: BoxDecoration(
@@ -197,8 +208,8 @@ class ReacherCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 33,
-                      height: 33,
+                      width: getScreenWidth(33),
+                      height: getScreenHeight(33),
                       clipBehavior: Clip.hardEdge,
                       child: Image.asset(
                         'assets/images/user.png',
@@ -206,7 +217,7 @@ class ReacherCard extends StatelessWidget {
                       ),
                       decoration: const BoxDecoration(shape: BoxShape.circle),
                     ).paddingOnly(l: 15, t: 10),
-                    const SizedBox(width: 9),
+                    SizedBox(width: getScreenWidth(9)),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,22 +225,26 @@ class ReacherCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Text('Rooney Brown',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textColor2,
-                                )),
+                            Text(
+                              'Rooney Brown',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(15),
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textColor2,
+                              ),
+                            ),
                             const SizedBox(width: 3),
                             SvgPicture.asset('assets/svgs/verified.svg')
                           ],
                         ),
-                        const Text('Manchester, United Kingdom',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            )),
+                        Text(
+                          'Manchester, United Kingdom',
+                          style: TextStyle(
+                            fontSize: getScreenHeight(11),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textColor2,
+                          ),
+                        ),
                       ],
                     ).paddingOnly(t: 10),
                   ],
@@ -238,28 +253,24 @@ class ReacherCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SvgPicture.asset('assets/svgs/starred.svg'),
-                    const SizedBox(width: 9),
+                    SizedBox(width: getScreenWidth(9)),
                     IconButton(
-                        onPressed: () async {
-                          await showKebabBottomSheet(context);
-                        },
-                        iconSize: 19,
-                        padding: const EdgeInsets.all(0),
-                        icon:
-                            SvgPicture.asset('assets/svgs/more-vertical.svg')),
+                      onPressed: () async {
+                        await showKebabBottomSheet(context);
+                      },
+                      iconSize: getScreenHeight(19),
+                      padding: const EdgeInsets.all(0),
+                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
+                    ),
                   ],
                 )
               ],
             ),
-            const Divider(
-              thickness: 0.5,
-              color: AppColors.greyShade4,
-            ),
             Flexible(
-              child: const Text(
+              child: Text(
                 "Someone said “when you become independent, you’ld understand why the prodigal son came back home”",
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: getScreenHeight(14),
                   fontWeight: FontWeight.w400,
                 ),
               ).paddingSymmetric(v: 10, h: 15),
@@ -269,122 +280,163 @@ class ReacherCard extends StatelessWidget {
               children: [
                 Flexible(
                   child: Container(
-                    height: 152,
-                    width: 152,
+                    height: getScreenHeight(152),
+                    width: getScreenWidth(152),
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        image: const DecorationImage(
-                            image: AssetImage('assets/images/post.png'),
-                            fit: BoxFit.fitHeight)),
+                      borderRadius: BorderRadius.circular(15),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/images/post.png'),
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: MediaCard(size: size),
-                ),
+                SizedBox(width: getScreenWidth(8)),
+                Flexible(child: MediaCard(size: size)),
               ],
-            ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
+            ).paddingOnly(
+              r: 16,
+              l: 16,
+              b: 16,
+              t: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: IconButton(
-                        onPressed: () {},
-                        padding: const EdgeInsets.all(0),
-                        constraints: const BoxConstraints(),
-                        icon: SvgPicture.asset('assets/svgs/like.svg'),
-                      ),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 11,
+                      vertical: 7,
                     ),
-                    const SizedBox(width: 4),
-                    const Flexible(
-                      child: Text('1.2k',
-                          style: TextStyle(
-                              fontSize: 12,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: const Color(0xFFF5F5F5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: SvgPicture.asset(
+                            'assets/svgs/like.svg',
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(4)),
+                        FittedBox(
+                          child: Text(
+                            '1.2k',
+                            style: TextStyle(
+                              fontSize: getScreenHeight(12),
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3)),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: IconButton(
-                        onPressed: () {
-                          RouteNavigators.route(
-                              context, const ViewCommentsScreen());
-                        },
-                        padding: const EdgeInsets.all(0),
-                        constraints: const BoxConstraints(),
-                        icon: SvgPicture.asset('assets/svgs/comments.svg'),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Flexible(
-                      child: Text('102k',
-                          style: TextStyle(
-                              fontSize: 12,
+                              color: AppColors.textColor3,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(15)),
+                        IconButton(
+                          onPressed: () {
+                            RouteNavigators.route(
+                                context, const ViewCommentsScreen());
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: SvgPicture.asset(
+                            'assets/svgs/comment.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(4)),
+                        FittedBox(
+                          child: Text(
+                            '102k',
+                            style: TextStyle(
+                              fontSize: getScreenHeight(12),
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3)),
+                              color: AppColors.textColor3,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(15)),
+                        IconButton(
+                          onPressed: () {},
+                          padding: const EdgeInsets.all(0),
+                          constraints: const BoxConstraints(),
+                          icon: SvgPicture.asset(
+                            'assets/svgs/message.svg',
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () {},
-                  padding: const EdgeInsets.all(0),
-                  constraints: const BoxConstraints(),
-                  icon: SvgPicture.asset(
-                    'assets/svgs/comment-post.svg',
                   ),
                 ),
+                SizedBox(width: getScreenWidth(20)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
-                      child: IconButton(
-                        onPressed: () {},
-                        padding: const EdgeInsets.all(0),
-                        constraints: const BoxConstraints(),
-                        icon: SvgPicture.asset('assets/svgs/shout-out.svg'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 11,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: const Color(0xFFF5F5F5),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {},
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: SvgPicture.asset(
+                                'assets/svgs/shoutout-a.svg',
+                              ),
+                            ),
+                            Flexible(child: SizedBox(width: getScreenWidth(4))),
+                            FittedBox(
+                              child: Text(
+                                '40',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(12),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor3,
+                                ),
+                              ),
+                            ),
+                            Flexible(child: SizedBox(width: getScreenWidth(4))),
+                            IconButton(
+                              onPressed: () {},
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              icon: SvgPicture.asset(
+                                'assets/svgs/shoutdown.svg',
+                              ),
+                            ),
+                            Flexible(child: SizedBox(width: getScreenWidth(4))),
+                            FittedBox(
+                              child: Text(
+                                '20',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(12),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor3,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Flexible(
-                      child: Text('1.2k',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3)),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: IconButton(
-                        onPressed: () {},
-                        padding: const EdgeInsets.all(0),
-                        constraints: const BoxConstraints(),
-                        icon: SvgPicture.asset('assets/svgs/shout-out.svg'),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Flexible(
-                      child: Text('5k',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3)),
                     ),
                   ],
                 ),
@@ -437,11 +489,13 @@ class UserStory extends StatelessWidget {
                         color: Color(0xFFF5F5F5),
                       ),
                       child: Container(
-                          width: 70,
-                          height: 70,
+                          width: getScreenWidth(70),
+                          height: getScreenHeight(70),
                           clipBehavior: Clip.hardEdge,
-                          child: Image.asset('assets/images/user.png',
-                              fit: BoxFit.fill),
+                          child: Image.asset(
+                            'assets/images/user.png',
+                            fit: BoxFit.fill,
+                          ),
                           decoration:
                               const BoxDecoration(shape: BoxShape.circle)),
                     ),
@@ -453,11 +507,13 @@ class UserStory extends StatelessWidget {
                       color: Color(0xFFF5F5F5),
                     ),
                     child: Container(
-                        width: 70,
-                        height: 70,
+                        width: getScreenWidth(70),
+                        height: getScreenHeight(70),
                         clipBehavior: Clip.hardEdge,
-                        child: Image.asset('assets/images/user.png',
-                            fit: BoxFit.fill),
+                        child: Image.asset(
+                          'assets/images/user.png',
+                          fit: BoxFit.fill,
+                        ),
                         decoration:
                             const BoxDecoration(shape: BoxShape.circle)),
                   ),
@@ -466,8 +522,8 @@ class UserStory extends StatelessWidget {
                     bottom: size.width * 0.01,
                     right: size.width * 0.008,
                     child: Container(
-                        width: 21,
-                        height: 21,
+                        width: getScreenWidth(21),
+                        height: getScreenHeight(21),
                         child: const Icon(
                           Icons.add,
                           color: AppColors.white,
@@ -487,25 +543,30 @@ class UserStory extends StatelessWidget {
                         bottom: size.width * 0.0001,
                         right: size.width * 0.054,
                         child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7),
-                            child: const Text('LIVE',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    letterSpacing: 1.1,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.white)),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                color: const Color(0xFFDE0606),
-                                borderRadius: BorderRadius.circular(3))),
+                          padding: const EdgeInsets.symmetric(horizontal: 7),
+                          child: Text('LIVE',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(11),
+                                letterSpacing: 1.1,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.white,
+                              )),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: const Color(0xFFDE0606),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
                       )
                     : const SizedBox.shrink(),
           ],
         ),
-        isLive ? const SizedBox(height: 7) : const SizedBox(height: 11),
+        isLive
+            ? SizedBox(height: getScreenHeight(7))
+            : SizedBox(height: getScreenHeight(11)),
         Text(username,
-            style: const TextStyle(
-              fontSize: 11,
+            style: TextStyle(
+              fontSize: getScreenHeight(11),
               fontWeight: FontWeight.w400,
             ))
       ],
@@ -529,20 +590,20 @@ Future showKebabBottomSheet(BuildContext context) {
             child: ListView(shrinkWrap: true, children: [
               Center(
                 child: Container(
-                    height: 4,
-                    width: 58,
+                    height: getScreenHeight(4),
+                    width: getScreenWidth(58),
                     decoration: BoxDecoration(
                         color: AppColors.greyShade4,
                         borderRadius: BorderRadius.circular(40))),
               ).paddingOnly(t: 23),
-              const SizedBox(height: 20),
+              SizedBox(height: getScreenHeight(20)),
               KebabBottomTextButton(label: 'Share Post', onPressed: () {}),
               KebabBottomTextButton(label: 'Save Post', onPressed: () {}),
               const KebabBottomTextButton(label: 'Report'),
               const KebabBottomTextButton(label: 'Reach'),
               const KebabBottomTextButton(label: 'Star User'),
               const KebabBottomTextButton(label: 'Copy Links'),
-              const SizedBox(height: 20),
+              SizedBox(height: getScreenHeight(20)),
             ]));
       });
 }

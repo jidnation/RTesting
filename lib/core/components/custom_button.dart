@@ -7,7 +7,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color textColor;
   final BorderSide borderSide;
-  final Size size;
+  final Size? size;
   final String prefix;
   final EdgeInsetsGeometry? padding;
   final double labelFontSize;
@@ -16,7 +16,7 @@ class CustomButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onPressed,
-    required this.size,
+    this.size,
     required this.textColor,
     required this.borderSide,
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
@@ -26,6 +26,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return SizedBox(
       width: size.width,
       child: TextButton(

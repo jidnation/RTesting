@@ -22,11 +22,16 @@ class MsgBubble extends StatelessWidget {
       margin: const BubbleEdges.only(top: 10),
       alignment: isMe ? Alignment.topRight : Alignment.topLeft,
       nip: isMe ? BubbleNip.rightTop : BubbleNip.leftTop,
-      color: AppColors.white,
-      borderColor: const Color(0xFFE1E1E1),
-      borderWidth: 2,
+      color: isMe ? AppColors.primaryColor : AppColors.white,
+      borderColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      radius: const Radius.circular(20),
+      nipOffset: 0,
+      nipHeight: 17,
+      borderWidth: 0,
       child: Container(
         constraints: BoxConstraints(maxWidth: size.width / 1.5),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           textBaseline: TextBaseline.ideographic,
@@ -36,10 +41,10 @@ class MsgBubble extends StatelessWidget {
               child: Text(
                 label,
                 textAlign: TextAlign.left,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textColor2,
+                  color: isMe ? AppColors.white : AppColors.textColor2,
                 ),
               ),
             ),
@@ -49,10 +54,11 @@ class MsgBubble extends StatelessWidget {
                 child: Text(
                   timeStamp,
                   textAlign: TextAlign.right,
-                  style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textColor2),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                    color: isMe ? AppColors.white : AppColors.textColor2,
+                  ),
                 )),
           ],
         ),

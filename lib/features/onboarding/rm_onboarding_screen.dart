@@ -1,4 +1,5 @@
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/onboarding/rm_onboarding_model.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -76,7 +77,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
         children: <Widget>[
           const SizedBox(height: 20),
           SizedBox(
-            height: size.height * 0.5,
+            height: size.height * 0.7,
             width: size.width,
             child: Container(
               color: Colors.transparent,
@@ -91,7 +92,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                   children: buildOnboardingPages()),
             ),
           ),
-          SizedBox(height: size.height * 0.1),
+          SizedBox(height: size.height * 0.05),
           Align(
             alignment: Alignment.center,
             child: Align(
@@ -102,7 +103,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: size.height * 0.1),
+          SizedBox(height: size.height * 0.05),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -175,7 +176,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
             width: 220,
           ),
         ),
-        const SizedBox(height: 96.0),
+        SizedBox(height: getScreenHeight(90)),
         Text(
           page.title,
           style: TextStyle(

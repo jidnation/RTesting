@@ -6,8 +6,8 @@ import 'package:reach_me/core/helper/endpoints.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/graphql/logger_http_client.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 
-var auth = '';
 
 class GraphQLApiClient {
   GraphQLApiClient()
@@ -18,7 +18,7 @@ class GraphQLApiClient {
               Endpoints.graphQLBaseUrl,
               httpClient: LoggerHttpClient(http.Client()),
               defaultHeaders: <String, String>{
-                'Authorization': 'Bearer $auth',
+                'Authorization': 'Bearer ${globals.token}',
               },
             ),
           ),

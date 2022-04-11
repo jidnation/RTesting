@@ -99,7 +99,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           password: event.password,
           token: event.token,
         );
-
         result.fold(
           (error) => emit(AuthError(error: error)),
           (value) {

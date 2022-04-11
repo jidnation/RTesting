@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
@@ -42,6 +43,9 @@ class CustomTextField extends StatelessWidget {
       autocorrect: autocorrect,
       textCapitalization: textCapitalization,
       validator: validator,
+      style: TextStyle(
+        fontSize: getScreenHeight(15),
+      ),
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
       ],

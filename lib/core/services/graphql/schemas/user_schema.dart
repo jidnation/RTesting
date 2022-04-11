@@ -6,7 +6,7 @@ class UserSchema {
             _id
             bio
             dateOfBirth
-            displayPicture
+            coverPicture
             gender
             location
             phone

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/media_card.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 
 class SavedPostReacherCard extends StatelessWidget {
   const SavedPostReacherCard({
@@ -46,7 +49,15 @@ class SavedPostReacherCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const ProfilePicture().paddingOnly(l: 20, t: 15),
+                  globals.user!.profilePicture == null
+                      ? ImagePlaceholder(
+                          width: getScreenWidth(65),
+                          height: getScreenHeight(65),
+                        ).paddingOnly(l: 20, t: 15)
+                      : ProfilePicture(
+                          width: getScreenWidth(65),
+                          height: getScreenHeight(65),
+                        ).paddingOnly(l: 20, t: 15),
                   const SizedBox(width: 9),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,

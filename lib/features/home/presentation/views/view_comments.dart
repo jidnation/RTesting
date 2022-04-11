@@ -4,8 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:readmore/readmore.dart';
 
 class ViewCommentsScreen extends StatelessWidget {
@@ -14,7 +17,6 @@ class ViewCommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -46,19 +48,27 @@ class ViewCommentsScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                ProfilePicture(),
-                Text('Rooney Brown',
+              children: [
+                globals.user!.profilePicture == null
+                    ? ImagePlaceholder(
+                        width: getScreenWidth(50),
+                        height: getScreenHeight(50),
+                      )
+                    : ProfilePicture(
+                        width: getScreenWidth(50),
+                        height: getScreenHeight(50),
+                      ),
+                const Text('Rooney Brown',
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: AppColors.black)),
-                Text('On my way to Dubai #luxury 👌😁😁',
+                const Text('On my way to Dubai #luxury 👌😁😁',
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
                         color: AppColors.black)),
-                Text('10h',
+                const Text('10h',
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
@@ -93,7 +103,15 @@ class ViewCommentsScreen extends StatelessWidget {
               onPressed: () {},
               icon: const Icon(Icons.send),
             ),
-            prefixIcon: const ProfilePicture(),
+            prefixIcon: globals.user!.profilePicture == null
+                ? ImagePlaceholder(
+                    width: getScreenWidth(50),
+                    height: getScreenHeight(50),
+                  )
+                : ProfilePicture(
+                    width: getScreenWidth(50),
+                    height: getScreenHeight(50),
+                  ),
           )
         ],
       ),
@@ -108,10 +126,17 @@ class CommentsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
     return Row(
       children: [
-        const ProfilePicture(),
+        globals.user!.profilePicture == null
+            ? ImagePlaceholder(
+                width: getScreenWidth(30),
+                height: getScreenHeight(30),
+              )
+            : ProfilePicture(
+                width: getScreenWidth(30),
+                height: getScreenHeight(30),
+              ),
         const SizedBox(width: 10),
         Flexible(
           child: Column(
@@ -184,5 +209,3 @@ class CommentsTile extends StatelessWidget {
     ).paddingSymmetric(h: 8, v: 8);
   }
 }
-
-

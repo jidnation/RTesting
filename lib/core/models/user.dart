@@ -8,7 +8,7 @@ class User {
   String? authId;
   String? bio;
   DateTime? dateofBirth;
-  String? displayPicture;
+  String? coverPicture;
   String? gender;
   String? location;
   String? profilePicture;
@@ -31,7 +31,7 @@ class User {
     this.authId,
     this.bio,
     this.dateofBirth,
-    this.displayPicture,
+    this.coverPicture,
     this.gender,
     this.location,
     this.profilePicture,
@@ -54,9 +54,10 @@ class User {
         phone: json["phone"],
         token: json["token"],
         bio: json["bio"],
-        dateofBirth:
-            DateTime.parse(json["dateofBirth"] ?? "2022-04-02 14:48:19.114636"),
-        displayPicture: json["displayPicture"],
+        dateofBirth: json["dateOfBirth"] != null
+            ? DateTime.tryParse(json["dateOfBirth"])
+            : null,
+        coverPicture: json["coverPicture"],
         gender: json["gender"],
         location: json["location"],
         profilePicture: json["profilePicture"],
@@ -79,8 +80,9 @@ class User {
         "_id": id,
         "authId": authId,
         "bio": bio,
-        "dateOfBirth": dateofBirth!.toIso8601String(),
-        "displayPicture": displayPicture,
+        "dateOfBirth":
+            dateofBirth != null ? dateofBirth!.toIso8601String() : null,
+        "coverPicture": coverPicture,
         "gender": gender,
         "location": location,
         "profilePicture": profilePicture,

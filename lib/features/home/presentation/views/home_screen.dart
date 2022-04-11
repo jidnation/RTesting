@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -19,66 +20,76 @@ class HomeScreen extends HookWidget {
   Widget build(BuildContext context) {
     final _currentIndex = useState<int>(0);
     useMemoized(() {
-      globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email));
+      globals.userBloc!
+          .add(GetUserProfileEvent(email: globals.loginResponse!.email));
     });
-    return Scaffold(
-      drawer: const AppDrawer(),
-      body: IndexedStack(
-        children: const [
-          TimelineScreen(),
-          SearchScreen(),
-          VideoMomentScreen(),
-          NotificationsScreen(),
-          AccountScreen(),
-        ],
-        index: _currentIndex.value,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex.value,
-        onTap: (index) => _currentIndex.value = index,
-        selectedItemColor: AppColors.primaryColor,
-        unselectedItemColor: AppColors.blackShade3,
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/home-a.svg',
-                color: _currentIndex.value == 0
-                    ? AppColors.primaryColor
-                    : AppColors.blackShade3),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/search.svg',
-                color: _currentIndex.value == 1
-                    ? AppColors.primaryColor
-                    : AppColors.blackShade3),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/play.svg',
-                color: _currentIndex.value == 2
-                    ? AppColors.primaryColor
-                    : AppColors.blackShade3),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/notification.svg',
-                color: _currentIndex.value == 3
-                    ? AppColors.primaryColor
-                    : AppColors.blackShade3),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset('assets/svgs/profile.svg',
-                color: _currentIndex.value == 4
-                    ? AppColors.primaryColor
-                    : AppColors.blackShade3),
-            label: '',
-          ),
-        ],
-      ),
-    );
+    return BlocConsumer<UserBloc, UserState>(
+        bloc: globals.userBloc,
+        listener: (context, state) {
+          if (state is UserData) {
+            globals.user = state.user;
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            drawer: const AppDrawer(),
+            body: IndexedStack(
+              children: const [
+                TimelineScreen(),
+                SearchScreen(),
+                VideoMomentScreen(),
+                NotificationsScreen(),
+                AccountScreen(),
+              ],
+              index: _currentIndex.value,
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: _currentIndex.value,
+              onTap: (index) => _currentIndex.value = index,
+              selectedItemColor: AppColors.primaryColor,
+              unselectedItemColor: AppColors.blackShade3,
+              showUnselectedLabels: false,
+              showSelectedLabels: false,
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset('assets/svgs/home-a.svg',
+                      color: _currentIndex.value == 0
+                          ? AppColors.primaryColor
+                          : AppColors.blackShade3),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset('assets/svgs/search.svg',
+                      color: _currentIndex.value == 1
+                          ? AppColors.primaryColor
+                          : AppColors.blackShade3),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset('assets/svgs/play.svg',
+                      color: _currentIndex.value == 2
+                          ? AppColors.primaryColor
+                          : AppColors.blackShade3),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset('assets/svgs/notification.svg',
+                      color: _currentIndex.value == 3
+                          ? AppColors.primaryColor
+                          : AppColors.blackShade3),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset('assets/svgs/profile.svg',
+                      color: _currentIndex.value == 4
+                          ? AppColors.primaryColor
+                          : AppColors.blackShade3),
+                  label: '',
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/onboarding/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -42,6 +43,7 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    SizeConfig().init(context);
     return SplashScreen(
       controller: _controller,
       size: size,
@@ -71,9 +73,10 @@ class SplashScreen extends StatelessWidget {
                       width: animation.firstContainerWidth.value,
                       height: animation.firstContainerHeight.value,
                       decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius:
-                              animation.firstContainerBorderRadius.value),
+                        color: AppColors.primaryColor,
+                        borderRadius:
+                            animation.firstContainerBorderRadius.value,
+                      ),
                     ),
                   ),
                 ),

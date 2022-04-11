@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
@@ -24,8 +25,8 @@ class AppDrawer extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const ImagePlaceholder(
-                    width: 65,
-                    height: 65,
+                    width: 49,
+                    height: 49,
                   ),
                   // Container(
                   //   width: 65,
@@ -35,7 +36,7 @@ class AppDrawer extends HookWidget {
                   //       Image.asset('assets/images/user.png', fit: BoxFit.fill),
                   //   decoration: const BoxDecoration(shape: BoxShape.circle),
                   // ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,19 +47,19 @@ class AppDrawer extends HookWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                            ('${globals.loginResponse!.firstName} ${globals.loginResponse!.lastName}')
                                 .toTitleCase(),
                             style: const TextStyle(
                               color: AppColors.textColor2,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const Text(
-                            '@RooneyBrown',
+                            '@badguy',
                             style: TextStyle(
                               color: Color(0xFF6C6A6A),
-                              fontSize: 11,
+                              fontSize: 13,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -89,16 +90,18 @@ class AppDrawer extends HookWidget {
                           Text(
                             '2K',
                             style: TextStyle(
-                                fontSize: 16,
-                                color: AppColors.textColor2,
-                                fontWeight: FontWeight.w600),
+                              fontSize: 16,
+                              color: AppColors.textColor2,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           Text(
                             'Reachers',
                             style: TextStyle(
-                                fontSize: 16,
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400),
+                              fontSize: 14,
+                              color: AppColors.greyShade2,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ],
                       ),
@@ -117,7 +120,7 @@ class AppDrawer extends HookWidget {
                           Text(
                             'Reaching',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: AppColors.greyShade2,
                                 fontWeight: FontWeight.w400),
                           ),
@@ -139,12 +142,14 @@ class AppDrawer extends HookWidget {
                   DrawerItem(
                       action: 'Add an existing account',
                       color: AppColors.primaryColor,
-                      notification: '',
+                      showIcon: false,
+                      icon: '',
                       onPressed: () {}),
                   DrawerItem(
                       action: 'Create a new account',
                       color: AppColors.primaryColor,
-                      notification: '',
+                      showIcon: false,
+                      icon: '',
                       onPressed: () {}),
                 ],
               ),
@@ -154,52 +159,47 @@ class AppDrawer extends HookWidget {
             visible: showOtherItem.value,
             child: Expanded(
               child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children: [
-                  DrawerItem(
-                    action: 'Reachers',
-                    notification: '+2 new...',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Reaching',
-                    notification: '+7 new...',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Starring',
-                    notification: '+10 new...',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Dictionary',
-                    notification: '+19 new...',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Abbreviation',
-                    notification: '+47 new...',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Saved post',
-                    notification: '',
-                    onPressed: () {},
-                  ),
-                  DrawerItem(
-                    action: 'Leading',
-                    notification: 'Video, Audio...',
-                    onPressed: () {},
-                  ),
-                ],
-              ),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  children: [
+                    DrawerItem(
+                      action: 'Reaches',
+                      icon: 'assets/svgs/reaches-d.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Shoutouts',
+                      icon: 'assets/svgs/shoutout-d.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Shoutdown',
+                      icon: 'assets/svgs/shoutdown-d.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Saved posts',
+                      icon: 'assets/svgs/saved-d.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Abbreviation',
+                      icon: 'assets/svgs/na.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Dictionary',
+                      icon: 'assets/svgs/dictionary-d.svg',
+                      onPressed: () {},
+                    ),
+                    const SizedBox(height: 10),
+                    const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
+                  ]),
             ),
           ),
-          const Divider(color: AppColors.primaryColor, thickness: 0.5),
           DrawerItem(
             action: 'Logout',
-            notification: '',
+            icon: 'assets/svgs/logout.svg',
             onPressed: () {},
           ),
         ],
@@ -212,14 +212,16 @@ class DrawerItem extends StatelessWidget {
   const DrawerItem(
       {Key? key,
       required this.action,
-      this.notification,
+      required this.icon,
       this.onPressed,
+      this.showIcon = true,
       this.color = AppColors.textColor2})
       : super(key: key);
 
   final String action;
-  final String? notification;
+  final String icon;
   final Function()? onPressed;
+  final bool showIcon;
   final Color color;
   @override
   Widget build(BuildContext context) {
@@ -231,10 +233,14 @@ class DrawerItem extends StatelessWidget {
           horizontal: 15,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          showIcon
+              ? SizedBox(height: 20, width: 20, child: SvgPicture.asset(icon))
+              : const SizedBox.shrink(),
+          showIcon ? const SizedBox(width: 17) : const SizedBox.shrink(),
           Text(
             action,
             style: TextStyle(
@@ -243,16 +249,14 @@ class DrawerItem extends StatelessWidget {
               color: color,
             ),
           ),
-          notification == ''
-              ? const SizedBox.shrink()
-              : Text(
-                  notification ?? '',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
+          action == 'Logout' ? const Spacer() : const SizedBox.shrink(),
+          action == 'Logout'
+              ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: SvgPicture.asset('assets/svgs/scan.svg'),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );

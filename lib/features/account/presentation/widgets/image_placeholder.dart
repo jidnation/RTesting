@@ -8,24 +8,27 @@ class ImagePlaceholder extends StatelessWidget {
     this.width = 100,
     this.height = 100,
     this.fontSize = 10,
+    this.border,
   }) : super(key: key);
 
   final double height, width, fontSize;
+  final Border? border;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
       width: width,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.primaryColor,
         shape: BoxShape.circle,
+        border: border
       ),
       child: FittedBox(
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Text(
-            '${globals.user!.firstName!} ${globals.user!.lastName!}'
+            '${globals.loginResponse!.firstName!} ${globals.loginResponse!.lastName!}'
                 .substring(0, 2)
                 .toUpperCase(),
             style: TextStyle(

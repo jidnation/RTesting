@@ -55,6 +55,14 @@ dependencies:
   flutter_bloc: 7.3.1
   sprintf: ^6.0.0
   flutter_hooks: ^0.18.2+1
+  image_picker: ^0.8.5
+  photo_gallery: ^1.1.1
+  permission_handler: ^9.2.0
+  card_swiper: ^2.0.3
+  carousel_slider: ^4.0.0
+  chewie: ^1.3.1
+  video_player: 
+  cached_network_image: ^3.2.0
 
 
 dev_dependencies:
@@ -76,7 +84,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/ic_launcher.png"
+  image_path: "assets/images/app-icon.png"
 
 # The following section is specific to Flutter.
 flutter:
@@ -90,6 +98,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/svgs/
+    - assets/videos/
 
   # fonts:
   #   - family: Karla

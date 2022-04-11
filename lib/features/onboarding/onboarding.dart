@@ -12,26 +12,27 @@ class OnboardingScreen extends StatelessWidget {
   final List<RMOnboardingModel>? pages = [
     RMOnboardingModel(
         title: 'Welcome to ReachMe',
-        description: 'Connect to your world, reach friends and family, chat in diverse languages, provide meanings to words and bring your culture to light',
+        description:
+            'Connect to your world, reach friends and family, chat in diverse languages, provide meanings to words and bring your culture to light',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
         imagePath: 'assets/svgs/onboarding-1.svg'),
     RMOnboardingModel(
         title: 'Enjoy audio features',
-        description: 'Post reaches, status and make comments in audio form',
+        description: 'Post reaches, status and make comments\nin audio form',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
         imagePath: 'assets/svgs/onboarding-2.svg'),
     RMOnboardingModel(
         title: 'Shoutout and Shoutdown posts',
-        description: 'Be in control of your reachme ecosystem, decide reaches that are legible to stay',
+        description:
+            'Be in control of your reachme ecosystem, decide reaches that are legible to stay',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
         imagePath: 'assets/svgs/onboarding-3.svg'),
   ];
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: RMOnboardingScreen(

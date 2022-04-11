@@ -35,6 +35,7 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+      Console.log('get user profile', result);
       Console.log('get user profile', result.data);
       return User.fromJson(result.data!['getUserByIdOrEmail']);
     } catch (e) {
@@ -95,6 +96,8 @@ class HomeRemoteDataSource {
     String? location,
     bool? showContact,
     bool? showLocation,
+    String? username,
+    String? phone,
   }) async {
     String q = r'''
         mutation updateUser(
@@ -120,14 +123,25 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      final result = await _client.mutate(gql(q), variables: {
-        'bio': bio,
-        'dateOfBirth': dateOfBirth,
-        'gender': gender,
-        'location': location,
-        'showContact': showContact,
-        'showLocation': showLocation,
-      });
+      Map<String, dynamic> variables = {};
+
+      if (bio != null) variables.putIfAbsent('bio', () => bio);
+      if (dateOfBirth != null) {
+        variables.putIfAbsent('dateOfBirth', () => dateOfBirth);
+      }
+      if (gender != null) variables.putIfAbsent('gender', () => gender);
+      if (location != null) variables.putIfAbsent('location', () => location);
+      if (showContact != null) {
+        variables.putIfAbsent('showContact', () => showContact);
+      }
+      if (showLocation != null) {
+        variables.putIfAbsent('showLocation', () => showLocation);
+      }
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -138,24 +152,36 @@ class HomeRemoteDataSource {
     }
   }
 
-  // Future<User> reachUser({required String? dob}) async {
-  //   String q = r'''
-  //       mutation setUsername($dateOfBirth: String!) {
-  //         setUsername(dateOfBirth: $dateOfBirth) {
-  //           ''' + UserSchema.schema + '''
-  //         }
-  //       }''';
-  //   try {
-  //     final result = await _client.mutate(gql(q), variables: {
-  //       'dateOfBirth': dob,
-  //     });
-  //     if (result is GraphQLError) {
-  //       throw GraphQLError(message: result.message);
-  //     }
-  //     Console.log('set date of birth', result.data);
-  //     return User.fromJson(result.data!['setDateOfBirth']);
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
+  Future<User> setImage({
+    required String? imageUrl,
+    required String? type,
+  }) async {
+    String q = r'''
+        mutation setImage(
+          $imageUrl: String!
+          $typeOfImageUpload: String!
+          ) {
+          setImage(
+            imageUrl: $imageUrl
+            typeOfImageUpload: $typeOfImageUpload
+            ) {
+            ''' +
+        UserSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'imageUrl': imageUrl,
+        'typeOfImageUpload': type,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('set image', result.data);
+      return User.fromJson(result.data!['setImage']);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

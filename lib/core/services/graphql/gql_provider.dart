@@ -1,6 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/helper/endpoints.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 
 String uuidFromObject(Object object) {
   if (object is Map<String, Object>) {
@@ -12,15 +13,14 @@ String uuidFromObject(Object object) {
 }
 
 ValueNotifier<GraphQLClient> clientFor() {
-  var token = ''; //get user token
   final HttpLink httpLink = HttpLink(
     Endpoints.graphQLBaseUrl,
     defaultHeaders: <String, String>{
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer ${globals.token}',
     },
   );
   final AuthLink authLink = AuthLink(
-    getToken: () => 'Bearer $token',
+    getToken: () => 'Bearer ${globals.token}',
   );
 
   Link link = authLink.concat(httpLink);
@@ -32,7 +32,7 @@ ValueNotifier<GraphQLClient> clientFor() {
         inactivityTimeout: const Duration(minutes: 5),
         delayBetweenReconnectionAttempts: const Duration(seconds: 1),
         queryAndMutationTimeout: const Duration(seconds: 40),
-        initialPayload: () => {'Authorization': 'Bearer $token'}),
+        initialPayload: () => {'Authorization': 'Bearer ${globals.token}'}),
   );
 
   link = link.concat(websocketLink);

@@ -37,4 +37,12 @@ class SetDOBEvent extends UserEvent {
   SetDOBEvent({required this.dateOfBirth});
 }
 
-class UploadUserProfilePictureEvent extends UserEvent {}
+class UploadUserProfilePictureEvent extends UserEvent {
+  final XFile file;
+  UploadUserProfilePictureEvent({required this.file});
+}
+
+class UploadUserCoverPhotoEvent extends UserEvent {
+  final XFile file;
+  UploadUserCoverPhotoEvent({required this.file});
+}

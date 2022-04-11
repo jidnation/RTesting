@@ -1,6 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
 
 // abstract class IUserRepository {
@@ -14,10 +18,13 @@ import 'package:reach_me/features/home/data/datasources/home_remote_datasource.d
 // }
 
 class UserRepository {
-  UserRepository({HomeRemoteDataSource? homeRemoteDataSource})
-      : _homeRemoteDataSource = homeRemoteDataSource ?? HomeRemoteDataSource();
+  UserRepository(
+      {HomeRemoteDataSource? homeRemoteDataSource, ApiClient? apiClient})
+      : _homeRemoteDataSource = homeRemoteDataSource ?? HomeRemoteDataSource(),
+        _apiClient = apiClient ?? ApiClient();
 
   final HomeRemoteDataSource _homeRemoteDataSource;
+  final ApiClient _apiClient;
 
   // @override
   Future<Either<String, User>> getUserProfile({
@@ -60,6 +67,8 @@ class UserRepository {
     String? location,
     bool? showContact,
     bool? showLocation,
+    String? phone,
+    String? username,
   }) async {
     try {
       final user = await _homeRemoteDataSource.updateUserProfile(
@@ -70,6 +79,33 @@ class UserRepository {
         showContact: showContact,
         showLocation: showLocation,
       );
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, String>> uploadPhoto({XFile? file}) async {
+    try {
+      final user = await _apiClient.uploadImage(file!);
+      Console.log('upload photo', user);
+      final String imgUrl = user['data'];
+      return Right(imgUrl);
+    } on DioError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, User>> setImage({
+    required String imageUrl,
+    required String type,
+  }) async {
+    try {
+      final user = await _homeRemoteDataSource.setImage(
+        imageUrl: imageUrl,
+        type: type,
+      );
+      Console.log('upload photo', user);
       return Right(user);
     } on GraphQLError catch (e) {
       return Left(e.message);

@@ -32,7 +32,7 @@ class MediaCard extends StatelessWidget {
             width: width,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(15),
               image: const DecorationImage(
                   image: AssetImage('assets/images/post.png'),
                   fit: BoxFit.fitHeight),
