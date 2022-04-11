@@ -3,7 +3,6 @@ class UserSchema {
 
   static String get schema {
     return r'''
-            _id
             bio
             dateOfBirth
             coverPicture
