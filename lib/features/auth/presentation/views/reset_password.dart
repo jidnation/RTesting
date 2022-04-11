@@ -56,7 +56,7 @@ class ResetPasswordScreen extends HookWidget {
                   children: <Widget>[
                     Center(
                       child: SvgPicture.asset(
-                        'assets/svgs/illustration 8-new.svg',
+                        'assets/svgs/reset.svg',
                         height: 186,
                         width: 290,
                       ),
@@ -66,8 +66,8 @@ class ResetPasswordScreen extends HookWidget {
                       'Reset Password',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor,
-                        fontSize: 25,
+                        color: AppColors.textColor2,
+                        fontSize: 20,
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -93,7 +93,7 @@ class ResetPasswordScreen extends HookWidget {
                     const SizedBox(height: 40),
                     CustomButton(
                       label: 'Reset',
-                      color: AppColors.primaryColor,
+                      color: AppColors.textColor2,
                       onPressed: () {
                         if (_formKey.value.currentState!.validate()) {
                           if (_passwordController.text ==

@@ -9,7 +9,7 @@ class VerifyAccountScreen extends StatelessWidget {
   final String? token;
   final String? uid;
   static const String id = 'verify_account';
-  
+
   late final String? altPin;
   final TextEditingController _pinPutController = TextEditingController();
   final FocusNode _pinPutFocusNode = FocusNode();
@@ -24,7 +24,9 @@ class VerifyAccountScreen extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context, ) {
+  Widget build(
+    BuildContext context,
+  ) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
@@ -125,10 +127,11 @@ class VerifyAccountScreen extends StatelessWidget {
                     //     .read(authNotifierProvider.notifier)
                     //     .verifyEmail(context, uid: uid, token: token);
                   } else {
-                    RMSnackBar.showErrorSnackBar(context,
-                        message: 'Incorrect code',
-                        milliseconds: 1000,
-                        snackBarBehavior: SnackBarBehavior.fixed);
+                    RMSnackBar.showErrorSnackBar(
+                      context,
+                      message: 'Incorrect code',
+                      milliseconds: 1000,
+                    );
                   }
                   // RouteNavigators.route(context,ResetPasswordScreen.id);
                 },

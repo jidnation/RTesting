@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:reach_me/features/auth/data/models/user.dart';
+import 'package:reach_me/features/auth/data/models/login_response.dart';
 
 // abstract class IAuthRepository {
 //   Future<Either<String, User>> createAccount({
@@ -46,12 +46,12 @@ class AuthRepository {
   final AuthRemoteDataSource _authRemoteDataSource;
 
   // @override
-  Future<Either<String, User>> createAccount({
+  Future<Either<String, LoginResponse>> createAccount({
     required String email,
     required String firstName,
     required String lastName,
     required String password,
-    String? phoneNumber,
+   
   }) async {
     try {
       final user = await _authRemoteDataSource.createAccount(
@@ -59,7 +59,7 @@ class AuthRepository {
         firstName: firstName,
         lastName: lastName,
         password: password,
-        phoneNumber: phoneNumber,
+      
       );
       return Right(user);
     } on GraphQLError catch (e) {
@@ -67,7 +67,7 @@ class AuthRepository {
     }
   }
 
-  Future<Either<String, User>> verifyAccount(
+  Future<Either<String, LoginResponse>> verifyAccount(
       {required String? email, required int pin}) async {
     try {
       final user =
@@ -115,7 +115,7 @@ class AuthRepository {
     }
   }
 
-  Future<Either<String, User>> login(
+  Future<Either<String, LoginResponse>> login(
       {required String? email, required String password}) async {
     try {
       final user =

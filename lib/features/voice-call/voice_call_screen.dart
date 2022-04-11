@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/voice-call/voice_calling_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
@@ -36,15 +39,23 @@ class VoiceCallScreen extends StatelessWidget {
               right: size.width * 0.36,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  ProfilePicture(height: 100, width: 100),
-                  Text('Bad Guy',
+                children: [
+                  globals.user!.profilePicture == null
+                      ? ImagePlaceholder(
+                          width: getScreenWidth(100),
+                          height: getScreenHeight(100),
+                        )
+                      : ProfilePicture(
+                          width: getScreenWidth(100),
+                          height: getScreenHeight(100),
+                        ),
+                  const Text('Bad Guy',
                       style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w400,
                           color: AppColors.white)),
-                  SizedBox(height: 8),
-                  Text('Calling...',
+                  const SizedBox(height: 8),
+                  const Text('Calling...',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w400,

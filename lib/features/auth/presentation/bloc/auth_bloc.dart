@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/auth/data/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
@@ -18,7 +19,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           firstName: event.firstName,
           lastName: event.lastName,
           password: event.password,
-          phoneNumber: event.phoneNumber,
         );
         result.fold(
           (error) => emit(AuthError(error: error)),
@@ -49,8 +49,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             .login(email: event.email, password: event.password);
         result.fold(
           (error) => emit(AuthError(error: error)),
-          (success) =>
-              emit(Authenticated(message: 'User logged in successfully')),
+          (user) {
+            globals.loginResponse = user;
+            globals.token = user.token;
+            emit(Authenticated(message: 'User logged in successfully'));
+          },
         );
       } on GraphQLError catch (e) {
         emit(AuthError(error: e.message));
@@ -96,7 +99,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           password: event.password,
           token: event.token,
         );
-        
         result.fold(
           (error) => emit(AuthError(error: error)),
           (value) {

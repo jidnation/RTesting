@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final bool autocorrect;
   final bool isDense;
+  final bool readOnly;
 
   const CustomTextField(
       {Key? key,
@@ -27,18 +29,23 @@ class CustomTextField extends StatelessWidget {
       this.autocorrect = false,
       this.suffixIcon,
       this.isDense = false,
+      this.readOnly = false,
       required this.textCapitalization})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: readOnly,
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
       autocorrect: autocorrect,
       textCapitalization: textCapitalization,
       validator: validator,
+      style: TextStyle(
+        fontSize: getScreenHeight(15),
+      ),
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
       ],
@@ -73,6 +80,10 @@ class CustomRoundTextField extends StatelessWidget {
   final double borderRadius;
   final TextStyle hintStyle;
   final TextStyle textStyle;
+  final int? maxLines;
+  final int? minLines;
+  final Color? fillColor;
+  final bool? isDense;
 
   const CustomRoundTextField(
       {Key? key,
@@ -87,16 +98,21 @@ class CustomRoundTextField extends StatelessWidget {
       this.suffixIcon,
       this.isFilled = true,
       this.borderRadius = 54,
-      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 15),
-      this.textStyle = const TextStyle(color: AppColors.black, fontSize: 15),
+      this.minLines = 1,
+      this.maxLines = 5,
+      this.isDense = false,
+      this.fillColor = const Color(0xFFF5F5F5),
+      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
+      this.textStyle =
+          const TextStyle(color: AppColors.textColor2, fontSize: 15),
       this.textCapitalization = TextCapitalization.none})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      minLines: 1,
-      maxLines: 5,
+      minLines: minLines,
+      maxLines: maxLines,
       style: textStyle,
       keyboardType: keyboardType,
       obscureText: obscureText,
@@ -108,9 +124,12 @@ class CustomRoundTextField extends StatelessWidget {
         hintText: hintText,
         hintStyle: hintStyle,
         filled: isFilled,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        fillColor: AppColors.greyShade8,
+        isDense: isDense,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 19,
+        ),
+        fillColor: fillColor,
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         enabledBorder: OutlineInputBorder(

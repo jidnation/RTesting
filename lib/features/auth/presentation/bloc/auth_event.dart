@@ -8,14 +8,14 @@ class RegisterUserEvent extends AuthEvent {
   final String password;
   final String firstName;
   final String lastName;
-  final String? phoneNumber;
+
 
   RegisterUserEvent({
     required this.email,
     required this.password,
     required this.firstName,
     required this.lastName,
-    this.phoneNumber,
+    
   });
 }
 

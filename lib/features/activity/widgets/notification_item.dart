@@ -1,9 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 
 class NotificationItem extends StatelessWidget {
   const NotificationItem({
@@ -21,7 +23,15 @@ class NotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return ListTile(
-      leading: const ProfilePicture(width: 50, height: 50),
+      leading: globals.user!.profilePicture == null
+          ? ImagePlaceholder(
+              width: getScreenWidth(50),
+              height: getScreenHeight(50),
+            )
+          : ProfilePicture(
+              width: getScreenWidth(50),
+              height: getScreenHeight(50),
+            ),
       contentPadding: EdgeInsets.zero,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

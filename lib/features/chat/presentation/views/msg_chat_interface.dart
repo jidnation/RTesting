@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -7,6 +8,9 @@ import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/widgets/bottom_sheet.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 import 'package:reach_me/features/video-call/video_call_screen.dart';
@@ -41,24 +45,24 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundShade2,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: AppColors.backgroundShade2,
-          statusBarIconBrightness: Brightness.dark, // For Android (dark icons)
-          statusBarBrightness: Brightness.light, // For iOS (dark icons)
+        backgroundColor: AppColors.white,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness:
+              Platform.isAndroid ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.grey,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
-        shadowColor: const Color(0x1A000000),
+        shadowColor: Colors.transparent,
         elevation: 4,
         leadingWidth: 45,
         titleSpacing: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/svgs/arrow-back.svg',
-            width: 19,
-            height: 12,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.black),
+          splashRadius: 15,
           onPressed: () => RouteNavigators.pop(context),
         ),
         title: InkWell(
@@ -67,22 +71,40 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const ProfilePicture(width: 30, height: 30),
+              globals.user!.profilePicture == null
+                  ? ImagePlaceholder(
+                      width: getScreenWidth(30),
+                      height: getScreenHeight(30),
+                    )
+                  : ProfilePicture(
+                      width: getScreenWidth(30),
+                      height: getScreenHeight(30),
+                    ),
               const SizedBox(width: 10),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('Rooney Brown',
+                  FittedBox(
+                    child: Text(
+                      'Rooney Brown',
                       style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.black)),
-                  Text('Active about 45min ago',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  FittedBox(
+                    child: Text(
+                      'Active about 45min ago',
                       style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.greyShade2)),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.greyShade2,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -93,7 +115,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             height: 40,
             width: 40,
             child: IconButton(
-              icon: SvgPicture.asset('assets/svgs/video call.svg'),
+              icon: SvgPicture.asset('assets/svgs/video.svg'),
               onPressed: () {
                 RouteNavigators.route(context, const VideoCallScreen());
               },
@@ -102,10 +124,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           ),
           const SizedBox(width: 10),
           SizedBox(
-            height: 30,
-            width: 30,
+            height: 35,
+            width: 35,
             child: IconButton(
-              icon: SvgPicture.asset('assets/svgs/voice call.svg'),
+              icon: SvgPicture.asset('assets/svgs/call.svg'),
               onPressed: () {
                 RouteNavigators.route(context, const VoiceCallScreen());
               },
@@ -114,10 +136,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           ),
           const SizedBox(width: 10),
           SizedBox(
-            height: 25,
-            width: 20,
+            height: 35,
+            width: 30,
             child: IconButton(
-              icon: SvgPicture.asset('assets/svgs/more-vertical.svg'),
+              icon: SvgPicture.asset('assets/svgs/pop-vertical.svg'),
               onPressed: () async {
                 await showKebabBottomSheet(context);
               },
@@ -137,18 +159,28 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      const ProfilePicture(height: 80, width: 80),
+                      globals.user!.profilePicture == null
+                          ? ImagePlaceholder(
+                              width: getScreenWidth(80),
+                              height: getScreenHeight(80),
+                            )
+                          : ProfilePicture(
+                              width: getScreenWidth(80),
+                              height: getScreenHeight(80),
+                            ),
                       const SizedBox(height: 5),
                       const Text('Rooney Brown',
                           style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2)),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textColor2,
+                          )),
                       const Text('@RooneyBrown',
                           style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2)),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF767474),
+                          )),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -159,16 +191,18 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               Text(
                                 '2K',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w600),
+                                  fontSize: 15,
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               Text(
                                 'Reachers',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400),
+                                  fontSize: 14,
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ],
                           ),
@@ -179,16 +213,18 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               Text(
                                 '270',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w600),
+                                  fontSize: 15,
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               Text(
                                 'Reaching',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400),
+                                  fontSize: 14,
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ],
                           )
@@ -210,15 +246,23 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                           width: 130,
                           height: 41,
                           child: CustomButton(
-                              label: 'View Profile',
-                              color: AppColors.primaryColor,
-                              onPressed: () {},
-                              size: size,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 9, horizontal: 21),
-                              textColor: AppColors.white,
-                              borderSide: BorderSide.none)),
+                            label: 'View Profile',
+                            color: AppColors.white,
+                            onPressed: () {},
+                            size: size,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 9, horizontal: 21),
+                            textColor: const Color(0xFF767474),
+                            borderSide: BorderSide.none,
+                          )),
                       const SizedBox(height: 15),
+                      const Text(
+                        'Apr 30, 2021',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textColor2,
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -278,6 +322,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             children: [
               Flexible(
                 child: CustomRoundTextField(
+                  fillColor: AppColors.white,
                   textCapitalization: TextCapitalization.sentences,
                   hintText: 'Type Message...',
                   hintStyle:
@@ -285,7 +330,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   prefixIcon: GestureDetector(
                     onTap: () {},
                     child: SvgPicture.asset(
-                      'assets/svgs/smile.svg',
+                      'assets/svgs/emoji.svg',
                     ).paddingAll(10),
                   ),
                   suffixIcon: Row(
@@ -293,24 +338,18 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                       
-                        },
+                        onTap: () {},
                         child: SvgPicture.asset(
-                          'assets/svgs/camera icon blue.svg',
-                          width: 24,
-                          height: 18,
+                          'assets/svgs/attach.svg',
+                          // width: 24,
+                          // height: 18,
                         ),
                       ),
                       const SizedBox(width: 15),
                       GestureDetector(
-                        onTap: () {
-                      
-                        },
+                        onTap: () {},
                         child: SvgPicture.asset(
-                          'assets/svgs/attach_svg.svg',
-                          width: 24,
-                          height: 18,
+                          'assets/svgs/gallery.svg',
                         ),
                       ),
                       const SizedBox(width: 15),
@@ -320,15 +359,21 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               ),
               const SizedBox(width: 7),
               GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: SvgPicture.asset('assets/svgs/mic.svg',
-                          width: 25, height: 25)))
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/svgs/mic.svg',
+                    width: 25,
+                    height: 25,
+                    color: AppColors.white,
+                  ),
+                ),
+              )
             ],
           )
         ],

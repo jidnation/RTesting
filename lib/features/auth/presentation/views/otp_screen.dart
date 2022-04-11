@@ -34,17 +34,18 @@ class OtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-        body: SafeArea(
-      child: BlocConsumer<AuthBloc, AuthState>(
+      body: SafeArea(
+        child: BlocConsumer<AuthBloc, AuthState>(
           bloc: globals.authBloc,
           listener: (context, state) {
             if (state is AuthEmailVerified) {
               RouteNavigators.routeNoWayHome(context, LoginScreen());
-              SchedulerBinding.instance!.addPostFrameCallback((timeStamp) =>
-                  RMSnackBar.showSuccessSnackBar(context,
-                      message: state.message!,
-                      milliseconds: 3000,
-                      snackBarBehavior: SnackBarBehavior.fixed));
+              SchedulerBinding.instance!.addPostFrameCallback(
+                  (timeStamp) => RMSnackBar.showSuccessSnackBar(
+                        context,
+                        message: state.message!,
+                        milliseconds: 3000,
+                      ));
             } else if (state is PinInvalid) {
               RMSnackBar.showErrorSnackBar(context, message: state.error!);
             }
@@ -54,97 +55,99 @@ class OtpScreen extends StatelessWidget {
               return const RLoader('');
             }
             return SizedBox(
-                height: size.height,
-                width: size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Center(
-                      child: SvgPicture.asset(
-                        'assets/svgs/illustration 6-new.svg',
-                        height: 186,
-                        width: 290,
-                      ),
+              height: size.height,
+              width: size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Center(
+                    child: SvgPicture.asset(
+                      'assets/svgs/illustration 6-new.svg',
+                      height: 186,
+                      width: 290,
                     ),
-                    const SizedBox(height: 60.0),
-                    const Text(
-                      'Enter OTP',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor,
-                        fontSize: 25,
-                      ),
+                  ),
+                  const SizedBox(height: 60.0),
+                  const Text(
+                    'Enter OTP',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryColor,
+                      fontSize: 25,
                     ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'An 4 digit code has been sent to your email: $email',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF1B1B1A),
-                        fontSize: 16,
-                      ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    'An 4 digit code has been sent to your email: $email',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF1B1B1A),
+                      fontSize: 16,
                     ),
-                    const SizedBox(height: 40),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 45.0),
-                      child: PinPut(
-                          fieldsCount: 6,
-                          separator: const SizedBox(width: 15.0),
-                          mainAxisSize: MainAxisSize.max,
-                          fieldsAlignment: MainAxisAlignment.spaceEvenly,
-                          onChanged: (val) {
-                            if (val.length == 6) {
-                              final pin = int.parse(_pinPutController.text);
-                              globals.authBloc!.add(EmailVerificationEvent(
-                                  email: email, pin: pin));
-                            }
-                          },
-                          focusNode: _pinPutFocusNode,
-                          controller: _pinPutController,
-                          submittedFieldDecoration:
-                              _pinPutDecoration.copyWith(),
-                          selectedFieldDecoration: _pinPutDecoration,
-                          followingFieldDecoration: _pinPutDecoration.copyWith(
-                            border: Border.all(color: const Color(0xFFF2EFEF)),
-                          ),
-                          cursor: const Text('|'),
-                          withCursor: true,
-                          initialValue: '',
-                          preFilledWidget: const Text('')),
-                    ),
-                    const SizedBox(height: 40),
-                    GestureDetector(
-                      onTap: () {},
-                      child: RichText(
-                        textScaleFactor: 0.8,
-                        text: const TextSpan(
-                          text: "Didn't receive a code? ",
-                          style: TextStyle(
-                            color: AppColors.textColor,
-                            fontFamily: 'Poppins',
-                            fontSize: 15,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Resend',
-                              style: TextStyle(
-                                color: AppColors.primaryColor,
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ],
+                  ),
+                  const SizedBox(height: 40),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 45.0),
+                    child: PinPut(
+                        fieldsCount: 6,
+                        separator: const SizedBox(width: 15.0),
+                        mainAxisSize: MainAxisSize.max,
+                        fieldsAlignment: MainAxisAlignment.spaceEvenly,
+                        onChanged: (val) {
+                          if (val.length == 6) {
+                            final pin = int.parse(_pinPutController.text);
+                            globals.authBloc!.add(
+                                EmailVerificationEvent(email: email, pin: pin));
+                          }
+                        },
+                        focusNode: _pinPutFocusNode,
+                        controller: _pinPutController,
+                        submittedFieldDecoration: _pinPutDecoration.copyWith(),
+                        selectedFieldDecoration: _pinPutDecoration,
+                        followingFieldDecoration: _pinPutDecoration.copyWith(
+                          border: Border.all(color: const Color(0xFFF2EFEF)),
                         ),
+                        cursor: const Text('|'),
+                        withCursor: true,
+                        initialValue: '',
+                        preFilledWidget: const Text('')),
+                  ),
+                  const SizedBox(height: 40),
+                  GestureDetector(
+                    onTap: () {},
+                    child: RichText(
+                      textScaleFactor: 0.8,
+                      text: const TextSpan(
+                        text: "Didn't receive a code? ",
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontFamily: 'Poppins',
+                          fontSize: 15,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Resend',
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ));
-          }),
-    ));
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }
 
@@ -193,7 +196,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                   children: <Widget>[
                     Center(
                       child: SvgPicture.asset(
-                        'assets/svgs/illustration 6-new.svg',
+                        'assets/svgs/otp.svg',
                         height: 186,
                         width: 290,
                       ),
@@ -209,7 +212,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'An 4 digit code has been sent to your email: $email',
+                      'An 6 digit code has been sent to your\nemail: $email',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
