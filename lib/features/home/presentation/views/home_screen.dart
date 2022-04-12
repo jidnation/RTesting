@@ -46,7 +46,11 @@ class HomeScreen extends HookWidget {
             bottomNavigationBar: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               currentIndex: _currentIndex.value,
-              onTap: (index) => _currentIndex.value = index,
+              onTap: (index) {
+                _currentIndex.value = index;
+                if (index != 2) {}
+                //TODO: DECLARE THE VIDEO CONTROLLER HERE
+              },
               selectedItemColor: AppColors.primaryColor,
               unselectedItemColor: AppColors.blackShade3,
               showUnselectedLabels: false,

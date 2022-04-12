@@ -111,4 +111,22 @@ class UserRepository {
       return Left(e.message);
     }
   }
+
+  Future<Either<String, List<User>>> getAllUsersByName({
+    required String query,
+    required int limit,
+    required int pageNumber,
+  }) async {
+    try {
+      final user = await _homeRemoteDataSource.getAllUsersByName(
+        query: query,
+        limit: limit,
+        pageNumber: pageNumber,
+      );
+      Console.log('get alll users by name', user);
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
 }

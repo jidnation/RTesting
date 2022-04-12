@@ -68,6 +68,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           if (state is UserData) {
             globals.user = state.user;
             RouteNavigators.pop(context);
+          } else if (state is UsernameChangeSuccess) {
+            globals.user = state.user;
+            RouteNavigators.pop(context);
           } else if (state is UserUploadProfilePictureSuccess) {
             globals.user = state.user;
           } else if (state is UserUploadError) {
@@ -78,9 +81,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
         },
         builder: (context, state) {
-          if (state is UserLoading) {
-            return const RLoader('');
-          }
+          bool _isLoading = state is UserLoading;
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -133,24 +134,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 UploadUserProfilePictureEvent(file: image));
                           }
                         },
-                        child: AbsorbPointer(
-                          child: state is UserUploadingImage
-                              ? const Center(child: CircularProgressIndicator())
-                              : state is UserUploadProfilePictureSuccess
-                                  ? ProfilePicture(
-                                      height: getScreenHeight(100),
-                                      width: getScreenWidth(100),
-                                      border: Border.all(
-                                          color: Colors.grey.shade50,
-                                          width: 3.0))
-                                  : ImagePlaceholder(
-                                      width: getScreenWidth(100),
-                                      height: getScreenHeight(100),
-                                      border: Border.all(
-                                          color: Colors.grey.shade50,
-                                          width: 3.0),
-                                    ),
-                        ),
+                        child: globals.user!.profilePicture != null
+                            ? ProfilePicture(
+                                height: getScreenHeight(100),
+                                width: getScreenWidth(100),
+                                border: Border.all(
+                                  color: Colors.grey.shade50,
+                                  width: 3.0,
+                                ))
+                            : AbsorbPointer(
+                                child: state is UserUploadingImage
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
+                                    : state is UserUploadProfilePictureSuccess
+                                        ? ProfilePicture(
+                                            height: getScreenHeight(100),
+                                            width: getScreenWidth(100),
+                                            border: Border.all(
+                                              color: Colors.grey.shade50,
+                                              width: 3.0,
+                                            ))
+                                        : ImagePlaceholder(
+                                            width: getScreenWidth(100),
+                                            height: getScreenHeight(100),
+                                            border: Border.all(
+                                              color: Colors.grey.shade50,
+                                              width: 3.0,
+                                            ),
+                                          ),
+                              ),
                       ),
                     ),
 
@@ -163,17 +175,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           debugPrint('tapped on change cover photo ');
                         },
                         child: Container(
-                            width: 30,
-                            height: 30,
-                            child: const Icon(
-                              Icons.camera_alt,
-                              color: AppColors.white,
-                              size: 19,
-                            ),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.primaryColor,
-                            )),
+                          width: 30,
+                          height: 30,
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: AppColors.white,
+                            size: 19,
+                          ),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
                       ),
                     ),
 
@@ -314,15 +327,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: getScreenHeight(40)),
                     CustomButton(
-                      label: 'Save',
-                      color: AppColors.primaryColor,
+                      label: _isLoading ? 'Saving...' : 'Save',
+                      color:
+                          _isLoading ? AppColors.grey : AppColors.primaryColor,
                       onPressed: () {
-                        globals.userBloc!.add(UpdateUserProfileEvent(
-                          bio: _bioController.text,
-                          showContact: showContactInfo.value,
-                          showLocation: showLocation.value,
-                          location: _locationController.text,
-                        ));
+                        if (_bioController.text != globals.user!.bio ||
+                            showContactInfo.value !=
+                                globals.user!.showContact ||
+                            showLocation.value != globals.user!.showLocation ||
+                            _locationController.text !=
+                                globals.user!.location) {
+                          globals.userBloc!.add(UpdateUserProfileEvent(
+                            bio: _bioController.text,
+                            showContact: showContactInfo.value,
+                            showLocation: showLocation.value,
+                            location: _locationController.text,
+                          ));
+                        }
+                        if (_usernameController.text !=
+                            globals.user!.username) {
+                          globals.userBloc!.add(SetUsernameEvent(
+                            username:
+                                _usernameController.text.replaceAll(' ', ''),
+                          ));
+                        }
                       },
                       size: size,
                       textColor: AppColors.white,

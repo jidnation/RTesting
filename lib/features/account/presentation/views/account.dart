@@ -378,7 +378,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textColor2,
                                   )),
-                              Text(globals.user!.username ?? '@username',
+                              Text('@${globals.user!.username ?? 'username'}',
                                   style: TextStyle(
                                     fontSize: getScreenHeight(13),
                                     fontWeight: FontWeight.w400,
@@ -419,7 +419,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             CrossAxisAlignment.center,
                                         children: [
                                           Text(
-                                            globals.user!.nReaching.toString(),
+                                            globals.user!.nReaching.toString() ,
                                             style: TextStyle(
                                                 fontSize: getScreenHeight(15),
                                                 color: AppColors.textColor2,

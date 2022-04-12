@@ -20,6 +20,7 @@ class AppGlobals {
   String? token;
 
   User? user;
+  List<User>? userList;
   LoginResponse? loginResponse;
 
   void init() {
@@ -28,6 +29,7 @@ class AppGlobals {
     authBloc = AuthBloc();
     userBloc = UserBloc();
     token = '';
+    userList = [];
   }
 
   void dispose() {

@@ -46,3 +46,13 @@ class UploadUserCoverPhotoEvent extends UserEvent {
   final XFile file;
   UploadUserCoverPhotoEvent({required this.file});
 }
+
+class FetchAllUsersByNameEvent extends UserEvent {
+  final String? query;
+  final int? limit, pageNumber;
+  FetchAllUsersByNameEvent({
+    required this.limit,
+    required this.pageNumber,
+    required this.query,
+  });
+}

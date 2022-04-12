@@ -13,8 +13,14 @@ class UserUploadProfilePictureSuccess extends UserState {
   UserUploadProfilePictureSuccess({this.user});
   final User? user;
 }
+
 class UserUploadCoverPictureSuccess extends UserState {
   UserUploadCoverPictureSuccess({this.user});
+  final User? user;
+}
+
+class UsernameChangeSuccess extends UserState {
+  UsernameChangeSuccess({this.user});
   final User? user;
 }
 
@@ -31,6 +37,11 @@ class UserLoaded extends UserState {
 class UserData extends UserState {
   UserData({this.user});
   final User? user;
+}
+
+class FetchUsersSuccess extends UserState {
+  FetchUsersSuccess({this.user});
+  final List<User>? user;
 }
 
 class UserError extends UserState {

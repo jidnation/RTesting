@@ -83,7 +83,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           (error) => emit(UserError(error: error)),
           (user) {
             globals.user = user;
-            emit(UserData(user: user));
+            emit(UsernameChangeSuccess(user: user));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<FetchAllUsersByNameEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getAllUsersByName(
+          limit: event.limit!,
+          pageNumber: event.pageNumber!,
+          query: event.query!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (usersList) {
+            globals.userList = usersList;
+            emit(FetchUsersSuccess(user: usersList));
           },
         );
       } on GraphQLError catch (e) {
