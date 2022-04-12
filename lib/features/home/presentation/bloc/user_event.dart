@@ -8,6 +8,11 @@ class GetUserProfileEvent extends UserEvent {
   GetUserProfileEvent({required this.email});
 }
 
+class GetRecipientProfileEvent extends UserEvent {
+  final String? email;
+  GetRecipientProfileEvent({required this.email});
+}
+
 class UpdateUserProfileEvent extends UserEvent {
   final String? dateOfBirth;
   final String? bio;

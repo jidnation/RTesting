@@ -39,6 +39,11 @@ class UserData extends UserState {
   final User? user;
 }
 
+class RecipientUserData extends UserState {
+  RecipientUserData({this.user});
+  final User? user;
+}
+
 class FetchUsersSuccess extends UserState {
   FetchUsersSuccess({this.user});
   final List<User>? user;

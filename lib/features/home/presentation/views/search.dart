@@ -5,8 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
@@ -84,6 +87,8 @@ class SearchScreen extends HookWidget {
                 listener: (context, state) {
                   if (state is FetchUsersSuccess) {
                     globals.userList = state.user;
+                  } else if (state is UserError) {
+                    RMSnackBar.showErrorSnackBar(context, message: state.error);
                   }
                 },
                 builder: (context, state) {
@@ -104,6 +109,7 @@ class SearchScreen extends HookWidget {
                                 ' ' +
                                 globals.userList![index].lastName!)
                             .toTitleCase(),
+                        email: globals.userList![index].email,
                         username: globals.userList![index].username,
                         imageUrl: globals.userList![index].profilePicture,
                       );
@@ -160,44 +166,61 @@ class SearchResultCard extends StatelessWidget {
     required this.username,
     required this.displayName,
     required this.imageUrl,
+    required this.email,
   }) : super(key: key);
 
   final String? imageUrl;
   final String? username;
   final String? displayName;
+  final String? email;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: ListTile(
-        leading: imageUrl == null
-            ? ImagePlaceholder(
-                height: getScreenHeight(50),
-                width: getScreenWidth(50),
-              )
-            : ProfilePicture(
-                height: getScreenHeight(50),
-                width: getScreenWidth(50),
+    return BlocConsumer<UserBloc, UserState>(
+        bloc: globals.userBloc,
+        listener: (context, state) {
+          if (state is RecipientUserData) {
+            globals.recipientUser = state.user;
+            //RouteNavigators.route(context, const RecipientAccountProfile());
+          } else if (state is UserError){
+            RMSnackBar.showErrorSnackBar(context, message: state.error);
+          }
+        },
+        builder: (context, state) {
+          return InkWell(
+            onTap: () {
+              RouteNavigators.route(context, const RecipientAccountProfile());
+              globals.userBloc!.add(GetRecipientProfileEvent(email: email));
+            },
+            child: ListTile(
+              leading: imageUrl == null
+                  ? ImagePlaceholder(
+                      height: getScreenHeight(50),
+                      width: getScreenWidth(50),
+                    )
+                  : ProfilePicture(
+                      height: getScreenHeight(50),
+                      width: getScreenWidth(50),
+                    ),
+              title: Text(
+                username ?? '',
+                style: TextStyle(
+                  fontSize: getScreenHeight(15),
+                  color: AppColors.textColor2,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-        title: Text(
-          username ?? '',
-          style: TextStyle(
-            fontSize: getScreenHeight(15),
-            color: AppColors.textColor2,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          displayName ?? '',
-          style: TextStyle(
-            fontSize: getScreenHeight(15),
-            color: AppColors.textColor2.withOpacity(0.7),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ),
-    );
+              subtitle: Text(
+                displayName ?? '',
+                style: TextStyle(
+                  fontSize: getScreenHeight(15),
+                  color: AppColors.textColor2.withOpacity(0.7),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          );
+        });
   }
 }
 

@@ -20,11 +20,13 @@ class AppGlobals {
   String? token;
 
   User? user;
+  User? recipientUser;
   List<User>? userList;
   LoginResponse? loginResponse;
 
   void init() {
     user = User();
+    recipientUser = User();
     loginResponse = LoginResponse();
     authBloc = AuthBloc();
     userBloc = UserBloc();

@@ -34,6 +34,23 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserError(error: e.message));
       }
     });
+    on<GetRecipientProfileEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getUserProfile(
+          email: event.email!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (user) {
+            globals.recipientUser = user;
+            emit(RecipientUserData(user: user));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
     on<UpdateUserProfileEvent>((event, emit) async {
       emit(UserLoading());
       try {
