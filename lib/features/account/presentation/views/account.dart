@@ -11,6 +11,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
 import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -1082,8 +1083,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       label: 'Reach',
                                       color: AppColors.primaryColor,
                                       onPressed: () {
-                                        RouteNavigators.route(
-                                            context, const EditProfileScreen());
+                                        // RouteNavigators.route(
+                                        //     context, const EditProfileScreen());
                                       },
                                       size: size,
                                       padding: const EdgeInsets.symmetric(
@@ -1102,8 +1103,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                         label: 'Message',
                                         color: AppColors.white,
                                         onPressed: () {
-                                          RouteNavigators.route(context,
-                                              const EditProfileScreen());
+                                          RouteNavigators.route(
+                                              context,
+                                              MsgChatInterface(
+                                                recipientUser:
+                                                    globals.recipientUser,
+                                              ));
                                         },
                                         size: size,
                                         padding: const EdgeInsets.symmetric(

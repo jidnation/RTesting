@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
 class ImagePlaceholder extends StatelessWidget {

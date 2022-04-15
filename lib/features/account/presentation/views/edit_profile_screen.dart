@@ -10,7 +10,6 @@ import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';

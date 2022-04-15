@@ -4,6 +4,7 @@ import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/features/auth/data/models/login_response.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -20,13 +21,17 @@ class AppGlobals {
   String? token;
 
   User? user;
+  Chat? userChat;
   User? recipientUser;
   List<User>? userList;
+  List<ChatsThread>? userThreads;
   LoginResponse? loginResponse;
 
   void init() {
     user = User();
     recipientUser = User();
+    userChat = Chat();
+    userThreads = [];
     loginResponse = LoginResponse();
     authBloc = AuthBloc();
     userBloc = UserBloc();
