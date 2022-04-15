@@ -115,3 +115,109 @@ class GraphQLApiClient {
     return result;
   }
 }
+class GraphQLChatClient {
+  GraphQLChatClient()
+      : graphQLClient = ValueNotifier<GraphQLClient>(
+          GraphQLClient(
+            cache: GraphQLCache(store: InMemoryStore()),
+            link: HttpLink(
+              Endpoints.graphQLChatUrl,
+              httpClient: LoggerHttpClient(http.Client()),
+              defaultHeaders: <String, String>{
+                'Authorization': 'Bearer ${globals.token}',
+              },
+            ),
+          ),
+        );
+
+  final ValueNotifier<GraphQLClient> graphQLClient;
+
+  Future<dynamic> query(
+    DocumentNode query, {
+    required Map<String, dynamic> variables,
+  }) async {
+    final QueryResult result = await chatClientFor().value.query(
+          QueryOptions(
+            document: query,
+            variables: variables,
+          ),
+        );
+    Console.log('query', result);
+
+    if (result.exception != null) {
+      Console.log('query exception', result.exception);
+      if (result.exception!.linkException != null) {
+        return const GraphQLError(
+            message: "Network error! Please check your internet connection");
+      } else {
+        if (result.exception != null) {
+          dynamic myException =
+              result.exception!.graphqlErrors.first.extensions!['exception'];
+          bool isUnauthorized =
+              myException['status'] != null && myException['status'] == 401
+                  ? true
+                  : false;
+
+          if (isUnauthorized) {
+            //if user token has expired, redirect them to login & remove all stacked routes
+            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
+            return const GraphQLError(
+                message: "Your session has expired, please login again");
+          }
+          return result.exception!.graphqlErrors.first;
+        }
+      }
+    }
+    return result;
+  }
+
+  Future<dynamic> mutate(
+    DocumentNode documentNode, {
+    required Map<String, dynamic> variables,
+  }) async {
+    final QueryResult result = await chatClientFor()
+        .value
+        .mutate(MutationOptions(document: documentNode, variables: variables));
+
+    Console.log('mutate ex', result.exception);
+    Console.log('mutate data', result.data);
+
+    if (result.exception != null) {
+      Console.log('mutate exception', result.exception);
+      if (result.exception!.linkException != null) {
+        return const GraphQLError(
+            message: "Network Error, Please check your internet connection");
+      } else {
+        dynamic myException =
+            result.exception!.graphqlErrors.first.extensions!['exception'];
+        bool isUnauthorized =
+            myException['status'] != null && myException['status'] == 401
+                ? true
+                : false;
+
+        if (isUnauthorized) {
+          //if user token has expired, redirect them to login & remove all stacked routes
+          //RouteNavigators.navigatePopUntil(LoginScreen.id);
+          return const GraphQLError(
+              message: "Your session has expired, please login again");
+        }
+        return result.exception!.graphqlErrors.first;
+      }
+    }
+    return result;
+  }
+
+  //subscriptions
+  Stream<QueryResult> subscription(DocumentNode document,
+      {required Map<String, dynamic> variables, String? operationName}) {
+    //  chatClientFor().value.cache.reset(); //reset cache
+
+    final SubscriptionOptions operation = SubscriptionOptions(
+      document: document,
+      operationName: operationName,
+    );
+
+    final Stream<QueryResult> result = chatClientFor().value.subscribe(operation);
+    return result;
+  }
+}

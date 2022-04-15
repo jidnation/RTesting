@@ -7,9 +7,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/widgets/bottom_sheet.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
@@ -20,7 +21,8 @@ import 'package:reach_me/core/utils/extensions.dart';
 
 class MsgChatInterface extends StatefulWidget {
   static const String id = 'msg_chat_interface';
-  const MsgChatInterface({Key? key}) : super(key: key);
+  const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);
+  final User? recipientUser;
 
   @override
   State<MsgChatInterface> createState() => _MsgChatInterfaceState();
@@ -71,7 +73,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              globals.user!.profilePicture == null
+              widget.recipientUser!.profilePicture == null
                   ? ImagePlaceholder(
                       width: getScreenWidth(30),
                       height: getScreenHeight(30),
@@ -84,12 +86,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   FittedBox(
                     child: Text(
-                      'Rooney Brown',
+                      (widget.recipientUser!.firstName! +
+                              ' ' +
+                              widget.recipientUser!.lastName!)
+                          .toTitleCase(),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: getScreenHeight(14),
                         fontWeight: FontWeight.w500,
                         color: AppColors.black,
                       ),
@@ -99,7 +104,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                     child: Text(
                       'Active about 45min ago',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: getScreenHeight(11),
                         fontWeight: FontWeight.w400,
                         color: AppColors.greyShade2,
                       ),
@@ -112,8 +117,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
         ),
         actions: [
           SizedBox(
-            height: 40,
-            width: 40,
+            height: getScreenHeight(40),
+            width: getScreenWidth(40),
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/video.svg'),
               onPressed: () {
@@ -122,10 +127,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               splashRadius: 20,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: getScreenWidth(10)),
           SizedBox(
-            height: 35,
-            width: 35,
+            height: getScreenHeight(35),
+            width: getScreenWidth(35),
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/call.svg'),
               onPressed: () {
@@ -136,8 +141,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           ),
           const SizedBox(width: 10),
           SizedBox(
-            height: 35,
-            width: 30,
+            height: getScreenHeight(35),
+            width: getScreenWidth(30),
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/pop-vertical.svg'),
               onPressed: () async {
@@ -158,8 +163,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                 SizedBox(
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
-                      globals.user!.profilePicture == null
+                      SizedBox(height: getScreenHeight(20)),
+                      widget.recipientUser!.profilePicture == null
                           ? ImagePlaceholder(
                               width: getScreenWidth(80),
                               height: getScreenHeight(80),
@@ -168,30 +173,34 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               width: getScreenWidth(80),
                               height: getScreenHeight(80),
                             ),
-                      const SizedBox(height: 5),
-                      const Text('Rooney Brown',
+                      SizedBox(height: getScreenHeight(5)),
+                      Text(
+                          (widget.recipientUser!.firstName! +
+                                  ' ' +
+                                  widget.recipientUser!.lastName!)
+                              .toTitleCase(),
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: getScreenHeight(14),
                             fontWeight: FontWeight.w600,
                             color: AppColors.textColor2,
                           )),
-                      const Text('@RooneyBrown',
+                      Text('@${widget.recipientUser!.username}',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: getScreenHeight(11),
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF767474),
+                            color: const Color(0xFF767474),
                           )),
-                      const SizedBox(height: 10),
+                      SizedBox(height: getScreenHeight(10)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text(
-                                '2K',
+                                widget.recipientUser!.nReachers.toString(),
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: getScreenHeight(15),
                                   color: AppColors.greyShade2,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -199,21 +208,21 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               Text(
                                 'Reachers',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: getScreenHeight(14),
                                   color: AppColors.greyShade2,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(width: 20),
+                          SizedBox(width: getScreenWidth(20)),
                           Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text(
-                                '270',
+                                widget.recipientUser!.nReaching.toString(),
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: getScreenHeight(15),
                                   color: AppColors.greyShade2,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -221,7 +230,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               Text(
                                 'Reaching',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: getScreenHeight(14),
                                   color: AppColors.greyShade2,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -230,28 +239,34 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                           )
                         ],
                       ),
-                      const SizedBox(height: 5),
-                      const SizedBox(
-                          width: 290,
+                      SizedBox(height: getScreenHeight(11)),
+                      SizedBox(
+                          width: getScreenWidth(290),
                           child: Text(
-                            "English actor, typecast as the antihro, Born in shirebrook, Derbyshire",
+                            widget.recipientUser!.bio ?? '',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400),
+                              fontSize: getScreenHeight(14),
+                              color: AppColors.greyShade2,
+                              fontWeight: FontWeight.w400,
+                            ),
                           )),
-                      const SizedBox(height: 15),
+                      SizedBox(height: getScreenHeight(15)),
                       SizedBox(
-                          width: 130,
-                          height: 41,
+                          width: getScreenWidth(130),
+                          height: getScreenHeight(41),
                           child: CustomButton(
                             label: 'View Profile',
                             color: AppColors.white,
-                            onPressed: () {},
+                            onPressed: () {
+                              RouteNavigators.route(
+                                  context, const RecipientAccountProfile());
+                            },
                             size: size,
                             padding: const EdgeInsets.symmetric(
-                                vertical: 9, horizontal: 21),
+                              vertical: 9,
+                              horizontal: 21,
+                            ),
                             textColor: const Color(0xFF767474),
                             borderSide: BorderSide.none,
                           )),

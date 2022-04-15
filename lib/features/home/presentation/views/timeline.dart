@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -31,7 +30,6 @@ class TimelineScreen extends HookWidget {
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     var size = MediaQuery.of(context).size;
     final changeState = useState<bool>(false);
-    Console.log('user', globals.token);
     return Scaffold(
       key: scaffoldKey.value,
       drawer: const AppDrawer(),

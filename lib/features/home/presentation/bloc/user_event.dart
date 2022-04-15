@@ -8,6 +8,11 @@ class GetUserProfileEvent extends UserEvent {
   GetUserProfileEvent({required this.email});
 }
 
+class GetRecipientProfileEvent extends UserEvent {
+  final String? email;
+  GetRecipientProfileEvent({required this.email});
+}
+
 class UpdateUserProfileEvent extends UserEvent {
   final String? dateOfBirth;
   final String? bio;
@@ -45,4 +50,14 @@ class UploadUserProfilePictureEvent extends UserEvent {
 class UploadUserCoverPhotoEvent extends UserEvent {
   final XFile file;
   UploadUserCoverPhotoEvent({required this.file});
+}
+
+class FetchAllUsersByNameEvent extends UserEvent {
+  final String? query;
+  final int? limit, pageNumber;
+  FetchAllUsersByNameEvent({
+    required this.limit,
+    required this.pageNumber,
+    required this.query,
+  });
 }

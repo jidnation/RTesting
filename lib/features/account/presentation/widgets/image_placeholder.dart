@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
 class ImagePlaceholder extends StatelessWidget {
@@ -19,25 +18,14 @@ class ImagePlaceholder extends StatelessWidget {
     return Container(
       height: height,
       width: width,
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: AppColors.primaryColor,
         shape: BoxShape.circle,
         border: border
       ),
       child: FittedBox(
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Text(
-            '${globals.loginResponse!.firstName!} ${globals.loginResponse!.lastName!}'
-                .substring(0, 2)
-                .toUpperCase(),
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w500,
-              color: AppColors.white,
-            ),
-          ),
-        ),
+        child: Image.asset('assets/images/blank-dp.png', fit: BoxFit.cover,)
       ),
     );
   }

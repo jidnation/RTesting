@@ -184,4 +184,35 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+  Future<List<User>> getAllUsersByName({
+    required int? limit,
+    required int? pageNumber,
+    required String? query,
+  }) async {
+    String q = r'''
+          query getAllUsers($limit: Int!, $name: String!, $pageNumber: Int!) {
+            getAllUsers(limit: $limit, name: $name, pageNumber: $pageNumber) {
+          ''' +
+        UserSchema.schema +
+        '''
+            }
+          }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'limit': limit,
+        'pageNumber': pageNumber,
+        'name': query,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get All Users ', result.data);
+      final res = result.data['getAllUsers'] as List;
+      final data = res.map((e) => User.fromJson(e)).toList();
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

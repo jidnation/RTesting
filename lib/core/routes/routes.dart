@@ -80,6 +80,9 @@ class RMRouter {
       case AccountScreen.id:
         return RMPageRoute(builder: (_) => const AccountScreen());
 
+      case RecipientAccountProfile.id:
+        return RMPageRoute(builder: (_) => const RecipientAccountProfile());
+
       case EditProfileScreen.id:
         return RMPageRoute(builder: (_) => const EditProfileScreen());
 

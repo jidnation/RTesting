@@ -39,16 +39,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: clientFor(),
-      child: LifeCycleManager(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'ReachMe',
-          theme: ThemeData(
-            fontFamily: 'Poppins',
-            primarySwatch: Colors.blue,
+      child: GraphQLProvider(
+        client: chatClientFor(),
+        child: LifeCycleManager(
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'ReachMe',
+            theme: ThemeData(
+              fontFamily: 'Poppins',
+              primarySwatch: Colors.blue,
+            ),
+            initialRoute: SplashScreenAnimator.id,
+            onGenerateRoute: RMRouter.generateRoute,
           ),
-          initialRoute: SplashScreenAnimator.id,
-          onGenerateRoute: RMRouter.generateRoute,
         ),
       ),
     );
