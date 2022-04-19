@@ -5,7 +5,7 @@ class User {
   String? phone;
   String? token;
   String? id;
-  String? authId;
+  // String? authId;
   String? bio;
   DateTime? dateofBirth;
   String? coverPicture;
@@ -28,7 +28,7 @@ class User {
     this.phone,
     this.token,
     this.id,
-    this.authId,
+    // this.authId,
     this.bio,
     this.dateofBirth,
     this.coverPicture,
@@ -46,8 +46,8 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["_id"],
-        authId: json["authId"],
+        //id: json["_id"],
+        id: json["authId"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         email: json["email"],
@@ -77,8 +77,8 @@ class User {
         "email": email,
         "phone": phone,
         "token": token,
-        "_id": id,
-        "authId": authId,
+        "authId": id,
+       // "authId": authId,
         "bio": bio,
         "dateOfBirth":
             dateofBirth != null ? dateofBirth!.toIso8601String() : null,

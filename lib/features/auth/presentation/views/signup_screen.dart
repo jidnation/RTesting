@@ -27,7 +27,8 @@ class SignUpScreen extends HookWidget {
     var size = MediaQuery.of(context).size;
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
-    final _fullNameController = useTextEditingController();
+    final _firstNameController = useTextEditingController();
+    final _lastNameController = useTextEditingController();
     final _obscureText = useState(true);
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -132,12 +133,21 @@ class SignUpScreen extends HookWidget {
                           ),
                           SizedBox(height: getScreenHeight(40)),
                           CustomRoundTextField(
-                            hintText: 'Full name',
+                            hintText: 'First name',
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.words,
                             validator: (value) =>
                                 Validator.fullNameValidate(value ?? ""),
-                            controller: _fullNameController,
+                            controller: _firstNameController,
+                          ),
+                          SizedBox(height: getScreenHeight(16)),
+                          CustomRoundTextField(
+                            hintText: 'Last name',
+                            keyboardType: TextInputType.name,
+                            textCapitalization: TextCapitalization.words,
+                            validator: (value) =>
+                                Validator.fullNameValidate(value ?? ""),
+                            controller: _lastNameController,
                           ),
                           SizedBox(height: getScreenHeight(16)),
                           CustomRoundTextField(
@@ -178,16 +188,16 @@ class SignUpScreen extends HookWidget {
                             color: AppColors.textColor2,
                             onPressed: () {
                               if (_key.currentState!.validate()) {
-                                final firstName =
-                                    _fullNameController.text.split(' ').first;
+                                final firstName = 
+                                    _firstNameController.text.trim();
                                 final lastName =
-                                    _fullNameController.text.split(' ').last;
+                                    _lastNameController.text.trim();
                                 globals.authBloc!.add(RegisterUserEvent(
                                   email:
                                       _emailController.text.replaceAll(' ', ''),
                                   password: _passwordController.text,
-                                  firstName: firstName.replaceAll(' ', ''),
-                                  lastName: lastName.replaceAll(' ', ''),
+                                  firstName: firstName,
+                                  lastName: lastName,
                                 ));
                               } else {
                                 return;

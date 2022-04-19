@@ -43,7 +43,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         response.fold(
           (error) => emit(UserError(error: error)),
           (user) {
-            globals.recipientUser = user;
+            // globals.recipientUser = user;
             emit(RecipientUserData(user: user));
           },
         );

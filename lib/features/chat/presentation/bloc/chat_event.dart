@@ -20,6 +20,11 @@ class DeleteThreadEvent extends ChatEvent {
   final String? fromMessageId;
 }
 
+class SubcribeToChatStreamEvent extends ChatEvent {
+  SubcribeToChatStreamEvent({required this.id});
+  final String? id;
+}
+
 class SendChatMessageEvent extends ChatEvent {
   SendChatMessageEvent({
     required this.senderId,
@@ -35,7 +40,22 @@ class SendChatMessageEvent extends ChatEvent {
   final String? type;
 }
 
-// class UploadUserProfilePictureEvent extends ChatEvent {
-//   UploadUserProfilePictureEvent({required this.file});
-//   final XFile file;
-// }
+class SendImageMessageEvent extends ChatEvent {
+  SendImageMessageEvent({
+    required this.senderId,
+    required this.receiverId,
+    required this.threadId,
+    required this.value,
+    required this.type,
+  });
+  final String? senderId;
+  final String? receiverId;
+  final String? threadId;
+  final String? value;
+  final String? type;
+}
+
+class UploadImageFileEvent extends ChatEvent {
+  UploadImageFileEvent({required this.file});
+  final XFile file;
+}

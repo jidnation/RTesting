@@ -611,7 +611,8 @@ class _AccountScreenState extends State<AccountScreen>
 
 class RecipientAccountProfile extends StatefulWidget {
   static const String id = "recipient_account_screen";
-  const RecipientAccountProfile({Key? key}) : super(key: key);
+  final String? email, imageUrl;
+  const RecipientAccountProfile({Key? key, this.email, this.imageUrl}) : super(key: key);
 
   @override
   State<RecipientAccountProfile> createState() =>
@@ -627,7 +628,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
     globals.userBloc!
-        .add(GetRecipientProfileEvent(email: globals.recipientUser!.email));
+        .add(GetRecipientProfileEvent(email: widget.email));
   }
 
   TabBar get _tabBar => TabBar(
@@ -901,7 +902,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 width: isGoingDown ? width : getScreenWidth(100),
                 height: isGoingDown ? height : getScreenHeight(100),
                 duration: const Duration(seconds: 1),
-                child: globals.recipientUser!.profilePicture == null
+                child: widget.imageUrl == null
                     ? ImagePlaceholder(
                         width: isGoingDown ? width : getScreenWidth(100),
                         height: isGoingDown ? height : getScreenHeight(100),
@@ -924,6 +925,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           listener: (context, state) {
             if (state is RecipientUserData) {
               globals.recipientUser = state.user;
+              setState(() {
+              
+              });
             }
           },
           builder: (context, state) {

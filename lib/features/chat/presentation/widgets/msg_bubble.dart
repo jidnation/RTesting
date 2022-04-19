@@ -1,6 +1,9 @@
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble({
@@ -18,6 +21,35 @@ class MsgBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (label.contains('amazon')) {
+      return GestureDetector(
+        onTap: (){
+          RouteNavigators.route(context, PhotoView(imageProvider: NetworkImage(label)));
+        },
+        child: Align(
+          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            clipBehavior: Clip.hardEdge,
+            padding: const EdgeInsets.only(top: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            constraints: BoxConstraints(
+              maxWidth: size.width * .5,
+              maxHeight: size.height * .4,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/blank-dp.png',
+                image: label,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Bubble(
       margin: const BubbleEdges.only(top: 10),
       alignment: isMe ? Alignment.topRight : Alignment.topLeft,

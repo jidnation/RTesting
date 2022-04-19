@@ -8,7 +8,6 @@ import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/graphql/logger_http_client.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 
-
 class GraphQLApiClient {
   GraphQLApiClient()
       : graphQLClient = ValueNotifier<GraphQLClient>(
@@ -109,12 +108,14 @@ class GraphQLApiClient {
     final SubscriptionOptions operation = SubscriptionOptions(
       document: document,
       operationName: operationName,
+      variables: variables,
     );
 
     final Stream<QueryResult> result = clientFor().value.subscribe(operation);
     return result;
   }
 }
+
 class GraphQLChatClient {
   GraphQLChatClient()
       : graphQLClient = ValueNotifier<GraphQLClient>(
@@ -142,7 +143,6 @@ class GraphQLChatClient {
             variables: variables,
           ),
         );
-    Console.log('query', result);
 
     if (result.exception != null) {
       Console.log('query exception', result.exception);
@@ -175,12 +175,11 @@ class GraphQLChatClient {
     DocumentNode documentNode, {
     required Map<String, dynamic> variables,
   }) async {
-    final QueryResult result = await chatClientFor()
-        .value
-        .mutate(MutationOptions(document: documentNode, variables: variables));
-
-    Console.log('mutate ex', result.exception);
-    Console.log('mutate data', result.data);
+    final QueryResult result =
+        await chatClientFor().value.mutate(MutationOptions(
+              document: documentNode,
+              variables: variables,
+            ));
 
     if (result.exception != null) {
       Console.log('mutate exception', result.exception);
@@ -208,16 +207,15 @@ class GraphQLChatClient {
   }
 
   //subscriptions
-  Stream<QueryResult> subscription(DocumentNode document,
-      {required Map<String, dynamic> variables, String? operationName}) {
-    //  chatClientFor().value.cache.reset(); //reset cache
-
-    final SubscriptionOptions operation = SubscriptionOptions(
+  Stream<QueryResult> subscribe(
+    DocumentNode document, {
+    required Map<String, dynamic> variables,
+  }) {
+    final SubscriptionOptions options = SubscriptionOptions(
       document: document,
-      operationName: operationName,
+      variables: variables,
     );
-
-    final Stream<QueryResult> result = chatClientFor().value.subscribe(operation);
+    final Stream<QueryResult> result = chatClientFor().value.subscribe(options);
     return result;
   }
 }

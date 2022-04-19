@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -181,16 +185,24 @@ class SearchResultCard extends StatelessWidget {
         listener: (context, state) {
           if (state is RecipientUserData) {
             globals.recipientUser = state.user;
-            //RouteNavigators.route(context, const RecipientAccountProfile());
-          } else if (state is UserError){
+            // RouteNavigators.route(
+            //     context, RecipientAccountProfile(email: email));
+          } else if (state is UserError) {
             RMSnackBar.showErrorSnackBar(context, message: state.error);
           }
         },
         builder: (context, state) {
+          if (state is UserLoading) {
+            return Center(
+                child: Platform.isIOS
+                    ? const CupertinoActivityIndicator()
+                    : const CircularProgressIndicator());
+          }
           return InkWell(
             onTap: () {
-              RouteNavigators.route(context, const RecipientAccountProfile());
               globals.userBloc!.add(GetRecipientProfileEvent(email: email));
+              RouteNavigators.route(
+                  context, RecipientAccountProfile(email: email));
             },
             child: ListTile(
               leading: imageUrl == null

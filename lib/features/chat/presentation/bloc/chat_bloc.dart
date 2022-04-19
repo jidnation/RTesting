@@ -3,6 +3,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/data/repositories/chat_repository.dart';
@@ -80,33 +82,39 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         emit(ChatSendError(error: e.message));
       }
     });
-    // on<UploadUserProfilePictureEvent>((event, emit) async {
-    //   emit(UserUploadingImage());
-    //   String imageUrl = '';
-    //   try {
-    //     //UPLOAD FILE & GET IMAGE URL
-    //     final response = await chatRepository.uploadPhoto(
-    //       file: event.file,
-    //     );
-    //     response.fold(
-    //       (error) => emit(UserUploadError(error: error)),
-    //       (imgUrl) => imageUrl = imgUrl,
-    //     );
-    //     //SAVE TO
-    //     final userRes = await userRepository.setImage(
-    //       imageUrl: imageUrl,
-    //       type: 'profilePicture',
-    //     );
-    //     userRes.fold(
-    //       (error) => emit(UserUploadError(error: error)),
-    //       (user) {
-    //         globals.user = user;
-    //         emit(UserUploadProfilePictureSuccess(user: user));
-    //       },
-    //     );
-    //   } on GraphQLError catch (e) {
-    //     emit(UserUploadError(error: e.message));
-    //   }
-    // });
+    on<SubcribeToChatStreamEvent>((event, emit) async {
+      try {
+        final response = chatRepository.subcribeToChats(id: event.id);
+        response.listen((event) async {
+          if (event.hasException) {
+            Console.log('subscription exception', event.exception);
+            // emit(ChatError(error: event.exception.toString()));
+          } else if (event.isLoading) {
+            Console.log('subscription loading', event.isLoading);
+          } else {
+            Console.log('subscription data', event.data);
+            final data = Chat.fromJson(event.data!);
+            emit(ChatStreamData(data: data));
+          }
+        });
+      } on GraphQLError catch (e) {
+        emit(ChatError(error: e.message));
+      }
+    });
+    on<UploadImageFileEvent>((event, emit) async {
+      emit(UserUploadingImage());
+      try {
+        //UPLOAD FILE & GET IMAGE URL
+        final response = await chatRepository.uploadPhoto(
+          file: event.file,
+        );
+        response.fold(
+          (error) => emit(ChatUploadError(error: error)),
+          (imgUrl) => emit(ChatUploadSuccess(imgUrl: imgUrl)),
+        );
+      } on GraphQLError catch (e) {
+        emit(ChatUploadError(error: e.message));
+      }
+    });
   }
 }

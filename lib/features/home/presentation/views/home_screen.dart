@@ -38,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //   // globals.userBloc!
     //   //     .add(FetchAllUsersByNameEvent(limit: 100, pageNumber: 1, query: ''));
     // }, [globals.user!]);
+    print(globals.loginResponse!.toJson());
     return BlocConsumer<UserBloc, UserState>(
         bloc: globals.userBloc,
         listener: (context, state) {

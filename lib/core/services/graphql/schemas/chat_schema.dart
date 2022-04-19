@@ -23,7 +23,7 @@ class ChatThreadSchema {
 
   static String get schema {
     return r'''
-      _id 
+      id 
       participants 
       tailMessage {
         _id 
@@ -40,6 +40,22 @@ class ChatThreadSchema {
       }
       createdAt
       updatedAt
+          ''';
+  }
+}
+
+class ChatSubSchema {
+  ChatSubSchema._();
+
+  static String get schema {
+    return r'''
+      id 
+      senderId 
+      receiverId
+      type 
+      value 
+      threadId 
+      sentAt 
           ''';
   }
 }

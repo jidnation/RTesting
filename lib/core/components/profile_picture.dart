@@ -30,7 +30,7 @@ class ProfilePicture extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: CachedNetworkImage(
-          imageUrl: globals.user!.profilePicture!,
+          imageUrl: globals.user!.profilePicture ?? '',
           fit: BoxFit.cover,
           placeholder: (context, url) => const ImagePlaceholder(),
           errorWidget: (context, url, error) => const ImagePlaceholder(),
