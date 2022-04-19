@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/home/data/models/virtual_reach.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 
 part 'user_event.dart';
@@ -152,6 +153,131 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         );
       } on GraphQLError catch (e) {
         emit(UserUploadError(error: e.message));
+      }
+    });
+    on<ReachUserEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.reachUser(
+          userId: event.userIdToReach!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (usersList) => emit(UserLoaded()),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<StarUserEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.starUser(
+          userId: event.userIdToStar!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (usersList) => emit(UserLoaded()),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<GetReachRelationshipEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getReachRelationship(
+          userId: event.userIdToReach!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (isReaching) =>
+              emit(GetReachRelationshipSuccess(isReaching: isReaching)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<DelReachRelationshipEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.deleteReachRelationship(
+          userId: event.userIdToDelete!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (isReachingDel) =>
+              emit(DelReachRelationshipSuccess(isReachingDel: isReachingDel)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<GetStarRelationshipEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getStarRelationship(
+          userId: event.userIdToStar!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (isStarring) =>
+              emit(GetStarRelationshipSuccess(isStarring: isStarring)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<DelStarRelationshipEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.deleteStarRelationship(
+          userId: event.starIdToDelete!,
+        );
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (isStarringDel) =>
+              emit(DelStarRelationshipSuccess(isStarringDel: isStarringDel)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<FetchUserReachersEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getReachers();
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (reachers) => emit(FetchUserReachersSuccess(reachers: reachers)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<FetchUserReachingsEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getReachings();
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (reachings) => emit(FetchUserReachingsSuccess(reachings: reachings)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<FetchUserStarredEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getStarred();
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (starredUsers) =>
+              emit(FetchUserStarredSuccess(starredUsers: starredUsers)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
       }
     });
   }

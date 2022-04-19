@@ -127,7 +127,13 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
         ),
         title: InkWell(
           onTap: () {
-            RouteNavigators.route(context, const RecipientAccountProfile());
+            RouteNavigators.route(
+                context,
+                RecipientAccountProfile(
+                  recipientEmail: widget.recipientUser!.email,
+                  recipientImageUrl: widget.recipientUser!.profilePicture,
+                  recipientId: widget.recipientUser!.id,
+                ));
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,

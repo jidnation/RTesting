@@ -55,6 +55,7 @@ class SearchScreen extends HookWidget {
           hintText: 'Search ReachMe',
           fillColor: AppColors.white,
           controller: _searchController,
+          maxLines: 1,
           onChanged: (val) {
             if (val.isNotEmpty) {
               _hasText.value = true;
@@ -116,6 +117,7 @@ class SearchScreen extends HookWidget {
                         email: globals.userList![index].email,
                         username: globals.userList![index].username,
                         imageUrl: globals.userList![index].profilePicture,
+                        id: globals.userList![index].id,
                       );
                     },
                   );
@@ -171,12 +173,14 @@ class SearchResultCard extends StatelessWidget {
     required this.displayName,
     required this.imageUrl,
     required this.email,
+    required this.id,
   }) : super(key: key);
 
   final String? imageUrl;
   final String? username;
   final String? displayName;
   final String? email;
+  final String? id;
 
   @override
   Widget build(BuildContext context) {
@@ -185,8 +189,10 @@ class SearchResultCard extends StatelessWidget {
         listener: (context, state) {
           if (state is RecipientUserData) {
             globals.recipientUser = state.user;
-            // RouteNavigators.route(
-            //     context, RecipientAccountProfile(email: email));
+            //  email == globals.loginResponse!.email
+            //       ? RouteNavigators.route(context, const AccountScreen())
+            //       : RouteNavigators.route(
+            //           context, RecipientAccountProfile(email: email));
           } else if (state is UserError) {
             RMSnackBar.showErrorSnackBar(context, message: state.error);
           }
@@ -201,8 +207,15 @@ class SearchResultCard extends StatelessWidget {
           return InkWell(
             onTap: () {
               globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-              RouteNavigators.route(
-                  context, RecipientAccountProfile(email: email));
+              email == globals.loginResponse!.email
+                  ? RouteNavigators.route(context, const AccountScreen())
+                  : RouteNavigators.route(
+                      context,
+                      RecipientAccountProfile(
+                        recipientEmail: email,
+                        recipientImageUrl: imageUrl,
+                        recipientId: id,
+                      ));
             },
             child: ListTile(
               leading: imageUrl == null
@@ -210,9 +223,10 @@ class SearchResultCard extends StatelessWidget {
                       height: getScreenHeight(50),
                       width: getScreenWidth(50),
                     )
-                  : ProfilePicture(
+                  : RecipientProfilePicture(
                       height: getScreenHeight(50),
                       width: getScreenWidth(50),
+                      imageUrl: imageUrl,
                     ),
               title: Text(
                 username ?? '',

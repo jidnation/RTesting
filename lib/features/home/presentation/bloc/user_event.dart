@@ -61,3 +61,39 @@ class FetchAllUsersByNameEvent extends UserEvent {
     required this.query,
   });
 }
+
+class ReachUserEvent extends UserEvent {
+  final String? userIdToReach;
+  ReachUserEvent({required this.userIdToReach});
+}
+
+class StarUserEvent extends UserEvent {
+  final String? userIdToStar;
+  StarUserEvent({required this.userIdToStar});
+}
+
+class GetReachRelationshipEvent extends UserEvent {
+  final String? userIdToReach;
+  GetReachRelationshipEvent({required this.userIdToReach});
+}
+
+class DelReachRelationshipEvent extends UserEvent {
+  final String? userIdToDelete;
+  DelReachRelationshipEvent({required this.userIdToDelete});
+}
+
+class GetStarRelationshipEvent extends UserEvent {
+  final String? userIdToStar;
+  GetStarRelationshipEvent({required this.userIdToStar});
+}
+
+class DelStarRelationshipEvent extends UserEvent {
+  final String? starIdToDelete;
+  DelStarRelationshipEvent({required this.starIdToDelete});
+}
+
+class FetchUserReachersEvent extends UserEvent {}
+
+class FetchUserReachingsEvent extends UserEvent {}
+
+class FetchUserStarredEvent extends UserEvent {}

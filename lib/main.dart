@@ -12,6 +12,8 @@ import 'dart:io';
 
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
 
+//TODO: STAR USER [STAR USER]
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   initSingletons();

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -611,8 +612,10 @@ class _AccountScreenState extends State<AccountScreen>
 
 class RecipientAccountProfile extends StatefulWidget {
   static const String id = "recipient_account_screen";
-  final String? email, imageUrl;
-  const RecipientAccountProfile({Key? key, this.email, this.imageUrl}) : super(key: key);
+  final String? recipientEmail, recipientImageUrl, recipientId;
+  const RecipientAccountProfile(
+      {Key? key, this.recipientEmail, this.recipientImageUrl, this.recipientId})
+      : super(key: key);
 
   @override
   State<RecipientAccountProfile> createState() =>
@@ -628,7 +631,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     super.initState();
     _tabController = TabController(length: 6, vsync: this);
     globals.userBloc!
-        .add(GetRecipientProfileEvent(email: widget.email));
+        .add(GetRecipientProfileEvent(email: widget.recipientEmail));
+    globals.userBloc!
+        .add(GetReachRelationshipEvent(userIdToReach: widget.recipientId));
   }
 
   TabBar get _tabBar => TabBar(
@@ -831,6 +836,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   double width = getScreenWidth(100);
   double height = getScreenHeight(100);
   ScrollController scrollViewController = ScrollController();
+
+  bool _isReaching = false;
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -902,14 +909,15 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 width: isGoingDown ? width : getScreenWidth(100),
                 height: isGoingDown ? height : getScreenHeight(100),
                 duration: const Duration(seconds: 1),
-                child: widget.imageUrl == null
+                child: widget.recipientImageUrl == null
                     ? ImagePlaceholder(
                         width: isGoingDown ? width : getScreenWidth(100),
                         height: isGoingDown ? height : getScreenHeight(100),
                         border:
                             Border.all(color: Colors.grey.shade50, width: 3.0),
                       )
-                    : ProfilePicture(
+                    : RecipientProfilePicture(
+                        imageUrl: widget.recipientImageUrl,
                         width: isGoingDown ? width : getScreenWidth(100),
                         height: isGoingDown ? height : getScreenHeight(100),
                         border:
@@ -925,9 +933,30 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           listener: (context, state) {
             if (state is RecipientUserData) {
               globals.recipientUser = state.user;
-              setState(() {
-              
-              });
+              setState(() {});
+            }
+
+            if (state is GetReachRelationshipSuccess) {
+              if (state.isReaching!) {
+                _isReaching = true;
+              } else {
+                _isReaching = false;
+              }
+              setState(() {});
+            }
+
+            if (state is DelReachRelationshipSuccess) {
+              globals.userBloc!
+                  .add(GetRecipientProfileEvent(email: widget.recipientEmail));
+              _isReaching = false;
+              setState(() {});
+            }
+
+            if (state is UserLoaded) {
+              globals.userBloc!
+                  .add(GetRecipientProfileEvent(email: widget.recipientEmail));
+              _isReaching = true;
+              setState(() {});
             }
           },
           builder: (context, state) {
@@ -1084,19 +1113,34 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     width: getScreenWidth(130),
                                     height: getScreenHeight(41),
                                     child: CustomButton(
-                                      label: 'Reach',
-                                      color: AppColors.primaryColor,
+                                      label: _isReaching ? 'Reaching' : 'Reach',
+                                      color: _isReaching
+                                          ? AppColors.white
+                                          : AppColors.primaryColor,
                                       onPressed: () {
-                                        // RouteNavigators.route(
-                                        //     context, const EditProfileScreen());
+                                        if (!_isReaching) {
+                                          globals.userBloc!.add(ReachUserEvent(
+                                              userIdToReach:
+                                                  globals.recipientUser!.id));
+                                        } else {
+                                          globals.userBloc!.add(
+                                              DelReachRelationshipEvent(
+                                                  userIdToDelete: globals
+                                                      .recipientUser!.id));
+                                        }
                                       },
                                       size: size,
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 9,
                                         horizontal: 21,
                                       ),
-                                      textColor: AppColors.white,
-                                      borderSide: BorderSide.none,
+                                      textColor: _isReaching
+                                          ? AppColors.black
+                                          : AppColors.white,
+                                      borderSide: _isReaching
+                                          ? const BorderSide(
+                                              color: AppColors.greyShade5)
+                                          : BorderSide.none,
                                     ),
                                   ),
                                   const SizedBox(width: 10),

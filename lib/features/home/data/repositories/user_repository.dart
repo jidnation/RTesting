@@ -6,6 +6,7 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
+import 'package:reach_me/features/home/data/models/virtual_reach.dart';
 
 // abstract class IUserRepository {
 //   Future<Either<String, User>> createAccount({
@@ -125,6 +126,111 @@ class UserRepository {
       );
       Console.log('get alll users by name', user);
       return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, dynamic>> reachUser({
+    required String userId,
+  }) async {
+    try {
+      final reach = await _homeRemoteDataSource.reachUser(
+        userId: userId,
+      );
+      return Right(reach);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, dynamic>> starUser({
+    required String userId,
+  }) async {
+    try {
+      final star = await _homeRemoteDataSource.starUser(
+        userId: userId,
+      );
+      return Right(star);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> getReachRelationship({
+    required String userId,
+  }) async {
+    try {
+      final isReaching = await _homeRemoteDataSource.getReachRelationship(
+        userId: userId,
+      );
+      return Right(isReaching);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteReachRelationship({
+    required String userId,
+  }) async {
+    try {
+      final isReachingDel = await _homeRemoteDataSource.deleteReachRelationship(
+        userId: userId,
+      );
+      return Right(isReachingDel);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> getStarRelationship({
+    required String userId,
+  }) async {
+    try {
+      final isStarring = await _homeRemoteDataSource.getStarRelationship(
+        userId: userId,
+      );
+      return Right(isStarring);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteStarRelationship({
+    required String userId,
+  }) async {
+    try {
+      final isStarringDel = await _homeRemoteDataSource.deleteStarRelationship(
+        userId: userId,
+      );
+      return Right(isStarringDel);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<VirtualReach>>> getReachers() async {
+    try {
+      final getReachers = await _homeRemoteDataSource.getReachers();
+      return Right(getReachers);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<VirtualReach>>> getReachings() async {
+    try {
+      final getReachings = await _homeRemoteDataSource.getReachings();
+      return Right(getReachings);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<VirtualStar>>> getStarred() async {
+    try {
+      final getStarred = await _homeRemoteDataSource.getStarred();
+      return Right(getStarred);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

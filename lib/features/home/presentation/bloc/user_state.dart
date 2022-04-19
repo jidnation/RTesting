@@ -49,6 +49,41 @@ class FetchUsersSuccess extends UserState {
   final List<User>? user;
 }
 
+class GetReachRelationshipSuccess extends UserState {
+  GetReachRelationshipSuccess({this.isReaching});
+  final bool? isReaching;
+}
+
+class DelReachRelationshipSuccess extends UserState {
+  DelReachRelationshipSuccess({this.isReachingDel});
+  final bool? isReachingDel;
+}
+
+class GetStarRelationshipSuccess extends UserState {
+  GetStarRelationshipSuccess({this.isStarring});
+  final bool? isStarring;
+}
+
+class DelStarRelationshipSuccess extends UserState {
+  DelStarRelationshipSuccess({this.isStarringDel});
+  final bool? isStarringDel;
+}
+
+class FetchUserReachersSuccess extends UserState {
+  FetchUserReachersSuccess({this.reachers});
+  final List<VirtualReach>? reachers;
+}
+
+class FetchUserReachingsSuccess extends UserState {
+  FetchUserReachingsSuccess({this.reachings});
+  final List<VirtualReach>? reachings;
+}
+
+class FetchUserStarredSuccess extends UserState {
+  FetchUserStarredSuccess({this.starredUsers});
+  final List<VirtualStar>? starredUsers;
+}
+
 class UserError extends UserState {
   UserError({this.error});
   final String? error;

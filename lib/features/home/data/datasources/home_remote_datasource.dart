@@ -3,6 +3,7 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/features/home/data/models/virtual_reach.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -199,7 +200,7 @@ class HomeRemoteDataSource {
             }
           }''';
     try {
-      final result = await _client.mutate(gql(q), variables: {
+      final result = await _client.query(gql(q), variables: {
         'limit': limit,
         'pageNumber': pageNumber,
         'name': query,
@@ -210,6 +211,222 @@ class HomeRemoteDataSource {
       Console.log('get All Users ', result.data);
       final res = result.data['getAllUsers'] as List;
       final data = res.map((e) => User.fromJson(e)).toList();
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> reachUser({required String? userId}) async {
+    String q = r'''
+          mutation reachUser($userIdToReach: String!) {
+            reachUser(userIdToReach: $userIdToReach) {
+              reacherId
+              reachingId
+            }
+          }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'userIdToReach': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('reach user ', result.data);
+      return result.data['reachUser'];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> starUser({required String? userId}) async {
+    String q = r'''
+          mutation starUser($userIdToStar: String!) {
+            starUser(userIdToStar: $userIdToStar) {
+              starredId
+              userId
+            }
+          }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'userIdToStar': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('star user ', result.data);
+      return result.data['starUser'];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getReachRelationship({required String? userId}) async {
+    String q = r'''
+          query getReachRelationship($userIdToReach: String!) {
+            getReachRelationship(userIdToReach: $userIdToReach)
+          }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'userIdToReach': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get reach relationship ', result.data);
+      return result.data['getReachRelationship'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteReachRelationship({required String? userId}) async {
+    String q = r'''
+          mutation deleteReachRelationship($userIdToDelete: String!) {
+            deleteReachRelationship(userIdToDelete: $userIdToDelete) 
+          }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'userIdToDelete': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('del reach relationship ', result.data);
+      return result.data['deleteReachRelationship'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> getStarRelationship({required String? userId}) async {
+    String q = r'''
+          query getStarRelationship($userIdToStar: String!) {
+            getStarRelationship(userIdToStar: $userIdToStar)
+          }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'userIdToStar': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get star relationship ', result.data);
+      return result.data['getStarRelationship'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteStarRelationship({required String? userId}) async {
+    String q = r'''
+          mutation deleteStarRelationship($starIdToDelete: String!) {
+            deleteStarRelationship(starIdToDelete: $starIdToDelete) 
+          }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'starIdToDelete': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('del star relationship ', result.data);
+      return result.data['deleteStarRelationship'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualReach>> getReachers() async {
+    String q = r'''
+          query getReachers() {
+            getReachers() {
+              reacher {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reacherId
+              reaching {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reachingId
+            }
+          }''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get Reachers', result.data);
+      var res = result.data['getReachers'] as List;
+      final data = res.map((e) => VirtualReach.fromJson(e)).toList();
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualReach>> getReachings() async {
+    String q = r'''
+          query getReachings() {
+            getReachings() {
+              reacher {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reacherId
+              reaching {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reachingId
+            }
+          }''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get reachings', result.data);
+      var res = result.data['getReachings'] as List;
+      final data = res.map((e) => VirtualReach.fromJson(e)).toList();
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualStar>> getStarred() async {
+    String q = r'''
+          query getStarred() {
+            getStarred() {
+              reacher {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reacherId
+              reaching {
+                ''' +
+        UserSchema.schema +
+        '''
+              }
+              reachingId
+            }
+          }''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get starreds', result.data);
+      var res = result.data['getStarred'] as List;
+      final data = res.map((e) => VirtualStar.fromJson(e)).toList();
       return data;
     } catch (e) {
       rethrow;
