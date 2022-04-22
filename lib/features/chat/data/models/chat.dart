@@ -1,3 +1,5 @@
+import 'package:reach_me/core/models/user.dart';
+
 class Chat {
   Chat({
     // this._id,
@@ -66,9 +68,11 @@ class ChatsThread {
     this.tailMessage,
     this.createdAt,
     this.updatedAt,
+    this.participantsInfo,
   });
   String? id;
   List<String>? participants;
+  List<ChatUser>? participantsInfo;
   Chat? tailMessage;
   String? createdAt;
   String? updatedAt;
@@ -79,6 +83,8 @@ class ChatsThread {
     tailMessage = Chat.fromJson(json['tailMessage']);
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    participantsInfo = List<ChatUser>.from(
+        json['participantsInfo'].map((item) => ChatUser.fromJson(item)));
   }
 
   Map<String, dynamic> toJson() {
@@ -88,6 +94,8 @@ class ChatsThread {
     _data['tailMessage'] = tailMessage!.toJson();
     _data['createdAt'] = createdAt;
     _data['updatedAt'] = updatedAt;
+    _data['participantsInfo'] =
+        participantsInfo?.map((item) => item.toJson()).toList();
     return _data;
   }
 }

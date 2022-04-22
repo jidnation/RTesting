@@ -78,7 +78,7 @@ class User {
         "phone": phone,
         "token": token,
         "authId": id,
-       // "authId": authId,
+        // "authId": authId,
         "bio": bio,
         "dateOfBirth":
             dateofBirth != null ? dateofBirth!.toIso8601String() : null,
@@ -93,5 +93,27 @@ class User {
         "nReaching": nReaching,
         "nStaring": nStaring,
         "username": username,
+      };
+}
+
+class ChatUser {
+  ChatUser({this.firstName, this.id, this.lastName, this.profilePicture});
+  String? id;
+  String? firstName;
+  String? lastName;
+  String? profilePicture;
+
+  factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
+        id: json["id"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        profilePicture: json["profilePicture"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "firstName": firstName,
+        "lastName": lastName,
+        "profilePicture": profilePicture,
       };
 }

@@ -1,9 +1,6 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/views/video_moment.dart';
@@ -22,49 +19,22 @@ class HomeScreen extends StatefulHookWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  void initState() {
-    globals.userBloc!
-        .add(GetUserProfileEvent(email: globals.loginResponse!.email));
-    setState(() {});
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final _currentIndex = useState<int>(0);
-    // useMemoized(() {
-    //   globals.userBloc!
-    //       .add(GetUserProfileEvent(email: globals.loginResponse!.email));
-    //   // globals.userBloc!
-    //   //     .add(FetchAllUsersByNameEvent(limit: 100, pageNumber: 1, query: ''));
-    // }, [globals.user!]);
-    print(globals.loginResponse!.toJson());
-    return BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is UserData) {
-            globals.user = state.user;
-          }
-          // if (state is FetchUsersSuccess) {
-          //   globals.userList = state.user;
-          // }
-        },
-        builder: (context, state) {
-          return Scaffold(
-            drawer: const AppDrawer(),
-            body: IndexedStack(
-              children: const [
-                TimelineScreen(),
-                SearchScreen(),
-                VideoMomentScreen(),
-                NotificationsScreen(),
-                AccountScreen(),
-              ],
-              index: _currentIndex.value,
-            ),
-            bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
-          );
-        });
+    return Scaffold(
+      drawer: const AppDrawer(),
+      body: IndexedStack(
+        children: const [
+          TimelineScreen(),
+          SearchScreen(),
+          VideoMomentScreen(),
+          NotificationsScreen(),
+          AccountScreen(),
+        ],
+        index: _currentIndex.value,
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
+    );
   }
 }
 

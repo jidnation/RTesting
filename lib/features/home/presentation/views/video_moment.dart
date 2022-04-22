@@ -349,8 +349,8 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void didChangeDependencies() {
-    _videoPlayerController = VideoPlayerController.asset(widget.src[0]);
-    loadController();
+    // _videoPlayerController = VideoPlayerController.asset(widget.src[0]);
+    // loadController();
     super.didChangeDependencies();
   }
 
@@ -384,8 +384,8 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void dispose() {
-    _videoPlayerController!.dispose();
-    _chewieController!.dispose();
+    // _videoPlayerController!.dispose();
+    // _chewieController!.dispose();
     super.dispose();
   }
 

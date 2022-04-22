@@ -12,6 +12,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
+import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/core/components/media_card.dart';
@@ -20,9 +21,21 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
 // ignore: must_be_immutable
-class TimelineScreen extends HookWidget {
+class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
   const TimelineScreen({Key? key}) : super(key: key);
+
+  @override
+  State<TimelineScreen> createState() => _TimelineScreenState();
+}
+
+class _TimelineScreenState extends State<TimelineScreen> {
+  @override
+  void initState() {
+    globals.userBloc!
+        .add(GetUserProfileEvent(email: globals.loginResponse!.email));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
