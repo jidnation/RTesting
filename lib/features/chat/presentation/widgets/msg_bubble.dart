@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/dimensions.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble({

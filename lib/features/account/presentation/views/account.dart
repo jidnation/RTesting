@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
-import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
