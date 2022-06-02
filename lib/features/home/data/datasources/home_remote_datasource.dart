@@ -2,7 +2,9 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_reach.dart';
 
 // abstract class IHomeRemoteDataSource {
@@ -428,6 +430,594 @@ class HomeRemoteDataSource {
       var res = result.data['getStarred'] as List;
       final data = res.map((e) => VirtualStar.fromJson(e)).toList();
       return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostModel> createPost({
+    String? audioMediaItem,
+    String? commentOption,
+    String? content,
+    List<String>? imageMediaItems,
+    bool? videoMediaItem,
+  }) async {
+    String q = r'''
+        mutation createPost(
+          $audioMediaItem: String
+          $commentOption: String!
+          $content: String!
+          $imageMediaItems: Boolean
+          $showLocation: Boolean
+          ) {
+          createPost(
+            postBody: {
+              audioMediaItem: $audioMediaItem
+              commentOption: $commentOption
+              content: $content
+              imageMediaItems: $imageMediaItems
+          }) {
+            ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'commentOption': commentOption,
+        'content': content,
+      };
+
+      if (audioMediaItem != null) {
+        variables.putIfAbsent('audioMediaItem', () => audioMediaItem);
+      }
+      if (imageMediaItems != null) {
+        variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
+      }
+      if (videoMediaItem != null) {
+        variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
+      }
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('create post', result.data);
+      return PostModel.fromJson(result.data!['createPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostModel> editContent({
+    String? postId,
+    String? content,
+  }) async {
+    String q = r'''
+        mutation editContent(
+          $postId: String!
+          $content: String!
+          ) {
+          editContent(
+            contentInput: {
+              postId: $postId
+              content: $content
+          }) {
+            ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'content': content,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('edit post', result.data);
+      return PostModel.fromJson(result.data!['editContent']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostModel> deletePost({String? postId}) async {
+    String q = r'''
+        mutation deletePost(
+          $postId: String!
+          ) {
+          deletePost(
+            postId: $postId
+          ) {
+            ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('delete post', result.data);
+      return PostModel.fromJson(result.data!['deletePost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostLikeModel> likePost({String? postId}) async {
+    String q = r'''
+        mutation likePost(
+          $postId: String!
+          ) {
+          likePost(
+            postId: $postId
+          ) {
+           likeId
+           authId
+           postId
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('like post', result.data);
+      return PostLikeModel.fromJson(result.data!['likePost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> unlikePost({String? postId}) async {
+    String q = r'''
+        mutation unlikePost($postId: String!) {
+          unlikePost(postId: $postId) 
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('unlike post', result.data);
+      return result.data!['unlikePost'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<CommentModel> commentOnPost({
+    String? postId,
+    String? content,
+  }) async {
+    String q = r'''
+        mutation commentOnPost(
+          $postId: String!
+          $content: String!
+          ) {
+          commentOnPost(
+            commentBody: {
+              postId: $postId
+              content: $content
+          }) {
+            ''' +
+        CommentSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'content': content,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('comment on post', result.data);
+      return CommentModel.fromJson(result.data!['commentOnPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<CommentModel> deletePostComment({String? commentId}) async {
+    String q = r'''
+        mutation deletePostComment($commentId: String!) {
+          deletePostComment(commentId: $commentId) {
+            ''' +
+        CommentSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {'commentId': commentId};
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('delete comment on post', result.data);
+      return CommentModel.fromJson(result.data!['deletePostComment']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostVoteModel> votePost({
+    required String postId,
+    required String voteType,
+  }) async {
+    String q = r'''
+        mutation votePost(
+          $voteType: String!
+          $postId: String!
+          ) {
+          votePost(
+            postId: $postId
+            voteType: $voteType
+          ){
+            voteId
+            authId
+            postId
+            voteType
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'voteType': voteType,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('delete post vote', result.data);
+      return PostVoteModel.fromJson(result.data!['votePost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> deletePostVote({String? voteId}) async {
+    String q = r'''
+        mutation deletePostVote($voteId: String!) {
+          deletePostVote(voteId: $voteId)
+        }''';
+    try {
+      Map<String, dynamic> variables = {'voteId': voteId};
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('delete post vote', result.data);
+      return result.data!['deletePostVote'] as String;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<CommentLikeModel> likeCommentOnPost({
+    required String postId,
+    required String commentId,
+  }) async {
+    String q = r'''
+        mutation likeCommentOnPost(
+          $postId: String!
+          $commentId: String!
+          ) {
+          likeCommentOnPost(
+            postId: $postId
+            commentId: $commentId
+          ) {
+           likeId
+           authId
+           commentId
+           postId
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'commentId': commentId,
+      };
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('like comment on post', result.data);
+      return CommentLikeModel.fromJson(result.data!['likeCommentOnPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> unlikeCommentOnPost({
+    required String commentLikeId,
+  }) async {
+    String q = r'''
+        mutation unlikeCommentOnPost(
+          $postId: String!
+          $commentLikeId: String!
+          ) {
+          unlikeCommentOnPost(
+            postId: $postId
+            commentLikeId: $commentLikeId
+          )
+        }''';
+    try {
+      Map<String, dynamic> variables = {'commentLikeId': commentLikeId};
+
+      final result = await _client.mutate(
+        gql(q),
+        variables: variables,
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('like comment on post', result.data);
+      return result.data!['unlikeCommentOnPost'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkCommentLike({required String? commentLikeId}) async {
+    String q = r'''
+        query checkCommentLike($commentLikeId: String!) {
+          checkCommentLike(commentLikeId: $commentLikeId)
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'commentLikeId': commentLikeId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('check comment like', result.data);
+      return result.data!['checkCommentLike'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkPostLike({required String? postId}) async {
+    String q = r'''
+        query checkPostLike($postId: String!) {
+          checkPostLike(postId: $postId)
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('check post like', result.data);
+      return result.data!['checkPostLike'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> checkPostVote({required String? postId}) async {
+    String q = r'''
+        query checkPostVote($postId: String!) {
+          checkPostVote(postId: $postId){
+            voteType
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('check post vote', result.data);
+      return result.data!['checkPostVote'] as String;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<CommentLikeModel>> getAllCommentLikes(
+      {required String? commentId}) async {
+    String q = r'''
+        query getAllCommentLikes($commentId: String!) {
+          getAllCommentLikes(commentId: $commentId){
+            authId
+            commentId
+            postId
+            likeId
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'commentId': commentId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get all comment likes', result.data);
+      return (result.data!['getAllCommentLikes'] as List)
+          .map((e) => CommentLikeModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualCommentModel>> getAllCommentsOnPost({
+    required String? postId,
+  }) async {
+    String q = r'''
+        query getAllCommentsOnPost($postId: String!) {
+          getAllCommentsOnPost(postId: $postId){
+            profile {
+                ''' +
+        UserSchema.schema +
+        '''
+            }
+               ''' +
+        CommentSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get all comments on post', result.data);
+      return (result.data!['getAllCommentsOnPost'] as List)
+          .map((e) => VirtualCommentModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualPostLikeModel>> getLikesOnPost({
+    required String? postId,
+  }) async {
+    String q = r'''
+        query getLikesOnPost($postId: String!) {
+          getLikesOnPost(postId: $postId){
+            profile {
+                ''' +
+        UserSchema.schema +
+        '''
+            }
+            authId
+            postId
+            likeId
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get all likes on post', result.data);
+      return (result.data!['getLikesOnPost'] as List)
+          .map((e) => VirtualPostLikeModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<VirtualPostModel> getPost({required String? postId}) async {
+    String q = r'''
+        query getPost($postId: String!) {
+          getPost(postId: $postId){
+              profile {
+                ''' +
+        UserSchema.schema +
+        '''
+            }
+               ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get post', result.data);
+      return VirtualPostModel.fromJson(result.data!['getPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<VirtualCommentModel> getSingleCommentOnPost({
+    required String? postId,
+  }) async {
+    String q = r'''
+        query getSingleCommentOnPost($postId: String!) {
+          getSingleCommentOnPost(postId: $postId){
+              profile {
+                ''' +
+        UserSchema.schema +
+        '''
+            }
+               ''' +
+        CommentSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'postId': postId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get single comment on post', result.data);
+      return VirtualCommentModel.fromJson(
+          result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
     }

@@ -34,6 +34,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
   void initState() {
     globals.userBloc!
         .add(GetUserProfileEvent(email: globals.loginResponse!.email));
+    //TODO: COMMOT SETSTATE IF E NO WORK
+    setState(() {});
     super.initState();
   }
 

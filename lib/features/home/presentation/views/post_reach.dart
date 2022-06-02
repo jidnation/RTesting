@@ -192,7 +192,7 @@ class _PostReachState extends State<PostReach> {
                                     if (_imageList.value.isEmpty) {
                                       return const SizedBox.shrink();
                                     }
-                                    print(_imageList.value.length);
+                                   
                                     return Stack(
                                       alignment: Alignment.topRight,
                                       children: [
