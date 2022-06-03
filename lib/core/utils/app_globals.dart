@@ -6,6 +6,7 @@ import 'package:reach_me/features/auth/data/models/login_response.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -20,6 +21,7 @@ class AppGlobals {
   AuthBloc? authBloc;
   UserBloc? userBloc;
   ChatBloc? chatBloc;
+  SocialServiceBloc? socialServiceBloc;
   String? token;
 
   User? user;
@@ -31,13 +33,14 @@ class AppGlobals {
 
   void init() {
     user = User();
-   recipientUser = User();
+    recipientUser = User();
     userChat = [];
     userThreads = [];
     loginResponse = LoginResponse();
     authBloc = AuthBloc();
     userBloc = UserBloc();
     chatBloc = ChatBloc();
+    socialServiceBloc = SocialServiceBloc();
     token = '';
     userList = [];
   }
@@ -46,6 +49,7 @@ class AppGlobals {
     authBloc!.close();
     userBloc!.close();
     chatBloc!.close();
+    socialServiceBloc!.close();
   }
 
   void showLoader(BuildContext context) {

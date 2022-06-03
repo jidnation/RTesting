@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -135,22 +133,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         final response = await userRepository.uploadPhoto(
           file: event.file,
         );
+
         response.fold(
           (error) => emit(UserUploadError(error: error)),
           (imgUrl) => imageUrl = imgUrl,
         );
         //SAVE TO
-        final userRes = await userRepository.setImage(
-          imageUrl: imageUrl,
-          type: 'profilePicture',
-        );
-        userRes.fold(
-          (error) => emit(UserUploadError(error: error)),
-          (user) {
-            globals.user = user;
-            emit(UserUploadProfilePictureSuccess(user: user));
-          },
-        );
+
+        if (imageUrl.isNotEmpty) {
+          final userRes = await userRepository.setImage(
+            imageUrl: imageUrl,
+            type: 'profilePicture',
+          );
+
+          userRes.fold(
+            (error) => emit(UserUploadError(error: error)),
+            (user) {
+              globals.user = user;
+              emit(UserUploadProfilePictureSuccess(user: user));
+            },
+          );
+        }
       } on GraphQLError catch (e) {
         emit(UserUploadError(error: e.message));
       }

@@ -93,7 +93,8 @@ class UserRepository {
       final String imgUrl = user['data'];
       return Right(imgUrl);
     } on DioError catch (e) {
-      return Left(e.message);
+      Console.log('taggerd', e.response);
+      return Left(e.response!.data['message']);
     }
   }
 
