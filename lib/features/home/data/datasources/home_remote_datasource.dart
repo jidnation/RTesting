@@ -4,8 +4,9 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
-import 'package:reach_me/features/home/data/models/virtual_reach.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -440,7 +441,7 @@ class HomeRemoteDataSource {
     String? commentOption,
     String? content,
     List<String>? imageMediaItems,
-    bool? videoMediaItem,
+    String? videoMediaItem,
   }) async {
     String q = r'''
         mutation createPost(
@@ -493,8 +494,8 @@ class HomeRemoteDataSource {
   }
 
   Future<PostModel> editContent({
-    String? postId,
-    String? content,
+    required String postId,
+    required String content,
   }) async {
     String q = r'''
         mutation editContent(
@@ -531,23 +532,17 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<PostModel> deletePost({String? postId}) async {
+  Future<PostModel> deletePost({required String postId}) async {
     String q = r'''
-        mutation deletePost(
-          $postId: String!
-          ) {
-          deletePost(
-            postId: $postId
-          ) {
+        mutation deletePost($postId: String!) {
+          deletePost(postId: $postId) {
             ''' +
         PostSchema.schema +
         '''
           }
         }''';
     try {
-      Map<String, dynamic> variables = {
-        'postId': postId,
-      };
+      Map<String, dynamic> variables = {'postId': postId};
 
       final result = await _client.mutate(
         gql(q),
@@ -563,23 +558,17 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<PostLikeModel> likePost({String? postId}) async {
+  Future<PostLikeModel> likePost({required String? postId}) async {
     String q = r'''
-        mutation likePost(
-          $postId: String!
-          ) {
-          likePost(
-            postId: $postId
-          ) {
+        mutation likePost($postId: String!) {
+          likePost(postId: $postId) {
            likeId
            authId
            postId
           }
         }''';
     try {
-      Map<String, dynamic> variables = {
-        'postId': postId,
-      };
+      Map<String, dynamic> variables = {'postId': postId};
 
       final result = await _client.mutate(
         gql(q),
@@ -595,23 +584,21 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<bool> unlikePost({String? postId}) async {
+  Future<bool> unlikePost({required String? postId}) async {
     String q = r'''
         mutation unlikePost($postId: String!) {
           unlikePost(postId: $postId) 
         }''';
     try {
-      Map<String, dynamic> variables = {
-        'postId': postId,
-      };
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {'postId': postId},
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('unlike post', result.data);
       return result.data!['unlikePost'] as bool;
     } catch (e) {
@@ -620,8 +607,8 @@ class HomeRemoteDataSource {
   }
 
   Future<CommentModel> commentOnPost({
-    String? postId,
-    String? content,
+    required String postId,
+    required String content,
   }) async {
     String q = r'''
         mutation commentOnPost(
@@ -639,18 +626,15 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      Map<String, dynamic> variables = {
+      final result = await _client.mutate(gql(q), variables: {
         'postId': postId,
         'content': content,
-      };
+      });
 
-      final result = await _client.mutate(
-        gql(q),
-        variables: variables,
-      );
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('comment on post', result.data);
       return CommentModel.fromJson(result.data!['commentOnPost']);
     } catch (e) {
@@ -658,7 +642,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<CommentModel> deletePostComment({String? commentId}) async {
+  Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
         mutation deletePostComment($commentId: String!) {
           deletePostComment(commentId: $commentId) {
@@ -668,15 +652,15 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      Map<String, dynamic> variables = {'commentId': commentId};
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {'commentId': commentId},
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('delete comment on post', result.data);
       return CommentModel.fromJson(result.data!['deletePostComment']);
     } catch (e) {
@@ -704,18 +688,18 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      Map<String, dynamic> variables = {
-        'postId': postId,
-        'voteType': voteType,
-      };
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {
+          'postId': postId,
+          'voteType': voteType,
+        },
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('delete post vote', result.data);
       return PostVoteModel.fromJson(result.data!['votePost']);
     } catch (e) {
@@ -723,21 +707,21 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<String> deletePostVote({String? voteId}) async {
+  Future<String> deletePostVote({required String? voteId}) async {
     String q = r'''
         mutation deletePostVote($voteId: String!) {
           deletePostVote(voteId: $voteId)
         }''';
     try {
-      Map<String, dynamic> variables = {'voteId': voteId};
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {'voteId': voteId},
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('delete post vote', result.data);
       return result.data!['deletePostVote'] as String;
     } catch (e) {
@@ -765,18 +749,15 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      Map<String, dynamic> variables = {
+      final result = await _client.mutate(gql(q), variables: {
         'postId': postId,
         'commentId': commentId,
-      };
+      });
 
-      final result = await _client.mutate(
-        gql(q),
-        variables: variables,
-      );
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('like comment on post', result.data);
       return CommentLikeModel.fromJson(result.data!['likeCommentOnPost']);
     } catch (e) {
@@ -798,15 +779,15 @@ class HomeRemoteDataSource {
           )
         }''';
     try {
-      Map<String, dynamic> variables = {'commentLikeId': commentLikeId};
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {'commentLikeId': commentLikeId},
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('like comment on post', result.data);
       return result.data!['unlikeCommentOnPost'] as bool;
     } catch (e) {
@@ -823,6 +804,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'commentLikeId': commentLikeId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -842,9 +824,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('check post like', result.data);
       return result.data!['checkPostLike'] as bool;
     } catch (e) {
@@ -863,9 +847,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('check post vote', result.data);
       return result.data!['checkPostVote'] as String;
     } catch (e) {
@@ -873,8 +859,9 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<CommentLikeModel>> getAllCommentLikes(
-      {required String? commentId}) async {
+  Future<List<CommentLikeModel>> getAllCommentLikes({
+    required String? commentId,
+  }) async {
     String q = r'''
         query getAllCommentLikes($commentId: String!) {
           getAllCommentLikes(commentId: $commentId){
@@ -888,9 +875,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'commentId': commentId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('get all comment likes', result.data);
       return (result.data!['getAllCommentLikes'] as List)
           .map((e) => CommentLikeModel.fromJson(e))
@@ -920,9 +909,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('get all comments on post', result.data);
       return (result.data!['getAllCommentsOnPost'] as List)
           .map((e) => VirtualCommentModel.fromJson(e))
@@ -952,9 +943,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('get all likes on post', result.data);
       return (result.data!['getLikesOnPost'] as List)
           .map((e) => VirtualPostLikeModel.fromJson(e))
@@ -982,9 +975,11 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
       });
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
       Console.log('get post', result.data);
       return VirtualPostModel.fromJson(result.data!['getPost']);
     } catch (e) {

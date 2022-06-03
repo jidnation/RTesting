@@ -6,7 +6,7 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
-import 'package:reach_me/features/home/data/models/virtual_reach.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 // abstract class IUserRepository {
 //   Future<Either<String, User>> createAccount({

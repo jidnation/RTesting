@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_dynamic_calls
+
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/models/user.dart';
-import 'package:reach_me/features/home/data/models/virtual_reach.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 
 part 'user_event.dart';
