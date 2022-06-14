@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 
@@ -18,14 +18,12 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
       try {
         final response = await userRepository.getUserProfile(
-          email: event.email!,
+          email: event.email,
         );
         response.fold(
           (error) => emit(UserError(error: error)),
           (user) {
             globals.user = user;
-            Console.log('user data bloc', user.toJson());
-            Console.log('user data globals bloc', globals.user!.toJson());
             emit(UserData(user: user));
           },
         );
@@ -146,6 +144,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             type: 'profilePicture',
           );
 
+          //TODO: OKAY OH
+
           userRes.fold(
             (error) => emit(UserUploadError(error: error)),
             (user) {
@@ -180,7 +180,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         );
         response.fold(
           (error) => emit(UserError(error: error)),
-          (usersList) => emit(UserLoaded()),
+          (star) => emit(StarUserSuccess(star: star)),
         );
       } on GraphQLError catch (e) {
         emit(UserError(error: e.message));

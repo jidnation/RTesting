@@ -1,50 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
-class RMSnackBar {
-  static showSuccessSnackBar(BuildContext context,
-      {required String message,
-      int milliseconds = 10000,
-      SnackBarBehavior snackBarBehavior = SnackBarBehavior.floating}) {
+class Snackbars {
+  static success(
+    BuildContext context, {
+    required String message,
+    int milliseconds = 5000,
+  }) {
     return ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(
+      SnackBar(
         backgroundColor: Colors.green,
-        margin: const EdgeInsets.only(bottom: 100.0),
-        behavior: snackBarBehavior,
-        action: SnackBarAction(
-            textColor: Colors.white,
-            label: 'DISMISS',
-            onPressed: () => _dismissCurrentSnackBar(context)),
         duration: Duration(milliseconds: milliseconds),
         content: SelectableText(
           message,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: getScreenHeight(14)),
         ),
       ),
     );
   }
 
-  static void showErrorSnackBar(BuildContext context,
-      { String? message,
-      int milliseconds = 5000,
-      SnackBarBehavior snackBarBehavior = SnackBarBehavior.floating}) {
+  static void error(
+    BuildContext context, {
+    String? message,
+    int milliseconds = 5000,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color(0xFFFF647C),
-        behavior: snackBarBehavior,
-        action: SnackBarAction(
-            textColor: Colors.black,
-            label: 'DISMISS',
-            onPressed: () => _dismissCurrentSnackBar(context)),
         duration: Duration(milliseconds: milliseconds),
         content: SelectableText(
           message ?? 'An error occured',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: getScreenHeight(14)),
         ),
       ),
     );
-  }
-
-  static void _dismissCurrentSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }
 }

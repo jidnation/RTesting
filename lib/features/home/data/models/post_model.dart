@@ -16,6 +16,8 @@ class PostModel {
   String? postId;
   String? postSlug;
   String? videoMediaItem;
+  DateTime? createdAt;
+  PostProfileModel? profile;
 
   PostModel({
     this.audioMediaItem,
@@ -35,6 +37,8 @@ class PostModel {
     this.postId,
     this.postSlug,
     this.videoMediaItem,
+    this.createdAt,
+    this.profile,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -61,6 +65,12 @@ class PostModel {
         postId: json["postId"],
         postSlug: json["postSlug"],
         videoMediaItem: json["videoMediaItem"],
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
+        profile: json["profile"] != null
+            ? PostProfileModel.fromJson(json["profile"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,6 +97,8 @@ class PostModel {
         "postId": postId,
         "postSlug": postSlug,
         "videoMediaItem": videoMediaItem,
+        "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
+        "profile": profile == null ? null : profile!.toJson(),
       };
 }
 
@@ -114,8 +126,6 @@ class PostLikeModel {
       };
 }
 
-
-
 class PostVoteModel {
   String? postId;
   String? authId;
@@ -141,5 +151,117 @@ class PostVoteModel {
         "authId": authId,
         "voteId": voteId,
         "voteType": voteType,
+      };
+}
+
+class PostFeedModel {
+  String? firstName;
+  String? feedOwnerId;
+  String? lastName;
+  String? location;
+  String? profilePicture;
+  String? profileSlug;
+  String? username;
+  String? postId;
+  PostModel? post;
+  String? postOwnerId;
+  bool? isLiked;
+  bool? reachingRelationship;
+  bool? verified;
+  DateTime? createdAt;
+
+  PostFeedModel({
+    this.firstName,
+    this.feedOwnerId,
+    this.lastName,
+    this.location,
+    this.profilePicture,
+    this.profileSlug,
+    this.postOwnerId,
+    this.username,
+    this.postId,
+    this.verified,
+    this.post,
+    this.createdAt,
+    this.isLiked,
+    this.reachingRelationship,
+  });
+
+  factory PostFeedModel.fromJson(Map<String, dynamic> json) => PostFeedModel(
+        location: json["location"],
+        firstName: json["firstName"],
+        feedOwnerId: json["feedOwnerId"],
+        lastName: json["lastName"],
+        profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        postOwnerId: json["postOwnerId"],
+        username: json["username"],
+        postId: json["postId"],
+        verified: json["verified"],
+        post: json["post"] == null ? null : PostModel.fromJson(json["post"]),
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
+        isLiked: json["isLiked"],
+        reachingRelationship: json["reachingRelationship"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "location": location,
+        "firstName": firstName,
+        "feedOwnerId": feedOwnerId,
+        "lastName": lastName,
+        "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "postOwnerId": postOwnerId,
+        "username": username,
+        "postId": postId,
+        "post": post == null ? null : post!.toJson(),
+        "verified": verified,
+        "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
+        "isLiked": isLiked,
+        "reachingRelationship": reachingRelationship,
+      };
+}
+
+class PostProfileModel {
+  String? firstName;
+  String? lastName;
+  String? location;
+  String? profilePicture;
+  String? profileSlug;
+  bool? verified;
+  String? username;
+
+  PostProfileModel({
+    this.firstName,
+    this.lastName,
+    this.location,
+    this.profilePicture,
+    this.profileSlug,
+    this.username,
+    this.verified,
+  });
+
+  factory PostProfileModel.fromJson(Map<String, dynamic> json) =>
+      PostProfileModel(
+        location: json["location"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        verified: json["verified"],
+        username: json["username"],
+
+      );
+
+  Map<String, dynamic> toJson() => {
+        "location": location,
+        "firstName": firstName,
+        "lastName": lastName,
+        "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "verified": verified,
+        "username": username,
       };
 }

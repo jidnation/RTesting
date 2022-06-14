@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/routes/routes.dart';
@@ -44,15 +45,17 @@ class MyApp extends StatelessWidget {
       child: GraphQLProvider(
         client: chatClientFor(),
         child: LifeCycleManager(
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'ReachMe',
-            theme: ThemeData(
-              fontFamily: 'Poppins',
-              primarySwatch: Colors.blue,
+          child: OverlaySupport.global(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'ReachMe',
+              theme: ThemeData(
+                fontFamily: 'Poppins',
+                primarySwatch: Colors.blue,
+              ),
+              initialRoute: SplashScreenAnimator.id,
+              onGenerateRoute: RMRouter.generateRoute,
             ),
-            initialRoute: SplashScreenAnimator.id,
-            onGenerateRoute: RMRouter.generateRoute,
           ),
         ),
       ),

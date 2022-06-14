@@ -19,12 +19,22 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class SearchScreen extends HookWidget {
+class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
   const SearchScreen({Key? key}) : super(key: key);
 
   @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin<SearchScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final _scaffoldKey = useState(GlobalKey<ScaffoldState>());
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
@@ -91,7 +101,7 @@ class SearchScreen extends HookWidget {
                   if (state is FetchUsersSuccess) {
                     globals.userList = state.user;
                   } else if (state is UserError) {
-                    RMSnackBar.showErrorSnackBar(context, message: state.error);
+                    Snackbars.error(context, message: state.error);
                   }
                 },
                 builder: (context, state) {
@@ -192,7 +202,7 @@ class SearchResultCard extends StatelessWidget {
             //       : RouteNavigators.route(
             //           context, RecipientAccountProfile(email: email));
           } else if (state is UserError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {

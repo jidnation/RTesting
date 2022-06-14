@@ -61,8 +61,8 @@ abstract class NetworkExceptions with _$NetworkExceptions {
             case DioErrorType.response:
               switch (error.response!.statusCode) {
                 case 400:
-                  networkExceptions =
-                      NetworkExceptions.notFound(error.response!.data['message']);
+                  networkExceptions = NetworkExceptions.notFound(
+                      error.response!.data['message']);
                   break;
                 case 401:
                   networkExceptions =
@@ -73,8 +73,8 @@ abstract class NetworkExceptions with _$NetworkExceptions {
                       const NetworkExceptions.unauthorisedRequest();
                   break;
                 case 404:
-                  networkExceptions =
-                      NetworkExceptions.notFound(error.response!.data['message']);
+                  networkExceptions = NetworkExceptions.notFound(
+                      error.response!.data['message']);
                   break;
                 case 409:
                   networkExceptions = const NetworkExceptions.conflict();
@@ -108,15 +108,13 @@ abstract class NetworkExceptions with _$NetworkExceptions {
       } on FormatException {
         return const NetworkExceptions.formatException();
       } catch (_) {
-      
         return const NetworkExceptions.unexpectedError();
       }
     } else {
       if (error.toString().contains("is not a subtype of")) {
-       // print(error.toString());
+        // print(error.toString());
         return const NetworkExceptions.unableToProcess();
       } else {
-       
         return const NetworkExceptions.unexpectedError();
       }
     }

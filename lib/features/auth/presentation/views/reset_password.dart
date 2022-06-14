@@ -32,11 +32,11 @@ class ResetPasswordScreen extends HookWidget {
         listener: (context, state) {
           if (state is AuthLoaded) {
             SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
-              RMSnackBar.showSuccessSnackBar(context, message: state.message!);
+              Snackbars.success(context, message: state.message!);
             });
             RouteNavigators.routeNoWayHome(context, LoginScreen());
           } else if (state is AuthError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {
@@ -105,7 +105,7 @@ class ResetPasswordScreen extends HookWidget {
                               ),
                             );
                           } else {
-                            RMSnackBar.showErrorSnackBar(
+                            Snackbars.error(
                               context,
                               message: 'Passwords do not match',
                             );

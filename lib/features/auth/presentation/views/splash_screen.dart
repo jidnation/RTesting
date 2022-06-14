@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -27,8 +28,15 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2000));
     _controller.forward();
-    _controller.addStatusListener((status) {
+    _controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
+        final token = await SecureStorage.readSecureData('token');
+        final email = await SecureStorage.readSecureData('email');
+        globals.email = email;
+        // if (token != null && email != null) {
+        //   RouteNavigators.routeNoWayHome(context, const HomeScreen());
+        //   return;
+        // }
         RouteNavigators.routeReplace(context, OnboardingScreen());
       }
     });

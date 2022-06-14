@@ -39,7 +39,7 @@ class SignUpScreen extends HookWidget {
                 OtpScreen(email: _emailController.text.replaceAll(' ', '')));
           } else if (state is AuthError) {
             Console.log('AuthError', state.error);
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {
@@ -188,7 +188,7 @@ class SignUpScreen extends HookWidget {
                             color: AppColors.textColor2,
                             onPressed: () {
                               if (_key.currentState!.validate()) {
-                                final firstName = 
+                                final firstName =
                                     _firstNameController.text.trim();
                                 final lastName =
                                     _lastNameController.text.trim();

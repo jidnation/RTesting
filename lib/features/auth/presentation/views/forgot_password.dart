@@ -34,7 +34,7 @@ class ForgotPasswordScreen extends HookWidget {
                   email: _emailController.text.replaceAll(' ', '')),
             );
           } else if (state is AuthError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {

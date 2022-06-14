@@ -74,7 +74,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
         response.fold(
           (error) => emit(LikePostError(error: error)),
-          (postLike) => emit(LikePostSuccess(postLikeModel: postLike)),
+          (postLike) => emit(LikePostSuccess(isLiked: postLike)),
         );
       } on GraphQLError catch (e) {
         emit(LikePostError(error: e.message));
@@ -100,6 +100,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         final response = await socialServiceRepository.commentOnPost(
           postId: event.postId!,
           content: event.content!,
+          userId: event.userId!,
         );
         response.fold(
           (error) => emit(CommentOnPostError(error: error)),
@@ -246,6 +247,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       try {
         final response = await socialServiceRepository.getAllCommentsOnPost(
           postId: event.postId!,
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
         );
         response.fold(
           (error) => emit(GetAllCommentsOnPostError(error: error)),
@@ -281,6 +284,50 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetSingleCommentOnPostError(error: e.message));
+      }
+    });
+    on<GetPostFeedEvent>((event, emit) async {
+      emit(GetPostFeedLoading());
+      try {
+        final response = await socialServiceRepository.getPostFeed(
+          pageNumber: event.pageNumber!,
+          pageLimit: event.pageLimit!,
+        );
+        response.fold(
+          (error) => emit(GetPostFeedError(error: error)),
+          (data) => emit(GetPostFeedSuccess(posts: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetPostFeedError(error: e.message));
+      }
+    });
+    on<GetAllPostsEvent>((event, emit) async {
+      emit(GetAllPostsLoading());
+      try {
+        final response = await socialServiceRepository.getAllPosts(
+          pageNumber: event.pageNumber!,
+          pageLimit: event.pageLimit!,
+        );
+        response.fold(
+          (error) => emit(GetAllPostsError(error: error)),
+          (data) => emit(GetAllPostsSuccess(posts: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetAllPostsError(error: e.message));
+      }
+    });
+    on<GetPostEvent>((event, emit) async {
+      emit(GetPostLoading());
+      try {
+        final response = await socialServiceRepository.getPost(
+          postId: event.postId!,
+        );
+        response.fold(
+          (error) => emit(GetPostError(error: error)),
+          (data) => emit(GetPostSuccess(data: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetPostError(error: e.message));
       }
     });
   }

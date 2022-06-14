@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
+import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:card_swiper/card_swiper.dart';
@@ -10,9 +11,10 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 
 class EmptyTimelineWidget extends HookWidget {
-  const EmptyTimelineWidget({
-    Key? key,
-  }) : super(key: key);
+  const EmptyTimelineWidget({Key? key, required this.loading})
+      : super(key: key);
+
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +22,10 @@ class EmptyTimelineWidget extends HookWidget {
     final reachBtnTap = useState<bool>(false);
     return SizedBox(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const SizedBox(height: kToolbarHeight + 20),
+          loading ? const LinearLoader() : const SizedBox.shrink(),
           SizedBox(height: getScreenHeight(30)),
           Text(
             'We are happy to have you on\nReachMe ${globals.loginResponse!.firstName!.toTitleCase()} 🎉',

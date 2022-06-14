@@ -40,14 +40,14 @@ class OtpScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is AuthEmailVerified) {
               RouteNavigators.routeNoWayHome(context, LoginScreen());
-              SchedulerBinding.instance!.addPostFrameCallback(
-                  (timeStamp) => RMSnackBar.showSuccessSnackBar(
+              SchedulerBinding.instance!
+                  .addPostFrameCallback((timeStamp) => Snackbars.success(
                         context,
                         message: state.message!,
                         milliseconds: 3000,
                       ));
             } else if (state is PinInvalid) {
-              RMSnackBar.showErrorSnackBar(context, message: state.error!);
+              Snackbars.error(context, message: state.error!);
             }
           },
           builder: (context, state) {
@@ -179,7 +179,7 @@ class ResetPasswordOtpScreen extends StatelessWidget {
               RouteNavigators.route(
                   context, ResetPasswordScreen(token: state.token));
             } else if (state is PinInvalid) {
-              RMSnackBar.showErrorSnackBar(context, message: state.error!);
+              Snackbars.error(context, message: state.error!);
             }
           },
           builder: (context, state) {

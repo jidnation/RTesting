@@ -1,4 +1,3 @@
-
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
@@ -52,7 +51,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, PostModel>> deletePost({
+  Future<Either<String, bool>> deletePost({
     required String postId,
   }) async {
     try {
@@ -63,7 +62,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, PostLikeModel>> likePost({
+  Future<Either<String, bool>> likePost({
     required String postId,
   }) async {
     try {
@@ -88,11 +87,13 @@ class SocialServiceRepository {
   Future<Either<String, CommentModel>> commentOnPost({
     required String postId,
     required String content,
+    required String userId,
   }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
         content: content,
+        userId: userId,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -218,14 +219,18 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, List<VirtualCommentModel>>> getAllCommentsOnPost({
+  Future<Either<String, List<CommentModel>>> getAllCommentsOnPost({
     required String postId,
+       required int? pageLimit,
+    required int? pageNumber,
   }) async {
     try {
-      final virtualComments = await _homeRemoteDataSource.getAllCommentsOnPost(
+      final comments = await _homeRemoteDataSource.getAllCommentsOnPost(
         postId: postId,
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
       );
-      return Right(virtualComments);
+      return Right(comments);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
@@ -244,7 +249,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, VirtualPostModel>> getPost({
+  Future<Either<String, PostModel>> getPost({
     required String postId,
   }) async {
     try {
@@ -265,6 +270,36 @@ class SocialServiceRepository {
         postId: postId,
       );
       return Right(virtualComment);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<PostFeedModel>>> getPostFeed({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    try {
+      final postFeeds = await _homeRemoteDataSource.getPostFeed(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(postFeeds);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<PostModel>>> getAllPosts({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getAllPosts(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

@@ -6,6 +6,7 @@ import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 // abstract class IHomeRemoteDataSource {
@@ -39,8 +40,6 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('get user profile', result);
-      Console.log('get user profile', result.data);
       return User.fromJson(result.data!['getUserByIdOrEmail']);
     } catch (e) {
       rethrow;
@@ -242,12 +241,13 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<dynamic> starUser({required String? userId}) async {
+  Future<StarModel> starUser({required String? userId}) async {
     String q = r'''
           mutation starUser($userIdToStar: String!) {
             starUser(userIdToStar: $userIdToStar) {
-              starredId
-              userId
+             ''' +
+        StarUserSchema.schema +
+        '''
             }
           }''';
     try {
@@ -258,7 +258,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('star user ', result.data);
-      return result.data['starUser'];
+      return StarModel.fromJson(result.data['starUser']);
     } catch (e) {
       rethrow;
     }
@@ -445,18 +445,13 @@ class HomeRemoteDataSource {
   }) async {
     String q = r'''
         mutation createPost(
-          $audioMediaItem: String
           $commentOption: String!
           $content: String!
-          $imageMediaItems: Boolean
-          $showLocation: Boolean
           ) {
           createPost(
             postBody: {
-              audioMediaItem: $audioMediaItem
               commentOption: $commentOption
               content: $content
-              imageMediaItems: $imageMediaItems
           }) {
             ''' +
         PostSchema.schema +
@@ -478,6 +473,8 @@ class HomeRemoteDataSource {
       if (videoMediaItem != null) {
         variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
       }
+
+      Console.log('omo wetin', variables);
 
       final result = await _client.mutate(
         gql(q),
@@ -532,14 +529,10 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<PostModel> deletePost({required String postId}) async {
+  Future<bool> deletePost({required String postId}) async {
     String q = r'''
         mutation deletePost($postId: String!) {
-          deletePost(postId: $postId) {
-            ''' +
-        PostSchema.schema +
-        '''
-          }
+          deletePost(postId: $postId)
         }''';
     try {
       Map<String, dynamic> variables = {'postId': postId};
@@ -552,33 +545,28 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('delete post', result.data);
-      return PostModel.fromJson(result.data!['deletePost']);
+      return result.data!['deletePost'] as bool;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<PostLikeModel> likePost({required String? postId}) async {
+  Future<bool> likePost({required String? postId}) async {
     String q = r'''
         mutation likePost($postId: String!) {
-          likePost(postId: $postId) {
-           likeId
-           authId
-           postId
-          }
+          likePost(postId: $postId)
         }''';
     try {
-      Map<String, dynamic> variables = {'postId': postId};
-
       final result = await _client.mutate(
         gql(q),
-        variables: variables,
+        variables: {'postId': postId},
       );
+
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
       Console.log('like post', result.data);
-      return PostLikeModel.fromJson(result.data!['likePost']);
+      return result.data!['likePost'] as bool;
     } catch (e) {
       rethrow;
     }
@@ -609,16 +597,19 @@ class HomeRemoteDataSource {
   Future<CommentModel> commentOnPost({
     required String postId,
     required String content,
+    required String userId,
   }) async {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
           $content: String!
+          $userId: String!
           ) {
           commentOnPost(
             commentBody: {
               postId: $postId
               content: $content
+              userId: $userId
           }) {
             ''' +
         CommentSchema.schema +
@@ -629,6 +620,7 @@ class HomeRemoteDataSource {
       final result = await _client.mutate(gql(q), variables: {
         'postId': postId,
         'content': content,
+        'userId': userId,
       });
 
       if (result is GraphQLError) {
@@ -852,8 +844,8 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
 
-      Console.log('check post vote', result.data);
-      return result.data!['checkPostVote'] as String;
+      Console.log('check post vote', result.data['checkPostVote']);
+      return result.data!['checkPostVote']['voteType'] as String;
     } catch (e) {
       rethrow;
     }
@@ -889,17 +881,22 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<VirtualCommentModel>> getAllCommentsOnPost({
+  Future<List<CommentModel>> getAllCommentsOnPost({
     required String? postId,
+    required int? pageLimit,
+    required int? pageNumber,
   }) async {
     String q = r'''
-        query getAllCommentsOnPost($postId: String!) {
-          getAllCommentsOnPost(postId: $postId){
-            profile {
-                ''' +
-        UserSchema.schema +
-        '''
-            }
+        query getAllCommentsOnPost(
+          $postId: String!
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getAllCommentsOnPost(
+            postId: $postId
+            page_limit: $page_limit
+            page_number: $page_number
+            ){
                ''' +
         CommentSchema.schema +
         '''
@@ -908,6 +905,8 @@ class HomeRemoteDataSource {
     try {
       final result = await _client.query(gql(q), variables: {
         'postId': postId,
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
       });
 
       if (result is GraphQLError) {
@@ -916,7 +915,7 @@ class HomeRemoteDataSource {
 
       Console.log('get all comments on post', result.data);
       return (result.data!['getAllCommentsOnPost'] as List)
-          .map((e) => VirtualCommentModel.fromJson(e))
+          .map((e) => CommentModel.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;
@@ -957,15 +956,10 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<VirtualPostModel> getPost({required String? postId}) async {
+  Future<PostModel> getPost({required String? postId}) async {
     String q = r'''
         query getPost($postId: String!) {
           getPost(postId: $postId){
-              profile {
-                ''' +
-        UserSchema.schema +
-        '''
-            }
                ''' +
         PostSchema.schema +
         '''
@@ -981,7 +975,7 @@ class HomeRemoteDataSource {
       }
 
       Console.log('get post', result.data);
-      return VirtualPostModel.fromJson(result.data!['getPost']);
+      return PostModel.fromJson(result.data!['getPost']);
     } catch (e) {
       rethrow;
     }
@@ -1013,6 +1007,84 @@ class HomeRemoteDataSource {
       Console.log('get single comment on post', result.data);
       return VirtualCommentModel.fromJson(
           result.data!['getSingleCommentOnPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<PostFeedModel>> getPostFeed({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getPostFeed(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getPostFeed(
+            page_limit: $page_limit
+            page_number: $page_number
+          ){
+              post {
+                ''' +
+        PostSchema.schema +
+        '''
+            }
+               ''' +
+        PostFeedSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get post feed', result.data);
+      return (result.data!['getPostFeed'] as List)
+          .map((e) => PostFeedModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<PostModel>> getAllPosts({
+    required int? pageLimit,
+    required int? pageNumber,
+    String? authId,
+  }) async {
+    String q = r'''
+        query getAllPosts(
+          $page_limit: Int!
+          $page_number: Int!
+          $authId: String
+          ) {
+          getAllPosts(
+            page_limit: $page_limit
+            page_number: $page_number
+            authId: $authId
+          ){   
+               ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get all posts', result.data);
+      return (result.data!['getAllPosts'] as List)
+          .map((e) => PostModel.fromJson(e))
+          .toList();
     } catch (e) {
       rethrow;
     }

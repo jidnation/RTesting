@@ -23,6 +23,7 @@ class AppGlobals {
   ChatBloc? chatBloc;
   SocialServiceBloc? socialServiceBloc;
   String? token;
+  String? email;
 
   User? user;
   List<Chat>? userChat;
@@ -42,6 +43,7 @@ class AppGlobals {
     chatBloc = ChatBloc();
     socialServiceBloc = SocialServiceBloc();
     token = '';
+    email = '';
     userList = [];
   }
 

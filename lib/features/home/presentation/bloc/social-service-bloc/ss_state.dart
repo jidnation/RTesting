@@ -38,7 +38,7 @@ class EditContentError extends SocialServiceState {
 class DeletePostLoading extends SocialServiceState {}
 
 class DeletePostSuccess extends SocialServiceState {
-  final PostModel? post;
+  final bool? post;
   DeletePostSuccess({this.post});
 }
 
@@ -52,8 +52,8 @@ class DeletePostError extends SocialServiceState {
 class LikePostLoading extends SocialServiceState {}
 
 class LikePostSuccess extends SocialServiceState {
-  final PostLikeModel? postLikeModel;
-  LikePostSuccess({this.postLikeModel});
+  final bool? isLiked;
+  LikePostSuccess({this.isLiked});
 }
 
 class LikePostError extends SocialServiceState {
@@ -220,7 +220,7 @@ class GetAllCommentLikesError extends SocialServiceState {
 class GetAllCommentsOnPostLoading extends SocialServiceState {}
 
 class GetAllCommentsOnPostSuccess extends SocialServiceState {
-  final List<VirtualCommentModel>? data;
+  final List<CommentModel>? data;
   GetAllCommentsOnPostSuccess({this.data});
 }
 
@@ -248,7 +248,7 @@ class GetLikesOnPostError extends SocialServiceState {
 class GetPostLoading extends SocialServiceState {}
 
 class GetPostSuccess extends SocialServiceState {
-  final VirtualPostModel? data;
+  final PostModel? data;
   GetPostSuccess({this.data});
 }
 
@@ -269,6 +269,34 @@ class GetSingleCommentOnPostSuccess extends SocialServiceState {
 class GetSingleCommentOnPostError extends SocialServiceState {
   final String error;
   GetSingleCommentOnPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetPostFeedLoading extends SocialServiceState {}
+
+class GetPostFeedSuccess extends SocialServiceState {
+  final List<PostFeedModel>? posts;
+  GetPostFeedSuccess({this.posts});
+}
+
+class GetPostFeedError extends SocialServiceState {
+  final String error;
+  GetPostFeedError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetAllPostsLoading extends SocialServiceState {}
+
+class GetAllPostsSuccess extends SocialServiceState {
+  final List<PostModel>? posts;
+  GetAllPostsSuccess({this.posts});
+}
+
+class GetAllPostsError extends SocialServiceState {
+  final String error;
+  GetAllPostsError({required this.error});
   @override
   List<Object> get props => [error];
 }

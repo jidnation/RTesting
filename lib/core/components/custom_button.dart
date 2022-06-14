@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/utils/constants.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
@@ -11,12 +13,14 @@ class CustomButton extends StatelessWidget {
   final String prefix;
   final EdgeInsetsGeometry? padding;
   final double labelFontSize;
+  final bool? isLoading;
   const CustomButton({
     Key? key,
     required this.label,
     required this.color,
     required this.onPressed,
     this.size,
+    this.isLoading = false,
     required this.textColor,
     required this.borderSide,
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
@@ -39,21 +43,28 @@ class CustomButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             shadowColor: const Color(0xFF323247)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            prefix == '' ? const SizedBox.shrink() : SvgPicture.asset(prefix),
-            prefix == '' ? const SizedBox.shrink() : const SizedBox(width: 15),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: labelFontSize,
-                color: textColor,
-                fontWeight: FontWeight.w600,
+        child: isLoading!
+            ? const CupertinoActivityIndicator(
+                color: AppColors.black, radius: 5)
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  prefix == ''
+                      ? const SizedBox.shrink()
+                      : SvgPicture.asset(prefix),
+                  prefix == ''
+                      ? const SizedBox.shrink()
+                      : const SizedBox(width: 15),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: labelFontSize,
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

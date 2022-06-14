@@ -35,13 +35,11 @@ class GraphQLApiClient {
             variables: variables,
           ),
         );
-    Console.log('query', result);
 
     if (result.exception != null) {
       Console.log('query exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         if (result.exception != null) {
           dynamic myException =
@@ -78,8 +76,7 @@ class GraphQLApiClient {
     if (result.exception != null) {
       Console.log('mutate exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];
@@ -147,8 +144,7 @@ class GraphQLChatClient {
     if (result.exception != null) {
       Console.log('query exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network error! Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         if (result.exception != null) {
           dynamic myException =
@@ -184,8 +180,7 @@ class GraphQLChatClient {
     if (result.exception != null) {
       Console.log('mutate exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];

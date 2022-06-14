@@ -54,6 +54,11 @@ class GetReachRelationshipSuccess extends UserState {
   final bool? isReaching;
 }
 
+class StarUserSuccess extends UserState {
+  StarUserSuccess({this.star});
+  final StarModel? star;
+}
+
 class DelReachRelationshipSuccess extends UserState {
   DelReachRelationshipSuccess({this.isReachingDel});
   final bool? isReachingDel;

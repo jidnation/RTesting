@@ -10,13 +10,23 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
-class VideoMomentScreen extends StatelessWidget {
+class VideoMomentScreen extends StatefulHookWidget {
   static const String id = 'video_moment_screen';
 
   const VideoMomentScreen({Key? key}) : super(key: key);
 
   @override
+  State<VideoMomentScreen> createState() => _VideoMomentScreenState();
+}
+
+class _VideoMomentScreenState extends State<VideoMomentScreen>
+    with AutomaticKeepAliveClientMixin<VideoMomentScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
     final videos = [
       'assets/videos/video-1.mp4',

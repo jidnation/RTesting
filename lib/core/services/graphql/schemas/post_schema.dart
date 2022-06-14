@@ -9,18 +9,21 @@ class PostSchema {
             content
             edited
             hashTags
+            created_at
             imageMediaItems
             location
             mentionList
             nComments
-            nDownvotes
             nLikes
             nShares
-            nUpvotes
             postId
             postSlug
             videoMediaItem
-          
+            profile {
+              ''' +
+        PostProfileSchema.schema +
+        '''
+            }
         ''';
   }
 }
@@ -34,9 +37,99 @@ class CommentSchema {
             authId
             commentSlug
             content
+            created_at
             nComments
             nLikes
             postId
+            profile {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
+
+class PostProfileSchema {
+  PostProfileSchema._();
+
+  static String get schema {
+    return r'''
+            firstName
+            lastName
+            location
+            profilePicture
+            profileSlug
+        ''';
+  }
+}
+
+class CommentProfileSchema {
+  CommentProfileSchema._();
+
+  static String get schema {
+    return r'''
+            firstName
+            lastName
+            location
+            profilePicture
+            profileSlug
+            username
+            verified
+        ''';
+  }
+}
+
+class PostFeedSchema {
+  PostFeedSchema._();
+
+  static String get schema {
+    return r'''
+            feedOwnerId
+            created_at
+            firstName
+            lastName
+            location
+            postId
+            profilePicture
+            profileSlug
+            username
+            isLiked
+            verified
+            reachingRelationship
+            postOwnerId
+        ''';
+  }
+}
+
+class StarUserSchema {
+  StarUserSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            created_at
+            starredId
+            starred {''' +
+        StarProfileSchema.schema +
+        ''' }
+            user {''' +
+        StarProfileSchema.schema +
+        ''' }     
+        ''';
+  }
+}
+
+class StarProfileSchema {
+  StarProfileSchema._();
+
+  static String get schema {
+    return r'''
+            firstName
+            lastName
+            profilePicture
+            profileSlug
+            username
         ''';
   }
 }

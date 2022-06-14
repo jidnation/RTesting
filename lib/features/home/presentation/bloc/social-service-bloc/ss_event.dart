@@ -29,11 +29,7 @@ class EditContentEvent extends SocialServiceEvent {
 
 class DeletePostEvent extends SocialServiceEvent {
   final String? postId;
-  final String? content;
-  DeletePostEvent({
-    required this.postId,
-    required this.content,
-  });
+  DeletePostEvent({required this.postId});
 }
 
 class LikePostEvent extends SocialServiceEvent {
@@ -49,9 +45,11 @@ class UnlikePostEvent extends SocialServiceEvent {
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final String? content;
+  final String? userId;
   CommentOnPostEvent({
     required this.postId,
     required this.content,
+    required this.userId,
   });
 }
 
@@ -110,7 +108,12 @@ class GetAllCommentLikesEvent extends SocialServiceEvent {
 
 class GetAllCommentsOnPostEvent extends SocialServiceEvent {
   final String? postId;
-  GetAllCommentsOnPostEvent({required this.postId});
+  final int? pageLimit;
+  final int? pageNumber;
+  GetAllCommentsOnPostEvent(
+      {required this.postId,
+      required this.pageLimit,
+      required this.pageNumber});
 }
 
 class GetLikesOnPostEvent extends SocialServiceEvent {
@@ -126,4 +129,22 @@ class GetPostEvent extends SocialServiceEvent {
 class GetSingleCommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   GetSingleCommentOnPostEvent({required this.postId});
+}
+
+class GetPostFeedEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  GetPostFeedEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
+class GetAllPostsEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  GetAllPostsEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
 }

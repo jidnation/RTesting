@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/auth/data/repositories/auth_repository.dart';
 
@@ -52,6 +53,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (user) {
             globals.loginResponse = user;
             globals.token = user.token;
+            globals.email = user.email;
+            SecureStorage.writeSecureData('token', globals.token!);
+            SecureStorage.writeSecureData('email', globals.email!);
             emit(Authenticated(message: 'User logged in successfully'));
           },
         );

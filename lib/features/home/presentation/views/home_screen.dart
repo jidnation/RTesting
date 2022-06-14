@@ -18,172 +18,42 @@ class HomeScreen extends StatefulHookWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final pages = const [
+    TimelineScreen(),
+    SearchScreen(),
+    VideoMomentScreen(),
+    NotificationsScreen(),
+    AccountScreen(),
+  ];
   @override
   Widget build(BuildContext context) {
     final _currentIndex = useState<int>(0);
+    final _pageController = usePageController(initialPage: _currentIndex.value);
     return Scaffold(
       drawer: const AppDrawer(),
-      body: IndexedStack(
-        children: const [
-          TimelineScreen(),
-          SearchScreen(),
-          VideoMomentScreen(),
-          NotificationsScreen(),
-          AccountScreen(),
-        ],
-        index: _currentIndex.value,
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: pages,
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex,
+        pageController: _pageController,
+      ),
     );
   }
 }
-
-// class CustomBottomNav extends StatelessWidget {
-//   const CustomBottomNav({
-//     Key? key,
-//     required this.selectedMenu,
-//     required this.onChanged,
-//   }) : super(key: key);
-//   final Menu selectedMenu;
-//   final ValueChanged<int> onChanged;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     //for when the menu option is not clicked
-//     const inActiveIconColor = LGTTEXT;
-//     final isDark = Theme.of(context).brightness == Brightness.dark;
-//     return Container(
-//       height: getScreenHeight(99),
-//       padding: const EdgeInsets.symmetric(horizontal: 17),
-//       decoration: BoxDecoration(
-//         color: isDark ? Colors.grey.shade100 : const Color(0x80F7F7F7),
-//         boxShadow: [
-//           BoxShadow(
-//             offset: const Offset(0, -15),
-//             blurRadius: 20,
-//             color: isDark
-//                 ? const Color(0xFFDADADA).withOpacity(0.3)
-//                 : const Color(0xFFDADADA).withOpacity(0.15),
-//           ),
-//         ],
-//       ),
-//       child: SafeArea(
-//         top: false,
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceAround,
-//           children: [
-//             //home options
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/home.svg',
-//                       color: Menu.home == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(0),
-//                   ),
-//                   Text(
-//                     'Home',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.home == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //escrow option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/escrow.svg',
-//                       color: Menu.escrow == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(1),
-//                   ),
-//                   Text(
-//                     'Escrow',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.escrow == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //wallet option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/wallet.svg',
-//                       color: Menu.wallet == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(2),
-//                   ),
-//                   Text(
-//                     'Wallet',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.wallet == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //more option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: Icon(
-//                       Icons.more_horiz,
-//                       size: 20,
-//                       color: Menu.more == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(3),
-//                   ),
-//                   Text(
-//                     'More',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.more == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     Key? key,
     required ValueNotifier<int> currentIndex,
+    required this.pageController,
   })  : _currentIndex = currentIndex,
         super(key: key);
 
   final ValueNotifier<int> _currentIndex;
+  final PageController pageController;
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +62,8 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: _currentIndex.value,
       onTap: (index) {
         _currentIndex.value = index;
-        if (index != 2) {}
+        pageController.jumpToPage(_currentIndex.value);
+        //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
       },
       selectedItemColor: AppColors.primaryColor,

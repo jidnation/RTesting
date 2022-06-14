@@ -87,7 +87,7 @@ class _PersonalInfoSettingsState extends State<PersonalInfoSettings> {
               globals.user = state.user;
               RouteNavigators.routeNoWayHome(context, const HomeScreen());
             } else if (state is UserError) {
-              RMSnackBar.showErrorSnackBar(context, message: state.error);
+              Snackbars.error(context, message: state.error);
             }
           },
           builder: (context, state) {

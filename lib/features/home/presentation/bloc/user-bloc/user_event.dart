@@ -4,7 +4,7 @@ part of 'user_bloc.dart';
 abstract class UserEvent {}
 
 class GetUserProfileEvent extends UserEvent {
-  final String? email;
+  final String email;
   GetUserProfileEvent({required this.email});
 }
 

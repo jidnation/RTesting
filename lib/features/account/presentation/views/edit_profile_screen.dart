@@ -73,10 +73,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           } else if (state is UserUploadProfilePictureSuccess) {
             globals.user = state.user;
           } else if (state is UserUploadError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
           if (state is UserError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {

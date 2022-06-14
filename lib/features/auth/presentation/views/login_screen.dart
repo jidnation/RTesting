@@ -35,10 +35,9 @@ class LoginScreen extends HookWidget {
             bloc: globals.authBloc,
             listener: (context, state) {
               if (state is Authenticated) {
-                //TODO: CHANGE NAV TO HOME
                 RouteNavigators.route(context, const HomeScreen());
               } else if (state is AuthError) {
-                RMSnackBar.showErrorSnackBar(context, message: state.error);
+                Snackbars.error(context, message: state.error);
               }
             },
             builder: (context, state) {
