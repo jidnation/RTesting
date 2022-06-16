@@ -102,6 +102,62 @@ class PostModel {
       };
 }
 
+class SavePostModel {
+  String? audioMediaItem;
+  String? authId;
+  String? content;
+  List<String>? imageMediaItems;
+  String? postId;
+  String? savedPostId;
+  String? videoMediaItem;
+  // DateTime? createdAt;
+  PostProfileModel? profile;
+
+  SavePostModel({
+    this.audioMediaItem,
+    this.authId,
+    this.content,
+    this.imageMediaItems,
+    this.postId,
+    this.savedPostId,
+    this.videoMediaItem,
+    //this.createdAt,
+    this.profile,
+  });
+
+  factory SavePostModel.fromJson(Map<String, dynamic> json) => SavePostModel(
+        audioMediaItem: json["audioMediaItem"],
+        authId: json["authId"],
+        content: json["content"],
+        imageMediaItems: json["imageMediaItems"] == null
+            ? null
+            : List<String>.from(json["imageMediaItems"].map((x) => x)),
+        postId: json["postId"],
+        savedPostId: json["savedPostId"],
+        videoMediaItem: json["videoMediaItem"],
+        // createdAt: json["createdAt"] == null
+        //     ? null
+        //     : DateTime.parse(json["createdAt"]),
+        profile: json["profile"] != null
+            ? PostProfileModel.fromJson(json["profile"])
+            : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "audioMediaItem": audioMediaItem,
+        "authId": authId,
+        "content": content,
+        "imageMediaItems": imageMediaItems == null
+            ? null
+            : List<dynamic>.from(imageMediaItems!.map((x) => x)),
+        "postId": postId,
+        "savedPostId": savedPostId,
+        "videoMediaItem": videoMediaItem,
+        //"createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
+        "profile": profile == null ? null : profile!.toJson(),
+      };
+}
+
 class PostLikeModel {
   String? postId;
   String? authId;
@@ -252,7 +308,6 @@ class PostProfileModel {
         profileSlug: json["profileSlug"],
         verified: json["verified"],
         username: json["username"],
-
       );
 
   Map<String, dynamic> toJson() => {

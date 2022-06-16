@@ -258,6 +258,22 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(GetAllCommentsOnPostError(error: e.message));
       }
     });
+    on<GetPersonalCommentsEvent>((event, emit) async {
+      emit(GetPersonalCommentsLoading());
+      try {
+        final response = await socialServiceRepository.getPersonalComments(
+          //authId: event.authId!,
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+        );
+        response.fold(
+          (error) => emit(GetPersonalCommentsError(error: error)),
+          (data) => emit(GetPersonalCommentsSuccess(data: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetPersonalCommentsError(error: e.message));
+      }
+    });
     on<GetLikesOnPostEvent>((event, emit) async {
       emit(GetLikesOnPostLoading());
       try {
@@ -328,6 +344,49 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetPostError(error: e.message));
+      }
+    });
+    on<GetAllSavedPostsEvent>((event, emit) async {
+      emit(GetAllSavedPostsLoading());
+      try {
+        final response = await socialServiceRepository.getAllSavedPosts(
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+        );
+        response.fold(
+          (error) => emit(GetAllSavedPostsError(error: error)),
+          (data) => emit(GetAllSavedPostsSuccess(data: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetAllSavedPostsError(error: e.message));
+      }
+    });
+    on<SavePostEvent>((event, emit) async {
+      emit(SavePostLoading());
+      try {
+        final response = await socialServiceRepository.savePost(
+          postId: event.postId!,
+        );
+        response.fold(
+          (error) => emit(SavePostError(error: error)),
+          (data) => emit(SavePostSuccess(data: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(SavePostError(error: e.message));
+      }
+    });
+    on<DeleteSavedPostEvent>((event, emit) async {
+      emit(DeleteSavedPostLoading());
+      try {
+        final response = await socialServiceRepository.deleteSavedPost(
+          postId: event.postId!,
+        );
+        response.fold(
+          (error) => emit(DeleteSavedPostError(error: error)),
+          (isDeleted) => emit(DeleteSavedPostSuccess(isDeleted: isDeleted)),
+        );
+      } on GraphQLError catch (e) {
+        emit(DeleteSavedPostError(error: e.message));
       }
     });
   }

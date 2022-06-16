@@ -110,10 +110,22 @@ class GetAllCommentsOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final int? pageLimit;
   final int? pageNumber;
-  GetAllCommentsOnPostEvent(
-      {required this.postId,
-      required this.pageLimit,
-      required this.pageNumber});
+  GetAllCommentsOnPostEvent({
+    required this.postId,
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
+class GetPersonalCommentsEvent extends SocialServiceEvent {
+  //final String? authId;
+  final int? pageLimit;
+  final int? pageNumber;
+  GetPersonalCommentsEvent({
+    //required this.authId,
+    required this.pageLimit,
+    required this.pageNumber,
+  });
 }
 
 class GetLikesOnPostEvent extends SocialServiceEvent {
@@ -126,6 +138,16 @@ class GetPostEvent extends SocialServiceEvent {
   GetPostEvent({required this.postId});
 }
 
+class SavePostEvent extends SocialServiceEvent {
+  SavePostEvent({required this.postId});
+  final String? postId;
+}
+
+class DeleteSavedPostEvent extends SocialServiceEvent {
+  DeleteSavedPostEvent({required this.postId});
+  final String? postId;
+}
+
 class GetSingleCommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   GetSingleCommentOnPostEvent({required this.postId});
@@ -135,6 +157,15 @@ class GetPostFeedEvent extends SocialServiceEvent {
   final int? pageLimit;
   final int? pageNumber;
   GetPostFeedEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
+class GetAllSavedPostsEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  GetAllSavedPostsEvent({
     required this.pageLimit,
     required this.pageNumber,
   });

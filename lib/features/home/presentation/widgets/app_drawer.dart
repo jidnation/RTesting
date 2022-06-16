@@ -3,15 +3,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final showOtherItem = useState<bool>(false);
+    final showOtherItem = useState<bool>(true);
     var size = MediaQuery.of(context).size;
     return Drawer(
       child: Column(
@@ -24,18 +25,10 @@ class AppDrawer extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const ImagePlaceholder(
-                    width: 49,
-                    height: 49,
+                  Helper.renderProfilePicture(
+                    globals.user!.profilePicture,
+                    size: 49,
                   ),
-                  // Container(
-                  //   width: 65,
-                  //   height: 65,
-                  //   clipBehavior: Clip.hardEdge,
-                  //   child:
-                  //       Image.asset('assets/images/user.png', fit: BoxFit.fill),
-                  //   decoration: const BoxDecoration(shape: BoxShape.circle),
-                  // ),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,17 +42,17 @@ class AppDrawer extends HookWidget {
                           Text(
                             ('${globals.loginResponse!.firstName} ${globals.loginResponse!.lastName}')
                                 .toTitleCase(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textColor2,
-                              fontSize: 17,
+                              fontSize: getScreenHeight(16),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const Text(
-                            '@badguy',
+                          Text(
+                            '@${globals.user!.username!}',
                             style: TextStyle(
-                              color: Color(0xFF6C6A6A),
-                              fontSize: 13,
+                              color: const Color(0xFF6C6A6A),
+                              fontSize: getScreenHeight(13),
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -80,17 +73,17 @@ class AppDrawer extends HookWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: getScreenHeight(20)),
                   Row(
                     children: [
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            '2K',
+                            globals.user!.nReachers.toString(),
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: getScreenHeight(16),
                               color: AppColors.textColor2,
                               fontWeight: FontWeight.w600,
                             ),
@@ -98,29 +91,29 @@ class AppDrawer extends HookWidget {
                           Text(
                             'Reachers',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: getScreenHeight(14),
                               color: AppColors.greyShade2,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(width: 20),
+                      SizedBox(width: getScreenWidth(20)),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            '270',
+                            globals.user!.nReaching.toString(),
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: getScreenHeight(16),
                                 color: AppColors.textColor2,
                                 fontWeight: FontWeight.w600),
                           ),
                           Text(
                             'Reaching',
                             style: TextStyle(
-                                fontSize: 14,
+                                fontSize: getScreenHeight(14),
                                 color: AppColors.greyShade2,
                                 fontWeight: FontWeight.w400),
                           ),
@@ -238,13 +231,19 @@ class DrawerItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           showIcon
-              ? SizedBox(height: 20, width: 20, child: SvgPicture.asset(icon))
+              ? SizedBox(
+                  height: getScreenHeight(20),
+                  width: getScreenWidth(20),
+                  child: SvgPicture.asset(icon),
+                )
               : const SizedBox.shrink(),
-          showIcon ? const SizedBox(width: 17) : const SizedBox.shrink(),
+          showIcon
+              ? SizedBox(width: getScreenWidth(17))
+              : const SizedBox.shrink(),
           Text(
             action,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: getScreenHeight(15),
               fontWeight: FontWeight.w400,
               color: color,
             ),
@@ -252,8 +251,8 @@ class DrawerItem extends StatelessWidget {
           action == 'Logout' ? const Spacer() : const SizedBox.shrink(),
           action == 'Logout'
               ? SizedBox(
-                  height: 20,
-                  width: 20,
+                  height: getScreenHeight(20),
+                  width: getScreenWidth(20),
                   child: SvgPicture.asset('assets/svgs/scan.svg'),
                 )
               : const SizedBox.shrink(),

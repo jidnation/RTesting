@@ -27,6 +27,26 @@ class PostSchema {
         ''';
   }
 }
+class SavePostSchema {
+  SavePostSchema._();
+
+  static String get schema {
+    return r'''
+            audioMediaItem
+            authId
+            content
+            imageMediaItems
+            postId
+            savedPostId
+            videoMediaItem
+            profile {
+              ''' +
+        PostProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
 
 class CommentSchema {
   CommentSchema._();

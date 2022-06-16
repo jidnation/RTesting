@@ -18,6 +18,7 @@ import 'package:reach_me/features/account/presentation/views/edit_profile_screen
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
+import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
@@ -49,6 +50,8 @@ class _AccountScreenState extends State<AccountScreen>
     globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
     globals.socialServiceBloc!
         .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
+    globals.socialServiceBloc!
+        .add(GetPersonalCommentsEvent(pageLimit: 50, pageNumber: 1));
   }
 
   TabBar get _tabBar => TabBar(
@@ -255,6 +258,7 @@ class _AccountScreenState extends State<AccountScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final _posts = useState<List<PostModel>>([]);
+    final _comments = useState<List<CommentModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: PreferredSize(
@@ -313,7 +317,7 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 onPressed: () async {
                   await showProfileMenuBottomSheet(context,
-                      user: globals.recipientUser!);
+                      user: globals.user!);
                 },
                 splashRadius: 20,
               )
@@ -342,320 +346,309 @@ class _AccountScreenState extends State<AccountScreen>
             }
           },
           builder: (context, state) {
-            return NotificationListener<ScrollUpdateNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (scrollViewController.position.userScrollDirection ==
-                    ScrollDirection.reverse) {
-                  setState(() {
-                    message = 'going down';
-                    width = getScreenWidth(50);
-                    height = getScreenHeight(50);
-                    isGoingDown = true;
-                  });
-                } else {
-                  if (scrollViewController.position.userScrollDirection ==
-                      ScrollDirection.forward) {
-                    setState(() {
-                      message = 'going up';
-                      width = getScreenWidth(100);
-                      height = getScreenHeight(100);
-                    });
+            return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
+                listener: (context, state) {
+                  if (state is GetAllPostsSuccess) {
+                    _posts.value = state.posts!;
                   }
-                }
-                return false;
-              },
-              child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
-                  bloc: globals.socialServiceBloc,
-                  listener: (context, state) {
-                    if (state is GetAllPostsSuccess) {
-                      _posts.value = state.posts!;
-                    }
-                    if (state is GetAllPostsError) {
-                      Snackbars.error(context, message: state.error);
-                    }
-                  },
-                  builder: (context, state) {
-                    bool _isLoading = state is GetAllPostsLoading;
-                    return NestedScrollView(
-                      controller: scrollViewController,
-                      headerSliverBuilder:
-                          (BuildContext context, bool boxIsScrolled) {
-                        return <Widget>[
-                          SliverList(
-                            delegate: SliverChildListDelegate(
-                              [
-                                Column(
-                                  children: [
-                                    SizedBox(height: getScreenHeight(10)),
-                                    Text(
-                                        ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                            .toTitleCase(),
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.textColor2,
-                                        )),
-                                    Text(
-                                        '@${globals.user!.username ?? 'username'}',
+                  if (state is GetAllPostsError) {
+                    Snackbars.error(context, message: state.error);
+                  }
+                  if (state is GetPersonalCommentsSuccess) {
+                    _comments.value = state.data!;
+                  }
+                  if (state is GetPersonalCommentsError) {
+                    Snackbars.error(context, message: state.error);
+                  }
+                },
+                builder: (context, state) {
+                  bool _isLoading = state is GetAllPostsLoading;
+                  return NestedScrollView(
+                    controller: scrollViewController,
+                    headerSliverBuilder:
+                        (BuildContext context, bool boxIsScrolled) {
+                      return <Widget>[
+                        SliverList(
+                          delegate: SliverChildListDelegate(
+                            [
+                              Column(
+                                children: [
+                                  SizedBox(height: getScreenHeight(10)),
+                                  Text(
+                                      ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                          .toTitleCase(),
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textColor2,
+                                      )),
+                                  Text(
+                                      '@${globals.user!.username ?? 'username'}',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(13),
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      )),
+                                  SizedBox(height: getScreenHeight(15)),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                globals.user!.nReachers
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(15),
+                                                    color: AppColors.textColor2,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                              Text(
+                                                'Reachers',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(13),
+                                                    color: AppColors.greyShade2,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(width: getScreenWidth(20)),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                globals.user!.nReaching
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(15),
+                                                    color: AppColors.textColor2,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                              Text(
+                                                'Reaching',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(13),
+                                                    color: AppColors.greyShade2,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(width: getScreenWidth(20)),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                globals.user!.nStaring
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(15),
+                                                    color: AppColors.textColor2,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                              Text(
+                                                'Starring',
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(13),
+                                                    color: AppColors.greyShade2,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  globals.user!.bio != null &&
+                                          globals.user!.bio != ''
+                                      ? SizedBox(height: getScreenHeight(20))
+                                      : const SizedBox.shrink(),
+                                  SizedBox(
+                                      width: getScreenWidth(290),
+                                      child: Text(
+                                        globals.user!.bio ?? '',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: getScreenHeight(13),
+                                          color: AppColors.greyShade2,
                                           fontWeight: FontWeight.w400,
-                                          color: AppColors.textColor2,
-                                        )),
-                                    SizedBox(height: getScreenHeight(15)),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nReachers
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Reachers',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(width: getScreenWidth(20)),
-                                            Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nReaching
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Reaching',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(width: getScreenWidth(20)),
-                                            Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nStaring
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Starring',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
-                                            )
-                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    globals.user!.bio != null &&
-                                            globals.user!.bio != ''
-                                        ? SizedBox(height: getScreenHeight(20))
-                                        : const SizedBox.shrink(),
-                                    SizedBox(
-                                        width: getScreenWidth(290),
-                                        child: Text(
-                                          globals.user!.bio ?? '',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        )),
-                                    globals.user!.bio != null &&
-                                            globals.user!.bio != ''
-                                        ? SizedBox(height: getScreenHeight(20))
-                                        : const SizedBox.shrink(),
-                                    SizedBox(
-                                        width: getScreenWidth(145),
-                                        height: getScreenHeight(45),
-                                        child: CustomButton(
-                                          label: 'Edit Profile',
-                                          labelFontSize: getScreenHeight(14),
-                                          color: AppColors.white,
-                                          onPressed: () {
-                                            RouteNavigators.route(context,
-                                                const EditProfileScreen());
-                                          },
-                                          size: size,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 9,
-                                            horizontal: 21,
-                                          ),
-                                          textColor: AppColors.textColor2,
-                                          borderSide: const BorderSide(
-                                              color: AppColors.greyShade5),
-                                        )),
-                                    SizedBox(height: getScreenHeight(15)),
-                                  ],
-                                ).paddingOnly(t: 50),
-                              ],
-                            ),
-                          )
-                        ];
-                      },
-                      body: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Divider(
-                            color: const Color(0xFF767474).withOpacity(0.5),
-                            thickness: 0.5,
+                                      )),
+                                  globals.user!.bio != null &&
+                                          globals.user!.bio != ''
+                                      ? SizedBox(height: getScreenHeight(20))
+                                      : const SizedBox.shrink(),
+                                  SizedBox(
+                                      width: getScreenWidth(145),
+                                      height: getScreenHeight(45),
+                                      child: CustomButton(
+                                        label: 'Edit Profile',
+                                        labelFontSize: getScreenHeight(14),
+                                        color: AppColors.white,
+                                        onPressed: () {
+                                          RouteNavigators.route(context,
+                                              const EditProfileScreen());
+                                        },
+                                        size: size,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 9,
+                                          horizontal: 21,
+                                        ),
+                                        textColor: AppColors.textColor2,
+                                        borderSide: const BorderSide(
+                                            color: AppColors.greyShade5),
+                                      )),
+                                  SizedBox(height: getScreenHeight(15)),
+                                ],
+                              ).paddingOnly(t: 50),
+                            ],
                           ),
-                          _tabBar,
-                          Expanded(
-                            child: TabBarView(
-                              physics: const NeverScrollableScrollPhysics(),
-                              controller: _tabController,
-                              children: [
-                                //COMMENTS TAB
-                                ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                        title:
-                                            'Comments you made on a post and comments made on your post',
-                                        subtitle:
-                                            'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                  ],
-                                ),
-
-                                //REACHES TAB
-                                if (_isLoading)
-                                  const CircularLoader()
-                                else
-                                  _posts.value.isEmpty
-                                      ? ListView(
-                                          padding: EdgeInsets.zero,
-                                          shrinkWrap: true,
-                                          children: const [
-                                            EmptyTabWidget(
-                                              title: "Reaches you’ve made",
+                        )
+                      ];
+                    },
+                    body: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Divider(
+                          color: const Color(0xFF767474).withOpacity(0.5),
+                          thickness: 0.5,
+                        ),
+                        _tabBar,
+                        Expanded(
+                          child: TabBarView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            controller: _tabController,
+                            children: [
+                              //COMMENTS TAB
+                              if (_isLoading)
+                                const CircularLoader()
+                              else
+                                _comments.value.isEmpty
+                                    ? ListView(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        children: const [
+                                          EmptyTabWidget(
+                                              title:
+                                                  'Comments you made on a post and comments made on your post',
                                               subtitle:
-                                                  "Find all posts or contributions you’ve made here ",
-                                            )
-                                          ],
-                                        )
-                                      : ListView.builder(
-                                          itemCount: _posts.value.length,
-                                          itemBuilder: (context, index) {
-                                            return _ReacherCard(
-                                                postModel: _posts.value[index]);
-                                          },
-                                        ),
+                                                  'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                        ],
+                                      )
+                                    : ListView.builder(
+                                        itemCount: _comments.value.length,
+                                        itemBuilder: (context, index) {
+                                          return _CommentReachCard(
+                                              commentModel:
+                                                  _comments.value[index]);
+                                        },
+                                      ),
 
-                                //SHOUTOUT TAB
-                                ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title:
-                                          "Posts you’ve shouted out and your posts that has been shouted out",
-                                      subtitle:
-                                          "See posts you’ve shouted out and your post that has been shouted out",
-                                    )
-                                  ],
-                                ),
+                              //REACHES TAB
+                              if (_isLoading)
+                                const CircularLoader()
+                              else
+                                _posts.value.isEmpty
+                                    ? ListView(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        children: const [
+                                          EmptyTabWidget(
+                                            title: "Reaches you’ve made",
+                                            subtitle:
+                                                "Find all posts or contributions you’ve made here ",
+                                          )
+                                        ],
+                                      )
+                                    : ListView.builder(
+                                        itemCount: _posts.value.length,
+                                        itemBuilder: (context, index) {
+                                          return _ReacherCard(
+                                              postModel: _posts.value[index]);
+                                        },
+                                      ),
 
-                                //SHOUTDOWN TAB
-                                ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title:
-                                          "Posts you’ve shouted down and your posts that has been shouted down",
-                                      subtitle:
-                                          "See posts you’ve shouted down and your post that has been shouted down",
-                                    )
-                                  ],
-                                ),
+                              //SHOUTOUT TAB
+                              ListView(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                children: const [
+                                  EmptyTabWidget(
+                                    title:
+                                        "Posts you’ve shouted out and your posts that has been shouted out",
+                                    subtitle:
+                                        "See posts you’ve shouted out and your post that has been shouted out",
+                                  )
+                                ],
+                              ),
 
-                                //LIKES TAB
-                                ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title: "Likes made",
-                                      subtitle:
-                                          "Find post you liked and your post that was liked",
-                                    )
-                                  ],
-                                ),
+                              //SHOUTDOWN TAB
+                              ListView(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                children: const [
+                                  EmptyTabWidget(
+                                    title:
+                                        "Posts you’ve shouted down and your posts that has been shouted down",
+                                    subtitle:
+                                        "See posts you’ve shouted down and your post that has been shouted down",
+                                  )
+                                ],
+                              ),
 
-                                //SHARES TAB
-                                ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title: "Post you shared",
-                                      subtitle: "Find post you’ve shared here",
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
+                              //LIKES TAB
+                              ListView(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                children: const [
+                                  EmptyTabWidget(
+                                    title: "Likes made",
+                                    subtitle:
+                                        "Find post you liked and your post that was liked",
+                                  )
+                                ],
+                              ),
+
+                              //SHARES TAB
+                              ListView(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                children: const [
+                                  EmptyTabWidget(
+                                    title: "Post you shared",
+                                    subtitle: "Find post you’ve shared here",
+                                  )
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }),
-            );
+                        ),
+                      ],
+                    ),
+                  );
+                });
           }),
     );
   }
@@ -796,7 +789,7 @@ class _ReacherCard extends HookWidget {
                   ),
                   if (postModel!.imageMediaItems!.isNotEmpty &&
                       postModel!.audioMediaItem!.isNotEmpty &&
-                      postModel!.audioMediaItem!.isNotEmpty)
+                      postModel!.videoMediaItem!.isNotEmpty)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -874,6 +867,299 @@ class _ReacherCard extends HookWidget {
                               FittedBox(
                                 child: Text(
                                   '${postModel!.nComments}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {},
+                                padding: const EdgeInsets.all(0),
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/message.svg',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: getScreenWidth(20)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: const Color(0xFFF5F5F5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/shoutout-a.svg',
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  // FittedBox(
+                                  //   child: Text(
+                                  //     '${postFeedModel!.post!.nUpvotes}',
+                                  //     style: TextStyle(
+                                  //       fontSize: getScreenHeight(12),
+                                  //       fontWeight: FontWeight.w500,
+                                  //       color: AppColors.textColor3,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/shoutdown.svg',
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  // FittedBox(
+                                  //   child: Text(
+                                  //     '${postFeedModel!.post!.nDownvotes}',
+                                  //     style: TextStyle(
+                                  //       fontSize: getScreenHeight(12),
+                                  //       fontWeight: FontWeight.w500,
+                                  //       color: AppColors.textColor3,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
+                ],
+              );
+            }),
+      ),
+    );
+  }
+}
+
+class _CommentReachCard extends HookWidget {
+  const _CommentReachCard({
+    Key? key,
+    required this.commentModel,
+    this.onComment,
+    this.onDownvote,
+    this.onLike,
+    this.onMessage,
+    this.onUpvote,
+    this.likeColour,
+  }) : super(key: key);
+
+  final CommentModel? commentModel;
+  final Function()? onLike, onComment, onMessage, onUpvote, onDownvote;
+  final Color? likeColour;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 13,
+        vertical: 7,
+      ),
+      child: Container(
+        width: size.width,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+            bloc: globals.socialServiceBloc,
+            listener: (context, state) {},
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 33,
+                          ).paddingOnly(l: 13, t: 10),
+                          SizedBox(width: getScreenWidth(9)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    (globals.user!.firstName! +
+                                            ' ' +
+                                            globals.user!.lastName!)
+                                        .toTitleCase(),
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(15),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  SvgPicture.asset('assets/svgs/verified.svg')
+                                ],
+                              ),
+                              Text(
+                                'Comment on @${commentModel!.commentProfile!.username}',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              ),
+                            ],
+                          ).paddingOnly(t: 10),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset('assets/svgs/starred.svg'),
+                          SizedBox(width: getScreenWidth(9)),
+                          IconButton(
+                            onPressed: () async {
+                              // await _showReacherCardBottomSheet(
+                              //     context, commentModel!);
+                            },
+                            iconSize: getScreenHeight(19),
+                            padding: const EdgeInsets.all(0),
+                            icon:
+                                SvgPicture.asset('assets/svgs/kebab card.svg'),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  Flexible(
+                    child: Text(
+                      commentModel!.content ?? '',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(14),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ).paddingSymmetric(v: 10, h: 16),
+                  ),
+                  // if (commentModel!.imageMediaItems!.isNotEmpty &&
+                  //     commentModel!.audioMediaItem!.isNotEmpty &&
+                  //     commentModel!.audioMediaItem!.isNotEmpty)
+                  //   Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Flexible(
+                  //         child: Container(
+                  //           height: getScreenHeight(152),
+                  //           width: getScreenWidth(152),
+                  //           clipBehavior: Clip.hardEdge,
+                  //           decoration: BoxDecoration(
+                  //             borderRadius: BorderRadius.circular(15),
+                  //             image: const DecorationImage(
+                  //               image: AssetImage('assets/images/post.png'),
+                  //               fit: BoxFit.fitHeight,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(width: getScreenWidth(8)),
+                  //       Flexible(child: MediaCard(size: size)),
+                  //     ],
+                  //   ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
+                  SizedBox(height: getScreenHeight(16)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: const Color(0xFFF5F5F5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: onLike,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/like.svg',
+                                  color: likeColour,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${commentModel!.nLikes}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {
+                                  // RouteNavigators.route(
+                                  //     context,  ViewCommentsScreen(post: postFeedModel!));
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/comment.svg',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${commentModel!.nComments}',
                                   style: TextStyle(
                                     fontSize: getScreenHeight(12),
                                     fontWeight: FontWeight.w500,

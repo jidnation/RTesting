@@ -231,6 +231,62 @@ class GetAllCommentsOnPostError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class GetPersonalCommentsLoading extends SocialServiceState {}
+
+class GetPersonalCommentsSuccess extends SocialServiceState {
+  final List<CommentModel>? data;
+  GetPersonalCommentsSuccess({this.data});
+}
+
+class GetPersonalCommentsError extends SocialServiceState {
+  final String error;
+  GetPersonalCommentsError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class DeleteSavedPostLoading extends SocialServiceState {}
+
+class DeleteSavedPostSuccess extends SocialServiceState {
+  final bool? isDeleted;
+  DeleteSavedPostSuccess({this.isDeleted});
+}
+
+class DeleteSavedPostError extends SocialServiceState {
+  final String error;
+  DeleteSavedPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetAllSavedPostsLoading extends SocialServiceState {}
+
+class GetAllSavedPostsSuccess extends SocialServiceState {
+  final List<SavePostModel>? data;
+  GetAllSavedPostsSuccess({this.data});
+}
+
+class GetAllSavedPostsError extends SocialServiceState {
+  final String error;
+  GetAllSavedPostsError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class SavePostLoading extends SocialServiceState {}
+
+class SavePostSuccess extends SocialServiceState {
+  final SavePostModel? data;
+  SavePostSuccess({this.data});
+}
+
+class SavePostError extends SocialServiceState {
+  final String error;
+  SavePostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class GetLikesOnPostLoading extends SocialServiceState {}
 
 class GetLikesOnPostSuccess extends SocialServiceState {

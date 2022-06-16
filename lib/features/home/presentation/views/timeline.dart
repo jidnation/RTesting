@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
@@ -415,7 +414,7 @@ class _ReacherCard extends HookWidget {
                   ),
                   if (postFeedModel!.post!.imageMediaItems!.isNotEmpty &&
                       postFeedModel!.post!.audioMediaItem!.isNotEmpty &&
-                      postFeedModel!.post!.audioMediaItem!.isNotEmpty)
+                      postFeedModel!.post!.videoMediaItem!.isNotEmpty)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -623,7 +622,7 @@ class UserStory extends StatelessWidget {
           children: [
             !hasWatched
                 ? Container(
-                    padding: const EdgeInsets.all(3),
+                    padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: !isLive
@@ -631,22 +630,15 @@ class UserStory extends StatelessWidget {
                           : const Color(0xFFDE0606),
                     ),
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFFF5F5F5),
-                      ),
-                      child: Container(
-                          width: getScreenWidth(70),
-                          height: getScreenHeight(70),
-                          clipBehavior: Clip.hardEdge,
-                          child: Image.asset(
-                            'assets/images/user.png',
-                            fit: BoxFit.fill,
-                          ),
-                          decoration:
-                              const BoxDecoration(shape: BoxShape.circle)),
-                    ),
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFFF5F5F5),
+                        ),
+                        child: Helper.renderProfilePicture(
+                          globals.user!.profilePicture,
+                          size: 60,
+                        )),
                   )
                 : Container(
                     padding: const EdgeInsets.all(2),

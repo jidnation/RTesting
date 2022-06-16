@@ -144,8 +144,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             type: 'profilePicture',
           );
 
-          //TODO: OKAY OH
-
           userRes.fold(
             (error) => emit(UserUploadError(error: error)),
             (user) {

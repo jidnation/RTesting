@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/snackbar.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -152,6 +151,22 @@ Future showReacherCardBottomSheet(BuildContext context,
             RouteNavigators.pop(context);
             Snackbars.error(context, message: state.error);
           }
+          if (state is SavePostSuccess) {
+            RouteNavigators.pop(context);
+            Snackbars.success(context, message: 'Post saved successfully');
+          }
+          if (state is SavePostError) {
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+          if (state is DeleteSavedPostSuccess) {
+            RouteNavigators.pop(context);
+            Snackbars.success(context, message: 'Post removed successfully');
+          }
+          if (state is DeleteSavedPostError) {
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
         },
         builder: (context, state) {
           bool _isLoading = state is GetPostLoading;
@@ -179,7 +194,11 @@ Future showReacherCardBottomSheet(BuildContext context,
                       KebabBottomTextButton(
                           label: 'Share post', onPressed: () {}),
                       KebabBottomTextButton(
-                          label: 'Save post', onPressed: () {}),
+                          label: 'Save post',
+                          onPressed: () {
+                            globals.socialServiceBloc!.add(
+                                SavePostEvent(postId: postFeedModel.postId));
+                          }),
                       const KebabBottomTextButton(label: 'Report'),
                       const KebabBottomTextButton(label: 'Reach user'),
                       const KebabBottomTextButton(label: 'Star user'),

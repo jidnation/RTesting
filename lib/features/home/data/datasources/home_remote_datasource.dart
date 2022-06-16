@@ -660,6 +660,94 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<SavePostModel> savePost({required String postId}) async {
+    String q = r'''
+        mutation savePost($postId: String!) {
+          savePost(postId: $postId) {
+            ''' +
+        SavePostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.mutate(
+        gql(q),
+        variables: {'postId': postId},
+      );
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('save post', result.data);
+      return SavePostModel.fromJson(result.data!['savePost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteSavedPost({required String postId}) async {
+    String q = r'''
+        mutation deleteSavedPost($postId: String!) {
+          deleteSavedPost(postId: $postId) 
+        }''';
+    try {
+      final result = await _client.mutate(
+        gql(q),
+        variables: {'postId': postId},
+      );
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('delete save post', result.data);
+      return result.data!['deleteSavedPost'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<SavePostModel>> getAllSavedPosts({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    String q = r'''
+        query getAllSavedPosts(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getAllSavedPosts(
+            page_limit: $page_limit
+            page_number: $page_number
+            ) {
+            ''' +
+        SavePostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(
+        gql(q),
+        variables: {
+          'page_limit': pageLimit,
+          'page_number': pageNumber,
+        },
+      );
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('get all saved posts', result.data);
+      return (result.data!['getAllSavedPosts'] as List)
+          .map((e) => SavePostModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<PostVoteModel> votePost({
     required String postId,
     required String voteType,
@@ -915,6 +1003,45 @@ class HomeRemoteDataSource {
 
       Console.log('get all comments on post', result.data);
       return (result.data!['getAllCommentsOnPost'] as List)
+          .map((e) => CommentModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<CommentModel>> getPersonalComments({
+    // required String? authId,
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getPersonalComments(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getPersonalComments(
+            page_limit: $page_limit
+            page_number: $page_number
+            ){
+               ''' +
+        CommentSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        //'authId': authId,
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('get personal comments ', result.data);
+      return (result.data!['getPersonalComments'] as List)
           .map((e) => CommentModel.fromJson(e))
           .toList();
     } catch (e) {

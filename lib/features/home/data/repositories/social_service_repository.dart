@@ -221,12 +221,29 @@ class SocialServiceRepository {
 
   Future<Either<String, List<CommentModel>>> getAllCommentsOnPost({
     required String postId,
-       required int? pageLimit,
+    required int? pageLimit,
     required int? pageNumber,
   }) async {
     try {
       final comments = await _homeRemoteDataSource.getAllCommentsOnPost(
         postId: postId,
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(comments);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<CommentModel>>> getPersonalComments({
+    //required String authId,
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    try {
+      final comments = await _homeRemoteDataSource.getPersonalComments(
+        //  authId: authId,
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
@@ -300,6 +317,47 @@ class SocialServiceRepository {
         pageNumber: pageNumber,
       );
       return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<SavePostModel>>> getAllSavedPosts({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getAllSavedPosts(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, SavePostModel>> savePost({
+    required String postId,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.savePost(
+        postId: postId,
+      );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteSavedPost({
+    required String postId,
+  }) async {
+    try {
+      final isDeleted = await _homeRemoteDataSource.deleteSavedPost(
+        postId: postId,
+      );
+      return Right(isDeleted);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
