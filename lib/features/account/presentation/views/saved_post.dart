@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
@@ -254,10 +255,10 @@ class _SavedPostReacherCard extends HookWidget {
                           SizedBox(width: getScreenWidth(9)),
                           IconButton(
                             onPressed: () async {
-                              // await showReacherCardBottomSheet(
-                              //   context,
-                              //   savedPostModel: savedPostModel!,
-                              // );
+                              await showSavedPostBottomSheet(
+                                context,
+                                savePostModel: savedPostModel!,
+                              );
                             },
                             iconSize: getScreenHeight(19),
                             padding: const EdgeInsets.all(0),
@@ -307,4 +308,66 @@ class _SavedPostReacherCard extends HookWidget {
       ),
     );
   }
+}
+
+Future showSavedPostBottomSheet(BuildContext context,
+    {required SavePostModel savePostModel}) async {
+  return showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) {
+      return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+        bloc: globals.socialServiceBloc,
+        listener: (context, state) {
+          if (state is DeleteSavedPostSuccess) {
+            RouteNavigators.pop(context);
+            Snackbars.success(context, message: 'Post removed successfully');
+            globals.socialServiceBloc!
+                .add(GetAllSavedPostsEvent(pageLimit: 30, pageNumber: 1));
+          }
+          if (state is DeleteSavedPostError) {
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+        },
+        builder: (context, state) {
+          bool _isLoading = state is DeleteSavedPostLoading;
+          return Container(
+              decoration: const BoxDecoration(
+                color: AppColors.greyShade7,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: ListView(shrinkWrap: true, children: [
+                Center(
+                  child: Container(
+                      height: getScreenHeight(4),
+                      width: getScreenWidth(58),
+                      decoration: BoxDecoration(
+                          color: AppColors.greyShade4,
+                          borderRadius: BorderRadius.circular(40))),
+                ).paddingOnly(t: 23),
+                SizedBox(height: getScreenHeight(20)),
+                Column(
+                  children: [
+                    KebabBottomTextButton(
+                        label: 'Remove from Saved Posts',
+                        isLoading: _isLoading,
+                        onPressed: () {
+                          globals.socialServiceBloc!.add(DeleteSavedPostEvent(
+                              postId: savePostModel.postId));
+                        }),
+                    KebabBottomTextButton(
+                        label: 'Share Post', onPressed: () {}),
+                    const KebabBottomTextButton(label: 'Copy link'),
+                  ],
+                ),
+                SizedBox(height: getScreenHeight(20)),
+              ]));
+        },
+      );
+    },
+  );
 }

@@ -80,6 +80,7 @@ class PostProfileSchema {
             location
             profilePicture
             profileSlug
+            verified
         ''';
   }
 }
