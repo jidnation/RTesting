@@ -92,8 +92,26 @@ class DelStarRelationshipEvent extends UserEvent {
   DelStarRelationshipEvent({required this.starIdToDelete});
 }
 
-class FetchUserReachersEvent extends UserEvent {}
+class FetchUserReachersEvent extends UserEvent {
+  final int pageLimit, pageNumber;
+  FetchUserReachersEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
 
-class FetchUserReachingsEvent extends UserEvent {}
+class FetchUserReachingsEvent extends UserEvent {
+  final int pageLimit, pageNumber;
+  FetchUserReachingsEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
 
-class FetchUserStarredEvent extends UserEvent {}
+class FetchUserStarredEvent extends UserEvent {
+  final int pageLimit, pageNumber;
+  FetchUserStarredEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}

@@ -25,3 +25,19 @@ class UserSchema {
         ''';
   }
 }
+
+class ReacherProfileSchema {
+  ReacherProfileSchema._();
+
+  static String get schema {
+    return r'''
+            profilePicture
+            profileSlug
+            location
+            authId
+            username
+            firstName
+            lastName
+        ''';
+  }
+}

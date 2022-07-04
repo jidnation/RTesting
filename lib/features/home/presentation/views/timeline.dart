@@ -40,6 +40,8 @@ class _TimelineScreenState extends State<TimelineScreen>
   @override
   bool get wantKeepAlive => true;
 
+  bool _firstLoad = true;
+
   @override
   void initState() {
     globals.userBloc!.add(GetUserProfileEvent(email: globals.email!));
@@ -106,7 +108,7 @@ class _TimelineScreenState extends State<TimelineScreen>
         actions: [
           IconButton(
             icon: SvgPicture.asset(
-              'assets/svgs/post.svg',
+              'assets/svgs/edit.svg',
               width: getScreenWidth(22),
               height: getScreenHeight(22),
             ),
@@ -115,8 +117,8 @@ class _TimelineScreenState extends State<TimelineScreen>
           IconButton(
             icon: SvgPicture.asset(
               'assets/svgs/message.svg',
-              width: getScreenWidth(22),
-              height: getScreenHeight(22),
+              // width: getScreenWidth(22),
+              // height: getScreenHeight(22),
             ),
             onPressed: () => RouteNavigators.route(
               context,
@@ -128,145 +130,163 @@ class _TimelineScreenState extends State<TimelineScreen>
       body: SafeArea(
         top: false,
         child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
-            bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              if (state is CreatePostError) {
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is CreatePostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                Snackbars.success(context,
-                    message: 'Your reach has been posted');
-              }
-              if (state is GetPostFeedError) {
-                Snackbars.error(context, message: state.error);
-              }
+          bloc: globals.socialServiceBloc,
+          listener: (context, state) {
+            if (state is CreatePostError) {
+              Snackbars.error(context, message: state.error);
+            }
+            if (state is CreatePostSuccess) {
+              globals.socialServiceBloc!
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+              Snackbars.success(context, message: 'Your reach has been posted');
+            }
+            if (state is GetPostFeedError) {
+              Snackbars.error(context, message: state.error);
+            }
 
-              if (state is GetPostFeedSuccess) {
-                _posts.value = state.posts!;
-                Console.log('posts', _posts.value);
-              }
+            if (state is GetPostFeedSuccess) {
+              _firstLoad = false;
+              _posts.value = state.posts!;
+              Console.log('posts', _posts.value);
+              _refreshController.refreshCompleted();
+            }
 
-              if (state is LikePostError ||
-                  state is LikePostSuccess ||
-                  state is UnlikePostError ||
-                  state is UnlikePostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-              }
+            if (state is LikePostError ||
+                state is LikePostSuccess ||
+                state is UnlikePostError ||
+                state is UnlikePostSuccess) {
+              globals.socialServiceBloc!
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+            }
 
-              if (state is LikePostSuccess) {
-                isLiked.value = state.isLiked!;
-              }
-              if (state is UnlikePostSuccess) {
-                isLiked.value = state.isUnliked!;
-              }
+            if (state is LikePostSuccess) {
+              isLiked.value = state.isLiked!;
+            }
+            if (state is UnlikePostSuccess) {
+              isLiked.value = state.isUnliked!;
+            }
 
-              if (state is DeletePostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                Snackbars.success(context,
-                    message: 'Your reach has been deleted!');
-              }
-              if (state is DeletePostError) {
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is EditContentSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                Snackbars.success(context,
-                    message: 'Your reach has been edited!');
-              }
-              if (state is EditContentError) {
-                Snackbars.error(context, message: state.error);
-              }
-            },
-            builder: (context, state) {
-              bool _isLoading = state is CreatePostLoading;
-              _isLoading = state is GetPostFeedLoading;
-              _isLoading = state is DeletePostLoading;
-              _isLoading = state is EditContentLoading;
+            if (state is DeletePostSuccess) {
+              globals.socialServiceBloc!
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+              Snackbars.success(context,
+                  message: 'Your reach has been deleted!');
+            }
+            if (state is DeletePostError) {
+              Snackbars.error(context, message: state.error);
+            }
+            if (state is EditContentSuccess) {
+              globals.socialServiceBloc!
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+              Snackbars.success(context,
+                  message: 'Your reach has been edited!');
+            }
+            if (state is EditContentError) {
+              Snackbars.error(context, message: state.error);
+            }
+          },
+          builder: (context, state) {
+            bool _isLoading = state is CreatePostLoading;
+            _isLoading = state is GetPostFeedLoading;
+            _isLoading = state is DeletePostLoading;
+            _isLoading = state is EditContentLoading;
 
-              return CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverFillRemaining(
-                    child: _posts.value.isEmpty
-                        ? EmptyTimelineWidget(loading: _isLoading)
-                        : SizedBox(
-                            height: getScreenHeight(100),
-                            child: Refresher(
-                              onRefresh: onRefresh,
-                              controller: _refreshController,
-                              child: ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: [
-                                  const SizedBox(
-                                      height: kToolbarHeight + 20), //30
-                                  _isLoading
-                                      ? const LinearLoader()
-                                      : const SizedBox.shrink(),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    physics: const BouncingScrollPhysics(),
-                                    child: SizedBox(
-                                      child: Row(
-                                        children: [
-                                          UserStory(
-                                              size: size,
-                                              isMe: true,
-                                              isLive: false,
-                                              hasWatched: false,
-                                              username: 'Add Moment'),
-                                        ],
-                                      ),
-                                    ).paddingOnly(l: 11),
-                                  ),
-                                  SizedBox(height: getScreenHeight(12)),
-                                  const Divider(
-                                    thickness: 0.5,
-                                    color: AppColors.greyShade4,
-                                  ),
-                                  Column(
-                                    children: List.generate(
-                                      _posts.value.length,
-                                      (index) => _ReacherCard(
-                                        postFeedModel: _posts.value[index],
-                                        likeColour: _posts.value[index].isLiked!
-                                            ? AppColors.primaryColor
-                                            : null,
-                                        onLike: () {
-                                          selectedIndex.value = index;
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            Console.log('like post',
-                                                _posts.value[index].isLiked);
-                                            _posts.value[index].isLiked!
-                                                ? globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                    postId: _posts
-                                                        .value[index].postId,
-                                                  ))
-                                                : globals.socialServiceBloc!
-                                                    .add(LikePostEvent(
-                                                    postId: _posts
-                                                        .value[index].postId,
-                                                  ));
-                                          }
-                                        },
-                                      ),
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  child: _firstLoad && state is GetPostFeedLoading ||
+                          state is UserLoading
+                      ? const SkeletonLoadingWidget()
+                      : SizedBox(
+                          // height: getScreenHeight(100),
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            children: [
+                              const SizedBox(height: kToolbarHeight + 30), //30
+                              _isLoading
+                                  ? const LinearLoader()
+                                  : const SizedBox.shrink(),
+                              SizedBox(
+                                height: getScreenHeight(105),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  child: SizedBox(
+                                    child: Row(
+                                      children: [
+                                        UserStory(
+                                            size: size,
+                                            isMe: true,
+                                            isLive: false,
+                                            hasWatched: false,
+                                            username: 'Add Moment'),
+                                      ],
                                     ),
-                                  )
-                                ],
+                                  ).paddingOnly(l: 11),
+                                ),
                               ),
-                            ),
+                              SizedBox(height: getScreenHeight(5)),
+                              const Divider(
+                                thickness: 0.5,
+                                color: AppColors.greyShade4,
+                              ),
+                              SizedBox(
+                                height: size.height,
+                                child: Refresher(
+                                  onRefresh: onRefresh,
+                                  controller: _refreshController,
+                                  child: _posts.value.isEmpty
+                                      ? EmptyTimelineWidget(loading: _isLoading)
+                                      : Column(
+                                          children: List.generate(
+                                            _posts.value.length,
+                                            (index) => _ReacherCard(
+                                              postFeedModel:
+                                                  _posts.value[index],
+                                              likeColour:
+                                                  _posts.value[index].isLiked!
+                                                      ? AppColors.primaryColor
+                                                      : null,
+                                              onLike: () {
+                                                selectedIndex.value = index;
+                                                handleTap(index);
+                                                if (active.contains(index)) {
+                                                  Console.log(
+                                                      'like post',
+                                                      _posts.value[index]
+                                                          .isLiked);
+                                                  _posts.value[index].isLiked!
+                                                      ? globals
+                                                          .socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                          postId: _posts
+                                                              .value[index]
+                                                              .postId,
+                                                        ))
+                                                      : globals
+                                                          .socialServiceBloc!
+                                                          .add(LikePostEvent(
+                                                          postId: _posts
+                                                              .value[index]
+                                                              .postId,
+                                                        ));
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ],
                           ),
-                  )
-                ],
-              ).paddingOnly(t: 10);
-            }),
+                        ),
+                )
+              ],
+            ).paddingOnly(t: 10);
+          },
+        ),
       ),
     );
   }
@@ -290,14 +310,6 @@ class _ReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final isLiked = useState(false);
-    // useEffect(() {
-    //   globals.socialServiceBloc!
-    //       .add(CheckPostLikeEvent(postId: postFeedModel!.postId));
-    //   globals.socialServiceBloc!
-    //       .add(CheckPostVoteEvent(postId: postFeedModel!.postId));
-    //   return null;
-    // }, []);
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -312,20 +324,7 @@ class _ReacherCard extends HookWidget {
         ),
         child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
             bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              // if (state is CheckPostLikeError) {
-              //   Snackbars.error(context, message: state.error);
-              // }
-              // if (state is CheckPostLikeSuccess) {
-              //   isLiked.value = state.checkPostLike!;
-              // }
-              // if (state is CheckPostVoteError) {
-              //   Snackbars.error(context, message: state.error);
-              // }
-              // if (state is CheckPostVoteSuccess) {
-              //   // postFeedModel!.isVoted = state.isVoted;
-              // }
-            },
+            listener: (context, state) {},
             builder: (context, state) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -546,16 +545,6 @@ class _ReacherCard extends HookWidget {
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  // FittedBox(
-                                  //   child: Text(
-                                  //     '${postFeedModel!.post!.nUpvotes}',
-                                  //     style: TextStyle(
-                                  //       fontSize: getScreenHeight(12),
-                                  //       fontWeight: FontWeight.w500,
-                                  //       color: AppColors.textColor3,
-                                  //     ),
-                                  //   ),
-                                  // ),
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
@@ -570,16 +559,6 @@ class _ReacherCard extends HookWidget {
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  // FittedBox(
-                                  //   child: Text(
-                                  //     '${postFeedModel!.post!.nDownvotes}',
-                                  //     style: TextStyle(
-                                  //       fontSize: getScreenHeight(12),
-                                  //       fontWeight: FontWeight.w500,
-                                  //       color: AppColors.textColor3,
-                                  //     ),
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),

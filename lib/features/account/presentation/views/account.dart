@@ -3,17 +3,21 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
@@ -43,15 +47,17 @@ class _AccountScreenState extends State<AccountScreen>
 
   TabController? _tabController;
 
+  late final _reachoutsRefreshController = RefreshController();
+  late final _commentsRefreshController = RefreshController();
+  late final _shoutoutsRefreshController = RefreshController();
+  late final _shoutdownsRefreshController = RefreshController();
+  late final _likesRefreshController = RefreshController();
+  late final _sharesRefreshController = RefreshController();
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
-    globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
-    globals.socialServiceBloc!
-        .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
-    globals.socialServiceBloc!
-        .add(GetPersonalCommentsEvent(pageLimit: 50, pageNumber: 1));
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   TabBar get _tabBar => TabBar(
@@ -61,6 +67,8 @@ class _AccountScreenState extends State<AccountScreen>
         unselectedLabelColor: AppColors.greyShade4,
         indicatorColor: Colors.transparent,
         labelColor: AppColors.primaryColor,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+        overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
         labelStyle: TextStyle(
           fontSize: getScreenHeight(15),
           fontFamily: 'Poppins',
@@ -73,32 +81,37 @@ class _AccountScreenState extends State<AccountScreen>
         ),
         tabs: [
           Tab(
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _tabController?.animateTo(0);
-              }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 0
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    'Comment',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
+            iconMargin: EdgeInsets.zero,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tabController?.animateTo(0);
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
                       color: _tabController!.index == 0
-                          ? AppColors.white
-                          : AppColors.textColor2,
+                          ? AppColors.textColor2
+                          : Colors.transparent,
+                    ),
+                    child: FittedBox(
+                      child: Text(
+                        'Comment',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(15),
+                          fontWeight: FontWeight.w400,
+                          color: _tabController!.index == 0
+                              ? AppColors.white
+                              : AppColors.textColor2,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
           Tab(
@@ -146,98 +159,11 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Shoutouts',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 2
-                          ? AppColors.white
-                          : AppColors.textColor2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Tab(
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _tabController?.animateTo(3);
-              }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 3
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    'Shoutdowns',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 3
-                          ? AppColors.white
-                          : AppColors.textColor2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Tab(
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _tabController?.animateTo(4);
-              }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 4
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
                     'Likes',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 4
-                          ? AppColors.white
-                          : AppColors.textColor2,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Tab(
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _tabController?.animateTo(5);
-              }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 5
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    'Shares',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 5
+                      color: _tabController!.index == 2
                           ? AppColors.white
                           : AppColors.textColor2,
                     ),
@@ -259,6 +185,15 @@ class _AccountScreenState extends State<AccountScreen>
     super.build(context);
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
+
+    useEffect(() {
+      globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
+      globals.socialServiceBloc!
+          .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
+      globals.socialServiceBloc!
+          .add(GetPersonalCommentsEvent(pageLimit: 50, pageNumber: 1));
+      return null;
+    }, []);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: PreferredSize(
@@ -397,85 +332,109 @@ class _AccountScreenState extends State<AccountScreen>
                                     children: [
                                       Row(
                                         children: [
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                globals.user!.nReachers
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(15),
-                                                    color: AppColors.textColor2,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              Text(
-                                                'Reachers',
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(13),
-                                                    color: AppColors.greyShade2,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                            ],
+                                          InkWell(
+                                            onTap: () => RouteNavigators.route(
+                                                context,
+                                                const AccountStatsInfo(
+                                                    index: 0)),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  globals.user!.nReachers
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(15),
+                                                      color:
+                                                          AppColors.textColor2,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                Text(
+                                                  'Reachers',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(13),
+                                                      color:
+                                                          AppColors.greyShade2,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                           SizedBox(width: getScreenWidth(20)),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                globals.user!.nReaching
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(15),
-                                                    color: AppColors.textColor2,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              Text(
-                                                'Reaching',
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(13),
-                                                    color: AppColors.greyShade2,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                            ],
+                                          InkWell(
+                                            onTap: () => RouteNavigators.route(
+                                                context,
+                                                const AccountStatsInfo(
+                                                    index: 1)),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  globals.user!.nReaching
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(15),
+                                                      color:
+                                                          AppColors.textColor2,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                Text(
+                                                  'Reaching',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(13),
+                                                      color:
+                                                          AppColors.greyShade2,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                           SizedBox(width: getScreenWidth(20)),
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                globals.user!.nStaring
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(15),
-                                                    color: AppColors.textColor2,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              Text(
-                                                'Starring',
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(13),
-                                                    color: AppColors.greyShade2,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
-                                            ],
+                                          InkWell(
+                                            onTap: () => RouteNavigators.route(
+                                                context,
+                                                const AccountStatsInfo(
+                                                    index: 2)),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  globals.user!.nStaring
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(15),
+                                                      color:
+                                                          AppColors.textColor2,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                Text(
+                                                  'Starring',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(13),
+                                                      color:
+                                                          AppColors.greyShade2,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
                                           )
                                         ],
                                       ),
@@ -561,8 +520,9 @@ class _AccountScreenState extends State<AccountScreen>
                                         itemCount: _comments.value.length,
                                         itemBuilder: (context, index) {
                                           return _CommentReachCard(
-                                              commentModel:
-                                                  _comments.value[index]);
+                                            commentModel:
+                                                _comments.value[index],
+                                          );
                                         },
                                       ),
 
@@ -582,41 +542,26 @@ class _AccountScreenState extends State<AccountScreen>
                                           )
                                         ],
                                       )
-                                    : ListView.builder(
-                                        itemCount: _posts.value.length,
-                                        itemBuilder: (context, index) {
-                                          return _ReacherCard(
-                                              postModel: _posts.value[index]);
+                                    : Refresher(
+                                        controller: _reachoutsRefreshController,
+                                        onRefresh: () {
+                                          globals.socialServiceBloc!.add(
+                                              GetAllPostsEvent(
+                                                  pageLimit: 50,
+                                                  pageNumber: 1));
                                         },
+                                        child: ListView.builder(
+                                          itemCount: _posts.value.length,
+                                          itemBuilder: (context, index) {
+                                            return _ReacherCard(
+                                              postModel: _posts.value[index],
+                                              // onLike: () {
+                                              //   _likePost(index);
+                                              // },
+                                            );
+                                          },
+                                        ),
                                       ),
-
-                              //SHOUTOUT TAB
-                              ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title:
-                                        "Posts you’ve shouted out and your posts that has been shouted out",
-                                    subtitle:
-                                        "See posts you’ve shouted out and your post that has been shouted out",
-                                  )
-                                ],
-                              ),
-
-                              //SHOUTDOWN TAB
-                              ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title:
-                                        "Posts you’ve shouted down and your posts that has been shouted down",
-                                    subtitle:
-                                        "See posts you’ve shouted down and your post that has been shouted down",
-                                  )
-                                ],
-                              ),
 
                               //LIKES TAB
                               ListView(
@@ -624,24 +569,51 @@ class _AccountScreenState extends State<AccountScreen>
                                 shrinkWrap: true,
                                 children: const [
                                   EmptyTabWidget(
-                                    title: "Likes made",
+                                    title: "Likes you made",
                                     subtitle:
                                         "Find post you liked and your post that was liked",
                                   )
                                 ],
                               ),
+                              // //SHOUTOUT TAB
+                              // ListView(
+                              //   padding: EdgeInsets.zero,
+                              //   shrinkWrap: true,
+                              //   children: const [
+                              //     EmptyTabWidget(
+                              //       title:
+                              //           "Posts you’ve shouted out and your posts that has been shouted out",
+                              //       subtitle:
+                              //           "See posts you’ve shouted out and your post that has been shouted out",
+                              //     )
+                              //   ],
+                              // ),
 
-                              //SHARES TAB
-                              ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title: "Post you shared",
-                                    subtitle: "Find post you’ve shared here",
-                                  )
-                                ],
-                              ),
+                              // //SHOUTDOWN TAB
+                              // ListView(
+                              //   padding: EdgeInsets.zero,
+                              //   shrinkWrap: true,
+                              //   children: const [
+                              //     EmptyTabWidget(
+                              //       title:
+                              //           "Posts you’ve shouted down and your posts that has been shouted down",
+                              //       subtitle:
+                              //           "See posts you’ve shouted down and your post that has been shouted down",
+                              //     )
+                              //   ],
+                              // ),
+
+                              // //SHARES TAB
+                              // ListView(
+                              //   padding: EdgeInsets.zero,
+                              //   shrinkWrap: true,
+                              //   children: const [
+                              //     EmptyTabWidget(
+                              //       title: "Post you shared",
+                              //       subtitle: "Find post you’ve shared here",
+                              //     )
+                              //   ],
+                              // ),
                             ],
                           ),
                         ),
@@ -911,22 +883,12 @@ class _ReacherCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      'assets/svgs/shoutout-a.svg',
+                                      'assets/svgs/upvote-active.svg',
                                     ),
                                   ),
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  // FittedBox(
-                                  //   child: Text(
-                                  //     '${postFeedModel!.post!.nUpvotes}',
-                                  //     style: TextStyle(
-                                  //       fontSize: getScreenHeight(12),
-                                  //       fontWeight: FontWeight.w500,
-                                  //       color: AppColors.textColor3,
-                                  //     ),
-                                  //   ),
-                                  // ),
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
@@ -935,22 +897,12 @@ class _ReacherCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      'assets/svgs/shoutdown.svg',
+                                      'assets/svgs/downvote.svg',
                                     ),
                                   ),
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  // FittedBox(
-                                  //   child: Text(
-                                  //     '${postFeedModel!.post!.nDownvotes}',
-                                  //     style: TextStyle(
-                                  //       fontSize: getScreenHeight(12),
-                                  //       fontWeight: FontWeight.w500,
-                                  //       color: AppColors.textColor3,
-                                  //     ),
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),
@@ -1123,7 +1075,7 @@ class _CommentReachCard extends HookWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                onPressed: onLike,
+                                onPressed: () {},
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
@@ -1987,7 +1939,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             shrinkWrap: true,
                             children: const [
                               EmptyTabWidget(
-                                title: "Likes made",
+                                title: "Likes you made",
                                 subtitle:
                                     "Find post you liked and your post that was liked",
                               )

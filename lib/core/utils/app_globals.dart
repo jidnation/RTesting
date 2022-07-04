@@ -24,6 +24,7 @@ class AppGlobals {
   SocialServiceBloc? socialServiceBloc;
   String? token;
   String? email;
+  String? fname;
 
   User? user;
   List<Chat>? userChat;
@@ -44,6 +45,7 @@ class AppGlobals {
     socialServiceBloc = SocialServiceBloc();
     token = '';
     email = '';
+    fname = '';
     userList = [];
   }
 

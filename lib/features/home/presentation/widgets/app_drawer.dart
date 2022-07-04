@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/services/database/secure_storage.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/features/account/presentation/views/saved_post.dart';
+import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -40,7 +44,7 @@ class AppDrawer extends HookWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            ('${globals.loginResponse!.firstName} ${globals.loginResponse!.lastName}')
+                            ('${globals.user!.firstName} ${globals.user!.lastName}')
                                 .toTitleCase(),
                             style: TextStyle(
                               color: AppColors.textColor2,
@@ -160,20 +164,21 @@ class AppDrawer extends HookWidget {
                       icon: 'assets/svgs/reaches-d.svg',
                       onPressed: () {},
                     ),
-                    DrawerItem(
-                      action: 'Shoutouts',
-                      icon: 'assets/svgs/shoutout-d.svg',
-                      onPressed: () {},
-                    ),
-                    DrawerItem(
-                      action: 'Shoutdown',
-                      icon: 'assets/svgs/shoutdown-d.svg',
-                      onPressed: () {},
-                    ),
+                    // DrawerItem(
+                    //   action: 'Shoutouts',
+                    //   icon: 'assets/svgs/shoutout-d.svg',
+                    //   onPressed: () {},
+                    // ),
+                    // DrawerItem(
+                    //   action: 'Shoutdown',
+                    //   icon: 'assets/svgs/shoutdown-d.svg',
+                    //   onPressed: () {},
+                    // ),
                     DrawerItem(
                       action: 'Saved posts',
                       icon: 'assets/svgs/saved-d.svg',
-                      onPressed: () {},
+                      onPressed: () => RouteNavigators.route(
+                          context, const SavedPostScreen()),
                     ),
                     DrawerItem(
                       action: 'Abbreviation',
@@ -193,7 +198,10 @@ class AppDrawer extends HookWidget {
           DrawerItem(
             action: 'Logout',
             icon: 'assets/svgs/logout.svg',
-            onPressed: () {},
+            onPressed: () {
+              SecureStorage.deleteSecureData();
+              RouteNavigators.routeNoWayHome(context, const LoginScreen());
+            },
           ),
         ],
       ).paddingOnly(r: 6, l: 6, b: 10),

@@ -141,6 +141,12 @@ class CustomRoundTextField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
             borderSide: focusedBorderSide,
             borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
       ),
     );
   }

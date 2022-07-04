@@ -211,27 +211,45 @@ class UserRepository {
     }
   }
 
-  Future<Either<String, List<VirtualReach>>> getReachers() async {
+  Future<Either<String, List<VirtualReach>>> getReachers({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     try {
-      final getReachers = await _homeRemoteDataSource.getReachers();
+      final getReachers = await _homeRemoteDataSource.getReachers(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
       return Right(getReachers);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
   }
 
-  Future<Either<String, List<VirtualReach>>> getReachings() async {
+  Future<Either<String, List<VirtualReach>>> getReachings({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     try {
-      final getReachings = await _homeRemoteDataSource.getReachings();
+      final getReachings = await _homeRemoteDataSource.getReachings(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
       return Right(getReachings);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
   }
 
-  Future<Either<String, List<VirtualStar>>> getStarred() async {
+  Future<Either<String, List<VirtualStar>>> getStarred({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     try {
-      final getStarred = await _homeRemoteDataSource.getStarred();
+      final getStarred = await _homeRemoteDataSource.getStarred(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
       return Right(getStarred);
     } on GraphQLError catch (e) {
       return Left(e.message);

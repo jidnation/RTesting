@@ -8,7 +8,6 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
@@ -39,13 +38,17 @@ class SignUpScreen extends HookWidget {
                 OtpScreen(email: _emailController.text.replaceAll(' ', '')));
           } else if (state is AuthError) {
             Console.log('AuthError', state.error);
-            Snackbars.error(context, message: state.error);
+            if (state.error!.contains('activate')) {
+              RouteNavigators.route(context,
+                  OtpScreen(email: _emailController.text.replaceAll(' ', '')));
+              return;
+            } else {
+              Snackbars.error(context, message: state.error);
+            }
           }
         },
         builder: (context, state) {
-          if (state is AuthLoading) {
-            return const RLoader('');
-          }
+          bool _isLoading = state is AuthLoading;
           return Container(
             width: size.width,
             height: size.height,
@@ -186,23 +189,27 @@ class SignUpScreen extends HookWidget {
                           CustomButton(
                             label: 'Done',
                             color: AppColors.textColor2,
-                            onPressed: () {
-                              if (_key.currentState!.validate()) {
-                                final firstName =
-                                    _firstNameController.text.trim();
-                                final lastName =
-                                    _lastNameController.text.trim();
-                                globals.authBloc!.add(RegisterUserEvent(
-                                  email:
-                                      _emailController.text.replaceAll(' ', ''),
-                                  password: _passwordController.text,
-                                  firstName: firstName,
-                                  lastName: lastName,
-                                ));
-                              } else {
-                                return;
-                              }
-                            },
+                            loaderColor: AppColors.white,
+                            isLoading: _isLoading,
+                            onPressed: !_isLoading
+                                ? () {
+                                    if (_key.currentState!.validate()) {
+                                      final firstName =
+                                          _firstNameController.text.trim();
+                                      final lastName =
+                                          _lastNameController.text.trim();
+                                      globals.authBloc!.add(RegisterUserEvent(
+                                        email: _emailController.text
+                                            .replaceAll(' ', ''),
+                                        password: _passwordController.text,
+                                        firstName: firstName,
+                                        lastName: lastName,
+                                      ));
+                                    } else {
+                                      return;
+                                    }
+                                  }
+                                : () {},
                             size: size,
                             textColor: AppColors.white,
                             borderSide: BorderSide.none,

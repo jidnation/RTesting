@@ -109,9 +109,9 @@ class _PostReachState extends State<PostReach> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  (globals.loginResponse!.firstName! +
+                                  (globals.user!.firstName! +
                                           ' ' +
-                                          globals.loginResponse!.lastName!)
+                                          globals.user!.lastName!)
                                       .toTitleCase(),
                                   style: const TextStyle(
                                     fontSize: 15,
@@ -662,9 +662,9 @@ class EditReach extends HookWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  (globals.loginResponse!.firstName! +
+                                  (globals.user!.firstName! +
                                           ' ' +
-                                          globals.loginResponse!.lastName!)
+                                          globals.user!.lastName!)
                                       .toTitleCase(),
                                   style: const TextStyle(
                                     fontSize: 15,

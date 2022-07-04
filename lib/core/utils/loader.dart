@@ -60,7 +60,7 @@ class _RLoaderState extends State<RLoader> with TickerProviderStateMixin {
                       decoration: const ShapeDecoration(
                         shape: CircleBorder(),
                       ),
-                      child: SvgPicture.asset('assets/svgs/logo-white.svg')
+                      child: SvgPicture.asset('assets/svgs/logo-blue.svg')
                       // )
                       ),
                 ),

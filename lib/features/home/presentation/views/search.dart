@@ -197,7 +197,7 @@ class SearchResultCard extends StatelessWidget {
         listener: (context, state) {
           if (state is RecipientUserData) {
             globals.recipientUser = state.user;
-            //  email == globals.loginResponse!.email
+            //  email == globals.user!.email
             //       ? RouteNavigators.route(context, const AccountScreen())
             //       : RouteNavigators.route(
             //           context, RecipientAccountProfile(email: email));
@@ -215,7 +215,7 @@ class SearchResultCard extends StatelessWidget {
           return InkWell(
             onTap: () {
               globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-              email == globals.loginResponse!.email
+              email == globals.user!.email
                   ? RouteNavigators.route(context, const AccountScreen())
                   : RouteNavigators.route(
                       context,

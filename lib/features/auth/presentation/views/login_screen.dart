@@ -8,7 +8,6 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/forgot_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
@@ -19,14 +18,13 @@ import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 
 class LoginScreen extends HookWidget {
   static const String id = 'login_screen';
-  LoginScreen({Key? key}) : super(key: key);
-
-  final GlobalKey<FormState> _key = GlobalKey();
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
+    final _key = useState<GlobalKey<FormState>>(GlobalKey());
     var size = MediaQuery.of(context).size;
     final _obscureText = useState(true);
     return Scaffold(
@@ -41,9 +39,7 @@ class LoginScreen extends HookWidget {
               }
             },
             builder: (context, state) {
-              if (state is AuthLoading) {
-                return const RLoader('');
-              }
+              bool _isLoading = state is AuthLoading;
               return SizedBox(
                 width: size.width,
                 height: size.height,
@@ -54,7 +50,7 @@ class LoginScreen extends HookWidget {
                       padding: const EdgeInsets.only(
                           left: 25.0, right: 25.0, top: 50.0, bottom: 30.0),
                       child: Form(
-                        key: _key,
+                        key: _key.value,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -141,17 +137,21 @@ class LoginScreen extends HookWidget {
                             CustomButton(
                               label: 'Done',
                               color: AppColors.textColor2,
-                              onPressed: () {
-                                if (_key.currentState!.validate()) {
-                                  globals.authBloc!.add(LoginUserEvent(
-                                    email: _emailController.text
-                                        .replaceAll(' ', ''),
-                                    password: _passwordController.text,
-                                  ));
-                                } else {
-                                  return;
-                                }
-                              },
+                              isLoading: _isLoading,
+                              loaderColor: AppColors.white,
+                              onPressed: !_isLoading
+                                  ? () {
+                                      if (_key.value.currentState!.validate()) {
+                                        globals.authBloc!.add(LoginUserEvent(
+                                          email: _emailController.text
+                                              .replaceAll(' ', ''),
+                                          password: _passwordController.text,
+                                        ));
+                                      } else {
+                                        return;
+                                      }
+                                    }
+                                  : () {},
                               size: size,
                               textColor: AppColors.white,
                               borderSide: BorderSide.none,
@@ -183,8 +183,7 @@ class LoginScreen extends HookWidget {
                                 label: 'Continue with Google',
                                 prefix: 'assets/svgs/google.svg',
                                 color: AppColors.white,
-                                onPressed: () => RouteNavigators.route(
-                                    context, const HomeScreen()),
+                                onPressed: () {},
                                 size: size,
                                 textColor: AppColors.textColor2,
                                 borderSide: const BorderSide(

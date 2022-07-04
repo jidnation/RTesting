@@ -340,26 +340,38 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<VirtualReach>> getReachers() async {
+  Future<List<VirtualReach>> getReachers({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     String q = r'''
-          query getReachers() {
-            getReachers() {
+          query getReachers(
+            $page_limit: Int!
+            $page_number: Int!
+          ) {
+            getReachers(
+              page_limit: $page_limit
+              page_number: $page_number
+            ) {
               reacher {
                 ''' +
-        UserSchema.schema +
+        ReacherProfileSchema.schema +
         '''
               }
               reacherId
               reaching {
                 ''' +
-        UserSchema.schema +
+        ReacherProfileSchema.schema +
         '''
               }
               reachingId
             }
           }''';
     try {
-      final result = await _client.query(gql(q), variables: {});
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -372,26 +384,38 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<VirtualReach>> getReachings() async {
+  Future<List<VirtualReach>> getReachings({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     String q = r'''
-          query getReachings() {
-            getReachings() {
+        query getReachings(
+            $page_limit: Int!
+            $page_number: Int!
+          ) {
+            getReachings(
+              page_limit: $page_limit
+              page_number: $page_number
+            ) {   
               reacher {
                 ''' +
-        UserSchema.schema +
+        ReacherProfileSchema.schema +
         '''
               }
               reacherId
               reaching {
                 ''' +
-        UserSchema.schema +
+        ReacherProfileSchema.schema +
         '''
               }
               reachingId
             }
           }''';
     try {
-      final result = await _client.query(gql(q), variables: {});
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -404,26 +428,38 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<VirtualStar>> getStarred() async {
+  Future<List<VirtualStar>> getStarred({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
     String q = r'''
-          query getStarred() {
-            getStarred() {
-              reacher {
+         query getStarred(
+            $page_limit: Int!
+            $page_number: Int!
+          ) {
+            getStarred(
+              page_limit: $page_limit
+              page_number: $page_number
+            ) {   
+              starred {
                 ''' +
-        UserSchema.schema +
+        StarProfileSchema.schema +
         '''
               }
-              reacherId
-              reaching {
+              starredId
+              user {
                 ''' +
-        UserSchema.schema +
+        StarProfileSchema.schema +
         '''
               }
-              reachingId
+              authId
             }
           }''';
     try {
-      final result = await _client.query(gql(q), variables: {});
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }

@@ -31,14 +31,14 @@ class VirtualReach {
 }
 
 class VirtualStar {
+  String? authId;
   String? starredId;
-  String? userId;
   User? user;
   User? starred;
 
   VirtualStar({
     this.user,
-    this.userId,
+    this.authId,
     this.starred,
     this.starredId,
   });
@@ -48,14 +48,14 @@ class VirtualStar {
         starred:
             json["starred"] != null ? User.fromJson(json["starred"]) : null,
         starredId: json["starredId"],
-        userId: json["userId"],
+        authId: json["authId"],
       );
 
   Map<String, dynamic> toJson() => {
         "user": user == null ? null : user!.toJson(),
         "starred": starred == null ? null : starred!.toJson(),
         "starredId": starredId,
-        "userId": userId,
+        "authId": authId,
       };
 }
 

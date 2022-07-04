@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,6 +16,7 @@ class CustomButton extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double labelFontSize;
   final bool? isLoading;
+  final Color? loaderColor;
   const CustomButton({
     Key? key,
     required this.label,
@@ -21,9 +24,10 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     this.size,
     this.isLoading = false,
+    this.loaderColor = AppColors.black,
     required this.textColor,
     required this.borderSide,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
     this.prefix = '',
     this.labelFontSize = 15,
   }) : super(key: key);
@@ -44,14 +48,22 @@ class CustomButton extends StatelessWidget {
             ),
             shadowColor: const Color(0xFF323247)),
         child: isLoading!
-            ? const CupertinoActivityIndicator(
-                color: AppColors.black, radius: 5)
+            ? Platform.isAndroid
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: loaderColor,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : CupertinoActivityIndicator(color: loaderColor, radius: 5)
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   prefix == ''
                       ? const SizedBox.shrink()
-                      : SvgPicture.asset(prefix),
+                      : SizedBox(height: 18, child: SvgPicture.asset(prefix)),
                   prefix == ''
                       ? const SizedBox.shrink()
                       : const SizedBox(width: 15),

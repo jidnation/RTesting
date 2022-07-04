@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/onboarding/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -32,12 +34,17 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
       if (status == AnimationStatus.completed) {
         final token = await SecureStorage.readSecureData('token');
         final email = await SecureStorage.readSecureData('email');
+        final fname = await SecureStorage.readSecureData('fname');
         globals.email = email;
-        // if (token != null && email != null) {
-        //   RouteNavigators.routeNoWayHome(context, const HomeScreen());
-        //   return;
-        // }
-        RouteNavigators.routeReplace(context, OnboardingScreen());
+        if (token != null && email != null) {
+          globals.token = token;
+          globals.fname = fname;
+          Console.log('mytoken', globals.token);
+          RouteNavigators.routeNoWayHome(context, const HomeScreen());
+          return;
+        } else {
+          RouteNavigators.routeReplace(context, OnboardingScreen());
+        }
       }
     });
   }
