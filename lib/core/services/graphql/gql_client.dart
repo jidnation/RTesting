@@ -44,14 +44,15 @@ class GraphQLApiClient {
         if (result.exception != null) {
           dynamic myException =
               result.exception!.graphqlErrors.first.extensions!['exception'];
-          bool isUnauthorized =
-              myException['status'] != null && myException['status'] == 401
-                  ? true
-                  : false;
+
+          bool isUnauthorized = myException['message']
+                  .toString()
+                  .contains('This endpoint requires authorization!')
+              ? true
+              : false;
 
           if (isUnauthorized) {
             //if user token has expired, redirect them to login & remove all stacked routes
-            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
             return const GraphQLError(
                 message: "Your session has expired, please login again");
           }
@@ -80,14 +81,14 @@ class GraphQLApiClient {
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];
-        bool isUnauthorized =
-            myException['status'] != null && myException['status'] == 401
-                ? true
-                : false;
+        bool isUnauthorized = myException['message']
+                .toString()
+                .contains('This endpoint requires authorization!')
+            ? true
+            : false;
 
         if (isUnauthorized) {
           //if user token has expired, redirect them to login & remove all stacked routes
-          //RouteNavigators.navigatePopUntil(LoginScreen.id);
           return const GraphQLError(
               message: "Your session has expired, please login again");
         }
@@ -149,14 +150,14 @@ class GraphQLChatClient {
         if (result.exception != null) {
           dynamic myException =
               result.exception!.graphqlErrors.first.extensions!['exception'];
-          bool isUnauthorized =
-              myException['status'] != null && myException['status'] == 401
-                  ? true
-                  : false;
+          bool isUnauthorized = myException['message']
+                  .toString()
+                  .contains('This endpoint requires authorization!')
+              ? true
+              : false;
 
           if (isUnauthorized) {
             //if user token has expired, redirect them to login & remove all stacked routes
-            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
             return const GraphQLError(
                 message: "Your session has expired, please login again");
           }
@@ -184,14 +185,14 @@ class GraphQLChatClient {
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];
-        bool isUnauthorized =
-            myException['status'] != null && myException['status'] == 401
-                ? true
-                : false;
+        bool isUnauthorized = myException['message']
+                .toString()
+                .contains('This endpoint requires authorization!')
+            ? true
+            : false;
 
         if (isUnauthorized) {
           //if user token has expired, redirect them to login & remove all stacked routes
-          //RouteNavigators.navigatePopUntil(LoginScreen.id);
           return const GraphQLError(
               message: "Your session has expired, please login again");
         }

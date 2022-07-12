@@ -13,6 +13,7 @@ import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -49,10 +50,10 @@ class _AccountScreenState extends State<AccountScreen>
 
   late final _reachoutsRefreshController = RefreshController();
   late final _commentsRefreshController = RefreshController();
-  late final _shoutoutsRefreshController = RefreshController();
-  late final _shoutdownsRefreshController = RefreshController();
-  late final _likesRefreshController = RefreshController();
-  late final _sharesRefreshController = RefreshController();
+  // late final _shoutoutsRefreshController = RefreshController();
+  // late final _shoutdownsRefreshController = RefreshController();
+  // late final _likesRefreshController = RefreshController();
+  // late final _sharesRefreshController = RefreshController();
 
   @override
   void initState() {
@@ -81,50 +82,16 @@ class _AccountScreenState extends State<AccountScreen>
         ),
         tabs: [
           Tab(
-            iconMargin: EdgeInsets.zero,
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => setState(() {
-                    _tabController?.animateTo(0);
-                  }),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: _tabController!.index == 0
-                          ? AppColors.textColor2
-                          : Colors.transparent,
-                    ),
-                    child: FittedBox(
-                      child: Text(
-                        'Comment',
-                        style: TextStyle(
-                          fontSize: getScreenHeight(15),
-                          fontWeight: FontWeight.w400,
-                          color: _tabController!.index == 0
-                              ? AppColors.white
-                              : AppColors.textColor2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Tab(
             child: GestureDetector(
               onTap: () => setState(() {
-                _tabController?.animateTo(1);
+                _tabController?.animateTo(0);
               }),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 1
+                  color: _tabController!.index == 0
                       ? AppColors.textColor2
                       : Colors.transparent,
                 ),
@@ -134,13 +101,47 @@ class _AccountScreenState extends State<AccountScreen>
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 1
+                      color: _tabController!.index == 0
                           ? AppColors.white
                           : AppColors.textColor2,
                     ),
                   ),
                 ),
               ),
+            ),
+          ),
+          Tab(
+            iconMargin: EdgeInsets.zero,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tabController?.animateTo(1);
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: _tabController!.index == 1
+                          ? AppColors.textColor2
+                          : Colors.transparent,
+                    ),
+                    child: FittedBox(
+                      child: Text(
+                        'Comment',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(15),
+                          fontWeight: FontWeight.w400,
+                          color: _tabController!.index == 1
+                              ? AppColors.white
+                              : AppColors.textColor2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Tab(
@@ -274,354 +275,307 @@ class _AccountScreenState extends State<AccountScreen>
         ),
       ),
       body: BlocConsumer<UserBloc, UserState>(
-          bloc: globals.userBloc,
-          listener: (context, state) {
-            if (state is UserData) {
-              globals.user = state.user;
-            }
-          },
-          builder: (context, state) {
-            return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-                bloc: globals.socialServiceBloc,
-                listener: (context, state) {
-                  if (state is GetAllPostsSuccess) {
-                    _posts.value = state.posts!;
-                  }
-                  if (state is GetAllPostsError) {
-                    Snackbars.error(context, message: state.error);
-                  }
-                  if (state is GetPersonalCommentsSuccess) {
-                    _comments.value = state.data!;
-                  }
-                  if (state is GetPersonalCommentsError) {
-                    Snackbars.error(context, message: state.error);
-                  }
-                },
-                builder: (context, state) {
-                  bool _isLoading = state is GetAllPostsLoading;
-                  return NestedScrollView(
-                    controller: scrollViewController,
-                    headerSliverBuilder:
-                        (BuildContext context, bool boxIsScrolled) {
-                      return <Widget>[
-                        SliverList(
-                          delegate: SliverChildListDelegate(
-                            [
-                              Column(
+        bloc: globals.userBloc,
+        listener: (context, state) {
+          if (state is UserData) {
+            globals.user = state.user;
+          }
+        },
+        builder: (context, state) {
+          return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+            bloc: globals.socialServiceBloc,
+            listener: (context, state) {
+              if (state is GetAllPostsSuccess) {
+                _posts.value = state.posts!;
+                _reachoutsRefreshController.refreshCompleted();
+              }
+              if (state is GetAllPostsError) {
+                Snackbars.error(context, message: state.error);
+                _reachoutsRefreshController.refreshFailed();
+              }
+              if (state is GetPersonalCommentsSuccess) {
+                _comments.value = state.data!;
+                _commentsRefreshController.refreshCompleted();
+              }
+              if (state is GetPersonalCommentsError) {
+                Snackbars.error(context, message: state.error);
+                _commentsRefreshController.refreshFailed();
+              }
+            },
+            builder: (context, state) {
+              bool _isLoading = state is GetAllPostsLoading;
+              return NestedScrollView(
+                controller: scrollViewController,
+                headerSliverBuilder:
+                    (BuildContext context, bool boxIsScrolled) {
+                  return <Widget>[
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          Column(
+                            children: [
+                              SizedBox(height: getScreenHeight(10)),
+                              Text(
+                                  ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                      .toTitleCase(),
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(15),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2,
+                                  )),
+                              Text('@${globals.user!.username ?? 'username'}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(13),
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textColor2,
+                                  )),
+                              SizedBox(height: getScreenHeight(15)),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
-                                  SizedBox(height: getScreenHeight(10)),
-                                  Text(
-                                      ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                          .toTitleCase(),
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(15),
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textColor2,
-                                      )),
-                                  Text(
-                                      '@${globals.user!.username ?? 'username'}',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(13),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      )),
-                                  SizedBox(height: getScreenHeight(15)),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
                                     children: [
-                                      Row(
-                                        children: [
-                                          InkWell(
-                                            onTap: () => RouteNavigators.route(
-                                                context,
-                                                const AccountStatsInfo(
-                                                    index: 0)),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nReachers
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Reachers',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
+                                      InkWell(
+                                        onTap: () => RouteNavigators.route(
+                                            context,
+                                            const AccountStatsInfo(index: 0)),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              globals.user!.nReachers
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(15),
+                                                  color: AppColors.textColor2,
+                                                  fontWeight: FontWeight.w600),
                                             ),
-                                          ),
-                                          SizedBox(width: getScreenWidth(20)),
-                                          InkWell(
-                                            onTap: () => RouteNavigators.route(
-                                                context,
-                                                const AccountStatsInfo(
-                                                    index: 1)),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nReaching
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Reaching',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
+                                            Text(
+                                              'Reachers',
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(13),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400),
                                             ),
-                                          ),
-                                          SizedBox(width: getScreenWidth(20)),
-                                          InkWell(
-                                            onTap: () => RouteNavigators.route(
-                                                context,
-                                                const AccountStatsInfo(
-                                                    index: 2)),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  globals.user!.nStaring
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(15),
-                                                      color:
-                                                          AppColors.textColor2,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                                Text(
-                                                  'Starring',
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(13),
-                                                      color:
-                                                          AppColors.greyShade2,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
+                                          ],
+                                        ),
                                       ),
+                                      SizedBox(width: getScreenWidth(20)),
+                                      InkWell(
+                                        onTap: () => RouteNavigators.route(
+                                            context,
+                                            const AccountStatsInfo(index: 1)),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              globals.user!.nReaching
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(15),
+                                                  color: AppColors.textColor2,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            Text(
+                                              'Reaching',
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(13),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: getScreenWidth(20)),
+                                      InkWell(
+                                        onTap: () => RouteNavigators.route(
+                                            context,
+                                            const AccountStatsInfo(index: 2)),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              globals.user!.nStaring.toString(),
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(15),
+                                                  color: AppColors.textColor2,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            Text(
+                                              'Starring',
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(13),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
-                                  globals.user!.bio != null &&
-                                          globals.user!.bio != ''
-                                      ? SizedBox(height: getScreenHeight(20))
-                                      : const SizedBox.shrink(),
-                                  SizedBox(
-                                      width: getScreenWidth(290),
-                                      child: Text(
-                                        globals.user!.bio ?? '',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      )),
-                                  globals.user!.bio != null &&
-                                          globals.user!.bio != ''
-                                      ? SizedBox(height: getScreenHeight(20))
-                                      : const SizedBox.shrink(),
-                                  SizedBox(
-                                      width: getScreenWidth(145),
-                                      height: getScreenHeight(45),
-                                      child: CustomButton(
-                                        label: 'Edit Profile',
-                                        labelFontSize: getScreenHeight(14),
-                                        color: AppColors.white,
-                                        onPressed: () {
-                                          RouteNavigators.route(context,
-                                              const EditProfileScreen());
-                                        },
-                                        size: size,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 9,
-                                          horizontal: 21,
-                                        ),
-                                        textColor: AppColors.textColor2,
-                                        borderSide: const BorderSide(
-                                            color: AppColors.greyShade5),
-                                      )),
-                                  SizedBox(height: getScreenHeight(15)),
-                                ],
-                              ).paddingOnly(t: 50),
-                            ],
-                          ),
-                        )
-                      ];
-                    },
-                    body: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Divider(
-                          color: const Color(0xFF767474).withOpacity(0.5),
-                          thickness: 0.5,
-                        ),
-                        _tabBar,
-                        Expanded(
-                          child: TabBarView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            controller: _tabController,
-                            children: [
-                              //COMMENTS TAB
-                              if (_isLoading)
-                                const CircularLoader()
-                              else
-                                _comments.value.isEmpty
-                                    ? ListView(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        children: const [
-                                          EmptyTabWidget(
-                                              title:
-                                                  'Comments you made on a post and comments made on your post',
-                                              subtitle:
-                                                  'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                        ],
-                                      )
-                                    : ListView.builder(
-                                        itemCount: _comments.value.length,
-                                        itemBuilder: (context, index) {
-                                          return _CommentReachCard(
-                                            commentModel:
-                                                _comments.value[index],
-                                          );
-                                        },
-                                      ),
-
-                              //REACHES TAB
-                              if (_isLoading)
-                                const CircularLoader()
-                              else
-                                _posts.value.isEmpty
-                                    ? ListView(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        children: const [
-                                          EmptyTabWidget(
-                                            title: "Reaches you’ve made",
-                                            subtitle:
-                                                "Find all posts or contributions you’ve made here ",
-                                          )
-                                        ],
-                                      )
-                                    : Refresher(
-                                        controller: _reachoutsRefreshController,
-                                        onRefresh: () {
-                                          globals.socialServiceBloc!.add(
-                                              GetAllPostsEvent(
-                                                  pageLimit: 50,
-                                                  pageNumber: 1));
-                                        },
-                                        child: ListView.builder(
-                                          itemCount: _posts.value.length,
-                                          itemBuilder: (context, index) {
-                                            return _ReacherCard(
-                                              postModel: _posts.value[index],
-                                              // onLike: () {
-                                              //   _likePost(index);
-                                              // },
-                                            );
-                                          },
-                                        ),
-                                      ),
-
-                              //LIKES TAB
-                              ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title: "Likes you made",
-                                    subtitle:
-                                        "Find post you liked and your post that was liked",
-                                  )
                                 ],
                               ),
-                              // //SHOUTOUT TAB
-                              // ListView(
-                              //   padding: EdgeInsets.zero,
-                              //   shrinkWrap: true,
-                              //   children: const [
-                              //     EmptyTabWidget(
-                              //       title:
-                              //           "Posts you’ve shouted out and your posts that has been shouted out",
-                              //       subtitle:
-                              //           "See posts you’ve shouted out and your post that has been shouted out",
-                              //     )
-                              //   ],
-                              // ),
+                              globals.user!.bio != null &&
+                                      globals.user!.bio != ''
+                                  ? SizedBox(height: getScreenHeight(20))
+                                  : const SizedBox.shrink(),
+                              SizedBox(
+                                  width: getScreenWidth(290),
+                                  child: Text(
+                                    globals.user!.bio ?? '',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(13),
+                                      color: AppColors.greyShade2,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  )),
+                              globals.user!.bio != null &&
+                                      globals.user!.bio != ''
+                                  ? SizedBox(height: getScreenHeight(20))
+                                  : const SizedBox.shrink(),
+                              SizedBox(
+                                  width: getScreenWidth(145),
+                                  height: getScreenHeight(45),
+                                  child: CustomButton(
+                                    label: 'Edit Profile',
+                                    labelFontSize: getScreenHeight(14),
+                                    color: AppColors.white,
+                                    onPressed: () {
+                                      RouteNavigators.route(
+                                          context, const EditProfileScreen());
+                                    },
+                                    size: size,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 9,
+                                      horizontal: 21,
+                                    ),
+                                    textColor: AppColors.textColor2,
+                                    borderSide: const BorderSide(
+                                        color: AppColors.greyShade5),
+                                  )),
+                              SizedBox(height: getScreenHeight(15)),
+                            ],
+                          ).paddingOnly(t: 50),
+                        ],
+                      ),
+                    )
+                  ];
+                },
+                body: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Divider(
+                      color: const Color(0xFF767474).withOpacity(0.5),
+                      thickness: 0.5,
+                    ),
+                    _tabBar,
+                    Expanded(
+                      child: TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: _tabController,
+                        children: [
+                          //REACHES TAB
+                          if (_isLoading)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _reachoutsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(GetAllPostsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                ));
+                              },
+                              child: _posts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Reaches you’ve made",
+                                          subtitle:
+                                              "Find all posts or contributions you’ve made here ",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _posts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _ReacherCard(
+                                          postModel: _posts.value[index],
+                                          // onLike: () {
+                                          //   _likePost(index);
+                                          // },
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                              // //SHOUTDOWN TAB
-                              // ListView(
-                              //   padding: EdgeInsets.zero,
-                              //   shrinkWrap: true,
-                              //   children: const [
-                              //     EmptyTabWidget(
-                              //       title:
-                              //           "Posts you’ve shouted down and your posts that has been shouted down",
-                              //       subtitle:
-                              //           "See posts you’ve shouted down and your post that has been shouted down",
-                              //     )
-                              //   ],
-                              // ),
+                          //COMMENTS TAB
+                          if (_isLoading)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _commentsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                'Comments you made on a post and comments made on your post',
+                                            subtitle:
+                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                              // //SHARES TAB
-                              // ListView(
-                              //   padding: EdgeInsets.zero,
-                              //   shrinkWrap: true,
-                              //   children: const [
-                              //     EmptyTabWidget(
-                              //       title: "Post you shared",
-                              //       subtitle: "Find post you’ve shared here",
-                              //     )
-                              //   ],
-                              // ),
+                          //LIKES TAB
+                          ListView(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            children: const [
+                              EmptyTabWidget(
+                                title: "Likes you made",
+                                subtitle:
+                                    "Find post you liked and your post that was liked",
+                              )
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  );
-                });
-          }),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
-import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:card_swiper/card_swiper.dart';

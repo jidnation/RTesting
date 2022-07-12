@@ -3,10 +3,14 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
+import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 // abstract class IHomeRemoteDataSource {
@@ -587,10 +591,14 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<bool> likePost({required String? postId}) async {
+  Future<PostLikeModel> likePost({required String? postId}) async {
     String q = r'''
         mutation likePost($postId: String!) {
-          likePost(postId: $postId)
+          likePost(postId: $postId){
+            ''' +
+        PostLikeSchema.schema +
+        '''
+          }
         }''';
     try {
       final result = await _client.mutate(
@@ -602,7 +610,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('like post', result.data);
-      return result.data!['likePost'] as bool;
+      return PostLikeModel.fromJson(result.data!['likePost']);
     } catch (e) {
       rethrow;
     }
@@ -784,7 +792,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<PostVoteModel> votePost({
+  Future<bool> votePost({
     required String postId,
     required String voteType,
   }) async {
@@ -796,28 +804,19 @@ class HomeRemoteDataSource {
           votePost(
             postId: $postId
             voteType: $voteType
-          ){
-            voteId
-            authId
-            postId
-            voteType
-          }
+          )
         }''';
     try {
-      final result = await _client.mutate(
-        gql(q),
-        variables: {
-          'postId': postId,
-          'voteType': voteType,
-        },
-      );
+      final result = await _client.mutate(gql(q), variables: {
+        'postId': postId,
+        'voteType': voteType,
+      });
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
       Console.log('delete post vote', result.data);
-      return PostVoteModel.fromJson(result.data!['votePost']);
+      return result.data!['votePost'] as bool;
     } catch (e) {
       rethrow;
     }
@@ -1237,6 +1236,96 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
+      final Map<String, dynamic> variables = {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      };
+      if (authId != null) {
+        variables.putIfAbsent('authId', () => authId);
+      }
+      final result = await _client.query(gql(q), variables: variables);
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get all posts', result.data);
+      return (result.data!['getAllPosts'] as List)
+          .map((e) => PostModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<StatusModel> createStatus({
+    required CreateStatusDto createStatusDto,
+  }) async {
+    String q = r'''
+        mutation createStatus(
+          $statusBody: CreateStatus!
+          ) {
+          createStatus(
+            statusBody: $statusBody
+          ){   
+               ''' +
+        StatusSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'statusBody': createStatusDto.toJson(),
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('createStatus', result.data);
+      return StatusModel.fromJson(result.data!['createStatus']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteStatus({required String? statusId}) async {
+    String q = r'''
+        mutation deleteStatus($statusId: String!) {
+          deleteStatus(statusId: $statusId)
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'statusId': statusId,
+      });
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('delete status', result.data);
+      return result.data!['deleteStatus'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<StatusModel>> getAllStatus({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getAllStatus(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getAllStatus(
+            page_limit: $page_limit
+            page_number: $page_number
+          ){   
+               ''' +
+        StatusSchema.schema +
+        '''
+          }
+        }''';
+    try {
       final result = await _client.query(gql(q), variables: {
         'page_limit': pageLimit,
         'page_number': pageNumber,
@@ -1244,9 +1333,65 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('get all posts', result.data);
-      return (result.data!['getAllPosts'] as List)
-          .map((e) => PostModel.fromJson(e))
+      Console.log('get all status', result.data);
+      return (result.data!['getAllStatus'] as List)
+          .map((e) => StatusModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<StatusModel> getStatus({required String? statusId}) async {
+    String q = r'''
+        query getStatus($statusId: String!) {
+          getStatus(statusId: $statusId)
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'statusId': statusId,
+      });
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      Console.log('delete status', result.data);
+      return StatusModel.fromJson(result.data!['getStatus']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<StatusModel>> getStatusFeed({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getStatusFeed(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getStatusFeed(
+            page_limit: $page_limit
+            page_number: $page_number
+          ){   
+               ''' +
+        StatusFeedSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get status feed', result.data);
+      return (result.data!['getStatusFeed'] as List)
+          .map((e) => StatusModel.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;

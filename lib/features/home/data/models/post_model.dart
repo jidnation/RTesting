@@ -18,6 +18,8 @@ class PostModel {
   String? videoMediaItem;
   DateTime? createdAt;
   PostProfileModel? profile;
+  List<PostLikeModel>? like;
+  List<PostVoteModel>? vote;
 
   PostModel({
     this.audioMediaItem,
@@ -39,6 +41,8 @@ class PostModel {
     this.videoMediaItem,
     this.createdAt,
     this.profile,
+    this.like,
+    this.vote,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -71,6 +75,14 @@ class PostModel {
         profile: json["profile"] != null
             ? PostProfileModel.fromJson(json["profile"])
             : null,
+        like: json["like"] == null
+            ? null
+            : List<PostLikeModel>.from(
+                json["like"].map((x) => PostLikeModel.fromJson(x))),
+        vote: json["vote"] == null
+            ? null
+            : List<PostVoteModel>.from(
+                json["vote"].map((x) => PostVoteModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -99,6 +111,12 @@ class PostModel {
         "videoMediaItem": videoMediaItem,
         "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
         "profile": profile == null ? null : profile!.toJson(),
+        "like": like == null
+            ? null
+            : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
+        "vote": vote == null
+            ? null
+            : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
       };
 }
 
@@ -161,52 +179,70 @@ class SavePostModel {
 class PostLikeModel {
   String? postId;
   String? authId;
-  String? likeId;
+  // String? likeId;
+  PostProfileModel? profile;
+  DateTime? createdAt;
 
   PostLikeModel({
     this.postId,
     this.authId,
-    this.likeId,
+    // this.likeId,
+    this.createdAt,
+    this.profile,
   });
 
   factory PostLikeModel.fromJson(Map<String, dynamic> json) => PostLikeModel(
         postId: json["postId"],
         authId: json["authId"],
-        likeId: json["likeId"],
+        // likeId: json["likeId"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+        profile: json["profile"] != null
+            ? PostProfileModel.fromJson(json["profile"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
         "postId": postId,
         "authId": authId,
-        "likeId": likeId,
+        //"likeId": likeId,
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
+        "profile": profile == null ? null : profile!.toJson(),
       };
 }
 
 class PostVoteModel {
   String? postId;
   String? authId;
-  String? voteId;
+  //String? voteId;
+  DateTime? createdAt;
   String? voteType;
 
   PostVoteModel({
     this.postId,
     this.authId,
-    this.voteId,
+    //this.voteId,
     this.voteType,
+    this.createdAt,
   });
 
   factory PostVoteModel.fromJson(Map<String, dynamic> json) => PostVoteModel(
         postId: json["postId"],
         authId: json["authId"],
-        voteId: json["voteId"],
+        //voteId: json["voteId"],
         voteType: json["voteType"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
       );
 
   Map<String, dynamic> toJson() => {
         "postId": postId,
         "authId": authId,
-        "voteId": voteId,
+        //"voteId": voteId,
         "voteType": voteType,
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
       };
 }
 
@@ -221,7 +257,8 @@ class PostFeedModel {
   String? postId;
   PostModel? post;
   String? postOwnerId;
-  bool? isLiked;
+  List<PostLikeModel>? like;
+  List<PostVoteModel>? vote;
   bool? reachingRelationship;
   bool? verified;
   DateTime? createdAt;
@@ -239,7 +276,8 @@ class PostFeedModel {
     this.verified,
     this.post,
     this.createdAt,
-    this.isLiked,
+    this.like,
+    this.vote,
     this.reachingRelationship,
   });
 
@@ -258,8 +296,15 @@ class PostFeedModel {
         createdAt: json["createdAt"] == null
             ? null
             : DateTime.parse(json["createdAt"]),
-        isLiked: json["isLiked"],
         reachingRelationship: json["reachingRelationship"],
+        like: json["like"] == null
+            ? null
+            : List<PostLikeModel>.from(
+                json["like"].map((x) => PostLikeModel.fromJson(x))),
+        vote: json["vote"] == null
+            ? null
+            : List<PostVoteModel>.from(
+                json["vote"].map((x) => PostVoteModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -275,8 +320,13 @@ class PostFeedModel {
         "post": post == null ? null : post!.toJson(),
         "verified": verified,
         "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
-        "isLiked": isLiked,
         "reachingRelationship": reachingRelationship,
+        "like": like == null
+            ? null
+            : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
+        "vote": vote == null
+            ? null
+            : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
       };
 }
 

@@ -52,7 +52,7 @@ class DeletePostError extends SocialServiceState {
 class LikePostLoading extends SocialServiceState {}
 
 class LikePostSuccess extends SocialServiceState {
-  final bool? isLiked;
+  final PostLikeModel? isLiked;
   LikePostSuccess({this.isLiked});
 }
 
@@ -108,8 +108,8 @@ class DeletePostCommentError extends SocialServiceState {
 class VotePostLoading extends SocialServiceState {}
 
 class VotePostSuccess extends SocialServiceState {
-  final PostVoteModel? postVoteModel;
-  VotePostSuccess({this.postVoteModel});
+  final bool? isVoted;
+  VotePostSuccess({this.isVoted});
 }
 
 class VotePostError extends SocialServiceState {
@@ -353,6 +353,76 @@ class GetAllPostsSuccess extends SocialServiceState {
 class GetAllPostsError extends SocialServiceState {
   final String error;
   GetAllPostsError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetAllStatusLoading extends SocialServiceState {}
+
+class GetAllStatusSuccess extends SocialServiceState {
+  final List<StatusModel>? status;
+  GetAllStatusSuccess({this.status});
+}
+
+class GetAllStatusError extends SocialServiceState {
+  final String error;
+  GetAllStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetStatusFeedLoading extends SocialServiceState {}
+
+class GetStatusFeedSuccess extends SocialServiceState {
+  final List<StatusModel>? status;
+  GetStatusFeedSuccess({this.status});
+}
+
+class GetStatusFeedError extends SocialServiceState {
+  final String error;
+  GetStatusFeedError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetStatusLoading extends SocialServiceState {}
+
+class GetStatusSuccess extends SocialServiceState {
+  final StatusModel? status;
+  GetStatusSuccess({this.status});
+}
+
+class GetStatusError extends SocialServiceState {
+  final String error;
+  GetStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class DeleteStatusLoading extends SocialServiceState {}
+
+class DeleteStatusSuccess extends SocialServiceState {
+  final bool? isDeleted;
+  DeleteStatusSuccess({this.isDeleted});
+}
+
+class DeleteStatusError extends SocialServiceState {
+  final String error;
+  DeleteStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class CreateStatusLoading extends SocialServiceState {}
+
+class CreateStatusSuccess extends SocialServiceState {
+  final StatusModel? status;
+  CreateStatusSuccess({this.status});
+}
+
+class CreateStatusError extends SocialServiceState {
+  final String error;
+  CreateStatusError({required this.error});
   @override
   List<Object> get props => [error];
 }

@@ -14,6 +14,7 @@ import 'package:reach_me/features/account/presentation/views/starred_profile.dar
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
@@ -227,6 +228,56 @@ Future showReacherCardBottomSheet(BuildContext context,
                       const KebabBottomTextButton(label: 'Copy link'),
                     ],
                   ),
+                SizedBox(height: getScreenHeight(20)),
+              ]));
+        },
+      );
+    },
+  );
+}
+
+Future showStoryBottomSheet(BuildContext context,
+    {required StatusModel status}) async {
+  return showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) {
+      return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+        bloc: globals.socialServiceBloc,
+        listener: (context, state) {},
+        builder: (context, state) {
+          return Container(
+              decoration: const BoxDecoration(
+                color: AppColors.greyShade7,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: ListView(shrinkWrap: true, children: [
+                Center(
+                  child: Container(
+                      height: getScreenHeight(4),
+                      width: getScreenWidth(58),
+                      decoration: BoxDecoration(
+                          color: AppColors.greyShade4,
+                          borderRadius: BorderRadius.circular(40))),
+                ).paddingOnly(t: 23),
+                SizedBox(height: getScreenHeight(20)),
+                Column(
+                  children: [
+                    KebabBottomTextButton(
+                      label: 'Report',
+                      onPressed: () {},
+                      color: const Color(0xFFE50101),
+                    ),
+                    KebabBottomTextButton(label: 'Reach', onPressed: () {}),
+                    KebabBottomTextButton(label: 'Star user', onPressed: () {}),
+                    KebabBottomTextButton(label: 'Copy link', onPressed: () {}),
+                    KebabBottomTextButton(label: 'Share', onPressed: () {}),
+                    KebabBottomTextButton(label: 'Mute', onPressed: () {}),
+                  ],
+                ),
                 SizedBox(height: getScreenHeight(20)),
               ]));
         },
