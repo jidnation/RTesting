@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/refresher.dart';
@@ -16,11 +18,15 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/status/view.my.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
@@ -44,10 +50,14 @@ class _TimelineScreenState extends State<TimelineScreen>
 
   @override
   void initState() {
+    super.initState();
     globals.userBloc!.add(GetUserProfileEvent(email: globals.email!));
     globals.socialServiceBloc!
         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-    super.initState();
+    globals.socialServiceBloc!
+        .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
+    globals.socialServiceBloc!
+        .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
   }
 
   Set active = {};
@@ -64,16 +74,20 @@ class _TimelineScreenState extends State<TimelineScreen>
   Future<void> onRefresh() async {
     globals.socialServiceBloc!
         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+    globals.socialServiceBloc!
+        .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
+    globals.socialServiceBloc!
+        .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final isLiked = useState<bool>(false);
     final selectedIndex = useState<int>(0);
     final scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     final _posts = useState<List<PostFeedModel>>([]);
+    final _myStatus = useState<List<StatusModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       key: scaffoldKey.value,
@@ -135,35 +149,48 @@ class _TimelineScreenState extends State<TimelineScreen>
             if (state is CreatePostError) {
               Snackbars.error(context, message: state.error);
             }
+
             if (state is CreatePostSuccess) {
               globals.socialServiceBloc!
                   .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
               Snackbars.success(context, message: 'Your reach has been posted');
             }
+
             if (state is GetPostFeedError) {
+              Snackbars.error(context, message: state.error);
+              if (state.error.contains('session')) {
+                RouteNavigators.routeNoWayHome(context, const LoginScreen());
+              }
+            }
+
+            if (state is GetAllStatusSuccess) {
+              _myStatus.value = state.status!;
+              for (var status in state.status!) {
+                Console.log('statusss', status.toJson());
+              }
+            }
+
+            if (state is GetAllStatusError) {
               Snackbars.error(context, message: state.error);
             }
 
             if (state is GetPostFeedSuccess) {
               _firstLoad = false;
               _posts.value = state.posts!;
-              Console.log('posts', _posts.value);
               _refreshController.refreshCompleted();
             }
 
-            if (state is LikePostError ||
-                state is LikePostSuccess ||
-                state is UnlikePostError ||
-                state is UnlikePostSuccess) {
+            if (state is LikePostSuccess || state is UnlikePostSuccess) {
               globals.socialServiceBloc!
                   .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
             }
 
-            if (state is LikePostSuccess) {
-              isLiked.value = state.isLiked!;
+            if (state is LikePostError) {
+              Snackbars.error(context, message: state.error);
             }
-            if (state is UnlikePostSuccess) {
-              isLiked.value = state.isUnliked!;
+
+            if (state is UnlikePostError) {
+              Snackbars.error(context, message: state.error);
             }
 
             if (state is DeletePostSuccess) {
@@ -184,6 +211,19 @@ class _TimelineScreenState extends State<TimelineScreen>
             if (state is EditContentError) {
               Snackbars.error(context, message: state.error);
             }
+
+            if (state is CreateStatusError) {
+              Snackbars.error(context, message: state.error);
+            }
+
+            if (state is CreateStatusSuccess) {
+              globals.socialServiceBloc!
+                  .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
+              showSimpleNotification(
+                const Text("Your status has been posted"),
+                background: Colors.green.shade700,
+              );
+            }
           },
           builder: (context, state) {
             bool _isLoading = state is CreatePostLoading;
@@ -191,95 +231,120 @@ class _TimelineScreenState extends State<TimelineScreen>
             _isLoading = state is DeletePostLoading;
             _isLoading = state is EditContentLoading;
 
+            bool _likingPost = state is LikePostLoading;
+            _likingPost = state is UnlikePostLoading;
+            _likingPost = state is GetPostFeedLoading;
+
+            Console.log('check', _firstLoad && state is GetPostFeedLoading);
+
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverFillRemaining(
-                  child: _firstLoad && state is GetPostFeedLoading ||
-                          state is UserLoading
+                  child: _firstLoad && state is GetPostFeedLoading
                       ? const SkeletonLoadingWidget()
                       : SizedBox(
-                          // height: getScreenHeight(100),
-                          child: ListView(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            children: [
-                              const SizedBox(height: kToolbarHeight + 30), //30
-                              _isLoading
-                                  ? const LinearLoader()
-                                  : const SizedBox.shrink(),
-                              SizedBox(
-                                height: getScreenHeight(105),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  child: SizedBox(
-                                    child: Row(
-                                      children: [
-                                        UserStory(
+                          child: Refresher(
+                            onRefresh: onRefresh,
+                            controller: _refreshController,
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: false,
+                              children: [
+                                const SizedBox(
+                                    height: kToolbarHeight + 30), //30
+                                _isLoading
+                                    ? const LinearLoader()
+                                    : const SizedBox.shrink(),
+                                SizedBox(
+                                  height: getScreenHeight(105),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    child: SizedBox(
+                                      child: Row(
+                                        children: [
+                                          UserStory(
                                             size: size,
                                             isMe: true,
                                             isLive: false,
                                             hasWatched: false,
-                                            username: 'Add Moment'),
-                                      ],
-                                    ),
-                                  ).paddingOnly(l: 11),
+                                            username: 'Add Moment',
+                                            isMeOnTap: () {
+                                              // RouteNavigators.route(
+                                              //     context,
+                                              //     ViewMyStatus(
+                                              //         status: _myStatus.value));
+                                              if (_myStatus.value.isEmpty) {
+                                                RouteNavigators.route(context,
+                                                    const CreateStatus());
+                                                return;
+                                              }
+
+                                              userStoryModal(
+                                                  context, _myStatus.value);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ).paddingOnly(l: 11),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: getScreenHeight(5)),
-                              const Divider(
-                                thickness: 0.5,
-                                color: AppColors.greyShade4,
-                              ),
-                              SizedBox(
-                                height: size.height,
-                                child: Refresher(
-                                  onRefresh: onRefresh,
-                                  controller: _refreshController,
+                                SizedBox(height: getScreenHeight(5)),
+                                const Divider(
+                                  thickness: 0.5,
+                                  color: AppColors.greyShade4,
+                                ),
+                                SizedBox(
                                   child: _posts.value.isEmpty
                                       ? EmptyTimelineWidget(loading: _isLoading)
-                                      : Column(
-                                          children: List.generate(
-                                            _posts.value.length,
-                                            (index) => _ReacherCard(
+                                      : ListView.builder(
+                                          shrinkWrap: true,
+                                          padding: EdgeInsets.zero,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: _posts.value.length,
+                                          itemBuilder: (context, index) {
+                                            return _ReacherCard(
+                                              likingPost: active.contains(index)
+                                                  ? _likingPost
+                                                  : false,
                                               postFeedModel:
                                                   _posts.value[index],
-                                              likeColour:
-                                                  _posts.value[index].isLiked!
-                                                      ? AppColors.primaryColor
-                                                      : null,
+                                              likeColour: _posts.value[index]
+                                                      .like!.isNotEmpty
+                                                  ? AppColors.primaryColor
+                                                  : null,
+                                              // vote: active.contains(index)? _posts.value[index].vote!
+                                              //         .isNotEmpty
                                               onLike: () {
                                                 selectedIndex.value = index;
                                                 handleTap(index);
                                                 if (active.contains(index)) {
-                                                  Console.log(
-                                                      'like post',
-                                                      _posts.value[index]
-                                                          .isLiked);
-                                                  _posts.value[index].isLiked!
-                                                      ? globals
-                                                          .socialServiceBloc!
-                                                          .add(UnlikePostEvent(
+                                                  if (_posts.value[index].like!
+                                                      .isNotEmpty) {
+                                                    globals.socialServiceBloc!
+                                                        .add(UnlikePostEvent(
+                                                      postId: _posts
+                                                          .value[index].postId,
+                                                    ));
+                                                  } else {
+                                                    globals.socialServiceBloc!
+                                                        .add(
+                                                      LikePostEvent(
                                                           postId: _posts
                                                               .value[index]
-                                                              .postId,
-                                                        ))
-                                                      : globals
-                                                          .socialServiceBloc!
-                                                          .add(LikePostEvent(
-                                                          postId: _posts
-                                                              .value[index]
-                                                              .postId,
-                                                        ));
+                                                              .postId),
+                                                    );
+                                                  }
                                                 }
                                               },
-                                            ),
-                                          ),
+                                            );
+                                          },
                                         ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                 )
@@ -290,13 +355,45 @@ class _TimelineScreenState extends State<TimelineScreen>
       ),
     );
   }
+
+  userStoryModal(BuildContext context, List<StatusModel> status) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView(
+          shrinkWrap: true,
+          children: [
+            Column(children: [
+              ListTile(
+                title: const Text('Create new story'),
+                onTap: () {
+                  RouteNavigators.pop(context);
+                  RouteNavigators.route(context, const CreateStatus());
+                },
+              ),
+              status.isEmpty
+                  ? const SizedBox.shrink()
+                  : ListTile(
+                      title: const Text('View your story'),
+                      onTap: () {
+                        RouteNavigators.pop(context);
+                        RouteNavigators.route(
+                            context, ViewMyStatus(status: status));
+                      },
+                    ),
+            ]).paddingSymmetric(v: 5),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _ReacherCard extends HookWidget {
   const _ReacherCard({
     Key? key,
     required this.postFeedModel,
-    this.onComment,
+    required this.likingPost,
     this.onDownvote,
     this.onLike,
     this.onMessage,
@@ -305,7 +402,8 @@ class _ReacherCard extends HookWidget {
   }) : super(key: key);
 
   final PostFeedModel? postFeedModel;
-  final Function()? onLike, onComment, onMessage, onUpvote, onDownvote;
+  final bool likingPost;
+  final Function()? onLike, onMessage, onUpvote, onDownvote;
   final Color? likeColour;
 
   @override
@@ -382,7 +480,7 @@ class _ReacherCard extends HookWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SvgPicture.asset('assets/svgs/starred.svg'),
+                          //  SvgPicture.asset('assets/svgs/starred.svg'),
                           SizedBox(width: getScreenWidth(9)),
                           IconButton(
                             onPressed: () async {
@@ -457,10 +555,12 @@ class _ReacherCard extends HookWidget {
                                 onPressed: onLike,
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
-                                icon: SvgPicture.asset(
-                                  'assets/svgs/like.svg',
-                                  color: likeColour,
-                                ),
+                                icon: likingPost
+                                    ? const CupertinoActivityIndicator()
+                                    : SvgPicture.asset(
+                                        'assets/svgs/like.svg',
+                                        color: likeColour,
+                                      ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
                               FittedBox(
@@ -539,7 +639,7 @@ class _ReacherCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      'assets/svgs/shoutout-a.svg',
+                                      'assets/svgs/upvote.svg',
                                     ),
                                   ),
                                   Flexible(
@@ -553,7 +653,7 @@ class _ReacherCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      'assets/svgs/shoutdown.svg',
+                                      'assets/svgs/downvote.svg',
                                     ),
                                   ),
                                   Flexible(
@@ -566,7 +666,7 @@ class _ReacherCard extends HookWidget {
                         ],
                       ),
                     ],
-                  ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
+                  ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
                 ],
               );
             }),
@@ -583,6 +683,8 @@ class UserStory extends StatelessWidget {
     required this.isMe,
     required this.username,
     required this.hasWatched,
+    this.isMeOnTap,
+    this.onTap,
   }) : super(key: key);
 
   final Size size;
@@ -590,106 +692,111 @@ class UserStory extends StatelessWidget {
   final bool isLive;
   final bool hasWatched;
   final String username;
+  final Function()? isMeOnTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
-          children: [
-            !hasWatched
-                ? Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: !isLive
-                          ? AppColors.primaryColor
-                          : const Color(0xFFDE0606),
+    return InkWell(
+      onTap: isMe ? isMeOnTap : onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            children: [
+              !hasWatched
+                  ? Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: !isLive
+                            ? AppColors.primaryColor
+                            : const Color(0xFFDE0606),
+                      ),
+                      child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFF5F5F5),
+                          ),
+                          child: Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 60,
+                          )),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFF5F5F5),
+                      ),
+                      child: Container(
+                          width: getScreenWidth(70),
+                          height: getScreenHeight(70),
+                          clipBehavior: Clip.hardEdge,
+                          child: Image.asset(
+                            'assets/images/user.png',
+                            fit: BoxFit.fill,
+                          ),
+                          decoration:
+                              const BoxDecoration(shape: BoxShape.circle)),
                     ),
-                    child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFFF5F5F5),
-                        ),
-                        child: Helper.renderProfilePicture(
-                          globals.user!.profilePicture,
-                          size: 60,
-                        )),
-                  )
-                : Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFF5F5F5),
-                    ),
-                    child: Container(
-                        width: getScreenWidth(70),
-                        height: getScreenHeight(70),
-                        clipBehavior: Clip.hardEdge,
-                        child: Image.asset(
-                          'assets/images/user.png',
-                          fit: BoxFit.fill,
-                        ),
-                        decoration:
-                            const BoxDecoration(shape: BoxShape.circle)),
-                  ),
-            isMe
-                ? Positioned(
-                    bottom: size.width * 0.01,
-                    right: size.width * 0.008,
-                    child: Container(
-                        width: getScreenWidth(21),
-                        height: getScreenHeight(21),
-                        child: const Icon(
-                          Icons.add,
-                          color: AppColors.white,
-                          size: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primaryColor,
-                          border: Border.all(
+              isMe
+                  ? Positioned(
+                      bottom: size.width * 0.01,
+                      right: size.width * 0.008,
+                      child: Container(
+                          width: getScreenWidth(21),
+                          height: getScreenHeight(21),
+                          child: const Icon(
+                            Icons.add,
                             color: AppColors.white,
-                            width: 1.5,
+                            size: 14,
                           ),
-                        )),
-                  )
-                : isLive
-                    ? Positioned(
-                        bottom: size.width * 0.0001,
-                        right: size.width / 20,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7),
-                          child: Text('LIVE',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(11),
-                                letterSpacing: 1.1,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.white,
-                              )),
                           decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: const Color(0xFFDE0606),
-                            borderRadius: BorderRadius.circular(3),
+                            shape: BoxShape.circle,
+                            color: AppColors.primaryColor,
+                            border: Border.all(
+                              color: AppColors.white,
+                              width: 1.5,
+                            ),
+                          )),
+                    )
+                  : isLive
+                      ? Positioned(
+                          bottom: size.width * 0.0001,
+                          right: size.width / 20,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7),
+                            child: Text('LIVE',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  letterSpacing: 1.1,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.white,
+                                )),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: const Color(0xFFDE0606),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                           ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-          ],
-        ),
-        isLive
-            ? SizedBox(height: getScreenHeight(7))
-            : SizedBox(height: getScreenHeight(11)),
-        Text(username,
-            style: TextStyle(
-              fontSize: getScreenHeight(11),
-              fontWeight: FontWeight.w400,
-            ))
-      ],
-    ).paddingOnly(r: 16);
+                        )
+                      : const SizedBox.shrink(),
+            ],
+          ),
+          isLive
+              ? SizedBox(height: getScreenHeight(7))
+              : SizedBox(height: getScreenHeight(11)),
+          Text(username,
+              style: TextStyle(
+                fontSize: getScreenHeight(11),
+                fontWeight: FontWeight.w400,
+              ))
+        ],
+      ).paddingOnly(r: 16),
+    );
   }
 }
 

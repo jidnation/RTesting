@@ -7,11 +7,13 @@ class KebabBottomTextButton extends StatelessWidget {
     Key? key,
     required this.label,
     this.onPressed,
+    this.color = AppColors.black,
     this.isLoading = false,
   }) : super(key: key);
 
   final String label;
   final bool isLoading;
+  final Color color;
   final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
@@ -27,9 +29,9 @@ class KebabBottomTextButton extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.left,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: AppColors.black,
+              color: color,
               fontWeight: FontWeight.w400,
             ),
           ),

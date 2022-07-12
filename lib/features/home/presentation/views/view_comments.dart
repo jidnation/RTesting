@@ -48,8 +48,9 @@ class ViewCommentsScreen extends HookWidget {
                 );
               });
               showSimpleNotification(
-                  const Text("Your commment has been posted"),
-                  background: Colors.green.shade700);
+                const Text("Your commment has been posted"),
+                background: Colors.green.shade700,
+              );
               triggerProgressIndicator.value = false;
               globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
                   postId: post.postId, pageLimit: 50, pageNumber: 1));

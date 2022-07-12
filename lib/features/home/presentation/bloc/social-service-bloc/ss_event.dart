@@ -179,3 +179,36 @@ class GetAllPostsEvent extends SocialServiceEvent {
     required this.pageNumber,
   });
 }
+
+class GetAllStatusEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  GetAllStatusEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
+class GetStatusFeedEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  GetStatusFeedEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
+class GetStatusEvent extends SocialServiceEvent {
+  final String? statusId;
+  GetStatusEvent({required this.statusId});
+}
+
+class DeleteStatusEvent extends SocialServiceEvent {
+  final String? statusId;
+  DeleteStatusEvent({required this.statusId});
+}
+
+class CreateStatusEvent extends SocialServiceEvent {
+  final CreateStatusDto? createStatusDto;
+  CreateStatusEvent({required this.createStatusDto});
+}

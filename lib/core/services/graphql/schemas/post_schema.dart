@@ -19,7 +19,15 @@ class PostSchema {
             postId
             postSlug
             videoMediaItem
-            profile {
+            like {
+              ''' +
+        PostLikeSchema.schema +
+        '''}
+          vote {
+              ''' +
+        PostVoteSchema.schema +
+        '''}
+          profile {
               ''' +
         PostProfileSchema.schema +
         '''
@@ -27,6 +35,7 @@ class PostSchema {
         ''';
   }
 }
+
 class SavePostSchema {
   SavePostSchema._();
 
@@ -81,6 +90,7 @@ class PostProfileSchema {
             profilePicture
             profileSlug
             verified
+            username
         ''';
   }
 }
@@ -115,7 +125,14 @@ class PostFeedSchema {
             profilePicture
             profileSlug
             username
-            isLiked
+            like {
+              ''' +
+        PostLikeSchema.schema +
+        '''}
+            vote {
+              ''' +
+        PostVoteSchema.schema +
+        '''}
             verified
             reachingRelationship
             postOwnerId
@@ -151,6 +168,36 @@ class StarProfileSchema {
             profilePicture
             profileSlug
             username
+        ''';
+  }
+}
+
+class PostLikeSchema {
+  PostLikeSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            created_at
+            postId
+            profile {
+              ''' +
+        PostProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
+
+class PostVoteSchema {
+  PostVoteSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            created_at
+            postId
+            voteType
         ''';
   }
 }

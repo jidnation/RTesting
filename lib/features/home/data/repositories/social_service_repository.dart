@@ -2,8 +2,10 @@ import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
+import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 class SocialServiceRepository {
@@ -62,7 +64,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, bool>> likePost({
+  Future<Either<String, PostLikeModel>> likePost({
     required String postId,
   }) async {
     try {
@@ -113,7 +115,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, PostVoteModel>> votePost({
+  Future<Either<String, bool>> votePost({
     required String voteType,
     required String postId,
   }) async {
@@ -358,6 +360,72 @@ class SocialServiceRepository {
         postId: postId,
       );
       return Right(isDeleted);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteStatus({
+    required String statusId,
+  }) async {
+    try {
+      final isDeleted = await _homeRemoteDataSource.deleteStatus(
+        statusId: statusId,
+      );
+      return Right(isDeleted);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<StatusModel>>> getAllStatus({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getAllStatus(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<StatusModel>>> getStatusFeed({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getStatusFeed(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, StatusModel>> getStatus({
+    required String statusId,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getStatus(statusId: statusId);
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, StatusModel>> createStatus({
+    required CreateStatusDto createStatusDto,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.createStatus(
+          createStatusDto: createStatusDto);
+      return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

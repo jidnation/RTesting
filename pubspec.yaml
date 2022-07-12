@@ -69,6 +69,10 @@ dependencies:
   pull_to_refresh: ^2.0.0
   overlay_support: ^2.0.1
   skeletons: ^0.0.3
+  camera: ^0.9.8+1
+  google_fonts: ^3.0.1
+  story_time: ^1.0.6
+  qr_code_scanner: ^0.7.0
 
 
 dev_dependencies:

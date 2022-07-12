@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/social_service_repository.dart';
 
@@ -133,7 +135,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
         response.fold(
           (error) => emit(VotePostError(error: error)),
-          (postVote) => emit(VotePostSuccess(postVoteModel: postVote)),
+          (postVote) => emit(VotePostSuccess(isVoted: postVote)),
         );
       } on GraphQLError catch (e) {
         emit(VotePostError(error: e.message));
@@ -387,6 +389,78 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(DeleteSavedPostError(error: e.message));
+      }
+    });
+    on<CreateStatusEvent>((event, emit) async {
+      emit(CreateStatusLoading());
+      try {
+        final response = await socialServiceRepository.createStatus(
+          createStatusDto: event.createStatusDto!,
+        );
+        response.fold(
+          (error) => emit(CreateStatusError(error: error)),
+          (status) => emit(CreateStatusSuccess(status: status)),
+        );
+      } on GraphQLError catch (e) {
+        emit(CreateStatusError(error: e.message));
+      }
+    });
+    on<DeleteStatusEvent>((event, emit) async {
+      emit(DeleteStatusLoading());
+      try {
+        final response = await socialServiceRepository.deleteStatus(
+          statusId: event.statusId!,
+        );
+        response.fold(
+          (error) => emit(DeleteStatusError(error: error)),
+          (isDeleted) => emit(DeleteStatusSuccess(isDeleted: isDeleted)),
+        );
+      } on GraphQLError catch (e) {
+        emit(DeleteStatusError(error: e.message));
+      }
+    });
+    on<GetAllStatusEvent>((event, emit) async {
+      emit(GetAllStatusLoading());
+      try {
+        final response = await socialServiceRepository.getAllStatus(
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+        );
+        response.fold(
+          (error) => emit(GetAllStatusError(error: error)),
+          (status) => emit(GetAllStatusSuccess(status: status)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetAllStatusError(error: e.message));
+      }
+    });
+    on<GetStatusFeedEvent>((event, emit) async {
+      emit(GetStatusFeedLoading());
+      try {
+        final response = await socialServiceRepository.getStatusFeed(
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+        );
+        response.fold(
+          (error) => emit(GetStatusFeedError(error: error)),
+          (status) => emit(GetStatusFeedSuccess(status: status)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetStatusFeedError(error: e.message));
+      }
+    });
+    on<GetStatusEvent>((event, emit) async {
+      emit(GetStatusLoading());
+      try {
+        final response = await socialServiceRepository.getStatus(
+          statusId: event.statusId!,
+        );
+        response.fold(
+          (error) => emit(GetStatusError(error: error)),
+          (status) => emit(GetStatusSuccess(status: status)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetStatusError(error: e.message));
       }
     });
   }
