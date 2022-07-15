@@ -261,7 +261,7 @@ class SignUpScreen extends HookWidget {
                           SizedBox(height: getScreenHeight(20)),
                           GestureDetector(
                             onTap: () {
-                              RouteNavigators.route(context, LoginScreen());
+                              RouteNavigators.route(context, const LoginScreen());
                             },
                             child: RichText(
                               textScaleFactor: 0.8,

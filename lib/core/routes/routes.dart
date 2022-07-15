@@ -45,7 +45,7 @@ class RMRouter {
         return RMPageRoute(builder: (_) => SignUpScreen());
 
       case LoginScreen.id:
-        return RMPageRoute(builder: (_) => LoginScreen());
+        return RMPageRoute(builder: (_) => const LoginScreen());
 
       case ForgotPasswordScreen.id:
         return RMPageRoute(builder: (_) => const ForgotPasswordScreen());

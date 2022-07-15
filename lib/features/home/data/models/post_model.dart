@@ -130,6 +130,8 @@ class SavePostModel {
   String? videoMediaItem;
   // DateTime? createdAt;
   PostProfileModel? profile;
+  List<PostLikeModel>? like;
+  List<PostVoteModel>? vote;
 
   SavePostModel({
     this.audioMediaItem,
@@ -141,6 +143,8 @@ class SavePostModel {
     this.videoMediaItem,
     //this.createdAt,
     this.profile,
+    this.like,
+    this.vote,
   });
 
   factory SavePostModel.fromJson(Map<String, dynamic> json) => SavePostModel(
@@ -159,6 +163,14 @@ class SavePostModel {
         profile: json["profile"] != null
             ? PostProfileModel.fromJson(json["profile"])
             : null,
+        like: json["like"] == null
+            ? null
+            : List<PostLikeModel>.from(
+                json["like"].map((x) => PostLikeModel.fromJson(x))),
+        vote: json["vote"] == null
+            ? null
+            : List<PostVoteModel>.from(
+                json["vote"].map((x) => PostVoteModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -173,6 +185,12 @@ class SavePostModel {
         "videoMediaItem": videoMediaItem,
         //"createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
         "profile": profile == null ? null : profile!.toJson(),
+        "like": like == null
+            ? null
+            : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
+        "vote": vote == null
+            ? null
+            : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
       };
 }
 

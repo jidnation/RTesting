@@ -39,7 +39,7 @@ class OtpScreen extends StatelessWidget {
           bloc: globals.authBloc,
           listener: (context, state) {
             if (state is AuthEmailVerified) {
-              RouteNavigators.routeNoWayHome(context, LoginScreen());
+              RouteNavigators.routeNoWayHome(context, const LoginScreen());
               SchedulerBinding.instance!
                   .addPostFrameCallback((timeStamp) => Snackbars.success(
                         context,

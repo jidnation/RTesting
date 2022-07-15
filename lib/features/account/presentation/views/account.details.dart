@@ -248,7 +248,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                                         data: _reachersList.value[index]);
                                   },
                                 ),
-                                SeeMyStarsList(),
+                               const SeeMyStarsList(),
                               ],
                             ).paddingSymmetric(h: 13),
                     ),

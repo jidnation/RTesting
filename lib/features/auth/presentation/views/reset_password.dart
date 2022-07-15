@@ -34,7 +34,7 @@ class ResetPasswordScreen extends HookWidget {
             SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
               Snackbars.success(context, message: state.message!);
             });
-            RouteNavigators.routeNoWayHome(context, LoginScreen());
+            RouteNavigators.routeNoWayHome(context, const LoginScreen());
           } else if (state is AuthError) {
             Snackbars.error(context, message: state.error);
           }
