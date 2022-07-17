@@ -86,24 +86,21 @@ class BottomNavBar extends StatelessWidget {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/play.svg',
-              color: _currentIndex.value == 2
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 2
+              ? SvgPicture.asset('assets/svgs/moments-active.svg')
+              : SvgPicture.asset('assets/svgs/moments.svg'),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/notification.svg',
-              color: _currentIndex.value == 3
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 3
+              ? SvgPicture.asset('assets/svgs/notification-active.svg')
+              : SvgPicture.asset('assets/svgs/notification.svg'),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/profile.svg',
-              color: _currentIndex.value == 4
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 4
+              ? SvgPicture.asset('assets/svgs/profile-active.svg')
+              : SvgPicture.asset('assets/svgs/profile.svg'),
           label: '',
         ),
       ],

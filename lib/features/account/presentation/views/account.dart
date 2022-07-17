@@ -814,7 +814,7 @@ class _ReacherCard extends HookWidget {
                                     onPressed: () {},
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
-                                    icon: SvgPicture.asset(
+                                    icon:    SvgPicture.asset(
                                       'assets/svgs/upvote-active.svg',
                                     ),
                                   ),

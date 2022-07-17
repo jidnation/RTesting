@@ -192,6 +192,11 @@ class _TimelineScreenState extends State<TimelineScreen>
                   Snackbars.error(context, message: state.error);
                 }
 
+                if (state is VotePostSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                }
+
                 if (state is GetPostFeedSuccess) {
                   _firstLoad = false;
                   _posts.value = state.posts!;
@@ -352,14 +357,19 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                   likingPost: false,
                                                   postFeedModel:
                                                       _posts.value[index],
-                                                  likeColour: _posts
-                                                          .value[index]
-                                                          .like!
-                                                          .isNotEmpty
-                                                      ? AppColors.primaryColor
+                                                  isLiked: _posts.value[index]
+                                                          .like!.isNotEmpty
+                                                      ? true
+                                                      : false,
+                                                  isVoted: _posts.value[index]
+                                                          .vote!.isNotEmpty
+                                                      ? true
+                                                      : false,
+                                                  voteType: _posts.value[index]
+                                                          .vote!.isNotEmpty
+                                                      ? _posts.value[index]
+                                                          .vote![0].voteType
                                                       : null,
-                                                  // vote: active.contains(index)? _posts.value[index].vote!
-                                                  //         .isNotEmpty
                                                   onMessage: () {
                                                     reachDM.value = true;
                                                     selectedIndex.value = index;
@@ -371,6 +381,34 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                               email: _posts
                                                                   .value[index]
                                                                   .postOwnerId!));
+                                                    }
+                                                  },
+                                                  onUpvote: () {
+                                                    selectedIndex.value = index;
+                                                    handleTap(index);
+                                                    if (active
+                                                        .contains(index)) {
+                                                      globals.socialServiceBloc!
+                                                          .add(VotePostEvent(
+                                                        voteType: 'upvote',
+                                                        postId: _posts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
+                                                    }
+                                                  },
+                                                  onDownvote: () {
+                                                    selectedIndex.value = index;
+                                                    handleTap(index);
+                                                    if (active
+                                                        .contains(index)) {
+                                                      globals.socialServiceBloc!
+                                                          .add(VotePostEvent(
+                                                        voteType: 'downvote',
+                                                        postId: _posts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
                                                     }
                                                   },
                                                   onLike: () {
@@ -461,13 +499,16 @@ class _ReacherCard extends HookWidget {
     this.onLike,
     this.onMessage,
     this.onUpvote,
-    this.likeColour,
+    required this.isVoted,
+    required this.voteType,
+    required this.isLiked,
   }) : super(key: key);
 
   final PostFeedModel? postFeedModel;
   final bool likingPost;
   final Function()? onLike, onMessage, onUpvote, onDownvote;
-  final Color? likeColour;
+  final bool isLiked, isVoted;
+  final String? voteType;
 
   @override
   Widget build(BuildContext context) {
@@ -494,9 +535,10 @@ class _ReacherCard extends HookWidget {
               children: [
                 Row(
                   children: [
-                    Helper.renderProfilePicture(postFeedModel!.profilePicture,
-                            size: 33)
-                        .paddingOnly(l: 13, t: 10),
+                    Helper.renderProfilePicture(
+                      postFeedModel!.profilePicture,
+                      size: 33,
+                    ).paddingOnly(l: 13, t: 10),
                     SizedBox(width: getScreenWidth(9)),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -511,7 +553,7 @@ class _ReacherCard extends HookWidget {
                                       postFeedModel!.lastName!)
                                   .toTitleCase(),
                               style: TextStyle(
-                                fontSize: getScreenHeight(15),
+                                fontSize: getScreenHeight(14),
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textColor2,
                               ),
@@ -525,7 +567,7 @@ class _ReacherCard extends HookWidget {
                         Text(
                           'Manchester, United Kingdom',
                           style: TextStyle(
-                            fontSize: getScreenHeight(11),
+                            fontSize: getScreenHeight(10),
                             fontWeight: FontWeight.w400,
                             color: AppColors.textColor2,
                           ),
@@ -613,10 +655,17 @@ class _ReacherCard extends HookWidget {
                           constraints: const BoxConstraints(),
                           icon: likingPost
                               ? const CupertinoActivityIndicator()
-                              : SvgPicture.asset(
-                                  'assets/svgs/like.svg',
-                                  color: likeColour,
-                                ),
+                              : isLiked
+                                  ? SvgPicture.asset(
+                                      'assets/svgs/like-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/svgs/like.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
                         ),
                         SizedBox(width: getScreenWidth(4)),
                         FittedBox(
@@ -639,8 +688,8 @@ class _ReacherCard extends HookWidget {
                           constraints: const BoxConstraints(),
                           icon: SvgPicture.asset(
                             'assets/svgs/comment.svg',
-                            height: 20,
-                            width: 20,
+                            height: getScreenHeight(20),
+                            width: getScreenWidth(20),
                           ),
                         ),
                         SizedBox(width: getScreenWidth(4)),
@@ -665,6 +714,8 @@ class _ReacherCard extends HookWidget {
                             constraints: const BoxConstraints(),
                             icon: SvgPicture.asset(
                               'assets/svgs/message.svg',
+                              height: getScreenHeight(20),
+                              width: getScreenWidth(20),
                             ),
                           ),
                       ],
@@ -691,22 +742,38 @@ class _ReacherCard extends HookWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: onUpvote,
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              icon: SvgPicture.asset(
-                                'assets/svgs/upvote.svg',
-                              ),
+                              icon: isVoted && voteType == 'upvote'
+                                  ? SvgPicture.asset(
+                                      'assets/svgs/shoutup-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/svgs/shoutup.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
                             ),
                             Flexible(child: SizedBox(width: getScreenWidth(4))),
                             Flexible(child: SizedBox(width: getScreenWidth(4))),
                             IconButton(
-                              onPressed: () {},
+                              onPressed: onDownvote,
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              icon: SvgPicture.asset(
-                                'assets/svgs/downvote.svg',
-                              ),
+                              icon: isVoted && voteType == 'downvote'
+                                  ? SvgPicture.asset(
+                                      'assets/svgs/shoutdown-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/svgs/shoutdown.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
                             ),
                             Flexible(child: SizedBox(width: getScreenWidth(4))),
                           ],
