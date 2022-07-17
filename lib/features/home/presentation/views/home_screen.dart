@@ -72,17 +72,16 @@ class BottomNavBar extends StatelessWidget {
       showSelectedLabels: false,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/home-a.svg',
-              color: _currentIndex.value == 0
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 0
+              ? SvgPicture.asset('assets/svgs/home-active.svg')
+              : SvgPicture.asset('assets/svgs/home-a.svg',
+                  color: AppColors.blackShade3),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/search.svg',
-              color: _currentIndex.value == 1
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 1
+              ? SvgPicture.asset('assets/svgs/search-active.svg')
+              : SvgPicture.asset('assets/svgs/search.svg'),
           label: '',
         ),
         BottomNavigationBarItem(

@@ -543,7 +543,7 @@ class _ContentScreenState extends State<ContentScreen> {
             width: double.infinity,
             height: getScreenHeight(90),
             decoration: const BoxDecoration(
-              color: AppColors.black,
+              color: AppColors.primaryColor,
             ),
           ),
         ),

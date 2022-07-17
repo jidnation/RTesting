@@ -45,6 +45,7 @@ class _PostReachState extends State<PostReach> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final counter = useState(0);
     final controller = useTextEditingController();
     final _imageList = useState<List<File>>([]);
     return Scaffold(
@@ -158,12 +159,14 @@ class _PostReachState extends State<PostReach> {
                               ),
                             ),
                             const SizedBox(width: 20),
-                            const Text(
-                              '10/200',
+                            Text(
+                              counter.value.toString() + '/' + '200',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
+                                color: counter.value == 200
+                                    ? Colors.red
+                                    : AppColors.textColor2,
                               ),
                             ),
                           ],
@@ -178,7 +181,11 @@ class _PostReachState extends State<PostReach> {
                       maxLines: 6,
                       controller: controller,
                       maxLength: 200,
+                      onChanged: (val) {
+                        counter.value = val.length;
+                      },
                       decoration: const InputDecoration(
+                        counterText: '',
                         hintText: "What's on your mind?",
                         hintStyle: TextStyle(
                           fontSize: 14,
@@ -703,6 +710,7 @@ class EditReach extends HookWidget {
                       maxLength: 200,
                       decoration: const InputDecoration(
                         hintText: "What's on your mind?",
+                        counterText: '',
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,

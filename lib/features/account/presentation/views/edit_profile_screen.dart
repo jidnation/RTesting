@@ -66,10 +66,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         listener: (context, state) {
           if (state is UserData) {
             globals.user = state.user;
-            RouteNavigators.pop(context);
           } else if (state is UsernameChangeSuccess) {
             globals.user = state.user;
-            RouteNavigators.pop(context);
           } else if (state is UserUploadProfilePictureSuccess) {
             globals.user = state.user;
           } else if (state is UserUploadError) {
@@ -90,12 +88,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   clipBehavior: Clip.none,
                   children: <Widget>[
                     /// Banner image
-                    SizedBox(
-                      height: getScreenHeight(150),
-                      width: size.width,
-                      child: Image.network(
-                        'https://wallpaperaccess.com/full/3956728.jpg',
-                        fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        debugPrint('tapped on change cover photo ');
+                      },
+                      child: SizedBox(
+                        height: getScreenHeight(150),
+                        width: size.width,
+                        child: Image.network(
+                          'https://wallpaperaccess.com/full/3956728.jpg',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     Row(
