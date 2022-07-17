@@ -5,7 +5,7 @@ class Snackbars {
   static success(
     BuildContext context, {
     required String message,
-    int milliseconds = 5000,
+    int milliseconds = 3000,
   }) {
     return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -22,7 +22,7 @@ class Snackbars {
   static void error(
     BuildContext context, {
     String? message,
-    int milliseconds = 5000,
+    int milliseconds = 3000,
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

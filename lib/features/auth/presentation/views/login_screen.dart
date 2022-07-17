@@ -156,40 +156,40 @@ class LoginScreen extends HookWidget {
                               textColor: AppColors.white,
                               borderSide: BorderSide.none,
                             ),
-                            SizedBox(height: getScreenHeight(20)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Expanded(
-                                    child: Divider(
-                                        color: AppColors.black,
-                                        thickness: 0.5,
-                                        height: 0.5,
-                                        endIndent: 18.0)),
-                                Text('OR',
-                                    style: TextStyle(
-                                        color: AppColors.textColor,
-                                        fontSize: 9.5)),
-                                Expanded(
-                                    child: Divider(
-                                        color: AppColors.black,
-                                        thickness: 0.5,
-                                        height: 0.5,
-                                        indent: 18.0)),
-                              ],
-                            ),
-                            SizedBox(height: getScreenHeight(20)),
-                            CustomButton(
-                                label: 'Continue with Google',
-                                prefix: 'assets/svgs/google.svg',
-                                color: AppColors.white,
-                                onPressed: () {},
-                                size: size,
-                                textColor: AppColors.textColor2,
-                                borderSide: const BorderSide(
-                                  width: 1,
-                                  color: AppColors.textColor2,
-                                )),
+                            //  SizedBox(height: getScreenHeight(20)),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //   children: const [
+                            //     Expanded(
+                            //         child: Divider(
+                            //             color: AppColors.black,
+                            //             thickness: 0.5,
+                            //             height: 0.5,
+                            //             endIndent: 18.0)),
+                            //     Text('OR',
+                            //         style: TextStyle(
+                            //             color: AppColors.textColor,
+                            //             fontSize: 9.5)),
+                            //     Expanded(
+                            //         child: Divider(
+                            //             color: AppColors.black,
+                            //             thickness: 0.5,
+                            //             height: 0.5,
+                            //             indent: 18.0)),
+                            //   ],
+                            // ),
+                            // SizedBox(height: getScreenHeight(20)),
+                            // CustomButton(
+                            //     label: 'Continue with Google',
+                            //     prefix: 'assets/svgs/google.svg',
+                            //     color: AppColors.white,
+                            //     onPressed: () {},
+                            //     size: size,
+                            //     textColor: AppColors.textColor2,
+                            //     borderSide: const BorderSide(
+                            //       width: 1,
+                            //       color: AppColors.textColor2,
+                            //     )),
                             GestureDetector(
                               onTap: () => RouteNavigators.route(
                                 context,

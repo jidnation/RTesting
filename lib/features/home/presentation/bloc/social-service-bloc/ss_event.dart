@@ -118,11 +118,11 @@ class GetAllCommentsOnPostEvent extends SocialServiceEvent {
 }
 
 class GetPersonalCommentsEvent extends SocialServiceEvent {
-  //final String? authId;
+  final String? authId;
   final int? pageLimit;
   final int? pageNumber;
   GetPersonalCommentsEvent({
-    //required this.authId,
+    this.authId,
     required this.pageLimit,
     required this.pageNumber,
   });
@@ -174,9 +174,11 @@ class GetAllSavedPostsEvent extends SocialServiceEvent {
 class GetAllPostsEvent extends SocialServiceEvent {
   final int? pageLimit;
   final int? pageNumber;
+  final String? authId;
   GetAllPostsEvent({
     required this.pageLimit,
     required this.pageNumber,
+    this.authId,
   });
 }
 

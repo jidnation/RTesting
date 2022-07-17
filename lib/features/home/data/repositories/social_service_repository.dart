@@ -239,13 +239,13 @@ class SocialServiceRepository {
   }
 
   Future<Either<String, List<CommentModel>>> getPersonalComments({
-    //required String authId,
+    String? authId,
     required int? pageLimit,
     required int? pageNumber,
   }) async {
     try {
       final comments = await _homeRemoteDataSource.getPersonalComments(
-        //  authId: authId,
+        authId: authId,
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
@@ -312,11 +312,13 @@ class SocialServiceRepository {
   Future<Either<String, List<PostModel>>> getAllPosts({
     required int? pageLimit,
     required int? pageNumber,
+    String? authId,
   }) async {
     try {
       final posts = await _homeRemoteDataSource.getAllPosts(
         pageLimit: pageLimit,
         pageNumber: pageNumber,
+        authId: authId,
       );
       return Right(posts);
     } on GraphQLError catch (e) {
@@ -393,16 +395,16 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, List<StatusModel>>> getStatusFeed({
+  Future<Either<String, List<StatusFeedModel>>> getStatusFeed({
     required int pageLimit,
     required int pageNumber,
   }) async {
     try {
-      final posts = await _homeRemoteDataSource.getStatusFeed(
+      final status = await _homeRemoteDataSource.getStatusFeed(
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
-      return Right(posts);
+      return Right(status);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

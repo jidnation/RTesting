@@ -161,6 +161,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is FetchUserReachingsSuccess) {
                   _reachingList.value = state.reachings!;
+                  print(_reachingList.value.length);
                 }
                 if (state is FetchUserStarredSuccess) {
                   _starsList.value = state.starredUsers!;
@@ -242,13 +243,13 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                                   },
                                 ),
                                 ListView.builder(
-                                  itemCount: _reachersList.value.length,
+                                  itemCount: _reachingList.value.length,
                                   itemBuilder: (context, index) {
                                     return SeeMyReachingsList(
-                                        data: _reachersList.value[index]);
+                                        data: _reachingList.value[index]);
                                   },
                                 ),
-                               const SeeMyStarsList(),
+                                const SeeMyStarsList(),
                               ],
                             ).paddingSymmetric(h: 13),
                     ),
@@ -340,7 +341,7 @@ class SeeMyReachingsList extends StatelessWidget {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: Helper.renderProfilePicture(
-            data!.reacher!.profilePicture ?? '',
+            data!.reaching!.profilePicture ?? '',
             size: 50,
           ),
           minLeadingWidth: getScreenWidth(20),
@@ -349,7 +350,7 @@ class SeeMyReachingsList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                (data!.reacher!.firstName! + ' ' + data!.reacher!.lastName!)
+                (data!.reaching!.firstName! + ' ' + data!.reaching!.lastName!)
                     .toTitleCase(),
                 style: TextStyle(
                   fontSize: getScreenHeight(16),
@@ -358,7 +359,7 @@ class SeeMyReachingsList extends StatelessWidget {
                 ),
               ),
               Text(
-                '@${data!.reacher!.username}',
+                '@${data!.reaching!.username}',
                 style: TextStyle(
                   fontSize: getScreenHeight(13),
                   color: const Color(0xFF767474),
@@ -399,5 +400,263 @@ class SeeMyStarsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container();
+  }
+}
+
+class RecipientAccountStatsInfo extends StatefulHookWidget {
+  const RecipientAccountStatsInfo({
+    Key? key,
+    this.index,
+    required this.recipientId,
+  }) : super(key: key);
+  final int? index;
+  final String? recipientId;
+
+  @override
+  State<RecipientAccountStatsInfo> createState() =>
+      _RecipientAccountStatsInfoState();
+}
+
+class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController =
+        TabController(length: 3, vsync: this, initialIndex: widget.index ?? 0);
+    globals.userBloc!.add(FetchUserReachersEvent(
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+    globals.userBloc!.add(FetchUserReachingsEvent(
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+    globals.userBloc!.add(FetchUserStarredEvent(
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+  }
+
+  TabBar get _tabBar => TabBar(
+        isScrollable: true,
+        controller: _tabController,
+        indicatorWeight: 1.5,
+        unselectedLabelColor: AppColors.greyShade4,
+        indicatorColor: Colors.transparent,
+        labelColor: AppColors.primaryColor,
+        labelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w400,
+        ),
+        tabs: [
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(0);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 0
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    '${globals.user!.nReachers} Reachers',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 0
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(1);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 1
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    '${globals.user!.nReaching} Reaching',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 1
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(2);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 2
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    '${globals.user!.nStaring} Star',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 2
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+  @override
+  Widget build(BuildContext context) {
+    final _searchController = useTextEditingController();
+    final _reachersList = useState<List<VirtualReach>>([]);
+    final _reachingList = useState<List<VirtualReach>>([]);
+    final _starsList = useState<List<VirtualStar>>([]);
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(25, 30, 25, 0),
+          child: BlocConsumer<UserBloc, UserState>(
+              bloc: globals.userBloc,
+              listener: (context, state) {
+                if (state is FetchUserReachersSuccess) {
+                  _reachersList.value = state.reachers!;
+                  
+                }
+                if (state is FetchUserReachingsSuccess) {
+                  _reachingList.value = state.reachings!;
+                }
+                if (state is FetchUserStarredSuccess) {
+                  _starsList.value = state.starredUsers!;
+                }
+                if (state is UserError) {
+                  Snackbars.error(context, message: state.error);
+                }
+              },
+              builder: (context, state) {
+                bool _isLoading = state is UserLoading;
+                return Column(
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () => RouteNavigators.pop(context),
+                          ),
+                          Text(
+                            (globals.user!.firstName! +
+                                    ' ' +
+                                    globals.user!.lastName!)
+                                .toTitleCase(),
+                            style: TextStyle(
+                              fontSize: getScreenHeight(18),
+                              color: AppColors.textColor2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Opacity(
+                            opacity: 0,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: null,
+                            ),
+                          ),
+                        ]),
+                    SizedBox(height: getScreenHeight(20)),
+                    CustomRoundTextField(
+                      hintText: 'Search',
+                      fillColor: const Color(0XffF5F5F5),
+                      controller: _searchController,
+                      maxLines: 1,
+                      onChanged: (val) {
+                        if (val.isNotEmpty) {
+                        } else {}
+                      },
+                    ).paddingSymmetric(h: 13),
+                    SizedBox(height: getScreenHeight(20)),
+                    _tabBar,
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(
+                              child: SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircularProgressIndicator.adaptive(
+                                backgroundColor: Colors.black26,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.black, //<-- SEE HERE
+                                ),
+                                strokeWidth: 3,
+                              ),
+                            ))
+                          : TabBarView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: _tabController,
+                              children: [
+                                ListView.builder(
+                                  itemCount: _reachersList.value.length,
+                                  itemBuilder: (context, index) {
+                                    return SeeMyReachersList(
+                                        data: _reachersList.value[index]);
+                                  },
+                                ),
+                                ListView.builder(
+                                  itemCount: _reachingList.value.length,
+                                  itemBuilder: (context, index) {
+                                    return SeeMyReachingsList(
+                                        data: _reachingList.value[index]);
+                                  },
+                                ),
+                                const SeeMyStarsList(),
+                              ],
+                            ).paddingSymmetric(h: 13),
+                    ),
+                  ],
+                );
+              }),
+        ),
+      ),
+    );
   }
 }

@@ -374,7 +374,7 @@ class GetAllStatusError extends SocialServiceState {
 class GetStatusFeedLoading extends SocialServiceState {}
 
 class GetStatusFeedSuccess extends SocialServiceState {
-  final List<StatusModel>? status;
+  final List<StatusFeedModel>? status;
   GetStatusFeedSuccess({this.status});
 }
 

@@ -80,7 +80,7 @@ class OtpScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    'An 4 digit code has been sent to your email: $email',
+                    'A 6 digit code has been sent to your email: $email',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontWeight: FontWeight.w400,

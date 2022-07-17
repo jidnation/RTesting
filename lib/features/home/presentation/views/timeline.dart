@@ -12,7 +12,6 @@ import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -28,7 +27,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:reach_me/features/home/presentation/views/status/view.my.status.dart';
+import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
@@ -91,6 +90,7 @@ class _TimelineScreenState extends State<TimelineScreen>
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     final _posts = useState<List<PostFeedModel>>([]);
     final _myStatus = useState<List<StatusModel>>([]);
+    final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       key: scaffoldKey.value,
@@ -134,8 +134,8 @@ class _TimelineScreenState extends State<TimelineScreen>
           IconButton(
             icon: SvgPicture.asset(
               'assets/svgs/message.svg',
-              // width: getScreenWidth(22),
-              // height: getScreenHeight(22),
+              width: getScreenWidth(25),
+              height: getScreenHeight(25),
             ),
             onPressed: () => RouteNavigators.route(
               context,
@@ -147,254 +147,274 @@ class _TimelineScreenState extends State<TimelineScreen>
       body: SafeArea(
         top: false,
         child: BlocConsumer<UserBloc, UserState>(
-            bloc: globals.userBloc,
-            listener: (context, state) {
-              if (state is RecipientUserData) {
+          bloc: globals.userBloc,
+          listener: (context, state) {
+            if (state is RecipientUserData) {
+              if (reachDM.value) {
                 RouteNavigators.route(
                     context, MsgChatInterface(recipientUser: state.user));
               }
-            },
-            builder: (context, state) {
-              return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-                bloc: globals.socialServiceBloc,
-                listener: (context, state) {
-                  if (state is CreatePostError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+            }
+          },
+          builder: (context, state) {
+            return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+              bloc: globals.socialServiceBloc,
+              listener: (context, state) {
+                if (state is CreatePostError) {
+                  Snackbars.error(context, message: state.error);
+                }
 
-                  if (state is CreatePostSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                    Snackbars.success(context,
-                        message: 'Your reach has been posted');
-                  }
+                if (state is CreatePostSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  Snackbars.success(context,
+                      message: 'Your reach has been posted');
+                }
 
-                  if (state is GetPostFeedError) {
-                    Snackbars.error(context, message: state.error);
-                    if (state.error.contains('session')) {
-                      SecureStorage.deleteSecureData();
-                      RouteNavigators.routeNoWayHome(
-                          context, const LoginScreen());
-                    }
+                if (state is GetPostFeedError) {
+                  Snackbars.error(context, message: state.error);
+                  if (state.error.contains('session')) {
+                    SecureStorage.deleteSecureData();
+                    RouteNavigators.routeNoWayHome(
+                        context, const LoginScreen());
                   }
+                }
 
-                  if (state is GetAllStatusSuccess) {
-                    _myStatus.value = state.status!;
-                    for (var status in state.status!) {
-                      Console.log('statusss', status.toJson());
-                    }
-                  }
+                if (state is GetAllStatusSuccess) {
+                  _myStatus.value = state.status!;
+                }
 
-                  if (state is GetAllStatusError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+                if (state is GetStatusFeedSuccess) {
+                  _userStatus.value = state.status!;
+                }
 
-                  if (state is GetPostFeedSuccess) {
-                    _firstLoad = false;
-                    _posts.value = state.posts!;
-                    _refreshController.refreshCompleted();
-                  }
+                if (state is GetAllStatusError) {
+                  Snackbars.error(context, message: state.error);
+                }
 
-                  if (state is LikePostSuccess || state is UnlikePostSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                  }
+                if (state is GetPostFeedSuccess) {
+                  _firstLoad = false;
+                  _posts.value = state.posts!;
+                  _refreshController.refreshCompleted();
+                }
 
-                  if (state is LikePostError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+                if (state is LikePostSuccess || state is UnlikePostSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                }
 
-                  if (state is UnlikePostError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+                if (state is DeletePostSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  Snackbars.success(context,
+                      message: 'Your reach has been deleted!');
+                }
+                if (state is DeletePostError) {
+                  Snackbars.error(context, message: state.error);
+                }
+                if (state is EditContentSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  Snackbars.success(context,
+                      message: 'Your reach has been edited!');
+                }
+                if (state is EditContentError) {
+                  Snackbars.error(context, message: state.error);
+                }
 
-                  if (state is DeletePostSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                    Snackbars.success(context,
-                        message: 'Your reach has been deleted!');
-                  }
-                  if (state is DeletePostError) {
-                    Snackbars.error(context, message: state.error);
-                  }
-                  if (state is EditContentSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-                    Snackbars.success(context,
-                        message: 'Your reach has been edited!');
-                  }
-                  if (state is EditContentError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+                if (state is CreateStatusError) {
+                  Snackbars.error(context, message: state.error);
+                }
 
-                  if (state is CreateStatusError) {
-                    Snackbars.error(context, message: state.error);
-                  }
+                if (state is CreateStatusSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
+                  showSimpleNotification(
+                    const Text("Your status has been posted"),
+                    background: Colors.green.shade700,
+                  );
+                }
+              },
+              builder: (context, state) {
+                bool _isLoading = state is CreatePostLoading;
+                _isLoading = state is GetPostFeedLoading;
+                _isLoading = state is DeletePostLoading;
+                _isLoading = state is EditContentLoading;
 
-                  if (state is CreateStatusSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
-                    showSimpleNotification(
-                      const Text("Your status has been posted"),
-                      background: Colors.green.shade700,
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  bool _isLoading = state is CreatePostLoading;
-                  _isLoading = state is GetPostFeedLoading;
-                  _isLoading = state is DeletePostLoading;
-                  _isLoading = state is EditContentLoading;
+                // bool _likingPost = state is LikePostLoading;
+                // _likingPost = state is UnlikePostLoading;
+                // _likingPost = state is GetPostFeedLoading;
 
-                  bool _likingPost = state is LikePostLoading;
-                  _likingPost = state is UnlikePostLoading;
-                  _likingPost = state is GetPostFeedLoading;
-
-                  return CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverFillRemaining(
-                        child: (_firstLoad)
-                            ? const SkeletonLoadingWidget()
-                            : SizedBox(
-                                child: Refresher(
-                                  onRefresh: onRefresh,
-                                  controller: _refreshController,
-                                  child: ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: false,
-                                    children: [
-                                      const SizedBox(
-                                          height: kToolbarHeight + 30), //30
-                                      _isLoading
-                                          ? const LinearLoader()
-                                          : const SizedBox.shrink(),
-                                      SizedBox(
-                                        height: getScreenHeight(105),
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          child: SizedBox(
-                                            child: Row(
-                                              children: [
-                                                UserStory(
-                                                  size: size,
-                                                  isMe: true,
-                                                  isLive: false,
-                                                  hasWatched: false,
-                                                  username: 'Add Moment',
-                                                  isMeOnTap: () {
-                                                    // RouteNavigators.route(
-                                                    //     context,
-                                                    //     ViewMyStatus(
-                                                    //         status: _myStatus.value));
-                                                    if (_myStatus
-                                                        .value.isEmpty) {
-                                                      RouteNavigators.route(
-                                                          context,
-                                                          const CreateStatus());
-                                                      return;
-                                                    }
-
-                                                    userStoryModal(context,
-                                                        _myStatus.value);
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ).paddingOnly(l: 11),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(5)),
-                                      const Divider(
-                                        thickness: 0.5,
-                                        color: AppColors.greyShade4,
-                                      ),
-                                      SizedBox(
-                                        child: _posts.value.isEmpty
-                                            ? EmptyTimelineWidget(
-                                                loading: _isLoading)
-                                            : ListView.builder(
-                                                shrinkWrap: true,
-                                                padding: EdgeInsets.zero,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: _posts.value.length,
-                                                itemBuilder: (context, index) {
-                                                  return _ReacherCard(
-                                                    likingPost:
-                                                        active.contains(index)
-                                                            ? _likingPost
-                                                            : false,
-                                                    postFeedModel:
-                                                        _posts.value[index],
-                                                    likeColour: _posts
-                                                            .value[index]
-                                                            .like!
-                                                            .isNotEmpty
-                                                        ? AppColors.primaryColor
-                                                        : null,
-                                                    // vote: active.contains(index)? _posts.value[index].vote!
-                                                    //         .isNotEmpty
-                                                    onMessage: () {
-                                                      reachDM.value = true;
-                                                      selectedIndex.value =
-                                                          index;
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        globals.userBloc!.add(
-                                                            GetRecipientProfileEvent(
-                                                                email: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postOwnerId!));
-                                                      }
-                                                    },
-                                                    onLike: () {
-                                                      selectedIndex.value =
-                                                          index;
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        if (_posts.value[index]
-                                                            .like!.isNotEmpty) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  UnlikePostEvent(
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                          ));
-                                                        } else {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                            LikePostEvent(
-                                                                postId: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postId),
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                  );
+                return CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverFillRemaining(
+                      child: (_firstLoad)
+                          ? const SkeletonLoadingWidget()
+                          : SizedBox(
+                              child: Refresher(
+                                onRefresh: onRefresh,
+                                controller: _refreshController,
+                                child: ListView(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: false,
+                                  children: [
+                                    const SizedBox(
+                                        height: kToolbarHeight + 30), //30
+                                    _isLoading
+                                        ? const LinearLoader()
+                                        : const SizedBox.shrink(),
+                                    SizedBox(
+                                      height: getScreenHeight(105),
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        physics: const BouncingScrollPhysics(),
+                                        child: SizedBox(
+                                          child: Row(
+                                            children: [
+                                              UserStory(
+                                                size: size,
+                                                isMe: true,
+                                                isLive: false,
+                                                hasWatched: false,
+                                                username: 'Add Status',
+                                                isMeOnTap: () {
+                                                  RouteNavigators.route(context,
+                                                      const CreateStatus());
+                                                  return;
                                                 },
                                               ),
+                                              if (_myStatus.value.isEmpty)
+                                                const SizedBox.shrink()
+                                              else
+                                                UserStory(
+                                                  size: size,
+                                                  isMe: false,
+                                                  isLive: false,
+                                                  hasWatched: false,
+                                                  username: 'Your status',
+                                                  onTap: () {
+                                                    RouteNavigators.route(
+                                                        context,
+                                                        ViewMyStatus(
+                                                            status: _myStatus
+                                                                .value));
+                                                  },
+                                                ),
+                                              ...List.generate(
+                                                _userStatus.value.length,
+                                                (index) => UserStory(
+                                                  size: size,
+                                                  isMe: false,
+                                                  isLive: false,
+                                                  hasWatched: false,
+                                                  username: _userStatus
+                                                      .value[index]
+                                                      .status![index]
+                                                      .statusCreatorModel!
+                                                      .username!,
+                                                  onTap: () {
+                                                    RouteNavigators.route(
+                                                      context,
+                                                      ViewUserStatus(
+                                                          status: _userStatus
+                                                              .value[index]
+                                                              .status!),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              // ..._userStatus.value.map(
+                                              //   (e) =>
+                                              // ),
+                                            ],
+                                          ),
+                                        ).paddingOnly(l: 11),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(5)),
+                                    const Divider(
+                                      thickness: 0.5,
+                                      color: AppColors.greyShade4,
+                                    ),
+                                    SizedBox(
+                                      child: _posts.value.isEmpty
+                                          ? EmptyTimelineWidget(
+                                              loading: _isLoading)
+                                          : ListView.builder(
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.zero,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              itemCount: _posts.value.length,
+                                              itemBuilder: (context, index) {
+                                                return _ReacherCard(
+                                                  likingPost: false,
+                                                  postFeedModel:
+                                                      _posts.value[index],
+                                                  likeColour: _posts
+                                                          .value[index]
+                                                          .like!
+                                                          .isNotEmpty
+                                                      ? AppColors.primaryColor
+                                                      : null,
+                                                  // vote: active.contains(index)? _posts.value[index].vote!
+                                                  //         .isNotEmpty
+                                                  onMessage: () {
+                                                    reachDM.value = true;
+                                                    selectedIndex.value = index;
+                                                    handleTap(index);
+                                                    if (active
+                                                        .contains(index)) {
+                                                      globals.userBloc!.add(
+                                                          GetRecipientProfileEvent(
+                                                              email: _posts
+                                                                  .value[index]
+                                                                  .postOwnerId!));
+                                                    }
+                                                  },
+                                                  onLike: () {
+                                                    selectedIndex.value = index;
+                                                    handleTap(index);
+                                                    if (active
+                                                        .contains(index)) {
+                                                      if (_posts.value[index]
+                                                          .like!.isNotEmpty) {
+                                                        globals
+                                                            .socialServiceBloc!
+                                                            .add(
+                                                                UnlikePostEvent(
+                                                          postId: _posts
+                                                              .value[index]
+                                                              .postId,
+                                                        ));
+                                                      } else {
+                                                        globals
+                                                            .socialServiceBloc!
+                                                            .add(
+                                                          LikePostEvent(
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId),
+                                                        );
+                                                      }
+                                                    }
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                      )
-                    ],
-                  ).paddingOnly(t: 10);
-                },
-              );
-            }),
+                            ),
+                    )
+                  ],
+                ).paddingOnly(t: 10);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -824,7 +844,7 @@ class UserStory extends StatelessWidget {
                 fontWeight: FontWeight.w400,
               ))
         ],
-      ).paddingOnly(r: 16),
+      ).paddingOnly(r: 25),
     );
   }
 }

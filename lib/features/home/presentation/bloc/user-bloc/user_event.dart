@@ -94,24 +94,30 @@ class DelStarRelationshipEvent extends UserEvent {
 
 class FetchUserReachersEvent extends UserEvent {
   final int pageLimit, pageNumber;
+  final String? authId;
   FetchUserReachersEvent({
     required this.pageLimit,
     required this.pageNumber,
+    this.authId,
   });
 }
 
 class FetchUserReachingsEvent extends UserEvent {
   final int pageLimit, pageNumber;
+  final String? authId;
   FetchUserReachingsEvent({
     required this.pageLimit,
     required this.pageNumber,
+    this.authId,
   });
 }
 
 class FetchUserStarredEvent extends UserEvent {
   final int pageLimit, pageNumber;
+  final String? authId;
   FetchUserStarredEvent({
     required this.pageLimit,
     required this.pageNumber,
+    this.authId,
   });
 }

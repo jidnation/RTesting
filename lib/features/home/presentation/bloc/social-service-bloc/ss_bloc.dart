@@ -264,7 +264,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetPersonalCommentsLoading());
       try {
         final response = await socialServiceRepository.getPersonalComments(
-          //authId: event.authId!,
+          authId: event.authId!,
           pageLimit: event.pageLimit!,
           pageNumber: event.pageNumber!,
         );
@@ -325,6 +325,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         final response = await socialServiceRepository.getAllPosts(
           pageNumber: event.pageNumber!,
           pageLimit: event.pageLimit!,
+          authId: event.authId,
         );
         response.fold(
           (error) => emit(GetAllPostsError(error: error)),

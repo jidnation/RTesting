@@ -214,11 +214,13 @@ class UserRepository {
   Future<Either<String, List<VirtualReach>>> getReachers({
     required int pageLimit,
     required int pageNumber,
+    String? authId,
   }) async {
     try {
       final getReachers = await _homeRemoteDataSource.getReachers(
         pageLimit: pageLimit,
         pageNumber: pageNumber,
+        authId: authId,
       );
       return Right(getReachers);
     } on GraphQLError catch (e) {

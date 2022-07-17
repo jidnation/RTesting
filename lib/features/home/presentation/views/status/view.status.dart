@@ -17,20 +17,7 @@ class ViewMyStatus extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final images = [
-      'https://images.unsplash.com/photo-1567899735474-c2a942086894?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2486&q=80',
-      'https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80',
-      'https://images.unsplash.com/photo-1518735881707-1a53be861a5f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2401&q=80',
-      'https://images.unsplash.com/photo-1567899735474-c2a942086894?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2486&q=80',
-      'https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80',
-      'https://images.unsplash.com/photo-1518735881707-1a53be861a5f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2401&q=80',
-      'https://images.unsplash.com/photo-1567899735474-c2a942086894?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2486&q=80',
-      'https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80',
-      'https://images.unsplash.com/photo-1518735881707-1a53be861a5f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2401&q=80',
-      'https://images.unsplash.com/photo-1567899735474-c2a942086894?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2486&q=80',
-      'https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80',
-      'https://images.unsplash.com/photo-1518735881707-1a53be861a5f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2401&q=80',
-    ];
+
     return Scaffold(
       body: StoryPageView(
         indicatorDuration: const Duration(seconds: 100),
@@ -136,6 +123,139 @@ class ViewMyStatus extends HookWidget {
                   icon: const Icon(Icons.more_horiz_rounded),
                   onPressed: () {
                     showStoryBottomSheet(context, status: status[storyIndex]);
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+        pageLength: 1,
+        storyLength: (int pageIndex) {
+          return status.length;
+        },
+        onPageLimitReached: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+}
+
+class ViewUserStatus extends HookWidget {
+  const ViewUserStatus({Key? key, required this.status}) : super(key: key);
+  final List<StatusFeedResponseModel> status;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      body: StoryPageView(
+        indicatorDuration: const Duration(seconds: 100),
+        itemBuilder: (context, pageIndex, storyIndex) {
+          final story = status[storyIndex];
+          //final image = images[storyIndex];
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Container(color: AppColors.black),
+              ),
+              //check typename from model and display widgets accordingly
+              Positioned.fill(
+                child: Container(
+                  height: size.height,
+                  width: size.width,
+                  decoration: BoxDecoration(
+                    color: story.status!.statusData!.background!
+                            .contains('Color')
+                        ? Color(
+                            int.parse(story.status!.statusData!.background!))
+                        : null,
+                    image: DecorationImage(
+                      image: AssetImage(story.status!.statusData!.background!),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      story.status!.statusData!.caption!,
+                      textAlign: Helper.getAlignment(
+                          story.status!.statusData!.alignment!)['align'],
+                      style: Helper.getFont(story.status!.statusData!.font!),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 44, left: 8),
+                child: Row(
+                  children: [
+                    Helper.renderProfilePicture(
+                        story.statusCreatorModel!.profilePicture ?? ''),
+                    SizedBox(width: getScreenWidth(12)),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          (story.statusCreatorModel!.firstName! +
+                                  ' ' +
+                                  story.statusCreatorModel!.lastName!)
+                              .toTitleCase(),
+                          style: TextStyle(
+                            fontSize: getScreenHeight(16),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '@${story.statusCreatorModel!.username!}',
+                          style: TextStyle(
+                            fontSize: getScreenHeight(13),
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CustomRoundTextField(
+                    hintText: 'Reach out to...',
+                    textCapitalization: TextCapitalization.none,
+                    fillColor: AppColors.black.withOpacity(0.5),
+                    enabledBorderSide:
+                        const BorderSide(width: 1, color: AppColors.white),
+                    focusedBorderSide:
+                        const BorderSide(width: 1, color: AppColors.white),
+                  )
+                ],
+              ).paddingOnly(b: 35, r: 8, l: 8)
+            ],
+          );
+        },
+        gestureItemBuilder: (context, pageIndex, storyIndex) {
+          return Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 44),
+              child: Container(
+                height: getScreenHeight(30),
+                decoration: BoxDecoration(
+                  color: AppColors.black.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  color: Colors.white,
+                  icon: const Icon(Icons.more_horiz_rounded),
+                  onPressed: () {
+                    //showStoryBottomSheet(context, status: status[storyIndex]);
                   },
                 ),
               ),

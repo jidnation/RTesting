@@ -50,8 +50,8 @@ class CustomButton extends StatelessWidget {
         child: isLoading!
             ? Platform.isAndroid
                 ? SizedBox(
-                    height: 20,
-                    width: 20,
+                    height: 15,
+                    width: 15,
                     child: CircularProgressIndicator(
                       color: loaderColor,
                       strokeWidth: 2,

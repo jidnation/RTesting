@@ -120,7 +120,7 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 const Text(
-                                  'Abuja, Nigeria',
+                                  'Nigeria',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
@@ -524,7 +524,7 @@ class TagLocation extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Abuja, Nigeria',
+                      'Nigeria',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.white,
@@ -673,7 +673,7 @@ class EditReach extends HookWidget {
                                   ),
                                 ),
                                 const Text(
-                                  'Abuja, Nigeria',
+                                  'Nigeria',
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
