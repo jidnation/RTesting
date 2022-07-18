@@ -35,8 +35,9 @@ class ViewMyStatus extends HookWidget {
                   height: size.height,
                   width: size.width,
                   decoration: BoxDecoration(
-                    color: story.statusData!.background!.contains('Color')
-                        ? Color(int.parse(story.statusData!.background!))
+                    color: story.statusData!.background!.contains('0x')
+                        ? Helper.getStatusBgColour(
+                            story.statusData!.background!)
                         : null,
                     image: DecorationImage(
                       image: AssetImage(story.statusData!.background!),

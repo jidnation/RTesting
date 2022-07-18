@@ -1,4 +1,5 @@
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/home/data/models/star_model.dart';
 
 class VirtualReach {
   String? reachingId;
@@ -33,8 +34,8 @@ class VirtualReach {
 class VirtualStar {
   String? authId;
   String? starredId;
-  User? user;
-  User? starred;
+  StarProfileModel? user;
+  StarProfileModel? starred;
 
   VirtualStar({
     this.user,
@@ -44,9 +45,12 @@ class VirtualStar {
   });
 
   factory VirtualStar.fromJson(Map<String, dynamic> json) => VirtualStar(
-        user: json["user"] != null ? User.fromJson(json["user"]) : null,
-        starred:
-            json["starred"] != null ? User.fromJson(json["starred"]) : null,
+        user: json["user"] != null
+            ? StarProfileModel.fromJson(json["user"])
+            : null,
+        starred: json["starred"] != null
+            ? StarProfileModel.fromJson(json["starred"])
+            : null,
         starredId: json["starredId"],
         authId: json["authId"],
       );

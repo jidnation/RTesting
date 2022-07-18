@@ -42,6 +42,7 @@ class StarProfileModel {
   String? profilePicture;
   String? profileSlug;
   String? starred;
+  String? username;
 
   StarProfileModel({
     this.firstName,
@@ -49,6 +50,7 @@ class StarProfileModel {
     this.profilePicture,
     this.profileSlug,
     this.starred,
+    this.username,
   });
 
   factory StarProfileModel.fromJson(Map<String, dynamic> json) =>
@@ -58,6 +60,7 @@ class StarProfileModel {
         profilePicture: json["profilePicture"],
         profileSlug: json["profileSlug"],
         starred: json["starred"],
+        username: json["username"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -66,5 +69,6 @@ class StarProfileModel {
         "profilePicture": profilePicture,
         "profileSlug": profileSlug,
         "starred": starred!,
+        "username": username,
       };
 }

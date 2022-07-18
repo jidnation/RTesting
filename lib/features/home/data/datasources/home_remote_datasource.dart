@@ -393,15 +393,18 @@ class HomeRemoteDataSource {
   Future<List<VirtualReach>> getReachings({
     required int pageLimit,
     required int pageNumber,
+    String? authId,
   }) async {
     String q = r'''
         query getReachings(
             $page_limit: Int!
             $page_number: Int!
+            $authId: String
           ) {
             getReachings(
               page_limit: $page_limit
               page_number: $page_number
+              authId: $authId
             ) {   
               reacher {
                 ''' +
@@ -421,6 +424,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'page_limit': pageLimit,
         'page_number': pageNumber,
+        'authId': authId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -437,15 +441,19 @@ class HomeRemoteDataSource {
   Future<List<VirtualStar>> getStarred({
     required int pageLimit,
     required int pageNumber,
+    String? authId,
   }) async {
+    //TODO: ADD AUTH ID TO QUERY
     String q = r'''
          query getStarred(
             $page_limit: Int!
             $page_number: Int!
+            
           ) {
             getStarred(
               page_limit: $page_limit
               page_number: $page_number
+              
             ) {   
               starred {
                 ''' +
@@ -465,6 +473,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'page_limit': pageLimit,
         'page_number': pageNumber,
+       // 'authId': authId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -1055,7 +1064,7 @@ class HomeRemoteDataSource {
         }''';
     try {
       final result = await _client.query(gql(q), variables: {
-       // 'authId': authId,
+        // 'authId': authId,
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });

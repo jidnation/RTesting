@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
@@ -128,6 +129,29 @@ class Helper {
           'align': TextAlign.center,
           'align_icon': Icons.format_align_center_rounded,
         };
+    }
+  }
+
+  static Color convertStringToColour(String colour) {
+    String valueString =
+        colour.replaceFirst('0', '').replaceAll('x', ''); //0xff0077b6
+    int value = int.parse(valueString, radix: 16);
+    Console.log('value:', value);
+    return Color(value);
+  }
+
+  static Color getStatusBgColour(String colour) {
+    switch (colour.toLowerCase()) {
+      case '0xff0077b6':
+        return const Color(0xFF0077B6);
+      case '0xff25b900':
+        return const Color(0xFF25B900);
+      case '0xfffe9800':
+        return const Color(0xFFFE9800);
+      case '0xffc12626':
+        return const Color(0xFFC12626);
+      default:
+        return const Color(0xFFC12626);
     }
   }
 }

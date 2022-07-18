@@ -231,11 +231,13 @@ class UserRepository {
   Future<Either<String, List<VirtualReach>>> getReachings({
     required int pageLimit,
     required int pageNumber,
+    String? authId,
   }) async {
     try {
       final getReachings = await _homeRemoteDataSource.getReachings(
         pageLimit: pageLimit,
         pageNumber: pageNumber,
+        authId: authId,
       );
       return Right(getReachings);
     } on GraphQLError catch (e) {
@@ -246,11 +248,13 @@ class UserRepository {
   Future<Either<String, List<VirtualStar>>> getStarred({
     required int pageLimit,
     required int pageNumber,
+    String? authId,
   }) async {
     try {
       final getStarred = await _homeRemoteDataSource.getStarred(
         pageLimit: pageLimit,
         pageNumber: pageNumber,
+        authId: authId,
       );
       return Right(getStarred);
     } on GraphQLError catch (e) {

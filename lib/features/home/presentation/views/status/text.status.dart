@@ -316,7 +316,7 @@ class _TextStatus2State extends State<TextStatus2> {
     final bgcolours = useState([
       const Color(0xFFC12626),
       const Color(0xFFFE9800),
-      const Color(0XFF25B900),
+      const Color(0xFF25B900),
       const Color(0xFF0077B6)
     ]);
 

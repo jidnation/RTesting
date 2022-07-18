@@ -247,7 +247,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<FetchUserReachersEvent>((event, emit) async {
       emit(UserLoading());
       try {
-        final response = await userRepository.getReachers(pageLimit: event.pageLimit, pageNumber: event.pageNumber,);
+        final response = await userRepository.getReachers(
+          pageLimit: event.pageLimit,
+          pageNumber: event.pageNumber,
+          authId: event.authId,
+        );
         response.fold(
           (error) => emit(UserError(error: error)),
           (reachers) => emit(FetchUserReachersSuccess(reachers: reachers)),
@@ -259,7 +263,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<FetchUserReachingsEvent>((event, emit) async {
       emit(UserLoading());
       try {
-        final response = await userRepository.getReachings(pageLimit: event.pageLimit, pageNumber: event.pageNumber,);
+        final response = await userRepository.getReachings(
+          pageLimit: event.pageLimit,
+          pageNumber: event.pageNumber,
+          authId: event.authId,
+        );
         response.fold(
           (error) => emit(UserError(error: error)),
           (reachings) => emit(FetchUserReachingsSuccess(reachings: reachings)),
@@ -271,7 +279,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<FetchUserStarredEvent>((event, emit) async {
       emit(UserLoading());
       try {
-        final response = await userRepository.getStarred(pageLimit: event.pageLimit, pageNumber: event.pageNumber,);
+        final response = await userRepository.getStarred(
+          pageLimit: event.pageLimit,
+          pageNumber: event.pageNumber,
+          authId: event.authId,
+        );
         response.fold(
           (error) => emit(UserError(error: error)),
           (starredUsers) =>

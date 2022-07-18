@@ -19,7 +19,6 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:reach_me/features/chat/presentation/widgets/bottom_sheet.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 import 'package:reach_me/features/video-call/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/voice_call_screen.dart';
@@ -91,16 +90,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     //final isRecording = useState<bool>(false);
     final controller = useTextEditingController();
     useMemoized(() {
-      //  timer = Timer.periodic(const Duration(seconds: 60), (timer) {
-
-      // SchedulerBinding.instance!.addPostFrameCallback((_) {
-      //   _controller.animateTo(
-      //     _controller.position.maxScrollExtent,
-      //     duration: const Duration(milliseconds: 10),
-      //     curve: Curves.easeOut,
-      //   );
-      // });
-      // });
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
     }, [globals.recipientUser!.id]);
@@ -206,17 +195,17 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             ),
           ),
           const SizedBox(width: 10),
-          SizedBox(
-            height: getScreenHeight(35),
-            width: getScreenWidth(30),
-            child: IconButton(
-              icon: SvgPicture.asset('assets/svgs/pop-vertical.svg'),
-              onPressed: () async {
-                await showKebabBottomSheet(context);
-              },
-              splashRadius: 20,
-            ),
-          ).paddingOnly(r: 10),
+          // SizedBox(
+          //   height: getScreenHeight(35),
+          //   width: getScreenWidth(30),
+          //   child: IconButton(
+          //     icon: SvgPicture.asset('assets/svgs/pop-vertical.svg'),
+          //     onPressed: () async {
+          //       await showKebabBottomSheet(context);
+          //     },
+          //     splashRadius: 20,
+          //   ),
+          // ).paddingOnly(r: 10),
         ],
       ),
       body: BlocConsumer<ChatBloc, ChatState>(
@@ -225,21 +214,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             if (state is ChatStreamData) {
               print(state.data);
             }
-            // if (state is ChatLoading) {
-            //   isSending.value = true;
-            //   showIsSending.value = true;
-            // }
+
             if (state is GetThreadMessagesSuccess) {
               isSending.value = false;
               showIsSending.value = false;
-
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
-                _controller.animateTo(
-                  _controller.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 10),
-                  curve: Curves.easeOut,
-                );
-              });
             }
 
             if (state is ChatUploadSuccess) {
@@ -377,8 +355,16 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     label: 'View Profile',
                                     color: AppColors.white,
                                     onPressed: () {
-                                      RouteNavigators.route(context,
-                                          const RecipientAccountProfile());
+                                      RouteNavigators.route(
+                                          context,
+                                          RecipientAccountProfile(
+                                            recipientEmail:
+                                                widget.recipientUser!.email,
+                                            recipientImageUrl: widget
+                                                .recipientUser!.profilePicture,
+                                            recipientId:
+                                                widget.recipientUser!.id,
+                                          ));
                                     },
                                     size: size,
                                     padding: const EdgeInsets.symmetric(
@@ -542,8 +528,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                             isTyping.value
                                 ? GestureDetector(
                                     onTap: () {
-                                      if (controller.text.isNotEmpty ||
-                                          controller.text != ' ') {
+                                      if (controller.text.isNotEmpty) {
                                         final value = controller.text.trim();
 
                                         Chat temp = Chat(
