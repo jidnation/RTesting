@@ -76,36 +76,9 @@ class SplashScreen extends StatelessWidget {
         animation: animation.controller,
         builder: (context, child) {
           return Scaffold(
+            backgroundColor: AppColors.primaryColor,
             body: Stack(
               children: [
-                Center(
-                  child: Opacity(
-                    opacity: animation.firstContainerOpacity.value,
-                    child: Container(
-                      width: animation.firstContainerWidth.value,
-                      height: animation.firstContainerHeight.value,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius:
-                            animation.firstContainerBorderRadius.value,
-                      ),
-                    ),
-                  ),
-                ),
-                animation.firstContainerOpacity.value == 0
-                    ? Center(
-                        child: Opacity(
-                          opacity: animation.secondContainerOpacity.value,
-                          child: Container(
-                            width: animation.secondContainerWidth.value,
-                            height: animation.secondContainerHeight.value,
-                            decoration: const BoxDecoration(
-                              color: Color(0x120077B6),
-                            ),
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
                 animation.secondContainerOpacity.value == 0
                     ? Opacity(
                         opacity: animation.imageOpacity.value,
@@ -115,8 +88,10 @@ class SplashScreen extends StatelessWidget {
                           children: [
                             const SizedBox(),
                             Center(
-                              child:
-                                  SvgPicture.asset('assets/svgs/logo-blue.svg'),
+                              child: SvgPicture.asset(
+                                'assets/svgs/logo-blue.svg',
+                                color: AppColors.white,
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 40.0),
@@ -129,15 +104,16 @@ class SplashScreen extends StatelessWidget {
                                       'By',
                                       style: TextStyle(
                                           fontSize: 16,
-                                          color: AppColors.black,
+                                          color: AppColors.white,
                                           fontWeight: FontWeight.w400),
                                     ),
                                     Text(
-                                      'ReachMe',
+                                      'Televerse',
                                       style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.primaryColor,
-                                          fontWeight: FontWeight.w500),
+                                        fontSize: 16,
+                                        color: AppColors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ],
                                 ),

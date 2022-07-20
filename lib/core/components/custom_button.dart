@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 class CustomButton extends StatelessWidget {
   final String label;
@@ -37,10 +38,11 @@ class CustomButton extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return SizedBox(
       width: size.width,
+      height: getScreenHeight(46),
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
-            padding: padding,
+            padding: EdgeInsets.zero,
             backgroundColor: color,
             side: borderSide,
             shape: RoundedRectangleBorder(

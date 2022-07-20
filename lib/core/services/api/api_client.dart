@@ -45,4 +45,20 @@ class ApiClient {
       rethrow;
     }
   }
+
+  Future<dynamic> getSignedURL(XFile file) async {
+    String fileName = file.path.split('/').last;
+    // String fileExtension = fileName.split('.').last;
+
+    try {
+      final response = await _dio.get(
+        'http://185.3.95.146:4600/utility/get-signed-url/$fileName',
+      );
+      return response.data;
+    } on FormatException {
+      throw const FormatException("Bad response format 👎");
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -61,9 +61,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                 : isActive && _currentPage == 2
                     ? const Color(0xFFFF7676)
                     : const Color(0xFFC4C4C4),
-        borderRadius:
-            isActive ? const BorderRadius.all(Radius.circular(12)) : null,
-        shape: isActive ? BoxShape.rectangle : BoxShape.circle,
+        borderRadius: const BorderRadius.all(Radius.circular(100)),
       ),
     );
   }
@@ -92,7 +90,6 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                   children: buildOnboardingPages()),
             ),
           ),
-          SizedBox(height: size.height * 0.05),
           Align(
             alignment: Alignment.center,
             child: Align(
@@ -103,29 +100,33 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: size.height * 0.05),
+          SizedBox(height: getScreenHeight(100)),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: _currentPage == widget.pages!.length - 1
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceBetween,
             children: [
-              Align(
-                alignment: FractionalOffset.bottomLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    bottom: 10,
-                  ),
-                  child: GestureDetector(
-                    onTap: () => widget.skipClicked!("Skip Tapped"),
-                    child: const Text(
-                      'Skip',
-                      style: TextStyle(
-                          color: AppColors.greyShade3,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600),
-                    ).paddingAll(14),
-                  ),
-                ),
-              ),
+              _currentPage == widget.pages!.length - 1
+                  ? const SizedBox.shrink()
+                  : Align(
+                      alignment: FractionalOffset.bottomLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          bottom: 10,
+                        ),
+                        child: GestureDetector(
+                          onTap: () => widget.skipClicked!("Skip Tapped"),
+                          child: const Text(
+                            'Skip',
+                            style: TextStyle(
+                                color: AppColors.greyShade3,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600),
+                          ).paddingAll(14),
+                        ),
+                      ),
+                    ),
               Align(
                 alignment: FractionalOffset.bottomRight,
                 child: Padding(
@@ -144,13 +145,19 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                         color: AppColors.textColor2,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        'Next',
-                        style: TextStyle(
+                      child: Text(
+                        _currentPage != widget.pages!.length - 1
+                            ? "Next"
+                            : "Let's get started",
+                        style: const TextStyle(
                             color: AppColors.white,
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600),
-                      ).paddingSymmetric(h: 14, v: 10),
+                      ).paddingSymmetric(
+                          h: _currentPage == widget.pages!.length - 1
+                              ? getScreenWidth(100)
+                              : getScreenWidth(25),
+                          v: getScreenHeight(10)),
                     ),
                   ),
                 ),
@@ -170,13 +177,9 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
         Center(
           child: SvgPicture.asset(
             page.imagePath,
-            height: page.imagePath == 'assets/svgs/illustration 3-new.svg'
-                ? 190
-                : 220,
-            width: 220,
           ),
         ),
-        SizedBox(height: getScreenHeight(90)),
+        SizedBox(height: getScreenHeight(30)),
         Text(
           page.title,
           style: TextStyle(
