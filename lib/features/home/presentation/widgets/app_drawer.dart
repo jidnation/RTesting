@@ -8,6 +8,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 
@@ -138,13 +139,13 @@ class AppDrawer extends HookWidget {
                 children: [
                   DrawerItem(
                       action: 'Add an existing account',
-                      color: AppColors.primaryColor,
+                      color: AppColors.textColor2,
                       showIcon: false,
                       icon: '',
                       onPressed: () {}),
                   DrawerItem(
                       action: 'Create a new account',
-                      color: AppColors.primaryColor,
+                      color: AppColors.textColor2,
                       showIcon: false,
                       icon: '',
                       onPressed: () {}),
@@ -162,7 +163,9 @@ class AppDrawer extends HookWidget {
                     DrawerItem(
                       action: 'Reaches',
                       icon: 'assets/svgs/reaches-d.svg',
-                      onPressed: () {},
+                      onPressed: () {
+                        RouteNavigators.route(context, const AccountScreen());
+                      },
                     ),
                     // DrawerItem(
                     //   action: 'Shoutouts',

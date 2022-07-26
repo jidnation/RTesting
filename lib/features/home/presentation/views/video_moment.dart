@@ -33,23 +33,26 @@ class _VideoMomentScreenState extends State<VideoMomentScreen>
       'assets/videos/video-2.mp4',
       'assets/videos/video-3.mp4',
     ];
-    return Scaffold(
-      body: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: Stack(
-          children: [
-            Swiper(
-              itemBuilder: (BuildContext context, int index) {
-                return ContentScreen(
-                  src: videos,
-                );
-              },
-              itemCount: videos.length,
-              scrollDirection: Axis.vertical,
-            ),
-            const MomentsAppBar(),
-          ],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: Stack(
+            children: [
+              Swiper(
+                itemBuilder: (BuildContext context, int index) {
+                  return ContentScreen(
+                    src: videos,
+                  );
+                },
+                itemCount: videos.length,
+                scrollDirection: Axis.vertical,
+              ),
+              const MomentsAppBar(),
+            ],
+          ),
         ),
       ),
     );

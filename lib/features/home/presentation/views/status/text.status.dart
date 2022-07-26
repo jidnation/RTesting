@@ -165,29 +165,29 @@ class _TextStatusState extends State<TextStatus> {
                               constraints: const BoxConstraints(),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(1),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isAudioStatus.value
-                                  ? AppColors.white
-                                  : Colors.transparent,
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                isAudioStatus.value = true;
-                                isTextStatus.value = false;
-                                isCameraStatus.value = false;
-                              },
-                              icon: SvgPicture.asset(
-                                  'assets/svgs/status-mic.svg',
-                                  color: isAudioStatus.value
-                                      ? AppColors.black
-                                      : null),
-                              // padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ),
+                          // Container(
+                          //   padding: const EdgeInsets.all(1),
+                          //   decoration: BoxDecoration(
+                          //     shape: BoxShape.circle,
+                          //     color: isAudioStatus.value
+                          //         ? AppColors.white
+                          //         : Colors.transparent,
+                          //   ),
+                          //   child: IconButton(
+                          //     onPressed: () {
+                          //       isAudioStatus.value = true;
+                          //       isTextStatus.value = false;
+                          //       isCameraStatus.value = false;
+                          //     },
+                          //     icon: SvgPicture.asset(
+                          //         'assets/svgs/status-mic.svg',
+                          //         color: isAudioStatus.value
+                          //             ? AppColors.black
+                          //             : null),
+                          //     // padding: EdgeInsets.zero,
+                          //     constraints: const BoxConstraints(),
+                          //   ),
+                          // ),
                           Container(
                             padding: const EdgeInsets.all(1),
                             decoration: BoxDecoration(

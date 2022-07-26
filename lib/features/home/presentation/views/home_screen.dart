@@ -18,19 +18,22 @@ class HomeScreen extends StatefulHookWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final pages = const [
-    TimelineScreen(),
-    SearchScreen(),
-    VideoMomentScreen(),
-    NotificationsScreen(),
-    AccountScreen(),
-  ];
   @override
   Widget build(BuildContext context) {
+    final scaffoldKey =
+        useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
+    final pages = [
+      TimelineScreen(scaffoldKey: scaffoldKey.value),
+      SearchScreen(scaffoldKey: scaffoldKey.value),
+      const VideoMomentScreen(),
+      const NotificationsScreen(),
+      const AccountScreen(),
+    ];
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
     return Scaffold(
       drawer: const AppDrawer(),
+      key: scaffoldKey.value,
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),

@@ -186,7 +186,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator.adaptive(
-                                  backgroundColor: AppColors.primaryColor,
+                                  backgroundColor: AppColors.black,
                                 ),
                               ),
                             ).paddingOnly(t: 30)
@@ -220,13 +220,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                               'assets/svgs/chat-list-empty.svg',
                                           title: 'Your general reachouts',
                                           subtitle:
-                                              'Your reachouts will be listed here, that is those you are having a conversation with already',
+                                              'Your reachouts will be listed here, that is those you\nare having a conversation with already',
                                         ),
                                   const EmptyChatListScreen(
                                     image: 'assets/svgs/chat-list-empty.svg',
                                     title: 'Your starred reachouts',
                                     subtitle:
-                                        'Your reachouts will be listed here, that is those profile you starred and having a conversation with already',
+                                        'Your reachouts will be listed here, that is those profile you\nstarred and having a conversation with already',
                                   ),
                                 ],
                               ),

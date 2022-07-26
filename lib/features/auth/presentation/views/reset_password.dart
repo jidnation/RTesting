@@ -27,6 +27,7 @@ class ResetPasswordScreen extends HookWidget {
     final _confirmPasswordController = useTextEditingController();
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: globals.authBloc,
         listener: (context, state) {

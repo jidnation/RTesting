@@ -94,7 +94,7 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Reachouts',
+                    'Reaches',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -194,364 +194,370 @@ class _AccountScreenState extends State<AccountScreen>
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is UserData) {
-            globals.user = state.user;
-          }
-        },
-        builder: (context, state) {
-          return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-              bloc: globals.socialServiceBloc,
-              listener: (context, state) {
-                if (state is GetAllPostsSuccess) {
-                  _posts.value = state.posts!;
-                  _reachoutsRefreshController.refreshCompleted();
-                }
-                if (state is GetAllPostsError) {
-                  Snackbars.error(context, message: state.error);
-                  _reachoutsRefreshController.refreshFailed();
-                }
-                if (state is GetPersonalCommentsSuccess) {
-                  _comments.value = state.data!;
-                  _commentsRefreshController.refreshCompleted();
-                }
-                if (state is GetPersonalCommentsError) {
-                  Snackbars.error(context, message: state.error);
-                  _commentsRefreshController.refreshFailed();
-                }
-              },
-              builder: (context, state) {
-                bool _isLoading = state is GetAllPostsLoading;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Stack(
-                      alignment: Alignment.topCenter,
-                      fit: StackFit.passthrough,
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        /// Banner image
-                        SizedBox(
-                          height: getScreenHeight(140),
-                          width: size.width,
-                          child: Image.network(
-                            'https://wallpaperaccess.com/full/3956728.jpg',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Container(
-                                  width: getScreenWidth(40),
-                                  height: getScreenHeight(40),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors.textColor2.withOpacity(0.5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/back.svg',
-                                    color: AppColors.white,
-                                    width: getScreenWidth(50),
-                                    height: getScreenHeight(50),
-                                  ),
-                                ),
-                                onPressed: () => RouteNavigators.route(
-                                    context, const HomeScreen()),
-                              ),
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Container(
-                                  width: getScreenWidth(40),
-                                  height: getScreenHeight(40),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors.textColor2.withOpacity(0.5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/pop-vertical.svg',
-                                    color: AppColors.white,
-                                    width: getScreenWidth(50),
-                                    height: getScreenHeight(50),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  await showProfileMenuBottomSheet(context,
-                                      user: globals.user!);
-                                },
-                                splashRadius: 20,
-                              )
-                            ]).paddingOnly(t: 25),
-
-                        Positioned(
-                          top: size.height * 0.1,
-                          child: AnimatedContainer(
-                            width: isGoingDown ? width : getScreenWidth(100),
-                            height: isGoingDown ? height : getScreenHeight(100),
-                            duration: const Duration(seconds: 1),
-                            child: Helper.renderProfilePicture(
-                              globals.user!.profilePicture,
-                              size: 100,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: BlocConsumer<UserBloc, UserState>(
+          bloc: globals.userBloc,
+          listener: (context, state) {
+            if (state is UserData) {
+              globals.user = state.user;
+            }
+          },
+          builder: (context, state) {
+            return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
+                listener: (context, state) {
+                  if (state is GetAllPostsSuccess) {
+                    _posts.value = state.posts!;
+                    _reachoutsRefreshController.refreshCompleted();
+                  }
+                  if (state is GetAllPostsError) {
+                    Snackbars.error(context, message: state.error);
+                    _reachoutsRefreshController.refreshFailed();
+                  }
+                  if (state is GetPersonalCommentsSuccess) {
+                    _comments.value = state.data!;
+                    _commentsRefreshController.refreshCompleted();
+                  }
+                  if (state is GetPersonalCommentsError) {
+                    Snackbars.error(context, message: state.error);
+                    _commentsRefreshController.refreshFailed();
+                  }
+                },
+                builder: (context, state) {
+                  bool _isLoading = state is GetAllPostsLoading;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Stack(
+                        alignment: Alignment.topCenter,
+                        fit: StackFit.passthrough,
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          /// Banner image
+                          SizedBox(
+                            height: getScreenHeight(140),
+                            width: size.width,
+                            child: Image.network(
+                              'https://wallpaperaccess.com/full/3956728.jpg',
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        SizedBox(height: getScreenHeight(10)),
-                        Text(
-                            ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                .toTitleCase(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(15),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor2,
-                            )),
-                        Text('@${globals.user!.username ?? 'username'}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(13),
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            )),
-                        SizedBox(height: getScreenHeight(15)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Row(
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 0)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReachers.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      Text(
-                                        'Reachers',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/back.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
                                   ),
+                                  onPressed: () => RouteNavigators.route(
+                                      context, const HomeScreen()),
                                 ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 1)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReaching.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      Text(
-                                        'Reaching',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/pop-vertical.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
                                   ),
+                                  onPressed: () async {
+                                    await showProfileMenuBottomSheet(context,
+                                        user: globals.user!);
+                                  },
+                                  splashRadius: 20,
+                                )
+                              ]).paddingOnly(t: 25),
+
+                          Positioned(
+                            top: size.height * 0.1,
+                            child: AnimatedContainer(
+                              width: isGoingDown ? width : getScreenWidth(100),
+                              height:
+                                  isGoingDown ? height : getScreenHeight(100),
+                              duration: const Duration(seconds: 1),
+                              child: Helper.renderProfilePicture(
+                                globals.user!.profilePicture,
+                                size: 100,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(height: getScreenHeight(10)),
+                          Text(
+                              ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                  .toTitleCase(),
+                              style: TextStyle(
+                                fontSize: getScreenHeight(15),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor2,
+                              )),
+                          Text('@${globals.user!.username ?? 'username'}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(13),
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor2,
+                              )),
+                          SizedBox(height: getScreenHeight(15)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 0)),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nReachers.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          'Reachers',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(20)),
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 1)),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nReaching.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          'Reaching',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(20)),
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 2)),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nStaring.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          'Starring',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          globals.user!.bio != null && globals.user!.bio != ''
+                              ? SizedBox(height: getScreenHeight(20))
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                              width: getScreenWidth(290),
+                              child: Text(
+                                globals.user!.bio ?? '',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(13),
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 2)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nStaring.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
+                              )),
+                          globals.user!.bio != null && globals.user!.bio != ''
+                              ? SizedBox(height: getScreenHeight(20))
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                              width: getScreenWidth(145),
+                              height: getScreenHeight(45),
+                              child: CustomButton(
+                                label: 'Edit Profile',
+                                labelFontSize: getScreenHeight(14),
+                                color: AppColors.white,
+                                onPressed: () {
+                                  RouteNavigators.route(
+                                      context, const EditProfileScreen());
+                                },
+                                size: size,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 9,
+                                  horizontal: 21,
+                                ),
+                                textColor: AppColors.textColor2,
+                                borderSide: const BorderSide(
+                                    color: AppColors.greyShade5),
+                              )),
+                          SizedBox(height: getScreenHeight(15)),
+                        ],
+                      ).paddingOnly(t: 50),
+                      Divider(
+                        color: const Color(0xFF767474).withOpacity(0.5),
+                        thickness: 0.5,
+                      ),
+                      Center(child: _tabBar),
+                      Expanded(
+                        child: TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          controller: _tabController,
+                          children: [
+                            //REACHES TAB
+                            if (_isLoading)
+                              const CircularLoader()
+                            else
+                              Refresher(
+                                controller: _reachoutsRefreshController,
+                                onRefresh: () {
+                                  globals.socialServiceBloc!
+                                      .add(GetAllPostsEvent(
+                                    pageLimit: 50,
+                                    pageNumber: 1,
+                                  ));
+                                },
+                                child: _posts.value.isEmpty
+                                    ? ListView(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        children: const [
+                                          EmptyTabWidget(
+                                            title: "Reaches you’ve made",
+                                            subtitle:
+                                                "Find all posts or contributions you’ve made here ",
+                                          )
+                                        ],
+                                      )
+                                    : ListView.builder(
+                                        itemCount: _posts.value.length,
+                                        itemBuilder: (context, index) {
+                                          return _ReacherCard(
+                                            postModel: _posts.value[index],
+                                            // onLike: () {
+                                            //   _likePost(index);
+                                            // },
+                                          );
+                                        },
                                       ),
-                                      Text(
-                                        'Starring',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
+                              ),
+
+                            //COMMENTS TAB
+                            if (_isLoading)
+                              const CircularLoader()
+                            else
+                              Refresher(
+                                controller: _commentsRefreshController,
+                                onRefresh: () {
+                                  globals.socialServiceBloc!
+                                      .add(GetPersonalCommentsEvent(
+                                    pageLimit: 50,
+                                    pageNumber: 1,
+                                    authId: globals.user!.id,
+                                  ));
+                                },
+                                child: _comments.value.isEmpty
+                                    ? ListView(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        children: const [
+                                          EmptyTabWidget(
+                                              title:
+                                                  'Comments you made on a post and comments made on your post',
+                                              subtitle:
+                                                  'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                        ],
+                                      )
+                                    : ListView.builder(
+                                        itemCount: _comments.value.length,
+                                        itemBuilder: (context, index) {
+                                          return _CommentReachCard(
+                                            commentModel:
+                                                _comments.value[index],
+                                          );
+                                        },
                                       ),
-                                    ],
-                                  ),
+                              ),
+
+                            //LIKES TAB
+                            ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              children: const [
+                                EmptyTabWidget(
+                                  title: "Likes you made",
+                                  subtitle:
+                                      "Find post you liked and your post that was liked",
                                 )
                               ],
                             ),
                           ],
                         ),
-                        globals.user!.bio != null && globals.user!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(290),
-                            child: Text(
-                              globals.user!.bio ?? '',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: getScreenHeight(13),
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            )),
-                        globals.user!.bio != null && globals.user!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(145),
-                            height: getScreenHeight(45),
-                            child: CustomButton(
-                              label: 'Edit Profile',
-                              labelFontSize: getScreenHeight(14),
-                              color: AppColors.white,
-                              onPressed: () {
-                                RouteNavigators.route(
-                                    context, const EditProfileScreen());
-                              },
-                              size: size,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 9,
-                                horizontal: 21,
-                              ),
-                              textColor: AppColors.textColor2,
-                              borderSide:
-                                  const BorderSide(color: AppColors.greyShade5),
-                            )),
-                        SizedBox(height: getScreenHeight(15)),
-                      ],
-                    ).paddingOnly(t: 50),
-                    Divider(
-                      color: const Color(0xFF767474).withOpacity(0.5),
-                      thickness: 0.5,
-                    ),
-                    Center(child: _tabBar),
-                    Expanded(
-                      child: TabBarView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: _tabController,
-                        children: [
-                          //REACHES TAB
-                          if (_isLoading)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _reachoutsRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(GetAllPostsEvent(
-                                  pageLimit: 50,
-                                  pageNumber: 1,
-                                ));
-                              },
-                              child: _posts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                          title: "Reaches you’ve made",
-                                          subtitle:
-                                              "Find all posts or contributions you’ve made here ",
-                                        )
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _posts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return _ReacherCard(
-                                          postModel: _posts.value[index],
-                                          // onLike: () {
-                                          //   _likePost(index);
-                                          // },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //COMMENTS TAB
-                          if (_isLoading)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _commentsRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!
-                                    .add(GetPersonalCommentsEvent(
-                                  pageLimit: 50,
-                                  pageNumber: 1,
-                                  authId: globals.user!.id,
-                                ));
-                              },
-                              child: _comments.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                            title:
-                                                'Comments you made on a post and comments made on your post',
-                                            subtitle:
-                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _comments.value.length,
-                                      itemBuilder: (context, index) {
-                                        return _CommentReachCard(
-                                          commentModel: _comments.value[index],
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //LIKES TAB
-                          ListView(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            children: const [
-                              EmptyTabWidget(
-                                title: "Likes you made",
-                                subtitle:
-                                    "Find post you liked and your post that was liked",
-                              )
-                            ],
-                          ),
-                        ],
                       ),
-                    ),
-                  ],
-                );
-              });
-        },
+                    ],
+                  );
+                });
+          },
+        ),
       ),
     );
   }
@@ -813,7 +819,7 @@ class _ReacherCard extends HookWidget {
                                     onPressed: () {},
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
-                                    icon:    SvgPicture.asset(
+                                    icon: SvgPicture.asset(
                                       'assets/svgs/upvote-active.svg',
                                     ),
                                   ),
@@ -1268,7 +1274,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Reachouts',
+                    'Reaches',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,

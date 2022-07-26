@@ -14,14 +14,14 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
-  const SearchScreen({Key? key}) : super(key: key);
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  const SearchScreen({Key? key, this.scaffoldKey}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -35,102 +35,102 @@ class _SearchScreenState extends State<SearchScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final _scaffoldKey = useState(GlobalKey<ScaffoldState>());
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      key: _scaffoldKey.value,
-      drawer: const AppDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.grey.shade50,
-        elevation: 0,
-        leading: IconButton(
-          padding: const EdgeInsets.all(0),
-          onPressed: () => _scaffoldKey.value.currentState!.openDrawer(),
-          icon: globals.user!.profilePicture == null
-              ? ImagePlaceholder(
-                  width: getScreenWidth(40),
-                  height: getScreenHeight(40),
-                )
-              : ProfilePicture(
-                  width: getScreenWidth(40),
-                  height: getScreenHeight(40),
-                ),
-        ).paddingOnly(t: 10, l: 10),
-        title: CustomRoundTextField(
-          hintText: 'Search ReachMe',
-          fillColor: AppColors.white,
-          controller: _searchController,
-          maxLines: 1,
-          onChanged: (val) {
-            if (val.isNotEmpty) {
-              _hasText.value = true;
-              _searchString.value = val;
-              globals.userBloc!.add(FetchAllUsersByNameEvent(
-                limit: 20,
-                pageNumber: 1,
-                query: val,
-              ));
-            } else {
-              _hasText.value = false;
-            }
-          },
-        ).paddingOnly(t: 10),
-        actions: [
-          IconButton(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.grey.shade50,
+          elevation: 0,
+          leading: IconButton(
             padding: const EdgeInsets.all(0),
-            icon: SvgPicture.asset(
-              'assets/svgs/Setting.svg',
-              width: 25,
-              height: 25,
-            ),
-            onPressed: () {},
-          ).paddingOnly(t: 10, r: 10),
-        ],
-      ),
-      body: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: !_hasText.value
-            ? const SearchStories()
-            : BlocConsumer<UserBloc, UserState>(
-                bloc: globals.userBloc,
-                listener: (context, state) {
-                  if (state is FetchUsersSuccess) {
-                    globals.userList = state.user;
-                  } else if (state is UserError) {
-                    Snackbars.error(context, message: state.error);
-                  }
-                },
-                builder: (context, state) {
-                  if (state is UserLoading) {
-                    return const Center(child: CupertinoActivityIndicator());
-                  }
-                  if (globals.userList!.isEmpty) {
-                    return SearchNoResultFound(size: size)
-                        .paddingSymmetric(h: 16);
-                  }
-                  return ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: globals.userList!.length,
-                    itemBuilder: (context, index) {
-                      return SearchResultCard(
-                        displayName: (globals.userList![index].firstName! +
-                                ' ' +
-                                globals.userList![index].lastName!)
-                            .toTitleCase(),
-                        email: globals.userList![index].email,
-                        username: globals.userList![index].username,
-                        imageUrl: globals.userList![index].profilePicture,
-                        id: globals.userList![index].id,
-                      );
-                    },
-                  );
-                },
+            onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
+            icon: globals.user!.profilePicture == null
+                ? ImagePlaceholder(
+                    width: getScreenWidth(40),
+                    height: getScreenHeight(40),
+                  )
+                : ProfilePicture(
+                    width: getScreenWidth(40),
+                    height: getScreenHeight(40),
+                  ),
+          ).paddingOnly(t: 10, l: 10),
+          title: CustomRoundTextField(
+            hintText: 'Search ReachMe',
+            fillColor: AppColors.white,
+            controller: _searchController,
+            maxLines: 1,
+            onChanged: (val) {
+              if (val.isNotEmpty) {
+                _hasText.value = true;
+                _searchString.value = val;
+                globals.userBloc!.add(FetchAllUsersByNameEvent(
+                  limit: 20,
+                  pageNumber: 1,
+                  query: val,
+                ));
+              } else {
+                _hasText.value = false;
+              }
+            },
+          ).paddingOnly(t: 10),
+          actions: [
+            IconButton(
+              padding: const EdgeInsets.all(0),
+              icon: SvgPicture.asset(
+                'assets/svgs/Setting.svg',
+                width: 25,
+                height: 25,
               ),
+              onPressed: () {},
+            ).paddingOnly(t: 10, r: 10),
+          ],
+        ),
+        body: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: !_hasText.value
+              ? const SearchStories()
+              : BlocConsumer<UserBloc, UserState>(
+                  bloc: globals.userBloc,
+                  listener: (context, state) {
+                    if (state is FetchUsersSuccess) {
+                      globals.userList = state.user;
+                    } else if (state is UserError) {
+                      Snackbars.error(context, message: state.error);
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is UserLoading) {
+                      return const Center(child: CupertinoActivityIndicator());
+                    }
+                    if (globals.userList!.isEmpty) {
+                      return SearchNoResultFound(size: size)
+                          .paddingSymmetric(h: 16);
+                    }
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: globals.userList!.length,
+                      itemBuilder: (context, index) {
+                        return SearchResultCard(
+                          displayName: (globals.userList![index].firstName! +
+                                  ' ' +
+                                  globals.userList![index].lastName!)
+                              .toTitleCase(),
+                          email: globals.userList![index].email,
+                          username: globals.userList![index].username,
+                          imageUrl: globals.userList![index].profilePicture,
+                          id: globals.userList![index].id,
+                        );
+                      },
+                    );
+                  },
+                ),
+        ),
       ),
     );
   }
@@ -193,68 +193,69 @@ class SearchResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is RecipientUserData) {
-            globals.recipientUser = state.user;
-            //  email == globals.user!.email
-            //       ? RouteNavigators.route(context, const AccountScreen())
-            //       : RouteNavigators.route(
-            //           context, RecipientAccountProfile(email: email));
-          } else if (state is UserError) {
-            Snackbars.error(context, message: state.error);
-          }
-        },
-        builder: (context, state) {
-          if (state is UserLoading) {
-            return Center(
-                child: Platform.isIOS
-                    ? const CupertinoActivityIndicator()
-                    : const CircularProgressIndicator());
-          }
-          return InkWell(
-            onTap: () {
-              globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-              email == globals.user!.email
-                  ? RouteNavigators.route(context, const AccountScreen())
-                  : RouteNavigators.route(
-                      context,
-                      RecipientAccountProfile(
-                        recipientEmail: email,
-                        recipientImageUrl: imageUrl,
-                        recipientId: id,
-                      ));
-            },
-            child: ListTile(
-              leading: imageUrl == null
-                  ? ImagePlaceholder(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                    )
-                  : RecipientProfilePicture(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                      imageUrl: imageUrl,
-                    ),
-              title: Text(
-                username ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: Text(
-                displayName ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2.withOpacity(0.7),
-                  fontWeight: FontWeight.w400,
-                ),
+      bloc: globals.userBloc,
+      listener: (context, state) {
+        if (state is RecipientUserData) {
+          globals.recipientUser = state.user;
+          //  email == globals.user!.email
+          //       ? RouteNavigators.route(context, const AccountScreen())
+          //       : RouteNavigators.route(
+          //           context, RecipientAccountProfile(email: email));
+        } else if (state is UserError) {
+          Snackbars.error(context, message: state.error);
+        }
+      },
+      builder: (context, state) {
+        if (state is UserLoading) {
+          return Center(
+              child: Platform.isIOS
+                  ? const CupertinoActivityIndicator()
+                  : const CircularProgressIndicator());
+        }
+        return InkWell(
+          onTap: () {
+            globals.userBloc!.add(GetRecipientProfileEvent(email: email));
+            email == globals.user!.email
+                ? RouteNavigators.route(context, const AccountScreen())
+                : RouteNavigators.route(
+                    context,
+                    RecipientAccountProfile(
+                      recipientEmail: email,
+                      recipientImageUrl: imageUrl,
+                      recipientId: id,
+                    ));
+          },
+          child: ListTile(
+            leading: imageUrl == null
+                ? ImagePlaceholder(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                  )
+                : RecipientProfilePicture(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                    imageUrl: imageUrl,
+                  ),
+            title: Text(
+              username ?? '',
+              style: TextStyle(
+                fontSize: getScreenHeight(15),
+                color: AppColors.textColor2,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          );
-        });
+            // subtitle: Text(
+            //   displayName ?? '',
+            //   style: TextStyle(
+            //     fontSize: getScreenHeight(15),
+            //     color: AppColors.textColor2.withOpacity(0.7),
+            //     fontWeight: FontWeight.w400,
+            //   ),
+            // ),
+          ),
+        );
+      },
+    );
   }
 }
 

@@ -161,7 +161,6 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is FetchUserReachingsSuccess) {
                   _reachingList.value = state.reachings!;
-                  print(_reachingList.value.length);
                 }
                 if (state is FetchUserStarredSuccess) {
                   _starsList.value = state.starredUsers!;
@@ -557,7 +556,6 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
               listener: (context, state) {
                 if (state is FetchUserReachersSuccess) {
                   _reachersList.value = state.reachers!;
-                  
                 }
                 if (state is FetchUserReachingsSuccess) {
                   _reachingList.value = state.reachings!;
