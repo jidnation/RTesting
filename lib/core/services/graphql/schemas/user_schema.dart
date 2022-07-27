@@ -41,3 +41,19 @@ class ReacherProfileSchema {
         ''';
   }
 }
+
+class ProfileIndexSchema {
+  ProfileIndexSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            firstName
+            lastName
+            profilePicture
+            profileSlug
+            username
+            verified
+        ''';
+  }
+}

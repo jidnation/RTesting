@@ -388,3 +388,44 @@ class PostProfileModel {
         "username": username,
       };
 }
+
+class ProfileIndexModel {
+  String? authId;
+  String? firstName;
+  String? lastName;
+  String? profilePicture;
+  String? profileSlug;
+  bool? verified;
+  String? username;
+
+  ProfileIndexModel({
+    this.authId,
+    this.firstName,
+    this.lastName,
+    this.profilePicture,
+    this.profileSlug,
+    this.username,
+    this.verified,
+  });
+
+  factory ProfileIndexModel.fromJson(Map<String, dynamic> json) =>
+      ProfileIndexModel(
+        authId: json["authId"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        verified: json["verified"],
+        username: json["username"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "authId": authId,
+        "firstName": firstName,
+        "lastName": lastName,
+        "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "verified": verified,
+        "username": username,
+      };
+}

@@ -13,6 +13,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
@@ -67,10 +68,10 @@ class _SearchScreenState extends State<SearchScreen>
               if (val.isNotEmpty) {
                 _hasText.value = true;
                 _searchString.value = val;
-                globals.userBloc!.add(FetchAllUsersByNameEvent(
-                  limit: 20,
+                globals.socialServiceBloc!.add(SearchProfileEvent(
+                  pageLimit: 20,
                   pageNumber: 1,
-                  query: val,
+                  name: val,
                 ));
               } else {
                 _hasText.value = false;
@@ -94,12 +95,12 @@ class _SearchScreenState extends State<SearchScreen>
           height: size.height,
           child: !_hasText.value
               ? const SearchStories()
-              : BlocConsumer<UserBloc, UserState>(
-                  bloc: globals.userBloc,
+              : BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                  bloc: globals.socialServiceBloc,
                   listener: (context, state) {
-                    if (state is FetchUsersSuccess) {
-                      globals.userList = state.user;
-                    } else if (state is UserError) {
+                    if (state is SearchProfileSuccess) {
+                      globals.userList = state.users!;
+                    } else if (state is SearchProfileError) {
                       Snackbars.error(context, message: state.error);
                     }
                   },
@@ -121,10 +122,10 @@ class _SearchScreenState extends State<SearchScreen>
                                   ' ' +
                                   globals.userList![index].lastName!)
                               .toTitleCase(),
-                          email: globals.userList![index].email,
+                          //: globals.userList![index].,
                           username: globals.userList![index].username,
                           imageUrl: globals.userList![index].profilePicture,
-                          id: globals.userList![index].id,
+                          id: globals.userList![index].authId,
                         );
                       },
                     );
@@ -180,14 +181,14 @@ class SearchResultCard extends StatelessWidget {
     required this.username,
     required this.displayName,
     required this.imageUrl,
-    required this.email,
+    // required this.email,
     required this.id,
   }) : super(key: key);
 
   final String? imageUrl;
   final String? username;
   final String? displayName;
-  final String? email;
+  // final String? email;
   final String? id;
 
   @override
@@ -214,13 +215,13 @@ class SearchResultCard extends StatelessWidget {
         }
         return InkWell(
           onTap: () {
-            globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-            email == globals.user!.email
+            globals.userBloc!.add(GetRecipientProfileEvent(email: id));
+            id == globals.user!.id
                 ? RouteNavigators.route(context, const AccountScreen())
                 : RouteNavigators.route(
                     context,
                     RecipientAccountProfile(
-                      recipientEmail: email,
+                      recipientEmail: 'email',
                       recipientImageUrl: imageUrl,
                       recipientId: id,
                     ));

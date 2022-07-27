@@ -214,3 +214,16 @@ class CreateStatusEvent extends SocialServiceEvent {
   final CreateStatusDto? createStatusDto;
   CreateStatusEvent({required this.createStatusDto});
 }
+
+class SearchProfileEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  final String? name;
+  SearchProfileEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+    this.name,
+  });
+}
+
+class SuggestUserEvent extends SocialServiceEvent {}

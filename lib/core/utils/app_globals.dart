@@ -6,6 +6,7 @@ import 'package:reach_me/features/auth/data/models/login_response.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -29,7 +30,7 @@ class AppGlobals {
   User? user;
   List<Chat>? userChat;
   User? recipientUser;
-  List<User>? userList;
+  List<ProfileIndexModel>? userList;
   List<ChatsThread>? userThreads;
   LoginResponse? loginResponse;
 

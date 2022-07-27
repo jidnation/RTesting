@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
@@ -428,6 +429,32 @@ class SocialServiceRepository {
       final posts = await _homeRemoteDataSource.createStatus(
           createStatusDto: createStatusDto);
       return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<ProfileIndexModel>>> searchProfile({
+    required int pageLimit,
+    required int pageNumber,
+    required String name,
+  }) async {
+    try {
+      final users = await _homeRemoteDataSource.searchProfile(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+        name: name,
+      );
+      return Right(users);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<User>>> suggestUser() async {
+    try {
+      final users = await _homeRemoteDataSource.suggestUser();
+      return Right(users);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

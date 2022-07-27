@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -462,6 +463,34 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetStatusError(error: e.message));
+      }
+    });
+    on<SuggestUserEvent>((event, emit) async {
+      emit(SuggestUserLoading());
+      try {
+        final response = await socialServiceRepository.suggestUser();
+        response.fold(
+          (error) => emit(SuggestUserError(error: error)),
+          (users) => emit(SuggestUserSuccess(users: users)),
+        );
+      } on GraphQLError catch (e) {
+        emit(SuggestUserError(error: e.message));
+      }
+    });
+    on<SearchProfileEvent>((event, emit) async {
+      emit(SearchProfileLoading());
+      try {
+        final response = await socialServiceRepository.searchProfile(
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+          name: event.name!,
+        );
+        response.fold(
+          (error) => emit(SearchProfileError(error: error)),
+          (users) => emit(SearchProfileSuccess(users: users)),
+        );
+      } on GraphQLError catch (e) {
+        emit(SearchProfileError(error: e.message));
       }
     });
   }

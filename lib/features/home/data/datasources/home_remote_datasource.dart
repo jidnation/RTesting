@@ -473,7 +473,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'page_limit': pageLimit,
         'page_number': pageNumber,
-       // 'authId': authId,
+        // 'authId': authId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -1382,6 +1382,67 @@ class HomeRemoteDataSource {
       Console.log('get status feed', result.data);
       return (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<User>> suggestUser() async {
+    String q = r'''
+        query suggestUser() {
+          suggestUser() {
+            ''' +
+        UserSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return (result.data['suggestUser'] as List)
+          .map((e) => User.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<ProfileIndexModel>> searchProfile({
+    required int? pageLimit,
+    required int? pageNumber,
+    required String? name,
+  }) async {
+    String q = r'''
+        query searchProfile(
+          $limit: Int!
+          $pageNumber: Int!
+          $name: String!
+          ) {
+          searchProfile(
+            name: $name
+            limit: $limit
+            pageNumber: $pageNumber
+          ){   
+               ''' +
+        ProfileIndexSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'limit': pageLimit,
+        'pageNumber': pageNumber,
+        'name': name,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('search profile', result.data);
+      return (result.data!['searchProfile'] as List)
+          .map((e) => ProfileIndexModel.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;

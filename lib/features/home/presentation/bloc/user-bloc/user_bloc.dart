@@ -115,7 +115,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         response.fold(
           (error) => emit(UserError(error: error)),
           (usersList) {
-            globals.userList = usersList;
+            //globals.userList = usersList;
             emit(FetchUsersSuccess(user: usersList));
           },
         );

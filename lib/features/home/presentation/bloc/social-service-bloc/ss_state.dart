@@ -426,3 +426,31 @@ class CreateStatusError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
+
+class SearchProfileLoading extends SocialServiceState {}
+
+class SearchProfileSuccess extends SocialServiceState {
+  final List<ProfileIndexModel>? users;
+  SearchProfileSuccess({this.users});
+}
+
+class SearchProfileError extends SocialServiceState {
+  final String error;
+  SearchProfileError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class SuggestUserLoading extends SocialServiceState {}
+
+class SuggestUserSuccess extends SocialServiceState {
+  final List<User>? users;
+  SuggestUserSuccess({this.users});
+}
+
+class SuggestUserError extends SocialServiceState {
+  final String error;
+  SuggestUserError({required this.error});
+  @override
+  List<Object> get props => [error];
+}

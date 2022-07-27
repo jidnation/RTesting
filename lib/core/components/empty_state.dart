@@ -1,233 +1,339 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/custom_button.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:skeletons/skeletons.dart';
 
-class EmptyTimelineWidget extends HookWidget {
+class EmptyTimelineWidget extends StatefulHookWidget {
   const EmptyTimelineWidget({Key? key, required this.loading})
       : super(key: key);
 
   final bool loading;
 
   @override
+  State<EmptyTimelineWidget> createState() => _EmptyTimelineWidgetState();
+}
+
+class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
+  Set<int> active = {};
+
+  handleTap(int index) {
+    if (active.isNotEmpty) active.clear();
+    setState(() {
+      active.add(index);
+    });
+    return active;
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    final reachBtnTap = useState<bool>(false);
+    final reachLabel = useState('Reach');
+    final reachingUser = useState(false);
+    final suggestedUsers = useState<List<User>>([]);
+    final isLoading = useState<bool>(true);
+    useEffect(() {
+      globals.socialServiceBloc!.add(SuggestUserEvent());
+      return null;
+    }, []);
     return SizedBox(
-      child: ListView(
-        shrinkWrap: true,
-        padding: EdgeInsets.zero,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          SizedBox(height: getScreenHeight(30)),
-          Text(
-            'We are happy to have you on\nReachMe ${globals.fname!.toTitleCase()} 🎉',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: getScreenHeight(20),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: getScreenHeight(12)),
-          Text(
-            "Let’s get you up to speed on the happenings and\nevents around you, reach people to see contents\nthey share.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF767474),
-              fontSize: getScreenHeight(14),
-            ),
-          ),
-          SizedBox(height: getScreenHeight(30)),
-          Text(
-            "ReachMe recommended",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: getScreenHeight(15),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: getScreenHeight(15)),
-          SizedBox(
-            height: getScreenHeight(350),
-            width: getScreenWidth(300),
-            child: Swiper(
-              loop: false,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+          bloc: globals.socialServiceBloc,
+          listener: (context, state) {
+            if (state is SuggestUserError) {
+              isLoading.value = false;
+              suggestedUsers.value = [];
+            }
+            if (state is SuggestUserSuccess) {
+              isLoading.value = false;
+              suggestedUsers.value = state.users!;
+            }
+          },
+          builder: (context, state) {
+            return BlocConsumer<UserBloc, UserState>(
+                bloc: globals.userBloc,
+                listener: (context, state) {
+                  if (state is UserLoaded) {
+                    reachingUser.value = false;
+                  }
+                  if (state is UserError) {
+                    if (state.error!.contains('reaching')) {
+                      reachLabel.value = 'Reaching';
+                    }
+                    reachingUser.value = false;
+                  }
+                },
+                builder: (context, state) {
+                  return ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          onPressed: () {},
-                          constraints: const BoxConstraints(),
-                          padding: const EdgeInsets.all(0),
-                          icon: const Icon(
-                            Icons.close,
-                            size: 20,
-                            color: Color(0xFF979797),
-                          ),
-                        ),
-                      ),
-                      ImagePlaceholder(
-                        height: getScreenHeight(88),
-                        width: getScreenHeight(88),
-                      ),
-                      SizedBox(height: getScreenHeight(11)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FittedBox(
-                            child: Text(
-                              "Bad Guy ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.textColor2,
-                                fontSize: getScreenHeight(16),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          SvgPicture.asset('assets/svgs/verified.svg')
-                        ],
-                      ),
+                      SizedBox(height: getScreenHeight(30)),
                       Text(
-                        "@badguy",
+                        'We are happy to have you on\nReachMe ${globals.fname!.toTitleCase()} 🎉',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: AppColors.textColor2.withOpacity(0.5),
-                          fontSize: getScreenHeight(12),
+                          color: AppColors.textColor2,
+                          fontSize: getScreenHeight(20),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: getScreenHeight(15)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: getScreenWidth(65),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '2K',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(13),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Reachers',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(12),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: getScreenWidth(65),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '270',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(13),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Reaching',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(12),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: getScreenWidth(65),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '300',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(13),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Stars',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(12),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
+                      SizedBox(height: getScreenHeight(12)),
+                      Text(
+                        "Let’s get you up to speed on the happenings and\nevents around you, reach people to see contents\nthey share.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: const Color(0xFF767474),
+                          fontSize: getScreenHeight(14),
+                        ),
+                      ),
+                      SizedBox(height: getScreenHeight(30)),
+                      Text(
+                        "ReachMe recommended",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textColor2,
+                          fontSize: getScreenHeight(15),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       SizedBox(height: getScreenHeight(15)),
-                      CustomButton(
-                        label: reachBtnTap.value ? 'Reaching' : 'Reach',
-                        color: reachBtnTap.value
-                            ? AppColors.white
-                            : AppColors.primaryColor,
-                        onPressed: () {
-                          reachBtnTap.value = !reachBtnTap.value;
-                        },
-                        size: size,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
+                      SizedBox(
+                        height: getScreenHeight(300),
+                        width: getScreenWidth(100),
+                        child: Swiper(
+                          loop: false,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SuggestedUserContainer(
+                              size: size,
+                              user: suggestedUsers.value[index],
+                              onReach: () {
+                                handleTap(index);
+                                if (active.contains(index)) {
+                                  reachingUser.value = true;
+                                  globals.userBloc!.add(ReachUserEvent(
+                                      userIdToReach:
+                                          suggestedUsers.value[index].id!));
+                                }
+                              },
+                              onDelete: () {
+                                handleTap(index);
+                                if (active.contains(index)) {
+                                  suggestedUsers.value.removeAt(index);
+                                }
+                              },
+                              loaderColor: AppColors.white,
+                              btnColour: active.contains(index)
+                                  ? reachLabel.value == 'Reaching'
+                                      ? Colors.transparent
+                                      : AppColors.primaryColor
+                                  : AppColors.primaryColor,
+                              textColor: active.contains(index)
+                                  ? reachLabel.value == 'Reaching'
+                                      ? AppColors.primaryColor
+                                      : AppColors.white
+                                  : AppColors.white,
+                              isLoading: active.contains(index)
+                                  ? reachingUser.value
+                                  : false,
+                              label: active.contains(index)
+                                  ? reachLabel.value
+                                  : 'Reach',
+                            );
+                          },
+                          itemCount: suggestedUsers.value.length,
+                          viewportFraction: getScreenHeight(0.7),
+                          scale: getScreenHeight(0.7),
                         ),
-                        textColor: reachBtnTap.value
-                            ? AppColors.primaryColor
-                            : AppColors.white,
-                        borderSide: reachBtnTap.value
-                            ? const BorderSide(
-                                color: AppColors.primaryColor, width: 1)
-                            : BorderSide.none,
-                      ).paddingSymmetric(h: 45),
-                      SizedBox(height: getScreenHeight(9)),
+                      )
                     ],
-                  ).paddingSymmetric(h: 16, v: 16),
-                );
-              },
-              itemCount: 10,
-              viewportFraction: 0.8,
-              scale: 0.9,
-            ),
-          )
-        ],
-      ),
+                  );
+                });
+          }),
     ).paddingSymmetric(h: 13);
+  }
+}
+
+class SuggestedUserContainer extends StatelessWidget {
+  const SuggestedUserContainer({
+    Key? key,
+    required this.size,
+    required this.onReach,
+    required this.user,
+    required this.btnColour,
+    required this.loaderColor,
+    required this.isLoading,
+    required this.label,
+    required this.textColor,
+    required this.onDelete,
+  }) : super(key: key);
+
+  final Size size;
+  final User user;
+  final VoidCallback onReach, onDelete;
+  final Color textColor, btnColour, loaderColor;
+  final bool isLoading;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              onPressed: onDelete,
+              constraints: const BoxConstraints(),
+              padding: const EdgeInsets.all(0),
+              icon: const Icon(
+                Icons.close,
+                size: 20,
+                color: Color(0xFF979797),
+              ),
+            ),
+          ),
+          ImagePlaceholder(
+            height: getScreenHeight(70),
+            width: getScreenHeight(70),
+          ),
+          SizedBox(height: getScreenHeight(13)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FittedBox(
+                child: Text(
+                  "@${user.username}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textColor2,
+                    fontSize: getScreenHeight(16),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              user.verified!
+                  ? SvgPicture.asset('assets/svgs/verified.svg')
+                  : const SizedBox.shrink(),
+            ],
+          ),
+          SizedBox(height: getScreenHeight(20)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: getScreenWidth(65),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      user.nReachers.toString(),
+                      style: TextStyle(
+                        fontSize: getScreenHeight(13),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Reachers',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(12),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: getScreenWidth(65),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      user.nReaching.toString(),
+                      style: TextStyle(
+                        fontSize: getScreenHeight(13),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Reaching',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(12),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: getScreenWidth(65),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      user.nStaring.toString(),
+                      style: TextStyle(
+                        fontSize: getScreenHeight(13),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Stars',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(12),
+                        color: AppColors.greyShade2,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          SizedBox(height: getScreenHeight(20)),
+          CustomButton(
+            label: label,
+            color: btnColour,
+            onPressed: onReach,
+            isLoading: isLoading,
+            loaderColor: loaderColor,
+            labelFontSize: getScreenHeight(14),
+            size: size,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 10,
+            ),
+            textColor: textColor,
+            borderSide:
+                const BorderSide(color: AppColors.primaryColor, width: 1),
+          ).paddingSymmetric(h: 45),
+          SizedBox(height: getScreenHeight(9)),
+        ],
+      ).paddingSymmetric(h: 16, v: 16),
+    );
   }
 }
 

@@ -1277,7 +1277,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.userBloc!
-        .add(GetRecipientProfileEvent(email: widget.recipientEmail));
+        .add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!
         .add(GetReachRelationshipEvent(userIdToReach: widget.recipientId));
     globals.userBloc!
