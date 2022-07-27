@@ -17,6 +17,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
+import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
@@ -47,6 +48,7 @@ class _AccountScreenState extends State<AccountScreen>
 
   late final _reachoutsRefreshController = RefreshController();
   late final _commentsRefreshController = RefreshController();
+  late final _savedPostsRefreshController = RefreshController();
   // late final _shoutoutsRefreshController = RefreshController();
   // late final _shoutdownsRefreshController = RefreshController();
   // late final _likesRefreshController = RefreshController();
@@ -55,7 +57,7 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   TabBar get _tabBar => TabBar(
@@ -126,7 +128,7 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     child: FittedBox(
                       child: Text(
-                        'Comment',
+                        'Comments',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontWeight: FontWeight.w400,
@@ -170,6 +172,35 @@ class _AccountScreenState extends State<AccountScreen>
               ),
             ),
           ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(3);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 3
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Saved posts',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 3
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       );
   String message = '';
@@ -183,14 +214,15 @@ class _AccountScreenState extends State<AccountScreen>
     super.build(context);
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
-
+    final _savedPosts = useState<List<SavePostModel>>([]);
     useEffect(() {
       globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
       globals.socialServiceBloc!
           .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
           pageLimit: 50, pageNumber: 1, authId: globals.user!.id));
-
+      globals.socialServiceBloc!
+          .add(GetAllSavedPostsEvent(pageLimit: 50, pageNumber: 1));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -224,6 +256,12 @@ class _AccountScreenState extends State<AccountScreen>
                     Snackbars.error(context, message: state.error);
                     _commentsRefreshController.refreshFailed();
                   }
+                  if (state is GetAllSavedPostsSuccess) {
+                    _savedPosts.value = state.data!;
+                  }
+                  if (state is GetAllSavedPostsError) {
+                    Snackbars.error(context, message: state.error);
+                  }
                 },
                 builder: (context, state) {
                   bool _isLoading = state is GetAllPostsLoading;
@@ -239,8 +277,8 @@ class _AccountScreenState extends State<AccountScreen>
                           SizedBox(
                             height: getScreenHeight(140),
                             width: size.width,
-                            child: Image.network(
-                              'https://wallpaperaccess.com/full/3956728.jpg',
+                            child: Image.asset(
+                              'assets/images/cover.png',
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -550,6 +588,30 @@ class _AccountScreenState extends State<AccountScreen>
                                 )
                               ],
                             ),
+
+                            //SAVED POSTS TAB
+                            if (_isLoading)
+                              const CircularLoader()
+                            else
+                              _savedPosts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "No saved posts",
+                                          subtitle: "",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _savedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return SavedPostReacherCardd(
+                                            savedPostModel:
+                                                _savedPosts.value[index]);
+                                      },
+                                    ),
                           ],
                         ),
                       ),
@@ -581,14 +643,6 @@ class _ReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final isLiked = useState(false);
-    // useEffect(() {
-    //   globals.socialServiceBloc!
-    //       .add(CheckPostLikeEvent(postId: postModel!.postId));
-    //   globals.socialServiceBloc!
-    //       .add(CheckPostVoteEvent(postId: postModel!.postId));
-    //   return null;
-    // }, []);
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -603,20 +657,7 @@ class _ReacherCard extends HookWidget {
         ),
         child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
             bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              // if (state is CheckPostLikeError) {
-              //   Snackbars.error(context, message: state.error);
-              // }
-              // if (state is CheckPostLikeSuccess) {
-              //   isLiked.value = state.checkPostLike!;
-              // }
-              // if (state is CheckPostVoteError) {
-              //   Snackbars.error(context, message: state.error);
-              // }
-              // if (state is CheckPostVoteSuccess) {
-              //   // postFeedModel!.isVoted = state.isVoted;
-              // }
-            },
+            listener: (context, state) {},
             builder: (context, state) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -642,10 +683,7 @@ class _ReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    (globals.user!.firstName! +
-                                            ' ' +
-                                            globals.user!.lastName!)
-                                        .toTitleCase(),
+                                    '@${globals.user!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w600,
@@ -745,6 +783,8 @@ class _ReacherCard extends HookWidget {
                                 icon: SvgPicture.asset(
                                   'assets/svgs/like.svg',
                                   color: likeColour,
+                                  height: 20,
+                                  width: 20,
                                 ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
@@ -790,6 +830,8 @@ class _ReacherCard extends HookWidget {
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
                                   'assets/svgs/message.svg',
+                                  height: 20,
+                                  width: 20,
                                 ),
                               ),
                             ],
@@ -821,6 +863,7 @@ class _ReacherCard extends HookWidget {
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
                                       'assets/svgs/upvote-active.svg',
+                                      height: 20,
                                     ),
                                   ),
                                   Flexible(
@@ -835,6 +878,7 @@ class _ReacherCard extends HookWidget {
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
                                       'assets/svgs/downvote.svg',
+                                      width: 20,
                                     ),
                                   ),
                                   Flexible(
@@ -1448,8 +1492,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                       SizedBox(
                         height: getScreenHeight(140),
                         width: size.width,
-                        child: Image.network(
-                          'https://wallpaperaccess.com/full/3956728.jpg',
+                        child: Image.asset(
+                          'assets/images/cover.png',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -1530,19 +1574,18 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     children: [
                       SizedBox(height: getScreenHeight(10)),
                       Text(
-                          ('${globals.recipientUser!.firstName} ${globals.recipientUser!.lastName}')
-                              .toTitleCase(),
+                          ('@${globals.recipientUser!.username}').toLowerCase(),
                           style: TextStyle(
                             fontSize: getScreenHeight(15),
                             fontWeight: FontWeight.w500,
                             color: AppColors.textColor2,
                           )),
-                      Text('@${globals.recipientUser!.username ?? 'username'}',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(13),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
-                          )),
+                      // Text('@${globals.recipientUser!.username ?? 'username'}',
+                      //     style: TextStyle(
+                      //       fontSize: getScreenHeight(13),
+                      //       fontWeight: FontWeight.w400,
+                      //       color: AppColors.textColor2,
+                      //     )),
                       SizedBox(height: getScreenHeight(15)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,

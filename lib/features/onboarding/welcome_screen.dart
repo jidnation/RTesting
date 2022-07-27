@@ -55,7 +55,8 @@ class WelcomeScreen extends StatelessWidget {
               CustomButton(
                 label: 'Login',
                 color: AppColors.textColor2,
-                onPressed: () => RouteNavigators.route(context, LoginScreen()),
+                onPressed: () =>
+                    RouteNavigators.route(context, const LoginScreen()),
                 size: size,
                 textColor: AppColors.white,
                 borderSide: BorderSide.none,

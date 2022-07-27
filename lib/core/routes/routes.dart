@@ -1,6 +1,4 @@
 import 'package:reach_me/core/routes/page_route.dart';
-import 'package:reach_me/features/account/presentation/views/abbreviation.dart';
-import 'package:reach_me/features/account/presentation/views/dictionary.dart';
 import 'package:reach_me/features/account/presentation/views/qr_code.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
@@ -116,11 +114,11 @@ class RMRouter {
       case ScanQRCodeScreen.id:
         return RMPageRoute(builder: (_) => const ScanQRCodeScreen());
 
-      case Dictionary.id:
-        return RMPageRoute(builder: (_) => const Dictionary());
+      // case Dictionary.id:
+      //   return RMPageRoute(builder: (_) => const Dictionary());
 
-      case Abbreviation.id:
-        return RMPageRoute(builder: (_) => const Abbreviation());
+      // case Abbreviation.id:
+      //   return RMPageRoute(builder: (_) => const Abbreviation());
 
       default:
         return RMPageRoute(

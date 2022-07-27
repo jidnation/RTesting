@@ -167,31 +167,11 @@ class AppDrawer extends HookWidget {
                         RouteNavigators.route(context, const AccountScreen());
                       },
                     ),
-                    // DrawerItem(
-                    //   action: 'Shoutouts',
-                    //   icon: 'assets/svgs/shoutout-d.svg',
-                    //   onPressed: () {},
-                    // ),
-                    // DrawerItem(
-                    //   action: 'Shoutdown',
-                    //   icon: 'assets/svgs/shoutdown-d.svg',
-                    //   onPressed: () {},
-                    // ),
                     DrawerItem(
                       action: 'Saved posts',
                       icon: 'assets/svgs/saved-d.svg',
                       onPressed: () => RouteNavigators.route(
                           context, const SavedPostScreen()),
-                    ),
-                    DrawerItem(
-                      action: 'Abbreviation',
-                      icon: 'assets/svgs/na.svg',
-                      onPressed: () {},
-                    ),
-                    DrawerItem(
-                      action: 'Dictionary',
-                      icon: 'assets/svgs/dictionary-d.svg',
-                      onPressed: () {},
                     ),
                     const SizedBox(height: 10),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),

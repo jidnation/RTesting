@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -6,11 +7,7 @@ import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/features/account/presentation/views/abbreviation.dart';
-import 'package:reach_me/features/account/presentation/views/dictionary.dart';
-import 'package:reach_me/features/account/presentation/views/qr_code.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
-import 'package:reach_me/features/account/presentation/views/starred_profile.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -68,25 +65,25 @@ Future showProfileMenuBottomSheet(BuildContext context,
               else
                 Column(
                   children: [
-                    KebabBottomTextButton(
-                        label: 'Dictionary',
-                        onPressed: () =>
-                            RouteNavigators.route(context, const Dictionary())),
-                    KebabBottomTextButton(
-                        label: 'Abbreviation',
-                        onPressed: () => RouteNavigators.route(
-                            context, const Abbreviation())),
-                    KebabBottomTextButton(
-                        label: 'Starred Profiles',
-                        onPressed: () {
-                          RouteNavigators.route(
-                              context, const StarredProfileScreen());
-                        }),
-                    KebabBottomTextButton(
-                        label: 'QR Code',
-                        onPressed: () {
-                          RouteNavigators.route(context, const QRCodeScreen());
-                        }),
+                    // KebabBottomTextButton(
+                    //     label: 'Dictionary',
+                    //     onPressed: () =>
+                    //         RouteNavigators.route(context, const Dictionary())),
+                    // KebabBottomTextButton(
+                    //     label: 'Abbreviation',
+                    //     onPressed: () => RouteNavigators.route(
+                    //         context, const Abbreviation())),
+                    // KebabBottomTextButton(
+                    //     label: 'Starred Profiles',
+                    //     onPressed: () {
+                    //       RouteNavigators.route(
+                    //           context, const StarredProfileScreen());
+                    //     }),
+                    // KebabBottomTextButton(
+                    //     label: 'QR Code',
+                    //     onPressed: () {
+                    //       RouteNavigators.route(context, const QRCodeScreen());
+                    //     }),
                     KebabBottomTextButton(
                         label: 'Saved Post',
                         onPressed: () {
@@ -94,8 +91,15 @@ Future showProfileMenuBottomSheet(BuildContext context,
                               context, const SavedPostScreen());
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Profile', onPressed: () {}),
-                    KebabBottomTextButton(label: 'More', onPressed: () {}),
+                        label: 'Share Profile',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Clipboard.setData(
+                              ClipboardData(text: globals.user!.profileSlug));
+                          Snackbars.success(context,
+                              message: 'Profile link copied to clipboard!');
+                        }),
+                    // KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 ),
               const SizedBox(height: 20),
@@ -200,10 +204,34 @@ Future showReacherCardBottomSheet(BuildContext context,
                             globals.socialServiceBloc!.add(
                                 SavePostEvent(postId: postFeedModel.postId));
                           }),
-                      const KebabBottomTextButton(label: 'Report'),
-                      const KebabBottomTextButton(label: 'Reach user'),
-                      const KebabBottomTextButton(label: 'Star user'),
-                      const KebabBottomTextButton(label: 'Copy link'),
+                      KebabBottomTextButton(
+                        label: 'Report',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                        },
+                      ),
+                      KebabBottomTextButton(
+                        label: 'Reach user',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                        },
+                      ),
+                      KebabBottomTextButton(
+                        label: 'Star user',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                        },
+                      ),
+                      KebabBottomTextButton(
+                        label: 'Copy link',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Clipboard.setData(ClipboardData(
+                              text: postFeedModel.post!.postSlug!));
+                          Snackbars.success(context,
+                              message: 'Link copied to clipboard');
+                        },
+                      ),
                     ],
                   )
                 else
@@ -224,8 +252,25 @@ Future showReacherCardBottomSheet(BuildContext context,
                             RouteNavigators.pop(context);
                           }),
                       KebabBottomTextButton(
-                          label: 'Share Post', onPressed: () {}),
-                      const KebabBottomTextButton(label: 'Copy link'),
+                        label: 'Share Post',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Clipboard.setData(ClipboardData(
+                              text: postFeedModel.post!.postSlug!));
+                          Snackbars.success(context,
+                              message: 'Link copied to clipboard');
+                        },
+                      ),
+                      KebabBottomTextButton(
+                        label: 'Copy link',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Clipboard.setData(ClipboardData(
+                              text: postFeedModel.post!.postSlug!));
+                          Snackbars.success(context,
+                              message: 'Link copied to clipboard');
+                        },
+                      ),
                     ],
                   ),
                 SizedBox(height: getScreenHeight(20)),

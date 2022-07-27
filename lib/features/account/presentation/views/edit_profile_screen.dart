@@ -95,8 +95,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: SizedBox(
                         height: getScreenHeight(150),
                         width: size.width,
-                        child: Image.network(
-                          'https://wallpaperaccess.com/full/3956728.jpg',
+                        child: Image.asset(
+                          'assets/images/cover.png',
                           fit: BoxFit.cover,
                         ),
                       ),

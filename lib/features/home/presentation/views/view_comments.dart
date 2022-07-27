@@ -329,6 +329,8 @@ class CommentsTile extends StatelessWidget {
                           constraints: const BoxConstraints(),
                           icon: SvgPicture.asset(
                             'assets/svgs/like.svg',
+                            height: 20,
+                            width: 20,
                           ),
                         ),
                         SizedBox(width: getScreenWidth(4)),
@@ -351,6 +353,8 @@ class CommentsTile extends StatelessWidget {
                             constraints: const BoxConstraints(),
                             icon: SvgPicture.asset(
                               'assets/svgs/message.svg',
+                              height: 20,
+                              width: 20,
                             ),
                           ),
                       ],
@@ -358,69 +362,6 @@ class CommentsTile extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: getScreenWidth(20)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xFFF5F5F5),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              icon: SvgPicture.asset(
-                                'assets/svgs/shoutout-a.svg',
-                              ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            // FittedBox(
-                            //   child: Text(
-                            //     '${postFeedModel!.post!.nUpvotes}',
-                            //     style: TextStyle(
-                            //       fontSize: getScreenHeight(12),
-                            //       fontWeight: FontWeight.w500,
-                            //       color: AppColors.textColor3,
-                            //     ),
-                            //   ),
-                            // ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            IconButton(
-                              onPressed: () {},
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              icon: SvgPicture.asset(
-                                'assets/svgs/shoutdown.svg',
-                              ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            // FittedBox(
-                            //   child: Text(
-                            //     '${postFeedModel!.post!.nDownvotes}',
-                            //     style: TextStyle(
-                            //       fontSize: getScreenHeight(12),
-                            //       fontWeight: FontWeight.w500,
-                            //       color: AppColors.textColor3,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             )
           ],

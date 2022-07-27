@@ -132,7 +132,7 @@ class SavedPostScreen extends HookWidget {
                           : ListView.builder(
                               itemCount: _savedPosts.value.length,
                               itemBuilder: (context, index) {
-                                return _SavedPostReacherCard(
+                                return SavedPostReacherCardd(
                                     savedPostModel: _savedPosts.value[index]);
                               },
                             ),
@@ -167,8 +167,8 @@ class SavedPostScreen extends HookWidget {
   }
 }
 
-class _SavedPostReacherCard extends HookWidget {
-  const _SavedPostReacherCard({
+class SavedPostReacherCardd extends HookWidget {
+  const SavedPostReacherCardd({
     Key? key,
     required this.savedPostModel,
     this.onDelete,
