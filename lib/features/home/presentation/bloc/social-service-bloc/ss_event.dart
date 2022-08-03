@@ -226,4 +226,14 @@ class SearchProfileEvent extends SocialServiceEvent {
   });
 }
 
+class GetLikedPostsEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+
+  GetLikedPostsEvent({
+    required this.pageLimit,
+    required this.pageNumber,
+  });
+}
+
 class SuggestUserEvent extends SocialServiceEvent {}

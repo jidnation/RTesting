@@ -114,6 +114,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                         width: getScreenWidth(100),
                         child: Swiper(
                           loop: false,
+                          allowImplicitScrolling: true,
                           itemBuilder: (BuildContext context, int index) {
                             return SuggestedUserContainer(
                               size: size,
@@ -122,9 +123,18 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                 handleTap(index);
                                 if (active.contains(index)) {
                                   reachingUser.value = true;
-                                  globals.userBloc!.add(ReachUserEvent(
-                                      userIdToReach:
-                                          suggestedUsers.value[index].id!));
+                                  if (suggestedUsers
+                                          .value[index].reaching!.reacherId ==
+                                      null) {
+                                    globals.userBloc!.add(ReachUserEvent(
+                                        userIdToReach:
+                                            suggestedUsers.value[index].id!));
+                                  } else {
+                                    globals.userBloc!.add(
+                                        DelReachRelationshipEvent(
+                                            userIdToDelete: suggestedUsers
+                                                .value[index].id!));
+                                  }
                                 }
                               },
                               onDelete: () {
@@ -154,7 +164,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                           },
                           itemCount: suggestedUsers.value.length,
                           viewportFraction: getScreenHeight(0.7),
-                          scale: getScreenHeight(0.7),
+                          scale: getScreenHeight(0.1),
                         ),
                       )
                     ],

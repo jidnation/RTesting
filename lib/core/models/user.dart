@@ -20,6 +20,7 @@ class User {
   int? nReachers;
   int? nReaching;
   int? nStaring;
+  ReachingRelationship? reaching;
 
   User({
     this.firstName,
@@ -43,6 +44,7 @@ class User {
     this.nReachers,
     this.nReaching,
     this.nStaring,
+    this.reaching,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -69,6 +71,9 @@ class User {
         nStaring: json["nStaring"],
         username: json["username"],
         verified: json["verified"],
+        reaching: json["reaching"] != null
+            ? ReachingRelationship.fromJson(json["reaching"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -93,6 +98,8 @@ class User {
         "nReaching": nReaching,
         "nStaring": nStaring,
         "username": username,
+        "verified": verified,
+        "reaching": reaching!.toJson(),
       };
 }
 
@@ -115,5 +122,25 @@ class ChatUser {
         "firstName": firstName,
         "lastName": lastName,
         "profilePicture": profilePicture,
+      };
+}
+
+class ReachingRelationship {
+  ReachingRelationship({
+    this.reacherId,
+    this.reachingId,
+  });
+  String? reacherId;
+  String? reachingId;
+
+  factory ReachingRelationship.fromJson(Map<String, dynamic> json) =>
+      ReachingRelationship(
+        reacherId: json["reacherId"],
+        reachingId: json["reachingId"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "reacherId": reacherId,
+        "reachingId": reachingId,
       };
 }

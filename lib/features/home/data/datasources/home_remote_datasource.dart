@@ -1448,4 +1448,39 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+  Future<List<PostFeedModel>> getLikedPosts({
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getLikedPosts(
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getLikedPosts(
+            page_limit: $page_limit
+            page_number: $page_number
+          ){   
+               ''' +
+        PostFeedSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('get liked posts', result.data);
+      return (result.data!['getLikedPosts'] as List)
+          .map((e) => PostFeedModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

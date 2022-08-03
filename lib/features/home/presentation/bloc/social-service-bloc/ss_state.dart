@@ -454,3 +454,19 @@ class SuggestUserError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
+
+class GetLikedPostsLoading extends SocialServiceState {}
+
+class GetLikedPostsSuccess extends SocialServiceState {
+  final List<PostFeedModel>? posts;
+  GetLikedPostsSuccess({this.posts});
+  @override
+  List<Object> get props => [posts!];
+}
+
+class GetLikedPostsError extends SocialServiceState {
+  final String error;
+  GetLikedPostsError({required this.error});
+  @override
+  List<Object> get props => [error];
+}

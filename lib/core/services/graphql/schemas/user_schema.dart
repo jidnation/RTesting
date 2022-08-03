@@ -22,6 +22,10 @@ class UserSchema {
             email
             firstName
             lastName
+            reaching {
+              reacherId
+              reachingId
+            }
         ''';
   }
 }

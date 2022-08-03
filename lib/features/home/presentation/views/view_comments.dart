@@ -28,7 +28,6 @@ class ViewCommentsScreen extends HookWidget {
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
     final scrollController = useScrollController();
-
     useEffect(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
           postId: post.postId, pageLimit: 50, pageNumber: 1));
@@ -47,10 +46,8 @@ class ViewCommentsScreen extends HookWidget {
                   curve: Curves.easeOut,
                 );
               });
-              showSimpleNotification(
-                const Text("Your commment has been posted"),
-                background: Colors.green.shade700,
-              );
+              Snackbars.success(context,
+                  message: "Your commment has been posted");
               triggerProgressIndicator.value = false;
               globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
                   postId: post.postId, pageLimit: 50, pageNumber: 1));
@@ -132,8 +129,7 @@ class ViewCommentsScreen extends HookWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                (post.firstName! + ' ' + post.lastName!)
-                                    .toTitleCase(),
+                                '@${post.username!}',
                                 style: TextStyle(
                                   fontSize: getScreenHeight(16),
                                   color: AppColors.textColor2,
@@ -141,7 +137,7 @@ class ViewCommentsScreen extends HookWidget {
                                 ),
                               ),
                               Text(
-                                'Manchester, UK',
+                                'Nigeria, Africa',
                                 style: TextStyle(
                                   fontSize: getScreenHeight(12),
                                   color: AppColors.textColor2.withOpacity(0.5),
@@ -191,8 +187,7 @@ class ViewCommentsScreen extends HookWidget {
                   child: TextFormField(
                     controller: controller,
                     decoration: InputDecoration(
-                      hintText:
-                          'Comment as ${globals.user!.username!.toTitleCase()}...',
+                      hintText: 'Comment as ${globals.user!.username!}...',
                       hintStyle: TextStyle(fontSize: getScreenHeight(14)),
                       suffixIcon: IconButton(
                         icon: SvgPicture.asset('assets/svgs/send.svg'),
@@ -211,7 +206,7 @@ class ViewCommentsScreen extends HookWidget {
                         children: [
                           Helper.renderProfilePicture(
                             globals.user!.profilePicture,
-                            size: 50,
+                            size: 35,
                           ),
                           const SizedBox(width: 10),
                         ],
@@ -275,10 +270,7 @@ class CommentsTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (comment.commentProfile!.firstName! +
-                              ' ' +
-                              comment.commentProfile!.lastName!)
-                          .toTitleCase(),
+                      '@${comment.commentProfile!.username!}',
                       style: TextStyle(
                         fontSize: getScreenHeight(15),
                         color: AppColors.textColor2,
@@ -286,7 +278,7 @@ class CommentsTile extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Manchester, UK',
+                      'Nigeria, Africa',
                       style: TextStyle(
                         fontSize: getScreenHeight(12),
                         color: AppColors.textColor2.withOpacity(0.5),

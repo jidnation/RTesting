@@ -98,6 +98,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: Image.asset(
                           'assets/images/cover.png',
                           fit: BoxFit.cover,
+                          gaplessPlayback: true,
                         ),
                       ),
                     ),

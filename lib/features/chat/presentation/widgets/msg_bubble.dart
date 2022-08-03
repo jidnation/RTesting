@@ -22,8 +22,9 @@ class MsgBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     if (label.contains('amazon')) {
       return GestureDetector(
-        onTap: (){
-          RouteNavigators.route(context, PhotoView(imageProvider: NetworkImage(label)));
+        onTap: () {
+          RouteNavigators.route(
+              context, PhotoView(imageProvider: NetworkImage(label)));
         },
         child: Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

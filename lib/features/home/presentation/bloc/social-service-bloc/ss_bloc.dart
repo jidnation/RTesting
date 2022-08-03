@@ -493,5 +493,20 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(SearchProfileError(error: e.message));
       }
     });
+    on<GetLikedPostsEvent>((event, emit) async {
+      emit(GetLikedPostsLoading());
+      try {
+        final response = await socialServiceRepository.getLikedPosts(
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+        );
+        response.fold(
+          (error) => emit(GetLikedPostsError(error: error)),
+          (posts) => emit(GetLikedPostsSuccess(posts: posts)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetLikedPostsError(error: e.message));
+      }
+    });
   }
 }

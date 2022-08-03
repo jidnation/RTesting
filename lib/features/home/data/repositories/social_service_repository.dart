@@ -451,6 +451,21 @@ class SocialServiceRepository {
     }
   }
 
+  Future<Either<String, List<PostFeedModel>>> getLikedPosts({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await _homeRemoteDataSource.getLikedPosts(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, List<User>>> suggestUser() async {
     try {
       final users = await _homeRemoteDataSource.suggestUser();

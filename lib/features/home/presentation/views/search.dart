@@ -273,7 +273,10 @@ class SearchStories extends HookWidget {
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
               margin: const EdgeInsets.all(5.0),
-              child: Image.asset(item),
+              child: Image.asset(
+                item,
+                gaplessPlayback: true,
+              ),
             ))
         .toList();
     final _currentIndex = useState<int>(0);

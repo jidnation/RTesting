@@ -28,6 +28,7 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/home/presentation/views/timeline.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -49,15 +50,21 @@ class _AccountScreenState extends State<AccountScreen>
   late final _reachoutsRefreshController = RefreshController();
   late final _commentsRefreshController = RefreshController();
   late final _savedPostsRefreshController = RefreshController();
-  // late final _shoutoutsRefreshController = RefreshController();
-  // late final _shoutdownsRefreshController = RefreshController();
-  // late final _likesRefreshController = RefreshController();
-  // late final _sharesRefreshController = RefreshController();
+  late final _likesRefreshController = RefreshController();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+  }
+
+  Set active = {};
+
+  handleTap(index) {
+    if (active.isNotEmpty) active.clear();
+    setState(() {
+      active.add(index);
+    });
   }
 
   TabBar get _tabBar => TabBar(
@@ -215,6 +222,7 @@ class _AccountScreenState extends State<AccountScreen>
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
     final _savedPosts = useState<List<SavePostModel>>([]);
+    final _likedPosts = useState<List<PostFeedModel>>([]);
     useEffect(() {
       globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
       globals.socialServiceBloc!
@@ -223,6 +231,8 @@ class _AccountScreenState extends State<AccountScreen>
           pageLimit: 50, pageNumber: 1, authId: globals.user!.id));
       globals.socialServiceBloc!
           .add(GetAllSavedPostsEvent(pageLimit: 50, pageNumber: 1));
+      globals.socialServiceBloc!
+          .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -248,6 +258,14 @@ class _AccountScreenState extends State<AccountScreen>
                     Snackbars.error(context, message: state.error);
                     _reachoutsRefreshController.refreshFailed();
                   }
+                  if (state is GetLikedPostsSuccess) {
+                    _likedPosts.value = state.posts!;
+                    _likesRefreshController.refreshCompleted();
+                  }
+                  if (state is GetLikedPostsError) {
+                    Snackbars.error(context, message: state.error);
+                    _likesRefreshController.refreshCompleted();
+                  }
                   if (state is GetPersonalCommentsSuccess) {
                     _comments.value = state.data!;
                     _commentsRefreshController.refreshCompleted();
@@ -264,7 +282,11 @@ class _AccountScreenState extends State<AccountScreen>
                   }
                 },
                 builder: (context, state) {
-                  bool _isLoading = state is GetAllPostsLoading;
+                  bool _isLoadingPosts = state is GetAllPostsLoading;
+                  bool _isLoadingLikes = state is GetLikedPostsLoading;
+                  bool _isLoadingComments = state is GetPersonalCommentsLoading;
+                  bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -280,6 +302,7 @@ class _AccountScreenState extends State<AccountScreen>
                             child: Image.asset(
                               'assets/images/cover.png',
                               fit: BoxFit.cover,
+                              gaplessPlayback: true,
                             ),
                           ),
                           Row(
@@ -502,7 +525,7 @@ class _AccountScreenState extends State<AccountScreen>
                           controller: _tabController,
                           children: [
                             //REACHES TAB
-                            if (_isLoading)
+                            if (_isLoadingPosts)
                               const CircularLoader()
                             else
                               Refresher(
@@ -540,7 +563,7 @@ class _AccountScreenState extends State<AccountScreen>
                               ),
 
                             //COMMENTS TAB
-                            if (_isLoading)
+                            if (_isLoadingComments)
                               const CircularLoader()
                             else
                               Refresher(
@@ -576,21 +599,113 @@ class _AccountScreenState extends State<AccountScreen>
                                       ),
                               ),
 
+                            //COMMENTS TAB
+                            if (_isLoadingLikes)
+                              const CircularLoader()
+                            else
+                              Refresher(
+                                controller: _likesRefreshController,
+                                onRefresh: () {
+                                  globals.socialServiceBloc!.add(
+                                      GetLikedPostsEvent(
+                                          pageLimit: 50, pageNumber: 1));
+                                },
+                                child: _likedPosts.value.isEmpty
+                                    ? ListView(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        children: const [
+                                          EmptyTabWidget(
+                                            title: "Likes you made",
+                                            subtitle:
+                                                "Find post you liked and your post that was liked",
+                                          )
+                                        ],
+                                      )
+                                    : ListView.builder(
+                                        itemCount: _likedPosts.value.length,
+                                        itemBuilder: (context, index) {
+                                          return PostFeedReacherCard(
+                                            likingPost: false,
+                                            postFeedModel:
+                                                _likedPosts.value[index],
+                                            isLiked: _likedPosts.value[index]
+                                                    .like!.isNotEmpty
+                                                ? true
+                                                : false,
+                                            isVoted: _likedPosts.value[index]
+                                                    .vote!.isNotEmpty
+                                                ? true
+                                                : false,
+                                            voteType: _likedPosts.value[index]
+                                                    .vote!.isNotEmpty
+                                                ? _likedPosts.value[index]
+                                                    .vote![0].voteType
+                                                : null,
+                                            onMessage: () {
+                                              //  reachDM.value = true;
+
+                                              handleTap(index);
+                                              if (active.contains(index)) {
+                                                globals.userBloc!.add(
+                                                    GetRecipientProfileEvent(
+                                                        email: _likedPosts
+                                                            .value[index]
+                                                            .postOwnerId!));
+                                              }
+                                            },
+                                            onUpvote: () {
+                                              handleTap(index);
+                                              if (active.contains(index)) {
+                                                globals.socialServiceBloc!
+                                                    .add(VotePostEvent(
+                                                  voteType: 'upvote',
+                                                  postId: _likedPosts
+                                                      .value[index].postId,
+                                                ));
+                                              }
+                                            },
+                                            onDownvote: () {
+                                              handleTap(index);
+                                              if (active.contains(index)) {
+                                                globals.socialServiceBloc!
+                                                    .add(VotePostEvent(
+                                                  voteType: 'downvote',
+                                                  postId: _likedPosts
+                                                      .value[index].postId,
+                                                ));
+                                              }
+                                            },
+                                            onLike: () {
+                                              handleTap(index);
+                                              if (active.contains(index)) {
+                                                if (_posts.value[index].like!
+                                                    .isNotEmpty) {
+                                                  globals.socialServiceBloc!
+                                                      .add(UnlikePostEvent(
+                                                    postId: _likedPosts
+                                                        .value[index].postId,
+                                                  ));
+                                                } else {
+                                                  globals.socialServiceBloc!
+                                                      .add(
+                                                    LikePostEvent(
+                                                        postId: _likedPosts
+                                                            .value[index]
+                                                            .postId),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                          );
+                                        },
+                                      ),
+                              ),
+
                             //LIKES TAB
-                            ListView(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              children: const [
-                                EmptyTabWidget(
-                                  title: "Likes you made",
-                                  subtitle:
-                                      "Find post you liked and your post that was liked",
-                                )
-                              ],
-                            ),
 
                             //SAVED POSTS TAB
-                            if (_isLoading)
+                            if (_isLoadingSavedPosts)
                               const CircularLoader()
                             else
                               _savedPosts.value.isEmpty
@@ -683,7 +798,7 @@ class _ReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '@${globals.user!.username}',
+                                    '@${postModel!.profile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w600,
@@ -1107,6 +1222,8 @@ class _CommentReachCard extends HookWidget {
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
                                   'assets/svgs/message.svg',
+                                  height: getScreenHeight(20),
+                                  width: getScreenWidth(20),
                                 ),
                               ),
                             ],
@@ -1137,7 +1254,9 @@ class _CommentReachCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      'assets/svgs/shoutout-a.svg',
+                                      'assets/svgs/shoutup-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
                                     ),
                                   ),
                                   Flexible(
@@ -1162,6 +1281,8 @@ class _CommentReachCard extends HookWidget {
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
                                       'assets/svgs/shoutdown.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
                                     ),
                                   ),
                                   Flexible(
@@ -1276,8 +1397,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
-    globals.userBloc!
-        .add(GetRecipientProfileEvent(email: widget.recipientId));
+    globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!
         .add(GetReachRelationshipEvent(userIdToReach: widget.recipientId));
     globals.userBloc!
@@ -1440,8 +1560,6 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is StarUserSuccess) {
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isStarring = true;
                 Snackbars.success(context,
                     message: 'You are now starring this profile!');
@@ -1449,22 +1567,16 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is DelStarRelationshipSuccess) {
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isStarring = false;
                 setState(() {});
               }
 
               if (state is GetReachRelationshipSuccess) {
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = state.isReaching!;
                 setState(() {});
               }
 
               if (state is DelReachRelationshipSuccess) {
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = false;
                 setState(() {});
               }
@@ -1495,6 +1607,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                         child: Image.asset(
                           'assets/images/cover.png',
                           fit: BoxFit.cover,
+                          gaplessPlayback: true,
                         ),
                       ),
                       Row(

@@ -98,6 +98,7 @@ class _TimelineScreenState extends State<TimelineScreen>
       ),
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
         appBar: AppBar(
           backgroundColor: AppColors.white,
           systemOverlayStyle: SystemUiOverlayStyle(
@@ -119,8 +120,8 @@ class _TimelineScreenState extends State<TimelineScreen>
           title: Text(
             'Reachme',
             style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: getScreenHeight(21),
+              color: const Color(0xFF001824),
+              fontSize: getScreenHeight(20),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -241,10 +242,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                   if (state is CreateStatusSuccess) {
                     globals.socialServiceBloc!
                         .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
-                    showSimpleNotification(
-                      const Text("Your status has been posted"),
-                      background: Colors.green.shade700,
-                    );
+                    Snackbars.success(context,
+                        message: "Your status has been posted");
                   }
                 },
                 builder: (context, state) {
@@ -271,86 +270,106 @@ class _TimelineScreenState extends State<TimelineScreen>
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: false,
                                     children: [
-                                      const SizedBox(
-                                          height: kToolbarHeight + 30), //30
+                                      SizedBox(
+                                          height: 0,
+                                          child: Divider(
+                                            color: const Color(0xFFE3E5E7)
+                                                .withOpacity(0.5),
+                                          )),
+                                      SizedBox(
+                                          height: kToolbarHeight +
+                                              getScreenHeight(22)), //30
                                       _isLoading
                                           ? const LinearLoader()
                                           : const SizedBox.shrink(),
-                                      SizedBox(
-                                        height: getScreenHeight(105),
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          child: SizedBox(
-                                            child: Row(
-                                              children: [
-                                                UserStory(
-                                                  size: size,
-                                                  isMe: true,
-                                                  isLive: false,
-                                                  hasWatched: false,
-                                                  username: 'Add Status',
-                                                  isMeOnTap: () {
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        const CreateStatus());
-                                                    return;
-                                                  },
-                                                ),
-                                                if (_myStatus.value.isEmpty)
-                                                  const SizedBox.shrink()
-                                                else
-                                                  UserStory(
-                                                    size: size,
-                                                    isMe: false,
-                                                    isLive: false,
-                                                    hasWatched: false,
-                                                    username: 'Your status',
-                                                    onTap: () {
-                                                      RouteNavigators.route(
-                                                          context,
-                                                          ViewMyStatus(
-                                                              status: _myStatus
-                                                                  .value));
-                                                    },
+                                      Container(
+                                        color: AppColors.white,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            SizedBox(
+                                              height: getScreenHeight(105),
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                child: SizedBox(
+                                                  child: Row(
+                                                    children: [
+                                                      UserStory(
+                                                        size: size,
+                                                        isMe: true,
+                                                        isLive: false,
+                                                        hasWatched: false,
+                                                        username: 'Add Status',
+                                                        isMeOnTap: () {
+                                                          RouteNavigators.route(
+                                                              context,
+                                                              const CreateStatus());
+                                                          return;
+                                                        },
+                                                      ),
+                                                      if (_myStatus
+                                                          .value.isEmpty)
+                                                        const SizedBox.shrink()
+                                                      else
+                                                        UserStory(
+                                                          size: size,
+                                                          isMe: false,
+                                                          isLive: false,
+                                                          hasWatched: false,
+                                                          username:
+                                                              'Your status',
+                                                          onTap: () {
+                                                            RouteNavigators.route(
+                                                                context,
+                                                                ViewMyStatus(
+                                                                    status: _myStatus
+                                                                        .value));
+                                                          },
+                                                        ),
+                                                      ...List.generate(
+                                                        _userStatus
+                                                            .value.length,
+                                                        (index) => UserStory(
+                                                          size: size,
+                                                          isMe: false,
+                                                          isLive: false,
+                                                          hasWatched: false,
+                                                          username: _userStatus
+                                                              .value[index]
+                                                              .status![index]
+                                                              .statusCreatorModel!
+                                                              .username!,
+                                                          onTap: () {
+                                                            RouteNavigators
+                                                                .route(
+                                                              context,
+                                                              ViewUserStatus(
+                                                                  status: _userStatus
+                                                                      .value[
+                                                                          index]
+                                                                      .status!),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                      // ..._userStatus.value.map(
+                                                      //   (e) =>
+                                                      // ),
+                                                    ],
                                                   ),
-                                                ...List.generate(
-                                                  _userStatus.value.length,
-                                                  (index) => UserStory(
-                                                    size: size,
-                                                    isMe: false,
-                                                    isLive: false,
-                                                    hasWatched: false,
-                                                    username: _userStatus
-                                                        .value[index]
-                                                        .status![index]
-                                                        .statusCreatorModel!
-                                                        .username!,
-                                                    onTap: () {
-                                                      RouteNavigators.route(
-                                                        context,
-                                                        ViewUserStatus(
-                                                            status: _userStatus
-                                                                .value[index]
-                                                                .status!),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                                // ..._userStatus.value.map(
-                                                //   (e) =>
-                                                // ),
-                                              ],
+                                                ).paddingOnly(l: 11),
+                                              ),
                                             ),
-                                          ).paddingOnly(l: 11),
+                                            SizedBox(
+                                                height: getScreenHeight(5)),
+                                          ],
                                         ),
                                       ),
-                                      SizedBox(height: getScreenHeight(5)),
-                                      const Divider(
-                                        thickness: 0.5,
-                                        color: AppColors.greyShade4,
-                                      ),
+                                      SizedBox(height: getScreenHeight(16)),
                                       SizedBox(
                                         child: _posts.value.isEmpty
                                             ? EmptyTimelineWidget(
@@ -362,7 +381,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                     const NeverScrollableScrollPhysics(),
                                                 itemCount: _posts.value.length,
                                                 itemBuilder: (context, index) {
-                                                  return _ReacherCard(
+                                                  return PostFeedReacherCard(
                                                     likingPost: false,
                                                     postFeedModel:
                                                         _posts.value[index],
@@ -498,8 +517,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                       title: const Text('View your story'),
                       onTap: () {
                         RouteNavigators.pop(context);
-                        RouteNavigators.route(
-                            context, ViewMyStatus(status: status));
+                        RouteNavigators.route(context,
+                            ViewMyStatus(status: status.reversed.toList()));
                       },
                     ),
             ]).paddingSymmetric(v: 5),
@@ -510,8 +529,8 @@ class _TimelineScreenState extends State<TimelineScreen>
   }
 }
 
-class _ReacherCard extends HookWidget {
-  const _ReacherCard({
+class PostFeedReacherCard extends HookWidget {
+  const PostFeedReacherCard({
     Key? key,
     required this.postFeedModel,
     required this.likingPost,
@@ -534,9 +553,10 @@ class _ReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 13,
-        vertical: 7,
+      padding: EdgeInsets.only(
+        right: getScreenWidth(15),
+        left: getScreenWidth(15),
+        bottom: getScreenHeight(16),
       ),
       child: Container(
         width: size.width,
@@ -848,7 +868,7 @@ class UserStory extends StatelessWidget {
                             : const Color(0xFFDE0606),
                       ),
                       child: Container(
-                          padding: const EdgeInsets.all(2),
+                          padding: const EdgeInsets.all(3.5),
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Color(0xFFF5F5F5),
@@ -871,6 +891,7 @@ class UserStory extends StatelessWidget {
                           child: Image.asset(
                             'assets/images/user.png',
                             fit: BoxFit.fill,
+                            gaplessPlayback: true,
                           ),
                           decoration:
                               const BoxDecoration(shape: BoxShape.circle)),

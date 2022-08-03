@@ -35,10 +35,8 @@ class CommentReacherCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -47,17 +45,16 @@ class CommentReacherCard extends StatelessWidget {
                       height: 50,
                       clipBehavior: Clip.hardEdge,
                       child: Image.asset(
-                          'assets/images/user.png',
-                          fit: BoxFit.fill),
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle),
+                        'assets/images/user.png',
+                        fit: BoxFit.fill,
+                        gaplessPlayback: true,
+                      ),
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
                     ).paddingOnly(l: 15, t: 10),
                     const SizedBox(width: 9),
                     Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start,
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
@@ -65,13 +62,10 @@ class CommentReacherCard extends StatelessWidget {
                             const Text('Rooney Brown',
                                 style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight:
-                                        FontWeight.w500,
-                                    color: AppColors
-                                        .textColor2)),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2)),
                             const SizedBox(width: 3),
-                            SvgPicture.asset(
-                                'assets/svgs/verified.svg')
+                            SvgPicture.asset('assets/svgs/verified.svg')
                           ],
                         ),
                         RichText(
@@ -80,10 +74,8 @@ class CommentReacherCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 9,
                                 fontFamily: 'Poppins',
-                                fontWeight:
-                                    FontWeight.w400,
-                                color:
-                                    AppColors.textColor4,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor4,
                                 height: 1,
                               ),
                               children: [
@@ -91,12 +83,9 @@ class CommentReacherCard extends StatelessWidget {
                                     text: '@tayy_dev',
                                     style: TextStyle(
                                       fontSize: 9,
-                                      color: AppColors
-                                          .primaryColor,
-                                      fontFamily:
-                                          'Poppins',
-                                      fontWeight:
-                                          FontWeight.w400,
+                                      color: AppColors.primaryColor,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
                                       height: 1,
                                     ))
                               ]),
@@ -122,8 +111,7 @@ class CommentReacherCard extends StatelessWidget {
                     },
                     iconSize: 19,
                     padding: const EdgeInsets.all(0),
-                    icon: SvgPicture.asset(
-                        'assets/svgs/more-vertical.svg'))
+                    icon: SvgPicture.asset('assets/svgs/more-vertical.svg'))
               ],
             ),
             Flexible(
