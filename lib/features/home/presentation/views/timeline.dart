@@ -424,10 +424,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         globals
                                                             .socialServiceBloc!
                                                             .add(VotePostEvent(
-                                                          voteType: 'upvote',
+                                                          voteType: 'Upvote',
                                                           postId: _posts
                                                               .value[index]
-                                                              .postId,
+                                                              .pgit ostId,
                                                         ));
                                                       }
                                                     },
@@ -440,7 +440,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         globals
                                                             .socialServiceBloc!
                                                             .add(VotePostEvent(
-                                                          voteType: 'downvote',
+                                                          voteType: 'Downvote',
                                                           postId: _posts
                                                               .value[index]
                                                               .postId,

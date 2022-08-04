@@ -1452,16 +1452,24 @@ class HomeRemoteDataSource {
   Future<List<PostFeedModel>> getLikedPosts({
     required int? pageLimit,
     required int? pageNumber,
+    String? authId,
   }) async {
     String q = r'''
         query getLikedPosts(
           $page_limit: Int!
           $page_number: Int!
+          $authId: String
           ) {
           getLikedPosts(
             page_limit: $page_limit
             page_number: $page_number
+            authId: $authId
           ){   
+             post {
+                ''' +
+        PostSchema.schema +
+        '''
+            }
                ''' +
         PostFeedSchema.schema +
         '''
@@ -1471,6 +1479,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'page_limit': pageLimit,
         'page_number': pageNumber,
+        'authId': authId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);

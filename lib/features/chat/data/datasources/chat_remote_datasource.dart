@@ -158,15 +158,15 @@ class ChatRemoteDataSource {
           }''';
     try {
       final result = _client.subscribe(gql(q), variables: {'id': id});
-      result.listen((event) {
-        if (event.hasException) {
-          Console.log('subscription exception', event.exception);
-        } else if (event.isLoading) {
-          Console.log('subscription loading', event.isLoading);
-        } else {
-          Console.log('subscription data', event.data);
-        }
-      });
+      // result.listen((event) {
+      //   if (event.hasException) {
+      //     Console.log('subscription exception', event.exception);
+      //   } else if (event.isLoading) {
+      //     Console.log('subscription loading', event.isLoading);
+      //   } else {
+      //     Console.log('subscription data', event.data);
+      //   }
+      // });
       return result;
     } catch (e) {
       rethrow;

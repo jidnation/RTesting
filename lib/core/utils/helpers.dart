@@ -26,7 +26,8 @@ class Helper {
   }
 
   static String parseChatDate(String date) {
-    final dateTime = DateTime.parse(date);
+    final dateTime = DateTime.tryParse(date);
+    if (dateTime == null) return '3:00PM';
     final now = DateTime.now();
     final diff = now.difference(dateTime);
     if (diff.inDays > 0) {

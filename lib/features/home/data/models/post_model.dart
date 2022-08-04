@@ -339,12 +339,12 @@ class PostFeedModel {
         "verified": verified,
         "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
         "reachingRelationship": reachingRelationship,
-        "like": like == null
-            ? null
-            : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
-        "vote": vote == null
-            ? null
-            : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
+        // "like": like == null
+        //     ? null
+        //     : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
+        // "vote": vote == null
+        //     ? null
+        //     : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
       };
 }
 

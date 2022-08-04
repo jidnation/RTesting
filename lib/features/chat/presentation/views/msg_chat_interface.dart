@@ -15,6 +15,7 @@ import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
@@ -89,7 +90,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     final showIsSending = useState<bool>(false);
     //final isRecording = useState<bool>(false);
     final controller = useTextEditingController();
-    useMemoized(() {
+    useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
     }, [globals.recipientUser!.id]);
@@ -395,8 +396,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       globals.userChat![index].senderId,
                                   label: globals.userChat![index].value!,
                                   size: size,
-                                  timeStamp: '3:00PM',
-                                  // timeStamp: Helper.parseChatDate(globals.userChat![index].sentAt!),
+                                  timeStamp: Helper.parseChatDate(
+                                      globals.userChat![index].sentAt ?? ''),
                                 ),
                               ),
                             )

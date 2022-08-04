@@ -669,10 +669,7 @@ class EditReach extends HookWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  (globals.user!.firstName! +
-                                          ' ' +
-                                          globals.user!.lastName!)
-                                      .toTitleCase(),
+                                  '@${globals.user!.username}',
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,

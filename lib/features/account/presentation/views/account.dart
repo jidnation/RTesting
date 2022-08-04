@@ -599,7 +599,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       ),
                               ),
 
-                            //COMMENTS TAB
+                            //LIKES TAB
                             if (_isLoadingLikes)
                               const CircularLoader()
                             else
@@ -625,6 +625,8 @@ class _AccountScreenState extends State<AccountScreen>
                                     : ListView.builder(
                                         itemCount: _likedPosts.value.length,
                                         itemBuilder: (context, index) {
+                                          print(_likedPosts.value[index]
+                                              .toJson());
                                           return PostFeedReacherCard(
                                             likingPost: false,
                                             postFeedModel:
@@ -701,8 +703,6 @@ class _AccountScreenState extends State<AccountScreen>
                                         },
                                       ),
                               ),
-
-                            //LIKES TAB
 
                             //SAVED POSTS TAB
                             if (_isLoadingSavedPosts)
@@ -1073,10 +1073,7 @@ class _CommentReachCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    (globals.user!.firstName! +
-                                            ' ' +
-                                            globals.user!.lastName!)
-                                        .toTitleCase(),
+                                    '@${commentModel!.commentProfile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w600,
@@ -1089,7 +1086,7 @@ class _CommentReachCard extends HookWidget {
                               ),
                               Text(
                                 'Comment on @${commentModel!.commentProfile!.username}',
-                                style: TextStyle(
+                                style: TextStyle(    
                                   fontSize: getScreenHeight(11),
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.textColor2,

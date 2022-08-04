@@ -104,17 +104,25 @@ class User {
 }
 
 class ChatUser {
-  ChatUser({this.firstName, this.id, this.lastName, this.profilePicture});
+  ChatUser({
+    this.firstName,
+    this.id,
+    this.lastName,
+    this.profilePicture,
+    this.username,
+  });
   String? id;
   String? firstName;
   String? lastName;
   String? profilePicture;
+  String? username;
 
   factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
         id: json["id"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         profilePicture: json["profilePicture"],
+        username: json["username"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -122,6 +130,7 @@ class ChatUser {
         "firstName": firstName,
         "lastName": lastName,
         "profilePicture": profilePicture,
+        "username": username,
       };
 }
 
