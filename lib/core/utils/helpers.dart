@@ -1,10 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
@@ -153,6 +158,159 @@ class Helper {
         return const Color(0xFFC12626);
       default:
         return const Color(0xFFC12626);
+    }
+  }
+
+  static Widget renderPostImages(
+      PostModel post, BuildContext context) {
+    switch (post.imageMediaItems!.length) {
+      case 1:
+        return GestureDetector(
+          onTap: (() => RouteNavigators.route(
+                context,
+                PhotoView(
+                  imageProvider:
+                      NetworkImage(post.imageMediaItems![0]),
+                  loadingBuilder: (context, event) => const Center(
+                    child: CupertinoActivityIndicator(color: Colors.white),
+                  ),
+                ),
+              )),
+          child: Container(
+            height: getScreenHeight(300),
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: CachedNetworkImage(
+              imageUrl: post.imageMediaItems![0],
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+
+      case 3:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: GestureDetector(
+                onTap: (() => RouteNavigators.route(
+                      context,
+                      PhotoView(
+                        imageProvider: NetworkImage(
+                            post.imageMediaItems![0]),
+                        loadingBuilder: (context, event) => const Center(
+                          child:
+                              CupertinoActivityIndicator(color: Colors.white),
+                        ),
+                      ),
+                    )),
+                child: Container(
+                  height: getScreenHeight(300),
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: post.imageMediaItems![0],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: getScreenWidth(5)),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+
+              ///crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                GestureDetector(
+                  onTap: (() => RouteNavigators.route(
+                        context,
+                        PhotoView(
+                          imageProvider: NetworkImage(
+                              post.imageMediaItems![1]),
+                          loadingBuilder: (context, event) => const Center(
+                            child:
+                                CupertinoActivityIndicator(color: Colors.white),
+                          ),
+                        ),
+                      )),
+                  child: Container(
+                    height: getScreenHeight(150),
+                    width: getScreenWidth(180),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: post.imageMediaItems![1],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(height: getScreenHeight(5)),
+                GestureDetector(
+                  onTap: (() => RouteNavigators.route(
+                        context,
+                        PhotoView(
+                          imageProvider: NetworkImage(
+                              post.imageMediaItems![2]),
+                          loadingBuilder: (context, event) => const Center(
+                            child:
+                                CupertinoActivityIndicator(color: Colors.white),
+                          ),
+                        ),
+                      )),
+                  child: Container(
+                    height: getScreenHeight(150),
+                    width: getScreenWidth(180),
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: post.imageMediaItems![2],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        );
+      default:
+        return Wrap(
+          runSpacing: getScreenHeight(5),
+          spacing: getScreenHeight(5),
+          alignment: WrapAlignment.spaceBetween,
+          children: [
+            for (var i = 0;
+                i < post.imageMediaItems!.length;
+                i++)
+              GestureDetector(
+                onTap: () => RouteNavigators.route(
+                    context,
+                    PhotoView(
+                      imageProvider: NetworkImage(
+                        post.imageMediaItems![i],
+                      ),
+                    )),
+                child: SizedBox(
+                  width: getScreenWidth(170),
+                  height: getScreenHeight(152),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      post.imageMediaItems![i],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
     }
   }
 }

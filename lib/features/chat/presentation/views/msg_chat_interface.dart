@@ -42,7 +42,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       _controller.animateTo(
         _controller.position.maxScrollExtent,
         duration: const Duration(milliseconds: 10),
@@ -63,7 +63,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     super.dispose();
   }
 
-  Future<XFile?> getImage(ImageSource source) async {
+  Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
       final imageFile = await _picker.pickImage(
@@ -74,7 +74,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       );
 
       if (imageFile != null) {
-        return imageFile;
+        File image = File(imageFile.path);
+        return image;
       }
     } catch (e) {
       // print(e);
@@ -145,10 +146,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                 children: [
                   FittedBox(
                     child: Text(
-                      (widget.recipientUser!.firstName! +
-                              ' ' +
-                              widget.recipientUser!.lastName!)
-                          .toTitleCase(),
+                      '@${widget.recipientUser!.username}',
                       style: TextStyle(
                         fontSize: getScreenHeight(14),
                         fontWeight: FontWeight.w500,
@@ -222,7 +220,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             }
 
             if (state is ChatUploadSuccess) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 _controller.animateTo(
                   _controller.position.maxScrollExtent,
                   duration: const Duration(milliseconds: 10),
@@ -266,21 +264,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       height: getScreenHeight(80),
                                     ),
                               SizedBox(height: getScreenHeight(5)),
-                              Text(
-                                  (widget.recipientUser!.firstName! +
-                                          ' ' +
-                                          widget.recipientUser!.lastName!)
-                                      .toTitleCase(),
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(14),
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textColor2,
-                                  )),
                               Text('@${widget.recipientUser!.username}',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(11),
+                                    fontSize: getScreenHeight(14),
                                     fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF767474),
+                                    color: AppColors.textColor2,
                                   )),
                               SizedBox(height: getScreenHeight(10)),
                               Row(
@@ -539,8 +527,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                         globals.userChat!.add(temp);
                                         controller.clear();
 
-                                        SchedulerBinding.instance!
-                                            .addPostFrameCallback(
+                                        SchedulerBinding.instance.addPostFrameCallback(
                                           (_) {
                                             _controller.animateTo(
                                               _controller

@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/refresher.dart';
@@ -30,7 +29,6 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
-import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
@@ -74,6 +72,7 @@ class _TimelineScreenState extends State<TimelineScreen>
   final _refreshController = RefreshController();
 
   Future<void> onRefresh() async {
+    SocialServiceBloc();
     globals.socialServiceBloc!
         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
     globals.socialServiceBloc!
@@ -91,6 +90,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
+    print(globals.token);
     return DoubleBackToCloseApp(
       snackBar: const SnackBar(
         backgroundColor: AppColors.primaryColor,
@@ -168,6 +168,18 @@ class _TimelineScreenState extends State<TimelineScreen>
               return BlocConsumer<SocialServiceBloc, SocialServiceState>(
                 bloc: globals.socialServiceBloc,
                 listener: (context, state) {
+                  if (state is UploadMediaError) {
+                    Snackbars.error(context,
+                        message: 'Failed to upload media in post');
+                  }
+
+                  if (state is UploadMediaSuccess) {
+                    globals.socialServiceBloc!.add(CreatePostEvent(
+                      content: globals.postContent,
+                      commentOption: globals.postCommentOption,
+                      imageMediaItem: state.data as List<String>,
+                    ));
+                  }
                   if (state is CreatePostError) {
                     Snackbars.error(context, message: state.error);
                   }
@@ -427,7 +439,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           voteType: 'Upvote',
                                                           postId: _posts
                                                               .value[index]
-                                                              .pgit ostId,
+                                                              .postId,
                                                         ));
                                                       }
                                                     },
@@ -591,7 +603,7 @@ class PostFeedReacherCard extends HookWidget {
                               '@${postFeedModel!.username!}',
                               style: TextStyle(
                                 fontSize: getScreenHeight(14),
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: AppColors.textColor2,
                               ),
                             ),
@@ -644,30 +656,11 @@ class PostFeedReacherCard extends HookWidget {
                 ),
               ).paddingSymmetric(v: 10, h: 16),
             ),
-            if (postFeedModel!.post!.imageMediaItems!.isNotEmpty &&
-                postFeedModel!.post!.audioMediaItem!.isNotEmpty &&
-                postFeedModel!.post!.videoMediaItem!.isNotEmpty)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Container(
-                      height: getScreenHeight(152),
-                      width: getScreenWidth(152),
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/post.png'),
-                          fit: BoxFit.fitHeight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: getScreenWidth(8)),
-                  Flexible(child: MediaCard(size: size)),
-                ],
-              ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
+            if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+              Helper.renderPostImages(postFeedModel!.post!, context)
+                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            else
+              const SizedBox(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,

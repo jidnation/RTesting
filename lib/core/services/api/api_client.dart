@@ -1,5 +1,12 @@
+// ignore_for_file: constant_identifier_names
+
+import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
+import 'package:reach_me/core/helper/logger.dart';
+
+const GOOGLE_API_KEY = 'AIzaSyDF05ECJlA_uSE13uGJ3jq80wJPNN21SfY';
 
 class ApiClient {
   final Dio _dio;
@@ -27,16 +34,26 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> uploadImage(XFile file) async {
-    String fileName = file.path.split('/').last;
-
-    FormData formData = FormData.fromMap(
-      {"file": await MultipartFile.fromFile(file.path, filename: fileName)},
-    );
+  Future<dynamic> uploadImage({
+    required String url,
+    required File file,
+  }) async {
     try {
-      final response = await _dio.post(
-        'http://185.3.95.146:4600/upload',
-        data: formData,
+      final image = await file.readAsBytes();
+      final cntlength = await file.length();
+      final mime = lookupMimeType(file.path);
+
+      final response = await _dio.put(
+        url,
+        data: Stream.fromIterable(image.map((e) => [e])),
+        options: Options(
+          contentType: mime,
+          headers: {
+            'Content-Length': cntlength.toString(),
+            'Connection': 'keep-alive',
+            'Accept': '*/*',
+          },
+        ),
       );
       return response.data;
     } on FormatException {
@@ -46,14 +63,32 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> getSignedURL(XFile file) async {
+  Future<dynamic> getSignedURL(File file) async {
     String fileName = file.path.split('/').last;
-    // String fileExtension = fileName.split('.').last;
 
     try {
       final response = await _dio.get(
-        'http://185.3.95.146:4600/utility/get-signed-url/$fileName',
+        'https://api.myreach.me/utility/get-signed-url/$fileName',
       );
+      Console.log('responseee', response);
+      return response.data;
+    } on FormatException {
+      throw const FormatException("Bad response format 👎");
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> reverseGeocode(
+      {required String lat, required String lng}) async {
+    try {
+      String latlng = '$lat,$lng';
+      final response = await _dio.get(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latlng&key=$GOOGLE_API_KEY',
+      );
+      Console.log('res', response);
+      Console.log(
+          'reverse geocode', response.data['results'][0]['formatted_address']);
       return response.data;
     } on FormatException {
       throw const FormatException("Bad response format 👎");

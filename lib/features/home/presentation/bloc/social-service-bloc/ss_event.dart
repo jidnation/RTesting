@@ -27,6 +27,11 @@ class EditContentEvent extends SocialServiceEvent {
   });
 }
 
+class UploadPostMediaEvent extends SocialServiceEvent {
+  final List<UploadFileDto>? media;
+  UploadPostMediaEvent({required this.media});
+}
+
 class DeletePostEvent extends SocialServiceEvent {
   final String? postId;
   DeletePostEvent({required this.postId});

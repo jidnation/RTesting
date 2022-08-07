@@ -186,8 +186,10 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator.adaptive(
-                                  backgroundColor: AppColors.black,
-                                ),
+                                    strokeWidth: 2,
+                                    backgroundColor: AppColors.black,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white)),
                               ),
                             ).paddingOnly(t: 30)
                           : Expanded(
@@ -202,12 +204,8 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                               recipientUser:
                                                   recipientUsers.value[index],
                                               id: usersList.value[index].id!,
-                                              username: (usersList.value[index]
-                                                          .firstName! +
-                                                      ' ' +
-                                                      usersList.value[index]
-                                                          .lastName!)
-                                                  .toTitleCase(),
+                                              username:
+                                                  '@${usersList.value[index].username}',
                                               status: tailMessage
                                                   .value[index].value!,
                                               avatar: usersList

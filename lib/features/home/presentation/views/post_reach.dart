@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,9 +13,15 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+
+class UploadFileDto {
+  File file;
+  String id;
+  UploadFileDto({required this.file, required this.id});
+}
 
 class PostReach extends StatefulHookWidget {
   const PostReach({Key? key}) : super(key: key);
@@ -47,7 +54,7 @@ class _PostReachState extends State<PostReach> {
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
     final controller = useTextEditingController();
-    final _imageList = useState<List<File>>([]);
+    final _imageList = useState<List<UploadFileDto>>([]);
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -87,10 +94,19 @@ class _PostReachState extends State<PostReach> {
                           onPressed: () {
                             if (controller.text.isNotEmpty ||
                                 _imageList.value.isNotEmpty) {
-                              globals.socialServiceBloc!.add(CreatePostEvent(
-                                content: controller.text,
-                                commentOption: 'everyone',
-                              ));
+                              if (_imageList.value.isNotEmpty) {
+                                globals.socialServiceBloc!.add(
+                                    UploadPostMediaEvent(
+                                        media: _imageList.value));
+                                globals.postContent = controller.text;
+                                globals.postCommentOption = 'everyone';
+                                setState(() {});
+                              } else {
+                                globals.socialServiceBloc!.add(CreatePostEvent(
+                                  content: controller.text,
+                                  commentOption: 'everyone',
+                                ));
+                              }
                               RouteNavigators.pop(context);
                             }
                           },
@@ -103,7 +119,10 @@ class _PostReachState extends State<PostReach> {
                       children: [
                         Row(
                           children: [
-                            const ImagePlaceholder(width: 33, height: 33),
+                            Helper.renderProfilePicture(
+                              globals.user!.profilePicture,
+                              size: 33,
+                            ),
                             const SizedBox(width: 12),
                             Column(
                               mainAxisSize: MainAxisSize.min,
@@ -116,7 +135,7 @@ class _PostReachState extends State<PostReach> {
                                       .toTitleCase(),
                                   style: const TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     color: AppColors.textColor2,
                                   ),
                                 ),
@@ -200,79 +219,80 @@ class _PostReachState extends State<PostReach> {
                       ),
                     ).paddingSymmetric(h: 16),
                     const SizedBox(height: 10),
-                    _imageList.value.isNotEmpty
-                        ? SizedBox(
-                            height: getScreenHeight(200),
-                            child: Center(
-                              child: ListView.builder(
-                                  itemCount: _imageList.value.length,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    if (_imageList.value.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
+                    if (_imageList.value.isNotEmpty)
+                      SizedBox(
+                          height: getScreenHeight(200),
+                          child: Center(
+                            child: ListView.builder(
+                                itemCount: _imageList.value.length,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  if (_imageList.value.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
 
-                                    return Stack(
-                                      alignment: Alignment.topRight,
-                                      children: [
-                                        Container(
-                                          width: getScreenWidth(200),
-                                          height: getScreenHeight(200),
-                                          clipBehavior: Clip.hardEdge,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              RouteNavigators.route(
-                                                context,
-                                                PhotoView(
-                                                  imageProvider: FileImage(
-                                                      _imageList.value[index]),
-                                                ),
-                                              );
-                                            },
-                                            child: Image.file(
-                                              _imageList.value[index],
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
+                                  return Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        width: getScreenWidth(200),
+                                        height: getScreenHeight(200),
+                                        clipBehavior: Clip.hardEdge,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
                                         ),
-                                        Positioned(
-                                          right: getScreenWidth(4),
-                                          top: getScreenWidth(5),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              _imageList.value.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Container(
-                                                height: getScreenHeight(26),
-                                                width: getScreenWidth(26),
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    color: AppColors.grey,
-                                                    size: getScreenHeight(14),
-                                                  ),
-                                                ),
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: AppColors.white),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            RouteNavigators.route(
+                                              context,
+                                              PhotoView(
+                                                imageProvider: FileImage(
+                                                    _imageList
+                                                        .value[index].file),
                                               ),
+                                            );
+                                          },
+                                          child: Image.file(
+                                            _imageList.value[index].file,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: getScreenWidth(4),
+                                        top: getScreenWidth(5),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _imageList.value.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Container(
+                                              height: getScreenHeight(26),
+                                              width: getScreenWidth(26),
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.close,
+                                                  color: AppColors.grey,
+                                                  size: getScreenHeight(14),
+                                                ),
+                                              ),
+                                              decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: AppColors.white),
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ).paddingOnly(r: 10);
-                                  }),
-                            )).paddingSymmetric(h: 16)
-                        : const SizedBox.shrink(),
+                                      ),
+                                    ],
+                                  ).paddingOnly(r: 10);
+                                }),
+                          )).paddingSymmetric(h: 16)
+                    else
+                      const SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -433,7 +453,9 @@ class _PostReachState extends State<PostReach> {
                           onPressed: () async {
                             final image = await getImage(ImageSource.gallery);
                             if (image != null) {
-                              _imageList.value.add(image);
+                              _imageList.value.add(UploadFileDto(
+                                  file: image,
+                                  id: Random().nextInt(100).toString()));
                               setState(() {});
                             }
                           },
@@ -662,7 +684,10 @@ class EditReach extends HookWidget {
                       children: [
                         Row(
                           children: [
-                            const ImagePlaceholder(width: 33, height: 33),
+                            Helper.renderProfilePicture(
+                              globals.user!.profilePicture,
+                              size: 33,
+                            ),
                             const SizedBox(width: 12),
                             Column(
                               mainAxisSize: MainAxisSize.min,

@@ -93,3 +93,15 @@ class UserError extends UserState {
   UserError({this.error});
   final String? error;
 }
+
+class GetUserLocationLoading extends UserState {}
+
+class GetUserLocationSuccess extends UserState {
+  GetUserLocationSuccess({this.location});
+  final String? location;
+}
+
+class GetUserLocationError extends UserState {
+  GetUserLocationError({this.error});
+  final String? error;
+}

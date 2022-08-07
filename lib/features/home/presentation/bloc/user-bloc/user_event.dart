@@ -43,7 +43,7 @@ class SetDOBEvent extends UserEvent {
 }
 
 class UploadUserProfilePictureEvent extends UserEvent {
-  final XFile file;
+  final File file;
   UploadUserProfilePictureEvent({required this.file});
 }
 
@@ -120,4 +120,9 @@ class FetchUserStarredEvent extends UserEvent {
     required this.pageNumber,
     this.authId,
   });
+}
+
+class GetUserLocationEvent extends UserEvent {
+  final String lat, lng;
+  GetUserLocationEvent({required this.lat, required this.lng});
 }

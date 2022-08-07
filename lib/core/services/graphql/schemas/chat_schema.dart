@@ -30,6 +30,7 @@ class ChatThreadSchema {
         lastName
         profilePicture
         id
+        username
       }
       tailMessage {
         _id 

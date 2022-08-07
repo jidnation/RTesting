@@ -39,7 +39,7 @@ class ViewCommentsScreen extends HookWidget {
           bloc: globals.socialServiceBloc,
           listener: (context, state) {
             if (state is CommentOnPostSuccess) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
                   scrollController.position.minScrollExtent,
                   duration: const Duration(milliseconds: 10),

@@ -57,5 +57,5 @@ class SendImageMessageEvent extends ChatEvent {
 
 class UploadImageFileEvent extends ChatEvent {
   UploadImageFileEvent({required this.file});
-  final XFile file;
+  final File file;
 }

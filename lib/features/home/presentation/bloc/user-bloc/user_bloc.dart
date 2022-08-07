@@ -1,7 +1,12 @@
+
+
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
@@ -123,22 +128,67 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserError(error: e.message));
       }
     });
+    // on<UploadUserProfilePictureEvent>((event, emit) async {
+    //   emit(UserUploadingImage());
+    //   String imageUrl = '';
+    //   try {
+    //     //UPLOAD FILE & GET IMAGE URL
+    //     final response = await userRepository.uploadPhoto(
+    //       file: event.file,
+    //     );
+
+    //     response.fold(
+    //       (error) => emit(UserUploadError(error: error)),
+    //       (imgUrl) => imageUrl = imgUrl,
+    //     );
+    //     //SAVE TO
+
+    //     if (imageUrl.isNotEmpty) {
+    //       final userRes = await userRepository.setImage(
+    //         imageUrl: imageUrl,
+    //         type: 'profilePicture',
+    //       );
+
+    //       userRes.fold(
+    //         (error) => emit(UserUploadError(error: error)),
+    //         (user) {
+    //           globals.user = user;
+    //           emit(UserUploadProfilePictureSuccess(user: user));
+    //         },
+    //       );
+    //     }
+    //   } on GraphQLError catch (e) {
+    //     emit(UserUploadError(error: e.message));
+    //   }
+    // });
     on<UploadUserProfilePictureEvent>((event, emit) async {
       emit(UserUploadingImage());
       String imageUrl = '';
+      String signedUrl = '';
       try {
-        //UPLOAD FILE & GET IMAGE URL
-        final response = await userRepository.uploadPhoto(
-          file: event.file,
-        );
+        //GET SIGNED URL
+        final response = await userRepository.getSignedURl(file: event.file);
 
         response.fold(
           (error) => emit(UserUploadError(error: error)),
-          (imgUrl) => imageUrl = imgUrl,
+          (data) {
+            signedUrl = data['signedUrl'];
+            imageUrl = data['imageUrl'];
+          },
         );
-        //SAVE TO
 
-        if (imageUrl.isNotEmpty) {
+        //UPLOAD FILE & GET IMAGE URL
+        if (signedUrl.isNotEmpty) {
+          final uploadRes = await userRepository.uploadPhoto(
+            url: signedUrl,
+            file: event.file,
+          );
+
+          uploadRes.fold(
+            (error) => emit(UserUploadError(error: error)),
+            (user) {},
+          );
+
           final userRes = await userRepository.setImage(
             imageUrl: imageUrl,
             type: 'profilePicture',
@@ -291,6 +341,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         );
       } on GraphQLError catch (e) {
         emit(UserError(error: e.message));
+      }
+    });
+    on<GetUserLocationEvent>((event, emit) async {
+      emit(GetUserLocationLoading());
+      try {
+        final response = await userRepository.reverseGeocode(
+          lat: event.lat,
+          lng: event.lng,
+        );
+        response.fold(
+          (error) => emit(GetUserLocationError(error: error)),
+          (data) {
+            globals.location = data;
+            emit(GetUserLocationSuccess(location: data));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(GetUserLocationError(error: e.message));
       }
     });
   }

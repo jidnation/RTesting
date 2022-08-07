@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -87,14 +89,43 @@ class UserRepository {
     }
   }
 
-  Future<Either<String, String>> uploadPhoto({XFile? file}) async {
+  Future<Either<String, String>> uploadPhoto({
+    required String url,
+    required File? file,
+  }) async {
     try {
-      final user = await _apiClient.uploadImage(file!);
-      Console.log('upload photo', user);
-      final String imgUrl = user['data'];
-      return Right(imgUrl);
+      await _apiClient.uploadImage(url: url, file: file!);
+      return const Right('Upload successful');
     } on DioError catch (e) {
       Console.log('taggerd', e.response);
+      return Left(e.response!.data['message']);
+    }
+  }
+
+  Future<Either<String, dynamic>> getSignedURl({required File file}) async {
+    try {
+      final res = await _apiClient.getSignedURL(file);
+      final imageUrl = res['data']['link'] as String;
+      final signedUrl = res['data']['signedUrl'] as String;
+      return Right({
+        'imageUrl': imageUrl,
+        'signedUrl': signedUrl,
+      });
+    } on DioError catch (e) {
+      return Left(e.response!.data['message']);
+    }
+  }
+
+  Future<Either<String, String>> reverseGeocode({
+    required String lat,
+    required String lng,
+  }) async {
+    try {
+      final res = await _apiClient.reverseGeocode(lat: lat, lng: lng);
+      Console.log('reverse geocode repo', res);
+      return Right(res);
+    } on DioError catch (e) {
+      Console.log('reverse geocode repo', e.response);
       return Left(e.response!.data['message']);
     }
   }

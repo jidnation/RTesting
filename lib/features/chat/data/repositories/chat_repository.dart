@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -86,9 +88,10 @@ class ChatRepository {
     return stream;
   }
 
-  Future<Either<String, String>> uploadPhoto({XFile? file}) async {
+  Future<Either<String, String>> uploadPhoto({File? file}) async {
     try {
-      final user = await _apiClient.uploadImage(file!);
+      //TODO: WORK ON THIS
+      final user = await _apiClient.uploadImage(url: '', file: file!);
       final String imgUrl = user['data'];
       return Right(imgUrl);
     } on DioError catch (e) {

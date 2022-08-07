@@ -29,8 +29,24 @@ class _HomeScreenState extends State<HomeScreen> {
       const NotificationsScreen(),
       const AccountScreen(),
     ];
+    // useEffect(() {
+    //   LocationHelper.determineLocation().then(
+    //     (value) {
+    //       if (value is LocationData) {
+    //         globals.userBloc!.add(
+    //           GetUserLocationEvent(
+    //             lat: value.latitude.toString(),
+    //             lng: value.longitude.toString(),x
+    //           ),
+    //         );
+    //       }
+    //     },
+    //   );
+    //   return null;
+    // });
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
+    //print(globals.location);
     return Scaffold(
       drawer: const AppDrawer(),
       key: scaffoldKey.value,

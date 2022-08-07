@@ -498,11 +498,17 @@ class HomeRemoteDataSource {
         mutation createPost(
           $commentOption: String!
           $content: String!
+          $audioMediaItem: String
+          $imageMediaItems: [String]
+          $videoMediaItem: String
           ) {
           createPost(
             postBody: {
               commentOption: $commentOption
               content: $content
+              audioMediaItem: $audioMediaItem
+              imageMediaItems: $imageMediaItems
+              videoMediaItem: $videoMediaItem
           }) {
             ''' +
         PostSchema.schema +

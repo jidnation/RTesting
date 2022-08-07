@@ -6,7 +6,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/empty_state.dart';
-import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
@@ -406,7 +405,7 @@ class _AccountScreenState extends State<AccountScreen>
                                           style: TextStyle(
                                               fontSize: getScreenHeight(15),
                                               color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
+                                              fontWeight: FontWeight.w500),
                                         ),
                                         Text(
                                           'Reachers',
@@ -432,7 +431,7 @@ class _AccountScreenState extends State<AccountScreen>
                                           style: TextStyle(
                                               fontSize: getScreenHeight(15),
                                               color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
+                                              fontWeight: FontWeight.w500),
                                         ),
                                         Text(
                                           'Reaching',
@@ -458,7 +457,7 @@ class _AccountScreenState extends State<AccountScreen>
                                           style: TextStyle(
                                               fontSize: getScreenHeight(15),
                                               color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
+                                              fontWeight: FontWeight.w500),
                                         ),
                                         Text(
                                           'Starring',
@@ -801,7 +800,7 @@ class _ReacherCard extends HookWidget {
                                     '@${postModel!.profile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w500,
                                       color: AppColors.textColor2,
                                     ),
                                   ),
@@ -849,30 +848,11 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if (postModel!.imageMediaItems!.isNotEmpty &&
-                      postModel!.audioMediaItem!.isNotEmpty &&
-                      postModel!.videoMediaItem!.isNotEmpty)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Container(
-                            height: getScreenHeight(152),
-                            width: getScreenWidth(152),
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              image: const DecorationImage(
-                                image: AssetImage('assets/images/post.png'),
-                                fit: BoxFit.fitHeight,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(8)),
-                        Flexible(child: MediaCard(size: size)),
-                      ],
-                    ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
+                  if (postModel!.imageMediaItems!.isNotEmpty)
+                    Helper.renderPostImages(postModel!, context)
+                        .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                  else
+                    const SizedBox(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1076,7 +1056,7 @@ class _CommentReachCard extends HookWidget {
                                     '@${commentModel!.commentProfile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w500,
                                       color: AppColors.textColor2,
                                     ),
                                   ),
@@ -1086,7 +1066,7 @@ class _CommentReachCard extends HookWidget {
                               ),
                               Text(
                                 'Comment on @${commentModel!.commentProfile!.username}',
-                                style: TextStyle(    
+                                style: TextStyle(
                                   fontSize: getScreenHeight(11),
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.textColor2,
@@ -1715,7 +1695,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w600),
+                                          fontWeight: FontWeight.w500),
                                     ),
                                     Text(
                                       'Reachers',
@@ -1741,7 +1721,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w600),
+                                          fontWeight: FontWeight.w500),
                                     ),
                                     Text(
                                       'Reaching',
@@ -1767,7 +1747,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w600),
+                                          fontWeight: FontWeight.w500),
                                     ),
                                     Text(
                                       'Starring',

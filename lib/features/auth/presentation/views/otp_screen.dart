@@ -33,7 +33,6 @@ class OtpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -42,8 +41,7 @@ class OtpScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is AuthEmailVerified) {
               RouteNavigators.routeNoWayHome(context, const LoginScreen());
-              SchedulerBinding.instance!
-                  .addPostFrameCallback((timeStamp) => Snackbars.success(
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) => Snackbars.success(
                         context,
                         message: state.message!,
                         milliseconds: 3000,

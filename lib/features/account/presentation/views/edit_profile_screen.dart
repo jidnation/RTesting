@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,7 +29,7 @@ class EditProfileScreen extends StatefulHookWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  Future<XFile?> getImage(ImageSource source) async {
+  Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
       final imageFile = await _picker.pickImage(
@@ -38,7 +40,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (imageFile != null) {
-        return imageFile;
+        File image = File(imageFile.path);
+        return image;
       }
     } catch (e) {
       // print(e);
