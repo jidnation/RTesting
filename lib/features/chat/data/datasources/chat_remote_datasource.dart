@@ -19,6 +19,7 @@ class ChatRemoteDataSource {
       : _client = client ?? GraphQLChatClient();
   final GraphQLChatClient _client;
 
+//send text message
   Future<Chat> sendTextMessage({
     required String? senderId,
     required String? receiverId,
@@ -65,6 +66,7 @@ class ChatRemoteDataSource {
     }
   }
 
+//get thread messages {messages between two users}
   Future<List<Chat>> getThreadMessages({
     required String? id,
     String? fromMessageId,
@@ -98,6 +100,8 @@ class ChatRemoteDataSource {
     }
   }
 
+
+//list of people you have chatted with.
   Future<List<ChatsThread>> getUserThreads({required String? id}) async {
     String q = r'''
         query getUserThreads($id: String!) {

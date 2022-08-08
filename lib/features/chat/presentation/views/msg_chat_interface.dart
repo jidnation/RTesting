@@ -49,8 +49,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
         curve: Curves.easeOut,
       );
     });
-    globals.chatBloc!
-        .add(SubcribeToChatStreamEvent(id: widget.recipientUser!.id));
+    // globals.chatBloc!
+    //     .add(SubcribeToChatStreamEvent(id: widget.recipientUser!.id));
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
