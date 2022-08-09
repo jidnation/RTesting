@@ -191,120 +191,89 @@ class SavedPostReacherCardd extends HookWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
         ),
-        child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
-            bloc: globals.socialServiceBloc,
-            listener: (context, state) {},
-            builder: (context, state) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Helper.renderProfilePicture(
-                            savedPostModel!.profile!.profilePicture,
-                            size: 33,
-                          ).paddingOnly(l: 13, t: 10),
-                          SizedBox(width: getScreenWidth(9)),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    (savedPostModel!.profile!.firstName! +
-                                            ' ' +
-                                            savedPostModel!.profile!.lastName!)
-                                        .toTitleCase(),
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textColor2,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  savedPostModel!.profile!.verified!
-                                      ? SvgPicture.asset(
-                                          'assets/svgs/verified.svg')
-                                      : const SizedBox.shrink()
-                                ],
-                              ),
-                              Text(
-                                'Manchester, United Kingdom',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
-                                ),
-                              ),
-                            ],
-                          ).paddingOnly(t: 10),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SvgPicture.asset('assets/svgs/starred.svg'),
-                          SizedBox(width: getScreenWidth(9)),
-                          IconButton(
-                            onPressed: () async {
-                              await showSavedPostBottomSheet(
-                                context,
-                                savePostModel: savedPostModel!,
-                              );
-                            },
-                            iconSize: getScreenHeight(19),
-                            padding: const EdgeInsets.all(0),
-                            icon:
-                                SvgPicture.asset('assets/svgs/kebab card.svg'),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  Flexible(
-                    child: Text(
-                      savedPostModel!.content ?? '',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(14),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ).paddingSymmetric(v: 10, h: 16),
-                  ),
-                  if (savedPostModel!.imageMediaItems!.isNotEmpty &&
-                      savedPostModel!.audioMediaItem!.isNotEmpty &&
-                      savedPostModel!.videoMediaItem!.isNotEmpty)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Helper.renderProfilePicture(
+                      savedPostModel!.profile!.profilePicture,
+                      size: 33,
+                    ).paddingOnly(l: 13, t: 10),
+                    SizedBox(width: getScreenWidth(9)),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Flexible(
-                          child: Container(
-                            height: getScreenHeight(152),
-                            width: getScreenWidth(152),
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              image: const DecorationImage(
-                                image: AssetImage('assets/images/post.png'),
-                                fit: BoxFit.fitHeight,
+                        Row(
+                          children: [
+                            Text(
+                              '@${savedPostModel!.profile!.username!}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(15),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor2,
                               ),
                             ),
+                            const SizedBox(width: 3),
+                            savedPostModel!.profile!.verified!
+                                ? SvgPicture.asset('assets/svgs/verified.svg')
+                                : const SizedBox.shrink()
+                          ],
+                        ),
+                        Text(
+                          'Manchester, United Kingdom',
+                          style: TextStyle(
+                            fontSize: getScreenHeight(11),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textColor2,
                           ),
                         ),
-                        SizedBox(width: getScreenWidth(8)),
-                        Flexible(child: MediaCard(size: size)),
                       ],
-                    ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
-                ],
-              );
-            }),
+                    ).paddingOnly(t: 10),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset('assets/svgs/starred.svg'),
+                    SizedBox(width: getScreenWidth(9)),
+                    IconButton(
+                      onPressed: () async {
+                        await showSavedPostBottomSheet(
+                          context,
+                          savePostModel: savedPostModel!,
+                        );
+                      },
+                      iconSize: getScreenHeight(19),
+                      padding: const EdgeInsets.all(0),
+                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            Flexible(
+              child: Text(
+                savedPostModel!.content ?? '',
+                style: TextStyle(
+                  fontSize: getScreenHeight(14),
+                  fontWeight: FontWeight.w400,
+                ),
+              ).paddingSymmetric(v: 10, h: 16),
+            ),
+            if (savedPostModel!.imageMediaItems!.isNotEmpty)
+              Helper.renderPostImages(savedPostModel!, context)
+                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+          ],
+        ),
       ),
     );
   }

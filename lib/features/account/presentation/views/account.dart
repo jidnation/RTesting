@@ -247,467 +247,467 @@ class _AccountScreenState extends State<AccountScreen>
           },
           builder: (context, state) {
             return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-                bloc: globals.socialServiceBloc,
-                listener: (context, state) {
-                  if (state is GetAllPostsSuccess) {
-                    _posts.value = state.posts!;
-                    _reachoutsRefreshController.refreshCompleted();
-                  }
-                  if (state is GetAllPostsError) {
-                    Snackbars.error(context, message: state.error);
-                    _reachoutsRefreshController.refreshFailed();
-                  }
-                  if (state is GetLikedPostsSuccess) {
-                    _likedPosts.value = state.posts!;
-                    _likesRefreshController.refreshCompleted();
-                  }
-                  if (state is GetLikedPostsError) {
-                    Snackbars.error(context, message: state.error);
-                    _likesRefreshController.refreshCompleted();
-                  }
-                  if (state is GetPersonalCommentsSuccess) {
-                    _comments.value = state.data!;
-                    _commentsRefreshController.refreshCompleted();
-                  }
-                  if (state is GetPersonalCommentsError) {
-                    Snackbars.error(context, message: state.error);
-                    _commentsRefreshController.refreshFailed();
-                  }
-                  if (state is GetAllSavedPostsSuccess) {
-                    _savedPosts.value = state.data!;
-                  }
-                  if (state is GetAllSavedPostsError) {
-                    Snackbars.error(context, message: state.error);
-                  }
-                },
-                builder: (context, state) {
-                  bool _isLoadingPosts = state is GetAllPostsLoading;
-                  bool _isLoadingLikes = state is GetLikedPostsLoading;
-                  bool _isLoadingComments = state is GetPersonalCommentsLoading;
-                  bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
+              bloc: globals.socialServiceBloc,
+              listener: (context, state) {
+                if (state is GetAllPostsSuccess) {
+                  _posts.value = state.posts!;
+                  _reachoutsRefreshController.refreshCompleted();
+                }
+                if (state is GetAllPostsError) {
+                  Snackbars.error(context, message: state.error);
+                  _reachoutsRefreshController.refreshFailed();
+                }
+                if (state is GetLikedPostsSuccess) {
+                  _likedPosts.value = state.posts!;
+                  _likesRefreshController.refreshCompleted();
+                }
+                if (state is GetLikedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                  _likesRefreshController.refreshCompleted();
+                }
+                if (state is GetPersonalCommentsSuccess) {
+                  _comments.value = state.data!;
+                  _commentsRefreshController.refreshCompleted();
+                }
+                if (state is GetPersonalCommentsError) {
+                  Snackbars.error(context, message: state.error);
+                  _commentsRefreshController.refreshFailed();
+                }
+                if (state is GetAllSavedPostsSuccess) {
+                  _savedPosts.value = state.data!;
+                }
+                if (state is GetAllSavedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                }
+              },
+              builder: (context, state) {
+                bool _isLoadingPosts = state is GetAllPostsLoading;
+                bool _isLoadingLikes = state is GetLikedPostsLoading;
+                bool _isLoadingComments = state is GetPersonalCommentsLoading;
+                bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Stack(
-                        alignment: Alignment.topCenter,
-                        fit: StackFit.passthrough,
-                        clipBehavior: Clip.none,
-                        children: <Widget>[
-                          /// Banner image
-                          SizedBox(
-                            height: getScreenHeight(140),
-                            width: size.width,
-                            child: Image.asset(
-                              'assets/images/cover.png',
-                              fit: BoxFit.cover,
-                              gaplessPlayback: true,
-                            ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Stack(
+                      alignment: Alignment.topCenter,
+                      fit: StackFit.passthrough,
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        /// Banner image
+                        SizedBox(
+                          height: getScreenHeight(140),
+                          width: size.width,
+                          child: Image.asset(
+                            'assets/images/cover.png',
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
                           ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Container(
-                                    width: getScreenWidth(40),
-                                    height: getScreenHeight(40),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color:
-                                          AppColors.textColor2.withOpacity(0.5),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/back.svg',
-                                      color: AppColors.white,
-                                      width: getScreenWidth(50),
-                                      height: getScreenHeight(50),
-                                    ),
+                        ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
                                   ),
-                                  onPressed: () => RouteNavigators.route(
-                                      context, const HomeScreen()),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Container(
-                                    width: getScreenWidth(40),
-                                    height: getScreenHeight(40),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color:
-                                          AppColors.textColor2.withOpacity(0.5),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/pop-vertical.svg',
-                                      color: AppColors.white,
-                                      width: getScreenWidth(50),
-                                      height: getScreenHeight(50),
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    await showProfileMenuBottomSheet(context,
-                                        user: globals.user!);
-                                  },
-                                  splashRadius: 20,
-                                )
-                              ]).paddingOnly(t: 25),
-
-                          Positioned(
-                            top: size.height * 0.1,
-                            child: AnimatedContainer(
-                              width: isGoingDown ? width : getScreenWidth(100),
-                              height:
-                                  isGoingDown ? height : getScreenHeight(100),
-                              duration: const Duration(seconds: 1),
-                              child: Helper.renderProfilePicture(
-                                globals.user!.profilePicture,
-                                size: 100,
+                                onPressed: () => RouteNavigators.route(
+                                    context, const HomeScreen()),
                               ),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/pop-vertical.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  await showProfileMenuBottomSheet(context,
+                                      user: globals.user!);
+                                },
+                                splashRadius: 20,
+                              )
+                            ]).paddingOnly(t: 25),
+
+                        Positioned(
+                          top: size.height * 0.1,
+                          child: AnimatedContainer(
+                            width: isGoingDown ? width : getScreenWidth(100),
+                            height: isGoingDown ? height : getScreenHeight(100),
+                            duration: const Duration(seconds: 1),
+                            child: Helper.renderProfilePicture(
+                              globals.user!.profilePicture,
+                              size: 100,
                             ),
                           ),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          SizedBox(height: getScreenHeight(10)),
-                          Text(
-                              ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                  .toTitleCase(),
-                              style: TextStyle(
-                                fontSize: getScreenHeight(15),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
-                              )),
-                          Text('@${globals.user!.username ?? 'username'}',
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        SizedBox(height: getScreenHeight(10)),
+                        Text(
+                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                .toTitleCase(),
+                            style: TextStyle(
+                              fontSize: getScreenHeight(15),
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColor2,
+                            )),
+                        Text('@${globals.user!.username ?? 'username'}',
+                            style: TextStyle(
+                              fontSize: getScreenHeight(13),
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textColor2,
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 0)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReachers.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Reachers',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 1)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReaching.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Reaching',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 2)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nStaring.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Starring',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(290),
+                            child: Text(
+                              globals.user!.bio ?? '',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: getScreenHeight(13),
+                                color: AppColors.greyShade2,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.textColor2,
-                              )),
-                          SizedBox(height: getScreenHeight(15)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Row(
-                                children: [
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 0)),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nReachers.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Text(
-                                          'Reachers',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(13),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(20)),
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 1)),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nReaching.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Text(
-                                          'Reaching',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(13),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(20)),
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 2)),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nStaring.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Text(
-                                          'Starring',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(13),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
                               ),
-                            ],
-                          ),
-                          globals.user!.bio != null && globals.user!.bio != ''
-                              ? SizedBox(height: getScreenHeight(20))
-                              : const SizedBox.shrink(),
-                          SizedBox(
-                              width: getScreenWidth(290),
-                              child: Text(
-                                globals.user!.bio ?? '',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(13),
-                                  color: AppColors.greyShade2,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              )),
-                          globals.user!.bio != null && globals.user!.bio != ''
-                              ? SizedBox(height: getScreenHeight(20))
-                              : const SizedBox.shrink(),
-                          SizedBox(
-                              width: getScreenWidth(145),
-                              height: getScreenHeight(45),
-                              child: CustomButton(
-                                label: 'Edit Profile',
-                                labelFontSize: getScreenHeight(14),
-                                color: AppColors.white,
-                                onPressed: () {
-                                  RouteNavigators.route(
-                                      context, const EditProfileScreen());
-                                },
-                                size: size,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 9,
-                                  horizontal: 21,
-                                ),
-                                textColor: AppColors.textColor2,
-                                borderSide: const BorderSide(
-                                    color: AppColors.greyShade5),
-                              )),
-                          SizedBox(height: getScreenHeight(15)),
-                        ],
-                      ).paddingOnly(t: 50),
-                      Divider(
-                        color: const Color(0xFF767474).withOpacity(0.5),
-                        thickness: 0.5,
-                      ),
-                      Center(child: _tabBar),
-                      Expanded(
-                        child: TabBarView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          controller: _tabController,
-                          children: [
-                            //REACHES TAB
-                            if (_isLoadingPosts)
-                              const CircularLoader()
-                            else
-                              Refresher(
-                                controller: _reachoutsRefreshController,
-                                onRefresh: () {
-                                  globals.socialServiceBloc!
-                                      .add(GetAllPostsEvent(
-                                    pageLimit: 50,
-                                    pageNumber: 1,
-                                  ));
-                                },
-                                child: _posts.value.isEmpty
-                                    ? ListView(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        children: const [
-                                          EmptyTabWidget(
-                                            title: "Reaches you’ve made",
+                            )),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(145),
+                            height: getScreenHeight(45),
+                            child: CustomButton(
+                              label: 'Edit Profile',
+                              labelFontSize: getScreenHeight(14),
+                              color: AppColors.white,
+                              onPressed: () {
+                                RouteNavigators.route(
+                                    context, const EditProfileScreen());
+                              },
+                              size: size,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 9,
+                                horizontal: 21,
+                              ),
+                              textColor: AppColors.textColor2,
+                              borderSide:
+                                  const BorderSide(color: AppColors.greyShade5),
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                      ],
+                    ).paddingOnly(t: 50),
+                    Divider(
+                      color: const Color(0xFF767474).withOpacity(0.5),
+                      thickness: 0.5,
+                    ),
+                    Center(child: _tabBar),
+                    Expanded(
+                      child: TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: _tabController,
+                        children: [
+                          //REACHES TAB
+                          if (_isLoadingPosts)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _reachoutsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(GetAllPostsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                ));
+                              },
+                              child: _posts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Reaches you’ve made",
+                                          subtitle:
+                                              "Find all posts or contributions you’ve made here ",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _posts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _ReacherCard(
+                                          postModel: _posts.value[index],
+                                          // onLike: () {
+                                          //   _likePost(index);
+                                          // },
+                                        );
+                                      },
+                                    ),
+                            ),
+
+                          //COMMENTS TAB
+                          if (_isLoadingComments)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _commentsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                  authId: globals.user!.id,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                'Comments you made on a post and comments made on your post',
                                             subtitle:
-                                                "Find all posts or contributions you’ve made here ",
-                                          )
-                                        ],
-                                      )
-                                    : ListView.builder(
-                                        itemCount: _posts.value.length,
-                                        itemBuilder: (context, index) {
-                                          return _ReacherCard(
-                                            postModel: _posts.value[index],
-                                            // onLike: () {
-                                            //   _likePost(index);
-                                            // },
-                                          );
-                                        },
-                                      ),
-                              ),
+                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                            //COMMENTS TAB
-                            if (_isLoadingComments)
-                              const CircularLoader()
-                            else
-                              Refresher(
-                                controller: _commentsRefreshController,
-                                onRefresh: () {
-                                  globals.socialServiceBloc!
-                                      .add(GetPersonalCommentsEvent(
-                                    pageLimit: 50,
-                                    pageNumber: 1,
-                                    authId: globals.user!.id,
-                                  ));
-                                },
-                                child: _comments.value.isEmpty
-                                    ? ListView(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        children: const [
-                                          EmptyTabWidget(
-                                              title:
-                                                  'Comments you made on a post and comments made on your post',
-                                              subtitle:
-                                                  'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                        ],
-                                      )
-                                    : ListView.builder(
-                                        itemCount: _comments.value.length,
-                                        itemBuilder: (context, index) {
-                                          return _CommentReachCard(
-                                            commentModel:
-                                                _comments.value[index],
-                                          );
-                                        },
-                                      ),
-                              ),
+                          //LIKES TAB
+                          if (_isLoadingLikes)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _likesRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(
+                                    GetLikedPostsEvent(
+                                        pageLimit: 50, pageNumber: 1));
+                              },
+                              child: _likedPosts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Likes you made",
+                                          subtitle:
+                                              "Find post you liked and your post that was liked",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _likedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _likedPosts.value[index],
+                                          isLiked: _likedPosts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _likedPosts.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                            //  reachDM.value = true;
 
-                            //LIKES TAB
-                            if (_isLoadingLikes)
-                              const CircularLoader()
-                            else
-                              Refresher(
-                                controller: _likesRefreshController,
-                                onRefresh: () {
-                                  globals.socialServiceBloc!.add(
-                                      GetLikedPostsEvent(
-                                          pageLimit: 50, pageNumber: 1));
-                                },
-                                child: _likedPosts.value.isEmpty
-                                    ? ListView(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        children: const [
-                                          EmptyTabWidget(
-                                            title: "Likes you made",
-                                            subtitle:
-                                                "Find post you liked and your post that was liked",
-                                          )
-                                        ],
-                                      )
-                                    : ListView.builder(
-                                        itemCount: _likedPosts.value.length,
-                                        itemBuilder: (context, index) {
-                                          print(_likedPosts.value[index]
-                                              .toJson());
-                                          return PostFeedReacherCard(
-                                            likingPost: false,
-                                            postFeedModel:
-                                                _likedPosts.value[index],
-                                            isLiked: _likedPosts.value[index]
-                                                    .like!.isNotEmpty
-                                                ? true
-                                                : false,
-                                            isVoted: _likedPosts.value[index]
-                                                    .vote!.isNotEmpty
-                                                ? true
-                                                : false,
-                                            voteType: _likedPosts.value[index]
-                                                    .vote!.isNotEmpty
-                                                ? _likedPosts.value[index]
-                                                    .vote![0].voteType
-                                                : null,
-                                            onMessage: () {
-                                              //  reachDM.value = true;
-
-                                              handleTap(index);
-                                              if (active.contains(index)) {
-                                                globals.userBloc!.add(
-                                                    GetRecipientProfileEvent(
-                                                        email: _likedPosts
-                                                            .value[index]
-                                                            .postOwnerId!));
-                                              }
-                                            },
-                                            onUpvote: () {
-                                              handleTap(index);
-                                              if (active.contains(index)) {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _likedPosts
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
+                                                postId: _likedPosts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _likedPosts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_posts.value[index].like!
+                                                  .isNotEmpty) {
                                                 globals.socialServiceBloc!
-                                                    .add(VotePostEvent(
-                                                  voteType: 'upvote',
+                                                    .add(UnlikePostEvent(
                                                   postId: _likedPosts
                                                       .value[index].postId,
                                                 ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _likedPosts
+                                                          .value[index].postId),
+                                                );
                                               }
-                                            },
-                                            onDownvote: () {
-                                              handleTap(index);
-                                              if (active.contains(index)) {
-                                                globals.socialServiceBloc!
-                                                    .add(VotePostEvent(
-                                                  voteType: 'downvote',
-                                                  postId: _likedPosts
-                                                      .value[index].postId,
-                                                ));
-                                              }
-                                            },
-                                            onLike: () {
-                                              handleTap(index);
-                                              if (active.contains(index)) {
-                                                if (_posts.value[index].like!
-                                                    .isNotEmpty) {
-                                                  globals.socialServiceBloc!
-                                                      .add(UnlikePostEvent(
-                                                    postId: _likedPosts
-                                                        .value[index].postId,
-                                                  ));
-                                                } else {
-                                                  globals.socialServiceBloc!
-                                                      .add(
-                                                    LikePostEvent(
-                                                        postId: _likedPosts
-                                                            .value[index]
-                                                            .postId),
-                                                  );
-                                                }
-                                              }
-                                            },
-                                          );
-                                        },
-                                      ),
-                              ),
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                            //SAVED POSTS TAB
-                            if (_isLoadingSavedPosts)
-                              const CircularLoader()
-                            else
-                              _savedPosts.value.isEmpty
+                          //SAVED POSTS TAB
+                          if (_isLoadingSavedPosts)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _savedPostsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(
+                                    GetAllSavedPostsEvent(
+                                        pageLimit: 50, pageNumber: 1));
+                              },
+                              child: _savedPosts.value.isEmpty
                                   ? ListView(
                                       padding: EdgeInsets.zero,
                                       shrinkWrap: true,
@@ -722,16 +722,29 @@ class _AccountScreenState extends State<AccountScreen>
                                       itemCount: _savedPosts.value.length,
                                       itemBuilder: (context, index) {
                                         return SavedPostReacherCardd(
-                                            savedPostModel:
-                                                _savedPosts.value[index]);
+                                          savedPostModel:
+                                              _savedPosts.value[index],
+                                          onDelete: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!.add(
+                                                  DeleteSavedPostEvent(
+                                                      postId: _savedPosts
+                                                          .value[index]
+                                                          .postId));
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
-                          ],
-                        ),
+                            )
+                        ],
                       ),
-                    ],
-                  );
-                });
+                    ),
+                  ],
+                );
+              },
+            );
           },
         ),
       ),

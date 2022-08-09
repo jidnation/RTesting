@@ -20,7 +20,6 @@ class ProfilePicture extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        //  border: border,
         shape: BoxShape.circle,
         color: Colors.grey.shade50,
       ),
@@ -39,6 +38,7 @@ class ProfilePicture extends StatelessWidget {
     );
   }
 }
+
 class RecipientProfilePicture extends StatelessWidget {
   const RecipientProfilePicture({
     Key? key,

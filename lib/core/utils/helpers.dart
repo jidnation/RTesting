@@ -162,7 +162,7 @@ class Helper {
   }
 
   static Widget renderPostImages(
-      PostModel post, BuildContext context) {
+      dynamic post, BuildContext context) {
     switch (post.imageMediaItems!.length) {
       case 1:
         return GestureDetector(
