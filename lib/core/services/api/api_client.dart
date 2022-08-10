@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:mime/mime.dart';
 import 'package:reach_me/core/helper/logger.dart';
 
-const GOOGLE_API_KEY = 'AIzaSyDF05ECJlA_uSE13uGJ3jq80wJPNN21SfY';
+const GOOGLE_API_KEY = 'AIzaSyAV2_9BKcCkpdd4IjZOoQ9mybLAn3i9tUE';
 
 class ApiClient {
   final Dio _dio;
@@ -86,10 +86,13 @@ class ApiClient {
       final response = await _dio.get(
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latlng&key=$GOOGLE_API_KEY',
       );
-      Console.log('res', response);
-      Console.log(
-          'reverse geocode', response.data['results'][0]['formatted_address']);
-      return response.data;
+
+      final location = response.data['results'][0]['address_components'][2]
+              ['long_name'] +
+          ',' +
+          ' ' +
+          response.data['results'][0]['address_components'][4]['long_name'];
+      return location as String;
     } on FormatException {
       throw const FormatException("Bad response format 👎");
     } catch (e) {

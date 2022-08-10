@@ -9,7 +9,6 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/home/data/models/post_model.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
@@ -32,7 +31,7 @@ class Helper {
 
   static String parseChatDate(String date) {
     final dateTime = DateTime.tryParse(date);
-    if (dateTime == null) return '3:00PM';
+    if (dateTime == null) return '1s';
     final now = DateTime.now();
     final diff = now.difference(dateTime);
     if (diff.inDays > 0) {
@@ -54,10 +53,11 @@ class Helper {
         height: getScreenHeight(size),
       );
     } else {
-      return ProfilePicture(
+      return RecipientProfilePicture(
         width: getScreenWidth(size),
         height: getScreenHeight(size),
         border: Border.all(color: Colors.grey.shade50, width: 3.0),
+        imageUrl: profilePicture,
       );
     }
   }
@@ -161,16 +161,14 @@ class Helper {
     }
   }
 
-  static Widget renderPostImages(
-      dynamic post, BuildContext context) {
+  static Widget renderPostImages(dynamic post, BuildContext context) {
     switch (post.imageMediaItems!.length) {
       case 1:
         return GestureDetector(
           onTap: (() => RouteNavigators.route(
                 context,
                 PhotoView(
-                  imageProvider:
-                      NetworkImage(post.imageMediaItems![0]),
+                  imageProvider: NetworkImage(post.imageMediaItems![0]),
                   loadingBuilder: (context, event) => const Center(
                     child: CupertinoActivityIndicator(color: Colors.white),
                   ),
@@ -198,8 +196,7 @@ class Helper {
                 onTap: (() => RouteNavigators.route(
                       context,
                       PhotoView(
-                        imageProvider: NetworkImage(
-                            post.imageMediaItems![0]),
+                        imageProvider: NetworkImage(post.imageMediaItems![0]),
                         loadingBuilder: (context, event) => const Center(
                           child:
                               CupertinoActivityIndicator(color: Colors.white),
@@ -229,8 +226,7 @@ class Helper {
                   onTap: (() => RouteNavigators.route(
                         context,
                         PhotoView(
-                          imageProvider: NetworkImage(
-                              post.imageMediaItems![1]),
+                          imageProvider: NetworkImage(post.imageMediaItems![1]),
                           loadingBuilder: (context, event) => const Center(
                             child:
                                 CupertinoActivityIndicator(color: Colors.white),
@@ -255,8 +251,7 @@ class Helper {
                   onTap: (() => RouteNavigators.route(
                         context,
                         PhotoView(
-                          imageProvider: NetworkImage(
-                              post.imageMediaItems![2]),
+                          imageProvider: NetworkImage(post.imageMediaItems![2]),
                           loadingBuilder: (context, event) => const Center(
                             child:
                                 CupertinoActivityIndicator(color: Colors.white),
@@ -286,9 +281,7 @@ class Helper {
           spacing: getScreenHeight(5),
           alignment: WrapAlignment.spaceBetween,
           children: [
-            for (var i = 0;
-                i < post.imageMediaItems!.length;
-                i++)
+            for (var i = 0; i < post.imageMediaItems!.length; i++)
               GestureDetector(
                 onTap: () => RouteNavigators.route(
                     context,

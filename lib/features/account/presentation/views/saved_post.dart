@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/empty_state.dart';
-import 'package:reach_me/core/components/media_card.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -228,14 +227,14 @@ class SavedPostReacherCardd extends HookWidget {
                                 : const SizedBox.shrink()
                           ],
                         ),
-                        Text(
-                          'Manchester, United Kingdom',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(11),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
-                          ),
-                        ),
+                        // Text(
+                        //   'Manchester, United Kingdom',
+                        //   style: TextStyle(
+                        //     fontSize: getScreenHeight(11),
+                        //     fontWeight: FontWeight.w400,
+                        //     color: AppColors.textColor2,
+                        //   ),
+                        // ),
                       ],
                     ).paddingOnly(t: 10),
                   ],

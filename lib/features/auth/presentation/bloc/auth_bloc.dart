@@ -55,9 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             globals.token = user.token;
             globals.email = user.email;
             globals.fname = user.firstName;
+            globals.userId = user.id;
             SecureStorage.writeSecureData('token', globals.token!);
             SecureStorage.writeSecureData('email', globals.email!);
             SecureStorage.writeSecureData('fname', user.firstName!);
+            SecureStorage.writeSecureData('userId', user.id!);
             emit(Authenticated(message: 'User logged in successfully'));
           },
         );

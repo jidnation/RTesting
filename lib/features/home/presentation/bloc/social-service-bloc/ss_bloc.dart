@@ -31,6 +31,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           videoMediaItem: event.videoMediaItem,
           commentOption: event.commentOption,
           content: event.content,
+          location: event.location,
         );
         response.fold(
           (error) => emit(CreatePostError(error: error)),

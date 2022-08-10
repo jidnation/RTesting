@@ -60,7 +60,7 @@ class ViewCommentsScreen extends HookWidget {
                   duration: const Duration(milliseconds: 100));
             }
             if (state is GetAllCommentsOnPostSuccess) {
-              comments.value = state.data!;
+              comments.value = state.data!.reversed.toList();
             }
 
             if (state is GetAllCommentsOnPostError) {

@@ -24,6 +24,7 @@ class SocialServiceRepository {
     String? content,
     List<String>? imageMediaItems,
     String? videoMediaItem,
+    String? location,
   }) async {
     try {
       final post = await _homeRemoteDataSource.createPost(
@@ -32,6 +33,7 @@ class SocialServiceRepository {
         content: content,
         imageMediaItems: imageMediaItems,
         videoMediaItem: videoMediaItem,
+        location: location,
       );
       return Right(post);
     } on GraphQLError catch (e) {

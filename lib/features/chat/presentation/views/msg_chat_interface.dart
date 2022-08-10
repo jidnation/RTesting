@@ -135,9 +135,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                       width: getScreenWidth(30),
                       height: getScreenHeight(30),
                     )
-                  : ProfilePicture(
+                  : RecipientProfilePicture(
                       width: getScreenWidth(30),
                       height: getScreenHeight(30),
+                      imageUrl: widget.recipientUser!.profilePicture,
                     ),
               const SizedBox(width: 10),
               Column(
@@ -156,7 +157,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   ),
                   FittedBox(
                     child: Text(
-                      'Active about 45min ago',
+                      'Active about ${Helper.parseChatDate(widget.recipientUser!.lastSeen!)} ago',
                       style: TextStyle(
                         fontSize: getScreenHeight(11),
                         fontWeight: FontWeight.w400,
@@ -259,9 +260,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       width: getScreenWidth(80),
                                       height: getScreenHeight(80),
                                     )
-                                  : ProfilePicture(
+                                  : RecipientProfilePicture(
                                       width: getScreenWidth(80),
                                       height: getScreenHeight(80),
+                                      imageUrl:
+                                          widget.recipientUser!.profilePicture,
                                     ),
                               SizedBox(height: getScreenHeight(5)),
                               Text('@${widget.recipientUser!.username}',
@@ -283,7 +286,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                         style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       Text(
@@ -306,7 +309,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                         style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       Text(
@@ -364,13 +367,13 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     borderSide: BorderSide.none,
                                   )),
                               const SizedBox(height: 15),
-                              const Text(
-                                'Apr 30, 2021',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textColor2,
-                                ),
-                              )
+                              // const Text(
+                              //   'Apr 30, 2021',
+                              //   style: TextStyle(
+                              //     fontSize: 10,
+                              //     color: AppColors.textColor2,
+                              //   ),
+                              // )
                             ],
                           ),
                           if (globals.userChat!.isEmpty)
@@ -527,7 +530,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                         globals.userChat!.add(temp);
                                         controller.clear();
 
-                                        SchedulerBinding.instance.addPostFrameCallback(
+                                        SchedulerBinding.instance
+                                            .addPostFrameCallback(
                                           (_) {
                                             _controller.animateTo(
                                               _controller

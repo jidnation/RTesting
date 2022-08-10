@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:location/location.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/refresher.dart';
@@ -17,6 +18,7 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/core/utils/location.helper.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
@@ -51,13 +53,21 @@ class _TimelineScreenState extends State<TimelineScreen>
   @override
   void initState() {
     super.initState();
-    globals.userBloc!.add(GetUserProfileEvent(email: globals.email!));
+    globals.userBloc!.add(GetUserProfileEvent(email: globals.userId!));
     globals.socialServiceBloc!
         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
     globals.socialServiceBloc!
         .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
     globals.socialServiceBloc!
         .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
+    LocationHelper.determineLocation().then((value) {
+      if (value is LocationData) {
+        globals.userBloc!.add(GetUserLocationEvent(
+          lat: value.latitude.toString(),
+          lng: value.longitude.toString(),
+        ));
+      }
+    });
   }
 
   Set active = {};
@@ -178,6 +188,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                       content: globals.postContent,
                       commentOption: globals.postCommentOption,
                       imageMediaItem: state.data as List<String>,
+                      location: globals.location ?? ' ',
                     ));
                   }
                   if (state is CreatePostError) {
@@ -312,6 +323,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                     children: [
                                                       UserStory(
                                                         size: size,
+                                                        image: globals.user!
+                                                            .profilePicture!,
                                                         isMe: true,
                                                         isLive: false,
                                                         hasWatched: false,
@@ -329,6 +342,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       else
                                                         UserStory(
                                                           size: size,
+                                                          image: globals.user!
+                                                              .profilePicture!,
                                                           isMe: false,
                                                           isLive: false,
                                                           hasWatched: false,
@@ -350,6 +365,11 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           isMe: false,
                                                           isLive: false,
                                                           hasWatched: false,
+                                                          image: _userStatus
+                                                              .value[index]
+                                                              .status![0]
+                                                              .statusCreatorModel!
+                                                              .profilePicture!,
                                                           username: _userStatus
                                                               .value[index]
                                                               .status![index]
@@ -613,14 +633,16 @@ class PostFeedReacherCard extends HookWidget {
                                 : const SizedBox.shrink()
                           ],
                         ),
-                        Text(
-                          'Nigeria, Africa.',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(10),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
-                          ),
-                        ),
+                        postFeedModel!.post!.location == null
+                            ? const SizedBox.shrink()
+                            : Text(
+                                postFeedModel!.post!.location ?? 'Somewhere',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(10),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              ),
                       ],
                     ).paddingOnly(t: 10),
                   ],
@@ -829,6 +851,7 @@ class UserStory extends StatelessWidget {
     required this.isMe,
     required this.username,
     required this.hasWatched,
+    required this.image,
     this.isMeOnTap,
     this.onTap,
   }) : super(key: key);
@@ -838,6 +861,7 @@ class UserStory extends StatelessWidget {
   final bool isLive;
   final bool hasWatched;
   final String username;
+  final String image;
   final Function()? isMeOnTap;
   final Function()? onTap;
 
@@ -863,11 +887,9 @@ class UserStory extends StatelessWidget {
                       child: Container(
                           padding: const EdgeInsets.all(3.5),
                           decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFF5F5F5),
-                          ),
+                              shape: BoxShape.circle, color: Colors.white),
                           child: Helper.renderProfilePicture(
-                            globals.user!.profilePicture,
+                            image,
                             size: 60,
                           )),
                     )

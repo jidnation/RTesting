@@ -821,14 +821,16 @@ class _ReacherCard extends HookWidget {
                                   SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              Text(
-                                'Manchester, United Kingdom',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
-                                ),
-                              ),
+                              postModel!.location == null
+                                  ? const SizedBox.shrink()
+                                  : Text(
+                                      postModel!.location ?? 'Somewhere',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(11),
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
                             ],
                           ).paddingOnly(t: 10),
                         ],

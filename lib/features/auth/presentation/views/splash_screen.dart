@@ -32,10 +32,12 @@ class _SplashScreenAnimatorState extends State<SplashScreenAnimator>
         final token = await SecureStorage.readSecureData('token');
         final email = await SecureStorage.readSecureData('email');
         final fname = await SecureStorage.readSecureData('fname');
+        final userId = await SecureStorage.readSecureData('userId');
         globals.email = email;
         if (token != null && email != null) {
           globals.token = token;
           globals.fname = fname;
+          globals.userId = userId;
           RouteNavigators.routeNoWayHome(context, const HomeScreen());
           return;
         } else {

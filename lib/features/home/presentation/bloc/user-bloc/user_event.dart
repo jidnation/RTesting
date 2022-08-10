@@ -52,6 +52,11 @@ class UploadUserCoverPhotoEvent extends UserEvent {
   UploadUserCoverPhotoEvent({required this.file});
 }
 
+class UpdateUserLastSeenEvent extends UserEvent {
+  final String userId;
+  UpdateUserLastSeenEvent({required this.userId});
+}
+
 class FetchAllUsersByNameEvent extends UserEvent {
   final String? query;
   final int? limit, pageNumber;

@@ -45,7 +45,7 @@ class RecipientProfilePicture extends StatelessWidget {
     this.height = 100,
     this.width = 100,
     this.border,
-    this.imageUrl,
+    required this.imageUrl,
   }) : super(key: key);
   final double height, width;
   final Border? border;

@@ -105,6 +105,7 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(CreatePostEvent(
                                   content: controller.text,
                                   commentOption: 'everyone',
+                                  location: globals.location ?? ' ',
                                 ));
                               }
                               RouteNavigators.pop(context);

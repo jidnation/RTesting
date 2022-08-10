@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -359,6 +357,20 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         );
       } on GraphQLError catch (e) {
         emit(GetUserLocationError(error: e.message));
+      }
+    });
+    on<UpdateUserLastSeenEvent>((event, emit) async {
+      emit(UpdateUserLastSeenLoading());
+      try {
+        final response = await userRepository.updateLastSeen(
+          userId: event.userId,
+        );
+        response.fold(
+          (error) => emit(UpdateUserLastSeenError(error: error)),
+          (isUpdated) => emit(UpdateUserLastSeenSuccess(isUpdated: isUpdated)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UpdateUserLastSeenError(error: e.message));
       }
     });
   }

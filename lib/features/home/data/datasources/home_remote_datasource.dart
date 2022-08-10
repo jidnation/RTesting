@@ -71,6 +71,24 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<bool> updateLastSeen({required String? userId}) async {
+    String q = r'''
+        mutation updateLastSeen($userId: String!) {
+          updateLastSeen(userId: $userId) 
+        }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'userId': userId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return result.data!['updateLastSeen'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<User> setDOB({required String? dob}) async {
     String q = r'''
         mutation setDateOfBirth($dateOfBirth: String!) {
@@ -491,6 +509,7 @@ class HomeRemoteDataSource {
     String? audioMediaItem,
     String? commentOption,
     String? content,
+    String? location,
     List<String>? imageMediaItems,
     String? videoMediaItem,
   }) async {
@@ -501,6 +520,7 @@ class HomeRemoteDataSource {
           $audioMediaItem: String
           $imageMediaItems: [String]
           $videoMediaItem: String
+          $location: String
           ) {
           createPost(
             postBody: {
@@ -509,6 +529,7 @@ class HomeRemoteDataSource {
               audioMediaItem: $audioMediaItem
               imageMediaItems: $imageMediaItems
               videoMediaItem: $videoMediaItem
+              location: $location
           }) {
             ''' +
         PostSchema.schema +
@@ -519,6 +540,7 @@ class HomeRemoteDataSource {
       Map<String, dynamic> variables = {
         'commentOption': commentOption,
         'content': content,
+        'location': location,
       };
 
       if (audioMediaItem != null) {

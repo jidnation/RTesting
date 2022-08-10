@@ -13,6 +13,7 @@ class UserSchema {
             profileSlug
             showContact
             showLocation
+            lastSeen
             authId
             username
             nReachers

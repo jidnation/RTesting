@@ -105,3 +105,15 @@ class GetUserLocationError extends UserState {
   GetUserLocationError({this.error});
   final String? error;
 }
+
+class UpdateUserLastSeenLoading extends UserState {}
+
+class UpdateUserLastSeenSuccess extends UserState {
+  UpdateUserLastSeenSuccess({this.isUpdated});
+  final bool? isUpdated;
+}
+
+class UpdateUserLastSeenError extends UserState {
+  UpdateUserLastSeenError({this.error});
+  final String? error;
+}

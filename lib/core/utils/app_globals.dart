@@ -26,6 +26,7 @@ class AppGlobals {
   String? token;
   String? email;
   String? fname;
+  String? userId;
   String? location;
   String? postContent;
   String? postCommentOption;
@@ -52,6 +53,7 @@ class AppGlobals {
     postCommentOption = '';
     postContent = '';
     fname = '';
+    userId = '';
     location = '';
     userList = [];
   }

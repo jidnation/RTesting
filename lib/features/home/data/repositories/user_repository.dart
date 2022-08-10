@@ -53,6 +53,17 @@ class UserRepository {
     }
   }
 
+  Future<Either<String, bool>> updateLastSeen({
+    required String userId,
+  }) async {
+    try {
+      final user = await _homeRemoteDataSource.updateLastSeen(userId: userId);
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, User>> setDOB({
     required String dateOfBirth,
   }) async {

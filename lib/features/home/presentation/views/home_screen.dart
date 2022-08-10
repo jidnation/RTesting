@@ -1,8 +1,7 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:location/location.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/location.helper.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
@@ -34,23 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
       const AccountScreen(),
     ];
     useEffect(() {
-      LocationHelper.determineLocation().then(
-        (value) {
-          if (value is LocationData) {
-            globals.userBloc!.add(
-              GetUserLocationEvent(
-                lat: value.latitude.toString(),
-                lng: value.longitude.toString(),
-              ),
-            );
-          }
-        },
-      );
+      globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
       return null;
     });
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
-    //print(globals.location);
+    Console.log('last seen', globals.user!.lastSeen);
     return Scaffold(
       drawer: const AppDrawer(),
       key: scaffoldKey.value,
