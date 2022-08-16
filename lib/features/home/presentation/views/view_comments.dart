@@ -148,13 +148,15 @@ class ViewCommentsScreen extends HookWidget {
                         ],
                       ),
                       SizedBox(height: getScreenHeight(12)),
-                      Text(
-                        post.post!.content!,
-                        style: TextStyle(
-                          fontSize: getScreenHeight(14),
-                          color: AppColors.textColor2,
-                        ),
-                      )
+                      post.post!.content == null
+                          ? const SizedBox()
+                          : Text(
+                              post.post!.content!,
+                              style: TextStyle(
+                                fontSize: getScreenHeight(14),
+                                color: AppColors.textColor2,
+                              ),
+                            )
                     ],
                   ),
                 ).paddingOnly(t: 16, b: 7, r: 20, l: 20),

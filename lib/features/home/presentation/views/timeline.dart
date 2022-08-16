@@ -667,17 +667,19 @@ class PostFeedReacherCard extends HookWidget {
                 )
               ],
             ),
-            Flexible(
-              child: Text(
-                postFeedModel!.post!.edited!
-                    ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                    : postFeedModel!.post!.content ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(14),
-                  fontWeight: FontWeight.w400,
-                ),
-              ).paddingSymmetric(v: 10, h: 16),
-            ),
+            postFeedModel!.post!.content == null
+                ? const SizedBox.shrink()
+                : Flexible(
+                    child: Text(
+                      postFeedModel!.post!.edited!
+                          ? "${postFeedModel!.post!.content ?? ''} (edited)"
+                          : postFeedModel!.post!.content ?? '',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(14),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ).paddingSymmetric(v: 10, h: 16),
+                  ),
             if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
               Helper.renderPostImages(postFeedModel!.post!, context)
                   .paddingOnly(r: 16, l: 16, b: 16, t: 10)

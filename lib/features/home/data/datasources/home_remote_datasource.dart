@@ -516,11 +516,11 @@ class HomeRemoteDataSource {
     String q = r'''
         mutation createPost(
           $commentOption: String!
-          $content: String!
+          $content: String
           $audioMediaItem: String
           $imageMediaItems: [String]
           $videoMediaItem: String
-          $location: String
+          $location: String!
           ) {
           createPost(
             postBody: {
@@ -539,10 +539,11 @@ class HomeRemoteDataSource {
     try {
       Map<String, dynamic> variables = {
         'commentOption': commentOption,
-        'content': content,
         'location': location,
       };
-
+      if (content != null && content.isNotEmpty) {
+        variables.putIfAbsent('content', () => content);
+      }
       if (audioMediaItem != null) {
         variables.putIfAbsent('audioMediaItem', () => audioMediaItem);
       }

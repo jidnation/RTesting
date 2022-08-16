@@ -157,7 +157,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   ),
                   FittedBox(
                     child: Text(
-                      'Active about ${Helper.parseChatDate(widget.recipientUser!.lastSeen!)} ago',
+                      'Active about ${Helper.parseChatDate(widget.recipientUser!.lastSeen ?? '50')} ago',
                       style: TextStyle(
                         fontSize: getScreenHeight(11),
                         fontWeight: FontWeight.w400,
