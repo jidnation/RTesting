@@ -140,9 +140,9 @@ class _PostReachState extends State<PostReach> {
                                     color: AppColors.textColor2,
                                   ),
                                 ),
-                                const Text(
-                                  'Nigeria',
-                                  style: TextStyle(
+                                Text(
+                                  globals.location!,
+                                  style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
                                       color: AppColors.greyShade1),
@@ -153,31 +153,31 @@ class _PostReachState extends State<PostReach> {
                         ),
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: () => RouteNavigators.route(
-                                  context, const TagLocation()),
-                              child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F5F5),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  children: [
-                                    SvgPicture.asset(
-                                        'assets/svgs/location.svg'),
-                                    const Text(
-                                      '   Location',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // GestureDetector(
+                            //   onTap: () => RouteNavigators.route(
+                            //       context, const TagLocation()),
+                            //   child: Container(
+                            //     padding: const EdgeInsets.all(3),
+                            //     decoration: BoxDecoration(
+                            //       color: const Color(0xFFF5F5F5),
+                            //       borderRadius: BorderRadius.circular(10),
+                            //     ),
+                            //     child: Row(
+                            //       children: [
+                            //         SvgPicture.asset(
+                            //             'assets/svgs/location.svg'),
+                            //         const Text(
+                            //           '   Location',
+                            //           style: TextStyle(
+                            //             fontSize: 12,
+                            //             fontWeight: FontWeight.w500,
+                            //             color: AppColors.textColor2,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                             const SizedBox(width: 20),
                             Text(
                               counter.value.toString() + '/' + '200',
@@ -702,9 +702,9 @@ class EditReach extends HookWidget {
                                     color: AppColors.textColor2,
                                   ),
                                 ),
-                                const Text(
-                                  'Nigeria',
-                                  style: TextStyle(
+                                Text(
+                                  globals.location ?? '',
+                                  style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
                                       color: AppColors.greyShade1),

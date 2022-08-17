@@ -5,6 +5,7 @@ import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -685,12 +686,14 @@ class HomeRemoteDataSource {
           $postId: String!
           $content: String!
           $userId: String!
+          $location: String!
           ) {
           commentOnPost(
             commentBody: {
               postId: $postId
               content: $content
               userId: $userId
+              location: $location
           }) {
             ''' +
         CommentSchema.schema +
@@ -702,6 +705,7 @@ class HomeRemoteDataSource {
         'postId': postId,
         'content': content,
         'userId': userId,
+        'location': globals.location,
       });
 
       if (result is GraphQLError) {

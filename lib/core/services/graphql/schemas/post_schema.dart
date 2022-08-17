@@ -49,10 +49,14 @@ class SavePostSchema {
             savedPostId
             videoMediaItem
             like {
-              ''' + PostLikeSchema.schema + '''
+              ''' +
+        PostLikeSchema.schema +
+        '''
             }
             vote {
-              ''' + PostVoteSchema.schema + '''
+              ''' +
+        PostVoteSchema.schema +
+        '''
             }
             postId
             profile {

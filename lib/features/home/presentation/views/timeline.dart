@@ -324,7 +324,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       UserStory(
                                                         size: size,
                                                         image: globals.user!
-                                                            .profilePicture!,
+                                                                .profilePicture ??
+                                                            '',
                                                         isMe: true,
                                                         isLive: false,
                                                         hasWatched: false,
@@ -343,7 +344,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         UserStory(
                                                           size: size,
                                                           image: globals.user!
-                                                              .profilePicture!,
+                                                                  .profilePicture ??
+                                                              '',
                                                           isMe: false,
                                                           isLive: false,
                                                           hasWatched: false,

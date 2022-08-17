@@ -115,7 +115,7 @@ class ViewCommentsScreen extends HookWidget {
                     color: AppColors.white,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
                         children: [
@@ -131,18 +131,21 @@ class ViewCommentsScreen extends HookWidget {
                               Text(
                                 '@${post.username!}',
                                 style: TextStyle(
-                                  fontSize: getScreenHeight(16),
+                                  fontSize: getScreenHeight(15),
                                   color: AppColors.textColor2,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              Text(
-                                'Nigeria, Africa',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(12),
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                              ),
+                              post.location == null
+                                  ? const SizedBox.shrink()
+                                  : Text(
+                                      '',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(12),
+                                        color: AppColors.textColor2
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
                             ],
                           )
                         ],
@@ -156,7 +159,12 @@ class ViewCommentsScreen extends HookWidget {
                                 fontSize: getScreenHeight(14),
                                 color: AppColors.textColor2,
                               ),
-                            )
+                            ),
+                      if (post.post!.imageMediaItems!.isNotEmpty)
+                        Helper.renderPostImages(post.post!, context)
+                            .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                      else
+                        const SizedBox(),
                     ],
                   ),
                 ).paddingOnly(t: 16, b: 7, r: 20, l: 20),
@@ -276,14 +284,7 @@ class CommentsTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: getScreenHeight(15),
                         color: AppColors.textColor2,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Nigeria, Africa',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(12),
-                        color: AppColors.textColor2.withOpacity(0.5),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
