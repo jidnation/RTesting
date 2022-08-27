@@ -9,12 +9,14 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/data/repositories/chat_repository.dart';
+import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 
 part 'chat_event.dart';
 part 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository chatRepository = ChatRepository();
+  final UserRepository userRepository = UserRepository();
   ChatBloc() : super(ChatInitial()) {
     on<GetThreadMessagesEvent>((event, emit) async {
       emit(ChatLoading());
@@ -104,15 +106,32 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
     on<UploadImageFileEvent>((event, emit) async {
       emit(UserUploadingImage());
+      String imageUrl = '';
+      String signedUrl = '';
       try {
-        //UPLOAD FILE & GET IMAGE URL
-        final response = await chatRepository.uploadPhoto(
-          file: event.file,
-        );
+        //GET SIGNED URL
+        final response = await userRepository.getSignedURl(file: event.file);
+
         response.fold(
           (error) => emit(ChatUploadError(error: error)),
-          (imgUrl) => emit(ChatUploadSuccess(imgUrl: imgUrl)),
+          (data) {
+            signedUrl = data['signedUrl'];
+            imageUrl = data['imageUrl'];
+          },
         );
+
+        //UPLOAD FILE & GET IMAGE URL
+        if (signedUrl.isNotEmpty) {
+          final uploadRes = await userRepository.uploadPhoto(
+            url: signedUrl,
+            file: event.file,
+          );
+
+          uploadRes.fold(
+            (error) => emit(ChatUploadError(error: error)),
+            (data) => emit(ChatUploadSuccess(imgUrl: imageUrl)),
+          );
+        }
       } on GraphQLError catch (e) {
         emit(ChatUploadError(error: e.message));
       }

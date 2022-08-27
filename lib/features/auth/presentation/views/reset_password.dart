@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,6 +23,7 @@ class ResetPasswordScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _obscureText = useState(true);
     final _formKey = useState<GlobalKey<FormState>>(GlobalKey());
     final _passwordController = useTextEditingController();
     final _confirmPasswordController = useTextEditingController();
@@ -74,22 +76,52 @@ class ResetPasswordScreen extends HookWidget {
                     const SizedBox(height: 40),
                     CustomTextField(
                       hintText: 'Enter new password',
-                      obscureText: true,
+                      obscureText: _obscureText.value,
                       keyboardType: TextInputType.text,
                       controller: _passwordController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>
                           Validator.validatePassword(value ?? ""),
+                      suffixIcon: CupertinoButton(
+                        minSize: 0,
+                        padding: EdgeInsets.zero,
+                        onPressed: () =>
+                            _obscureText.value = !_obscureText.value,
+                        child: _obscureText.value
+                            ? const Icon(
+                                Icons.visibility_off_outlined,
+                                color: AppColors.textFieldLabelColor,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: AppColors.primaryColor,
+                              ),
+                      ),
                     ).paddingSymmetric(h: 45.0),
                     const SizedBox(height: 30),
                     CustomTextField(
                       hintText: 'Confirm new password',
-                      obscureText: true,
+                      obscureText: _obscureText.value,
                       keyboardType: TextInputType.text,
                       controller: _confirmPasswordController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>
                           Validator.validatePassword(value ?? ""),
+                      suffixIcon: CupertinoButton(
+                        minSize: 0,
+                        padding: EdgeInsets.zero,
+                        onPressed: () =>
+                            _obscureText.value = !_obscureText.value,
+                        child: _obscureText.value
+                            ? const Icon(
+                                Icons.visibility_off_outlined,
+                                color: AppColors.textFieldLabelColor,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: AppColors.primaryColor,
+                              ),
+                      ),
                     ).paddingSymmetric(h: 45.0),
                     const SizedBox(height: 40),
                     CustomButton(

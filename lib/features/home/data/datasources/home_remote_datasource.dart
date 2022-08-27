@@ -705,7 +705,7 @@ class HomeRemoteDataSource {
         'postId': postId,
         'content': content,
         'userId': userId,
-        'location': globals.location,
+        'location': globals.location ?? ' ',
       });
 
       if (result is GraphQLError) {

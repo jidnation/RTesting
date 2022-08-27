@@ -31,7 +31,7 @@ class Helper {
 
   static String parseChatDate(String date) {
     final dateTime = DateTime.tryParse(date);
-    if (dateTime == null) return '1s';
+    if (dateTime == null) return '38mins';
     final now = DateTime.now();
     final diff = now.difference(dateTime);
     if (diff.inDays > 0) {

@@ -198,7 +198,8 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                         ],
                       ),
                       _isLoadingUser
-                          ? const LinearLoader()
+                          ? const LinearLoader(color: AppColors.black)
+                              .paddingOnly(t: 10)
                           : const SizedBox.shrink(),
                       _isLoading
                           ? const Center(

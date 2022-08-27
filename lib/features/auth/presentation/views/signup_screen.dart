@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -171,8 +172,10 @@ class SignUpScreen extends HookWidget {
                             textCapitalization: TextCapitalization.none,
                             validator: (value) =>
                                 Validator.validatePassword(value ?? ""),
-                            suffixIcon: GestureDetector(
-                              onTap: () =>
+                            suffixIcon: CupertinoButton(
+                              minSize: 0,
+                              padding: EdgeInsets.zero,
+                              onPressed: () =>
                                   _obscureText.value = !_obscureText.value,
                               child: _obscureText.value
                                   ? const Icon(

@@ -54,7 +54,7 @@ class AppGlobals {
     postContent = '';
     fname = '';
     userId = '';
-    location = '';
+    location = 'NIL';
     userList = [];
   }
 

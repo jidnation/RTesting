@@ -60,14 +60,14 @@ class _TimelineScreenState extends State<TimelineScreen>
         .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
     globals.socialServiceBloc!
         .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
-    LocationHelper.determineLocation().then((value) {
-      if (value is LocationData) {
-        globals.userBloc!.add(GetUserLocationEvent(
-          lat: value.latitude.toString(),
-          lng: value.longitude.toString(),
-        ));
-      }
-    });
+    // LocationHelper.determineLocation().then((value) {
+    //   if (value is LocationData) {
+    //     globals.userBloc!.add(GetUserLocationEvent(
+    //       lat: value.latitude.toString(),
+    //       lng: value.longitude.toString(),
+    //     ));
+    //   }
+    // });
   }
 
   Set active = {};
@@ -188,7 +188,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                       content: globals.postContent,
                       commentOption: globals.postCommentOption,
                       imageMediaItem: state.data as List<String>,
-                      location: globals.location ?? ' ',
+                      location: globals.location,
                     ));
                   }
                   if (state is CreatePostError) {
@@ -435,6 +435,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             .vote![0].voteType
                                                         : null,
                                                     onMessage: () {
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                       reachDM.value = true;
                                                       selectedIndex.value =
                                                           index;
@@ -450,6 +452,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       }
                                                     },
                                                     onUpvote: () {
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                       selectedIndex.value =
                                                           index;
                                                       handleTap(index);
@@ -466,6 +470,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       }
                                                     },
                                                     onDownvote: () {
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                       selectedIndex.value =
                                                           index;
                                                       handleTap(index);
@@ -482,6 +488,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       }
                                                     },
                                                     onLike: () {
+                                                      HapticFeedback
+                                                          .mediumImpact();
                                                       selectedIndex.value =
                                                           index;
                                                       handleTap(index);
@@ -585,6 +593,7 @@ class PostFeedReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(voteType);
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
@@ -635,7 +644,8 @@ class PostFeedReacherCard extends HookWidget {
                                 : const SizedBox.shrink()
                           ],
                         ),
-                        postFeedModel!.post!.location == null
+                        postFeedModel!.post!.location == null ||
+                                postFeedModel!.post!.location == 'NIL'
                             ? const SizedBox.shrink()
                             : Text(
                                 postFeedModel!.post!.location ?? 'Somewhere',
@@ -705,11 +715,11 @@ class PostFeedReacherCard extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
+                        CupertinoButton(
+                          minSize: 0,
                           onPressed: onLike,
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: likingPost
+                          child: likingPost
                               ? const CupertinoActivityIndicator()
                               : isLiked
                                   ? SvgPicture.asset(
@@ -735,14 +745,14 @@ class PostFeedReacherCard extends HookWidget {
                           ),
                         ),
                         SizedBox(width: getScreenWidth(15)),
-                        IconButton(
+                        CupertinoButton(
+                          minSize: 0,
                           onPressed: () {
                             RouteNavigators.route(context,
                                 ViewCommentsScreen(post: postFeedModel!));
                           },
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: SvgPicture.asset(
+                          child: SvgPicture.asset(
                             'assets/svgs/comment.svg',
                             height: getScreenHeight(20),
                             width: getScreenWidth(20),
@@ -764,11 +774,11 @@ class PostFeedReacherCard extends HookWidget {
                           SizedBox(width: getScreenWidth(15)),
                         if (postFeedModel!.postOwnerId !=
                             postFeedModel!.feedOwnerId)
-                          IconButton(
+                          CupertinoButton(
+                            minSize: 0,
                             onPressed: onMessage,
                             padding: const EdgeInsets.all(0),
-                            constraints: const BoxConstraints(),
-                            icon: SvgPicture.asset(
+                            child: SvgPicture.asset(
                               'assets/svgs/message.svg',
                               height: getScreenHeight(20),
                               width: getScreenWidth(20),
@@ -797,11 +807,11 @@ class PostFeedReacherCard extends HookWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconButton(
+                            CupertinoButton(
+                              minSize: 0,
                               onPressed: onUpvote,
                               padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              icon: isVoted && voteType == 'upvote'
+                              child: isVoted && voteType == 'Upvote'
                                   ? SvgPicture.asset(
                                       'assets/svgs/shoutup-active.svg',
                                       height: getScreenHeight(20),
@@ -815,11 +825,11 @@ class PostFeedReacherCard extends HookWidget {
                             ),
                             Flexible(child: SizedBox(width: getScreenWidth(4))),
                             Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            IconButton(
+                            CupertinoButton(
+                              minSize: 0,
                               onPressed: onDownvote,
                               padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              icon: isVoted && voteType == 'downvote'
+                              child: isVoted && voteType == 'Downvote'
                                   ? SvgPicture.asset(
                                       'assets/svgs/shoutdown-active.svg',
                                       height: getScreenHeight(20),
