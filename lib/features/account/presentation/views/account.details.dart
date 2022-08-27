@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -142,12 +144,15 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
           ),
         ],
       );
+
+
   @override
   Widget build(BuildContext context) {
     final _searchController = useTextEditingController();
     final _reachersList = useState<List<VirtualReach>>([]);
     final _reachingList = useState<List<VirtualReach>>([]);
     final _starsList = useState<List<VirtualStar>>([]);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -261,13 +266,19 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
   }
 }
 
+
+
 class SeeMyReachersList extends StatelessWidget {
-  const SeeMyReachersList({Key? key, this.data}) : super(key: key);
+  const SeeMyReachersList({Key? key, this.data }) : super(key: key);
 
   final VirtualReach? data;
 
+
+
   @override
   Widget build(BuildContext context) {
+
+    var size = MediaQuery.of(context).size;
     return Column(
       children: [
         SizedBox(height: getScreenHeight(20)),
@@ -304,22 +315,31 @@ class SeeMyReachersList extends StatelessWidget {
           trailing: SizedBox(
             height: getScreenHeight(40),
             width: getScreenWidth(80),
-            child: TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            child: CustomButton(
+            loaderColor: data!.reacher!.id == 'userBlocked'
+                ? AppColors.primaryColor
+                    : AppColors.white,
+                label: data!.reacher!.id == 'userBlocked' ? 'Unblock' : 'Block',
+              labelFontSize: getScreenHeight(13),
+                color: data!.reacher!.id == 'userBlocked'
+                ? AppColors.white
+                    : AppColors.primaryColor,
+                onPressed: () {
+                  // Block or Unblock user and render button according to userBlockRelationship //
+                },
+                size: size,
+                padding: const EdgeInsets.symmetric(
+                vertical: 9,
+                horizontal: 21,
                 ),
-              ),
-              child: Text(
-                'Reach',
-                style: TextStyle(
-                  fontSize: getScreenHeight(13),
-                  color: AppColors.white,
+                textColor: data!.reacher!.id == 'userBlocked'
+                ? AppColors.black
+                    : AppColors.white,
+                borderSide: data!.reacher!.id == 'userBlocked'
+                ? const BorderSide(
+                color: AppColors.greyShade5)
+                    : BorderSide.none,
                 ),
-              ),
-            ),
           ),
         ),
       ],
@@ -370,24 +390,20 @@ class SeeMyReachingsList extends StatelessWidget {
           trailing: SizedBox(
             height: getScreenHeight(40),
             width: getScreenWidth(80),
-            child: TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Text(
-                'Reach',
-                style: TextStyle(
-                  fontSize: getScreenHeight(13),
-                  color: AppColors.white,
-                ),
-              ),
-            ),
+            child: CustomButton(
+              loaderColor: AppColors.primaryColor,
+              label: 'Unreach',
+              labelFontSize: getScreenHeight(13),
+              color: AppColors.white,
+              onPressed: () {
+                // Remove User from Reaching UI //
+              },
+              textColor: AppColors.black,
+              borderSide: const BorderSide(
+                  color: AppColors.greyShade5),
+            ),)
           ),
-        ),
+
       ],
     );
   }
@@ -643,7 +659,8 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                                   itemCount: _reachingList.value.length,
                                   itemBuilder: (context, index) {
                                     return SeeMyReachingsList(
-                                        data: _reachingList.value[index]);
+                                        data: _reachingList.value[index],
+                                    );
                                   },
                                 ),
                                 const SeeMyStarsList(),

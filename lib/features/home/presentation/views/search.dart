@@ -40,98 +40,95 @@ class _SearchScreenState extends State<SearchScreen>
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
     var size = MediaQuery.of(context).size;
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.grey.shade50,
-          elevation: 0,
-          leading: IconButton(
-            padding: const EdgeInsets.all(0),
-            onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
-            icon: globals.user!.profilePicture == null
-                ? ImagePlaceholder(
-                    width: getScreenWidth(40),
-                    height: getScreenHeight(40),
-                  )
-                : ProfilePicture(
-                    width: getScreenWidth(40),
-                    height: getScreenHeight(40),
-                  ),
-          ).paddingOnly(t: 10, l: 10),
-          title: CustomRoundTextField(
-            hintText: 'Search ReachMe',
-            fillColor: AppColors.white,
-            controller: _searchController,
-            maxLines: 1,
-            onChanged: (val) {
-              if (val.isNotEmpty) {
-                _hasText.value = true;
-                _searchString.value = val;
-                globals.socialServiceBloc!.add(SearchProfileEvent(
-                  pageLimit: 20,
-                  pageNumber: 1,
-                  name: val,
-                ));
-              } else {
-                _hasText.value = false;
-              }
-            },
-          ).paddingOnly(t: 10),
-          actions: [
-            IconButton(
-              padding: const EdgeInsets.all(0),
-              icon: SvgPicture.asset(
-                'assets/svgs/Setting.svg',
-                width: 25,
-                height: 25,
-              ),
-              onPressed: () {},
-            ).paddingOnly(t: 10, r: 10),
-          ],
-        ),
-        body: SizedBox(
-          width: size.width,
-          height: size.height,
-          child: !_hasText.value
-              ? const SearchStories()
-              : BlocConsumer<SocialServiceBloc, SocialServiceState>(
-                  bloc: globals.socialServiceBloc,
-                  listener: (context, state) {
-                    if (state is SearchProfileSuccess) {
-                      globals.userList = state.users!;
-                    } else if (state is SearchProfileError) {
-                      Snackbars.error(context, message: state.error);
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is UserLoading) {
-                      return const Center(child: CupertinoActivityIndicator());
-                    }
-                    if (globals.userList!.isEmpty) {
-                      return SearchNoResultFound(size: size)
-                          .paddingSymmetric(h: 16);
-                    }
-                    return ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: globals.userList!.length,
-                      itemBuilder: (context, index) {
-                        return SearchResultCard(
-                          displayName: (globals.userList![index].firstName! +
-                                  ' ' +
-                                  globals.userList![index].lastName!)
-                              .toTitleCase(),
-                          //: globals.userList![index].,
-                          username: globals.userList![index].username,
-                          imageUrl: globals.userList![index].profilePicture,
-                          id: globals.userList![index].authId,
-                        );
-                      },
-                    );
-                  },
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade50,
+        elevation: 0,
+        leading: IconButton(
+          padding: const EdgeInsets.all(0),
+          onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
+          icon: globals.user!.profilePicture == null
+              ? ImagePlaceholder(
+                  width: getScreenWidth(40),
+                  height: getScreenHeight(40),
+                )
+              : ProfilePicture(
+                  width: getScreenWidth(40),
+                  height: getScreenHeight(40),
                 ),
-        ),
+        ).paddingOnly(t: 10, l: 10),
+        title: CustomRoundTextField(
+          hintText: 'Search ReachMe',
+          fillColor: AppColors.white,
+          controller: _searchController,
+          maxLines: 1,
+          onChanged: (val) {
+            if (val.isNotEmpty) {
+              _hasText.value = true;
+              _searchString.value = val;
+              globals.socialServiceBloc!.add(SearchProfileEvent(
+                pageLimit: 20,
+                pageNumber: 1,
+                name: val,
+              ));
+            } else {
+              _hasText.value = false;
+            }
+          },
+        ).paddingOnly(t: 10),
+        actions: [
+          IconButton(
+            padding: const EdgeInsets.all(0),
+            icon: SvgPicture.asset(
+              'assets/svgs/Setting.svg',
+              width: 25,
+              height: 25,
+            ),
+            onPressed: () {},
+          ).paddingOnly(t: 10, r: 10),
+        ],
+      ),
+      body: SizedBox(
+        width: size.width,
+        height: size.height,
+        child: !_hasText.value
+            ? const SearchStories()
+            : BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
+                listener: (context, state) {
+                  if (state is SearchProfileSuccess) {
+                    globals.userList = state.users!;
+                  } else if (state is SearchProfileError) {
+                    Snackbars.error(context, message: state.error);
+                  }
+                },
+                builder: (context, state) {
+                  if (state is UserLoading) {
+                    return const Center(child: CupertinoActivityIndicator());
+                  }
+                  if (globals.userList!.isEmpty) {
+                    return SearchNoResultFound(size: size)
+                        .paddingSymmetric(h: 16);
+                  }
+                  return ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: globals.userList!.length,
+                    itemBuilder: (context, index) {
+                      return SearchResultCard(
+                        displayName: (globals.userList![index].firstName! +
+                                ' ' +
+                                globals.userList![index].lastName!)
+                            .toTitleCase(),
+                        //: globals.userList![index].,
+                        username: globals.userList![index].username,
+                        imageUrl: globals.userList![index].profilePicture,
+                        id: globals.userList![index].authId,
+                      );
+                    },
+                  );
+                },
+              ),
       ),
     );
   }

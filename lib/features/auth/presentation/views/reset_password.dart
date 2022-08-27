@@ -24,6 +24,7 @@ class ResetPasswordScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final _obscureText = useState(true);
+    final _obscureConfirmText = useState(true);
     final _formKey = useState<GlobalKey<FormState>>(GlobalKey());
     final _passwordController = useTextEditingController();
     final _confirmPasswordController = useTextEditingController();
@@ -101,7 +102,7 @@ class ResetPasswordScreen extends HookWidget {
                     const SizedBox(height: 30),
                     CustomTextField(
                       hintText: 'Confirm new password',
-                      obscureText: _obscureText.value,
+                      obscureText: _obscureConfirmText.value,
                       keyboardType: TextInputType.text,
                       controller: _confirmPasswordController,
                       textCapitalization: TextCapitalization.none,
@@ -110,8 +111,8 @@ class ResetPasswordScreen extends HookWidget {
                       suffixIcon: CupertinoButton(
                         minSize: 0,
                         padding: EdgeInsets.zero,
-                        onPressed: () =>
-                            _obscureText.value = !_obscureText.value,
+                        onPressed: () => _obscureConfirmText.value =
+                            !_obscureConfirmText.value,
                         child: _obscureText.value
                             ? const Icon(
                                 Icons.visibility_off_outlined,

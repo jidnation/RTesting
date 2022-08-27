@@ -1,5 +1,6 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
@@ -39,13 +40,40 @@ class _HomeScreenState extends State<HomeScreen> {
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
     Console.log('last seen', globals.user!.lastSeen);
+
+    int backPressCounter = 0;
+    bool onWillPop() {
+      if (_pageController.page!.round() == _pageController.initialPage){
+        if (backPressCounter < 1) {
+          Fluttertoast.showToast(msg: "Tap again to leave app",
+              backgroundColor: Colors.blue);
+          backPressCounter++;
+          Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
+            backPressCounter--;
+          });
+          return false;
+        }
+        return true;
+      }
+      else {
+          _pageController.previousPage(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.linear,
+          ).then((index) => _currentIndex.value--);
+        return false;
+      }
+    }
+
     return Scaffold(
       drawer: const AppDrawer(),
       key: scaffoldKey.value,
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: pages,
+      body: WillPopScope(
+        onWillPop: () => Future.sync(onWillPop),
+        child: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: pages,
+        ),
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
@@ -54,6 +82,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
+// int backPressCounter = 0;
+// int backPressTotal = 2;
+//
+// Future<bool> onWillPop() {
+//   if (backPressCounter < 2) {
+//     Fluttertoast.showToast(msg: "Press ${backPressTotal - backPressCounter} time to exit app",
+//         backgroundColor: Colors.blue);
+//     backPressCounter++;
+//     Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
+//       backPressCounter--;
+//     });
+//     return Future.value(false);
+//   } else {
+//     return Future.value(true);
+//   }
+// }
+
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({

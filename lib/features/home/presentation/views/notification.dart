@@ -26,43 +26,40 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     super.build(context);
     var size = MediaQuery.of(context).size;
     final changeState = useState<bool>(false);
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        body: SafeArea(
-          child: GestureDetector(
-            // onTap: () => changeState.value = !changeState.value,
-            child: Container(
-              width: size.width,
-              height: size.height,
-              color: const Color(0xFFF5F5F5),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    const CustomRoundTextField(
-                      hintText: "Search notifications",
-                      fillColor: AppColors.white,
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                    const SizedBox(height: 20),
-                    !changeState.value
-                        ? const EmptyNotificationScreen()
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const NewNotificationContainer()
-                                  .paddingSymmetric(v: 10),
-                              const ThisWeekNotificationContainer()
-                                  .paddingSymmetric(v: 10),
-                              const ThisMonthNotificationContainer()
-                                  .paddingSymmetric(v: 10)
-                            ],
-                          ).paddingSymmetric(h: 20),
-                  ],
-                ).paddingOnly(t: 22, r: 24, l: 24),
-              ),
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      body: SafeArea(
+        child: GestureDetector(
+          // onTap: () => changeState.value = !changeState.value,
+          child: Container(
+            width: size.width,
+            height: size.height,
+            color: const Color(0xFFF5F5F5),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const CustomRoundTextField(
+                    hintText: "Search notifications",
+                    fillColor: AppColors.white,
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                  const SizedBox(height: 20),
+                  !changeState.value
+                      ? const EmptyNotificationScreen()
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const NewNotificationContainer()
+                                .paddingSymmetric(v: 10),
+                            const ThisWeekNotificationContainer()
+                                .paddingSymmetric(v: 10),
+                            const ThisMonthNotificationContainer()
+                                .paddingSymmetric(v: 10)
+                          ],
+                        ).paddingSymmetric(h: 20),
+                ],
+              ).paddingOnly(t: 22, r: 24, l: 24),
             ),
           ),
         ),

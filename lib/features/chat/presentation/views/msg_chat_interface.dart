@@ -25,6 +25,7 @@ import 'package:reach_me/features/video-call/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/voice_call_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:grouped_list/grouped_list.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -157,7 +158,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   ),
                   FittedBox(
                     child: Text(
-                      'Active about ${Helper.parseChatDate(widget.recipientUser!.lastSeen ?? '50')} ago',
+                      'Active ${Helper.parseUserLastSeen(widget.recipientUser!.lastSeen ?? '50')}',
                       style: TextStyle(
                         fontSize: getScreenHeight(11),
                         fontWeight: FontWeight.w400,
@@ -367,13 +368,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     borderSide: BorderSide.none,
                                   )),
                               const SizedBox(height: 15),
-                              // const Text(
-                              //   'Apr 30, 2021',
-                              //   style: TextStyle(
-                              //     fontSize: 10,
-                              //     color: AppColors.textColor2,
-                              //   ),
-                              // )
                             ],
                           ),
                           if (globals.userChat!.isEmpty)
@@ -383,11 +377,12 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               children: List.generate(
                                 globals.userChat!.length,
                                 (index) => MsgBubble(
+                                  msgDate: '',
                                   isMe: globals.user!.id ==
                                       globals.userChat![index].senderId,
                                   label: globals.userChat![index].value!,
                                   size: size,
-                                  timeStamp: Helper.parseChatDate(
+                                  timeStamp: Helper.parseChatTime(
                                       globals.userChat![index].sentAt ?? ''),
                                 ),
                               ),

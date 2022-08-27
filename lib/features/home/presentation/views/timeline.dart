@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
@@ -19,6 +21,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
@@ -47,8 +50,9 @@ class _TimelineScreenState extends State<TimelineScreen>
     with AutomaticKeepAliveClientMixin<TimelineScreen> {
   @override
   bool get wantKeepAlive => true;
-
   bool _firstLoad = true;
+  int backPressCounter = 0;
+  int backPressTotal = 2;
 
   @override
   void initState() {
@@ -101,64 +105,59 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
     print(globals.token);
-    return DoubleBackToCloseApp(
-      snackBar: const SnackBar(
-        backgroundColor: AppColors.primaryColor,
-        content: Text('Tap back again to exit app'),
-      ),
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
-        appBar: AppBar(
-          backgroundColor: AppColors.white,
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness:
-                Platform.isAndroid ? Brightness.dark : Brightness.light,
-            systemNavigationBarColor: Colors.transparent,
-            systemNavigationBarDividerColor: Colors.grey,
-            systemNavigationBarIconBrightness: Brightness.dark,
-          ),
-          shadowColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-              onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
-              icon: Helper.renderProfilePicture(globals.user!.profilePicture)),
-          titleSpacing: 5,
-          leadingWidth: getScreenWidth(70),
-          title: Text(
-            'Reachme',
-            style: TextStyle(
-              color: const Color(0xFF001824),
-              fontSize: getScreenHeight(20),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/svgs/edit.svg',
-                width: getScreenWidth(22),
-                height: getScreenHeight(22),
-              ),
-              onPressed: () =>
-                  RouteNavigators.route(context, const PostReach()),
-            ),
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/svgs/message.svg',
-                width: getScreenWidth(25),
-                height: getScreenHeight(25),
-              ),
-              onPressed: () => RouteNavigators.route(
-                context,
-                const ChatsListScreen(),
-              ),
-            ).paddingOnly(r: 16),
-          ],
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
+      appBar: AppBar(
+        backgroundColor: AppColors.white,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness:
+              Platform.isAndroid ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.grey,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
-        body: SafeArea(
+        shadowColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+            onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
+            icon: Helper.renderProfilePicture(globals.user!.profilePicture)),
+        titleSpacing: 5,
+        leadingWidth: getScreenWidth(70),
+        title: Text(
+          'Reachme',
+          style: TextStyle(
+            color: const Color(0xFF001824),
+            fontSize: getScreenHeight(20),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/svgs/edit.svg',
+              width: getScreenWidth(22),
+              height: getScreenHeight(22),
+            ),
+            onPressed: () => RouteNavigators.route(context, const PostReach()),
+          ),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/svgs/message.svg',
+              width: getScreenWidth(25),
+              height: getScreenHeight(25),
+            ),
+            onPressed: () => RouteNavigators.route(
+              context,
+              const ChatsListScreen(),
+            ),
+          ).paddingOnly(r: 16),
+        ],
+      ),
+      body: ProgressHUD(
+        child: SafeArea(
           top: false,
           child: BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
@@ -275,8 +274,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                   _isLoading = state is DeletePostLoading;
                   _isLoading = state is EditContentLoading;
 
-                  // bool _likingPost = state is LikePostLoading;
-                  // _likingPost = state is UnlikePostLoading;
+                  bool _likingPost = state is LikePostLoading;
+                  bool _unLikingPost = state is UnlikePostLoading;
                   // _likingPost = state is GetPostFeedLoading;
 
                   return CustomScrollView(
@@ -616,53 +615,77 @@ class PostFeedReacherCard extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    CupertinoButton(
-                      minSize: 0,
-                      padding: EdgeInsets.zero,
-                      onPressed: routeProfile,
-                      child: Helper.renderProfilePicture(
+                CupertinoButton(
+                  minSize: 0,
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    final progress = ProgressHUD.of(
+                      context,
+                    );
+                    progress?.showWithText('Viewing Reacher..');
+                    Future.delayed(const Duration(seconds: 3), () {
+                      globals.userBloc!.add(GetRecipientProfileEvent(
+                          email: postFeedModel!.postOwnerId));
+                      postFeedModel!.postOwnerId == globals.user!.id
+                          ? RouteNavigators.route(
+                              context, const AccountScreen())
+                          : RouteNavigators.route(
+                              context,
+                              RecipientAccountProfile(
+                                recipientEmail: 'email',
+                                recipientImageUrl:
+                                    postFeedModel!.profilePicture,
+                                recipientId: postFeedModel!.postOwnerId,
+                              ));
+                      progress?.dismiss();
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      Helper.renderProfilePicture(
                         postFeedModel!.profilePicture,
                         size: 33,
                       ).paddingOnly(l: 13, t: 10),
-                    ),
-                    SizedBox(width: getScreenWidth(9)),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '@${postFeedModel!.username!}',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
-                              ),
-                            ),
-                            const SizedBox(width: 3),
-                            postFeedModel!.verified!
-                                ? SvgPicture.asset('assets/svgs/verified.svg')
-                                : const SizedBox.shrink()
-                          ],
-                        ),
-                        postFeedModel!.post!.location == null ||
-                                postFeedModel!.post!.location == 'NIL'
-                            ? const SizedBox.shrink()
-                            : Text(
-                                postFeedModel!.post!.location ?? 'Somewhere',
+                      SizedBox(width: getScreenWidth(9)),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                '@${postFeedModel!.username!}',
                                 style: TextStyle(
-                                  fontSize: getScreenHeight(10),
-                                  fontWeight: FontWeight.w400,
+                                  fontSize: getScreenHeight(14),
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500,
                                   color: AppColors.textColor2,
                                 ),
                               ),
-                      ],
-                    ).paddingOnly(t: 10),
-                  ],
+                              const SizedBox(width: 3),
+                              postFeedModel!.verified!
+                                  ? SvgPicture.asset('assets/svgs/verified.svg')
+                                  : const SizedBox.shrink()
+                            ],
+                          ),
+                          postFeedModel!.post!.location == null ||
+                                  postFeedModel!.post!.location == 'NIL'
+                              ? const SizedBox.shrink()
+                              : Text(
+                                  postFeedModel!.post!.location ?? 'Somewhere',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(10),
+                                    fontFamily: 'Poppins',
+                                    letterSpacing: 0.4,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textColor2,
+                                  ),
+                                ),
+                        ],
+                      ).paddingOnly(t: 10),
+                    ],
+                  ),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -861,6 +884,357 @@ class PostFeedReacherCard extends HookWidget {
     );
   }
 }
+
+// class PostFeedReacherCard extends HookWidget {
+//   const PostFeedReacherCard({
+//     Key? key,
+//     required this.postFeedModel,
+//     required this.likingPost,
+//     this.onDownvote,
+//     this.onLike,
+//     this.onMessage,
+//     this.onUpvote,
+//     this.routeProfile,
+//     required this.isVoted,
+//     required this.voteType,
+//     required this.isLiked,
+//   }) : super(key: key);
+
+//   final PostFeedModel? postFeedModel;
+//   final bool likingPost;
+//   final Function()? onLike, onMessage, onUpvote, onDownvote, routeProfile;
+//   final bool isLiked, isVoted;
+//   final String? voteType;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final size = MediaQuery.of(context).size;
+//     return Padding(
+//       padding: EdgeInsets.only(
+//         right: getScreenWidth(15),
+//         left: getScreenWidth(15),
+//         bottom: getScreenHeight(16),
+//       ),
+//       child: Container(
+//         width: size.width,
+//         decoration: BoxDecoration(
+//           color: AppColors.white,
+//           borderRadius: BorderRadius.circular(25),
+//         ),
+//         child: Material(
+//           borderRadius: BorderRadius.circular(25),
+//           color: AppColors.white,
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Row(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   CupertinoButton(
+//                     borderRadius: BorderRadius.circular(25),
+//                      minSize: 0,
+//                       padding: EdgeInsets.zero,
+//                     onPressed: (){
+//                       final progress = ProgressHUD.of(context,);
+//                       progress?.showWithText('Viewing Reacher..',);
+//                       Future.delayed(const Duration(seconds: 3), () {
+//                         globals.userBloc!.add(GetRecipientProfileEvent(email: postFeedModel!.postOwnerId));
+//                         postFeedModel!.postOwnerId == globals.user!.id
+//                             ? RouteNavigators.route(context, const AccountScreen())
+//                             : RouteNavigators.route(
+//                             context,
+//                             RecipientAccountProfile(
+//                               recipientEmail: 'email',
+//                               recipientImageUrl: postFeedModel!.profilePicture,
+//                               recipientId: postFeedModel!.postOwnerId,
+//                             ));
+//                         progress?.dismiss();
+//                       });
+//                     },
+//                     child: Padding(
+//                       padding: const EdgeInsets.only(right: 20, bottom: 5),
+//                       child: Row(
+//                         children: [
+//                           Helper.renderProfilePicture(
+//                             postFeedModel!.profilePicture,
+//                             size: 33,
+//                           ).paddingOnly(l: 13, t: 10),
+//                           SizedBox(width: getScreenWidth(9)),
+//                           Column(
+//                             mainAxisAlignment: MainAxisAlignment.start,
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             mainAxisSize: MainAxisSize.min,
+//                             children: [
+//                               Row(
+//                                 children: [
+//                                   Text(
+//                                     '@${postFeedModel!.username!}',
+//                                     style: TextStyle(
+//                                       fontSize: getScreenHeight(14),
+//                                       fontWeight: FontWeight.w500,
+//                                       color: AppColors.textColor2,
+//                                     ),
+//                                   ),
+//                                   const SizedBox(width: 3),
+//                                   postFeedModel!.verified!
+//                                       ? SvgPicture.asset('assets/svgs/verified.svg')
+//                                       : const SizedBox.shrink()
+//                                 ],
+//                               ),
+//                               postFeedModel!.post!.location == null
+//                                   ? const SizedBox.shrink()
+//                                   : Text(
+//                                       postFeedModel!.post!.location ?? 'Somewhere',
+//                                       style: TextStyle(
+//                                         fontSize: getScreenHeight(10),
+//                                         fontWeight: FontWeight.w400,
+//                                         color: AppColors.textColor2,
+//                                       ),
+//                                     ),
+//                             ],
+//                           ).paddingOnly(t: 10),
+//                         ],
+//                       ),
+//                     ),),
+//                   //   child: Row(
+//                   //     mainAxisAlignment: MainAxisAlignment.start,
+//                   //     mainAxisSize: MainAxisSize.min,
+//                   //     children: [
+//                   //       CupertinoButton(
+//                   //         minSize: 0,
+//                   //         onPressed: onLike,
+//                   //         padding: EdgeInsets.zero,
+//                   //         child: likingPost
+//                   //             ? const CupertinoActivityIndicator()
+//                   //             : isLiked
+//                   //                 ? SvgPicture.asset(
+//                   //                     'assets/svgs/like-active.svg',
+//                   //                     height: getScreenHeight(20),
+//                   //                     width: getScreenWidth(20),
+//                   //                   )
+//                   //                 : SvgPicture.asset(
+//                   //                     'assets/svgs/like.svg',
+//                   //                     height: getScreenHeight(20),
+//                   //                     width: getScreenWidth(20),
+//                   //                   ),
+//                   //       ),
+//                   //       SizedBox(width: getScreenWidth(4)),
+//                   //       FittedBox(
+//                   //         child: Text(
+//                   //           '${postFeedModel!.post!.nLikes}',
+//                   //           style: TextStyle(
+//                   //             fontSize: getScreenHeight(12),
+//                   //             fontWeight: FontWeight.w500,
+//                   //             color: AppColors.textColor3,
+//                   //           ),
+//                   //         ),
+//                   //       ),
+//                   //       SizedBox(width: getScreenWidth(15)),
+//                   //       CupertinoButton(
+//                   //         minSize: 0,
+//                   //         onPressed: () {
+//                   //           RouteNavigators.route(context,
+//                   //               ViewCommentsScreen(post: postFeedModel!));
+//                   //         },
+//                   //         padding: EdgeInsets.zero,
+//                   //         child: SvgPicture.asset(
+//                   //           'assets/svgs/comment.svg',
+//                   //           height: getScreenHeight(20),
+//                   //           width: getScreenWidth(20),
+//                   //         ),
+//                   //         SizedBox(width: getScreenWidth(4)),
+//                   //         FittedBox(
+//                   //           child: Text(
+//                   //             '${postFeedModel!.post!.nLikes}',
+//                   //             style: TextStyle(
+//                   //               fontSize: getScreenHeight(12),
+//                   //               fontWeight: FontWeight.w500,
+//                   //               color: AppColors.textColor3,
+//                   //             ),
+//                   //           ),
+//                   //         ),
+//                   //         SizedBox(width: getScreenWidth(15)),
+//                   //       if (postFeedModel!.postOwnerId !=
+//                   //           postFeedModel!.feedOwnerId)
+//                   //         CupertinoButton(
+//                   //           minSize: 0,
+//                   //           onPressed: onMessage,
+//                   //           padding: const EdgeInsets.all(0),
+//                   //           child: SvgPicture.asset(
+//                   //             'assets/svgs/message.svg',
+//                   //             height: getScreenHeight(20),
+//                   //             width: getScreenWidth(20),
+//                   //           ),
+//                   //         ),
+//                   //     ],
+//                   //   ),
+//                   // ),
+//                // ),
+//                 SizedBox(width: getScreenWidth(20)),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     Flexible(
+//                       child: Container(
+//                         padding: const EdgeInsets.symmetric(
+//                           horizontal: 11,
+//                           vertical: 7,
+//                         ),
+//                         decoration: BoxDecoration(
+//                           borderRadius: BorderRadius.circular(15),
+//                           color: const Color(0xFFF5F5F5),
+//                         ),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.start,
+//                           mainAxisSize: MainAxisSize.min,
+//                           children: [
+//                             CupertinoButton(
+//                               minSize: 0,
+//                               onPressed: onUpvote,
+//                               padding: EdgeInsets.zero,
+//                               child: isVoted && voteType == 'Upvote'
+//                                   ? SvgPicture.asset(
+//                                       'assets/svgs/shoutup-active.svg',
+//                                       height: getScreenHeight(20),
+//                                       width: getScreenWidth(20),
+//                                     )
+//                                   : SvgPicture.asset(
+//                                       'assets/svgs/shoutup.svg',
+//                                       height: getScreenHeight(20),
+//                                       width: getScreenWidth(20),
+//                                     ),
+//                             ),
+//                             Flexible(child: SizedBox(width: getScreenWidth(4))),
+//                             Flexible(child: SizedBox(width: getScreenWidth(4))),
+//                             CupertinoButton(
+//                               minSize: 0,
+//                               onPressed: onDownvote,
+//                               padding: EdgeInsets.zero,
+//                               child: isVoted && voteType == 'Downvote'
+//                                   ? SvgPicture.asset(
+//                                       'assets/svgs/shoutdown-active.svg',
+//                                       height: getScreenHeight(20),
+//                                       width: getScreenWidth(20),
+//                                     )
+//                                   : SvgPicture.asset(
+//                                       'assets/svgs/shoutdown.svg',
+//                                       height: getScreenHeight(20),
+//                                       width: getScreenWidth(20),
+//                                     ),
+//                             ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                   SizedBox(width: getScreenWidth(20)),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     mainAxisSize: MainAxisSize.min,
+//                     children: [
+//                       Flexible(
+//                         child: Container(
+//                           padding: const EdgeInsets.symmetric(
+//                             horizontal: 11,
+//                             vertical: 7,
+//                           ),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(15),
+//                             color: const Color(0xFFF5F5F5),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.start,
+//                             mainAxisSize: MainAxisSize.min,
+//                             children: [
+//                               IconButton(
+//                                 onPressed: onUpvote,
+//                                 padding: EdgeInsets.zero,
+//                                 constraints: const BoxConstraints(),
+//                                 icon: isVoted && voteType == 'upvote'
+//                                     ? SvgPicture.asset(
+//                                         'assets/svgs/shoutup-active.svg',
+//                                         height: getScreenHeight(20),
+//                                         width: getScreenWidth(20),
+//                                       )
+//                                     : SvgPicture.asset(
+//                                         'assets/svgs/shoutup.svg',
+//                                         height: getScreenHeight(20),
+//                                         width: getScreenWidth(20),
+//                                       ),
+//                               ),
+//                               SizedBox(width: getScreenWidth(4)),
+//                               FittedBox(
+//                                 child: postFeedModel!.post!.nUpvotes != null ? Text(
+//                                   '${postFeedModel!.post!.nUpvotes}',
+//                                   style: TextStyle(
+//                                     fontSize: getScreenHeight(12),
+//                                     fontWeight: FontWeight.w500,
+//                                     color: AppColors.textColor3,
+//                                   ),
+//                                 ) : Text(
+//                                     '0',
+//                                     style: TextStyle(
+//                                     fontSize: getScreenHeight(12),
+//                                   fontWeight: FontWeight.w500,
+//                                   color: AppColors.textColor3,
+//                                   ),
+//                                 ),
+//                               ),
+//                               Flexible(child: SizedBox(width: getScreenWidth(4))),
+//                               Flexible(child: SizedBox(width: getScreenWidth(4))),
+//                               IconButton(
+//                                 onPressed: onDownvote,
+//                                 padding: EdgeInsets.zero,
+//                                 constraints: const BoxConstraints(),
+//                                 icon: isVoted && voteType == 'downvote'
+//                                     ? SvgPicture.asset(
+//                                         'assets/svgs/shoutdown-active.svg',
+//                                         height: getScreenHeight(20),
+//                                         width: getScreenWidth(20),
+//                                       )
+//                                     : SvgPicture.asset(
+//                                         'assets/svgs/shoutdown.svg',
+//                                         height: getScreenHeight(20),
+//                                         width: getScreenWidth(20),
+//                                       ),
+//                               ),
+//                               SizedBox(width: getScreenWidth(4)),
+//                               FittedBox(
+//                                 child: postFeedModel!.post!.nDownvotes != null ? Text(
+//                                   '${postFeedModel!.post!.nDownvotes}',
+//                                   style: TextStyle(
+//                                     fontSize: getScreenHeight(12),
+//                                     fontWeight: FontWeight.w500,
+//                                     color: AppColors.textColor3,
+//                                   ),
+//                                 ) : Text(
+//                                   '0',
+//                                   style: TextStyle(
+//                                     fontSize: getScreenHeight(12),
+//                                     fontWeight: FontWeight.w500,
+//                                     color: AppColors.textColor3,
+//                                   ),
+//                                 ),
+//                               ),
+//                               // Flexible(child: SizedBox(width: getScreenWidth(4))),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class UserStory extends StatelessWidget {
   const UserStory({

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -9,8 +10,10 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
+import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -26,107 +29,149 @@ class AppDrawer extends HookWidget {
           SizedBox(
             height: size.height * 0.35,
             child: DrawerHeader(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Helper.renderProfilePicture(
-                    globals.user!.profilePicture,
-                    size: 49,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                .toTitleCase(),
-                            style: TextStyle(
-                              color: AppColors.textColor2,
-                              fontSize: getScreenHeight(16),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            '@${globals.user!.username!}',
-                            style: TextStyle(
-                              color: const Color(0xFF6C6A6A),
-                              fontSize: getScreenHeight(13),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () => showOtherItem.value = !showOtherItem.value,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            showOtherItem.value
-                                ? Icons.keyboard_arrow_down
-                                : Icons.keyboard_arrow_up,
-                            color: AppColors.primaryColor,
-                            size: 20,
-                          ),
+              child: Material(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(30),
+                      splashColor: AppColors.backgroundShade4,
+                      onTap: (){
+                        RouteNavigators.route(context, const AccountScreen());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Helper.renderProfilePicture(
+                          globals.user!.profilePicture,
+                          size: 49,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: getScreenHeight(20)),
-                  Row(
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            globals.user!.nReachers.toString(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(16),
-                              color: AppColors.textColor2,
-                              fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(25),
+                      splashColor: AppColors.backgroundShade4,
+                      onTap: (){
+                        RouteNavigators.route(context, const AccountScreen());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                      .toTitleCase(),
+                                  style: TextStyle(
+                                    color: AppColors.textColor2,
+                                    fontSize: getScreenHeight(16),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '@${globals.user!.username!}',
+                                  style: TextStyle(
+                                    color: const Color(0xFF6C6A6A),
+                                    fontSize: getScreenHeight(13),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Text(
-                            'Reachers',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(14),
-                              color: AppColors.greyShade2,
-                              fontWeight: FontWeight.w400,
+                            GestureDetector(
+                              onTap: () => showOtherItem.value = !showOtherItem.value,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  showOtherItem.value
+                                      ? Icons.keyboard_arrow_down
+                                      : Icons.keyboard_arrow_up,
+                                  color: AppColors.primaryColor,
+                                  size: 20,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      SizedBox(width: getScreenWidth(20)),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            globals.user!.nReaching.toString(),
-                            style: TextStyle(
-                                fontSize: getScreenHeight(16),
-                                color: AppColors.textColor2,
-                                fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: getScreenHeight(20)),
+                    Row(
+                      children: [
+                        InkWell(
+                          borderRadius: BorderRadius.circular(25),
+                          splashColor: AppColors.backgroundShade4,
+                          onTap: (){
+                            RouteNavigators.route(context, const AccountStatsInfo());
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  globals.user!.nReachers.toString(),
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(16),
+                                    color: AppColors.textColor2,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Reachers',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(14),
+                                    color: AppColors.greyShade2,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(
-                            'Reaching',
-                            style: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400),
+                        ),
+                        SizedBox(width: getScreenWidth(20)),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(25),
+                          splashColor: AppColors.backgroundShade4,
+                          onTap: (){
+                            RouteNavigators.route(context, const AccountStatsInfo(index: 1,));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  globals.user!.nReaching.toString(),
+                                  style: TextStyle(
+                                      fontSize: getScreenHeight(16),
+                                      color: AppColors.textColor2,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Text(
+                                  'Reaching',
+                                  style: TextStyle(
+                                      fontSize: getScreenHeight(14),
+                                      color: AppColors.greyShade2,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
