@@ -257,7 +257,6 @@ class ViewUserStatus extends HookWidget {
               },
               gestureItemBuilder: (context, pageIndex, storyIndex) {
                 final story = status[storyIndex];
-                print(globals.user!.id);
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

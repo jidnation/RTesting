@@ -60,14 +60,14 @@ class _TimelineScreenState extends State<TimelineScreen>
         .add(GetAllStatusEvent(pageLimit: 50, pageNumber: 1));
     globals.socialServiceBloc!
         .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
-    // LocationHelper.determineLocation().then((value) {
-    //   if (value is LocationData) {
-    //     globals.userBloc!.add(GetUserLocationEvent(
-    //       lat: value.latitude.toString(),
-    //       lng: value.longitude.toString(),
-    //     ));
-    //   }
-    // });
+    LocationHelper.determineLocation().then((value) {
+      if (value is LocationData) {
+        globals.userBloc!.add(GetUserLocationEvent(
+          lat: value.latitude.toString(),
+          lng: value.longitude.toString(),
+        ));
+      }
+    });
   }
 
   Set active = {};
@@ -580,6 +580,7 @@ class PostFeedReacherCard extends HookWidget {
     this.onLike,
     this.onMessage,
     this.onUpvote,
+    this.routeProfile,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
@@ -587,13 +588,12 @@ class PostFeedReacherCard extends HookWidget {
 
   final PostFeedModel? postFeedModel;
   final bool likingPost;
-  final Function()? onLike, onMessage, onUpvote, onDownvote;
+  final Function()? onLike, onMessage, onUpvote, onDownvote, routeProfile;
   final bool isLiked, isVoted;
   final String? voteType;
 
   @override
   Widget build(BuildContext context) {
-    print(voteType);
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
@@ -618,10 +618,15 @@ class PostFeedReacherCard extends HookWidget {
               children: [
                 Row(
                   children: [
-                    Helper.renderProfilePicture(
-                      postFeedModel!.profilePicture,
-                      size: 33,
-                    ).paddingOnly(l: 13, t: 10),
+                    CupertinoButton(
+                      minSize: 0,
+                      padding: EdgeInsets.zero,
+                      onPressed: routeProfile,
+                      child: Helper.renderProfilePicture(
+                        postFeedModel!.profilePicture,
+                        size: 33,
+                      ).paddingOnly(l: 13, t: 10),
+                    ),
                     SizedBox(width: getScreenWidth(9)),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
