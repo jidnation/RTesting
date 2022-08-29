@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/helper/logger.dart';
@@ -9,6 +10,7 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/chat/data/models/chat.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
@@ -30,19 +32,53 @@ class Helper {
   }
 
   static String parseChatDate(String date) {
+    String today = DateFormat("EEE, MMM d, y").format(DateTime.now());
+    String yesterday = DateFormat("EEE, MMM d, y").format(DateTime.now().add(Duration(days: -1)));
+
+    final msgDate = DateTime.tryParse(date);
+    if (msgDate == null) return 'Today';
+    String dateString = DateFormat("EEE, MMM d, y").format(msgDate);
+      if (today == dateString) {
+        return "Today";
+      } else if (yesterday == dateString) {
+        return "Yesterday";
+      }else{
+        return dateString;
+      }
+  }
+
+  static String parseChatTime(String time) {
+    final msgTime = DateTime.tryParse(time);
+    if (msgTime == null) {
+      return 'now';
+    }else {
+      return DateFormat('jm').format(msgTime).toLowerCase();
+    }
+  }
+
+
+
+  static String parseUserLastSeen(String date) {
     final dateTime = DateTime.tryParse(date);
-    if (dateTime == null) return '38mins';
+    if (dateTime == null) return 'now';
     final now = DateTime.now();
     final diff = now.difference(dateTime);
-    if (diff.inDays > 0) {
-      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-    } else if (diff.inHours > 0) {
-      return '${diff.inHours}h';
-    } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes}m';
+    if (diff.inDays == 1) {
+      return 'Yesterday';
+    } else if (diff.inDays > 1) {
+      return 'about ${diff.inDays.toString()} days ago';
+    } else if (diff.inHours == 1) {
+      return 'about ${diff.inHours.toString()} hour ago';
+    } else if (diff.inHours > 1) {
+      return 'about ${diff.inHours.toString()} hours ago';
+    } else if (diff.inMinutes >= 1) {
+      return 'about ${diff.inMinutes.toString()} min ago';
+    } else if (diff.inSeconds > 1) {
+      return 'now';
     } else {
-      return '${diff.inSeconds}s';
+      return 'now';
     }
+
   }
 
   static Widget renderProfilePicture(String? profilePicture,

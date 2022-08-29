@@ -68,7 +68,11 @@ dependencies:
   pull_to_refresh: ^2.0.0
   overlay_support: ^2.0.1
   skeletons: ^0.0.3
-  camera: ^0.9.8+1
+  fluttertoast: ^8.0.9
+  flutter_progress_hud: ^2.0.2
+  grouped_list: ^5.1.2
+  camera: ^0.10.0+1
+#  camera: ^0.9.8+1
   google_fonts: ^3.0.1
   story_time: ^1.0.6
   # qr_code_scanner: ^0.7.0
