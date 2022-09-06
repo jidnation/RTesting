@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';

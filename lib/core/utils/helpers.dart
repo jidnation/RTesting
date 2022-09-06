@@ -10,7 +10,6 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/chat/data/models/chat.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
@@ -33,7 +32,7 @@ class Helper {
 
   static String parseChatDate(String date) {
     String today = DateFormat("EEE, MMM d, y").format(DateTime.now());
-    String yesterday = DateFormat("EEE, MMM d, y").format(DateTime.now().add(Duration(days: -1)));
+    String yesterday = DateFormat("EEE, MMM d, y").format(DateTime.now().add(const Duration(days: -1)));
 
     final msgDate = DateTime.tryParse(date);
     if (msgDate == null) return 'Today';

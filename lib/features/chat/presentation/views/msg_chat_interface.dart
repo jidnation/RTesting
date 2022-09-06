@@ -25,7 +25,6 @@ import 'package:reach_me/features/video-call/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/voice_call_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:grouped_list/grouped_list.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -95,6 +94,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+      return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
       appBar: AppBar(

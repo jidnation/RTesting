@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Fluttertoast.showToast(msg: "Tap again to leave app",
               backgroundColor: Colors.blue);
           backPressCounter++;
-          Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
+          Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
             backPressCounter--;
           });
           return false;
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       else {
           _pageController.previousPage(
-            duration: Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 200),
             curve: Curves.linear,
           ).then((index) => _currentIndex.value--);
         return false;

@@ -43,7 +43,6 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     var size = MediaQuery.of(context).size;
     final _tabController = useTabController(initialLength: 2);
     final usersList = useState<List<ChatUser>>([]);
-    final selectedIndex = useState<int?>(null);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
     useMemoized(() {
