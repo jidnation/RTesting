@@ -80,6 +80,7 @@ dependencies:
   double_back_to_close_app: ^2.1.0
   location: ^4.4.0
   mime: ^1.0.2
+  firebase_core: ^1.21.1
   # geocoder: ^0.2.1
 
 
