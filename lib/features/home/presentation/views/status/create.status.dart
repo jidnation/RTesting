@@ -1,11 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
 
 late List<CameraDescription> _cameras;
@@ -59,6 +67,26 @@ class _CreateStatusState extends State<CreateStatus>
     });
   }
 
+  Future<File?> getImage(ImageSource source) async {
+    final _picker = ImagePicker();
+    try {
+      final imageFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 50,
+        maxHeight: 900,
+        maxWidth: 600,
+      );
+
+      if (imageFile != null) {
+        File image = File(imageFile.path);
+        return image;
+      }
+    } catch (e) {
+      // print(e);
+    }
+    return null;
+  }
+
   @override
   void dispose() {
     controller!.dispose();
@@ -72,12 +100,12 @@ class _CreateStatusState extends State<CreateStatus>
     final isAudioStatus = useState(false);
     final isTextStatus = useState(false);
     return Scaffold(
-      backgroundColor: AppColors.black.withOpacity(0.1),
+      backgroundColor: const Color(0xFF001824),
       body: SizedBox(
         height: size.height,
         width: size.width,
         child: ListView(
-          shrinkWrap: true,
+          // shrinkWrap: true,
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           children: [
@@ -93,7 +121,7 @@ class _CreateStatusState extends State<CreateStatus>
                   : CameraPreview(
                       controller!,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        //mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -246,7 +274,13 @@ class _CreateStatusState extends State<CreateStatus>
                     children: [
                       Flexible(
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final image = await getImage(ImageSource.gallery);
+                            if (image != null) {
+                              RouteNavigators.route(context,
+                                  BuildCameraPreview(image: XFile(image.path)));
+                            }
+                          },
                           icon: Transform.scale(
                             scale: 1.8,
                             child: SvgPicture.asset(
@@ -262,7 +296,9 @@ class _CreateStatusState extends State<CreateStatus>
                       Flexible(
                         child: InkWell(
                           onTap: () async {
-                            await controller!.takePicture();
+                            await controller!.takePicture().then((value) =>
+                                RouteNavigators.route(
+                                    context, BuildCameraPreview(image: value)));
                           },
                           child: Container(
                             decoration: const BoxDecoration(
@@ -319,9 +355,95 @@ class _CreateStatusState extends State<CreateStatus>
   }
 }
 
-/// This allows a value of type T or T? to be treated as a value of type T?.
-///
-/// We use this so that APIs that have become non-nullable can still be used
-/// with `!` and `?` on the stable branch.
-// TODO(ianh): Remove this once we roll stable in late 2021.
-T? _ambiguate<T>(T? value) => value;
+class BuildCameraPreview extends StatelessWidget {
+  const BuildCameraPreview({
+    Key? key,
+    required this.image,
+  }) : super(key: key);
+  final XFile image;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF001824),
+      body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+          bloc: globals.socialServiceBloc,
+          listener: (context, state) {
+            if (state is MediaUploadLoading) {
+              Snackbars.success(
+                context,
+                message: 'Uploading status...',
+                milliseconds: 1000,
+              );
+            }
+            if (state is MediaUploadError) {
+              Snackbars.error(context, message: state.error);
+            }
+            if (state is MediaUploadSuccess) {
+              globals.socialServiceBloc!.add(
+                CreateStatusEvent(
+                  createStatusDto: CreateStatusDto(
+                    caption: 'NIL',
+                    type: 'image',
+                    imageMedia: state.image,
+                  ),
+                ),
+              );
+              RouteNavigators.pop(context);
+            }
+          },
+          builder: (context, state) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: Image.file(
+                    File(image.path),
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: getScreenHeight(50)),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                            },
+                            icon: Transform.scale(
+                              scale: 1.8,
+                              child: SvgPicture.asset(
+                                'assets/svgs/dc-cancel.svg',
+                                height: getScreenHeight(71),
+                              ),
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              globals.socialServiceBloc!.add(
+                                  MediaUploadEvent(media: File(image.path)));
+                            },
+                            icon: Transform.scale(
+                              scale: 1.8,
+                              child: SvgPicture.asset(
+                                'assets/svgs/dc-send.svg',
+                                height: getScreenHeight(71),
+                              ),
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ).paddingSymmetric(h: 24),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+    );
+  }
+}

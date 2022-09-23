@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,7 +31,58 @@ class ViewMyStatus extends HookWidget {
         itemBuilder: (context, pageIndex, storyIndex) {
           final story = status[storyIndex];
           //final image = images[storyIndex];
-
+          if (story.statusData!.imageMedia != null ||
+              story.statusData!.imageMedia!.isNotEmpty) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: Container(color: AppColors.black),
+                ),
+                Positioned.fill(
+                  child: SizedBox(
+                    height: size.height,
+                    width: size.width,
+                    child: CachedNetworkImage(
+                      imageUrl: story.statusData!.imageMedia!,
+                      fit: BoxFit.fitWidth,
+                      placeholder: (context, url) =>
+                          const CupertinoActivityIndicator(
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 44, left: 8),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                              story.profileModel!.profilePicture ?? ''),
+                          SizedBox(width: getScreenWidth(12)),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '@${globals.user!.username!}',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
           return Stack(
             children: [
               Positioned.fill(

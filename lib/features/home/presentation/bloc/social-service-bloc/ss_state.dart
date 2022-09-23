@@ -133,6 +133,20 @@ class UploadMediaError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class MediaUploadLoading extends SocialServiceState {}
+
+class MediaUploadSuccess extends SocialServiceState {
+  final String? image;
+  MediaUploadSuccess({this.image});
+}
+
+class MediaUploadError extends SocialServiceState {
+  final String error;
+  MediaUploadError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class DeletePostVoteLoading extends SocialServiceState {}
 
 class DeletePostVoteSuccess extends SocialServiceState {

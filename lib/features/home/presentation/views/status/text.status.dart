@@ -53,7 +53,10 @@ class _TextStatusState extends State<TextStatus> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 60, 0, 35),
+          padding: EdgeInsets.only(
+            top: getScreenHeight(60),
+            bottom: getScreenHeight(35),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -345,7 +348,8 @@ class _TextStatus2State extends State<TextStatus2> {
               : null,
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 60, 24, 35),
+          padding: EdgeInsets.fromLTRB(getScreenWidth(24), getScreenHeight(60),
+              getScreenWidth(24), getScreenHeight(35)),
           child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
               bloc: globals.socialServiceBloc,
               listener: (context, state) {
@@ -426,8 +430,6 @@ class _TextStatus2State extends State<TextStatus2> {
                           ),
                           IconButton(
                             onPressed: () {
-                              // Helper.iterate(
-                              //     currentAlignment.value, alignments.value);
                               for (var i = 0;
                                   i < alignments.value.length;
                                   i++) {
@@ -468,8 +470,10 @@ class _TextStatus2State extends State<TextStatus2> {
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                             ),
-                            child: Text('Font',
-                                style: Helper.getFont(currentFont.value)),
+                            child: Text(
+                              'Font',
+                              style: Helper.getFont(currentFont.value),
+                            ),
                           ),
                           IconButton(
                             onPressed: () {

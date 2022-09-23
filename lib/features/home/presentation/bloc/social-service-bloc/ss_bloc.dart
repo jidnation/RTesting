@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
@@ -586,6 +589,38 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           emit(UploadMediaSuccess(data: imageUrl.toSet().toList()));
         } else {
           emit(UploadMediaError(error: 'No media uploaded'));
+        }
+      } on GraphQLError catch (e) {
+        emit(UploadMediaError(error: e.message));
+      }
+    });
+    on<MediaUploadEvent>((event, emit) async {
+      emit(MediaUploadLoading());
+      String imageUrl = '';
+      String signedUrl = '';
+      try {
+        //GET SIGNED URL
+        final response = await userRepository.getSignedURl(file: event.media);
+
+        response.fold(
+          (error) => emit(MediaUploadError(error: error)),
+          (data) {
+            signedUrl = data['signedUrl'];
+            imageUrl = data['imageUrl'];
+          },
+        );
+
+        //UPLOAD FILE & GET IMAGE URL
+        if (signedUrl.isNotEmpty) {
+          final uploadRes = await userRepository.uploadPhoto(
+            url: signedUrl,
+            file: event.media,
+          );
+
+          uploadRes.fold(
+            (error) => emit(MediaUploadError(error: error)),
+            (user) => emit(MediaUploadSuccess(image: imageUrl)),
+          );
         }
       } on GraphQLError catch (e) {
         emit(UploadMediaError(error: e.message));

@@ -33,6 +33,11 @@ class UploadPostMediaEvent extends SocialServiceEvent {
   UploadPostMediaEvent({required this.media});
 }
 
+class MediaUploadEvent extends SocialServiceEvent {
+  final File media;
+  MediaUploadEvent({required this.media});
+}
+
 class DeletePostEvent extends SocialServiceEvent {
   final String? postId;
   DeletePostEvent({required this.postId});
