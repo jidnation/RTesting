@@ -81,6 +81,11 @@ class CommentSchema {
             nComments
             nLikes
             postId
+            like {
+              ''' +
+        CommentLikeSchema.schema +
+        '''
+            }
             profile {
               ''' +
         CommentProfileSchema.schema +
@@ -191,6 +196,24 @@ class PostLikeSchema {
             authId
             created_at
             postId
+            profile {
+              ''' +
+        PostProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
+
+class CommentLikeSchema {
+  CommentLikeSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            created_at
+            postId
+            commentId
             profile {
               ''' +
         PostProfileSchema.schema +

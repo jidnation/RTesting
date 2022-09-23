@@ -93,8 +93,11 @@ class LikeCommentOnPostEvent extends SocialServiceEvent {
 }
 
 class UnlikeCommentOnPostEvent extends SocialServiceEvent {
-  final String? commentLikeId;
-  UnlikeCommentOnPostEvent({required this.commentLikeId});
+  final String? commentId, postId;
+  UnlikeCommentOnPostEvent({
+    required this.commentId,
+    required this.postId,
+  });
 }
 
 class CheckCommentLikeEvent extends SocialServiceEvent {

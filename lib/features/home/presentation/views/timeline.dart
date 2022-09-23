@@ -96,7 +96,7 @@ class _TimelineScreenState extends State<TimelineScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final selectedIndex = useState<int>(0);
+
     final reachDM = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
     final _myStatus = useState<List<StatusModel>>([]);
@@ -435,8 +435,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       HapticFeedback
                                                           .mediumImpact();
                                                       reachDM.value = true;
-                                                      selectedIndex.value =
-                                                          index;
+
                                                       handleTap(index);
                                                       if (active
                                                           .contains(index)) {
@@ -451,8 +450,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                     onUpvote: () {
                                                       HapticFeedback
                                                           .mediumImpact();
-                                                      selectedIndex.value =
-                                                          index;
+
                                                       handleTap(index);
                                                       if (active
                                                           .contains(index)) {
@@ -469,8 +467,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                     onDownvote: () {
                                                       HapticFeedback
                                                           .mediumImpact();
-                                                      selectedIndex.value =
-                                                          index;
+
                                                       handleTap(index);
                                                       if (active
                                                           .contains(index)) {
@@ -487,8 +484,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                     onLike: () {
                                                       HapticFeedback
                                                           .mediumImpact();
-                                                      selectedIndex.value =
-                                                          index;
                                                       handleTap(index);
                                                       if (active
                                                           .contains(index)) {
@@ -743,19 +738,17 @@ class PostFeedReacherCard extends HookWidget {
                           minSize: 0,
                           onPressed: onLike,
                           padding: EdgeInsets.zero,
-                          child: likingPost
-                              ? const CupertinoActivityIndicator()
-                              : isLiked
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/like-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/like.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
+                          child: isLiked
+                              ? SvgPicture.asset(
+                                  'assets/svgs/like-active.svg',
+                                  height: getScreenHeight(20),
+                                  width: getScreenWidth(20),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/svgs/like.svg',
+                                  height: getScreenHeight(20),
+                                  width: getScreenWidth(20),
+                                ),
                         ),
                         SizedBox(width: getScreenWidth(4)),
                         FittedBox(

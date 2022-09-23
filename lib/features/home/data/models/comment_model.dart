@@ -8,6 +8,7 @@ class CommentModel {
   int? nLikes;
   DateTime? createdAt;
   CommentProfileModel? commentProfile;
+  List<CommentLikeModel>? like;
 
   CommentModel({
     this.postId,
@@ -19,6 +20,7 @@ class CommentModel {
     this.nLikes,
     this.commentProfile,
     this.createdAt,
+    this.like,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
@@ -33,6 +35,10 @@ class CommentModel {
         commentProfile: json["profile"] != null
             ? CommentProfileModel.fromJson(json["profile"])
             : null,
+        like: json["like"] == null
+            ? null
+            : List<CommentLikeModel>.from(
+                json["like"].map((x) => CommentLikeModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +51,9 @@ class CommentModel {
         "nLikes": nLikes,
         "created_at": createdAt!.toIso8601String(),
         "profile": commentProfile == null ? null : commentProfile!.toJson(),
+        "like": like == null
+            ? null
+            : List<CommentLikeModel>.from(like!.map((x) => x.toJson())),
       };
 }
 

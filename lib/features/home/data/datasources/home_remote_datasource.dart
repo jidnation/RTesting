@@ -892,7 +892,6 @@ class HomeRemoteDataSource {
             postId: $postId
             commentId: $commentId
           ) {
-           likeId
            authId
            commentId
            postId
@@ -915,22 +914,26 @@ class HomeRemoteDataSource {
   }
 
   Future<bool> unlikeCommentOnPost({
-    required String commentLikeId,
+    required String commentId,
+    required String postId,
   }) async {
     String q = r'''
         mutation unlikeCommentOnPost(
+          $commentId: String!
           $postId: String!
-          $commentLikeId: String!
           ) {
           unlikeCommentOnPost(
-            postId: $postId
-            commentLikeId: $commentLikeId
+             postId: $postId
+            commentId: $commentId
           )
         }''';
     try {
       final result = await _client.mutate(
         gql(q),
-        variables: {'commentLikeId': commentLikeId},
+        variables: {
+          'commentId': commentId,
+          'postId': postId,
+        },
       );
 
       if (result is GraphQLError) {

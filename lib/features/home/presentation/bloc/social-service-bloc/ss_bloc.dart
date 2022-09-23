@@ -181,7 +181,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(UnlikeCommentOnPostLoading());
       try {
         final response = await socialServiceRepository.unlikeCommentOnPost(
-          commentLikeId: event.commentLikeId!,
+          commentLikeId: event.commentId!,
+          postId: event.postId!,
         );
         response.fold(
           (error) => emit(UnlikeCommentOnPostError(error: error)),
