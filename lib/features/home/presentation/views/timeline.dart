@@ -715,7 +715,7 @@ class PostFeedReacherCard extends HookWidget {
               Helper.renderPostImages(postFeedModel!.post!, context)
                   .paddingOnly(r: 16, l: 16, b: 16, t: 10)
             else
-              const SizedBox(),
+              const SizedBox.shrink(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
