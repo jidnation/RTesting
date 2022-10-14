@@ -27,12 +27,12 @@ class ViewMyStatus extends HookWidget {
 
     return Scaffold(
       body: StoryPageView(
-        indicatorDuration: const Duration(seconds: 100),
+        indicatorDuration: const Duration(seconds: 7),
         itemBuilder: (context, pageIndex, storyIndex) {
           final story = status[storyIndex];
           //final image = images[storyIndex];
           if (story.statusData!.imageMedia != null ||
-              story.statusData!.imageMedia!.isNotEmpty) {
+              (story.statusData!.imageMedia ?? '').isNotEmpty) {
             return Stack(
               children: [
                 Positioned.fill(

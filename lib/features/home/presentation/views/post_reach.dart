@@ -13,7 +13,9 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/formatters.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/core/utils/regex_util.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 
@@ -200,11 +202,15 @@ class _PostReachState extends State<PostReach> {
                     TextField(
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       minLines: 1,
-                      maxLines: 6,
+                      maxLines: null,
                       controller: controller,
-                      maxLength: 200,
+                      inputFormatters: [
+                        MaxWordTextInputFormater(maxWords: 200)
+                      ],
+                      // maxLength: 200,
                       onChanged: (val) {
-                        counter.value = val.length;
+                        counter.value =
+                            val.trim().split(RegexUtil.spaceOrNewLine).length;
                       },
                       decoration: const InputDecoration(
                         counterText: '',
