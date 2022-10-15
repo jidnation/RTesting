@@ -73,7 +73,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
       child: ListView(
         shrinkWrap: true,
         children: <Widget>[
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           SizedBox(
             height: size.height * 0.7,
             width: size.width,
@@ -90,6 +90,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                   children: buildOnboardingPages()),
             ),
           ),
+          const SizedBox(height: 50),
           Align(
             alignment: Alignment.center,
             child: Align(
@@ -100,7 +101,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: getScreenHeight(100)),
+          SizedBox(height: getScreenHeight(50)),
           Row(
             mainAxisAlignment: _currentPage == widget.pages!.length - 1
                 ? MainAxisAlignment.center
@@ -142,7 +143,7 @@ class RMOnboardingScreenState extends State<RMOnboardingScreen> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.textColor2,
+                        color: AppColors.buttonColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(

@@ -78,7 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
           if (state is UserError) {
             Snackbars.error(context, message: state.error);
-          }
+          } 
         },
         builder: (context, state) {
           bool _isLoading = state is UserLoading;

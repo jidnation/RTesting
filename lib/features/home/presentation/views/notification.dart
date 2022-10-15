@@ -42,7 +42,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                   const CustomRoundTextField(
                     hintText: "Search notifications",
                     fillColor: AppColors.white,
-                    suffixIcon: Icon(Icons.search),
+                    //suffixIcon: Icon(Icons.search),
                   ),
                   const SizedBox(height: 20),
                   !changeState.value

@@ -45,6 +45,17 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final usersList = useState<List<ChatUser>>([]);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
+
+    setState(() {
+      _tabController.addListener(() {
+        if (_tabController.index == 0) {
+          _tabController.animateTo(0);
+        } else {
+          _tabController.animateTo(1);
+        }
+      });
+    });
+
     useMemoized(() {
       globals.chatBloc!.add(GetUserThreadsEvent(id: globals.user!.id));
     });
@@ -95,22 +106,34 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back_ios,
+                            icon: SvgPicture.asset(
+                              'assets/svgs/back.svg',
                               color: AppColors.black,
                             ),
                             onPressed: () {
                               RouteNavigators.pop(context);
                             },
                           ),
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/Setting.svg',
-                              width: 23,
-                              height: 23,
-                              color: AppColors.textColor2,
-                            ),
-                            onPressed: () {},
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/message-plus.svg',
+                                  width: 23,
+                                  height: 23,
+                                ),
+                                onPressed: () {},
+                              ),
+                              IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/Setting.svg',
+                                  width: 23,
+                                  height: 23,
+                                  color: AppColors.textColor2,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -118,7 +141,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                       const SizedBox(
                         height: 48,
                         child: CustomRoundTextField(
-                          hintText: 'Search Reach',
+                          hintText: 'Search general reachout',
                           textCapitalization: TextCapitalization.characters,
                         ),
                       ).paddingSymmetric(h: 20),

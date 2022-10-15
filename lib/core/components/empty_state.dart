@@ -9,6 +9,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
@@ -118,6 +119,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                           itemBuilder: (BuildContext context, int index) {
                             return SuggestedUserContainer(
                               size: size,
+                              profilePicture: suggestedUsers.value[index].profilePicture,
                               user: suggestedUsers.value[index],
                               onReach: () {
                                 handleTap(index);
@@ -181,6 +183,7 @@ class SuggestedUserContainer extends StatelessWidget {
     required this.size,
     required this.onReach,
     required this.user,
+    required this.profilePicture,
     required this.btnColour,
     required this.loaderColor,
     required this.isLoading,
@@ -191,6 +194,7 @@ class SuggestedUserContainer extends StatelessWidget {
 
   final Size size;
   final User user;
+  final String? profilePicture;
   final VoidCallback onReach, onDelete;
   final Color textColor, btnColour, loaderColor;
   final bool isLoading;
@@ -221,11 +225,11 @@ class SuggestedUserContainer extends StatelessWidget {
               ),
             ),
           ),
-          ImagePlaceholder(
-            height: getScreenHeight(70),
-            width: getScreenHeight(70),
-          ),
-          SizedBox(height: getScreenHeight(13)),
+          Helper.renderProfilePicture(
+                            profilePicture,
+                            size: 80,
+                          ),
+          SizedBox(height: getScreenHeight(5)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -240,6 +244,7 @@ class SuggestedUserContainer extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(width: getScreenWidth(5)),
               user.verified!
                   ? SvgPicture.asset('assets/svgs/verified.svg')
                   : const SizedBox.shrink(),
@@ -274,7 +279,7 @@ class SuggestedUserContainer extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: getScreenWidth(65),
+                width: getScreenWidth(58),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -323,7 +328,7 @@ class SuggestedUserContainer extends StatelessWidget {
               )
             ],
           ),
-          SizedBox(height: getScreenHeight(20)),
+          SizedBox(height: getScreenHeight(19)),
           CustomButton(
             label: label,
             color: btnColour,
@@ -333,8 +338,8 @@ class SuggestedUserContainer extends StatelessWidget {
             labelFontSize: getScreenHeight(14),
             size: size,
             padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 10,
+              horizontal: 5,
+              vertical: 5,
             ),
             textColor: textColor,
             borderSide:
@@ -449,10 +454,11 @@ class EmptyChatListScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        SizedBox(height: getScreenHeight(40)),
         SvgPicture.asset(
           image!,
-          width: getScreenWidth(150),
-          height: getScreenHeight(150),
+          width: getScreenWidth(190),
+          height: getScreenHeight(190),
         ),
         SizedBox(height: getScreenWidth(20)),
         Text(
@@ -522,6 +528,7 @@ class EmptyNotificationScreen extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        const SizedBox(width: 5),
                         SvgPicture.asset(
                           'assets/svgs/verified.svg',
                           width: 16,
@@ -543,7 +550,9 @@ class EmptyNotificationScreen extends StatelessWidget {
                         color: Color(0xFF767474),
                       ),
                     ),
+                    const SizedBox(height: 8),
                   ],
+            
                 ),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -589,14 +598,14 @@ class EmptyNotificationScreen extends StatelessWidget {
         ),
         SvgPicture.asset(
           'assets/svgs/notifications-empty.svg',
-          width: size.width * 0.8,
+          width: size.width * 1.3,
           height: size.height * 0.3,
         ),
         const Text(
-          'No notifications',
+          'Notifications',
           style: TextStyle(
             fontSize: 19,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: AppColors.textColor2,
           ),
         ),
@@ -605,7 +614,7 @@ class EmptyNotificationScreen extends StatelessWidget {
           'All forms of notifications will be found here',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: FontWeight.w400,
             color: Color(0xFF767474),
           ),
