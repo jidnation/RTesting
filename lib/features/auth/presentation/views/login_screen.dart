@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -59,56 +60,94 @@ class LoginScreen extends HookWidget {
                             SizedBox(height: getScreenHeight(35)),
                             SvgPicture.asset(
                               'assets/svgs/login.svg',
-                              width: size.width * 0.35,
+                              width: size.width * 0.60,
                             ),
                             SizedBox(height: getScreenHeight(35)),
-                            Text(
-                              'Welcome Back',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(20),
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textColor2,
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(18),
+                                  color: AppColors.textColor2,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 7),
-                            Text(
-                              'Login to your account',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(15),
-                                color: AppColors.textColor,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SizedBox(height: getScreenHeight(30)),
+                            SizedBox(height: getScreenHeight(10)),
                             CustomRoundTextField(
-                              hintText: 'Email',
+                              hintText: 'linda@framcreative.com',
                               keyboardType: TextInputType.emailAddress,
                               textCapitalization: TextCapitalization.none,
+                              hintStyle: TextStyle(
+                                fontSize: getScreenHeight(18),
+                                fontWeight: FontWeight.w400,
+                              ),
                               validator: (value) =>
                                   Validator.validateEmail(value ?? ""),
                               controller: _emailController,
                             ),
                             SizedBox(height: getScreenHeight(15)),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    'Password',
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(18),
+                                      color: AppColors.textColor2,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: <InlineSpan>[
+                                        WidgetSpan(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5.0, right: 5.0),
+                                            child: GestureDetector(
+                                              onTap: () => _obscureText.value =
+                                                  !_obscureText.value,
+                                              child: _obscureText.value
+                                                  ? const Icon(
+                                                      Icons
+                                                          .visibility_off_outlined,
+                                                      size: 23,
+                                                      color: AppColors
+                                                          .textFieldLabelColor,
+                                                    )
+                                                  : const Icon(
+                                                      Icons.visibility,
+                                                      size: 23,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Show',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(18),
+                                            color: AppColors.textColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ]),
+                            SizedBox(height: getScreenHeight(10)),
                             CustomRoundTextField(
                               maxLines: 1,
-                              hintText: 'Password',
                               obscureText: _obscureText.value,
                               keyboardType: TextInputType.text,
                               controller: _passwordController,
                               textCapitalization: TextCapitalization.none,
-                              suffixIcon: GestureDetector(
-                                onTap: () =>
-                                    _obscureText.value = !_obscureText.value,
-                                child: _obscureText.value
-                                    ? const Icon(
-                                        Icons.visibility_off_outlined,
-                                        color: AppColors.textFieldLabelColor,
-                                      )
-                                    : const Icon(
-                                        Icons.visibility,
-                                        color: AppColors.primaryColor,
-                                      ),
-                              ),
                             ),
                             Align(
                               alignment: Alignment.centerRight,
@@ -126,7 +165,7 @@ class LoginScreen extends HookWidget {
                                 child: Text(
                                   'Forgot password',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(14),
+                                    fontSize: getScreenHeight(17),
                                     color: AppColors.textColor2,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -135,8 +174,8 @@ class LoginScreen extends HookWidget {
                             ),
                             SizedBox(height: getScreenHeight(20)),
                             CustomButton(
-                              label: 'Done',
-                              color: AppColors.textColor2,
+                              label: 'Login',
+                              color: AppColors.buttonColor,
                               isLoading: _isLoading,
                               loaderColor: AppColors.white,
                               onPressed: !_isLoading
@@ -156,40 +195,6 @@ class LoginScreen extends HookWidget {
                               textColor: AppColors.white,
                               borderSide: BorderSide.none,
                             ),
-                            //  SizedBox(height: getScreenHeight(20)),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            //   children: const [
-                            //     Expanded(
-                            //         child: Divider(
-                            //             color: AppColors.black,
-                            //             thickness: 0.5,
-                            //             height: 0.5,
-                            //             endIndent: 18.0)),
-                            //     Text('OR',
-                            //         style: TextStyle(
-                            //             color: AppColors.textColor,
-                            //             fontSize: 9.5)),
-                            //     Expanded(
-                            //         child: Divider(
-                            //             color: AppColors.black,
-                            //             thickness: 0.5,
-                            //             height: 0.5,
-                            //             indent: 18.0)),
-                            //   ],
-                            // ),
-                            // SizedBox(height: getScreenHeight(20)),
-                            // CustomButton(
-                            //     label: 'Continue with Google',
-                            //     prefix: 'assets/svgs/google.svg',
-                            //     color: AppColors.white,
-                            //     onPressed: () {},
-                            //     size: size,
-                            //     textColor: AppColors.textColor2,
-                            //     borderSide: const BorderSide(
-                            //       width: 1,
-                            //       color: AppColors.textColor2,
-                            //     )),
                             GestureDetector(
                               onTap: () => RouteNavigators.route(
                                 context,
@@ -198,18 +203,18 @@ class LoginScreen extends HookWidget {
                               child: RichText(
                                 textScaleFactor: 0.8,
                                 text: TextSpan(
-                                  text: "Don't have an acccount? ",
+                                  text: "Do not have an account? ",
                                   style: TextStyle(
                                     color: AppColors.textColor,
                                     fontFamily: 'Poppins',
-                                    fontSize: getScreenHeight(15),
+                                    fontSize: getScreenHeight(18),
                                   ),
                                   children: [
                                     TextSpan(
                                       text: 'Sign up',
                                       style: TextStyle(
                                         color: AppColors.primaryColor,
-                                        fontSize: getScreenHeight(15),
+                                        fontSize: getScreenHeight(18),
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w500,
                                       ),

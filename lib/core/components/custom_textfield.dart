@@ -130,7 +130,7 @@ class CustomRoundTextField extends StatelessWidget {
         isDense: isDense,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 24,
-          vertical: 19,
+          vertical: 12,
         ),
         fillColor: fillColor,
         suffixIcon: suffixIcon,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -12,6 +13,8 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
+import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -25,7 +28,7 @@ class AppDrawer extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: size.height * 0.35,
+            height: size.height * 0.29,
             child: DrawerHeader(
               child: Material(
                 child: Column(
@@ -35,24 +38,24 @@ class AppDrawer extends HookWidget {
                     InkWell(
                       borderRadius: BorderRadius.circular(30),
                       splashColor: AppColors.backgroundShade4,
-                      onTap: (){
+                      onTap: () {
                         RouteNavigators.route(context, const AccountScreen());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Helper.renderProfilePicture(
                           globals.user!.profilePicture,
-                          size: 49,
+                          size: 80,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
                     InkWell(
                       borderRadius: BorderRadius.circular(25),
                       splashColor: AppColors.backgroundShade4,
-                      onTap: (){
+                      onTap: () {
                         RouteNavigators.route(context, const AccountScreen());
                       },
+                      
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Row(
@@ -76,22 +79,24 @@ class AppDrawer extends HookWidget {
                                 Text(
                                   '@${globals.user!.username!}',
                                   style: TextStyle(
-                                    color: const Color(0xFF6C6A6A),
-                                    fontSize: getScreenHeight(13),
+                                    color
+                                    : const Color(0xFF6C6A6A),
+                                    fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],
                             ),
                             GestureDetector(
-                              onTap: () => showOtherItem.value = !showOtherItem.value,
+                              onTap: () =>
+                                  showOtherItem.value = !showOtherItem.value,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Icon(
                                   showOtherItem.value
                                       ? Icons.keyboard_arrow_down
                                       : Icons.keyboard_arrow_up,
-                                  color: AppColors.primaryColor,
+                                  color: AppColors.textColor2,
                                   size: 20,
                                 ),
                               ),
@@ -100,14 +105,15 @@ class AppDrawer extends HookWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: getScreenHeight(20)),
+                    SizedBox(height: getScreenHeight(2)),
                     Row(
                       children: [
                         InkWell(
                           borderRadius: BorderRadius.circular(25),
                           splashColor: AppColors.backgroundShade4,
-                          onTap: (){
-                            RouteNavigators.route(context, const AccountStatsInfo());
+                          onTap: () {
+                            RouteNavigators.route(
+                                context, const AccountStatsInfo());
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -115,21 +121,29 @@ class AppDrawer extends HookWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  globals.user!.nReachers.toString(),
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(16),
-                                    color: AppColors.textColor2,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Reachers',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(14),
-                                    color: AppColors.greyShade2,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start, 
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      globals.user!.nReachers.toString(),
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(16),
+                                        color: AppColors.textColor2,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(width: getScreenWidth(5)),
+                                    Text(
+                                      'Reachers',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(16),
+                                        color: AppColors.greyShade2,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -139,8 +153,12 @@ class AppDrawer extends HookWidget {
                         InkWell(
                           borderRadius: BorderRadius.circular(25),
                           splashColor: AppColors.backgroundShade4,
-                          onTap: (){
-                            RouteNavigators.route(context, const AccountStatsInfo(index: 1,));
+                          onTap: () {
+                            RouteNavigators.route(
+                                context,
+                                const AccountStatsInfo(
+                                  index: 1,
+                                ));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -148,19 +166,27 @@ class AppDrawer extends HookWidget {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  globals.user!.nReaching.toString(),
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(16),
-                                      color: AppColors.textColor2,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  'Reaching',
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(14),
-                                      color: AppColors.greyShade2,
-                                      fontWeight: FontWeight.w400),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      globals.user!.nReaching.toString(),
+                                      style: TextStyle(
+                                          fontSize: getScreenHeight(16),
+                                          color: AppColors.textColor2,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    SizedBox(width: getScreenWidth(5)),
+                                    Text(
+                                      'Reaching',
+                                      style: TextStyle(
+                                          fontSize: getScreenHeight(16),
+                                          color: AppColors.greyShade2,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -180,18 +206,25 @@ class AppDrawer extends HookWidget {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 children: [
-                  DrawerItem(
-                      action: 'Add an existing account',
-                      color: AppColors.textColor2,
-                      showIcon: false,
-                      icon: '',
-                      onPressed: () {}),
+                  
                   DrawerItem(
                       action: 'Create a new account',
                       color: AppColors.textColor2,
                       showIcon: false,
                       icon: '',
-                      onPressed: () {}),
+                      onPressed: () {
+                        SecureStorage.deleteSecureData();
+                        RouteNavigators.routeNoWayHome(context, SignUpScreen());
+                      }),
+                      DrawerItem(
+                      action: 'Add an already existing account',
+                      color: AppColors.textColor2,
+                      showIcon: false,
+                      icon: '',
+                      onPressed: () {
+                        SecureStorage.deleteSecureData();
+                        RouteNavigators.routeNoWayHome(context, const LoginScreen());
+                      }),
                 ],
               ),
             ),
@@ -204,8 +237,14 @@ class AppDrawer extends HookWidget {
                   shrinkWrap: true,
                   children: [
                     DrawerItem(
+                        action: 'Profile',
+                        icon: 'assets/svgs/profile.svg',
+                        onPressed: () {
+                          RouteNavigators.route(context, const AccountScreen());
+                        }),
+                    DrawerItem(
                       action: 'Reaches',
-                      icon: 'assets/svgs/reaches-d.svg',
+                      icon: 'assets/svgs/reaches.svg',
                       onPressed: () {
                         RouteNavigators.route(context, const AccountScreen());
                       },
@@ -216,11 +255,36 @@ class AppDrawer extends HookWidget {
                       onPressed: () => RouteNavigators.route(
                           context, const SavedPostScreen()),
                     ),
-                    const SizedBox(height: 10),
+                    DrawerItem(
+                      action: 'Abbreviation',
+                      icon: 'assets/svgs/abreviation.svg',
+                      onPressed: () {},
+                    ),
+                    DrawerItem(
+                      action: 'Dictionary',
+                      icon: 'assets/svgs/dictionary.svg',
+                      onPressed: () {},
+                    ),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
+                    DrawerItem(
+                      action: 'Settings',
+                      icon: 'assets/svgs/Setting.svg',
+                      onPressed: () {},
+                    ),
+                    const SizedBox(height: 10),
+                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                   ]),
             ),
           ),
+           Visibility(
+            visible: showOtherItem.value,
+             child: DrawerItem(
+              action: 'Help Center',
+              icon: 'assets/svgs/help.svg',
+              onPressed: () {},
+                     ),
+           ), 
+          const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
           DrawerItem(
             action: 'Logout',
             icon: 'assets/svgs/logout.svg',
@@ -287,7 +351,7 @@ class DrawerItem extends StatelessWidget {
               ? SizedBox(
                   height: getScreenHeight(20),
                   width: getScreenWidth(20),
-                  child: SvgPicture.asset('assets/svgs/scan.svg'),
+                  child: SvgPicture.asset('assets/svgs/qrcode.svg'),
                 )
               : const SizedBox.shrink(),
         ],

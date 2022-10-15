@@ -6,6 +6,7 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
@@ -48,12 +49,12 @@ class ForgotPasswordScreen extends HookWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Center(
                     child: SvgPicture.asset(
                       'assets/svgs/forgot.svg',
-                      height: 186,
+                      height: 240,
                       width: 290,
                     ),
                   ),
@@ -77,8 +78,22 @@ class ForgotPasswordScreen extends HookWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
+                  SizedBox(
+                    width: size.width * 0.8-20,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Email',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(18),
+                          color: AppColors.textColor2,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomRoundTextField(
-                    hintText: 'Email',
+                    hintText: 'linda@framcreative.com',
                     keyboardType: TextInputType.emailAddress,
                     textCapitalization: TextCapitalization.none,
                     validator: (value) => Validator.validateEmail(value ?? ""),
@@ -87,7 +102,7 @@ class ForgotPasswordScreen extends HookWidget {
                   const SizedBox(height: 34),
                   CustomButton(
                     label: 'Send',
-                    color: AppColors.textColor2,
+                    color: AppColors.buttonColor,
                     onPressed: () {
                       globals.authBloc!.add(RequestPasswordResetEvent(
                           email: _emailController.text.replaceAll(' ', '')));

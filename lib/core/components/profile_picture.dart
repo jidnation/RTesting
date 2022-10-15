@@ -69,7 +69,7 @@ class RecipientProfilePicture extends StatelessWidget {
         ),
         child: CachedNetworkImage(
           imageUrl: imageUrl ?? '',
-          fit: BoxFit.cover,
+          //fit: BoxFit.cover,
           placeholder: (context, url) => const ImagePlaceholder(),
           errorWidget: (context, url, error) => const ImagePlaceholder(),
         ),
