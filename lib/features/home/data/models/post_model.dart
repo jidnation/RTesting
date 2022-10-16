@@ -69,9 +69,9 @@ class PostModel {
         postId: json["postId"],
         postSlug: json["postSlug"],
         videoMediaItem: json["videoMediaItem"],
-        createdAt: json["createdAt"] == null
+        createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["createdAt"]),
+            : DateTime.parse(json["created_at"]),
         profile: json["profile"] != null
             ? PostProfileModel.fromJson(json["profile"])
             : null,
@@ -311,9 +311,9 @@ class PostFeedModel {
         postId: json["postId"],
         verified: json["verified"],
         post: json["post"] == null ? null : PostModel.fromJson(json["post"]),
-        createdAt: json["createdAt"] == null
+        createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["createdAt"]),
+            : DateTime.parse(json["created_at"]),
         reachingRelationship: json["reachingRelationship"],
         like: json["like"] == null
             ? null
