@@ -45,74 +45,84 @@ class ForgotPasswordScreen extends HookWidget {
           return SafeArea(
             child: SizedBox(
               height: size.height,
-              width: size.width,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Center(
-                    child: SvgPicture.asset(
-                      'assets/svgs/forgot.svg',
-                      height: 240,
-                      width: 290,
+              // width: size.width,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 25.0, right: 25.0, top: 50.0, bottom: 30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Center(
+                      child: SvgPicture.asset(
+                        'assets/svgs/forgot.svg',
+                        height: 240,
+                        width: 290,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 25.0),
-                  const Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textColor2,
-                      fontSize: 19,
+                    const SizedBox(height: 25.0),
+                    const Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textColor2,
+                        fontSize: 19,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  const Text(
-                    'Don’t worry! It happens. Please enter\nthe address associated with your account.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF767474),
-                      fontSize: 15,
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      'Don’t worry! It happens. Please enter\nthe address associated with your account.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF767474),
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  SizedBox(
-                    width: size.width * 0.8-20,
-                    child: Align(
+                    const SizedBox(height: 40),
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Email',
                         style: TextStyle(
-                          fontSize: getScreenHeight(18),
+                          fontSize: getScreenHeight(15),
                           color: AppColors.textColor2,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                  ),
-                  CustomRoundTextField(
-                    hintText: 'linda@framcreative.com',
-                    keyboardType: TextInputType.emailAddress,
-                    textCapitalization: TextCapitalization.none,
-                    validator: (value) => Validator.validateEmail(value ?? ""),
-                    controller: _emailController,
-                  ).paddingSymmetric(h: 45),
-                  const SizedBox(height: 34),
-                  CustomButton(
-                    label: 'Send',
-                    color: AppColors.buttonColor,
-                    onPressed: () {
-                      globals.authBloc!.add(RequestPasswordResetEvent(
-                          email: _emailController.text.replaceAll(' ', '')));
-                    },
-                    size: size,
-                    textColor: AppColors.white,
-                    borderSide: BorderSide.none,
-                  ).paddingSymmetric(h: 45),
-                  const SizedBox(height: 20),
-                ],
+                   const SizedBox(height: 5),
+                    CustomRoundTextField(
+                      focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                      enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                      isFilled: false,
+                      hintText: 'linda@framcreative.com',
+                      keyboardType: TextInputType.emailAddress,
+                      textCapitalization: TextCapitalization.none,
+                      validator: (value) => Validator.validateEmail(value ?? ""),
+                      controller: _emailController,
+                      hintStyle: TextStyle(
+                        color: Colors.black26,
+                        fontSize: getScreenHeight(15),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 34),
+                    CustomButton(
+                      label: 'Send',
+                      color: AppColors.buttonColor,
+                      onPressed: () {
+                        globals.authBloc!.add(RequestPasswordResetEvent(
+                            email: _emailController.text.replaceAll(' ', '')));
+                      },
+                      size: size,
+                      textColor: AppColors.white,
+                      borderSide: BorderSide.none,
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           );

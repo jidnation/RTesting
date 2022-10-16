@@ -68,26 +68,30 @@ class LoginScreen extends HookWidget {
                               child: Text(
                                 'Email',
                                 style: TextStyle(
-                                  fontSize: getScreenHeight(18),
+                                  fontSize: getScreenHeight(15),
                                   color: AppColors.textColor2,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                            SizedBox(height: getScreenHeight(10)),
+                            SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
+                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              isFilled: false,
                               hintText: 'linda@framcreative.com',
                               keyboardType: TextInputType.emailAddress,
                               textCapitalization: TextCapitalization.none,
                               hintStyle: TextStyle(
-                                fontSize: getScreenHeight(18),
+                                color: Colors.black26,
+                                fontSize: getScreenHeight(15),
                                 fontWeight: FontWeight.w400,
                               ),
                               validator: (value) =>
                                   Validator.validateEmail(value ?? ""),
                               controller: _emailController,
                             ),
-                            SizedBox(height: getScreenHeight(15)),
+                            SizedBox(height: getScreenHeight(30)),
                             Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -97,7 +101,7 @@ class LoginScreen extends HookWidget {
                                   Text(
                                     'Password',
                                     style: TextStyle(
-                                      fontSize: getScreenHeight(18),
+                                      fontSize: getScreenHeight(15),
                                       color: AppColors.textColor2,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -116,13 +120,13 @@ class LoginScreen extends HookWidget {
                                                   ? const Icon(
                                                       Icons
                                                           .visibility_off_outlined,
-                                                      size: 23,
+                                                      size: 15,
                                                       color: AppColors
                                                           .textFieldLabelColor,
                                                     )
                                                   : const Icon(
                                                       Icons.visibility,
-                                                      size: 23,
+                                                      size: 15,
                                                       color: AppColors
                                                           .primaryColor,
                                                     ),
@@ -132,7 +136,7 @@ class LoginScreen extends HookWidget {
                                         TextSpan(
                                           text: 'Show',
                                           style: TextStyle(
-                                            fontSize: getScreenHeight(18),
+                                            fontSize: getScreenHeight(13),
                                             color: AppColors.textColor,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -141,8 +145,11 @@ class LoginScreen extends HookWidget {
                                     ),
                                   ),
                                 ]),
-                            SizedBox(height: getScreenHeight(10)),
+                            SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
+                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              isFilled: false,
                               maxLines: 1,
                               obscureText: _obscureText.value,
                               keyboardType: TextInputType.text,
@@ -165,7 +172,7 @@ class LoginScreen extends HookWidget {
                                 child: Text(
                                   'Forgot password',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(17),
+                                    fontSize: getScreenHeight(13),
                                     color: AppColors.textColor2,
                                     fontWeight: FontWeight.w500,
                                   ),

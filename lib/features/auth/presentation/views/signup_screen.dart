@@ -93,7 +93,7 @@ class SignUpScreen extends HookWidget {
                                 text: "By continuing, you agree to our User\n ",
                                 style: TextStyle(
                                   color: AppColors.textColor,
-                                  fontSize: getScreenHeight(15),
+                                  fontSize: getScreenHeight(16),
                                   fontFamily: 'Poppins',
                                 ),
                                 children: [
@@ -101,7 +101,7 @@ class SignUpScreen extends HookWidget {
                                     text: 'Agreement ',
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
-                                      fontSize: getScreenHeight(15),
+                                      fontSize: getScreenHeight(16),
                                       fontWeight: FontWeight.normal,
                                       fontFamily: 'Poppins',
                                     ),
@@ -110,7 +110,7 @@ class SignUpScreen extends HookWidget {
                                     text: 'and ',
                                     style: TextStyle(
                                       color: AppColors.textColor,
-                                      fontSize: getScreenHeight(15),
+                                      fontSize: getScreenHeight(16),
                                       fontWeight: FontWeight.normal,
                                       fontFamily: 'Poppins',
                                     ),
@@ -119,7 +119,7 @@ class SignUpScreen extends HookWidget {
                                     text: 'Privacy Policy',
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
-                                      fontSize: getScreenHeight(15),
+                                      fontSize: getScreenHeight(16),
                                       fontWeight: FontWeight.normal,
                                       fontFamily: 'Poppins',
                                     ),
@@ -128,7 +128,7 @@ class SignUpScreen extends HookWidget {
                                     text: '.',
                                     style: TextStyle(
                                       color: AppColors.textColor,
-                                      fontSize: getScreenHeight(15),
+                                      fontSize: getScreenHeight(16),
                                       fontWeight: FontWeight.normal,
                                       fontFamily: 'Poppins',
                                     ),
@@ -143,13 +143,16 @@ class SignUpScreen extends HookWidget {
                             child: Text(
                               'First Name',
                               style: TextStyle(
-                                fontSize: getScreenHeight(18),
+                                fontSize: getScreenHeight(15),
                                 color: AppColors.textColor2,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                           CustomRoundTextField(
+                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            isFilled: false,
                             hintText: '',
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.words,
@@ -163,13 +166,16 @@ class SignUpScreen extends HookWidget {
                             child: Text(
                               'Last Name',
                               style: TextStyle(
-                                fontSize: getScreenHeight(18),
+                                fontSize: getScreenHeight(15),
                                 color: AppColors.textColor2,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                           CustomRoundTextField(
+                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            isFilled: false,
                             hintText: '',
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.words,
@@ -183,16 +189,24 @@ class SignUpScreen extends HookWidget {
                             child: Text(
                               'Email',
                               style: TextStyle(
-                                fontSize: getScreenHeight(18),
+                                fontSize: getScreenHeight(15),
                                 color: AppColors.textColor2,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
                           CustomRoundTextField(
+                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            isFilled: false,
                             hintText: 'linda@framcreative.com',
                             keyboardType: TextInputType.emailAddress,
                             textCapitalization: TextCapitalization.none,
+                            hintStyle: TextStyle(
+                              color: Colors.black26,
+                              fontSize: getScreenHeight(15),
+                              fontWeight: FontWeight.w400,
+                            ),
                             validator: (value) =>
                                 Validator.validateEmail(value ?? ""),
                             controller: _emailController,
@@ -206,7 +220,7 @@ class SignUpScreen extends HookWidget {
                                 Text(
                                   'Password',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(18),
+                                    fontSize: getScreenHeight(15),
                                     color: AppColors.textColor2,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -225,13 +239,13 @@ class SignUpScreen extends HookWidget {
                                                 ? const Icon(
                                                     Icons
                                                         .visibility_off_outlined,
-                                                    size: 23,
+                                                    size: 15,
                                                     color: AppColors
                                                         .textFieldLabelColor,
                                                   )
                                                 : const Icon(
                                                     Icons.visibility,
-                                                    size: 23,
+                                                    size: 15,
                                                     color:
                                                         AppColors.primaryColor,
                                                   ),
@@ -241,7 +255,7 @@ class SignUpScreen extends HookWidget {
                                       TextSpan(
                                         text: 'Show',
                                         style: TextStyle(
-                                          fontSize: getScreenHeight(18),
+                                          fontSize: getScreenHeight(13),
                                           color: AppColors.textColor,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -250,7 +264,11 @@ class SignUpScreen extends HookWidget {
                                   ),
                                 ),
                               ]),
+                          SizedBox(height: getScreenHeight(5)),
                           CustomRoundTextField(
+                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            isFilled: false,
                             maxLines: 1,
                             obscureText: _obscureText.value,
                             keyboardType: TextInputType.text,
@@ -284,7 +302,7 @@ class SignUpScreen extends HookWidget {
                                     TextSpan(
                                       children: <InlineSpan>[
                                         TextSpan(
-                                          text: '• One special character',
+                                          text: '• one special character',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(12),
                                             color: AppColors.textColor,
@@ -298,7 +316,7 @@ class SignUpScreen extends HookWidget {
                                     TextSpan(
                                       children: <InlineSpan>[
                                         TextSpan(
-                                          text: '• One number',
+                                          text: '• one number',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(12),
                                             color: AppColors.textColor,
@@ -317,7 +335,7 @@ class SignUpScreen extends HookWidget {
                                     TextSpan(
                                       children: <InlineSpan>[
                                         TextSpan(
-                                          text: '• One uppercase character',
+                                          text: '• one uppercase character',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(12),
                                             color: AppColors.textColor,
@@ -331,7 +349,7 @@ class SignUpScreen extends HookWidget {
                                     TextSpan(
                                       children: <InlineSpan>[
                                         TextSpan(
-                                          text: '• One lowercase character',
+                                          text: '• one lowercase character',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(12),
                                             color: AppColors.textColor,
@@ -433,8 +451,8 @@ class SignUpScreen extends HookWidget {
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontFamily: 'Poppins',
-                                      fontSize: getScreenHeight(17),
-                                      fontWeight: FontWeight.normal,
+                                      fontSize: getScreenHeight(18),
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
