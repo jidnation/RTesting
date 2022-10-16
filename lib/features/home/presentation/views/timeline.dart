@@ -16,7 +16,9 @@ import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
@@ -28,12 +30,10 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -227,7 +227,10 @@ class _TimelineScreenState extends State<TimelineScreen>
 
                   if (state is GetPostFeedSuccess) {
                     _firstLoad = false;
-                    _posts.value = state.posts!;
+                    _posts.value = (state.posts!);
+                    _posts.value.sort((a, b) => b.post!.createdAt!
+                        .toIso8601String()
+                        .compareTo(a.post!.createdAt!.toIso8601String()));
                     _refreshController.refreshCompleted();
                   }
 
@@ -276,251 +279,275 @@ class _TimelineScreenState extends State<TimelineScreen>
                   bool _unLikingPost = state is UnlikePostLoading;
                   // _likingPost = state is GetPostFeedLoading;
 
-                  return CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverFillRemaining(
-                        child: (_firstLoad)
-                            ? const SkeletonLoadingWidget()
-                            : SizedBox(
-                                child: Refresher(
-                                  onRefresh: onRefresh,
-                                  controller: _refreshController,
-                                  child: ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: false,
-                                    children: [
-                                      SizedBox(
-                                          height: 0,
-                                          child: Divider(
-                                            color: const Color(0xFFE3E5E7)
-                                                .withOpacity(0.5),
-                                          )),
-                                      SizedBox(
-                                          height: kToolbarHeight +
-                                              getScreenHeight(22)), //30
-                                      _isLoading
-                                          ? const LinearLoader()
-                                          : const SizedBox.shrink(),
-                                      Container(
-                                        color: AppColors.white,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            SizedBox(
-                                              height: getScreenHeight(105),
-                                              child: SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                child: SizedBox(
-                                                  child: Row(
-                                                    children: [
-                                                      UserStory(
-                                                        size: size,
-                                                        image: globals.user!
-                                                                .profilePicture ??
-                                                            '',
-                                                        isMe: true,
-                                                        isLive: false,
-                                                        hasWatched: false,
-                                                        username: 'Add Status',
-                                                        isMeOnTap: () {
-                                                          RouteNavigators.route(
-                                                              context,
-                                                              const CreateStatus());
-                                                          return;
-                                                        },
-                                                      ),
-                                                      if (_myStatus
-                                                          .value.isEmpty)
-                                                        const SizedBox.shrink()
-                                                      else
+                  return GestureDetector(
+                    onHorizontalDragEnd: (dragEndDetails) {
+                      if (dragEndDetails.primaryVelocity! < 0) {
+                        // Swipe Right
+
+                      } else if (dragEndDetails.primaryVelocity! > 0) {
+                        // Swipe Left
+                        widget.scaffoldKey!.currentState!.openDrawer();
+                      }
+                    },
+                    child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      slivers: [
+                        SliverFillRemaining(
+                          child: (_firstLoad)
+                              ? const SkeletonLoadingWidget()
+                              : SizedBox(
+                                  child: Refresher(
+                                    onRefresh: onRefresh,
+                                    controller: _refreshController,
+                                    child: ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: false,
+                                      children: [
+                                        SizedBox(
+                                            height: 0,
+                                            child: Divider(
+                                              color: const Color(0xFFE3E5E7)
+                                                  .withOpacity(0.5),
+                                            )),
+                                        SizedBox(
+                                            height: kToolbarHeight +
+                                                getScreenHeight(22)), //30
+                                        _isLoading
+                                            ? const LinearLoader()
+                                            : const SizedBox.shrink(),
+                                        Container(
+                                          color: AppColors.white,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              SizedBox(
+                                                height: getScreenHeight(105),
+                                                child: SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  child: SizedBox(
+                                                    child: Row(
+                                                      children: [
                                                         UserStory(
                                                           size: size,
                                                           image: globals.user!
                                                                   .profilePicture ??
                                                               '',
-                                                          isMe: false,
+                                                          isMe: true,
                                                           isLive: false,
                                                           hasWatched: false,
                                                           username:
-                                                              'Your status',
-                                                          onTap: () {
+                                                              'Add Status',
+                                                          isMeOnTap: () {
                                                             RouteNavigators.route(
                                                                 context,
-                                                                ViewMyStatus(
-                                                                    status: _myStatus
-                                                                        .value));
+                                                                const CreateStatus());
+                                                            return;
                                                           },
                                                         ),
-                                                      ...List.generate(
-                                                        _userStatus
-                                                            .value.length,
-                                                        (index) => UserStory(
-                                                          size: size,
-                                                          isMe: false,
-                                                          isLive: false,
-                                                          hasWatched: false,
-                                                          image: _userStatus
+                                                        if (_myStatus
+                                                            .value.isEmpty)
+                                                          const SizedBox
+                                                              .shrink()
+                                                        else
+                                                          UserStory(
+                                                            size: size,
+                                                            image: globals.user!
+                                                                    .profilePicture ??
+                                                                '',
+                                                            isMe: false,
+                                                            isLive: false,
+                                                            hasWatched: false,
+                                                            username:
+                                                                'Your status',
+                                                            onTap: () {
+                                                              RouteNavigators.route(
+                                                                  context,
+                                                                  ViewMyStatus(
+                                                                      status: _myStatus
+                                                                          .value));
+                                                            },
+                                                          ),
+                                                        ...List.generate(
+                                                          _userStatus
+                                                              .value.length,
+                                                          (index) => UserStory(
+                                                            size: size,
+                                                            isMe: false,
+                                                            isLive: false,
+                                                            hasWatched: false,
+                                                            image: _userStatus
+                                                                .value[index]
+                                                                .status![0]
+                                                                .statusCreatorModel!
+                                                                .profilePicture!,
+                                                            username: _userStatus
+                                                                .value[index]
+                                                                .status![index]
+                                                                .statusCreatorModel!
+                                                                .username!,
+                                                            onTap: () {
+                                                              RouteNavigators
+                                                                  .route(
+                                                                context,
+                                                                ViewUserStatus(
+                                                                    status: _userStatus
+                                                                        .value[
+                                                                            index]
+                                                                        .status!),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                        // ..._userStatus.value.map(
+                                                        //   (e) =>
+                                                        // ),
+                                                      ],
+                                                    ),
+                                                  ).paddingOnly(l: 11),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: getScreenHeight(5)),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: getScreenHeight(16)),
+                                        SizedBox(
+                                          child: _posts.value.isEmpty
+                                              ? EmptyTimelineWidget(
+                                                  loading: _isLoading)
+                                              : ListView.builder(
+                                                  shrinkWrap: true,
+                                                  padding: EdgeInsets.zero,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount:
+                                                      _posts.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return PostFeedReacherCard(
+                                                      likingPost: false,
+                                                      postFeedModel:
+                                                          _posts.value[index],
+                                                      isLiked: _posts
                                                               .value[index]
-                                                              .status![0]
-                                                              .statusCreatorModel!
-                                                              .profilePicture!,
-                                                          username: _userStatus
+                                                              .like!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      isVoted: _posts
                                                               .value[index]
-                                                              .status![index]
-                                                              .statusCreatorModel!
-                                                              .username!,
-                                                          onTap: () {
-                                                            RouteNavigators
-                                                                .route(
-                                                              context,
-                                                              ViewUserStatus(
-                                                                  status: _userStatus
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      voteType: _posts
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? _posts.value[index]
+                                                              .vote![0].voteType
+                                                          : null,
+                                                      onMessage: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _posts
                                                                       .value[
                                                                           index]
-                                                                      .status!),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ),
-                                                      // ..._userStatus.value.map(
-                                                      //   (e) =>
-                                                      // ),
-                                                    ],
-                                                  ),
-                                                ).paddingOnly(l: 11),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height: getScreenHeight(5)),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(16)),
-                                      SizedBox(
-                                        child: _posts.value.isEmpty
-                                            ? EmptyTimelineWidget(
-                                                loading: _isLoading)
-                                            : ListView.builder(
-                                                shrinkWrap: true,
-                                                padding: EdgeInsets.zero,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: _posts.value.length,
-                                                itemBuilder: (context, index) {
-                                                  return PostFeedReacherCard(
-                                                    likingPost: false,
-                                                    postFeedModel:
-                                                        _posts.value[index],
-                                                    isLiked: _posts.value[index]
-                                                            .like!.isNotEmpty
-                                                        ? true
-                                                        : false,
-                                                    isVoted: _posts.value[index]
-                                                            .vote!.isNotEmpty
-                                                        ? true
-                                                        : false,
-                                                    voteType: _posts
-                                                            .value[index]
-                                                            .vote!
-                                                            .isNotEmpty
-                                                        ? _posts.value[index]
-                                                            .vote![0].voteType
-                                                        : null,
-                                                    onMessage: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      reachDM.value = true;
+                                                                      .postOwnerId!));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
 
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        globals.userBloc!.add(
-                                                            GetRecipientProfileEvent(
-                                                                email: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postOwnerId!));
-                                                      }
-                                                    },
-                                                    onUpvote: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        globals
-                                                            .socialServiceBloc!
-                                                            .add(VotePostEvent(
-                                                          voteType: 'Upvote',
-                                                          postId: _posts
-                                                              .value[index]
-                                                              .postId,
-                                                        ));
-                                                      }
-                                                    },
-                                                    onDownvote: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        globals
-                                                            .socialServiceBloc!
-                                                            .add(VotePostEvent(
-                                                          voteType: 'Downvote',
-                                                          postId: _posts
-                                                              .value[index]
-                                                              .postId,
-                                                        ));
-                                                      }
-                                                    },
-                                                    onLike: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        if (_posts.value[index]
-                                                            .like!.isNotEmpty) {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
                                                           globals
                                                               .socialServiceBloc!
                                                               .add(
-                                                                  UnlikePostEvent(
+                                                                  VotePostEvent(
+                                                            voteType: 'Upvote',
                                                             postId: _posts
                                                                 .value[index]
                                                                 .postId,
                                                           ));
-                                                        } else {
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
                                                           globals
                                                               .socialServiceBloc!
                                                               .add(
-                                                            LikePostEvent(
-                                                                postId: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postId),
-                                                          );
+                                                                  VotePostEvent(
+                                                            voteType:
+                                                                'Downvote',
+                                                            postId: _posts
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
                                                         }
-                                                      }
-                                                    },
-                                                  );
-                                                },
-                                              ),
-                                      ),
-                                    ],
+                                                      },
+                                                      onLike: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_posts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _posts
+                                                                      .value[
+                                                                          index]
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                      )
-                    ],
-                  ).paddingOnly(t: 10);
+                        )
+                      ],
+                    ).paddingOnly(t: 10),
+                  );
                 },
               );
             },
