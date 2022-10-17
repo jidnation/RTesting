@@ -13,6 +13,7 @@ class UserSchema {
             profileSlug
             showContact
             showLocation
+            lastSeen
             authId
             username
             nReachers
@@ -22,6 +23,42 @@ class UserSchema {
             email
             firstName
             lastName
+            reaching {
+              reacherId
+              reachingId
+            }
+        ''';
+  }
+}
+
+class ReacherProfileSchema {
+  ReacherProfileSchema._();
+
+  static String get schema {
+    return r'''
+            profilePicture
+            profileSlug
+            location
+            authId
+            username
+            firstName
+            lastName
+        ''';
+  }
+}
+
+class ProfileIndexSchema {
+  ProfileIndexSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            firstName
+            lastName
+            profilePicture
+            profileSlug
+            username
+            verified
         ''';
   }
 }

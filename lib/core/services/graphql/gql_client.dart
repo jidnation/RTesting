@@ -8,7 +8,6 @@ import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/graphql/logger_http_client.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 
-
 class GraphQLApiClient {
   GraphQLApiClient()
       : graphQLClient = ValueNotifier<GraphQLClient>(
@@ -36,25 +35,24 @@ class GraphQLApiClient {
             variables: variables,
           ),
         );
-    Console.log('query', result);
 
     if (result.exception != null) {
       Console.log('query exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         if (result.exception != null) {
           dynamic myException =
               result.exception!.graphqlErrors.first.extensions!['exception'];
-          bool isUnauthorized =
-              myException['status'] != null && myException['status'] == 401
-                  ? true
-                  : false;
+
+          bool isUnauthorized = myException['message']
+                  .toString()
+                  .contains('This endpoint requires authorization!')
+              ? true
+              : false;
 
           if (isUnauthorized) {
             //if user token has expired, redirect them to login & remove all stacked routes
-            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
             return const GraphQLError(
                 message: "Your session has expired, please login again");
           }
@@ -79,19 +77,18 @@ class GraphQLApiClient {
     if (result.exception != null) {
       Console.log('mutate exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];
-        bool isUnauthorized =
-            myException['status'] != null && myException['status'] == 401
-                ? true
-                : false;
+        bool isUnauthorized = myException['message']
+                .toString()
+                .contains('This endpoint requires authorization!')
+            ? true
+            : false;
 
         if (isUnauthorized) {
           //if user token has expired, redirect them to login & remove all stacked routes
-          //RouteNavigators.navigatePopUntil(LoginScreen.id);
           return const GraphQLError(
               message: "Your session has expired, please login again");
         }
@@ -109,12 +106,14 @@ class GraphQLApiClient {
     final SubscriptionOptions operation = SubscriptionOptions(
       document: document,
       operationName: operationName,
+      variables: variables,
     );
 
     final Stream<QueryResult> result = clientFor().value.subscribe(operation);
     return result;
   }
 }
+
 class GraphQLChatClient {
   GraphQLChatClient()
       : graphQLClient = ValueNotifier<GraphQLClient>(
@@ -142,25 +141,23 @@ class GraphQLChatClient {
             variables: variables,
           ),
         );
-    Console.log('query', result);
 
     if (result.exception != null) {
       Console.log('query exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network error! Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         if (result.exception != null) {
           dynamic myException =
               result.exception!.graphqlErrors.first.extensions!['exception'];
-          bool isUnauthorized =
-              myException['status'] != null && myException['status'] == 401
-                  ? true
-                  : false;
+          bool isUnauthorized = myException['message']
+                  .toString()
+                  .contains('This endpoint requires authorization!')
+              ? true
+              : false;
 
           if (isUnauthorized) {
             //if user token has expired, redirect them to login & remove all stacked routes
-            // RouteNavigators.routeNoWayHome(context, const LoginScreen());
             return const GraphQLError(
                 message: "Your session has expired, please login again");
           }
@@ -175,29 +172,27 @@ class GraphQLChatClient {
     DocumentNode documentNode, {
     required Map<String, dynamic> variables,
   }) async {
-    final QueryResult result = await chatClientFor()
-        .value
-        .mutate(MutationOptions(document: documentNode, variables: variables));
-
-    Console.log('mutate ex', result.exception);
-    Console.log('mutate data', result.data);
+    final QueryResult result =
+        await chatClientFor().value.mutate(MutationOptions(
+              document: documentNode,
+              variables: variables,
+            ));
 
     if (result.exception != null) {
       Console.log('mutate exception', result.exception);
       if (result.exception!.linkException != null) {
-        return const GraphQLError(
-            message: "Network Error, Please check your internet connection");
+        return const GraphQLError(message: "Something went wrong. Try again.");
       } else {
         dynamic myException =
             result.exception!.graphqlErrors.first.extensions!['exception'];
-        bool isUnauthorized =
-            myException['status'] != null && myException['status'] == 401
-                ? true
-                : false;
+        bool isUnauthorized = myException['message']
+                .toString()
+                .contains('This endpoint requires authorization!')
+            ? true
+            : false;
 
         if (isUnauthorized) {
           //if user token has expired, redirect them to login & remove all stacked routes
-          //RouteNavigators.navigatePopUntil(LoginScreen.id);
           return const GraphQLError(
               message: "Your session has expired, please login again");
         }
@@ -208,16 +203,15 @@ class GraphQLChatClient {
   }
 
   //subscriptions
-  Stream<QueryResult> subscription(DocumentNode document,
-      {required Map<String, dynamic> variables, String? operationName}) {
-    //  chatClientFor().value.cache.reset(); //reset cache
-
-    final SubscriptionOptions operation = SubscriptionOptions(
+  Stream<QueryResult> subscribe(
+    DocumentNode document, {
+    required Map<String, dynamic> variables,
+  }) {
+    final SubscriptionOptions options = SubscriptionOptions(
       document: document,
-      operationName: operationName,
+      variables: variables,
     );
-
-    final Stream<QueryResult> result = chatClientFor().value.subscribe(operation);
+    final Stream<QueryResult> result = chatClientFor().value.subscribe(options);
     return result;
   }
 }

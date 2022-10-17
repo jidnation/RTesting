@@ -130,7 +130,7 @@ class CustomRoundTextField extends StatelessWidget {
         isDense: isDense,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 24,
-          vertical: 19,
+          vertical: 12,
         ),
         fillColor: fillColor,
         suffixIcon: suffixIcon,
@@ -139,6 +139,12 @@ class CustomRoundTextField extends StatelessWidget {
             borderSide: enabledBorderSide,
             borderRadius: BorderRadius.circular(borderRadius)),
         focusedBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedErrorBorder: OutlineInputBorder(
             borderSide: focusedBorderSide,
             borderRadius: BorderRadius.circular(borderRadius)),
       ),

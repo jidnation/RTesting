@@ -13,7 +13,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/core/utils/validator.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 
 class PersonalInfoSettings extends StatefulHookWidget {
@@ -87,7 +87,7 @@ class _PersonalInfoSettingsState extends State<PersonalInfoSettings> {
               globals.user = state.user;
               RouteNavigators.routeNoWayHome(context, const HomeScreen());
             } else if (state is UserError) {
-              RMSnackBar.showErrorSnackBar(context, message: state.error);
+              Snackbars.error(context, message: state.error);
             }
           },
           builder: (context, state) {

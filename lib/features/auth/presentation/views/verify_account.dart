@@ -127,7 +127,7 @@ class VerifyAccountScreen extends StatelessWidget {
                     //     .read(authNotifierProvider.notifier)
                     //     .verifyEmail(context, uid: uid, token: token);
                   } else {
-                    RMSnackBar.showErrorSnackBar(
+                    Snackbars.error(
                       context,
                       message: 'Incorrect code',
                       milliseconds: 1000,

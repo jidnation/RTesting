@@ -10,13 +10,23 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
-class VideoMomentScreen extends StatelessWidget {
+class VideoMomentScreen extends StatefulHookWidget {
   static const String id = 'video_moment_screen';
 
   const VideoMomentScreen({Key? key}) : super(key: key);
 
   @override
+  State<VideoMomentScreen> createState() => _VideoMomentScreenState();
+}
+
+class _VideoMomentScreenState extends State<VideoMomentScreen>
+    with AutomaticKeepAliveClientMixin<VideoMomentScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
     final videos = [
       'assets/videos/video-1.mp4',
@@ -66,8 +76,19 @@ class MomentsAppBar extends StatelessWidget {
               Row(
                 children: [
                   IconButton(
-                    icon: SvgPicture.asset('assets/svgs/back.svg',
-                        color: Colors.white),
+                    icon: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            offset: const Offset(0.0, 0.2),
+                            blurRadius: 20,
+                            color: AppColors.black.withOpacity(0.1),
+                          ),
+                        ],
+                      ),
+                      child: SvgPicture.asset('assets/svgs/back.svg',
+                          color: Colors.white),
+                    ),
                     padding: const EdgeInsets.all(0),
                     constraints: const BoxConstraints(),
                     onPressed: () {
@@ -86,20 +107,42 @@ class MomentsAppBar extends StatelessWidget {
               ),
               Row(
                 children: [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/svgs/fluent_live-24-regular.svg',
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          offset: const Offset(0.0, 0.2),
+                          blurRadius: 20,
+                          color: AppColors.black.withOpacity(0.1),
+                        ),
+                      ],
                     ),
-                    padding: const EdgeInsets.all(0),
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      //Navigator.pop(context);
-                    },
+                    child: IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/svgs/fluent_live-24-regular.svg',
+                      ),
+                      padding: const EdgeInsets.all(0),
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        //Navigator.pop(context);
+                      },
+                    ),
                   ),
                   SizedBox(width: getScreenWidth(40)),
                   IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/svgs/Camera.svg',
+                    icon: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            offset: const Offset(0.0, 0.2),
+                            blurRadius: 20,
+                            color: AppColors.black.withOpacity(0.1),
+                          ),
+                        ],
+                      ),
+                      child: SvgPicture.asset(
+                        'assets/svgs/Camera.svg',
+                      ),
                     ),
                     padding: const EdgeInsets.all(0),
                     constraints: const BoxConstraints(),
@@ -178,8 +221,19 @@ class OptionsWidget extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/like for tv.svg',
+                            icon: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: const Offset(0.0, 0.2),
+                                    blurRadius: 20,
+                                    color: AppColors.black.withOpacity(0.1),
+                                  ),
+                                ],
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/svgs/like for tv.svg',
+                              ),
                             ),
                             padding: const EdgeInsets.all(0),
                             constraints: const BoxConstraints(),
@@ -191,10 +245,17 @@ class OptionsWidget extends StatelessWidget {
                           Text(
                             '24k',
                             style: TextStyle(
-                              fontSize: getScreenHeight(14),
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
+                                fontSize: getScreenHeight(14),
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w500,
+                                shadows: [
+                                  Shadow(
+                                      offset: const Offset(0.0, 0.2),
+                                      blurRadius: 20,
+                                      color: AppColors.black.withOpacity(0.4)
+                                      //color: AppColors.black,
+                                      ),
+                                ]),
                           )
                         ],
                       ),
@@ -202,15 +263,26 @@ class OptionsWidget extends StatelessWidget {
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/Vector(1).svg',
+                          Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: const Offset(0.0, 0.2),
+                                  blurRadius: 20,
+                                  color: AppColors.black.withOpacity(0.1),
+                                ),
+                              ],
                             ),
-                            padding: const EdgeInsets.all(0),
-                            constraints: const BoxConstraints(),
-                            onPressed: () {
-                              //Navigator.pop(context);
-                            },
+                            child: IconButton(
+                              icon: SvgPicture.asset(
+                                'assets/svgs/Vector(1).svg',
+                              ),
+                              padding: const EdgeInsets.all(0),
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                //Navigator.pop(context);
+                              },
+                            ),
                           ),
                           SizedBox(height: getScreenHeight(5)),
                           Text(
@@ -219,6 +291,14 @@ class OptionsWidget extends StatelessWidget {
                               fontSize: getScreenHeight(14),
                               color: AppColors.white,
                               fontWeight: FontWeight.w500,
+                              shadows: [
+                                Shadow(
+                                    offset: const Offset(0.0, 0.2),
+                                    blurRadius: 20,
+                                    color: AppColors.black.withOpacity(0.4)
+                                    //color: AppColors.black,
+                                    ),
+                              ],
                             ),
                           )
                         ],
@@ -228,9 +308,20 @@ class OptionsWidget extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/message.svg',
-                              color: AppColors.white,
+                            icon: Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: const Offset(0.0, 0.2),
+                                    blurRadius: 20,
+                                    color: AppColors.black.withOpacity(0.1),
+                                  ),
+                                ],
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/svgs/message.svg',
+                                color: AppColors.white,
+                              ),
                             ),
                             padding: const EdgeInsets.all(0),
                             constraints: const BoxConstraints(),
@@ -247,26 +338,60 @@ class OptionsWidget extends StatelessWidget {
               SizedBox(height: getScreenHeight(10)),
               ListTile(
                 contentPadding: const EdgeInsets.all(0),
-                title: Text(
-                  '@badguy',
-                  style: TextStyle(
-                    fontSize: getScreenHeight(17),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.white,
-                  ),
-                ),
-                subtitle: Text(
-                  "Girlie wanna play with a big playboy like me...\nOooof!",
-                  style: TextStyle(
-                    fontSize: getScreenHeight(14),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.white,
-                  ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '@badguy',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(17),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                        shadows: [
+                          Shadow(
+                              offset: const Offset(0.0, 0.2),
+                              blurRadius: 20,
+                              color: AppColors.black.withOpacity(0.4)
+                              //color: AppColors.black,
+                              ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: getScreenHeight(5)),
+                    Text(
+                      "Girlie wanna play with a big playboy like me...\nOooof!",
+                      style: TextStyle(
+                        fontSize: getScreenHeight(14),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                        shadows: [
+                          Shadow(
+                              offset: const Offset(0.0, 0.2),
+                              blurRadius: 20,
+                              color: AppColors.black.withOpacity(0.4)
+                              //color: AppColors.black,
+                              ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 trailing: IconButton(
-                  icon: SvgPicture.asset(
-                    'assets/svgs/pop-vertical.svg',
-                    color: AppColors.white,
+                  icon: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          offset: const Offset(0.0, 0.2),
+                          blurRadius: 20,
+                          color: AppColors.black.withOpacity(0.1),
+                        ),
+                      ],
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/svgs/pop-vertical.svg',
+                      color: AppColors.white,
+                    ),
                   ),
                   padding: const EdgeInsets.all(0),
                   constraints: const BoxConstraints(),
@@ -283,8 +408,19 @@ class OptionsWidget extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/svgs/music.svg',
+                        icon: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                offset: const Offset(0.0, 0.2),
+                                blurRadius: 20,
+                                color: AppColors.black.withOpacity(0.1),
+                              ),
+                            ],
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/svgs/music.svg',
+                          ),
                         ),
                         padding: const EdgeInsets.all(0),
                         constraints: const BoxConstraints(),
@@ -299,14 +435,21 @@ class OptionsWidget extends StatelessWidget {
                           fontSize: getScreenHeight(16),
                           color: AppColors.white,
                           fontWeight: FontWeight.w600,
+                          shadows: [
+                            Shadow(
+                                offset: const Offset(0.0, 0.2),
+                                blurRadius: 20,
+                                color: AppColors.black.withOpacity(0.4)
+                                //color: AppColors.black,
+                                ),
+                          ],
                         ),
                       )
                     ],
                   ),
-                  Image.asset('assets/images/music-cd.png')
                 ],
               ),
-              SizedBox(height: getScreenHeight(10)),
+              SizedBox(height: getScreenHeight(20)),
             ],
           ),
         )
@@ -349,8 +492,8 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void didChangeDependencies() {
-    _videoPlayerController = VideoPlayerController.asset(widget.src[0]);
-    loadController();
+    // _videoPlayerController = VideoPlayerController.asset(widget.src[0]);
+    // loadController();
     super.didChangeDependencies();
   }
 
@@ -384,8 +527,8 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   void dispose() {
-    _videoPlayerController!.dispose();
-    _chewieController!.dispose();
+    // _videoPlayerController!.dispose();
+    // _chewieController!.dispose();
     super.dispose();
   }
 
@@ -397,37 +540,30 @@ class _ContentScreenState extends State<ContentScreen> {
         Align(
           alignment: Alignment.topCenter,
           child: Container(
-            height: 50,
             width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                end: const Alignment(0.0, 0.4),
-                begin: const Alignment(0.0, -1),
-                colors: <Color>[
-                  const Color(0x8A000000),
-                  Colors.black12.withOpacity(0.0)
-                ],
-              ),
+            height: getScreenHeight(90),
+            decoration: const BoxDecoration(
+              color: AppColors.primaryColor,
             ),
           ),
         ),
-        //bottom grey shadow
         Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.topCenter,
           child: Container(
-            height: 50,
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                end: const Alignment(0.0, -1),
-                begin: const Alignment(0.0, 0.4),
-                stops: const [0.0, 1.0],
+                begin: const Alignment(0.0, 4),
+                end: const Alignment(0.0, -1.2),
                 colors: <Color>[
-                  const Color(0x8A000000),
+                  AppColors.black.withOpacity(0.5),
                   Colors.black12.withOpacity(0.0)
                 ],
               ),
             ),
+            // decoration: BoxDecoration(
+            //   color: AppColors.grey.withOpacity(0.14),
+            // )
           ),
         ),
         _chewieController != null &&

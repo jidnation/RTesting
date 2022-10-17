@@ -8,19 +8,29 @@ import 'package:reach_me/features/activity/widgets/week_notification_item.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
-class NotificationsScreen extends HookWidget {
+class NotificationsScreen extends StatefulHookWidget {
   static const String id = "notification_screen";
   const NotificationsScreen({Key? key}) : super(key: key);
 
   @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen>
+    with AutomaticKeepAliveClientMixin<NotificationsScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
     final changeState = useState<bool>(false);
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: GestureDetector(
-         // onTap: () => changeState.value = !changeState.value,
+          // onTap: () => changeState.value = !changeState.value,
           child: Container(
             width: size.width,
             height: size.height,
@@ -32,11 +42,9 @@ class NotificationsScreen extends HookWidget {
                   const CustomRoundTextField(
                     hintText: "Search notifications",
                     fillColor: AppColors.white,
-                    suffixIcon: Icon(Icons.search),
+                    //suffixIcon: Icon(Icons.search),
                   ),
                   const SizedBox(height: 20),
-                  
-
                   !changeState.value
                       ? const EmptyNotificationScreen()
                       : Column(

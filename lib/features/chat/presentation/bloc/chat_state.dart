@@ -9,8 +9,12 @@ class ChatLoading extends ChatState {}
 
 class ChatSending extends ChatState {}
 
-
 class UserUploadingImage extends ChatState {}
+
+class ChatUploadSuccess extends ChatState {
+  ChatUploadSuccess({this.imgUrl});
+  final String? imgUrl;
+}
 
 class ChatUploadError extends ChatState {
   ChatUploadError({this.error});
@@ -29,12 +33,17 @@ class DeleteThreadsSuccess extends ChatState {
 
 class GetThreadMessagesSuccess extends ChatState {
   GetThreadMessagesSuccess({this.chat});
-  final Chat? chat;
+  final List<Chat>? chat;
 }
 
 class ChatSendSuccess extends ChatState {
   ChatSendSuccess({this.chat});
   final Chat? chat;
+}
+
+class ChatStreamData extends ChatState {
+  ChatStreamData({this.data});
+  final Chat? data;
 }
 
 class ChatError extends ChatState {

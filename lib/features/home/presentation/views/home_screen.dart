@@ -1,9 +1,10 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/views/video_moment.dart';
@@ -22,197 +23,95 @@ class HomeScreen extends StatefulHookWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
-  void initState() {
-    globals.userBloc!
-        .add(GetUserProfileEvent(email: globals.loginResponse!.email));
-    setState(() {});
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final scaffoldKey =
+        useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
+    final pages = [
+      TimelineScreen(scaffoldKey: scaffoldKey.value),
+      SearchScreen(scaffoldKey: scaffoldKey.value),
+      const VideoMomentScreen(),
+      const NotificationsScreen(),
+      const AccountScreen(),
+    ];
+    useEffect(() {
+      globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
+      return null;
+    });
     final _currentIndex = useState<int>(0);
-    // useMemoized(() {
-    //   globals.userBloc!
-    //       .add(GetUserProfileEvent(email: globals.loginResponse!.email));
-    //   // globals.userBloc!
-    //   //     .add(FetchAllUsersByNameEvent(limit: 100, pageNumber: 1, query: ''));
-    // }, [globals.user!]);
-    return BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is UserData) {
-            globals.user = state.user;
-          }
-          // if (state is FetchUsersSuccess) {
-          //   globals.userList = state.user;
-          // }
-        },
-        builder: (context, state) {
-          return Scaffold(
-            drawer: const AppDrawer(),
-            body: IndexedStack(
-              children: const [
-                TimelineScreen(),
-                SearchScreen(),
-                VideoMomentScreen(),
-                NotificationsScreen(),
-                AccountScreen(),
-              ],
-              index: _currentIndex.value,
-            ),
-            bottomNavigationBar: BottomNavBar(currentIndex: _currentIndex),
-          );
-        });
+    final _pageController = usePageController(initialPage: _currentIndex.value);
+    Console.log('last seen', globals.user!.lastSeen);
+
+    int backPressCounter = 0;
+    bool onWillPop() {
+      if (_pageController.page!.round() == _pageController.initialPage){
+        if (backPressCounter < 1) {
+          Fluttertoast.showToast(msg: "Tap again to leave app",
+              backgroundColor: Colors.blue);
+          backPressCounter++;
+          Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+            backPressCounter--;
+          });
+          return false;
+        }
+        return true;
+      }
+      else {
+          _pageController.previousPage(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.linear,
+          ).then((index) => _currentIndex.value--);
+        return false;
+      }
+    }
+
+    return Scaffold(
+      drawer: const AppDrawer(),
+      key: scaffoldKey.value,
+      body: WillPopScope(
+        onWillPop: () => Future.sync(onWillPop),
+        child: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: pages,
+        ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex,
+        pageController: _pageController,
+      ),
+    );
   }
 }
 
-// class CustomBottomNav extends StatelessWidget {
-//   const CustomBottomNav({
-//     Key? key,
-//     required this.selectedMenu,
-//     required this.onChanged,
-//   }) : super(key: key);
-//   final Menu selectedMenu;
-//   final ValueChanged<int> onChanged;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     //for when the menu option is not clicked
-//     const inActiveIconColor = LGTTEXT;
-//     final isDark = Theme.of(context).brightness == Brightness.dark;
-//     return Container(
-//       height: getScreenHeight(99),
-//       padding: const EdgeInsets.symmetric(horizontal: 17),
-//       decoration: BoxDecoration(
-//         color: isDark ? Colors.grey.shade100 : const Color(0x80F7F7F7),
-//         boxShadow: [
-//           BoxShadow(
-//             offset: const Offset(0, -15),
-//             blurRadius: 20,
-//             color: isDark
-//                 ? const Color(0xFFDADADA).withOpacity(0.3)
-//                 : const Color(0xFFDADADA).withOpacity(0.15),
-//           ),
-//         ],
-//       ),
-//       child: SafeArea(
-//         top: false,
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceAround,
-//           children: [
-//             //home options
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/home.svg',
-//                       color: Menu.home == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(0),
-//                   ),
-//                   Text(
-//                     'Home',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.home == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //escrow option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/escrow.svg',
-//                       color: Menu.escrow == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(1),
-//                   ),
-//                   Text(
-//                     'Escrow',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.escrow == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //wallet option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: SvgPicture.asset(
-//                       'assets/svgs/wallet.svg',
-//                       color: Menu.wallet == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(2),
-//                   ),
-//                   Text(
-//                     'Wallet',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.wallet == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             //more option
-//             Expanded(
-//               child: Column(
-//                 children: [
-//                   IconButton(
-//                     icon: Icon(
-//                       Icons.more_horiz,
-//                       size: 20,
-//                       color: Menu.more == selectedMenu
-//                           ? PRYCOLOUR
-//                           : inActiveIconColor,
-//                     ),
-//                     onPressed: () => onChanged(3),
-//                   ),
-//                   Text(
-//                     'More',
-//                     style: GoogleFonts.rubik(
-//                       fontSize: getScreenWidth(12),
-//                       color: Menu.more == selectedMenu ? PRYCOLOUR : LGTTEXT,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
+// int backPressCounter = 0;
+// int backPressTotal = 2;
+//
+// Future<bool> onWillPop() {
+//   if (backPressCounter < 2) {
+//     Fluttertoast.showToast(msg: "Press ${backPressTotal - backPressCounter} time to exit app",
+//         backgroundColor: Colors.blue);
+//     backPressCounter++;
+//     Future.delayed(Duration(seconds: 1, milliseconds: 500), () {
+//       backPressCounter--;
+//     });
+//     return Future.value(false);
+//   } else {
+//     return Future.value(true);
 //   }
 // }
+
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     Key? key,
     required ValueNotifier<int> currentIndex,
+    required this.pageController,
   })  : _currentIndex = currentIndex,
         super(key: key);
 
   final ValueNotifier<int> _currentIndex;
+  final PageController pageController;
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +120,8 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: _currentIndex.value,
       onTap: (index) {
         _currentIndex.value = index;
-        if (index != 2) {}
+        pageController.jumpToPage(_currentIndex.value);
+        //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
       },
       selectedItemColor: AppColors.primaryColor,
@@ -230,38 +130,34 @@ class BottomNavBar extends StatelessWidget {
       showSelectedLabels: false,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/home-a.svg',
-              color: _currentIndex.value == 0
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 0
+              ? SvgPicture.asset('assets/svgs/home-active.svg')
+              : SvgPicture.asset('assets/svgs/home-a.svg',
+                  color: AppColors.blackShade3),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/search.svg',
-              color: _currentIndex.value == 1
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 1
+              ? SvgPicture.asset('assets/svgs/search-active.svg')
+              : SvgPicture.asset('assets/svgs/search.svg'),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/play.svg',
-              color: _currentIndex.value == 2
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 2
+              ? SvgPicture.asset('assets/svgs/moments-active.svg')
+              : SvgPicture.asset('assets/svgs/moments.svg'),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/notification.svg',
-              color: _currentIndex.value == 3
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 3
+              ? SvgPicture.asset('assets/svgs/notification-active.svg')
+              : SvgPicture.asset('assets/svgs/notification.svg'),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('assets/svgs/profile.svg',
-              color: _currentIndex.value == 4
-                  ? AppColors.primaryColor
-                  : AppColors.blackShade3),
+          icon: _currentIndex.value == 4
+              ? SvgPicture.asset('assets/svgs/profile-active.svg')
+              : SvgPicture.asset('assets/svgs/profile.svg'),
           label: '',
         ),
       ],

@@ -20,13 +20,15 @@ class ImagePlaceholder extends StatelessWidget {
       width: width,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        shape: BoxShape.circle,
-        border: border
-      ),
+          color: AppColors.primaryColor,
+          shape: BoxShape.circle,
+          border: border),
       child: FittedBox(
-        child: Image.asset('assets/images/blank-dp.png', fit: BoxFit.cover,)
-      ),
+          child: Image.asset(
+        'assets/images/blank-dp.png',
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+      )),
     );
   }
 }

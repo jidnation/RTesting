@@ -15,10 +15,11 @@ import 'package:reach_me/features/chat/data/models/chat.dart';
 // }
 
 class ChatRemoteDataSource {
-  ChatRemoteDataSource({GraphQLApiClient? client})
-      : _client = client ?? GraphQLApiClient();
-  final GraphQLApiClient _client;
+  ChatRemoteDataSource({GraphQLChatClient? client})
+      : _client = client ?? GraphQLChatClient();
+  final GraphQLChatClient _client;
 
+//send text message
   Future<Chat> sendTextMessage({
     required String? senderId,
     required String? receiverId,
@@ -59,14 +60,14 @@ class ChatRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('send chat message', result.data);
       return Chat.fromJson(result.data!['sendChatMessage']);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<Chat> getThreadMessages({
+//get thread messages {messages between two users}
+  Future<List<Chat>> getThreadMessages({
     required String? id,
     String? fromMessageId,
   }) async {
@@ -90,13 +91,17 @@ class ChatRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('get thread messages', result.data);
-      return Chat.fromJson(result.data!['getThreadMessages']);
+
+      var res = result.data!['getThreadMessages'] as List;
+      var data = res.map((e) => Chat.fromJson(e)).toList();
+      return data;
     } catch (e) {
       rethrow;
     }
   }
 
+
+//list of people you have chatted with.
   Future<List<ChatsThread>> getUserThreads({required String? id}) async {
     String q = r'''
         query getUserThreads($id: String!) {
@@ -132,6 +137,41 @@ class ChatRemoteDataSource {
       }
       Console.log('delete thread', result.data);
       return result.data!['deleteThread'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<QueryResult> subscribeToChats({required String? id}) {
+    Console.log('sub id', id);
+    String q = r'''
+          subscription messageAdded($id: String!) {
+            messageAdded(id: $id) {
+                _id
+                id
+                senderId
+                receiverId
+                receivers
+                type
+                value
+                threadId
+                sentAt
+                createdAt
+                updatedAt
+            }
+          }''';
+    try {
+      final result = _client.subscribe(gql(q), variables: {'id': id});
+      // result.listen((event) {
+      //   if (event.hasException) {
+      //     Console.log('subscription exception', event.exception);
+      //   } else if (event.isLoading) {
+      //     Console.log('subscription loading', event.isLoading);
+      //   } else {
+      //     Console.log('subscription data', event.data);
+      //   }
+      // });
+      return result;
     } catch (e) {
       rethrow;
     }

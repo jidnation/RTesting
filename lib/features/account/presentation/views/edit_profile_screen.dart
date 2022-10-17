@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,7 +18,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 class EditProfileScreen extends StatefulHookWidget {
   static const String id = "edit_profile_screen";
@@ -27,7 +29,7 @@ class EditProfileScreen extends StatefulHookWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  Future<XFile?> getImage(ImageSource source) async {
+  Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
       final imageFile = await _picker.pickImage(
@@ -38,7 +40,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (imageFile != null) {
-        return imageFile;
+        File image = File(imageFile.path);
+        return image;
       }
     } catch (e) {
       // print(e);
@@ -66,18 +69,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         listener: (context, state) {
           if (state is UserData) {
             globals.user = state.user;
-            RouteNavigators.pop(context);
           } else if (state is UsernameChangeSuccess) {
             globals.user = state.user;
-            RouteNavigators.pop(context);
           } else if (state is UserUploadProfilePictureSuccess) {
             globals.user = state.user;
           } else if (state is UserUploadError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
           if (state is UserError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
-          }
+            Snackbars.error(context, message: state.error);
+          } 
         },
         builder: (context, state) {
           bool _isLoading = state is UserLoading;
@@ -90,80 +91,88 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   clipBehavior: Clip.none,
                   children: <Widget>[
                     /// Banner image
-                    SizedBox(
-                      height: getScreenHeight(150),
-                      width: size.width,
-                      child: Image.network(
-                        'https://wallpaperaccess.com/full/3956728.jpg',
-                        fit: BoxFit.cover,
+                    GestureDetector(
+                      onTap: () {
+                        debugPrint('tapped on change cover photo ');
+                      },
+                      child: SizedBox(
+                        height: getScreenHeight(150),
+                        width: size.width,
+                        child: Image.asset(
+                          'assets/images/cover.png',
+                          fit: BoxFit.cover,
+                          gaplessPlayback: true,
+                        ),
                       ),
                     ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/back.svg',
-                              width: getScreenWidth(19),
-                              height: getScreenHeight(14),
-                              color: AppColors.white,
-                            ),
-                            onPressed: () => RouteNavigators.pop(context),
-                          ),
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/svgs/pop-vertical.svg',
-                              color: AppColors.white,
-                            ),
-                            onPressed: () async {
-                              //   await showKebabBottomSheet(context);
-                            },
-                            splashRadius: 20,
-                          )
-                        ]).paddingOnly(t: 25),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/back.svg',
+                                  width: getScreenWidth(19),
+                                  height: getScreenHeight(14),
+                                  color: AppColors.white,
+                                ),
+                                onPressed: () => RouteNavigators.pop(context),
+                              ),
+                              IconButton(
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/pop-vertical.svg',
+                                  color: AppColors.white,
+                                ),
+                                onPressed: () async {
+                                  //   await showKebabBottomSheet(context);
+                                },
+                                splashRadius: 20,
+                              )
+                            ]).paddingOnly(t: 25),
+                        GestureDetector(
+                          onTap: () async {
+                            final image = await getImage(ImageSource.gallery);
+                            if (image != null) {
+                              globals.userBloc!.add(
+                                  UploadUserProfilePictureEvent(file: image));
+                            }
+                          },
+                          child: globals.user!.profilePicture != null
+                              ? ProfilePicture(
+                                  height: getScreenHeight(100),
+                                  width: getScreenWidth(100),
+                                  border: Border.all(
+                                    color: Colors.grey.shade50,
+                                    width: 3.0,
+                                  ))
+                              : AbsorbPointer(
+                                  child: state is UserUploadingImage
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : state is UserUploadProfilePictureSuccess
+                                          ? ProfilePicture(
+                                              height: getScreenHeight(100),
+                                              width: getScreenWidth(100),
+                                              border: Border.all(
+                                                color: Colors.grey.shade50,
+                                                width: 3.0,
+                                              ))
+                                          : ImagePlaceholder(
+                                              width: getScreenWidth(100),
+                                              height: getScreenHeight(100),
+                                              border: Border.all(
+                                                color: Colors.grey.shade50,
+                                                width: 3.0,
+                                              ),
+                                            ),
+                                ),
+                        ),
+                      ],
+                    ),
 
                     //PROFILE PICTURE
-                    Positioned(
-                      top: getScreenHeight(100),
-                      child: GestureDetector(
-                        onTap: () async {
-                          final image = await getImage(ImageSource.gallery);
-                          if (image != null) {
-                            globals.userBloc!.add(
-                                UploadUserProfilePictureEvent(file: image));
-                          }
-                        },
-                        child: globals.user!.profilePicture != null
-                            ? ProfilePicture(
-                                height: getScreenHeight(100),
-                                width: getScreenWidth(100),
-                                border: Border.all(
-                                  color: Colors.grey.shade50,
-                                  width: 3.0,
-                                ))
-                            : AbsorbPointer(
-                                child: state is UserUploadingImage
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : state is UserUploadProfilePictureSuccess
-                                        ? ProfilePicture(
-                                            height: getScreenHeight(100),
-                                            width: getScreenWidth(100),
-                                            border: Border.all(
-                                              color: Colors.grey.shade50,
-                                              width: 3.0,
-                                            ))
-                                        : ImagePlaceholder(
-                                            width: getScreenWidth(100),
-                                            height: getScreenHeight(100),
-                                            border: Border.all(
-                                              color: Colors.grey.shade50,
-                                              width: 3.0,
-                                            ),
-                                          ),
-                              ),
-                      ),
-                    ),
 
                     //CHANGE COVER PHOTO
                     Positioned(
@@ -191,11 +200,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     //CHANGE PROFILE PHOTO
                     Positioned(
-                      top: getScreenHeight(165),
-                      right: getScreenWidth(155),
+                      top: getScreenHeight(145),
+                      right: getScreenWidth(164),
                       child: GestureDetector(
-                        onTap: () {
-                          debugPrint('tapped on change profile photo ');
+                        onTap: () async {
+                          final image = await getImage(ImageSource.gallery);
+                          if (image != null) {
+                            globals.userBloc!.add(
+                                UploadUserProfilePictureEvent(file: image));
+                          }
                         },
                         child: Container(
                             width: getScreenWidth(25),

@@ -5,7 +5,7 @@ class User {
   String? phone;
   String? token;
   String? id;
-  String? authId;
+  String? lastSeen;
   String? bio;
   DateTime? dateofBirth;
   String? coverPicture;
@@ -20,6 +20,7 @@ class User {
   int? nReachers;
   int? nReaching;
   int? nStaring;
+  ReachingRelationship? reaching;
 
   User({
     this.firstName,
@@ -28,7 +29,7 @@ class User {
     this.phone,
     this.token,
     this.id,
-    this.authId,
+    this.lastSeen,
     this.bio,
     this.dateofBirth,
     this.coverPicture,
@@ -43,11 +44,12 @@ class User {
     this.nReachers,
     this.nReaching,
     this.nStaring,
+    this.reaching,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["_id"],
-        authId: json["authId"],
+        lastSeen: json["lastSeen"],
+        id: json["authId"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         email: json["email"],
@@ -69,6 +71,9 @@ class User {
         nStaring: json["nStaring"],
         username: json["username"],
         verified: json["verified"],
+        reaching: json["reaching"] != null
+            ? ReachingRelationship.fromJson(json["reaching"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -77,8 +82,8 @@ class User {
         "email": email,
         "phone": phone,
         "token": token,
-        "_id": id,
-        "authId": authId,
+        "authId": id,
+        "lastSeen": lastSeen,
         "bio": bio,
         "dateOfBirth":
             dateofBirth != null ? dateofBirth!.toIso8601String() : null,
@@ -93,5 +98,58 @@ class User {
         "nReaching": nReaching,
         "nStaring": nStaring,
         "username": username,
+        "verified": verified,
+        "reaching": reaching!.toJson(),
+      };
+}
+
+class ChatUser {
+  ChatUser({
+    this.firstName,
+    this.id,
+    this.lastName,
+    this.profilePicture,
+    this.username,
+  });
+  String? id;
+  String? firstName;
+  String? lastName;
+  String? profilePicture;
+  String? username;
+
+  factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
+        id: json["id"],
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        profilePicture: json["profilePicture"],
+        username: json["username"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "firstName": firstName,
+        "lastName": lastName,
+        "profilePicture": profilePicture,
+        "username": username,
+      };
+}
+
+class ReachingRelationship {
+  ReachingRelationship({
+    this.reacherId,
+    this.reachingId,
+  });
+  String? reacherId;
+  String? reachingId;
+
+  factory ReachingRelationship.fromJson(Map<String, dynamic> json) =>
+      ReachingRelationship(
+        reacherId: json["reacherId"],
+        reachingId: json["reachingId"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "reacherId": reacherId,
+        "reachingId": reachingId,
       };
 }

@@ -4,5 +4,6 @@ class Endpoints {
 
   //chat api
   static const String graphQLChatUrl = "http://185.3.95.146:4400/graphql";
-  static const String gqlSubscriptionChatUrl = "ws:/185.3.95.146:4400/graphql";
+  static const String gqlSubscriptionChatUrl =
+      "wss://185.3.95.146:4400/graphql";
 }

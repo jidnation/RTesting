@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/routes/routes.dart';
@@ -11,10 +13,12 @@ import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'dart:io';
 
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
+import 'package:reach_me/firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initSingletons();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = AppBlocObserver();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -42,15 +46,17 @@ class MyApp extends StatelessWidget {
       child: GraphQLProvider(
         client: chatClientFor(),
         child: LifeCycleManager(
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'ReachMe',
-            theme: ThemeData(
-              fontFamily: 'Poppins',
-              primarySwatch: Colors.blue,
+          child: OverlaySupport.global(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'ReachMe',
+              theme: ThemeData(
+                fontFamily: 'Poppins',
+                primarySwatch: Colors.blue,
+              ),
+              initialRoute: SplashScreenAnimator.id,
+              onGenerateRoute: RMRouter.generateRoute,
             ),
-            initialRoute: SplashScreenAnimator.id,
-            onGenerateRoute: RMRouter.generateRoute,
           ),
         ),
       ),

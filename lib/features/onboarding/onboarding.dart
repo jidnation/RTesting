@@ -26,7 +26,7 @@ class OnboardingScreen extends StatelessWidget {
     RMOnboardingModel(
         title: 'Shoutout and Shoutdown posts',
         description:
-            'Be in control of your reachme ecosystem, decide reaches that are legible to stay',
+            'Be in control of your reachme ecosystem,\ndecide reaches that are legible to stay',
         titleColor: const Color(0xFF001533),
         descripColor: const Color(0xFF767474),
         imagePath: 'assets/svgs/onboarding-3.svg'),

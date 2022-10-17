@@ -20,6 +20,44 @@ class ProfilePicture extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey.shade50,
+      ),
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: CachedNetworkImage(
+          imageUrl: globals.user!.profilePicture ?? '',
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const ImagePlaceholder(),
+          errorWidget: (context, url, error) => const ImagePlaceholder(),
+        ),
+      ),
+    );
+  }
+}
+
+class RecipientProfilePicture extends StatelessWidget {
+  const RecipientProfilePicture({
+    Key? key,
+    this.height = 100,
+    this.width = 100,
+    this.border,
+    required this.imageUrl,
+  }) : super(key: key);
+  final double height, width;
+  final Border? border;
+  final String? imageUrl;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      padding: const EdgeInsets.all(3),
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
         //  border: border,
         shape: BoxShape.circle,
         color: Colors.grey.shade50,
@@ -30,8 +68,8 @@ class ProfilePicture extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: CachedNetworkImage(
-          imageUrl: globals.user!.profilePicture!,
-          fit: BoxFit.cover,
+          imageUrl: imageUrl ?? '',
+          //fit: BoxFit.cover,
           placeholder: (context, url) => const ImagePlaceholder(),
           errorWidget: (context, url, error) => const ImagePlaceholder(),
         ),

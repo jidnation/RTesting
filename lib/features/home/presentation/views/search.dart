@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,32 +13,40 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class SearchScreen extends HookWidget {
+class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
-  const SearchScreen({Key? key}) : super(key: key);
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  const SearchScreen({Key? key, this.scaffoldKey}) : super(key: key);
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin<SearchScreen> {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    final _scaffoldKey = useState(GlobalKey<ScaffoldState>());
+    super.build(context);
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      key: _scaffoldKey.value,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.grey.shade50,
         elevation: 0,
         leading: IconButton(
           padding: const EdgeInsets.all(0),
-          onPressed: () => _scaffoldKey.value.currentState!.openDrawer(),
+          onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
           icon: globals.user!.profilePicture == null
               ? ImagePlaceholder(
                   width: getScreenWidth(40),
@@ -51,14 +61,15 @@ class SearchScreen extends HookWidget {
           hintText: 'Search ReachMe',
           fillColor: AppColors.white,
           controller: _searchController,
+          maxLines: 1,
           onChanged: (val) {
             if (val.isNotEmpty) {
               _hasText.value = true;
               _searchString.value = val;
-              globals.userBloc!.add(FetchAllUsersByNameEvent(
-                limit: 20,
+              globals.socialServiceBloc!.add(SearchProfileEvent(
+                pageLimit: 20,
                 pageNumber: 1,
-                query: val,
+                name: val,
               ));
             } else {
               _hasText.value = false;
@@ -82,13 +93,13 @@ class SearchScreen extends HookWidget {
         height: size.height,
         child: !_hasText.value
             ? const SearchStories()
-            : BlocConsumer<UserBloc, UserState>(
-                bloc: globals.userBloc,
+            : BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
                 listener: (context, state) {
-                  if (state is FetchUsersSuccess) {
-                    globals.userList = state.user;
-                  } else if (state is UserError) {
-                    RMSnackBar.showErrorSnackBar(context, message: state.error);
+                  if (state is SearchProfileSuccess) {
+                    globals.userList = state.users!;
+                  } else if (state is SearchProfileError) {
+                    Snackbars.error(context, message: state.error);
                   }
                 },
                 builder: (context, state) {
@@ -109,9 +120,10 @@ class SearchScreen extends HookWidget {
                                 ' ' +
                                 globals.userList![index].lastName!)
                             .toTitleCase(),
-                        email: globals.userList![index].email,
+                        //: globals.userList![index].,
                         username: globals.userList![index].username,
                         imageUrl: globals.userList![index].profilePicture,
+                        id: globals.userList![index].authId,
                       );
                     },
                   );
@@ -166,61 +178,82 @@ class SearchResultCard extends StatelessWidget {
     required this.username,
     required this.displayName,
     required this.imageUrl,
-    required this.email,
+    // required this.email,
+    required this.id,
   }) : super(key: key);
 
   final String? imageUrl;
   final String? username;
   final String? displayName;
-  final String? email;
+  // final String? email;
+  final String? id;
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is RecipientUserData) {
-            globals.recipientUser = state.user;
-            //RouteNavigators.route(context, const RecipientAccountProfile());
-          } else if (state is UserError){
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
-          }
-        },
-        builder: (context, state) {
-          return InkWell(
-            onTap: () {
-              RouteNavigators.route(context, const RecipientAccountProfile());
-              globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-            },
-            child: ListTile(
-              leading: imageUrl == null
-                  ? ImagePlaceholder(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                    )
-                  : ProfilePicture(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                    ),
-              title: Text(
-                username ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: Text(
-                displayName ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2.withOpacity(0.7),
-                  fontWeight: FontWeight.w400,
-                ),
+      bloc: globals.userBloc,
+      listener: (context, state) {
+        if (state is RecipientUserData) {
+          globals.recipientUser = state.user;
+          //  email == globals.user!.email
+          //       ? RouteNavigators.route(context, const AccountScreen())
+          //       : RouteNavigators.route(
+          //           context, RecipientAccountProfile(email: email));
+        } else if (state is UserError) {
+          Snackbars.error(context, message: state.error);
+        }
+      },
+      builder: (context, state) {
+        if (state is UserLoading) {
+          return Center(
+              child: Platform.isIOS
+                  ? const CupertinoActivityIndicator()
+                  : const CircularProgressIndicator());
+        }
+        return InkWell(
+          onTap: () {
+            globals.userBloc!.add(GetRecipientProfileEvent(email: id));
+            id == globals.user!.id
+                ? RouteNavigators.route(context, const AccountScreen())
+                : RouteNavigators.route(
+                    context,
+                    RecipientAccountProfile(
+                      recipientEmail: 'email',
+                      recipientImageUrl: imageUrl,
+                      recipientId: id,
+                    ));
+          },
+          child: ListTile(
+            leading: imageUrl == null
+                ? ImagePlaceholder(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                  )
+                : RecipientProfilePicture(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                    imageUrl: imageUrl,
+                  ),
+            title: Text(
+              username ?? '',
+              style: TextStyle(
+                fontSize: getScreenHeight(15),
+                color: AppColors.textColor2,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          );
-        });
+            // subtitle: Text(
+            //   displayName ?? '',
+            //   style: TextStyle(
+            //     fontSize: getScreenHeight(15),
+            //     color: AppColors.textColor2.withOpacity(0.7),
+            //     fontWeight: FontWeight.w400,
+            //   ),
+            // ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -237,7 +270,10 @@ class SearchStories extends HookWidget {
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
               margin: const EdgeInsets.all(5.0),
-              child: Image.asset(item),
+              child: Image.asset(
+                item,
+                gaplessPlayback: true,
+              ),
             ))
         .toList();
     final _currentIndex = useState<int>(0);

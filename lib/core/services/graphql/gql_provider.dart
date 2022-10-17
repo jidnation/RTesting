@@ -50,11 +50,12 @@ ValueNotifier<GraphQLClient> clientFor() {
 //CHAT GQL CLIENT
 ValueNotifier<GraphQLClient> chatClientFor() {
   final HttpLink httpLink = HttpLink(
-    Endpoints.gqlSubscriptionChatUrl,
+    Endpoints.graphQLChatUrl,
     defaultHeaders: <String, String>{
       'Authorization': 'Bearer ${globals.token}',
     },
   );
+
   final AuthLink authLink = AuthLink(
     getToken: () => 'Bearer ${globals.token}',
   );
@@ -64,11 +65,12 @@ ValueNotifier<GraphQLClient> chatClientFor() {
   final WebSocketLink websocketLink = WebSocketLink(
     Endpoints.gqlSubscriptionChatUrl,
     config: SocketClientConfig(
-        autoReconnect: true,
-        inactivityTimeout: const Duration(minutes: 5),
-        delayBetweenReconnectionAttempts: const Duration(seconds: 1),
-        queryAndMutationTimeout: const Duration(seconds: 40),
-        initialPayload: () => {'Authorization': 'Bearer ${globals.token}'}),
+      autoReconnect: true,
+      inactivityTimeout: const Duration(minutes: 5),
+      delayBetweenReconnectionAttempts: const Duration(seconds: 1),
+      queryAndMutationTimeout: const Duration(seconds: 40),
+      initialPayload: () => {'Authorization': 'Bearer ${globals.token}'},
+    ),
   );
 
   link = link.concat(websocketLink);
@@ -80,4 +82,3 @@ ValueNotifier<GraphQLClient> chatClientFor() {
     ),
   );
 }
-

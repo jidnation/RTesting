@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -8,7 +9,6 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/forgot_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
@@ -19,14 +19,13 @@ import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 
 class LoginScreen extends HookWidget {
   static const String id = 'login_screen';
-  LoginScreen({Key? key}) : super(key: key);
-
-  final GlobalKey<FormState> _key = GlobalKey();
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final _emailController = useTextEditingController();
     final _passwordController = useTextEditingController();
+    final _key = useState<GlobalKey<FormState>>(GlobalKey());
     var size = MediaQuery.of(context).size;
     final _obscureText = useState(true);
     return Scaffold(
@@ -35,16 +34,13 @@ class LoginScreen extends HookWidget {
             bloc: globals.authBloc,
             listener: (context, state) {
               if (state is Authenticated) {
-                //TODO: CHANGE NAV TO HOME
                 RouteNavigators.route(context, const HomeScreen());
               } else if (state is AuthError) {
-                RMSnackBar.showErrorSnackBar(context, message: state.error);
+                Snackbars.error(context, message: state.error);
               }
             },
             builder: (context, state) {
-              if (state is AuthLoading) {
-                return const RLoader('');
-              }
+              bool _isLoading = state is AuthLoading;
               return SizedBox(
                 width: size.width,
                 height: size.height,
@@ -55,7 +51,7 @@ class LoginScreen extends HookWidget {
                       padding: const EdgeInsets.only(
                           left: 25.0, right: 25.0, top: 50.0, bottom: 30.0),
                       child: Form(
-                        key: _key,
+                        key: _key.value,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -64,56 +60,101 @@ class LoginScreen extends HookWidget {
                             SizedBox(height: getScreenHeight(35)),
                             SvgPicture.asset(
                               'assets/svgs/login.svg',
-                              width: size.width * 0.35,
+                              width: size.width * 0.60,
                             ),
                             SizedBox(height: getScreenHeight(35)),
-                            Text(
-                              'Welcome Back',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(20),
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textColor2,
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(15),
+                                  color: AppColors.textColor2,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 7),
-                            Text(
-                              'Login to your account',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(15),
-                                color: AppColors.textColor,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SizedBox(height: getScreenHeight(30)),
+                            SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
-                              hintText: 'Email',
+                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              isFilled: false,
+                              hintText: 'linda@framcreative.com',
                               keyboardType: TextInputType.emailAddress,
                               textCapitalization: TextCapitalization.none,
+                              hintStyle: TextStyle(
+                                color: Colors.black26,
+                                fontSize: getScreenHeight(15),
+                                fontWeight: FontWeight.w400,
+                              ),
                               validator: (value) =>
                                   Validator.validateEmail(value ?? ""),
                               controller: _emailController,
                             ),
-                            SizedBox(height: getScreenHeight(15)),
+                            SizedBox(height: getScreenHeight(30)),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    'Password',
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(15),
+                                      color: AppColors.textColor2,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text.rich(
+                                    TextSpan(
+                                      children: <InlineSpan>[
+                                        WidgetSpan(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5.0, right: 5.0),
+                                            child: GestureDetector(
+                                              onTap: () => _obscureText.value =
+                                                  !_obscureText.value,
+                                              child: _obscureText.value
+                                                  ? const Icon(
+                                                      Icons
+                                                          .visibility_off_outlined,
+                                                      size: 15,
+                                                      color: AppColors
+                                                          .textFieldLabelColor,
+                                                    )
+                                                  : const Icon(
+                                                      Icons.visibility,
+                                                      size: 15,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Show',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.textColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ]),
+                            SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
+                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              isFilled: false,
                               maxLines: 1,
-                              hintText: 'Password',
                               obscureText: _obscureText.value,
                               keyboardType: TextInputType.text,
                               controller: _passwordController,
                               textCapitalization: TextCapitalization.none,
-                              suffixIcon: GestureDetector(
-                                onTap: () =>
-                                    _obscureText.value = !_obscureText.value,
-                                child: _obscureText.value
-                                    ? const Icon(
-                                        Icons.visibility_off_outlined,
-                                        color: AppColors.textFieldLabelColor,
-                                      )
-                                    : const Icon(
-                                        Icons.visibility,
-                                        color: AppColors.primaryColor,
-                                      ),
-                              ),
                             ),
                             Align(
                               alignment: Alignment.centerRight,
@@ -131,7 +172,7 @@ class LoginScreen extends HookWidget {
                                 child: Text(
                                   'Forgot password',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(14),
+                                    fontSize: getScreenHeight(13),
                                     color: AppColors.textColor2,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -140,58 +181,27 @@ class LoginScreen extends HookWidget {
                             ),
                             SizedBox(height: getScreenHeight(20)),
                             CustomButton(
-                              label: 'Done',
-                              color: AppColors.textColor2,
-                              onPressed: () {
-                                if (_key.currentState!.validate()) {
-                                  globals.authBloc!.add(LoginUserEvent(
-                                    email: _emailController.text
-                                        .replaceAll(' ', ''),
-                                    password: _passwordController.text,
-                                  ));
-                                } else {
-                                  return;
-                                }
-                              },
+                              label: 'Login',
+                              color: AppColors.buttonColor,
+                              isLoading: _isLoading,
+                              loaderColor: AppColors.white,
+                              onPressed: !_isLoading
+                                  ? () {
+                                      if (_key.value.currentState!.validate()) {
+                                        globals.authBloc!.add(LoginUserEvent(
+                                          email: _emailController.text
+                                              .replaceAll(' ', ''),
+                                          password: _passwordController.text,
+                                        ));
+                                      } else {
+                                        return;
+                                      }
+                                    }
+                                  : () {},
                               size: size,
                               textColor: AppColors.white,
                               borderSide: BorderSide.none,
                             ),
-                            SizedBox(height: getScreenHeight(20)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Expanded(
-                                    child: Divider(
-                                        color: AppColors.black,
-                                        thickness: 0.5,
-                                        height: 0.5,
-                                        endIndent: 18.0)),
-                                Text('OR',
-                                    style: TextStyle(
-                                        color: AppColors.textColor,
-                                        fontSize: 9.5)),
-                                Expanded(
-                                    child: Divider(
-                                        color: AppColors.black,
-                                        thickness: 0.5,
-                                        height: 0.5,
-                                        indent: 18.0)),
-                              ],
-                            ),
-                            SizedBox(height: getScreenHeight(20)),
-                            CustomButton(
-                                label: 'Continue with Google',
-                                prefix: 'assets/svgs/google.svg',
-                                color: AppColors.white,
-                                onPressed: () => RouteNavigators.route(
-                                    context, const HomeScreen()),
-                                size: size,
-                                textColor: AppColors.textColor2,
-                                borderSide: const BorderSide(
-                                  width: 1,
-                                  color: AppColors.textColor2,
-                                )),
                             GestureDetector(
                               onTap: () => RouteNavigators.route(
                                 context,
@@ -200,18 +210,18 @@ class LoginScreen extends HookWidget {
                               child: RichText(
                                 textScaleFactor: 0.8,
                                 text: TextSpan(
-                                  text: "Don't have an acccount? ",
+                                  text: "Do not have an account? ",
                                   style: TextStyle(
                                     color: AppColors.textColor,
                                     fontFamily: 'Poppins',
-                                    fontSize: getScreenHeight(15),
+                                    fontSize: getScreenHeight(18),
                                   ),
                                   children: [
                                     TextSpan(
                                       text: 'Sign up',
                                       style: TextStyle(
                                         color: AppColors.primaryColor,
-                                        fontSize: getScreenHeight(15),
+                                        fontSize: getScreenHeight(18),
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.w500,
                                       ),
