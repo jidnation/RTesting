@@ -50,11 +50,13 @@ class _AccountScreenState extends State<AccountScreen>
   late final _commentsRefreshController = RefreshController();
   late final _savedPostsRefreshController = RefreshController();
   late final _likesRefreshController = RefreshController();
-
+  late final _shoutoutRefreshController = RefreshController();
+  late final _shoutdownRefreshController = RefreshController();
+  late final _shareRefreshController = RefreshController();
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
   }
 
   Set active = {};
@@ -134,7 +136,7 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     child: FittedBox(
                       child: Text(
-                        'Comments',
+                        'Likes',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontWeight: FontWeight.w400,
@@ -165,7 +167,7 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Likes',
+                    'Comments',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -194,11 +196,98 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Saved posts',
+                    'Shoutout',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
                       color: _tabController!.index == 3
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(4);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 4
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutdown',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 4
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(5);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 5
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Share',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 5
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(6);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 6
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 6
                           ? AppColors.white
                           : AppColors.textColor2,
                     ),
@@ -313,8 +402,7 @@ class _AccountScreenState extends State<AccountScreen>
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color:
-                                      AppColors.textColor2.withOpacity(0.5),
+                                  color: AppColors.textColor2.withOpacity(0.5),
                                 ),
                                 child: SvgPicture.asset(
                                   'assets/svgs/back.svg',
@@ -334,8 +422,7 @@ class _AccountScreenState extends State<AccountScreen>
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color:
-                                      AppColors.textColor2.withOpacity(0.5),
+                                  color: AppColors.textColor2.withOpacity(0.5),
                                 ),
                                 child: SvgPicture.asset(
                                   'assets/svgs/pop-vertical.svg',
@@ -389,12 +476,11 @@ class _AccountScreenState extends State<AccountScreen>
                           Row(
                             children: [
                               InkWell(
-                                onTap: () => RouteNavigators.route(context,
-                                    const AccountStatsInfo(index: 0)),
+                                onTap: () => RouteNavigators.route(
+                                    context, const AccountStatsInfo(index: 0)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       globals.user!.nReachers.toString(),
@@ -416,12 +502,11 @@ class _AccountScreenState extends State<AccountScreen>
                               ),
                               SizedBox(width: getScreenWidth(20)),
                               InkWell(
-                                onTap: () => RouteNavigators.route(context,
-                                    const AccountStatsInfo(index: 1)),
+                                onTap: () => RouteNavigators.route(
+                                    context, const AccountStatsInfo(index: 1)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       globals.user!.nReaching.toString(),
@@ -443,12 +528,11 @@ class _AccountScreenState extends State<AccountScreen>
                               ),
                               SizedBox(width: getScreenWidth(20)),
                               InkWell(
-                                onTap: () => RouteNavigators.route(context,
-                                    const AccountStatsInfo(index: 2)),
+                                onTap: () => RouteNavigators.route(
+                                    context, const AccountStatsInfo(index: 2)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       globals.user!.nStaring.toString(),
@@ -559,42 +643,6 @@ class _AccountScreenState extends State<AccountScreen>
                                   ),
                           ),
 
-                        //COMMENTS TAB
-                        if (_isLoadingComments)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _commentsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!
-                                  .add(GetPersonalCommentsEvent(
-                                pageLimit: 50,
-                                pageNumber: 1,
-                                authId: globals.user!.id,
-                              ));
-                            },
-                            child: _comments.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                          title:
-                                              'Comments you made on a post and comments made on your post',
-                                          subtitle:
-                                              'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _comments.value.length,
-                                    itemBuilder: (context, index) {
-                                      return _CommentReachCard(
-                                        commentModel: _comments.value[index],
-                                      );
-                                    },
-                                  ),
-                          ),
-
                         //LIKES TAB
                         if (_isLoadingLikes)
                           const CircularLoader()
@@ -602,9 +650,8 @@ class _AccountScreenState extends State<AccountScreen>
                           Refresher(
                             controller: _likesRefreshController,
                             onRefresh: () {
-                              globals.socialServiceBloc!.add(
-                                  GetLikedPostsEvent(
-                                      pageLimit: 50, pageNumber: 1));
+                              globals.socialServiceBloc!.add(GetLikedPostsEvent(
+                                  pageLimit: 50, pageNumber: 1));
                             },
                             child: _likedPosts.value.isEmpty
                                 ? ListView(
@@ -623,8 +670,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     itemBuilder: (context, index) {
                                       return PostFeedReacherCard(
                                         likingPost: false,
-                                        postFeedModel:
-                                            _likedPosts.value[index],
+                                        postFeedModel: _likedPosts.value[index],
                                         isLiked: _likedPosts
                                                 .value[index].like!.isNotEmpty
                                             ? true
@@ -635,8 +681,8 @@ class _AccountScreenState extends State<AccountScreen>
                                             : false,
                                         voteType: _likedPosts
                                                 .value[index].vote!.isNotEmpty
-                                            ? _likedPosts.value[index]
-                                                .vote![0].voteType
+                                            ? _likedPosts
+                                                .value[index].vote![0].voteType
                                             : null,
                                         onMessage: () {
                                           //  reachDM.value = true;
@@ -695,7 +741,147 @@ class _AccountScreenState extends State<AccountScreen>
                                     },
                                   ),
                           ),
+                        //COMMENTS TAB
+                        if (_isLoadingComments)
+                          const CircularLoader()
+                        else
+                          Refresher(
+                            controller: _commentsRefreshController,
+                            onRefresh: () {
+                              globals.socialServiceBloc!
+                                  .add(GetPersonalCommentsEvent(
+                                pageLimit: 50,
+                                pageNumber: 1,
+                                authId: globals.user!.id,
+                              ));
+                            },
+                            child: _comments.value.isEmpty
+                                ? ListView(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                          title:
+                                              'Comments you made on a post and comments made on your post',
+                                          subtitle:
+                                              'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    itemCount: _comments.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _CommentReachCard(
+                                        commentModel: _comments.value[index],
+                                      );
+                                    },
+                                  ),
+                          ),
 
+                        //SHOUTOUTS TAB
+                        if (_isLoadingComments)
+                          const CircularLoader()
+                        else
+                          Refresher(
+                            controller: _shoutoutRefreshController,
+                            onRefresh: () {
+                              globals.socialServiceBloc!
+                                  .add(GetPersonalCommentsEvent(
+                                pageLimit: 50,
+                                pageNumber: 1,
+                                authId: globals.user!.id,
+                              ));
+                            },
+                            child: _comments.value.isEmpty
+                                ? ListView(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                          title:
+                                              "Posts you've shouted out and your posts that has been shouted out",
+                                          subtitle:
+                                              "See posts you've shouted out and your post that has been shouted out")
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    itemCount: _comments.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _CommentReachCard(
+                                        commentModel: _comments.value[index],
+                                      );
+                                    },
+                                  ),
+                          ),
+
+                        //SHOUTDOWN TAB
+                        if (_isLoadingComments)
+                          const CircularLoader()
+                        else
+                          Refresher(
+                            controller: _shoutdownRefreshController,
+                            onRefresh: () {
+                              globals.socialServiceBloc!
+                                  .add(GetPersonalCommentsEvent(
+                                pageLimit: 50,
+                                pageNumber: 1,
+                                authId: globals.user!.id,
+                              ));
+                            },
+                            child: _comments.value.isEmpty
+                                ? ListView(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                          title:
+                                              "Posts you've shouted down and your posts that has been shouted down",
+                                          subtitle:
+                                              "See posts you've shouted down and your post that has been shouted down")
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    itemCount: _comments.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _CommentReachCard(
+                                        commentModel: _comments.value[index],
+                                      );
+                                    },
+                                  ),
+                          ),
+
+                        //SHARE TAB
+                        if (_isLoadingComments)
+                          const CircularLoader()
+                        else
+                          Refresher(
+                            controller: _shareRefreshController,
+                            onRefresh: () {
+                              globals.socialServiceBloc!
+                                  .add(GetPersonalCommentsEvent(
+                                pageLimit: 50,
+                                pageNumber: 1,
+                                authId: globals.user!.id,
+                              ));
+                            },
+                            child: _comments.value.isEmpty
+                                ? ListView(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                          title: "Post you shared",
+                                          subtitle: "Find post you've shared")
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    itemCount: _comments.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _CommentReachCard(
+                                        commentModel: _comments.value[index],
+                                      );
+                                    },
+                                  ),
+                          ),
                         //SAVED POSTS TAB
                         if (_isLoadingSavedPosts)
                           const CircularLoader()
@@ -730,8 +916,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             globals.socialServiceBloc!.add(
                                                 DeleteSavedPostEvent(
                                                     postId: _savedPosts
-                                                        .value[index]
-                                                        .postId));
+                                                        .value[index].postId));
                                           }
                                         },
                                       );

@@ -1,4 +1,5 @@
 import 'dart:io';
+//import 'dart:js_util';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -143,9 +144,10 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.location == 'NIL'
-                                      ? ''
-                                      : globals.location!,
+                                  globals.user!.showLocation! ? globals.location! : '',
+                                  // globals.location == 'NIL'
+                                  //     ? ''
+                                  //     : globals.location!
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
