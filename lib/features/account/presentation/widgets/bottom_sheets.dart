@@ -424,17 +424,17 @@ Future showUserStoryBottomSheet(BuildContext context,
                                 globals.userBloc!.add(
                                     StarUserEvent(userIdToStar: status.authId));
                               }),
-                          KebabBottomTextButton(
-                              label: 'Copy link',
-                              onPressed: () {
-                                // RouteNavigators.pop(context);
-                                // Clipboard.setData(ClipboardData(
-                                //     text: status.profileModel.));
-                                // Snackbars.success(context,
-                                //     message: 'Link copied to clipboard');
-                              }),
-                          KebabBottomTextButton(
-                              label: 'Share', onPressed: () {}),
+                          // KebabBottomTextButton(
+                          //     label: 'Copy link',
+                          //     onPressed: () {
+                          //       // RouteNavigators.pop(context);
+                          //       // Clipboard.setData(ClipboardData(
+                          //       //     text: status.profileModel.));
+                          //       // Snackbars.success(context,
+                          //       //     message: 'Link copied to clipboard');
+                          //     }),
+                          // KebabBottomTextButton(
+                          //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
                               label: 'Mute', onPressed: () {}),
                         ],
