@@ -34,6 +34,7 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -610,9 +611,11 @@ class PostFeedReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("Post created: ${postFeedModel!.createdAt.toString()}");
+    final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     final size = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.only(
+      padding: EdgeInsets.only( 
         right: getScreenWidth(15),
         left: getScreenWidth(15),
         bottom: getScreenHeight(16),
@@ -684,21 +687,37 @@ class PostFeedReacherCard extends HookWidget {
                                   : const SizedBox.shrink()
                             ],
                           ),
-                          postFeedModel!.post!.location == null ||
-                                  postFeedModel!.post!.location == 'NIL'
-                              ? const SizedBox.shrink()
-                              : Text(
-                                  postFeedModel!.post!.location ?? 'Somewhere',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
-                                  ),
+                          Row(
+                            children: [
+                              postFeedModel!.post!.location == null ||
+                                      postFeedModel!.post!.location == 'NIL'
+                                  ? const SizedBox.shrink()
+                                  : Text(
+                                    globals.user!.showLocation! ? postFeedModel!.post!.location! : 'Somewhere',
+                                      // postFeedModel!.post!.location ??
+                                      //     'Somewhere',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                              Text(
+                                postDuration,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(10),
+                                  fontFamily: 'Poppins',
+                                  letterSpacing: 0.4,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
                                 ),
+                              ).paddingOnly(l: 6),
+                            ],
+                          )
                         ],
-                      ).paddingOnly(t: 10),
+                      ). paddingOnly(t: 10),
                     ],
                   ),
                 ),
