@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -211,6 +212,10 @@ class _PostReachState extends State<PostReach> {
                       onChanged: (val) {
                         counter.value =
                             val.trim().split(RegexUtil.spaceOrNewLine).length;
+                        if (counter.value >= 200) {
+                          Snackbars.error(context,
+                              message: '200 words limit reached!');
+                        }
                       },
                       decoration: const InputDecoration(
                         counterText: '',

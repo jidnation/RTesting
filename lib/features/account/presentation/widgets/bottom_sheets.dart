@@ -6,15 +6,16 @@ import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:share_plus/share_plus.dart';
 
 Future showProfileMenuBottomSheet(BuildContext context,
     {required User user, bool isStarring = false}) {
@@ -175,106 +176,124 @@ Future showReacherCardBottomSheet(BuildContext context,
         },
         builder: (context, state) {
           bool _isLoading = state is GetPostLoading;
-          return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.greyShade7,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-              ),
-              child: ListView(shrinkWrap: true, children: [
-                Center(
-                  child: Container(
-                      height: getScreenHeight(4),
-                      width: getScreenWidth(58),
-                      decoration: BoxDecoration(
-                          color: AppColors.greyShade4,
-                          borderRadius: BorderRadius.circular(40))),
-                ).paddingOnly(t: 23),
-                SizedBox(height: getScreenHeight(20)),
-                if (postFeedModel.postOwnerId != postFeedModel.feedOwnerId)
-                  Column(
-                    children: [
-                      KebabBottomTextButton(
-                          label: 'Share post', onPressed: () {}),
-                      KebabBottomTextButton(
-                          label: 'Save post',
-                          onPressed: () {
-                            globals.socialServiceBloc!.add(
-                                SavePostEvent(postId: postFeedModel.postId));
-                          }),
-                      KebabBottomTextButton(
-                        label: 'Report',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                        },
-                      ),
-                      KebabBottomTextButton(
-                        label: 'Reach user',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                        },
-                      ),
-                      KebabBottomTextButton(
-                        label: 'Star user',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                        },
-                      ),
-                      KebabBottomTextButton(
-                        label: 'Copy link',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                          Clipboard.setData(ClipboardData(
-                              text: postFeedModel.post!.postSlug!));
-                          Snackbars.success(context,
-                              message: 'Link copied to clipboard');
-                        },
-                      ),
-                    ],
-                  )
-                else
-                  Column(
-                    children: [
-                      KebabBottomTextButton(
-                          label: 'Edit content',
-                          isLoading: _isLoading,
-                          onPressed: () {
-                            globals.socialServiceBloc!.add(
-                                GetPostEvent(postId: postFeedModel.postId));
-                          }),
-                      KebabBottomTextButton(
-                          label: 'Delete post',
-                          onPressed: () {
-                            globals.socialServiceBloc!.add(
-                                DeletePostEvent(postId: postFeedModel.postId));
-                            RouteNavigators.pop(context);
-                          }),
-                      KebabBottomTextButton(
-                        label: 'Share Post',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                          Clipboard.setData(ClipboardData(
-                              text: postFeedModel.post!.postSlug!));
-                          Snackbars.success(context,
-                              message: 'Link copied to clipboard');
-                        },
-                      ),
-                      KebabBottomTextButton(
-                        label: 'Copy link',
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                          Clipboard.setData(ClipboardData(
-                              text: postFeedModel.post!.postSlug!));
-                          Snackbars.success(context,
-                              message: 'Link copied to clipboard');
-                        },
-                      ),
-                    ],
+          return BlocConsumer<UserBloc, UserState>(
+            bloc: globals.userBloc,
+            listener: (context, state) {
+              if (state is UserLoading) {}
+              if (state is UserError) {
+                RouteNavigators.pop(context);
+                Snackbars.error(context, message: state.error);
+              }
+            },
+            builder: (context, state) {
+              return Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.greyShade7,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
                   ),
-                SizedBox(height: getScreenHeight(20)),
-              ]));
+                  child: ListView(shrinkWrap: true, children: [
+                    Center(
+                      child: Container(
+                          height: getScreenHeight(4),
+                          width: getScreenWidth(58),
+                          decoration: BoxDecoration(
+                              color: AppColors.greyShade4,
+                              borderRadius: BorderRadius.circular(40))),
+                    ).paddingOnly(t: 23),
+                    SizedBox(height: getScreenHeight(20)),
+                    if (postFeedModel.postOwnerId != postFeedModel.feedOwnerId)
+                      Column(
+                        children: [
+                          KebabBottomTextButton(
+                              label: 'Share post',
+                              onPressed: () {
+                                RouteNavigators.pop(context);
+                                Share.share(postFeedModel.post!.postSlug!);
+                              }),
+                          KebabBottomTextButton(
+                              label: 'Save post',
+                              onPressed: () {
+                                globals.socialServiceBloc!.add(SavePostEvent(
+                                    postId: postFeedModel.postId));
+                              }),
+                          KebabBottomTextButton(
+                            label: 'Report',
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                            },
+                          ),
+                          KebabBottomTextButton(
+                            label: 'Reach user',
+                            onPressed: () {
+                              globals.showLoader(context);
+                              globals.userBloc!.add(ReachUserEvent(
+                                  userIdToReach: postFeedModel.postOwnerId));
+                            },
+                          ),
+                          KebabBottomTextButton(
+                            label: 'Star user',
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                            },
+                          ),
+                          KebabBottomTextButton(
+                            label: 'Copy link',
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                              Clipboard.setData(ClipboardData(
+                                  text: postFeedModel.post!.postSlug!));
+                              Snackbars.success(context,
+                                  message: 'Link copied to clipboard');
+                            },
+                          ),
+                        ],
+                      )
+                    else
+                      Column(
+                        children: [
+                          KebabBottomTextButton(
+                              label: 'Edit content',
+                              isLoading: _isLoading,
+                              onPressed: () {
+                                globals.socialServiceBloc!.add(
+                                    GetPostEvent(postId: postFeedModel.postId));
+                              }),
+                          KebabBottomTextButton(
+                              label: 'Delete post',
+                              onPressed: () {
+                                globals.socialServiceBloc!.add(DeletePostEvent(
+                                    postId: postFeedModel.postId));
+                                RouteNavigators.pop(context);
+                              }),
+                          KebabBottomTextButton(
+                            label: 'Share Post',
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                              Clipboard.setData(ClipboardData(
+                                  text: postFeedModel.post!.postSlug!));
+                              Snackbars.success(context,
+                                  message: 'Link copied to clipboard');
+                            },
+                          ),
+                          KebabBottomTextButton(
+                            label: 'Copy link',
+                            onPressed: () {
+                              RouteNavigators.pop(context);
+                              Clipboard.setData(ClipboardData(
+                                  text: postFeedModel.post!.postSlug!));
+                              Snackbars.success(context,
+                                  message: 'Link copied to clipboard');
+                            },
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: getScreenHeight(20)),
+                  ]));
+            },
+          );
         },
       );
     },
@@ -291,40 +310,48 @@ Future showStoryBottomSheet(BuildContext context,
         bloc: globals.socialServiceBloc,
         listener: (context, state) {},
         builder: (context, state) {
-          return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.greyShade7,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-              ),
-              child: ListView(shrinkWrap: true, children: [
-                Center(
-                  child: Container(
-                      height: getScreenHeight(4),
-                      width: getScreenWidth(58),
-                      decoration: BoxDecoration(
-                          color: AppColors.greyShade4,
-                          borderRadius: BorderRadius.circular(40))),
-                ).paddingOnly(t: 23),
-                SizedBox(height: getScreenHeight(20)),
-                Column(
-                  children: [
-                    KebabBottomTextButton(
-                      label: 'Report',
-                      onPressed: () {},
-                      color: const Color(0xFFE50101),
+          return BlocConsumer<UserBloc, UserState>(
+            bloc: globals.userBloc,
+            listener: (context, state) {},
+            builder: (context, state) {
+              return Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.greyShade7,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
                     ),
-                    KebabBottomTextButton(label: 'Reach', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Star user', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Copy link', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Share', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Mute', onPressed: () {}),
-                  ],
-                ),
-                SizedBox(height: getScreenHeight(20)),
-              ]));
+                  ),
+                  child: ListView(shrinkWrap: true, children: [
+                    Center(
+                      child: Container(
+                          height: getScreenHeight(4),
+                          width: getScreenWidth(58),
+                          decoration: BoxDecoration(
+                              color: AppColors.greyShade4,
+                              borderRadius: BorderRadius.circular(40))),
+                    ).paddingOnly(t: 23),
+                    SizedBox(height: getScreenHeight(20)),
+                    Column(
+                      children: [
+                        KebabBottomTextButton(
+                          label: 'Report',
+                          onPressed: () {},
+                          color: const Color(0xFFE50101),
+                        ),
+                        KebabBottomTextButton(label: 'Reach', onPressed: () {}),
+                        KebabBottomTextButton(
+                            label: 'Star user', onPressed: () {}),
+                        KebabBottomTextButton(
+                            label: 'Copy link', onPressed: () {}),
+                        KebabBottomTextButton(label: 'Share', onPressed: () {}),
+                        KebabBottomTextButton(label: 'Mute', onPressed: () {}),
+                      ],
+                    ),
+                    SizedBox(height: getScreenHeight(20)),
+                  ]));
+            },
+          );
         },
       );
     },
@@ -341,40 +368,80 @@ Future showUserStoryBottomSheet(BuildContext context,
         bloc: globals.socialServiceBloc,
         listener: (context, state) {},
         builder: (context, state) {
-          return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.greyShade7,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
-                ),
-              ),
-              child: ListView(shrinkWrap: true, children: [
-                Center(
-                  child: Container(
-                      height: getScreenHeight(4),
-                      width: getScreenWidth(58),
-                      decoration: BoxDecoration(
-                          color: AppColors.greyShade4,
-                          borderRadius: BorderRadius.circular(40))),
-                ).paddingOnly(t: 23),
-                SizedBox(height: getScreenHeight(20)),
-                Column(
-                  children: [
-                    KebabBottomTextButton(
-                      label: 'Report',
-                      onPressed: () {},
-                      color: const Color(0xFFE50101),
+          return BlocConsumer<UserBloc, UserState>(
+              bloc: globals.userBloc,
+              listener: (context, state) {
+                if (state is UserLoading) {}
+                if (state is UserError) {
+                  RouteNavigators.pop(context);
+                  RouteNavigators.pop(context);
+                  Snackbars.error(context, message: state.error);
+                }
+                if (state is StarUserSuccess) {
+                  RouteNavigators.pop(context);
+                  RouteNavigators.pop(context);
+                  Snackbars.success(context,
+                      message: 'User starred successfully!');
+                }
+              },
+              builder: (context, state) {
+                return Container(
+                    decoration: const BoxDecoration(
+                      color: AppColors.greyShade7,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
                     ),
-                    KebabBottomTextButton(label: 'Reach', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Star user', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Copy link', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Share', onPressed: () {}),
-                    KebabBottomTextButton(label: 'Mute', onPressed: () {}),
-                  ],
-                ),
-                SizedBox(height: getScreenHeight(20)),
-              ]));
+                    child: ListView(shrinkWrap: true, children: [
+                      Center(
+                        child: Container(
+                            height: getScreenHeight(4),
+                            width: getScreenWidth(58),
+                            decoration: BoxDecoration(
+                                color: AppColors.greyShade4,
+                                borderRadius: BorderRadius.circular(40))),
+                      ).paddingOnly(t: 23),
+                      SizedBox(height: getScreenHeight(20)),
+                      Column(
+                        children: [
+                          KebabBottomTextButton(
+                            label: 'Report',
+                            onPressed: () {},
+                            color: const Color(0xFFE50101),
+                          ),
+                          KebabBottomTextButton(
+                              label: 'Reach',
+                              onPressed: () {
+                                globals.showLoader(context);
+                                globals.userBloc!.add(ReachUserEvent(
+                                    userIdToReach: status.authId));
+                              }),
+                          KebabBottomTextButton(
+                              label: 'Star user',
+                              onPressed: () {
+                                globals.showLoader(context);
+                                globals.userBloc!.add(
+                                    StarUserEvent(userIdToStar: status.authId));
+                              }),
+                          // KebabBottomTextButton(
+                          //     label: 'Copy link',
+                          //     onPressed: () {
+                          //       // RouteNavigators.pop(context);
+                          //       // Clipboard.setData(ClipboardData(
+                          //       //     text: status.profileModel.));
+                          //       // Snackbars.success(context,
+                          //       //     message: 'Link copied to clipboard');
+                          //     }),
+                          // KebabBottomTextButton(
+                          //     label: 'Share', onPressed: () {}),
+                          KebabBottomTextButton(
+                              label: 'Mute', onPressed: () {}),
+                        ],
+                      ),
+                      SizedBox(height: getScreenHeight(20)),
+                    ]));
+              });
         },
       );
     },

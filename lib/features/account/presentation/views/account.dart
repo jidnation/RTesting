@@ -12,7 +12,9 @@ import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
@@ -25,8 +27,6 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -215,6 +215,7 @@ class _AccountScreenState extends State<AccountScreen>
   double width = getScreenWidth(100);
   double height = getScreenHeight(100);
   ScrollController scrollViewController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);

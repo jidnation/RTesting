@@ -383,10 +383,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                 .value[index]
                                                                 .status![0]
                                                                 .statusCreatorModel!
-                                                                .profilePicture!,
+                                                                .profilePicture,
                                                             username: _userStatus
                                                                 .value[index]
-                                                                .status![index]
+                                                                .status![0]
                                                                 .statusCreatorModel!
                                                                 .username!,
                                                             onTap: () {
@@ -402,9 +402,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             },
                                                           ),
                                                         ),
-                                                        // ..._userStatus.value.map(
-                                                        //   (e) =>
-                                                        // ),
                                                       ],
                                                     ),
                                                   ).paddingOnly(l: 11),
@@ -1260,7 +1257,7 @@ class UserStory extends StatelessWidget {
     required this.isMe,
     required this.username,
     required this.hasWatched,
-    required this.image,
+    this.image,
     this.isMeOnTap,
     this.onTap,
   }) : super(key: key);
@@ -1270,7 +1267,7 @@ class UserStory extends StatelessWidget {
   final bool isLive;
   final bool hasWatched;
   final String username;
-  final String image;
+  final String? image;
   final Function()? isMeOnTap;
   final Function()? onTap;
 

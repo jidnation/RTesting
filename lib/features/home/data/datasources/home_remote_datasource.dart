@@ -1,11 +1,12 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
-import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -1416,9 +1417,16 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('get status feed', result.data);
-      return (result.data!['getStatusFeed'] as List)
+      final tempList = (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedModel.fromJson(e))
           .toList();
+      final groupedList =
+          tempList.first.status!.groupBy((item) => item.status!.authId!);
+      List<StatusFeedModel> list = [];
+      groupedList.forEach((key, value) {
+        list.add(StatusFeedModel(id: key, status: value.toList()));
+      });
+      return list;
     } catch (e) {
       rethrow;
     }
