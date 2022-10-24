@@ -161,7 +161,7 @@ class _TimelineScreenState extends State<TimelineScreen>
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is RecipientUserData) {
-                reachDM.value = false;
+                // reachDM.value = false;
                 if (reachDM.value) {
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
