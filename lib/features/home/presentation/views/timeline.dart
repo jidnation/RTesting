@@ -1364,11 +1364,14 @@ class UserStory extends StatelessWidget {
           isLive
               ? SizedBox(height: getScreenHeight(7))
               : SizedBox(height: getScreenHeight(11)),
-          Text(username,
+          Text(
+              (username.length > 11
+                  ? '${username.substring(0, 11)}...'
+                  : username),
               style: TextStyle(
-                fontSize: getScreenHeight(11),
-                fontWeight: FontWeight.w400,
-              ))
+                  fontSize: getScreenHeight(11),
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis))
         ],
       ).paddingOnly(r: 25),
     );

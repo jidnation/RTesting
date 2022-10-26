@@ -1069,6 +1069,7 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+      print(result.toString());
 
       return (result.data!['getAllCommentsOnPost'] as List)
           .map((e) => CommentModel.fromJson(e))
