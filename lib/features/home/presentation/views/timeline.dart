@@ -221,6 +221,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is VotePostSuccess) {
+                    // if (!(state.isVoted!)) {
+                    //   Snackbars.success(context,
+                    //       message: 'You shouted down on this post');
+                    // }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
                   }
@@ -468,7 +472,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onUpvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {
@@ -486,7 +489,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onDownvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {

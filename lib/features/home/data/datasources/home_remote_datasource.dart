@@ -848,7 +848,7 @@ class HomeRemoteDataSource {
         'postId': postId,
         'voteType': voteType,
       });
-
+      // print('RESULTSSS: ' + result.toString());
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
