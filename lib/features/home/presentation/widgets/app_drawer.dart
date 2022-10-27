@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -14,7 +13,6 @@ import 'package:reach_me/features/account/presentation/views/account.details.dar
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
-import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -105,7 +103,7 @@ class AppDrawer extends HookWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: getScreenHeight(2)),
+                    SizedBox(height: getScreenHeight(0.5)),
                     Row(
                       children: [
                         InkWell(

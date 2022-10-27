@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
               Center(
                 child: SvgPicture.asset(
                   'assets/svgs/Sign Up.svg',
-                  height: 186,
+                  height: 250,
                   width: 290,
                 ),
               ),

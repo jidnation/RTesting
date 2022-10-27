@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
@@ -41,21 +42,11 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    final _tabController = useTabController(initialLength: 2);
+    final _tabController = useTabController(initialLength: 2, initialIndex: 0);
     final usersList = useState<List<ChatUser>>([]);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
-
-    setState(() {
-      _tabController.addListener(() {
-        if (_tabController.index == 0) {
-          _tabController.animateTo(0);
-        } else {
-          _tabController.animateTo(1);
-        }
-      });
-    });
-
+    
     useMemoized(() {
       globals.chatBloc!.add(GetUserThreadsEvent(id: globals.user!.id));
     });
@@ -151,10 +142,15 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                         alignment: Alignment.bottomCenter,
                         children: <Widget>[
                           TabBar(
+                            isScrollable: false,
                             indicatorWeight: 1.5,
                             indicatorColor: Colors.transparent,
-                            unselectedLabelColor: AppColors.greyShade4,
-                            labelColor: AppColors.textColor2,
+                            unselectedLabelColor: AppColors.textColor2,
+                            labelColor: AppColors.white,
+                            indicator: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              color: AppColors.textColor2,
+                            ),
                             controller: _tabController,
                             tabs: [
                               Tab(
@@ -162,25 +158,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                   onTap: () => setState(() {
                                     _tabController.animateTo(0);
                                   }),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: _tabController.index == 0
-                                          ? AppColors.textColor2
-                                          : Colors.transparent,
-                                    ),
-                                    child: FittedBox(
-                                      child: Text(
-                                        'General Reachout',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          fontWeight: FontWeight.w400,
-                                          color: _tabController.index == 0
-                                              ? AppColors.white
-                                              : AppColors.textColor2,
-                                        ),
+                                  child: FittedBox(
+                                    child: Text(
+                                      'General Reachout',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        fontWeight: FontWeight.w400,
+                                        
                                       ),
                                     ),
                                   ),
@@ -191,25 +175,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                   onTap: () => setState(() {
                                     _tabController.animateTo(1);
                                   }),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: _tabController.index == 1
-                                          ? AppColors.textColor2
-                                          : Colors.transparent,
-                                    ),
-                                    child: FittedBox(
-                                      child: Text(
-                                        'Starred Reachout',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          fontWeight: FontWeight.w400,
-                                          color: _tabController.index == 1
-                                              ? AppColors.white
-                                              : AppColors.textColor2,
-                                        ),
+                                  child: FittedBox(
+                                    child: Text(
+                                      'Starred Reachout',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        fontWeight: FontWeight.w400,
+                                        
                                       ),
                                     ),
                                   ),
@@ -224,7 +196,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                               .paddingOnly(t: 10)
                           : const SizedBox.shrink(),
                       _isLoading
-                          ? const Center(
+                          ? const Center( 
                               child: SizedBox(
                                 height: 20,
                                 width: 20,

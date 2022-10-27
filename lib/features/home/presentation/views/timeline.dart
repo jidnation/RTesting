@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:location/location.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
+import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -120,8 +121,16 @@ class _TimelineScreenState extends State<TimelineScreen>
         shadowColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
-            icon: Helper.renderProfilePicture(globals.user!.profilePicture)),
+          onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
+          icon: SizedBox(
+            height: 30,
+            width: 30,
+            child: ProfilePicture(
+              height: getScreenHeight(50),
+              width: getScreenWidth(50),
+            ),
+          ),
+        ),
         titleSpacing: 5,
         leadingWidth: getScreenWidth(70),
         title: Text(
@@ -315,104 +324,107 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         _isLoading
                                             ? const LinearLoader()
                                             : const SizedBox.shrink(),
-                                        Container(
-                                          color: AppColors.white,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: getScreenHeight(105),
-                                                child: SingleChildScrollView(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  physics:
-                                                      const BouncingScrollPhysics(),
-                                                  child: SizedBox(
-                                                    child: Row(
-                                                      children: [
-                                                        UserStory(
-                                                          size: size,
-                                                          image: globals.user!
-                                                                  .profilePicture ??
-                                                              '',
-                                                          isMe: true,
-                                                          isLive: false,
-                                                          hasWatched: false,
-                                                          username:
-                                                              'Add Status',
-                                                          isMeOnTap: () {
-                                                            RouteNavigators.route(
-                                                                context,
-                                                                const CreateStatus());
-                                                            return;
-                                                          },
-                                                        ),
-                                                        if (_myStatus
-                                                            .value.isEmpty)
-                                                          const SizedBox
-                                                              .shrink()
-                                                        else
+                                        Visibility(
+                                          visible: _posts.value.isNotEmpty,
+                                          child: Container(
+                                            color: AppColors.white,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                SizedBox(
+                                                  height: getScreenHeight(105),
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    physics:
+                                                        const BouncingScrollPhysics(),
+                                                    child: SizedBox(
+                                                      child: Row(
+                                                        children: [
                                                           UserStory(
                                                             size: size,
                                                             image: globals.user!
                                                                     .profilePicture ??
                                                                 '',
-                                                            isMe: false,
+                                                            isMe: true,
                                                             isLive: false,
                                                             hasWatched: false,
                                                             username:
-                                                                'Your status',
-                                                            onTap: () {
+                                                                'Add Status',
+                                                            isMeOnTap: () {
                                                               RouteNavigators.route(
                                                                   context,
-                                                                  ViewMyStatus(
-                                                                      status: _myStatus
-                                                                          .value));
+                                                                  const CreateStatus());
+                                                              return;
                                                             },
                                                           ),
-                                                        ...List.generate(
-                                                          _userStatus
-                                                              .value.length,
-                                                          (index) => UserStory(
-                                                            size: size,
-                                                            isMe: false,
-                                                            isLive: false,
-                                                            hasWatched: false,
-                                                            image: _userStatus
-                                                                .value[index]
-                                                                .status![0]
-                                                                .statusCreatorModel!
-                                                                .profilePicture!,
-                                                            username: _userStatus
-                                                                .value[index]
-                                                                .status![index]
-                                                                .statusCreatorModel!
-                                                                .username!,
-                                                            onTap: () {
-                                                              RouteNavigators
-                                                                  .route(
-                                                                context,
-                                                                ViewUserStatus(
-                                                                    status: _userStatus
-                                                                        .value[
-                                                                            index]
-                                                                        .status!),
-                                                              );
-                                                            },
+                                                          if (_myStatus
+                                                              .value.isEmpty)
+                                                            const SizedBox
+                                                                .shrink()
+                                                          else
+                                                            UserStory(
+                                                              size: size,
+                                                              image: globals.user!
+                                                                      .profilePicture ??
+                                                                  '',
+                                                              isMe: false,
+                                                              isLive: false,
+                                                              hasWatched: false,
+                                                              username:
+                                                                  'Your status',
+                                                              onTap: () {
+                                                                RouteNavigators.route(
+                                                                    context,
+                                                                    ViewMyStatus(
+                                                                        status: _myStatus
+                                                                            .value));
+                                                              },
+                                                            ),
+                                                          ...List.generate(
+                                                            _userStatus
+                                                                .value.length,
+                                                            (index) => UserStory(
+                                                              size: size,
+                                                              isMe: false,
+                                                              isLive: false,
+                                                              hasWatched: false,
+                                                              image: _userStatus
+                                                                  .value[index]
+                                                                  .status![0]
+                                                                  .statusCreatorModel!
+                                                                  .profilePicture!,
+                                                              username: _userStatus
+                                                                  .value[index]
+                                                                  .status![index]
+                                                                  .statusCreatorModel!
+                                                                  .username!,
+                                                              onTap: () {
+                                                                RouteNavigators
+                                                                    .route(
+                                                                  context,
+                                                                  ViewUserStatus(
+                                                                      status: _userStatus
+                                                                          .value[
+                                                                              index]
+                                                                          .status!),
+                                                                );
+                                                              },
+                                                            ),
                                                           ),
-                                                        ),
-                                                        // ..._userStatus.value.map(
-                                                        //   (e) =>
-                                                        // ),
-                                                      ],
-                                                    ),
-                                                  ).paddingOnly(l: 11),
+                                                          // ..._userStatus.value.map(
+                                                          //   (e) =>
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ).paddingOnly(l: 11),
+                                                  ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                  height: getScreenHeight(5)),
-                                            ],
+                                                SizedBox(
+                                                    height: getScreenHeight(5)),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         SizedBox(height: getScreenHeight(16)),

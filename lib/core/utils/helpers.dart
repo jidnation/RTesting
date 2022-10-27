@@ -80,6 +80,8 @@ class Helper {
 
   }
 
+
+
   static Widget renderProfilePicture(String? profilePicture,
       {double size = 35}) {
     if (profilePicture == null) {
@@ -89,6 +91,23 @@ class Helper {
       );
     } else {
       return RecipientProfilePicture(
+        width: getScreenWidth(size),
+        height: getScreenHeight(size),
+        border: Border.all(color: Colors.grey.shade50, width: 3.0),
+        imageUrl: profilePicture,
+      );
+    }
+  }
+
+  static Widget renderRecommendPicture(String? profilePicture,
+      {double size = 35}) {
+    if (profilePicture == null) {
+      return ImagePlaceholder(
+        width: getScreenWidth(size),
+        height: getScreenHeight(size),
+      );
+    } else {
+      return RecommendPicture(
         width: getScreenWidth(size),
         height: getScreenHeight(size),
         border: Border.all(color: Colors.grey.shade50, width: 3.0),

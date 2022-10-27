@@ -340,8 +340,6 @@ class _AccountScreenState extends State<AccountScreen>
                                 child: SvgPicture.asset(
                                   'assets/svgs/pop-vertical.svg',
                                   color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
                                 ),
                               ),
                               onPressed: () async {
@@ -352,16 +350,18 @@ class _AccountScreenState extends State<AccountScreen>
                             )
                           ]).paddingOnly(t: 40),
                       Positioned(
-                        top: size.height * 0.2 - 20,
-                        child: AnimatedContainer(
-                          width: isGoingDown ? width : getScreenWidth(100),
-                          height: isGoingDown ? height : getScreenHeight(100),
-                          duration: const Duration(seconds: 1),
-                          child: Helper.renderProfilePicture(
-                            globals.user!.profilePicture,
-                            size: 150,
-                          ),
-                        ),
+                        top: size.height * 0.2 - 30,
+                        child: SizedBox(
+                                  width: 80,
+                                  height: 100,
+                                  child: ProfilePicture(
+                                      height: getScreenHeight(100),
+                                      width: getScreenWidth(100),
+                                      border: Border.all(
+                                        color: Colors.grey.shade50,
+                                        width: 3.0,
+                                      )),
+                                )
                       ),
                     ],
                   ),
@@ -1593,7 +1593,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     children: <Widget>[
                       /// Banner image
                       SizedBox(
-                        height: getScreenHeight(140),
+                        height: getScreenHeight(200),
                         width: size.width,
                         child: Image.asset(
                           'assets/images/cover.png',
@@ -1648,29 +1648,28 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               },
                               splashRadius: 20,
                             )
-                          ]).paddingOnly(t: 25),
+                          ]).paddingOnly(t: 40),
 
                       Positioned(
-                        top: size.height * 0.1,
-                        child: AnimatedContainer(
-                          width: getScreenWidth(100),
-                          height: getScreenHeight(100),
-                          duration: const Duration(seconds: 1),
-                          child: widget.recipientImageUrl == null
-                              ? ImagePlaceholder(
-                                  width: getScreenWidth(100),
-                                  height: getScreenHeight(100),
-                                  border: Border.all(
-                                      color: Colors.grey.shade50, width: 3.0),
+                        top: size.height * 0.2 - 30,
+                        child: widget.recipientImageUrl == null
+                            ? ImagePlaceholder(
+                                width: getScreenWidth(100),
+                                height: getScreenHeight(100),
+                                border: Border.all(
+                                    color: Colors.grey.shade50, width: 3.0),
+                              )
+                            : SizedBox(
+                                  width: 80,
+                                  height: 100,
+                                  child: RecipientProfilePicture(
+                                      height: getScreenHeight(100),
+                                      width: getScreenWidth(100),
+                                      border: Border.all(
+                                        color: Colors.grey.shade50,
+                                        width: 3.0,
+                                      ), imageUrl: widget.recipientImageUrl),
                                 )
-                              : RecipientProfilePicture(
-                                  imageUrl: widget.recipientImageUrl,
-                                  width: getScreenWidth(100),
-                                  height: getScreenHeight(100),
-                                  border: Border.all(
-                                      color: Colors.grey.shade50, width: 3.0),
-                                ),
-                        ),
                       ),
                     ],
                   ),
