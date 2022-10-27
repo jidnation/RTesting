@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -9,12 +8,13 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/features/abbreviation/presentation/views/abbreviation_view.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
-import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -55,7 +55,6 @@ class AppDrawer extends HookWidget {
                       onTap: () {
                         RouteNavigators.route(context, const AccountScreen());
                       },
-                      
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Row(
@@ -79,8 +78,7 @@ class AppDrawer extends HookWidget {
                                 Text(
                                   '@${globals.user!.username!}',
                                   style: TextStyle(
-                                    color
-                                    : const Color(0xFF6C6A6A),
+                                    color: const Color(0xFF6C6A6A),
                                     fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -122,7 +120,7 @@ class AppDrawer extends HookWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.start, 
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -206,7 +204,6 @@ class AppDrawer extends HookWidget {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 children: [
-                  
                   DrawerItem(
                       action: 'Create a new account',
                       color: AppColors.textColor2,
@@ -216,14 +213,15 @@ class AppDrawer extends HookWidget {
                         SecureStorage.deleteSecureData();
                         RouteNavigators.routeNoWayHome(context, SignUpScreen());
                       }),
-                      DrawerItem(
+                  DrawerItem(
                       action: 'Add an already existing account',
                       color: AppColors.textColor2,
                       showIcon: false,
                       icon: '',
                       onPressed: () {
                         SecureStorage.deleteSecureData();
-                        RouteNavigators.routeNoWayHome(context, const LoginScreen());
+                        RouteNavigators.routeNoWayHome(
+                            context, const LoginScreen());
                       }),
                 ],
               ),
@@ -258,12 +256,14 @@ class AppDrawer extends HookWidget {
                     DrawerItem(
                       action: 'Abbreviation',
                       icon: 'assets/svgs/abreviation.svg',
-                      onPressed: () {},
+                      onPressed: () => RouteNavigators.route(
+                          context, const AbbreviationView()),
                     ),
                     DrawerItem(
                       action: 'Dictionary',
                       icon: 'assets/svgs/dictionary.svg',
-                      onPressed: () {},
+                      onPressed: () => RouteNavigators.route(
+                          context, const DictionaryView()),
                     ),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                     DrawerItem(
@@ -272,18 +272,18 @@ class AppDrawer extends HookWidget {
                       onPressed: () {},
                     ),
                     const SizedBox(height: 10),
-                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
+                    const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                   ]),
             ),
           ),
-           Visibility(
+          Visibility(
             visible: showOtherItem.value,
-             child: DrawerItem(
+            child: DrawerItem(
               action: 'Help Center',
               icon: 'assets/svgs/help.svg',
               onPressed: () {},
-                     ),
-           ), 
+            ),
+          ),
           const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
           DrawerItem(
             action: 'Logout',
