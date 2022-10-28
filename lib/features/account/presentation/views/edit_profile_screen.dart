@@ -78,7 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
           if (state is UserError) {
             Snackbars.error(context, message: state.error);
-          } 
+          }
         },
         builder: (context, state) {
           bool _isLoading = state is UserLoading;
@@ -363,6 +363,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _usernameController.text.replaceAll(' ', ''),
                           ));
                         }
+                        _isLoading ? null : Snackbars.success(context, message: "Changes Saved");
                       },
                       size: size,
                       textColor: AppColors.white,

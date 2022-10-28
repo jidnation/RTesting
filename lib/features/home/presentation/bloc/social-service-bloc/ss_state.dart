@@ -498,3 +498,21 @@ class GetLikedPostsError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
+
+class DownloadPostLoading extends SocialServiceState {}
+
+class DownloadPostSuccess extends SocialServiceState {
+  final Uint8List? image;
+
+  DownloadPostSuccess({required this.image});
+  @override
+  List<Object> get props => [image!];
+}
+
+class DownloadPostError extends SocialServiceState {
+  final String error;
+  DownloadPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+

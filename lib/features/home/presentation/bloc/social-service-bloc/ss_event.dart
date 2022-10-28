@@ -53,6 +53,7 @@ class UnlikePostEvent extends SocialServiceEvent {
   UnlikePostEvent({required this.postId});
 }
 
+
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final String? content;
@@ -248,6 +249,12 @@ class GetLikedPostsEvent extends SocialServiceEvent {
     required this.pageLimit,
     required this.pageNumber,
   });
+}
+
+
+class DownloadPostEvent extends SocialServiceEvent {
+
+
 }
 
 class SuggestUserEvent extends SocialServiceEvent {}
