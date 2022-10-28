@@ -179,10 +179,18 @@ Future showReacherCardBottomSheet(BuildContext context,
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is UserLoading) {}
+              if (state is UserLoading) {
+                // globals.showLoader(context);
+              }
               if (state is UserError) {
                 RouteNavigators.pop(context);
+                RouteNavigators.pop(context);
                 Snackbars.error(context, message: state.error);
+              }
+              if (state is StarUserSuccess) {
+                RouteNavigators.pop(context);
+                Snackbars.success(context,
+                    message: 'User starred successfully!');
               }
             },
             builder: (context, state) {
@@ -211,7 +219,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                               label: 'Share post',
                               onPressed: () {
                                 RouteNavigators.pop(context);
-                                Share.share(postFeedModel.post!.postSlug!);
+                                Share.share(
+                                    'Reaching you with this: ${postFeedModel.post!.postSlug!}');
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',
@@ -236,7 +245,9 @@ Future showReacherCardBottomSheet(BuildContext context,
                           KebabBottomTextButton(
                             label: 'Star user',
                             onPressed: () {
-                              RouteNavigators.pop(context);
+                              globals.showLoader(context);
+                              globals.userBloc!.add(StarUserEvent(
+                                  userIdToStar: postFeedModel.postOwnerId));
                             },
                           ),
                           KebabBottomTextButton(

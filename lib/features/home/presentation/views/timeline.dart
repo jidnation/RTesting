@@ -162,7 +162,7 @@ class _TimelineScreenState extends State<TimelineScreen>
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is RecipientUserData) {
-                reachDM.value = false;
+                // reachDM.value = false;
                 if (reachDM.value) {
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
@@ -222,6 +222,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is VotePostSuccess) {
+                    // if (!(state.isVoted!)) {
+                    //   Snackbars.success(context,
+                    //       message: 'You shouted down on this post');
+                    // }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
                   }
@@ -469,7 +473,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onUpvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {
@@ -487,7 +490,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onDownvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {
@@ -1383,11 +1385,14 @@ class UserStory extends StatelessWidget {
           isLive
               ? SizedBox(height: getScreenHeight(7))
               : SizedBox(height: getScreenHeight(11)),
-          Text(username,
+          Text(
+              (username.length > 11
+                  ? '${username.substring(0, 11)}...'
+                  : username),
               style: TextStyle(
-                fontSize: getScreenHeight(11),
-                fontWeight: FontWeight.w400,
-              ))
+                  fontSize: getScreenHeight(11),
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis))
         ],
       ).paddingOnly(r: 25),
     );

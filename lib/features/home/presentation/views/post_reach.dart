@@ -646,6 +646,8 @@ class EditReach extends HookWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final controller = useTextEditingController(text: post.content ?? '');
+    final counter = useState(
+        (post.content ?? '').trim().split(RegexUtil.spaceOrNewLine).length);
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -728,9 +730,9 @@ class EditReach extends HookWidget {
                             ),
                           ],
                         ),
-                        const Text(
-                          '10/200',
-                          style: TextStyle(
+                        Text(
+                          '${counter.value}/200',
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textColor2,
@@ -745,7 +747,19 @@ class EditReach extends HookWidget {
                       minLines: 1,
                       maxLines: 6,
                       controller: controller,
-                      maxLength: 200,
+                      // maxLength: 200,
+                      inputFormatters: [
+                        MaxWordTextInputFormater(maxWords: 200)
+                      ],
+                      // maxLength: 200,
+                      onChanged: (val) {
+                        counter.value =
+                            val.trim().split(RegexUtil.spaceOrNewLine).length;
+                        if (counter.value >= 200) {
+                          Snackbars.error(context,
+                              message: '200 words limit reached!');
+                        }
+                      },
                       decoration: const InputDecoration(
                         hintText: "What's on your mind?",
                         counterText: '',
