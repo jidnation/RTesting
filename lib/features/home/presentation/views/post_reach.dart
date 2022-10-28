@@ -1,4 +1,5 @@
 import 'dart:io';
+//import 'dart:js_util';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -143,9 +145,10 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.location == 'NIL'
-                                      ? ''
-                                      : globals.location!,
+                                  globals.user!.showLocation! ? globals.location! : '',
+                                  // globals.location == 'NIL'
+                                  //     ? ''
+                                  //     : globals.location!
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
@@ -211,6 +214,10 @@ class _PostReachState extends State<PostReach> {
                       onChanged: (val) {
                         counter.value =
                             val.trim().split(RegexUtil.spaceOrNewLine).length;
+                        if (counter.value >= 200) {
+                          Snackbars.error(context,
+                              message: '200 words limit reached!');
+                        }
                       },
                       decoration: const InputDecoration(
                         counterText: '',
@@ -639,6 +646,8 @@ class EditReach extends HookWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final controller = useTextEditingController(text: post.content ?? '');
+    final counter = useState(
+        (post.content ?? '').trim().split(RegexUtil.spaceOrNewLine).length);
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -721,9 +730,9 @@ class EditReach extends HookWidget {
                             ),
                           ],
                         ),
-                        const Text(
-                          '10/200',
-                          style: TextStyle(
+                        Text(
+                          '${counter.value}/200',
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textColor2,
@@ -738,7 +747,19 @@ class EditReach extends HookWidget {
                       minLines: 1,
                       maxLines: 6,
                       controller: controller,
-                      maxLength: 200,
+                      // maxLength: 200,
+                      inputFormatters: [
+                        MaxWordTextInputFormater(maxWords: 200)
+                      ],
+                      // maxLength: 200,
+                      onChanged: (val) {
+                        counter.value =
+                            val.trim().split(RegexUtil.spaceOrNewLine).length;
+                        if (counter.value >= 200) {
+                          Snackbars.error(context,
+                              message: '200 words limit reached!');
+                        }
+                      },
                       decoration: const InputDecoration(
                         hintText: "What's on your mind?",
                         counterText: '',

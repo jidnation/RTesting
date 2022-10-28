@@ -396,6 +396,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _usernameController.text.replaceAll(' ', ''),
                           ));
                         }
+                        _isLoading ? null : Snackbars.success(context, message: "Changes Saved");
                       },
                       size: size,
                       textColor: AppColors.white,

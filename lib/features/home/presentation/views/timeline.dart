@@ -1,13 +1,17 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
@@ -35,6 +39,9 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:readmore/readmore.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -170,7 +177,7 @@ class _TimelineScreenState extends State<TimelineScreen>
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is RecipientUserData) {
-                reachDM.value = false;
+                // reachDM.value = false;
                 if (reachDM.value) {
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
@@ -230,6 +237,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is VotePostSuccess) {
+                    // if (!(state.isVoted!)) {
+                    //   Snackbars.success(context,
+                    //       message: 'You shouted down on this post');
+                    // }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
                   }
@@ -359,6 +370,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                               return;
                                                             },
                                                           ),
+
                                                           if (_myStatus
                                                               .value.isEmpty)
                                                             const SizedBox
@@ -420,6 +432,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       ),
                                                     ).paddingOnly(l: 11),
                                                   ),
+                                                  
                                                 ),
                                                 SizedBox(
                                                     height: getScreenHeight(5)),
@@ -483,7 +496,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onUpvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {
@@ -501,7 +513,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       onDownvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
-
                                                         handleTap(index);
                                                         if (active
                                                             .contains(index)) {
@@ -625,6 +636,30 @@ class PostFeedReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
+    var scr = GlobalKey();
+    final ScreenshotController screenshotController = ScreenshotController();
+    Future<String> saveImage(Uint8List? bytes) async {
+      await [Permission.storage].request();
+      String time = DateTime.now().microsecondsSinceEpoch.toString();
+      final name = 'screenshot_${time}_reachme';
+      final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+      debugPrint("Result ${result['filePath']}");
+        Snackbars.success(context, message: 'Image saved to Gallery');
+      return result['filePath'];
+    }
+
+    void takeScreenShot() async {
+      RenderRepaintBoundary boundary = scr.currentContext!.findRenderObject()
+          as RenderRepaintBoundary; // the key provided
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      debugPrint("Byte Data: $byteData");
+      await saveImage(byteData!.buffer.asUint8List());
+    }
+
+
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
@@ -632,78 +667,97 @@ class PostFeedReacherCard extends HookWidget {
         left: getScreenWidth(15),
         bottom: getScreenHeight(16),
       ),
-      child: Container(
-        width: size.width,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CupertinoButton(
-                  minSize: 0,
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    final progress = ProgressHUD.of(context);
-                    progress?.showWithText('Viewing Reacher..');
-                    Future.delayed(const Duration(seconds: 3), () {
-                      globals.userBloc!.add(GetRecipientProfileEvent(
-                          email: postFeedModel!.postOwnerId));
-                      postFeedModel!.postOwnerId == globals.user!.id
-                          ? RouteNavigators.route(
-                              context, const AccountScreen())
-                          : RouteNavigators.route(
-                              context,
-                              RecipientAccountProfile(
-                                recipientEmail: 'email',
-                                recipientImageUrl:
-                                    postFeedModel!.profilePicture,
-                                recipientId: postFeedModel!.postOwnerId,
-                              ));
-                      progress?.dismiss();
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      Helper.renderProfilePicture(
-                        postFeedModel!.profilePicture,
-                        size: 33,
-                      ).paddingOnly(l: 13, t: 10),
-                      SizedBox(width: getScreenWidth(9)),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                '@${postFeedModel!.username!}',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(14),
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor2,
+      child: RepaintBoundary(
+        key: scr,
+        child: Container(
+          width: size.width,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    minSize: 0,
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      final progress = ProgressHUD.of(context);
+                      progress?.showWithText('Viewing Reacher..');
+                      Future.delayed(const Duration(seconds: 3), () {
+                        globals.userBloc!.add(GetRecipientProfileEvent(
+                            email: postFeedModel!.postOwnerId));
+                        postFeedModel!.postOwnerId == globals.user!.id
+                            ? RouteNavigators.route(
+                                context, const AccountScreen())
+                            : RouteNavigators.route(
+                                context,
+                                RecipientAccountProfile(
+                                  recipientEmail: 'email',
+                                  recipientImageUrl:
+                                      postFeedModel!.profilePicture,
+                                  recipientId: postFeedModel!.postOwnerId,
+                                ));
+                        progress?.dismiss();
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Helper.renderProfilePicture(
+                          postFeedModel!.profilePicture,
+                          size: 33,
+                        ).paddingOnly(l: 13, t: 10),
+                        SizedBox(width: getScreenWidth(9)),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '@${postFeedModel!.username!}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(14),
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 3),
-                              postFeedModel!.verified!
-                                  ? SvgPicture.asset('assets/svgs/verified.svg')
-                                  : const SizedBox.shrink()
-                            ],
-                          ),
-                          postFeedModel!.post!.location == null ||
-                                  postFeedModel!.post!.location == 'NIL'
-                              ? const SizedBox.shrink()
-                              : Text(
-                                  postFeedModel!.post!.location ?? 'Somewhere',
+                                const SizedBox(width: 3),
+                                postFeedModel!.verified!
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/verified.svg')
+                                    : const SizedBox.shrink()
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                postFeedModel!.post!.location == null ||
+                                        postFeedModel!.post!.location == 'NIL'
+                                    ? const SizedBox.shrink()
+                                    : Text(
+                                        globals.user!.showLocation!
+                                            ? postFeedModel!.post!.location!
+                                            : '',
+                                        // postFeedModel!.post!.location ??
+                                        //     'Somewhere',
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(10),
+                                          fontFamily: 'Poppins',
+                                          letterSpacing: 0.4,
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.textColor2,
+                                        ),
+                                      ),
+                                Text(
+                                  postDuration,
                                   style: TextStyle(
                                     fontSize: getScreenHeight(10),
                                     fontFamily: 'Poppins',
@@ -711,202 +765,217 @@ class PostFeedReacherCard extends HookWidget {
                                     fontWeight: FontWeight.w400,
                                     color: AppColors.textColor2,
                                   ),
-                                ),
-                        ],
-                      ).paddingOnly(t: 10),
-                    ],
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //  SvgPicture.asset('assets/svgs/starred.svg'),
-                    SizedBox(width: getScreenWidth(9)),
-                    IconButton(
-                      onPressed: () async {
-                        await showReacherCardBottomSheet(
-                          context,
-                          postFeedModel: postFeedModel!,
-                        );
-                      },
-                      iconSize: getScreenHeight(19),
-                      padding: const EdgeInsets.all(0),
-                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
+                                ).paddingOnly(l: 6),
+                              ],
+                            )
+                          ],
+                        ).paddingOnly(t: 10),
+                      ],
                     ),
-                  ],
-                )
-              ],
-            ),
-            postFeedModel!.post!.content == null
-                ? const SizedBox.shrink()
-                : Flexible(
-                    child: Text(
-                      postFeedModel!.post!.edited!
-                          ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                          : postFeedModel!.post!.content ?? '',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(14),
-                        fontWeight: FontWeight.w400,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //  SvgPicture.asset('assets/svgs/starred.svg'),
+                      SizedBox(width: getScreenWidth(9)),
+                      IconButton(
+                        onPressed: () async {
+                          await showReacherCardBottomSheet(
+                            context,
+                            downloadPost: takeScreenShot,
+                            postFeedModel: postFeedModel!,
+                          );
+                        },
+                        iconSize: getScreenHeight(19),
+                        padding: const EdgeInsets.all(0),
+                        icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
                       ),
-                    ).paddingSymmetric(v: 10, h: 16),
-                  ),
-            if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-              Helper.renderPostImages(postFeedModel!.post!, context)
-                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
-            else
-              const SizedBox.shrink(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
+                    ],
+                  )
+                ],
+              ),
+              postFeedModel!.post!.content == null
+                  ? const SizedBox.shrink()
+                  : Flexible(
+                      child: ReadMoreText(
+                        postFeedModel!.post!.edited!
+                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
+                            : postFeedModel!.post!.content ?? '',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenHeight(14)),
+                        trimLines: 3,
+                        colorClickableText: const Color(0xff717F85),
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: 'See more',
+                        trimExpandedText: 'See less',
+                        moreStyle: TextStyle(
+                            fontSize: getScreenHeight(14),
+                            fontFamily: "Roboto",
+                            color: const Color(0xff717F85)),
+                      ).paddingSymmetric(h: 16, v: 10),
                     ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: const Color(0xFFF5F5F5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: onLike,
-                          padding: EdgeInsets.zero,
-                          child: isLiked
-                              ? SvgPicture.asset(
-                                  'assets/svgs/like-active.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/svgs/like.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postFeedModel!.post!.nLikes}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(15)),
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: () {
-                            RouteNavigators.route(context,
-                                ViewCommentsScreen(post: postFeedModel!));
-                          },
-                          padding: EdgeInsets.zero,
-                          child: SvgPicture.asset(
-                            'assets/svgs/comment.svg',
-                            height: getScreenHeight(20),
-                            width: getScreenWidth(20),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postFeedModel!.post!.nComments}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        if (postFeedModel!.postOwnerId !=
-                            postFeedModel!.feedOwnerId)
-                          SizedBox(width: getScreenWidth(15)),
-                        if (postFeedModel!.postOwnerId !=
-                            postFeedModel!.feedOwnerId)
+              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+                Helper.renderPostImages(postFeedModel!.post!, context)
+                    .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+              else
+                const SizedBox.shrink(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: const Color(0xFFF5F5F5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           CupertinoButton(
                             minSize: 0,
-                            onPressed: onMessage,
-                            padding: const EdgeInsets.all(0),
+                            onPressed: onLike,
+                            padding: EdgeInsets.zero,
+                            child: isLiked
+                                ? SvgPicture.asset(
+                                    'assets/svgs/like-active.svg',
+                                    height: getScreenHeight(20),
+                                    width: getScreenWidth(20),
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/svgs/like.svg',
+                                    height: getScreenHeight(20),
+                                    width: getScreenWidth(20),
+                                  ),
+                          ),
+                          SizedBox(width: getScreenWidth(4)),
+                          FittedBox(
+                            child: Text(
+                              '${postFeedModel!.post!.nLikes}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(12),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor3,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: getScreenWidth(15)),
+                          CupertinoButton(
+                            minSize: 0,
+                            onPressed: () {
+                              RouteNavigators.route(context,
+                                  ViewCommentsScreen(post: postFeedModel!));
+                            },
+                            padding: EdgeInsets.zero,
                             child: SvgPicture.asset(
-                              'assets/svgs/message.svg',
+                              'assets/svgs/comment.svg',
                               height: getScreenHeight(20),
                               width: getScreenWidth(20),
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: getScreenWidth(20)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xFFF5F5F5),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
+                          SizedBox(width: getScreenWidth(4)),
+                          FittedBox(
+                            child: Text(
+                              '${postFeedModel!.post!.nComments}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(12),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor3,
+                              ),
+                            ),
+                          ),
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
+                            SizedBox(width: getScreenWidth(15)),
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
                             CupertinoButton(
                               minSize: 0,
-                              onPressed: onUpvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Upvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutup-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutup.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
+                              onPressed: onMessage,
+                              padding: const EdgeInsets.all(0),
+                              child: SvgPicture.asset(
+                                'assets/svgs/message.svg',
+                                height: getScreenHeight(20),
+                                width: getScreenWidth(20),
+                              ),
                             ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            CupertinoButton(
-                              minSize: 0,
-                              onPressed: onDownvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Downvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutdown-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutdown.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
-          ],
+                  ),
+                  SizedBox(width: getScreenWidth(20)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: const Color(0xFFF5F5F5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CupertinoButton(
+                                minSize: 0,
+                                onPressed: onUpvote,
+                                padding: EdgeInsets.zero,
+                                child: isVoted && voteType == 'Upvote'
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/shoutup-active.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      )
+                                    : SvgPicture.asset(
+                                        'assets/svgs/shoutup.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      ),
+                              ),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                              CupertinoButton(
+                                minSize: 0,
+                                onPressed: onDownvote,
+                                padding: EdgeInsets.zero,
+                                child: isVoted && voteType == 'Downvote'
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/shoutdown-active.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      )
+                                    : SvgPicture.asset(
+                                        'assets/svgs/shoutdown.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      ),
+                              ),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
+            ],
+          ),
         ),
       ),
     );
@@ -1272,7 +1341,7 @@ class UserStory extends StatelessWidget {
     required this.isMe,
     required this.username,
     required this.hasWatched,
-    required this.image,
+    this.image,
     this.isMeOnTap,
     this.onTap,
   }) : super(key: key);
@@ -1282,7 +1351,7 @@ class UserStory extends StatelessWidget {
   final bool isLive;
   final bool hasWatched;
   final String username;
-  final String image;
+  final String? image;
   final Function()? isMeOnTap;
   final Function()? onTap;
 
@@ -1379,11 +1448,14 @@ class UserStory extends StatelessWidget {
           isLive
               ? SizedBox(height: getScreenHeight(7))
               : SizedBox(height: getScreenHeight(11)),
-          Text(username,
+          Text(
+              (username.length > 11
+                  ? '${username.substring(0, 11)}...'
+                  : username),
               style: TextStyle(
-                fontSize: getScreenHeight(11),
-                fontWeight: FontWeight.w400,
-              ))
+                  fontSize: getScreenHeight(11),
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis))
         ],
       ).paddingOnly(r: 25),
     );

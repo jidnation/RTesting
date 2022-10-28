@@ -144,7 +144,6 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
         ],
       );
 
-
   @override
   Widget build(BuildContext context) {
     final _searchController = useTextEditingController();
@@ -252,7 +251,13 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                                         data: _reachingList.value[index]);
                                   },
                                 ),
-                                const SeeMyStarsList(),
+                                ListView.builder(
+                                  itemCount: _starsList.value.length,
+                                  itemBuilder: (context, index) {
+                                    return SeeMyStarsList(
+                                        data: _starsList.value[index]);
+                                  },
+                                ),
                               ],
                             ).paddingSymmetric(h: 13),
                     ),
@@ -265,18 +270,13 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
   }
 }
 
-
-
 class SeeMyReachersList extends StatelessWidget {
-  const SeeMyReachersList({Key? key, this.data }) : super(key: key);
+  const SeeMyReachersList({Key? key, this.data}) : super(key: key);
 
   final VirtualReach? data;
 
-
-
   @override
   Widget build(BuildContext context) {
-
     var size = MediaQuery.of(context).size;
     return Column(
       children: [
@@ -315,30 +315,29 @@ class SeeMyReachersList extends StatelessWidget {
             height: getScreenHeight(40),
             width: getScreenWidth(80),
             child: CustomButton(
-            loaderColor: data!.reacher!.id == 'userBlocked'
-                ? AppColors.primaryColor
-                    : AppColors.white,
-                label: data!.reacher!.id == 'userBlocked' ? 'Unblock' : 'Block',
+              loaderColor: data!.reacher!.id == 'userBlocked'
+                  ? AppColors.primaryColor
+                  : AppColors.white,
+              label: data!.reacher!.id == 'userBlocked' ? 'Unblock' : 'EX',
               labelFontSize: getScreenHeight(13),
-                color: data!.reacher!.id == 'userBlocked'
-                ? AppColors.white
-                    : AppColors.primaryColor,
-                onPressed: () {
-                  // Block or Unblock user and render button according to userBlockRelationship //
-                },
-                size: size,
-                padding: const EdgeInsets.symmetric(
+              color: data!.reacher!.id == 'userBlocked'
+                  ? AppColors.white
+                  : AppColors.primaryColor,
+              onPressed: () {
+                // Block or Unblock user and render button according to userBlockRelationship //
+              },
+              size: size,
+              padding: const EdgeInsets.symmetric(
                 vertical: 9,
                 horizontal: 21,
-                ),
-                textColor: data!.reacher!.id == 'userBlocked'
-                ? AppColors.black
-                    : AppColors.white,
-                borderSide: data!.reacher!.id == 'userBlocked'
-                ? const BorderSide(
-                color: AppColors.greyShade5)
-                    : BorderSide.none,
-                ),
+              ),
+              textColor: data!.reacher!.id == 'userBlocked'
+                  ? AppColors.black
+                  : AppColors.white,
+              borderSide: data!.reacher!.id == 'userBlocked'
+                  ? const BorderSide(color: AppColors.greyShade5)
+                  : BorderSide.none,
+            ),
           ),
         ),
       ],
@@ -357,63 +356,112 @@ class SeeMyReachingsList extends StatelessWidget {
       children: [
         SizedBox(height: getScreenHeight(20)),
         ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Helper.renderProfilePicture(
-            data!.reaching!.profilePicture ?? '',
-            size: 50,
-          ),
-          minLeadingWidth: getScreenWidth(20),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                (data!.reaching!.firstName! + ' ' + data!.reaching!.lastName!)
-                    .toTitleCase(),
-                style: TextStyle(
-                  fontSize: getScreenHeight(16),
-                  color: AppColors.textColor2,
-                  fontWeight: FontWeight.w500,
+            contentPadding: EdgeInsets.zero,
+            leading: Helper.renderProfilePicture(
+              data!.reaching!.profilePicture ?? '',
+              size: 50,
+            ),
+            minLeadingWidth: getScreenWidth(20),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (data!.reaching!.firstName! + ' ' + data!.reaching!.lastName!)
+                      .toTitleCase(),
+                  style: TextStyle(
+                    fontSize: getScreenHeight(16),
+                    color: AppColors.textColor2,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                Text(
+                  '@${data!.reaching!.username}',
+                  style: TextStyle(
+                    fontSize: getScreenHeight(13),
+                    color: const Color(0xFF767474),
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              ],
+            ),
+            trailing: SizedBox(
+              height: getScreenHeight(40),
+              width: getScreenWidth(80),
+              child: CustomButton(
+                loaderColor: AppColors.primaryColor,
+                label: 'Unreach',
+                labelFontSize: getScreenHeight(13),
+                color: AppColors.white,
+                onPressed: () {
+                  // Remove User from Reaching UI //
+                },
+                textColor: AppColors.black,
+                borderSide: const BorderSide(color: AppColors.greyShade5),
               ),
-              Text(
-                '@${data!.reaching!.username}',
-                style: TextStyle(
-                  fontSize: getScreenHeight(13),
-                  color: const Color(0xFF767474),
-                  fontWeight: FontWeight.w400,
-                ),
-              )
-            ],
-          ),
-          trailing: SizedBox(
-            height: getScreenHeight(40),
-            width: getScreenWidth(80),
-            child: CustomButton(
-              loaderColor: AppColors.primaryColor,
-              label: 'Unreach',
-              labelFontSize: getScreenHeight(13),
-              color: AppColors.white,
-              onPressed: () {
-                // Remove User from Reaching UI //
-              },
-              textColor: AppColors.black,
-              borderSide: const BorderSide(
-                  color: AppColors.greyShade5),
-            ),)
-          ),
-
+            )),
       ],
     );
   }
 }
 
 class SeeMyStarsList extends StatelessWidget {
-  const SeeMyStarsList({Key? key}) : super(key: key);
+  const SeeMyStarsList({Key? key, this.data}) : super(key: key);
+
+  final VirtualStar? data;
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Column(
+      children: [
+        SizedBox(height: getScreenHeight(20)),
+        ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Helper.renderProfilePicture(
+              data!.starred!.profilePicture ?? '',
+              size: 50,
+            ),
+            minLeadingWidth: getScreenWidth(20),
+            title: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (data!.starred!.firstName! + ' ' + data!.starred!.lastName!)
+                      .toTitleCase(),
+                  style: TextStyle(
+                    fontSize: getScreenHeight(16),
+                    color: AppColors.textColor2,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  '@${data!.starred!.username}',
+                  style: TextStyle(
+                    fontSize: getScreenHeight(13),
+                    color: const Color(0xFF767474),
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              ],
+            ),
+            trailing: SizedBox(
+              height: getScreenHeight(40),
+              width: getScreenWidth(80),
+              child: CustomButton(
+                loaderColor: AppColors.primaryColor,
+                label: 'Unstar',
+                labelFontSize: getScreenHeight(13),
+                color: AppColors.white,
+                onPressed: () {
+                  // Remove User from Reaching UI //
+                },
+                textColor: AppColors.black,
+                borderSide: const BorderSide(color: AppColors.greyShade5),
+              ),
+            )),
+      ],
+    );
   }
 }
 
@@ -658,7 +706,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                                   itemCount: _reachingList.value.length,
                                   itemBuilder: (context, index) {
                                     return SeeMyReachingsList(
-                                        data: _reachingList.value[index],
+                                      data: _reachingList.value[index],
                                     );
                                   },
                                 ),

@@ -91,7 +91,6 @@ class ChatRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
       var res = result.data!['getThreadMessages'] as List;
       var data = res.map((e) => Chat.fromJson(e)).toList();
       return data;
@@ -99,7 +98,6 @@ class ChatRemoteDataSource {
       rethrow;
     }
   }
-
 
 //list of people you have chatted with.
   Future<List<ChatsThread>> getUserThreads({required String? id}) async {
