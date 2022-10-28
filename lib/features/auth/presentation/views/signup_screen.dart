@@ -30,7 +30,13 @@ class SignUpScreen extends HookWidget {
     final _passwordController = useTextEditingController();
     final _firstNameController = useTextEditingController();
     final _lastNameController = useTextEditingController();
+    String _obscureString;
     final _obscureText = useState(true);
+    if (_obscureText.value) {
+      _obscureString = 'Show';
+    } else {
+      _obscureString = 'Hide';
+    }
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: globals.authBloc,
@@ -253,7 +259,7 @@ class SignUpScreen extends HookWidget {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: 'Show',
+                                        text: _obscureString,
                                         style: TextStyle(
                                           fontSize: getScreenHeight(13),
                                           color: AppColors.textColor,

@@ -225,7 +225,7 @@ class SuggestedUserContainer extends StatelessWidget {
               ),
             ),
           ),
-          Helper.renderProfilePicture(
+          Helper.renderRecommendPicture(
                             profilePicture,
                             size: 80,
                           ),
@@ -345,7 +345,7 @@ class SuggestedUserContainer extends StatelessWidget {
             borderSide:
                 const BorderSide(color: AppColors.primaryColor, width: 1),
           ).paddingSymmetric(h: 45),
-          SizedBox(height: getScreenHeight(9)),
+          SizedBox(height: getScreenHeight(5)),
         ],
       ).paddingSymmetric(h: 16, v: 16),
     );
@@ -552,7 +552,6 @@ class EmptyNotificationScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                   ],
-            
                 ),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,

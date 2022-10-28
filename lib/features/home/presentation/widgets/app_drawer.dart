@@ -14,7 +14,9 @@ import 'package:reach_me/features/account/presentation/views/account.details.dar
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
+
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
+
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -103,7 +105,7 @@ class AppDrawer extends HookWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: getScreenHeight(2)),
+                    SizedBox(height: getScreenHeight(0.5)),
                     Row(
                       children: [
                         InkWell(

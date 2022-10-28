@@ -83,6 +83,9 @@ dependencies:
   location: ^4.4.0
   mime: ^1.0.2
   firebase_core: ^1.21.1
+  tab_indicator_styler: ^2.0.0
+  bubble_tab_indicator: ^0.1.6
+  image_cropper: ^3.0.0
   # geocoder: ^0.2.1
   share_plus: ^5.0.0
   image_gallery_saver: ^1.7.1

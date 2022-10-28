@@ -27,7 +27,13 @@ class LoginScreen extends HookWidget {
     final _passwordController = useTextEditingController();
     final _key = useState<GlobalKey<FormState>>(GlobalKey());
     var size = MediaQuery.of(context).size;
+    String _obscureString;
     final _obscureText = useState(true);
+    if (_obscureText.value) {
+      _obscureString = 'Show';
+    } else {
+      _obscureString = 'Hide';
+    }
     return Scaffold(
         backgroundColor: AppColors.white,
         body: BlocConsumer<AuthBloc, AuthState>(
@@ -76,8 +82,14 @@ class LoginScreen extends HookWidget {
                             ),
                             SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
-                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              focusedBorderSide: const BorderSide(
+                                  color: Colors.black12,
+                                  width: 1,
+                                  style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(
+                                  color: Colors.black12,
+                                  width: 1,
+                                  style: BorderStyle.solid),
                               isFilled: false,
                               hintText: 'linda@framcreative.com',
                               keyboardType: TextInputType.emailAddress,
@@ -134,7 +146,7 @@ class LoginScreen extends HookWidget {
                                           ),
                                         ),
                                         TextSpan(
-                                          text: 'Show',
+                                          text: _obscureString,
                                           style: TextStyle(
                                             fontSize: getScreenHeight(13),
                                             color: AppColors.textColor,
@@ -147,8 +159,14 @@ class LoginScreen extends HookWidget {
                                 ]),
                             SizedBox(height: getScreenHeight(5)),
                             CustomRoundTextField(
-                              focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                              enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                              focusedBorderSide: const BorderSide(
+                                  color: Colors.black12,
+                                  width: 1,
+                                  style: BorderStyle.solid),
+                              enabledBorderSide: const BorderSide(
+                                  color: Colors.black12,
+                                  width: 1,
+                                  style: BorderStyle.solid),
                               isFilled: false,
                               maxLines: 1,
                               obscureText: _obscureText.value,
