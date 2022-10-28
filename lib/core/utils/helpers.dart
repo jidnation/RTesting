@@ -266,7 +266,32 @@ class Helper {
               ),
             );
           });
-    } else if (post.imageMediaItems!.length == 3) {
+    } else if(post.imageMediaItems!.length == 1){
+         return GestureDetector(
+          onTap: (() => RouteNavigators.route(
+                context,
+                PhotoView(
+                  imageProvider: NetworkImage(post.imageMediaItems![0]),
+                  loadingBuilder: (context, event) => const Center(
+                    child: CupertinoActivityIndicator(color: Colors.white),
+                  ),
+                ),
+              )),
+          child: Container(
+            height: getScreenHeight(300),
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: CachedNetworkImage(
+              imageUrl: post.imageMediaItems![0],
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+    }
+    
+    else if (post.imageMediaItems!.length == 3) {
       int remImageLength =
           1; // length of extra image not seen in the grid at first
       return Row(

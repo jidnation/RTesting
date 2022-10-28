@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -618,7 +620,7 @@ class PostFeedReacherCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
-
+    var scr = GlobalKey();
     final ScreenshotController screenshotController = ScreenshotController();
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
@@ -626,27 +628,20 @@ class PostFeedReacherCard extends HookWidget {
       final name = 'screenshot_${time}_reachme';
       final result = await ImageGallerySaver.saveImage(bytes!, name: name);
       debugPrint("Result ${result['filePath']}");
-      Snackbars.success(context, message: 'Image saved to Gallery');
+        Snackbars.success(context, message: 'Image saved to Gallery');
       return result['filePath'];
     }
 
-    void takeScreenShotAndSave() async {
-      final image = await screenshotController.capture();
-      if (image == null) debugPrint("Image $image");
-
-      await saveImage(image);
-      // final directory = (await getApplicationDocumentsDirectory())
-      //     .path; //from path_provide package
-      // String fileName =
-      //     "Screenshot_${DateTime.now().microsecondsSinceEpoch.toString()}_reach_me.png";
-      // String path = directory;
-      //
-      // screenshotController.captureAndSave(path, fileName: fileName);
-      //
-      // debugPrint("ScreenShot taken");
-      // debugPrint("Path: $path");
-      // debugPrint("FileName: $fileName");
+    void takeScreenShot() async {
+      RenderRepaintBoundary boundary = scr.currentContext!.findRenderObject()
+          as RenderRepaintBoundary; // the key provided
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      debugPrint("Byte Data: $byteData");
+      await saveImage(byteData!.buffer.asUint8List());
     }
+
 
     final size = MediaQuery.of(context).size;
     return Padding(
@@ -655,8 +650,8 @@ class PostFeedReacherCard extends HookWidget {
         left: getScreenWidth(15),
         bottom: getScreenHeight(16),
       ),
-      child: Screenshot(
-        controller: screenshotController,
+      child: RepaintBoundary(
+        key: scr,
         child: Container(
           width: size.width,
           decoration: BoxDecoration(
@@ -770,7 +765,7 @@ class PostFeedReacherCard extends HookWidget {
                         onPressed: () async {
                           await showReacherCardBottomSheet(
                             context,
-                            downloadPost: takeScreenShotAndSave,
+                            downloadPost: takeScreenShot,
                             postFeedModel: postFeedModel!,
                           );
                         },
