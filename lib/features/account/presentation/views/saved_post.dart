@@ -268,9 +268,9 @@ class SavedPostReacherCardd extends HookWidget {
                 ),
               ).paddingSymmetric(v: 10, h: 16),
             ),
-            if (savedPostModel!.imageMediaItems!.isNotEmpty)
-              Helper.renderPostImages(savedPostModel!, context)
-                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            // if (savedPostModel!.imageMediaItems!.isNotEmpty)
+            //   Helper.renderPostImages(savedPostModel!, context)
+            //       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
           ],
         ),
       ),

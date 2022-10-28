@@ -141,7 +141,7 @@ Future showKebabCommentBottomSheet(BuildContext context) {
 }
 
 Future showReacherCardBottomSheet(BuildContext context,
-    {required PostFeedModel postFeedModel}) async {
+    {required PostFeedModel postFeedModel, void Function()? downloadPost}) {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
@@ -229,6 +229,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                                     postId: postFeedModel.postId));
                               }),
                           KebabBottomTextButton(
+                              label: 'Download post', onPressed: downloadPost),
+                          KebabBottomTextButton(
                             label: 'Report',
                             onPressed: () {
                               RouteNavigators.pop(context);
@@ -289,6 +291,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                                   message: 'Link copied to clipboard');
                             },
                           ),
+                          KebabBottomTextButton(
+                              label: 'Download post', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Copy link',
                             onPressed: () {
