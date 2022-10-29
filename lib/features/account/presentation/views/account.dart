@@ -70,78 +70,46 @@ class _AccountScreenState extends State<AccountScreen>
   }
 
   TabBar get _tabBar => TabBar(
-    isScrollable: true,
-    controller: _tabController,
-    indicatorWeight: 1.5,
-    unselectedLabelColor: AppColors.greyShade4,
-    indicatorColor: Colors.transparent,
-    labelColor: AppColors.primaryColor,
-    labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-    overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
-    labelStyle: TextStyle(
-      fontSize: getScreenHeight(15),
-      fontFamily: 'Poppins',
-      fontWeight: FontWeight.w600,
-    ),
-    unselectedLabelStyle: TextStyle(
-      fontSize: getScreenHeight(15),
-      fontFamily: 'Poppins',
-      fontWeight: FontWeight.w400,
-    ),
-    tabs: [
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(0);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 0
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Reaches',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
-                  color: _tabController!.index == 0
-                      ? AppColors.white
-                      : AppColors.textColor2,
-                ),
-              ),
-            ),
-          ),
+        isScrollable: true,
+        controller: _tabController,
+        indicatorWeight: 1.5,
+        unselectedLabelColor: AppColors.greyShade4,
+        indicatorColor: Colors.transparent,
+        labelColor: AppColors.primaryColor,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+        overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        labelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w600,
         ),
-      ),
-      Tab(
-        iconMargin: EdgeInsets.zero,
-        child: Row(
-          children: [
-            GestureDetector(
+        unselectedLabelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w400,
+        ),
+        tabs: [
+          Tab(
+            child: GestureDetector(
               onTap: () => setState(() {
-                _tabController?.animateTo(1);
+                _tabController?.animateTo(0);
               }),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 1
+                  color: _tabController!.index == 0
                       ? AppColors.textColor2
                       : Colors.transparent,
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Likes',
+                    'Reaches',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 1
+                      color: _tabController!.index == 0
                           ? AppColors.white
                           : AppColors.textColor2,
                     ),
@@ -149,156 +117,188 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(2);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 2
-                  ? AppColors.textColor2
-                  : Colors.transparent,
+          ),
+          Tab(
+            iconMargin: EdgeInsets.zero,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tabController?.animateTo(1);
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: _tabController!.index == 1
+                          ? AppColors.textColor2
+                          : Colors.transparent,
+                    ),
+                    child: FittedBox(
+                      child: Text(
+                        'Likes',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(15),
+                          fontWeight: FontWeight.w400,
+                          color: _tabController!.index == 1
+                              ? AppColors.white
+                              : AppColors.textColor2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            child: FittedBox(
-              child: Text(
-                'Comments',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(2);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 2
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Comments',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 2
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(3);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 3
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Shoutout',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(3);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 3
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutout',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 3
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(4);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 4
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Shoutdown',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(4);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 4
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutdown',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 4
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(5);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 5
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Share',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(5);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 5
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Share',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 5
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(6);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 6
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Save',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(6);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 6
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 6
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    ],
-  );
+        ],
+      );
   String message = '';
   bool isGoingDown = false;
   bool isGoingUp = false;
@@ -406,7 +406,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color:
-                                    AppColors.textColor2.withOpacity(0.5),
+                                        AppColors.textColor2.withOpacity(0.5),
                                   ),
                                   child: SvgPicture.asset(
                                     'assets/svgs/back.svg',
@@ -427,7 +427,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color:
-                                    AppColors.textColor2.withOpacity(0.5),
+                                        AppColors.textColor2.withOpacity(0.5),
                                   ),
                                   child: SvgPicture.asset(
                                     'assets/svgs/pop-vertical.svg',
@@ -486,7 +486,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         globals.user!.nReachers.toString(),
@@ -513,7 +513,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         globals.user!.nReaching.toString(),
@@ -540,7 +540,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         globals.user!.nStaring.toString(),
@@ -599,7 +599,7 @@ class _AccountScreenState extends State<AccountScreen>
                               ),
                               textColor: AppColors.textColor2,
                               borderSide:
-                              const BorderSide(color: AppColors.greyShade5),
+                                  const BorderSide(color: AppColors.greyShade5),
                             )),
                         SizedBox(height: getScreenHeight(15)),
                       ],
@@ -628,27 +628,27 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _posts.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title: "Reaches you’ve made",
-                                    subtitle:
-                                    "Find all posts or contributions you’ve made here ",
-                                  )
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Reaches you’ve made",
+                                          subtitle:
+                                              "Find all posts or contributions you’ve made here ",
+                                        )
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _posts.value.length,
-                                itemBuilder: (context, index) {
-                                  return _ReacherCard(
-                                    postModel: _posts.value[index],
-                                    // onLike: () {
-                                    //   _likePost(index);
-                                    // },
-                                  );
-                                },
-                              ),
+                                      itemCount: _posts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _ReacherCard(
+                                          postModel: _posts.value[index],
+                                          // onLike: () {
+                                          //   _likePost(index);
+                                          // },
+                                        );
+                                      },
+                                    ),
                             ),
 
                           //LIKES TAB
@@ -664,92 +664,92 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _likedPosts.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title: "Likes you made",
-                                    subtitle:
-                                    "Find post you liked and your post that was liked",
-                                  )
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Likes you made",
+                                          subtitle:
+                                              "Find post you liked and your post that was liked",
+                                        )
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _likedPosts.value.length,
-                                itemBuilder: (context, index) {
-                                  return PostFeedReacherCard(
-                                    likingPost: false,
-                                    postFeedModel:
-                                    _likedPosts.value[index],
-                                    isLiked: _likedPosts
-                                        .value[index].like!.isNotEmpty
-                                        ? true
-                                        : false,
-                                    isVoted: _likedPosts
-                                        .value[index].vote!.isNotEmpty
-                                        ? true
-                                        : false,
-                                    voteType: _likedPosts
-                                        .value[index].vote!.isNotEmpty
-                                        ? _likedPosts.value[index]
-                                        .vote![0].voteType
-                                        : null,
-                                    onMessage: () {
-                                      //  reachDM.value = true;
+                                      itemCount: _likedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _likedPosts.value[index],
+                                          isLiked: _likedPosts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _likedPosts.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                            //  reachDM.value = true;
 
-                                      handleTap(index);
-                                      if (active.contains(index)) {
-                                        globals.userBloc!.add(
-                                            GetRecipientProfileEvent(
-                                                email: _likedPosts
-                                                    .value[index]
-                                                    .postOwnerId!));
-                                      }
-                                    },
-                                    onUpvote: () {
-                                      handleTap(index);
-                                      if (active.contains(index)) {
-                                        globals.socialServiceBloc!
-                                            .add(VotePostEvent(
-                                          voteType: 'upvote',
-                                          postId: _likedPosts
-                                              .value[index].postId,
-                                        ));
-                                      }
-                                    },
-                                    onDownvote: () {
-                                      handleTap(index);
-                                      if (active.contains(index)) {
-                                        globals.socialServiceBloc!
-                                            .add(VotePostEvent(
-                                          voteType: 'downvote',
-                                          postId: _likedPosts
-                                              .value[index].postId,
-                                        ));
-                                      }
-                                    },
-                                    onLike: () {
-                                      handleTap(index);
-                                      if (active.contains(index)) {
-                                        if (_posts.value[index].like!
-                                            .isNotEmpty) {
-                                          globals.socialServiceBloc!
-                                              .add(UnlikePostEvent(
-                                            postId: _likedPosts
-                                                .value[index].postId,
-                                          ));
-                                        } else {
-                                          globals.socialServiceBloc!.add(
-                                            LikePostEvent(
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _likedPosts
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
                                                 postId: _likedPosts
-                                                    .value[index].postId),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  );
-                                },
-                              ),
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _likedPosts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_posts.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _likedPosts
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _likedPosts
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                             ),
                           //COMMENTS TAB
                           if (_isLoadingComments)
@@ -767,24 +767,24 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _comments.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                      title:
-                                      'Comments you made on a post and comments made on your post',
-                                      subtitle:
-                                      'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                'Comments you made on a post and comments made on your post',
+                                            subtitle:
+                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _comments.value.length,
-                                itemBuilder: (context, index) {
-                                  return _CommentReachCard(
-                                    commentModel: _comments.value[index],
-                                  );
-                                },
-                              ),
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
                             ),
 
                           //SHOUTOUTS TAB
@@ -803,24 +803,24 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _comments.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                      title:
-                                      "Posts you've shouted out and your posts that has been shouted out",
-                                      subtitle:
-                                      "See posts you've shouted out and your post that has been shouted out")
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                "Posts you've shouted out and your posts that has been shouted out",
+                                            subtitle:
+                                                "See posts you've shouted out and your post that has been shouted out")
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _comments.value.length,
-                                itemBuilder: (context, index) {
-                                  return _CommentReachCard(
-                                    commentModel: _comments.value[index],
-                                  );
-                                },
-                              ),
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
                             ),
 
                           //SHOUTDOWN TAB
@@ -839,24 +839,24 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _comments.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                      title:
-                                      "Posts you've shouted down and your posts that has been shouted down",
-                                      subtitle:
-                                      "See posts you've shouted down and your post that has been shouted down")
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                "Posts you've shouted down and your posts that has been shouted down",
+                                            subtitle:
+                                                "See posts you've shouted down and your post that has been shouted down")
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _comments.value.length,
-                                itemBuilder: (context, index) {
-                                  return _CommentReachCard(
-                                    commentModel: _comments.value[index],
-                                  );
-                                },
-                              ),
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
                             ),
 
                           //SHARE TAB
@@ -875,22 +875,22 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _comments.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                      title: "Post you shared",
-                                      subtitle: "Find post you've shared")
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title: "Post you shared",
+                                            subtitle: "Find post you've shared")
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _comments.value.length,
-                                itemBuilder: (context, index) {
-                                  return _CommentReachCard(
-                                    commentModel: _comments.value[index],
-                                  );
-                                },
-                              ),
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
                             ),
                           //SAVED POSTS TAB
                           if (_isLoadingSavedPosts)
@@ -905,34 +905,34 @@ class _AccountScreenState extends State<AccountScreen>
                               },
                               child: _savedPosts.value.isEmpty
                                   ? ListView(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                children: const [
-                                  EmptyTabWidget(
-                                    title: "No saved posts",
-                                    subtitle: "",
-                                  )
-                                ],
-                              )
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "No saved posts",
+                                          subtitle: "",
+                                        )
+                                      ],
+                                    )
                                   : ListView.builder(
-                                itemCount: _savedPosts.value.length,
-                                itemBuilder: (context, index) {
-                                  return SavedPostReacherCardd(
-                                    savedPostModel:
-                                    _savedPosts.value[index],
-                                    onDelete: () {
-                                      handleTap(index);
-                                      if (active.contains(index)) {
-                                        globals.socialServiceBloc!.add(
-                                            DeleteSavedPostEvent(
-                                                postId: _savedPosts
-                                                    .value[index]
-                                                    .postId));
-                                      }
-                                    },
-                                  );
-                                },
-                              ),
+                                      itemCount: _savedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return SavedPostReacherCardd(
+                                          savedPostModel:
+                                              _savedPosts.value[index],
+                                          onDelete: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!.add(
+                                                  DeleteSavedPostEvent(
+                                                      postId: _savedPosts
+                                                          .value[index]
+                                                          .postId));
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                             )
                         ],
                       ),
@@ -1017,16 +1017,16 @@ class _ReacherCard extends HookWidget {
                                   SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              postModel!.location == null
-                                  ? const SizedBox.shrink()
-                                  : Text(
-                                postModel!.location ?? 'Somewhere',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
-                                ),
-                              ),
+                              globals.user!.showLocation!
+                                  ? Text(
+                                      postModel!.location ?? 'Somewhere',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(11),
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1044,7 +1044,7 @@ class _ReacherCard extends HookWidget {
                             iconSize: getScreenHeight(19),
                             padding: const EdgeInsets.all(0),
                             icon:
-                            SvgPicture.asset('assets/svgs/kebab card.svg'),
+                                SvgPicture.asset('assets/svgs/kebab card.svg'),
                           ),
                         ],
                       )
@@ -1174,10 +1174,10 @@ class _ReacherCard extends HookWidget {
                                   ),
                                   Flexible(
                                       child:
-                                      SizedBox(width: getScreenWidth(4))),
+                                          SizedBox(width: getScreenWidth(4))),
                                   Flexible(
                                       child:
-                                      SizedBox(width: getScreenWidth(4))),
+                                          SizedBox(width: getScreenWidth(4))),
                                   IconButton(
                                     onPressed: () {},
                                     padding: EdgeInsets.zero,
@@ -1189,7 +1189,7 @@ class _ReacherCard extends HookWidget {
                                   ),
                                   Flexible(
                                       child:
-                                      SizedBox(width: getScreenWidth(4))),
+                                          SizedBox(width: getScreenWidth(4))),
                                 ],
                               ),
                             ),
@@ -1300,7 +1300,7 @@ class _CommentReachCard extends HookWidget {
                             iconSize: getScreenHeight(19),
                             padding: const EdgeInsets.all(0),
                             icon:
-                            SvgPicture.asset('assets/svgs/kebab card.svg'),
+                                SvgPicture.asset('assets/svgs/kebab card.svg'),
                           ),
                         ],
                       )
@@ -1449,7 +1449,7 @@ class _CommentReachCard extends HookWidget {
                                   ),
                                   Flexible(
                                       child:
-                                      SizedBox(width: getScreenWidth(4))),
+                                          SizedBox(width: getScreenWidth(4))),
                                   // FittedBox(
                                   //   child: Text(
                                   //     '${postFeedModel!.post!.nUpvotes}',
@@ -1475,7 +1475,7 @@ class _CommentReachCard extends HookWidget {
                                   ),
                                   Flexible(
                                       child:
-                                      SizedBox(width: getScreenWidth(4))),
+                                          SizedBox(width: getScreenWidth(4))),
                                   // FittedBox(
                                   //   child: Text(
                                   //     '${postFeedModel!.post!.nDownvotes}',
@@ -1593,112 +1593,112 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   }
 
   TabBar get _tabBar => TabBar(
-    isScrollable: true,
-    controller: _tabController,
-    indicatorWeight: 1.5,
-    unselectedLabelColor: AppColors.greyShade4,
-    indicatorColor: Colors.transparent,
-    labelColor: AppColors.primaryColor,
-    labelStyle: TextStyle(
-      fontSize: getScreenHeight(15),
-      fontFamily: 'Poppins',
-      fontWeight: FontWeight.w600,
-    ),
-    unselectedLabelStyle: TextStyle(
-      fontSize: getScreenHeight(15),
-      fontFamily: 'Poppins',
-      fontWeight: FontWeight.w400,
-    ),
-    tabs: [
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(0);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 0
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Reaches',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+        isScrollable: true,
+        controller: _tabController,
+        indicatorWeight: 1.5,
+        unselectedLabelColor: AppColors.greyShade4,
+        indicatorColor: Colors.transparent,
+        labelColor: AppColors.primaryColor,
+        labelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: getScreenHeight(15),
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w400,
+        ),
+        tabs: [
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(0);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 0
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Reaches',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 0
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(1);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 1
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Comment',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(1);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 1
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Comment',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 1
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-      Tab(
-        child: GestureDetector(
-          onTap: () => setState(() {
-            _tabController?.animateTo(2);
-          }),
-          child: Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: _tabController!.index == 2
-                  ? AppColors.textColor2
-                  : Colors.transparent,
-            ),
-            child: FittedBox(
-              child: Text(
-                'Likes',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  fontWeight: FontWeight.w400,
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(2);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
                   color: _tabController!.index == 2
-                      ? AppColors.white
-                      : AppColors.textColor2,
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Likes',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 2
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    ],
-  );
+        ],
+      );
   String message = '';
 
   bool _isReaching = false;
@@ -1717,7 +1717,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshCompleted();
           }
           if (state is GetAllPostsError) {
-            Snackbars.error(context, message: state.error);
+           Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
           if (state is GetPersonalCommentsSuccess) {
@@ -1739,7 +1739,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserError) {
-                Snackbars.error(context, message: state.error);
+                // Snackbars.error(context, message: state.error);
               }
 
               if (state is GetStarRelationshipSuccess) {
@@ -1764,6 +1764,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 setState(() {});
               }
 
+            
+
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
                 setState(() {});
@@ -1773,6 +1775,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 globals.userBloc!.add(
                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
+                
                 setState(() {});
               }
             },
@@ -1855,18 +1858,18 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                           duration: const Duration(seconds: 1),
                           child: widget.recipientImageUrl == null
                               ? ImagePlaceholder(
-                            width: getScreenWidth(100),
-                            height: getScreenHeight(100),
-                            border: Border.all(
-                                color: Colors.grey.shade50, width: 3.0),
-                          )
+                                  width: getScreenWidth(100),
+                                  height: getScreenHeight(100),
+                                  border: Border.all(
+                                      color: Colors.grey.shade50, width: 3.0),
+                                )
                               : RecipientProfilePicture(
-                            imageUrl: widget.recipientImageUrl,
-                            width: getScreenWidth(100),
-                            height: getScreenHeight(100),
-                            border: Border.all(
-                                color: Colors.grey.shade50, width: 3.0),
-                          ),
+                                  imageUrl: widget.recipientImageUrl,
+                                  width: getScreenWidth(100),
+                                  height: getScreenHeight(100),
+                                  border: Border.all(
+                                      color: Colors.grey.shade50, width: 3.0),
+                                ),
                         ),
                       ),
                     ],
@@ -1975,7 +1978,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                         ],
                       ),
                       globals.recipientUser!.bio != null &&
-                          globals.recipientUser!.bio != ''
+                              globals.recipientUser!.bio != ''
                           ? SizedBox(height: getScreenHeight(20))
                           : const SizedBox.shrink(),
                       SizedBox(
@@ -1990,7 +1993,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             ),
                           )),
                       globals.recipientUser!.bio != null &&
-                          globals.recipientUser!.bio != ''
+                              globals.recipientUser!.bio != ''
                           ? SizedBox(height: getScreenHeight(20))
                           : const SizedBox.shrink(),
                       Row(
@@ -2012,12 +2015,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                 if (!_isReaching) {
                                   globals.userBloc!.add(ReachUserEvent(
                                       userIdToReach:
-                                      globals.recipientUser!.id));
+                                          globals.recipientUser!.id));
                                 } else {
                                   globals.userBloc!.add(
                                       DelReachRelationshipEvent(
                                           userIdToDelete:
-                                          globals.recipientUser!.id));
+                                              globals.recipientUser!.id));
                                 }
                               },
                               size: size,
@@ -2030,7 +2033,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   : AppColors.white,
                               borderSide: _isReaching
                                   ? const BorderSide(
-                                  color: AppColors.greyShade5)
+                                      color: AppColors.greyShade5)
                                   : BorderSide.none,
                             ),
                           ),
@@ -2086,27 +2089,27 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             },
                             child: _posts.value.isEmpty
                                 ? ListView(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              children: const [
-                                EmptyTabWidget(
-                                  title: "Reaches you’ve made",
-                                  subtitle:
-                                  "Find all posts or contributions you’ve made here ",
-                                )
-                              ],
-                            )
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                        title: "Reaches you’ve made",
+                                        subtitle:
+                                            "Find all posts or contributions you’ve made here ",
+                                      )
+                                    ],
+                                  )
                                 : ListView.builder(
-                              itemCount: _posts.value.length,
-                              itemBuilder: (context, index) {
-                                return _ReacherCard(
-                                  postModel: _posts.value[index],
-                                  // onLike: () {
-                                  //   _likePost(index);
-                                  // },
-                                );
-                              },
-                            ),
+                                    itemCount: _posts.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _ReacherCard(
+                                        postModel: _posts.value[index],
+                                        // onLike: () {
+                                        //   _likePost(index);
+                                        // },
+                                      );
+                                    },
+                                  ),
                           ),
 
                         //COMMENTS TAB
@@ -2125,24 +2128,24 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             },
                             child: _comments.value.isEmpty
                                 ? ListView(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              children: const [
-                                EmptyTabWidget(
-                                    title:
-                                    'Comments you made on a post and comments made on your post',
-                                    subtitle:
-                                    'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                              ],
-                            )
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    children: const [
+                                      EmptyTabWidget(
+                                          title:
+                                              'Comments you made on a post and comments made on your post',
+                                          subtitle:
+                                              'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                    ],
+                                  )
                                 : ListView.builder(
-                              itemCount: _comments.value.length,
-                              itemBuilder: (context, index) {
-                                return _CommentReachCard(
-                                  commentModel: _comments.value[index],
-                                );
-                              },
-                            ),
+                                    itemCount: _comments.value.length,
+                                    itemBuilder: (context, index) {
+                                      return _CommentReachCard(
+                                        commentModel: _comments.value[index],
+                                      );
+                                    },
+                                  ),
                           ),
 
                         //LIKES TAB

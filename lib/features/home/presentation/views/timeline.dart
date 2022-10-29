@@ -378,7 +378,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           else
                                                             UserStory(
                                                               size: size,
-                                                              image: globals.user!
+                                                              image: globals
+                                                                      .user!
                                                                       .profilePicture ??
                                                                   '',
                                                               isMe: false,
@@ -390,14 +391,15 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                 RouteNavigators.route(
                                                                     context,
                                                                     ViewMyStatus(
-                                                                        status: _myStatus
-                                                                            .value));
+                                                                        status:
+                                                                            _myStatus.value));
                                                               },
                                                             ),
                                                           ...List.generate(
                                                             _userStatus
                                                                 .value.length,
-                                                            (index) => UserStory(
+                                                            (index) =>
+                                                                UserStory(
                                                               size: size,
                                                               isMe: false,
                                                               isLive: false,
@@ -409,7 +411,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .profilePicture!,
                                                               username: _userStatus
                                                                   .value[index]
-                                                                  .status![index]
+                                                                  .status![
+                                                                      index]
                                                                   .statusCreatorModel!
                                                                   .username!,
                                                               onTap: () {
@@ -432,7 +435,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       ),
                                                     ).paddingOnly(l: 11),
                                                   ),
-                                                  
                                                 ),
                                                 SizedBox(
                                                     height: getScreenHeight(5)),
@@ -645,7 +647,8 @@ class PostFeedReacherCard extends HookWidget {
       final name = 'screenshot_${time}_reachme';
       final result = await ImageGallerySaver.saveImage(bytes!, name: name);
       debugPrint("Result ${result['filePath']}");
-        Snackbars.success(context, message: 'Image saved to Gallery');
+      Snackbars.success(context, message: 'Image saved to Gallery');
+      RouteNavigators.pop(context);
       return result['filePath'];
     }
 
@@ -659,12 +662,11 @@ class PostFeedReacherCard extends HookWidget {
       await saveImage(byteData!.buffer.asUint8List());
     }
 
-
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
-        right: getScreenWidth(15),
-        left: getScreenWidth(15),
+        right: getScreenWidth(16),
+        left: getScreenWidth(16),
         bottom: getScreenHeight(16),
       ),
       child: RepaintBoundary(
@@ -738,16 +740,13 @@ class PostFeedReacherCard extends HookWidget {
                               ],
                             ),
                             Row(
-                              children: [
-                                postFeedModel!.post!.location == null ||
-                                        postFeedModel!.post!.location == 'NIL'
-                                    ? const SizedBox.shrink()
-                                    : Text(
+                              children: [                            
+                                
+                                  Text(
                                         globals.user!.showLocation!
                                             ? postFeedModel!.post!.location!
                                             : '',
-                                        // postFeedModel!.post!.location ??
-                                        //     'Somewhere',
+                                  
                                         style: TextStyle(
                                           fontSize: getScreenHeight(10),
                                           fontFamily: 'Poppins',
@@ -831,7 +830,7 @@ class PostFeedReacherCard extends HookWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(8),
                         color: const Color(0xFFF5F5F5),
                       ),
                       child: Row(
@@ -921,7 +920,7 @@ class PostFeedReacherCard extends HookWidget {
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(8),
                             color: const Color(0xFFF5F5F5),
                           ),
                           child: Row(
