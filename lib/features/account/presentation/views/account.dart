@@ -2088,7 +2088,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               ));
                             },
                             child: _posts.value.isEmpty
-                                ? ListView(
+                                ? ListView( 
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
                                     children: const [
