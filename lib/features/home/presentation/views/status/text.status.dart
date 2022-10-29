@@ -340,7 +340,7 @@ class _TextStatus2State extends State<TextStatus2> {
     final showEmoji = useState(false);
     Widget buildEmoji() {
       return SizedBox(
-        height: getScreenHeight(400),
+        height: MediaQuery.of(context).size.height *0.4,
         child: EmojiPicker(
           textEditingController: controller,
           config: Config(

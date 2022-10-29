@@ -296,15 +296,33 @@ class Helper {
           });
     } else if(post.imageMediaItems!.length == 1){
          return GestureDetector(
-          onTap: (() => RouteNavigators.route(
-                context,
-                PhotoView(
-                  imageProvider: NetworkImage(post.imageMediaItems![0]),
-                  loadingBuilder: (context, event) => const Center(
-                    child: CupertinoActivityIndicator(color: Colors.white),
+          onTap: (() =>    RouteNavigators.route(
+                  context,
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
                   ),
-                ),
-              )),
+                )
+              ),
           child: Container(
             height: getScreenHeight(300),
             clipBehavior: Clip.hardEdge,
@@ -317,8 +335,7 @@ class Helper {
             ),
           ),
         );
-    }
-    
+    }    
     else if (post.imageMediaItems!.length == 3) {
       int remImageLength =
           1; // length of extra image not seen in the grid at first
@@ -327,16 +344,33 @@ class Helper {
           children: [
             Flexible(
               child: GestureDetector(
-                onTap: (() => RouteNavigators.route(
-                      context,
-                      PhotoView(
-                        imageProvider: NetworkImage(post.imageMediaItems![0]),
-                        loadingBuilder: (context, event) => const Center(
-                          child:
-                              CupertinoActivityIndicator(color: Colors.white),
-                        ),
-                      ),
-                    )),
+                onTap: (() =>   RouteNavigators.route(
+                  context,
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
+                  ),
+                )
+                    ),
                 child: Container(
                   height: getScreenHeight(300),
                   clipBehavior: Clip.hardEdge,
@@ -424,15 +458,30 @@ class Helper {
             return GestureDetector(
               onTap: (() => RouteNavigators.route(
                     context,
-                    PhotoView(
-                        imageProvider:
-                            NetworkImage(post.imageMediaItems![index]),
-                        loadingBuilder: (context, event) => const Center(
-                              child: CupertinoActivityIndicator(
-                                color: Colors.white,
-                              ),
-                            )),
-                  )),
+                     ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
+                  ),
+              )),
               child: Container(
                 height: getScreenHeight(300),
                 clipBehavior: Clip.hardEdge,
