@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' as foundation;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -35,6 +38,7 @@ class _TextStatusState extends State<TextStatus> {
     final isCameraStatus = useState(false);
     final isAudioStatus = useState(false);
     final isTextStatus = useState(true);
+
     final currentSelectedBg = useState<String>('assets/images/status-bg-1.jpg');
     final bgList = useState([
       'assets/images/status-bg-1.jpg',
@@ -333,6 +337,49 @@ class _TextStatus2State extends State<TextStatus2> {
     ]);
 
     final controller = useTextEditingController();
+    final showEmoji = useState(false);
+    Widget buildEmoji() {
+      return SizedBox(
+        height: getScreenHeight(400),
+        child: EmojiPicker(
+          textEditingController: controller,
+          config: Config(
+            columns: 7,
+            emojiSizeMax:
+                32 * (!foundation.kIsWeb && Platform.isIOS ? 1.30 : 1.0),
+            verticalSpacing: 0,
+            horizontalSpacing: 0,
+            gridPadding: EdgeInsets.zero,
+            initCategory: Category.RECENT,
+            bgColor: const Color(0xFFF2F2F2),
+            indicatorColor: Colors.blue,
+            iconColor: Colors.grey,
+            iconColorSelected: Colors.blue,
+            backspaceColor: Colors.blue,
+            skinToneDialogBgColor: Colors.white,
+            skinToneIndicatorColor: Colors.grey,
+            enableSkinTones: true,
+            showRecentsTab: true,
+            recentsLimit: 28,
+            replaceEmojiOnLimitExceed: false,
+            noRecents: const Text(
+              'No Recents',
+              style: TextStyle(fontSize: 20, color: Colors.black26),
+              textAlign: TextAlign.center,
+            ),
+            loadingIndicator: const SizedBox.shrink(),
+            tabIndicatorAnimDuration: kTabScrollDuration,
+            categoryIcons: const CategoryIcons(),
+            buttonMode: ButtonMode.MATERIAL,
+            checkPlatformCompatibility: true,
+          ),
+          onBackspacePressed: () {
+            controller.text.substring(0, controller.text.length - 1);
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.black,
       body: Container(
@@ -422,7 +469,9 @@ class _TextStatus2State extends State<TextStatus2> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              showEmoji.value = !showEmoji.value;
+                            },
                             icon: SvgPicture.asset(
                                 'assets/svgs/status-smile.svg'),
                             padding: EdgeInsets.zero,
@@ -560,7 +609,8 @@ class _TextStatus2State extends State<TextStatus2> {
                           ),
                         ],
                       ),
-                    )
+                    ),
+                    showEmoji.value ? buildEmoji() : const SizedBox.shrink()
                   ],
                 );
               }),
