@@ -285,10 +285,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                             label: 'Share Post',
                             onPressed: () {
                               RouteNavigators.pop(context);
-                              Clipboard.setData(ClipboardData(
-                                  text: postFeedModel.post!.postSlug!));
-                              Snackbars.success(context,
-                                  message: 'Link copied to clipboard');
+                              Share.share(
+                                  'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
                             },
                           ),
                           KebabBottomTextButton(
@@ -349,18 +347,18 @@ Future showStoryBottomSheet(BuildContext context,
                     SizedBox(height: getScreenHeight(20)),
                     Column(
                       children: [
-                        KebabBottomTextButton(
-                          label: 'Report',
-                          onPressed: () {},
-                          color: const Color(0xFFE50101),
-                        ),
-                        KebabBottomTextButton(label: 'Reach', onPressed: () {}),
-                        KebabBottomTextButton(
-                            label: 'Star user', onPressed: () {}),
+                        // KebabBottomTextButton(
+                        //   label: 'Report',
+                        //   onPressed: () {},
+                        //   color: const Color(0xFFE50101),
+                        // ),
+                        // KebabBottomTextButton(label: 'Reach', onPressed: () {}),
+                        // KebabBottomTextButton(
+                        //     label: 'Star user', onPressed: () {}),
                         KebabBottomTextButton(
                             label: 'Copy link', onPressed: () {}),
                         KebabBottomTextButton(label: 'Share', onPressed: () {}),
-                        KebabBottomTextButton(label: 'Mute', onPressed: () {}),
+                        // KebabBottomTextButton(label: 'Mute', onPressed: () {}),
                       ],
                     ),
                     SizedBox(height: getScreenHeight(20)),

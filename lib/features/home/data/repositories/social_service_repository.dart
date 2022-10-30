@@ -133,7 +133,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, String>> deletePostVote({
+  Future<Either<String, bool>> deletePostVote({
     required String voteId,
   }) async {
     try {

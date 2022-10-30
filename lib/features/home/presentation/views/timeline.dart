@@ -44,6 +44,8 @@ import 'package:readmore/readmore.dart';
 // import 'package:screenshot/screenshot.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../../core/helper/logger.dart';
+
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -238,12 +240,21 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is VotePostSuccess) {
-                    // if (!(state.isVoted!)) {
-                    //   Snackbars.success(context,
-                    //       message: 'You shouted down on this post');
-                    // }
+                    if (!(state.isVoted!)) {
+                      Snackbars.success(context,
+                          message: 'Post shouted down has been removed!');
+                    }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteSuccess) {
+                    globals.socialServiceBloc!
+                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteError) {
+                    Snackbars.error(context, message: state.error);
                   }
 
                   if (state is GetPostFeedSuccess) {
@@ -500,17 +511,35 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+
                                                         if (active
                                                             .contains(index)) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  VotePostEvent(
-                                                            voteType: 'Upvote',
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                          ));
+                                                          if ((_posts
+                                                                      .value[
+                                                                          index]
+                                                                      .vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          }
                                                         }
                                                       },
                                                       onDownvote: () {
@@ -535,6 +564,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+                                                        Console.log(
+                                                            'Like Data',
+                                                            _posts.value[index]
+                                                                .toJson());
                                                         if (active
                                                             .contains(index)) {
                                                           if (_posts

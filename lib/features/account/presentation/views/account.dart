@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
@@ -28,7 +30,9 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../../home/presentation/views/post_reach.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -306,9 +310,39 @@ class _AccountScreenState extends State<AccountScreen>
   double height = getScreenHeight(100);
   ScrollController scrollViewController = ScrollController();
 
+  void refreshPage() {
+    switch (_tabController!.index) {
+      case 0:
+        _reachoutsRefreshController.requestRefresh();
+        break;
+      case 1:
+        _likesRefreshController.requestRefresh();
+        break;
+      case 2:
+        _commentsRefreshController.requestRefresh();
+        break;
+      case 3:
+        _shoutoutRefreshController.requestRefresh();
+        break;
+      case 4:
+        _shoutdownRefreshController.requestRefresh();
+        break;
+      case 5:
+        _shareRefreshController.requestRefresh();
+        break;
+      case 6:
+        _savedPostsRefreshController.requestRefresh();
+        break;
+      default:
+        _reachoutsRefreshController.requestRefresh();
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final reachDM = useState(false);
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
     final _savedPosts = useState<List<SavePostModel>>([]);
@@ -331,6 +365,16 @@ class _AccountScreenState extends State<AccountScreen>
         body: BlocConsumer<UserBloc, UserState>(
           bloc: globals.userBloc,
           listener: (context, state) {
+            if (state is RecipientUserData) {
+              reachDM.value = true;
+              if (reachDM.value) {
+                RouteNavigators.route(
+                    context, MsgChatInterface(recipientUser: state.user));
+              }
+            }
+            if (state is UserError) {
+              reachDM.value = false;
+            }
             if (state is UserData) {
               globals.user = state.user;
             }
@@ -367,6 +411,27 @@ class _AccountScreenState extends State<AccountScreen>
                   _savedPosts.value = state.data!;
                 }
                 if (state is GetAllSavedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                }
+                if (state is LikePostSuccess || state is UnlikePostSuccess) {
+                  refreshPage();
+                }
+
+                if (state is VotePostSuccess) {
+                  if (!(state.isVoted!)) {
+                    Snackbars.success(context,
+                        message: 'Post shouted down has been removed!');
+                  }
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                }
+
+                if (state is DeletePostVoteSuccess) {
+                  globals.socialServiceBloc!
+                      .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                }
+
+                if (state is DeletePostVoteError) {
                   Snackbars.error(context, message: state.error);
                 }
               },
@@ -731,7 +796,7 @@ class _AccountScreenState extends State<AccountScreen>
                                           onLike: () {
                                             handleTap(index);
                                             if (active.contains(index)) {
-                                              if (_posts.value[index].like!
+                                              if (_likedPosts.value[index].like!
                                                   .isNotEmpty) {
                                                 globals.socialServiceBloc!
                                                     .add(UnlikePostEvent(
@@ -751,6 +816,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       },
                                     ),
                             ),
+
                           //COMMENTS TAB
                           if (_isLoadingComments)
                             const CircularLoader()
@@ -892,7 +958,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       },
                                     ),
                             ),
-                            
+
                           //SAVED POSTS TAB
                           if (_isLoadingSavedPosts)
                             const CircularLoader()
@@ -1511,7 +1577,16 @@ Future _showReacherCardBottomSheet(
     builder: (context) {
       return BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is GetPostSuccess) {
+            RouteNavigators.pop(context);
+            RouteNavigators.route(context, EditReach(post: state.data!));
+          }
+          if (state is GetPostError) {
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+        },
         builder: (context, state) {
           return Container(
               decoration: const BoxDecoration(
@@ -1547,8 +1622,22 @@ Future _showReacherCardBottomSheet(
                           RouteNavigators.pop(context);
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Post', onPressed: () {}),
-                    const KebabBottomTextButton(label: 'Copy link'),
+                        label: 'Share Post',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Share.share(
+                              'Have fun viewing this: ${postModel.postSlug!}');
+                        }),
+                    KebabBottomTextButton(
+                      label: 'Copy link',
+                      onPressed: () {
+                        RouteNavigators.pop(context);
+                        Clipboard.setData(
+                            ClipboardData(text: postModel.postSlug!));
+                        Snackbars.success(context,
+                            message: 'Link copied to clipboard');
+                      },
+                    ),
                   ],
                 ),
                 SizedBox(height: getScreenHeight(20)),
@@ -1718,7 +1807,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshCompleted();
           }
           if (state is GetAllPostsError) {
-           Snackbars.error(context, message: state.error);
+            Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
           if (state is GetPersonalCommentsSuccess) {
@@ -1765,8 +1854,6 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 setState(() {});
               }
 
-            
-
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
                 setState(() {});
@@ -1776,7 +1863,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 globals.userBloc!.add(
                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
-                
+
                 setState(() {});
               }
             },
@@ -2089,7 +2176,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               ));
                             },
                             child: _posts.value.isEmpty
-                                ? ListView( 
+                                ? ListView(
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
                                     children: const [

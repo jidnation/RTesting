@@ -858,22 +858,22 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<String> deletePostVote({required String? voteId}) async {
+  Future<bool> deletePostVote({required String? voteId}) async {
     String q = r'''
-        mutation deletePostVote($voteId: String!) {
-          deletePostVote(voteId: $voteId)
+        mutation deletePostVote($postId: String!) {
+          deletePostVote(postId: $postId)
         }''';
     try {
       final result = await _client.mutate(
         gql(q),
-        variables: {'voteId': voteId},
+        variables: {'postId': voteId},
       );
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      return result.data!['deletePostVote'] as String;
+      return result.data!['deletePostVote'] as bool;
     } catch (e) {
       rethrow;
     }
