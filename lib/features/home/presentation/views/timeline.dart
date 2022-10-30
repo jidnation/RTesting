@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
@@ -740,21 +741,19 @@ class PostFeedReacherCard extends HookWidget {
                               ],
                             ),
                             Row(
-                              children: [                            
-                                
-                                  Text(
-                                        globals.user!.showLocation!
-                                            ? postFeedModel!.post!.location!
-                                            : '',
-                                  
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(10),
-                                          fontFamily: 'Poppins',
-                                          letterSpacing: 0.4,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.textColor2,
-                                        ),
-                                      ),
+                              children: [
+                                Text(
+                                  globals.user!.showLocation!
+                                      ? postFeedModel!.post!.location!
+                                      : '',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(10),
+                                    fontFamily: 'Poppins',
+                                    letterSpacing: 0.4,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textColor2,
+                                  ),
+                                ),
                                 Text(
                                   postDuration,
                                   style: TextStyle(
