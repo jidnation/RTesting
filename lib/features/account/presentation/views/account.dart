@@ -892,6 +892,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       },
                                     ),
                             ),
+                            
                           //SAVED POSTS TAB
                           if (_isLoadingSavedPosts)
                             const CircularLoader()
@@ -917,7 +918,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _savedPosts.value.length,
                                       itemBuilder: (context, index) {
-                                        return SavedPostReacherCardd(
+                                        return SavedPostReacherCard(
                                           savedPostModel:
                                               _savedPosts.value[index],
                                           onDelete: () {
