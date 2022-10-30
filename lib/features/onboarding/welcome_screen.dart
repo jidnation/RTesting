@@ -28,7 +28,7 @@ class WelcomeScreen extends StatelessWidget {
               Center(
                 child: SvgPicture.asset(
                   'assets/svgs/Sign Up.svg',
-                  height: 186,
+                  height: 250,
                   width: 290,
                 ),
               ),
@@ -54,7 +54,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 40),
               CustomButton(
                 label: 'Login',
-                color: AppColors.textColor2,
+                color: AppColors.buttonColor,
                 onPressed: () =>
                     RouteNavigators.route(context, const LoginScreen()),
                 size: size,

@@ -4,7 +4,9 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus_windows
+  emoji_picker_flutter
   flutter_secure_storage_windows
+  permission_handler_windows
   share_plus_windows
   url_launcher_windows
 )

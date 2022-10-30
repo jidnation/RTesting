@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,7 +28,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -53,11 +51,13 @@ class _AccountScreenState extends State<AccountScreen>
   late final _commentsRefreshController = RefreshController();
   late final _savedPostsRefreshController = RefreshController();
   late final _likesRefreshController = RefreshController();
-
+  late final _shoutoutRefreshController = RefreshController();
+  late final _shoutdownRefreshController = RefreshController();
+  late final _shareRefreshController = RefreshController();
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
   }
 
   Set active = {};
@@ -137,7 +137,7 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     child: FittedBox(
                       child: Text(
-                        'Comments',
+                        'Likes',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontWeight: FontWeight.w400,
@@ -168,7 +168,7 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Likes',
+                    'Comments',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -197,11 +197,98 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
                 child: FittedBox(
                   child: Text(
-                    'Saved posts',
+                    'Shoutout',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
                       color: _tabController!.index == 3
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(4);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 4
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutdown',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 4
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(5);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 5
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Share',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 5
+                          ? AppColors.white
+                          : AppColors.textColor2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(6);
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: _tabController!.index == 6
+                      ? AppColors.textColor2
+                      : Colors.transparent,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                      color: _tabController!.index == 6
                           ? AppColors.white
                           : AppColors.textColor2,
                     ),
@@ -222,9 +309,8 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final reachDM = useState(false);
     final _posts = useState<List<PostModel>>([]);
-    final comments = useState<List<CommentModel>>([]);
+    final _comments = useState<List<CommentModel>>([]);
     final _savedPosts = useState<List<SavePostModel>>([]);
     final _likedPosts = useState<List<PostFeedModel>>([]);
     useEffect(() {
@@ -240,624 +326,624 @@ class _AccountScreenState extends State<AccountScreen>
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is RecipientUserData) {
-            if (reachDM.value) {
-              RouteNavigators.route(
-                  context, MsgChatInterface(recipientUser: state.user));
+    return ProgressHUD(
+      child: Scaffold(
+        body: BlocConsumer<UserBloc, UserState>(
+          bloc: globals.userBloc,
+          listener: (context, state) {
+            if (state is UserData) {
+              globals.user = state.user;
             }
-            reachDM.value = false;
-          }
-          if (state is UserError) {
-            reachDM.value = false;
-          }
-          if (state is UserData) {
-            globals.user = state.user;
-          }
-        },
-        builder: (context, state) {
-          return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-            bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              if (state is LikePostSuccess ||
-                  state is UnlikePostSuccess ||
-                  state is VotePostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
-                globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
-                    pageLimit: 50, pageNumber: 1, authId: globals.user!.id));
-                globals.socialServiceBloc!
-                    .add(GetAllSavedPostsEvent(pageLimit: 50, pageNumber: 1));
-                globals.socialServiceBloc!
-                    .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
-              }
-              if (state is GetAllPostsSuccess) {
-                _posts.value = state.posts!;
-                _reachoutsRefreshController.refreshCompleted();
-              }
-              if (state is GetAllPostsError) {
-                Snackbars.error(context, message: state.error);
-                _reachoutsRefreshController.refreshFailed();
-              }
-              if (state is GetLikedPostsSuccess) {
-                _likedPosts.value = state.posts!;
-                _likesRefreshController.refreshCompleted();
-              }
-              if (state is GetLikedPostsError) {
-                Snackbars.error(context, message: state.error);
-                _likesRefreshController.refreshCompleted();
-              }
-              if (state is GetPersonalCommentsSuccess) {
-                comments.value = state.data!;
-                _commentsRefreshController.refreshCompleted();
-              }
-              if (state is GetPersonalCommentsError) {
-                Snackbars.error(context, message: state.error);
-                _commentsRefreshController.refreshFailed();
-              }
-              if (state is GetAllSavedPostsSuccess) {
-                _savedPosts.value = state.data!;
-              }
-              if (state is GetAllSavedPostsError) {
-                Snackbars.error(context, message: state.error);
-              }
-            },
-            builder: (context, state) {
-              bool _isLoadingPosts = state is GetAllPostsLoading;
-              bool _isLoadingLikes = state is GetLikedPostsLoading;
-              bool _isLoadingComments = state is GetPersonalCommentsLoading;
-              bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
+          },
+          builder: (context, state) {
+            return BlocConsumer<SocialServiceBloc, SocialServiceState>(
+              bloc: globals.socialServiceBloc,
+              listener: (context, state) {
+                if (state is GetAllPostsSuccess) {
+                  _posts.value = state.posts!;
+                  _reachoutsRefreshController.refreshCompleted();
+                }
+                if (state is GetAllPostsError) {
+                  Snackbars.error(context, message: state.error);
+                  _reachoutsRefreshController.refreshFailed();
+                }
+                if (state is GetLikedPostsSuccess) {
+                  _likedPosts.value = state.posts!;
+                  _likesRefreshController.refreshCompleted();
+                }
+                if (state is GetLikedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                  _likesRefreshController.refreshCompleted();
+                }
+                if (state is GetPersonalCommentsSuccess) {
+                  _comments.value = state.data!;
+                  _commentsRefreshController.refreshCompleted();
+                }
+                if (state is GetPersonalCommentsError) {
+                  Snackbars.error(context, message: state.error);
+                  _commentsRefreshController.refreshFailed();
+                }
+                if (state is GetAllSavedPostsSuccess) {
+                  _savedPosts.value = state.data!;
+                }
+                if (state is GetAllSavedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                }
+              },
+              builder: (context, state) {
+                bool _isLoadingPosts = state is GetAllPostsLoading;
+                bool _isLoadingLikes = state is GetLikedPostsLoading;
+                bool _isLoadingComments = state is GetPersonalCommentsLoading;
+                bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Stack(
-                    alignment: Alignment.topCenter,
-                    fit: StackFit.passthrough,
-                    clipBehavior: Clip.none,
-                    children: <Widget>[
-                      /// Banner image
-                      SizedBox(
-                        height: getScreenHeight(140),
-                        width: size.width,
-                        child: Image.asset(
-                          'assets/images/cover.png',
-                          fit: BoxFit.cover,
-                          gaplessPlayback: true,
-                        ),
-                      ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () => RouteNavigators.route(
-                                  context, const HomeScreen()),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.user!);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]).paddingOnly(t: 25),
-
-                      Positioned(
-                        top: size.height * 0.1,
-                        child: AnimatedContainer(
-                          width: isGoingDown ? width : getScreenWidth(100),
-                          height: isGoingDown ? height : getScreenHeight(100),
-                          duration: const Duration(seconds: 1),
-                          child: Helper.renderProfilePicture(
-                            globals.user!.profilePicture,
-                            size: 100,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Stack(
+                      alignment: Alignment.topCenter,
+                      fit: StackFit.passthrough,
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        /// Banner image
+                        SizedBox(
+                          height: getScreenHeight(200),
+                          width: size.width,
+                          child: Image.asset(
+                            'assets/images/cover.png',
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(height: getScreenHeight(10)),
-                      Text(
-                          ('${globals.user!.firstName} ${globals.user!.lastName}')
-                              .toTitleCase(),
-                          style: TextStyle(
-                            fontSize: getScreenHeight(15),
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textColor2,
-                          )),
-                      Text('@${globals.user!.username ?? 'username'}',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(13),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
-                          )),
-                      SizedBox(height: getScreenHeight(15)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 0)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.user!.nReachers.toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Reachers',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
+                                onPressed: () => RouteNavigators.route(
+                                    context, const HomeScreen()),
                               ),
-                              SizedBox(width: getScreenWidth(20)),
-                              InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 1)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.user!.nReaching.toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Reaching',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/pop-vertical.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: getScreenWidth(20)),
-                              InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 2)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.user!.nStaring.toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Starring',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
+                                onPressed: () async {
+                                  await showProfileMenuBottomSheet(context,
+                                      user: globals.user!);
+                                },
+                                splashRadius: 20,
                               )
-                            ],
+                            ]).paddingOnly(t: 40),
+                        Positioned(
+                          top: size.height * 0.2 - 20,
+                          child: AnimatedContainer(
+                            width: isGoingDown ? width : getScreenWidth(100),
+                            height: isGoingDown ? height : getScreenHeight(100),
+                            duration: const Duration(seconds: 1),
+                            child: Helper.renderProfilePicture(
+                              globals.user!.profilePicture,
+                              size: 150,
+                            ),
                           ),
-                        ],
-                      ),
-                      globals.user!.bio != null && globals.user!.bio != ''
-                          ? SizedBox(height: getScreenHeight(20))
-                          : const SizedBox.shrink(),
-                      SizedBox(
-                          width: getScreenWidth(290),
-                          child: Text(
-                            globals.user!.bio ?? '',
-                            textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        SizedBox(height: getScreenHeight(10)),
+                        Text(
+                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                .toTitleCase(),
+                            style: TextStyle(
+                              fontSize: getScreenHeight(17),
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColor2,
+                            )),
+                        Text('@${globals.user!.username ?? 'username'}',
                             style: TextStyle(
                               fontSize: getScreenHeight(13),
-                              color: AppColors.greyShade2,
                               fontWeight: FontWeight.w400,
-                            ),
-                          )),
-                      globals.user!.bio != null && globals.user!.bio != ''
-                          ? SizedBox(height: getScreenHeight(20))
-                          : const SizedBox.shrink(),
-                      SizedBox(
-                          width: getScreenWidth(145),
-                          height: getScreenHeight(45),
-                          child: CustomButton(
-                            label: 'Edit Profile',
-                            labelFontSize: getScreenHeight(14),
-                            color: AppColors.white,
-                            onPressed: () {
-                              RouteNavigators.route(
-                                  context, const EditProfileScreen());
-                            },
-                            size: size,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 9,
-                              horizontal: 21,
-                            ),
-                            textColor: AppColors.textColor2,
-                            borderSide:
-                                const BorderSide(color: AppColors.greyShade5),
-                          )),
-                      SizedBox(height: getScreenHeight(15)),
-                    ],
-                  ).paddingOnly(t: 50),
-                  Divider(
-                    color: const Color(0xFF767474).withOpacity(0.5),
-                    thickness: 0.5,
-                  ),
-                  Center(child: _tabBar),
-                  Expanded(
-                    child: TabBarView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      controller: _tabController,
-                      children: [
-                        //REACHES TAB
-                        if (_isLoadingPosts)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _reachoutsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!.add(GetAllPostsEvent(
-                                pageLimit: 50,
-                                pageNumber: 1,
-                              ));
-                            },
-                            child: _posts.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                        title: "Reaches you’ve made",
-                                        subtitle:
-                                            "Find all posts or contributions you’ve made here ",
-                                      )
+                              color: AppColors.textColor2,
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 0)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReachers.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reachers',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
                                     ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _posts.value.length,
-                                    itemBuilder: (context, index) {
-                                      return _ReacherCard(
-                                        postModel: _posts.value[index],
-                                        isLiked:
-                                            _posts.value[index].like!.isNotEmpty
-                                                ? true
-                                                : false,
-                                        isVoted:
-                                            _posts.value[index].vote!.isNotEmpty
-                                                ? true
-                                                : false,
-                                        voteType:
-                                            _posts.value[index].vote!.isNotEmpty
-                                                ? _posts.value[index].vote![0]
-                                                    .voteType
-                                                : null,
-                                        onMessage: () {
-                                          HapticFeedback.mediumImpact();
-                                          reachDM.value = true;
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.userBloc!.add(
-                                                GetRecipientProfileEvent(
-                                                    email: _posts
-                                                        .value[index].authId!));
-                                          }
-                                        },
-                                        onUpvote: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Upvote',
-                                              postId:
-                                                  _posts.value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onDownvote: () {
-                                          HapticFeedback.mediumImpact();
-
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Downvote',
-                                              postId:
-                                                  _posts.value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onLike: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (_posts.value[index].like!
-                                                .isNotEmpty) {
-                                              globals.socialServiceBloc!
-                                                  .add(UnlikePostEvent(
-                                                postId:
-                                                    _posts.value[index].postId,
-                                              ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikePostEvent(
-                                                    postId: _posts
-                                                        .value[index].postId),
-                                              );
-                                            }
-                                          }
-                                        },
-                                      );
-                                    },
                                   ),
-                          ),
-
-                        //COMMENTS TAB
-                        if (_isLoadingComments)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _commentsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!
-                                  .add(GetPersonalCommentsEvent(
-                                pageLimit: 50,
-                                pageNumber: 1,
-                                authId: globals.user!.id,
-                              ));
-                            },
-                            child: comments.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                          title:
-                                              'Comments you made on a post and comments made on your post',
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 1)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReaching.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reaching',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 2)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nStaring.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Star',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(290),
+                            child: Text(
+                              globals.user!.bio ?? '',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: getScreenHeight(13),
+                                color: AppColors.greyShade2,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            )),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(145),
+                            height: getScreenHeight(45),
+                            child: CustomButton(
+                              label: 'Edit Profile',
+                              labelFontSize: getScreenHeight(14),
+                              color: AppColors.white,
+                              onPressed: () {
+                                RouteNavigators.route(
+                                    context, const EditProfileScreen());
+                              },
+                              size: size,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 9,
+                                horizontal: 21,
+                              ),
+                              textColor: AppColors.textColor2,
+                              borderSide:
+                                  const BorderSide(color: AppColors.greyShade5),
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                      ],
+                    ).paddingOnly(t: 50),
+                    Divider(
+                      color: const Color(0xFF767474).withOpacity(0.5),
+                      thickness: 0.5,
+                    ),
+                    Center(child: _tabBar),
+                    Expanded(
+                      child: TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: _tabController,
+                        children: [
+                          //REACHES TAB
+                          if (_isLoadingPosts)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _reachoutsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(GetAllPostsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                ));
+                              },
+                              child: _posts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Reaches you’ve made",
                                           subtitle:
-                                              'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: comments.value.length,
-                                    itemBuilder: (context, index) {
-                                      return _CommentReachCard(
-                                        commentModel: comments.value[index],
-                                        likingPost: false,
-                                        isLiked: comments
-                                                .value[index].like!.isNotEmpty
-                                            ? true
-                                            : false,
-                                        onLike: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (comments.value[index].like!
-                                                .isNotEmpty) {
-                                              globals.socialServiceBloc!
-                                                  .add(UnlikeCommentOnPostEvent(
-                                                commentId: comments
-                                                    .value[index].commentId,
-                                                postId: comments
-                                                    .value[index].postId,
-                                              ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikeCommentOnPostEvent(
-                                                  postId: comments
-                                                      .value[index].postId,
-                                                  commentId: comments
-                                                      .value[index].commentId,
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                          ),
+                                              "Find all posts or contributions you’ve made here ",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _posts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _ReacherCard(
+                                          postModel: _posts.value[index],
+                                          // onLike: () {
+                                          //   _likePost(index);
+                                          // },
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                        //LIKES TAB
-                        if (_isLoadingLikes)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _likesRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!.add(GetLikedPostsEvent(
-                                  pageLimit: 50, pageNumber: 1));
-                            },
-                            child: _likedPosts.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                        title: "Likes you made",
-                                        subtitle:
-                                            "Find post you liked and your post that was liked",
-                                      )
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _likedPosts.value.length,
-                                    itemBuilder: (context, index) {
-                                      return PostFeedReacherCard(
-                                        likingPost: false,
-                                        postFeedModel: _likedPosts.value[index],
-                                        isLiked: _likedPosts
-                                                .value[index].like!.isNotEmpty
-                                            ? true
-                                            : false,
-                                        isVoted: _likedPosts
-                                                .value[index].vote!.isNotEmpty
-                                            ? true
-                                            : false,
-                                        voteType: _likedPosts
-                                                .value[index].vote!.isNotEmpty
-                                            ? _likedPosts
-                                                .value[index].vote![0].voteType
-                                            : null,
-                                        onMessage: () {
-                                          reachDM.value = true;
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.userBloc!.add(
-                                                GetRecipientProfileEvent(
-                                                    email: _likedPosts
-                                                        .value[index]
-                                                        .postOwnerId!));
-                                          }
-                                        },
-                                        onUpvote: () {
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Upvote',
-                                              postId: _likedPosts
-                                                  .value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onDownvote: () {
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Downvote',
-                                              postId: _likedPosts
-                                                  .value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onLike: () {
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (_posts.value[index].like!
-                                                .isNotEmpty) {
+                          //LIKES TAB
+                          if (_isLoadingLikes)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _likesRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(
+                                    GetLikedPostsEvent(
+                                        pageLimit: 50, pageNumber: 1));
+                              },
+                              child: _likedPosts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "Likes you made",
+                                          subtitle:
+                                              "Find post you liked and your post that was liked",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _likedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _likedPosts.value[index],
+                                          isLiked: _likedPosts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _likedPosts.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                            //  reachDM.value = true;
+
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _likedPosts
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
                                               globals.socialServiceBloc!
-                                                  .add(UnlikePostEvent(
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
                                                 postId: _likedPosts
                                                     .value[index].postId,
                                               ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikePostEvent(
-                                                    postId: _likedPosts
-                                                        .value[index].postId),
-                                              );
                                             }
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                          ),
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _likedPosts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_posts.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _likedPosts
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _likedPosts
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
+                            ),
+                          //COMMENTS TAB
+                          if (_isLoadingComments)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _commentsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                  authId: globals.user!.id,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                'Comments you made on a post and comments made on your post',
+                                            subtitle:
+                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
 
-                        //SAVED POSTS TAB
-                        if (_isLoadingSavedPosts)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _savedPostsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!.add(
-                                  GetAllSavedPostsEvent(
-                                      pageLimit: 50, pageNumber: 1));
-                            },
-                            child: _savedPosts.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                        title: "No saved posts",
-                                        subtitle: "",
-                                      )
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _savedPosts.value.length,
-                                    itemBuilder: (context, index) {
-                                      return SavedPostReacherCardd(
-                                        savedPostModel:
-                                            _savedPosts.value[index],
-                                        onDelete: () {
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!.add(
-                                                DeleteSavedPostEvent(
-                                                    postId: _savedPosts
-                                                        .value[index].postId));
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                          )
-                      ],
+                          //SHOUTOUTS TAB
+                          if (_isLoadingComments)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _shoutoutRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                  authId: globals.user!.id,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                "Posts you've shouted out and your posts that has been shouted out",
+                                            subtitle:
+                                                "See posts you've shouted out and your post that has been shouted out")
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
+
+                          //SHOUTDOWN TAB
+                          if (_isLoadingComments)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _shoutdownRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                  authId: globals.user!.id,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title:
+                                                "Posts you've shouted down and your posts that has been shouted down",
+                                            subtitle:
+                                                "See posts you've shouted down and your post that has been shouted down")
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
+
+                          //SHARE TAB
+                          if (_isLoadingComments)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _shareRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!
+                                    .add(GetPersonalCommentsEvent(
+                                  pageLimit: 50,
+                                  pageNumber: 1,
+                                  authId: globals.user!.id,
+                                ));
+                              },
+                              child: _comments.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                            title: "Post you shared",
+                                            subtitle: "Find post you've shared")
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return _CommentReachCard(
+                                          commentModel: _comments.value[index],
+                                        );
+                                      },
+                                    ),
+                            ),
+                            
+                          //SAVED POSTS TAB
+                          if (_isLoadingSavedPosts)
+                            const CircularLoader()
+                          else
+                            Refresher(
+                              controller: _savedPostsRefreshController,
+                              onRefresh: () {
+                                globals.socialServiceBloc!.add(
+                                    GetAllSavedPostsEvent(
+                                        pageLimit: 50, pageNumber: 1));
+                              },
+                              child: _savedPosts.value.isEmpty
+                                  ? ListView(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: const [
+                                        EmptyTabWidget(
+                                          title: "No saved posts",
+                                          subtitle: "",
+                                        )
+                                      ],
+                                    )
+                                  : ListView.builder(
+                                      itemCount: _savedPosts.value.length,
+                                      itemBuilder: (context, index) {
+                                        return SavedPostReacherCard(
+                                          savedPostModel:
+                                              _savedPosts.value[index],
+                                          onDelete: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!.add(
+                                                  DeleteSavedPostEvent(
+                                                      postId: _savedPosts
+                                                          .value[index]
+                                                          .postId));
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
+                            )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          );
-        },
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -867,24 +953,21 @@ class _ReacherCard extends HookWidget {
   const _ReacherCard({
     Key? key,
     required this.postModel,
+    this.onComment,
     this.onDownvote,
     this.onLike,
     this.onMessage,
     this.onUpvote,
-    required this.isLiked,
-    required this.voteType,
-    required this.isVoted,
+    this.likeColour,
   }) : super(key: key);
 
   final PostModel? postModel;
-  final Function()? onLike, onMessage, onUpvote, onDownvote;
-  final bool isLiked, isVoted;
-  final String? voteType;
+  final Function()? onLike, onComment, onMessage, onUpvote, onDownvote;
+  final Color? likeColour;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 13,
@@ -896,237 +979,229 @@ class _ReacherCard extends HookWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Helper.renderProfilePicture(
-                      globals.user!.profilePicture,
-                      size: 33,
-                    ).paddingOnly(l: 13, t: 10),
-                    SizedBox(width: getScreenWidth(9)),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '@${postModel!.profile!.username}',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(15),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
+        child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+            bloc: globals.socialServiceBloc,
+            listener: (context, state) {},
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 33,
+                          ).paddingOnly(l: 13, t: 10),
+                          SizedBox(width: getScreenWidth(9)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '@${postModel!.profile!.username}',
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(15),
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  SvgPicture.asset('assets/svgs/verified.svg')
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 3),
-                            SvgPicture.asset('assets/svgs/verified.svg')
-                          ],
-                        ),
-                        postModel!.location == null
-                            ? const SizedBox.shrink()
-                            : Text(
-                                postModel!.location ?? 'Somewhere',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
-                                ),
-                              ),
-                      ],
-                    ).paddingOnly(t: 10),
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset('assets/svgs/starred.svg'),
-                    SizedBox(width: getScreenWidth(9)),
-                    IconButton(
-                      onPressed: () async {
-                        await _showReacherCardBottomSheet(context, postModel!);
-                      },
-                      iconSize: getScreenHeight(19),
-                      padding: const EdgeInsets.all(0),
-                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Flexible(
-              child: Text(
-                postModel!.content ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(14),
-                  fontWeight: FontWeight.w400,
-                ),
-              ).paddingSymmetric(v: 10, h: 16),
-            ),
-            if (postModel!.imageMediaItems!.isNotEmpty)
-              Helper.renderPostImages(postModel!, context)
-                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
-            else
-              const SizedBox.shrink(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: const Color(0xFFF5F5F5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: onLike,
-                          padding: EdgeInsets.zero,
-                          child: isLiked
-                              ? SvgPicture.asset(
-                                  'assets/svgs/like-active.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/svgs/like.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postModel!.nLikes}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(15)),
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: () {
-                            RouteNavigators.route(context,
-                                AltViewCommentsScreen(post: postModel!));
-                          },
-                          padding: EdgeInsets.zero,
-                          child: SvgPicture.asset(
-                            'assets/svgs/comment.svg',
-                            height: getScreenHeight(20),
-                            width: getScreenWidth(20),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postModel!.nComments}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        if (postModel!.authId != globals.user!.id)
-                          SizedBox(width: getScreenWidth(15)),
-                        if (postModel!.authId != globals.user!.id)
-                          CupertinoButton(
-                            minSize: 0,
-                            onPressed: () {},
+                              globals.user!.showLocation!
+                                  ? Text(
+                                      postModel!.location ?? 'Somewhere',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(11),
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()
+                            ],
+                          ).paddingOnly(t: 10),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset('assets/svgs/starred.svg'),
+                          SizedBox(width: getScreenWidth(9)),
+                          IconButton(
+                            onPressed: () async {
+                              await _showReacherCardBottomSheet(
+                                  context, postModel!);
+                            },
+                            iconSize: getScreenHeight(19),
                             padding: const EdgeInsets.all(0),
-                            child: SvgPicture.asset(
-                              'assets/svgs/message.svg',
-                              height: getScreenHeight(20),
-                              width: getScreenWidth(20),
-                            ),
+                            icon:
+                                SvgPicture.asset('assets/svgs/kebab card.svg'),
                           ),
-                      ],
-                    ),
+                        ],
+                      )
+                    ],
                   ),
-                ),
-                SizedBox(width: getScreenWidth(20)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xFFF5F5F5),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CupertinoButton(
-                              minSize: 0,
-                              onPressed: onUpvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Upvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutup-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutup.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            CupertinoButton(
-                              minSize: 0,
-                              onPressed: onDownvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Downvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutdown-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutdown.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                          ],
+                  Flexible(
+                    child: Text(
+                      postModel!.content ?? '',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(14),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ).paddingSymmetric(v: 10, h: 16),
+                  ),
+                  if (postModel!.imageMediaItems!.isNotEmpty)
+                    Helper.renderPostImages(postModel!, context)
+                        .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                  else
+                    const SizedBox(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: const Color(0xFFF5F5F5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: onLike,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/like.svg',
+                                  color: likeColour,
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${postModel!.nLikes}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {
+                                  // RouteNavigators.route(
+                                  //     context,  ViewCommentsScreen(post: postFeedModel!));
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/comment.svg',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${postModel!.nComments}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {},
+                                padding: const EdgeInsets.all(0),
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/message.svg',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
-          ],
-        ),
+                      SizedBox(width: getScreenWidth(20)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: const Color(0xFFF5F5F5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/upvote-active.svg',
+                                      height: 20,
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/downvote.svg',
+                                      width: 20,
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
+                ],
+              );
+            }),
       ),
     );
   }
@@ -1136,15 +1211,17 @@ class _CommentReachCard extends HookWidget {
   const _CommentReachCard({
     Key? key,
     required this.commentModel,
-    required this.likingPost,
+    this.onComment,
+    this.onDownvote,
     this.onLike,
-    required this.isLiked,
+    this.onMessage,
+    this.onUpvote,
+    this.likeColour,
   }) : super(key: key);
 
   final CommentModel? commentModel;
-  final bool likingPost;
-  final Function()? onLike;
-  final bool isLiked;
+  final Function()? onLike, onComment, onMessage, onUpvote, onDownvote;
+  final Color? likeColour;
 
   @override
   Widget build(BuildContext context) {
@@ -1160,159 +1237,267 @@ class _CommentReachCard extends HookWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Helper.renderProfilePicture(
-                      globals.user!.profilePicture,
-                      size: 33,
-                    ).paddingOnly(l: 13, t: 10),
-                    SizedBox(width: getScreenWidth(9)),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              '@${commentModel!.commentProfile!.username}',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(15),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
+        child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+            bloc: globals.socialServiceBloc,
+            listener: (context, state) {},
+            builder: (context, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 33,
+                          ).paddingOnly(l: 13, t: 10),
+                          SizedBox(width: getScreenWidth(9)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '@${commentModel!.commentProfile!.username}',
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(15),
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  SvgPicture.asset('assets/svgs/verified.svg')
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 3),
-                            SvgPicture.asset('assets/svgs/verified.svg')
-                          ],
-                        ),
-                        Text(
-                          'Comment on @${commentModel!.commentProfile!.username}',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(11),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
+                              Text(
+                                'Comment on @${commentModel!.commentProfile!.username}',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              ),
+                            ],
+                          ).paddingOnly(t: 10),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset('assets/svgs/starred.svg'),
+                          SizedBox(width: getScreenWidth(9)),
+                          IconButton(
+                            onPressed: () async {
+                              // await _showReacherCardBottomSheet(
+                              //     context, commentModel!);
+                            },
+                            iconSize: getScreenHeight(19),
+                            padding: const EdgeInsets.all(0),
+                            icon:
+                                SvgPicture.asset('assets/svgs/kebab card.svg'),
                           ),
-                        ),
-                      ],
-                    ).paddingOnly(t: 10),
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset('assets/svgs/starred.svg'),
-                    SizedBox(width: getScreenWidth(9)),
-                    IconButton(
-                      onPressed: () async {
-                        // await _showReacherCardBottomSheet(
-                        //     context, commentModel!);
-                      },
-                      iconSize: getScreenHeight(19),
-                      padding: const EdgeInsets.all(0),
-                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Flexible(
-              child: Text(
-                commentModel!.content ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(14),
-                  fontWeight: FontWeight.w400,
-                ),
-              ).paddingSymmetric(v: 10, h: 16),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: const Color(0xFFF5F5F5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CupertinoButton(
-                          onPressed: onLike,
-                          padding: EdgeInsets.zero,
-                          minSize: 0,
-                          child: isLiked
-                              ? SvgPicture.asset(
-                                  'assets/svgs/like-active.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                )
-                              : SvgPicture.asset(
+                        ],
+                      )
+                    ],
+                  ),
+                  Flexible(
+                    child: Text(
+                      commentModel!.content ?? '',
+                      style: TextStyle(
+                        fontSize: getScreenHeight(14),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ).paddingSymmetric(v: 10, h: 16),
+                  ),
+                  // if (commentModel!.imageMediaItems!.isNotEmpty &&
+                  //     commentModel!.audioMediaItem!.isNotEmpty &&
+                  //     commentModel!.audioMediaItem!.isNotEmpty)
+                  //   Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Flexible(
+                  //         child: Container(
+                  //           height: getScreenHeight(152),
+                  //           width: getScreenWidth(152),
+                  //           clipBehavior: Clip.hardEdge,
+                  //           decoration: BoxDecoration(
+                  //             borderRadius: BorderRadius.circular(15),
+                  //             image: const DecorationImage(
+                  //               image: AssetImage('assets/images/post.png'),
+                  //               fit: BoxFit.fitHeight,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(width: getScreenWidth(8)),
+                  //       Flexible(child: MediaCard(size: size)),
+                  //     ],
+                  //   ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
+                  SizedBox(height: getScreenHeight(16)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: const Color(0xFFF5F5F5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
                                   'assets/svgs/like.svg',
+                                  color: likeColour,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${commentModel!.nLikes}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {
+                                  // RouteNavigators.route(
+                                  //     context,  ViewCommentsScreen(post: postFeedModel!));
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/comment.svg',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(4)),
+                              FittedBox(
+                                child: Text(
+                                  '${commentModel!.nComments}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(15)),
+                              IconButton(
+                                onPressed: () {},
+                                padding: const EdgeInsets.all(0),
+                                constraints: const BoxConstraints(),
+                                icon: SvgPicture.asset(
+                                  'assets/svgs/message.svg',
                                   height: getScreenHeight(20),
                                   width: getScreenWidth(20),
                                 ),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${commentModel!.nLikes}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
+                      ),
+                      SizedBox(width: getScreenWidth(20)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: const Color(0xFFF5F5F5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/shoutup-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  // FittedBox(
+                                  //   child: Text(
+                                  //     '${postFeedModel!.post!.nUpvotes}',
+                                  //     style: TextStyle(
+                                  //       fontSize: getScreenHeight(12),
+                                  //       fontWeight: FontWeight.w500,
+                                  //       color: AppColors.textColor3,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  Flexible(
+                                    child: SizedBox(width: getScreenWidth(4)),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: SvgPicture.asset(
+                                      'assets/svgs/shoutdown.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  // FittedBox(
+                                  //   child: Text(
+                                  //     '${postFeedModel!.post!.nDownvotes}',
+                                  //     style: TextStyle(
+                                  //       fontSize: getScreenHeight(12),
+                                  //       fontWeight: FontWeight.w500,
+                                  //       color: AppColors.textColor3,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: getScreenWidth(15)),
-                        CupertinoButton(
-                          onPressed: () {
-                            // RouteNavigators.route(
-                            //     context,  ViewCommentsScreen(post: postFeedModel!));
-                          },
-                          padding: EdgeInsets.zero,
-                          minSize: 0,
-                          child: SvgPicture.asset(
-                            'assets/svgs/comment.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${commentModel!.nComments}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: getScreenWidth(20)),
-              ],
-            ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
-          ],
-        ),
+                        ],
+                      ),
+                    ],
+                  ).paddingOnly(b: 32, r: 16, l: 16, t: 5),
+                ],
+              );
+            }),
       ),
     );
   }
@@ -1406,15 +1591,6 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         .add(GetReachRelationshipEvent(userIdToReach: widget.recipientId));
     globals.userBloc!
         .add(GetStarRelationshipEvent(userIdToStar: widget.recipientId));
-  }
-
-  Set active = {};
-
-  handleTap(index) {
-    if (active.isNotEmpty) active.clear();
-    setState(() {
-      active.add(index);
-    });
   }
 
   TabBar get _tabBar => TabBar(
@@ -1532,8 +1708,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final _posts = useState<List<PostModel>>([]);
-    final reachDM = useState(false);
-    final comments = useState<List<CommentModel>>([]);
+    final _comments = useState<List<CommentModel>>([]);
     return Scaffold(
       body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
@@ -1543,11 +1718,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshCompleted();
           }
           if (state is GetAllPostsError) {
-            Snackbars.error(context, message: state.error);
+           Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
           if (state is GetPersonalCommentsSuccess) {
-            comments.value = state.data!;
+            _comments.value = state.data!;
             _commentsRefreshController.refreshCompleted();
           }
           if (state is GetPersonalCommentsError) {
@@ -1565,7 +1740,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserError) {
-                Snackbars.error(context, message: state.error);
+                // Snackbars.error(context, message: state.error);
               }
 
               if (state is GetStarRelationshipSuccess) {
@@ -1590,6 +1765,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 setState(() {});
               }
 
+            
+
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
                 setState(() {});
@@ -1599,6 +1776,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 globals.userBloc!.add(
                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
+                
                 setState(() {});
               }
             },
@@ -1911,7 +2089,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               ));
                             },
                             child: _posts.value.isEmpty
-                                ? ListView(
+                                ? ListView( 
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
                                     children: const [
@@ -1927,75 +2105,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     itemBuilder: (context, index) {
                                       return _ReacherCard(
                                         postModel: _posts.value[index],
-                                        isLiked:
-                                            _posts.value[index].like!.isNotEmpty
-                                                ? true
-                                                : false,
-                                        isVoted:
-                                            _posts.value[index].vote!.isNotEmpty
-                                                ? true
-                                                : false,
-                                        voteType:
-                                            _posts.value[index].vote!.isNotEmpty
-                                                ? _posts.value[index].vote![0]
-                                                    .voteType
-                                                : null,
-                                        onMessage: () {
-                                          HapticFeedback.mediumImpact();
-                                          reachDM.value = true;
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.userBloc!.add(
-                                                GetRecipientProfileEvent(
-                                                    email: _posts
-                                                        .value[index].authId!));
-                                          }
-                                        },
-                                        onUpvote: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Upvote',
-                                              postId:
-                                                  _posts.value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onDownvote: () {
-                                          HapticFeedback.mediumImpact();
-
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Downvote',
-                                              postId:
-                                                  _posts.value[index].postId,
-                                            ));
-                                          }
-                                        },
-                                        onLike: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (_posts.value[index].like!
-                                                .isNotEmpty) {
-                                              globals.socialServiceBloc!
-                                                  .add(UnlikePostEvent(
-                                                postId:
-                                                    _posts.value[index].postId,
-                                              ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikePostEvent(
-                                                    postId: _posts
-                                                        .value[index].postId),
-                                              );
-                                            }
-                                          }
-                                        },
+                                        // onLike: () {
+                                        //   _likePost(index);
+                                        // },
                                       );
                                     },
                                   ),
@@ -2015,7 +2127,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                 authId: widget.recipientId,
                               ));
                             },
-                            child: comments.value.isEmpty
+                            child: _comments.value.isEmpty
                                 ? ListView(
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
@@ -2028,40 +2140,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     ],
                                   )
                                 : ListView.builder(
-                                    itemCount: comments.value.length,
+                                    itemCount: _comments.value.length,
                                     itemBuilder: (context, index) {
                                       return _CommentReachCard(
-                                        commentModel: comments.value[index],
-                                        likingPost: false,
-                                        isLiked: comments
-                                                .value[index].like!.isNotEmpty
-                                            ? true
-                                            : false,
-                                        onLike: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (comments.value[index].like!
-                                                .isNotEmpty) {
-                                              globals.socialServiceBloc!
-                                                  .add(UnlikeCommentOnPostEvent(
-                                                commentId: comments
-                                                    .value[index].commentId,
-                                                postId: comments
-                                                    .value[index].postId,
-                                              ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikeCommentOnPostEvent(
-                                                  postId: comments
-                                                      .value[index].postId,
-                                                  commentId: comments
-                                                      .value[index].commentId,
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        },
+                                        commentModel: _comments.value[index],
                                       );
                                     },
                                   ),

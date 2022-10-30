@@ -318,7 +318,7 @@ class SeeMyReachersList extends StatelessWidget {
               loaderColor: data!.reacher!.id == 'userBlocked'
                   ? AppColors.primaryColor
                   : AppColors.white,
-              label: data!.reacher!.id == 'userBlocked' ? 'Unblock' : 'Block',
+              label: data!.reacher!.id == 'userBlocked' ? 'Unblock' : 'EX',
               labelFontSize: getScreenHeight(13),
               color: data!.reacher!.id == 'userBlocked'
                   ? AppColors.white

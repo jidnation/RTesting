@@ -17,6 +17,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -40,13 +41,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (imageFile != null) {
-        File image = File(imageFile.path);
+        File? img = File(imageFile.path);
+        img = await _cropImage(imageFile: img);
+        File? image = img;
         return image;
       }
     } catch (e) {
       // print(e);
     }
     return null;
+  }
+
+  Future<File?> _cropImage({required File imageFile}) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      cropStyle: CropStyle.circle,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Edit Picture',
+          toolbarColor: AppColors.primaryColor,
+          toolbarWidgetColor: AppColors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+        IOSUiSettings(
+          title: 'Edit Picture',
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedImage == null) return null;
+    return File(croppedImage.path);
   }
 
   @override
@@ -96,7 +124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         debugPrint('tapped on change cover photo ');
                       },
                       child: SizedBox(
-                        height: getScreenHeight(150),
+                        height: getScreenHeight(200),
                         width: size.width,
                         child: Image.asset(
                           'assets/images/cover.png',
@@ -130,7 +158,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                                 splashRadius: 20,
                               )
-                            ]).paddingOnly(t: 25),
+                            ]).paddingOnly(t: 40),
+                        SizedBox(height: getScreenHeight(30)),
                         GestureDetector(
                           onTap: () async {
                             final image = await getImage(ImageSource.gallery);
@@ -140,13 +169,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             }
                           },
                           child: globals.user!.profilePicture != null
-                              ? ProfilePicture(
-                                  height: getScreenHeight(100),
-                                  width: getScreenWidth(100),
-                                  border: Border.all(
-                                    color: Colors.grey.shade50,
-                                    width: 3.0,
-                                  ))
+                              ? SizedBox(
+                                  width: 80,
+                                  height: 100,
+                                  child: ProfilePicture(
+                                      height: getScreenHeight(100),
+                                      width: getScreenWidth(100),
+                                      border: Border.all(
+                                        color: Colors.grey.shade50,
+                                        width: 3.0,
+                                      )),
+                                )
                               : AbsorbPointer(
                                   child: state is UserUploadingImage
                                       ? const Center(
@@ -200,8 +233,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     //CHANGE PROFILE PHOTO
                     Positioned(
-                      top: getScreenHeight(145),
-                      right: getScreenWidth(164),
+                      top: size.height * 0.3 - 45,
+                      right: getScreenWidth(170),
                       child: GestureDetector(
                         onTap: () async {
                           final image = await getImage(ImageSource.gallery);
@@ -363,6 +396,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _usernameController.text.replaceAll(' ', ''),
                           ));
                         }
+                        _isLoading ? null : Snackbars.success(context, message: "Changes Saved");
                       },
                       size: size,
                       textColor: AppColors.white,

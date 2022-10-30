@@ -1,15 +1,21 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/empty_state.dart';
+import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/refresher.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -34,6 +40,9 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:readmore/readmore.dart';
+// import 'package:screenshot/screenshot.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -120,8 +129,16 @@ class _TimelineScreenState extends State<TimelineScreen>
         shadowColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
-            icon: Helper.renderProfilePicture(globals.user!.profilePicture)),
+          onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
+          icon: SizedBox(
+            height: 30,
+            width: 30,
+            child: ProfilePicture(
+              height: getScreenHeight(50),
+              width: getScreenWidth(50),
+            ),
+          ),
+        ),
         titleSpacing: 5,
         leadingWidth: getScreenWidth(70),
         title: Text(
@@ -319,101 +336,111 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         _isLoading
                                             ? const LinearLoader()
                                             : const SizedBox.shrink(),
-                                        Container(
-                                          color: AppColors.white,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: getScreenHeight(105),
-                                                child: SingleChildScrollView(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  physics:
-                                                      const BouncingScrollPhysics(),
-                                                  child: SizedBox(
-                                                    child: Row(
-                                                      children: [
-                                                        UserStory(
-                                                          size: size,
-                                                          image: globals.user!
-                                                                  .profilePicture ??
-                                                              '',
-                                                          isMe: true,
-                                                          isLive: false,
-                                                          hasWatched: false,
-                                                          username:
-                                                              'Add Status',
-                                                          isMeOnTap: () {
-                                                            RouteNavigators.route(
-                                                                context,
-                                                                const CreateStatus());
-                                                            return;
-                                                          },
-                                                        ),
-                                                        if (_myStatus
-                                                            .value.isEmpty)
-                                                          const SizedBox
-                                                              .shrink()
-                                                        else
+                                        Visibility(
+                                          visible: _posts.value.isNotEmpty,
+                                          child: Container(
+                                            color: AppColors.white,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                SizedBox(
+                                                  height: getScreenHeight(105),
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    physics:
+                                                        const BouncingScrollPhysics(),
+                                                    child: SizedBox(
+                                                      child: Row(
+                                                        children: [
                                                           UserStory(
                                                             size: size,
                                                             image: globals.user!
                                                                     .profilePicture ??
                                                                 '',
-                                                            isMe: false,
+                                                            isMe: true,
                                                             isLive: false,
                                                             hasWatched: false,
                                                             username:
-                                                                'Your status',
-                                                            onTap: () {
+                                                                'Add Status',
+                                                            isMeOnTap: () {
                                                               RouteNavigators.route(
                                                                   context,
-                                                                  ViewMyStatus(
-                                                                      status: _myStatus
-                                                                          .value));
+                                                                  const CreateStatus());
+                                                              return;
                                                             },
                                                           ),
-                                                        ...List.generate(
-                                                          _userStatus
-                                                              .value.length,
-                                                          (index) => UserStory(
-                                                            size: size,
-                                                            isMe: false,
-                                                            isLive: false,
-                                                            hasWatched: false,
-                                                            image: _userStatus
-                                                                .value[index]
-                                                                .status![0]
-                                                                .statusCreatorModel!
-                                                                .profilePicture,
-                                                            username: _userStatus
-                                                                .value[index]
-                                                                .status![0]
-                                                                .statusCreatorModel!
-                                                                .username!,
-                                                            onTap: () {
-                                                              RouteNavigators
-                                                                  .route(
-                                                                context,
-                                                                ViewUserStatus(
-                                                                    status: _userStatus
-                                                                        .value[
-                                                                            index]
-                                                                        .status!),
-                                                              );
-                                                            },
+
+                                                          if (_myStatus
+                                                              .value.isEmpty)
+                                                            const SizedBox
+                                                                .shrink()
+                                                          else
+                                                            UserStory(
+                                                              size: size,
+                                                              image: globals
+                                                                      .user!
+                                                                      .profilePicture ??
+                                                                  '',
+                                                              isMe: false,
+                                                              isLive: false,
+                                                              hasWatched: false,
+                                                              username:
+                                                                  'Your status',
+                                                              onTap: () {
+                                                                RouteNavigators.route(
+                                                                    context,
+                                                                    ViewMyStatus(
+                                                                        status:
+                                                                            _myStatus.value));
+                                                              },
+                                                            ),
+                                                          ...List.generate(
+                                                            _userStatus
+                                                                .value.length,
+                                                            (index) =>
+                                                                UserStory(
+                                                              size: size,
+                                                              isMe: false,
+                                                              isLive: false,
+                                                              hasWatched: false,
+                                                              image: _userStatus
+                                                                  .value[index]
+                                                                  .status![0]
+                                                                  .statusCreatorModel!
+                                                                  .profilePicture!,
+                                                              username: _userStatus
+                                                                  .value[index]
+                                                                  .status![
+                                                                      index]
+                                                                  .statusCreatorModel!
+                                                                  .username!,
+                                                              onTap: () {
+                                                                RouteNavigators
+                                                                    .route(
+                                                                  context,
+                                                                  ViewUserStatus(
+                                                                      status: _userStatus
+                                                                          .value[
+                                                                              index]
+                                                                          .status!),
+                                                                );
+                                                              },
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ).paddingOnly(l: 11),
+                                                          // ..._userStatus.value.map(
+                                                          //   (e) =>
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ).paddingOnly(l: 11),
+                                                  ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                  height: getScreenHeight(5)),
-                                            ],
+                                                SizedBox(
+                                                    height: getScreenHeight(5)),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         SizedBox(height: getScreenHeight(16)),
@@ -612,85 +639,113 @@ class PostFeedReacherCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
+    var scr = GlobalKey();
+    // final ScreenshotController screenshotController = ScreenshotController();
+    Future<String> saveImage(Uint8List? bytes) async {
+      await [Permission.storage].request();
+      String time = DateTime.now().microsecondsSinceEpoch.toString();
+      final name = 'screenshot_${time}_reachme';
+      final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+      debugPrint("Result ${result['filePath']}");
+      Snackbars.success(context, message: 'Image saved to Gallery');
+      RouteNavigators.pop(context);
+      return result['filePath'];
+    }
+
+    void takeScreenShot() async {
+      RenderRepaintBoundary boundary = scr.currentContext!.findRenderObject()
+          as RenderRepaintBoundary; // the key provided
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      debugPrint("Byte Data: $byteData");
+      await saveImage(byteData!.buffer.asUint8List());
+    }
+
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
-        right: getScreenWidth(15),
-        left: getScreenWidth(15),
+        right: getScreenWidth(16),
+        left: getScreenWidth(16),
         bottom: getScreenHeight(16),
       ),
-      child: Container(
-        width: size.width,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CupertinoButton(
-                  minSize: 0,
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    final progress = ProgressHUD.of(context);
-                    progress?.showWithText('Viewing Reacher..');
-                    Future.delayed(const Duration(seconds: 3), () {
-                      globals.userBloc!.add(GetRecipientProfileEvent(
-                          email: postFeedModel!.postOwnerId));
-                      postFeedModel!.postOwnerId == globals.user!.id
-                          ? RouteNavigators.route(
-                              context, const AccountScreen())
-                          : RouteNavigators.route(
-                              context,
-                              RecipientAccountProfile(
-                                recipientEmail: 'email',
-                                recipientImageUrl:
-                                    postFeedModel!.profilePicture,
-                                recipientId: postFeedModel!.postOwnerId,
-                              ));
-                      progress?.dismiss();
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      Helper.renderProfilePicture(
-                        postFeedModel!.profilePicture,
-                        size: 33,
-                      ).paddingOnly(l: 13, t: 10),
-                      SizedBox(width: getScreenWidth(9)),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                '@${postFeedModel!.username!}',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(14),
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.textColor2,
+      child: RepaintBoundary(
+        key: scr,
+        child: Container(
+          width: size.width,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    minSize: 0,
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      final progress = ProgressHUD.of(context);
+                      progress?.showWithText('Viewing Reacher..');
+                      Future.delayed(const Duration(seconds: 3), () {
+                        globals.userBloc!.add(GetRecipientProfileEvent(
+                            email: postFeedModel!.postOwnerId));
+                        postFeedModel!.postOwnerId == globals.user!.id
+                            ? RouteNavigators.route(
+                                context, const AccountScreen())
+                            : RouteNavigators.route(
+                                context,
+                                RecipientAccountProfile(
+                                  recipientEmail: 'email',
+                                  recipientImageUrl:
+                                      postFeedModel!.profilePicture,
+                                  recipientId: postFeedModel!.postOwnerId,
+                                ));
+                        progress?.dismiss();
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Helper.renderProfilePicture(
+                          postFeedModel!.profilePicture,
+                          size: 33,
+                        ).paddingOnly(l: 13, t: 10),
+                        SizedBox(width: getScreenWidth(9)),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '@${postFeedModel!.username!}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(14),
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 3),
-                              postFeedModel!.verified!
-                                  ? SvgPicture.asset('assets/svgs/verified.svg')
-                                  : const SizedBox.shrink()
-                            ],
-                          ),
-                          postFeedModel!.post!.location == null ||
-                                  postFeedModel!.post!.location == 'NIL'
-                              ? const SizedBox.shrink()
-                              : Text(
-                                  postFeedModel!.post!.location ?? 'Somewhere',
+                                const SizedBox(width: 3),
+                                postFeedModel!.verified!
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/verified.svg')
+                                    : const SizedBox.shrink()
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  globals.user!.showLocation!
+                                      ? postFeedModel!.post!.location!
+                                      : '',
                                   style: TextStyle(
                                     fontSize: getScreenHeight(10),
                                     fontFamily: 'Poppins',
@@ -699,201 +754,226 @@ class PostFeedReacherCard extends HookWidget {
                                     color: AppColors.textColor2,
                                   ),
                                 ),
-                        ],
-                      ).paddingOnly(t: 10),
-                    ],
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //  SvgPicture.asset('assets/svgs/starred.svg'),
-                    SizedBox(width: getScreenWidth(9)),
-                    IconButton(
-                      onPressed: () async {
-                        await showReacherCardBottomSheet(
-                          context,
-                          postFeedModel: postFeedModel!,
-                        );
-                      },
-                      iconSize: getScreenHeight(19),
-                      padding: const EdgeInsets.all(0),
-                      icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
+                                Text(
+                                  postDuration,
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(10),
+                                    fontFamily: 'Poppins',
+                                    letterSpacing: 0.4,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textColor2,
+                                  ),
+                                ).paddingOnly(l: 6),
+                              ],
+                            )
+                          ],
+                        ).paddingOnly(t: 10),
+                      ],
                     ),
-                  ],
-                )
-              ],
-            ),
-            postFeedModel!.post!.content == null
-                ? const SizedBox.shrink()
-                : Flexible(
-                    child: Text(
-                      postFeedModel!.post!.edited!
-                          ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                          : postFeedModel!.post!.content ?? '',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(14),
-                        fontWeight: FontWeight.w400,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //  SvgPicture.asset('assets/svgs/starred.svg'),
+                      SizedBox(width: getScreenWidth(9)),
+                      IconButton(
+                        onPressed: () async {
+                          await showReacherCardBottomSheet(
+                            context,
+                            downloadPost: takeScreenShot,
+                            postFeedModel: postFeedModel!,
+                          );
+                        },
+                        iconSize: getScreenHeight(19),
+                        padding: const EdgeInsets.all(0),
+                        icon: SvgPicture.asset('assets/svgs/kebab card.svg'),
                       ),
-                    ).paddingSymmetric(v: 10, h: 16),
-                  ),
-            if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-              Helper.renderPostImages(postFeedModel!.post!, context)
-                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
-            else
-              const SizedBox.shrink(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
+                    ],
+                  )
+                ],
+              ),
+              postFeedModel!.post!.content == null
+                  ? const SizedBox.shrink()
+                  : Flexible(
+                      child: ReadMoreText(
+                        postFeedModel!.post!.edited!
+                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
+                            : postFeedModel!.post!.content ?? '',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: getScreenHeight(14)),
+                        trimLines: 3,
+                        colorClickableText: const Color(0xff717F85),
+                        trimMode: TrimMode.Line,
+                        trimCollapsedText: 'See more',
+                        trimExpandedText: 'See less',
+                        moreStyle: TextStyle(
+                            fontSize: getScreenHeight(14),
+                            fontFamily: "Roboto",
+                            color: const Color(0xff717F85)),
+                      ).paddingSymmetric(h: 16, v: 10),
                     ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: const Color(0xFFF5F5F5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: onLike,
-                          padding: EdgeInsets.zero,
-                          child: isLiked
-                              ? SvgPicture.asset(
-                                  'assets/svgs/like-active.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/svgs/like.svg',
-                                  height: getScreenHeight(20),
-                                  width: getScreenWidth(20),
-                                ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postFeedModel!.post!.nLikes}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(15)),
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: () {
-                            RouteNavigators.route(context,
-                                ViewCommentsScreen(post: postFeedModel!));
-                          },
-                          padding: EdgeInsets.zero,
-                          child: SvgPicture.asset(
-                            'assets/svgs/comment.svg',
-                            height: getScreenHeight(20),
-                            width: getScreenWidth(20),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(4)),
-                        FittedBox(
-                          child: Text(
-                            '${postFeedModel!.post!.nComments}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor3,
-                            ),
-                          ),
-                        ),
-                        if (postFeedModel!.postOwnerId !=
-                            postFeedModel!.feedOwnerId)
-                          SizedBox(width: getScreenWidth(15)),
-                        if (postFeedModel!.postOwnerId !=
-                            postFeedModel!.feedOwnerId)
+              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+                Helper.renderPostImages(postFeedModel!.post!, context)
+                    .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+              else
+                const SizedBox.shrink(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFFF5F5F5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           CupertinoButton(
                             minSize: 0,
-                            onPressed: onMessage,
-                            padding: const EdgeInsets.all(0),
+                            onPressed: onLike,
+                            padding: EdgeInsets.zero,
+                            child: isLiked
+                                ? SvgPicture.asset(
+                                    'assets/svgs/like-active.svg',
+                                    height: getScreenHeight(20),
+                                    width: getScreenWidth(20),
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/svgs/like.svg',
+                                    height: getScreenHeight(20),
+                                    width: getScreenWidth(20),
+                                  ),
+                          ),
+                          SizedBox(width: getScreenWidth(4)),
+                          FittedBox(
+                            child: Text(
+                              '${postFeedModel!.post!.nLikes}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(12),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor3,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: getScreenWidth(15)),
+                          CupertinoButton(
+                            minSize: 0,
+                            onPressed: () {
+                              RouteNavigators.route(context,
+                                  ViewCommentsScreen(post: postFeedModel!));
+                            },
+                            padding: EdgeInsets.zero,
                             child: SvgPicture.asset(
-                              'assets/svgs/message.svg',
+                              'assets/svgs/comment.svg',
                               height: getScreenHeight(20),
                               width: getScreenWidth(20),
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: getScreenWidth(20)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xFFF5F5F5),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
+                          SizedBox(width: getScreenWidth(4)),
+                          FittedBox(
+                            child: Text(
+                              '${postFeedModel!.post!.nComments}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(12),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor3,
+                              ),
+                            ),
+                          ),
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
+                            SizedBox(width: getScreenWidth(15)),
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
                             CupertinoButton(
                               minSize: 0,
-                              onPressed: onUpvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Upvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutup-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutup.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
+                              onPressed: onMessage,
+                              padding: const EdgeInsets.all(0),
+                              child: SvgPicture.asset(
+                                'assets/svgs/message.svg',
+                                height: getScreenHeight(20),
+                                width: getScreenWidth(20),
+                              ),
                             ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                            CupertinoButton(
-                              minSize: 0,
-                              onPressed: onDownvote,
-                              padding: EdgeInsets.zero,
-                              child: isVoted && voteType == 'Downvote'
-                                  ? SvgPicture.asset(
-                                      'assets/svgs/shoutdown-active.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/svgs/shoutdown.svg',
-                                      height: getScreenHeight(20),
-                                      width: getScreenWidth(20),
-                                    ),
-                            ),
-                            Flexible(child: SizedBox(width: getScreenWidth(4))),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
-          ],
+                  ),
+                  SizedBox(width: getScreenWidth(20)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xFFF5F5F5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CupertinoButton(
+                                minSize: 0,
+                                onPressed: onUpvote,
+                                padding: EdgeInsets.zero,
+                                child: isVoted && voteType == 'Upvote'
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/shoutup-active.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      )
+                                    : SvgPicture.asset(
+                                        'assets/svgs/shoutup.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      ),
+                              ),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                              CupertinoButton(
+                                minSize: 0,
+                                onPressed: onDownvote,
+                                padding: EdgeInsets.zero,
+                                child: isVoted && voteType == 'Downvote'
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/shoutdown-active.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      )
+                                    : SvgPicture.asset(
+                                        'assets/svgs/shoutdown.svg',
+                                        height: getScreenHeight(20),
+                                        width: getScreenWidth(20),
+                                      ),
+                              ),
+                              Flexible(
+                                  child: SizedBox(width: getScreenWidth(4))),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
+            ],
+          ),
         ),
       ),
     );
