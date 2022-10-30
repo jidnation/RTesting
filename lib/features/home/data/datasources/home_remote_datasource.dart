@@ -848,7 +848,6 @@ class HomeRemoteDataSource {
         'postId': postId,
         'voteType': voteType,
       });
-      // print('RESULTSSS: ' + result.toString());
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -1069,7 +1068,6 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      print(result.toString());
 
       return (result.data!['getAllCommentsOnPost'] as List)
           .map((e) => CommentModel.fromJson(e))
@@ -1418,6 +1416,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       Console.log('get status feed', result.data);
+      print('RESULTSSSS:' + result.toString());
       final tempList = (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedModel.fromJson(e))
           .toList();

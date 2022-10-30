@@ -220,7 +220,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 Share.share(
-                                    'Reaching you with this: ${postFeedModel.post!.postSlug!}');
+                                    'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',

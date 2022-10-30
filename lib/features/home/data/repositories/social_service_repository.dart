@@ -394,6 +394,7 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
+      print(posts);
       return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -409,6 +410,7 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
+      print(status);
       return Right(status);
     } on GraphQLError catch (e) {
       return Left(e.message);
