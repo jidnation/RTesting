@@ -229,7 +229,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                                     postId: postFeedModel.postId));
                               }),
                           KebabBottomTextButton(
-                              label: 'Download reach card', onPressed: downloadPost),
+                              label: 'Download post', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Report',
                             onPressed: () {
@@ -292,7 +292,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                             },
                           ),
                           KebabBottomTextButton(
-                              label: 'Download reach card', onPressed: downloadPost),
+                              label: 'Download post', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Copy link',
                             onPressed: () {

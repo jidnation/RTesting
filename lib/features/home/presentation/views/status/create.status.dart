@@ -104,23 +104,21 @@ class _CreateStatusState extends State<CreateStatus>
       body: SizedBox(
         height: size.height,
         width: size.width,
-        child: Stack(
+        child: ListView(
           // shrinkWrap: true,
-         // padding: EdgeInsets.zero,
-         // physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
           children: [
-           cameraLoading?  const Flexible(
-             child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-           ) : 
-                    Container(
+            Container(
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: 
-                   CameraPreview(
+              child: cameraLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : CameraPreview(
                       controller!,
                       child: Column(
                         //mainAxisSize: MainAxisSize.min,
@@ -259,99 +257,95 @@ class _CreateStatusState extends State<CreateStatus>
                         ],
                       ).paddingOnly(t: 50),
                     ),
-           
             ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.8,
-              child: Container(
-                // height: size.height,
-                width: size.width,
-                decoration: const BoxDecoration(
-                    //  color: AppColors.black.withOpacity(0.9),
-                    ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: getScreenHeight(44)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: IconButton(
-                            onPressed: () async {
-                              final image = await getImage(ImageSource.gallery);
-                              if (image != null) {
-                                RouteNavigators.route(context,
-                                    BuildCameraPreview(image: XFile(image.path)));
-                              }
-                            },
-                            icon: Transform.scale(
-                              scale: 1.8,
-                              child: SvgPicture.asset(
-                                'assets/svgs/check-gallery.svg',
-                                height: getScreenHeight(71),
-                              ),
+            Container(
+              // height: size.height,
+              width: size.width,
+              decoration: const BoxDecoration(
+                  //  color: AppColors.black.withOpacity(0.9),
+                  ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: getScreenHeight(44)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: IconButton(
+                          onPressed: () async {
+                            final image = await getImage(ImageSource.gallery);
+                            if (image != null) {
+                              RouteNavigators.route(context,
+                                  BuildCameraPreview(image: XFile(image.path)));
+                            }
+                          },
+                          icon: Transform.scale(
+                            scale: 1.8,
+                            child: SvgPicture.asset(
+                              'assets/svgs/check-gallery.svg',
+                              height: getScreenHeight(71),
                             ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
                           ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        SizedBox(width: getScreenWidth(70)),
-                        Flexible(
-                          child: InkWell(
-                            onTap: () async {
-                              await controller!.takePicture().then((value) =>
-                                  RouteNavigators.route(
-                                      context, BuildCameraPreview(image: value)));
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.white,
-                              ),
-                              padding: const EdgeInsets.all(20),
-                              child: SvgPicture.asset(
-                                'assets/svgs/Camera.svg',
-                                color: AppColors.black,
-                              ),
+                      ),
+                      SizedBox(width: getScreenWidth(70)),
+                      Flexible(
+                        child: InkWell(
+                          onTap: () async {
+                            await controller!.takePicture().then((value) =>
+                                RouteNavigators.route(
+                                    context, BuildCameraPreview(image: value)));
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.white,
+                            ),
+                            padding: const EdgeInsets.all(20),
+                            child: SvgPicture.asset(
+                              'assets/svgs/Camera.svg',
+                              color: AppColors.black,
                             ),
                           ),
                         ),
-                        SizedBox(width: getScreenWidth(70)),
-                        Flexible(
-                          child: IconButton(
-                            onPressed: () {
-                              if (_cameras.isNotEmpty && _cameras.length > 1) {
-                                if (_cameras.length == 2) {
-                                  if (controller!.description.lensDirection ==
-                                      CameraLensDirection.front) {
-                                    initializeCamera(_cameras[0]);
-                                  } else {
-                                    initializeCamera(_cameras[1]);
-                                  }
+                      ),
+                      SizedBox(width: getScreenWidth(70)),
+                      Flexible(
+                        child: IconButton(
+                          onPressed: () {
+                            if (_cameras.isNotEmpty && _cameras.length > 1) {
+                              if (_cameras.length == 2) {
+                                if (controller!.description.lensDirection ==
+                                    CameraLensDirection.front) {
+                                  initializeCamera(_cameras[0]);
                                 } else {
                                   initializeCamera(_cameras[1]);
                                 }
+                              } else {
+                                initializeCamera(_cameras[1]);
                               }
-                              setState(() {});
-                            },
-                            icon: Transform.scale(
-                              scale: 1.8,
-                              child: SvgPicture.asset(
-                                'assets/svgs/flip-camera.svg',
-                                height: getScreenHeight(71),
-                              ),
+                            }
+                            setState(() {});
+                          },
+                          icon: Transform.scale(
+                            scale: 1.8,
+                            child: SvgPicture.asset(
+                              'assets/svgs/flip-camera.svg',
+                              height: getScreenHeight(71),
                             ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
                           ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: getScreenHeight(44))
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: getScreenHeight(44))
+                ],
               ),
             ),
           ],
