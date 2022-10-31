@@ -268,9 +268,9 @@ class SavedPostReacherCard extends HookWidget {
                 ),
               ).paddingSymmetric(v: 10, h: 16),
             ),
-            // if (savedPostModel!.imageMediaItems!.isNotEmpty)
-            //   Helper.renderPostImages(savedPostModel!, context)
-            //       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            if (savedPostModel!.imageMediaItems!.isNotEmpty)
+              Helper.renderSavedPostImages(savedPostModel!, context)
+                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
           ],
         ),
       ),
@@ -290,7 +290,7 @@ Future showSavedPostBottomSheet(BuildContext context,
           if (state is DeleteSavedPostSuccess) {
             RouteNavigators.pop(context);
             Snackbars.success(context, message: 'Post removed successfully');
-            globals.socialServiceBloc!
+            globals.socialServiceBloc!  
                 .add(GetAllSavedPostsEvent(pageLimit: 30, pageNumber: 1));
           }
           if (state is DeleteSavedPostError) {

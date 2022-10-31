@@ -745,8 +745,7 @@ class PostFeedReacherCard extends HookWidget {
                                   Text(
                                         globals.user!.showLocation!
                                             ? postFeedModel!.post!.location!
-                                            : '',
-                                  
+                                            : '',                                  
                                         style: TextStyle(
                                           fontSize: getScreenHeight(10),
                                           fontFamily: 'Poppins',

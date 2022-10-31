@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -170,6 +171,8 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
+      print("Result update profile $result");
 
       return User.fromJson(result.data!['updateUser']);
     } catch (e) {
@@ -563,7 +566,7 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
+      debugPrint("Create Post: $result");
       return PostModel.fromJson(result.data!['createPost']);
     } catch (e) {
       rethrow;
