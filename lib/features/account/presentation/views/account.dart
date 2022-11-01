@@ -376,109 +376,26 @@ class _AccountScreenState extends State<AccountScreen>
                 bool _isLoadingComments = state is GetPersonalCommentsLoading;
                 bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Stack(
-                    alignment: Alignment.topCenter,
-                    fit: StackFit.passthrough,
-                    clipBehavior: Clip.none,
-                    children: <Widget>[
-                      /// Banner image
-                      SizedBox(
-                        height: getScreenHeight(200),
-                        width: size.width,
-                        child: Image.asset(
-                          'assets/images/cover.png',
-                          fit: BoxFit.cover,
-                          gaplessPlayback: true,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Stack(
+                      alignment: Alignment.topCenter,
+                      fit: StackFit.passthrough,
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        /// Banner image
+                        SizedBox(
+                          height: getScreenHeight(200),
+                          width: size.width,
+                          child: Image.asset(
+                            'assets/images/cover.png',
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
+                          ),
                         ),
-                      ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () => RouteNavigators.route(
-                                  context, const HomeScreen()),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                ),
-                              ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.user!);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]).paddingOnly(t: 40),
-                      Positioned(
-                        top: size.height * 0.2 - 30,
-                        child: SizedBox(
-                                  width: 80,
-                                  height: 100,
-                                  child: ProfilePicture(
-                                      height: getScreenHeight(100),
-                                      width: getScreenWidth(100),
-                                      border: Border.all(
-                                        color: Colors.grey.shade50,
-                                        width: 3.0,
-                                      )),
-                                )
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(height: getScreenHeight(10)),
-                      Text(
-                          ('${globals.user!.firstName} ${globals.user!.lastName}')
-                              .toTitleCase(),
-                          style: TextStyle(
-                            fontSize: getScreenHeight(17),
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textColor2,
-                          )),
-                      Text('@${globals.user!.username ?? 'username'}',
-                          style: TextStyle(
-                            fontSize: getScreenHeight(13),
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textColor2,
-                          )),
-                      SizedBox(height: getScreenHeight(15)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconButton(
                                 padding: EdgeInsets.zero,
@@ -975,6 +892,7 @@ class _AccountScreenState extends State<AccountScreen>
                                       },
                                     ),
                             ),
+                            
                           //SAVED POSTS TAB
                           if (_isLoadingSavedPosts)
                             const CircularLoader()
@@ -1000,7 +918,7 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _savedPosts.value.length,
                                       itemBuilder: (context, index) {
-                                        return SavedPostReacherCardd(
+                                        return SavedPostReacherCard(
                                           savedPostModel:
                                               _savedPosts.value[index],
                                           onDelete: () {
@@ -1100,16 +1018,16 @@ class _ReacherCard extends HookWidget {
                                   SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              postModel!.location == null
-                                  ? const SizedBox.shrink()
-                                  : Text(
+                              globals.user!.showLocation!
+                                  ? Text(
                                       postModel!.location ?? 'Somewhere',
                                       style: TextStyle(
                                         fontSize: getScreenHeight(11),
                                         fontWeight: FontWeight.w400,
                                         color: AppColors.textColor2,
                                       ),
-                                    ),
+                                    )
+                                  : const SizedBox.shrink()
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1800,7 +1718,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshCompleted();
           }
           if (state is GetAllPostsError) {
-            Snackbars.error(context, message: state.error);
+           Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
           if (state is GetPersonalCommentsSuccess) {
@@ -1822,7 +1740,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserError) {
-                Snackbars.error(context, message: state.error);
+                // Snackbars.error(context, message: state.error);
               }
 
               if (state is GetStarRelationshipSuccess) {
@@ -1847,6 +1765,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 setState(() {});
               }
 
+            
+
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
                 setState(() {});
@@ -1856,6 +1776,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 globals.userBloc!.add(
                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
+                
                 setState(() {});
               }
             },
@@ -1873,7 +1794,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     children: <Widget>[
                       /// Banner image
                       SizedBox(
-                        height: getScreenHeight(200),
+                        height: getScreenHeight(140),
                         width: size.width,
                         child: Image.asset(
                           'assets/images/cover.png',
@@ -1928,28 +1849,29 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               },
                               splashRadius: 20,
                             )
-                          ]).paddingOnly(t: 40),
+                          ]).paddingOnly(t: 25),
 
                       Positioned(
-                        top: size.height * 0.2 - 30,
-                        child: widget.recipientImageUrl == null
-                            ? ImagePlaceholder(
-                                width: getScreenWidth(100),
-                                height: getScreenHeight(100),
-                                border: Border.all(
-                                    color: Colors.grey.shade50, width: 3.0),
-                              )
-                            : SizedBox(
-                                  width: 80,
-                                  height: 100,
-                                  child: RecipientProfilePicture(
-                                      height: getScreenHeight(100),
-                                      width: getScreenWidth(100),
-                                      border: Border.all(
-                                        color: Colors.grey.shade50,
-                                        width: 3.0,
-                                      ), imageUrl: widget.recipientImageUrl),
+                        top: size.height * 0.1,
+                        child: AnimatedContainer(
+                          width: getScreenWidth(100),
+                          height: getScreenHeight(100),
+                          duration: const Duration(seconds: 1),
+                          child: widget.recipientImageUrl == null
+                              ? ImagePlaceholder(
+                                  width: getScreenWidth(100),
+                                  height: getScreenHeight(100),
+                                  border: Border.all(
+                                      color: Colors.grey.shade50, width: 3.0),
                                 )
+                              : RecipientProfilePicture(
+                                  imageUrl: widget.recipientImageUrl,
+                                  width: getScreenWidth(100),
+                                  height: getScreenHeight(100),
+                                  border: Border.all(
+                                      color: Colors.grey.shade50, width: 3.0),
+                                ),
+                        ),
                       ),
                     ],
                   ),
@@ -2167,7 +2089,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               ));
                             },
                             child: _posts.value.isEmpty
-                                ? ListView(
+                                ? ListView( 
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
                                     children: const [

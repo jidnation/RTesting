@@ -234,14 +234,21 @@ class Helper {
                 RouteNavigators.route(
                   context,
                   ListView.builder(
+                    scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(
-                      height: getScreenHeight(300),
-                      margin: const EdgeInsets.only(top: 50),
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
                       child: PhotoView(
                           imageProvider:
-                              NetworkImage(post.imageMediaItems![index]),
+                              NetworkImage(post.imageMediaItems![index],),
                           loadingBuilder: (context, event) => const Center(
                                 child: CupertinoActivityIndicator(
                                   color: Colors.white,
@@ -259,7 +266,7 @@ class Helper {
                     height: getScreenHeight(300),
                     clipBehavior: Clip.hardEdge,
                     decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(4)),
+                        BoxDecoration(borderRadius: BorderRadius.circular(8)),
                     child: CachedNetworkImage(
                       imageUrl: post.imageMediaItems![index],
                       fit: BoxFit.cover,
@@ -271,7 +278,9 @@ class Helper {
                           height: getScreenHeight(50),
                           width: getScreenWidth(50),
                           decoration:
-                              const BoxDecoration(color: Colors.black38),
+                             BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.black38),
                           child: Text(
                             "+ $remImageLength",
                             style: TextStyle(
@@ -287,20 +296,38 @@ class Helper {
           });
     } else if(post.imageMediaItems!.length == 1){
          return GestureDetector(
-          onTap: (() => RouteNavigators.route(
-                context,
-                PhotoView(
-                  imageProvider: NetworkImage(post.imageMediaItems![0]),
-                  loadingBuilder: (context, event) => const Center(
-                    child: CupertinoActivityIndicator(color: Colors.white),
+          onTap: (() =>    RouteNavigators.route(
+                  context,
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
                   ),
-                ),
-              )),
+                )
+              ),
           child: Container(
             height: getScreenHeight(300),
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: CachedNetworkImage(
               imageUrl: post.imageMediaItems![0],
@@ -308,8 +335,7 @@ class Helper {
             ),
           ),
         );
-    }
-    
+    }    
     else if (post.imageMediaItems!.length == 3) {
       int remImageLength =
           1; // length of extra image not seen in the grid at first
@@ -318,21 +344,38 @@ class Helper {
           children: [
             Flexible(
               child: GestureDetector(
-                onTap: (() => RouteNavigators.route(
-                      context,
-                      PhotoView(
-                        imageProvider: NetworkImage(post.imageMediaItems![0]),
-                        loadingBuilder: (context, event) => const Center(
-                          child:
-                              CupertinoActivityIndicator(color: Colors.white),
-                        ),
-                      ),
-                    )),
+                onTap: (() =>   RouteNavigators.route(
+                  context,
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
+                  ),
+                )
+                    ),
                 child: Container(
                   height: getScreenHeight(300),
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: CachedNetworkImage(
                     imageUrl: post.imageMediaItems![0],
@@ -363,7 +406,7 @@ class Helper {
                     width: getScreenWidth(180),
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: CachedNetworkImage(
                       imageUrl: post.imageMediaItems![1],
@@ -388,7 +431,7 @@ class Helper {
                     width: getScreenWidth(180),
                     clipBehavior: Clip.hardEdge,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: CachedNetworkImage(
                       imageUrl: post.imageMediaItems![2],
@@ -415,15 +458,30 @@ class Helper {
             return GestureDetector(
               onTap: (() => RouteNavigators.route(
                     context,
-                    PhotoView(
-                        imageProvider:
-                            NetworkImage(post.imageMediaItems![index]),
-                        loadingBuilder: (context, event) => const Center(
-                              child: CupertinoActivityIndicator(
-                                color: Colors.white,
-                              ),
-                            )),
-                  )),
+                     ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: imageLength,
+                    itemBuilder: (context, index) => Container(                 
+                       decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+                    //clipBehavior: Clip.hardEdge,
+                      width: MediaQuery.of(context).size.width,
+                      //height:MediaQuery.of(context).size.height ,
+                      margin: const EdgeInsets.only(right: 50),
+
+                      child: PhotoView(
+                          imageProvider:
+                              NetworkImage(post.imageMediaItems![index],),
+                          loadingBuilder: (context, event) => const Center(
+                                child: CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                              )),
+                    ),
+                  ),
+              )),
               child: Container(
                 height: getScreenHeight(300),
                 clipBehavior: Clip.hardEdge,

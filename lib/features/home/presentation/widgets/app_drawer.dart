@@ -31,168 +31,170 @@ class AppDrawer extends HookWidget {
             height: size.height * 0.29,
             child: DrawerHeader(
               child: Material(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(30),
-                      splashColor: AppColors.backgroundShade4,
-                      onTap: () {
-                        RouteNavigators.route(context, const AccountScreen());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Helper.renderProfilePicture(
-                          globals.user!.profilePicture,
-                          size: 80,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        splashColor: AppColors.backgroundShade4,
+                        onTap: () {
+                          RouteNavigators.route(context, const AccountScreen());
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 80,
+                          ),
                         ),
                       ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(25),
-                      splashColor: AppColors.backgroundShade4,
-                      onTap: () {
-                        RouteNavigators.route(context, const AccountScreen());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                      .toTitleCase(),
-                                  style: TextStyle(
+                      InkWell(
+                        borderRadius: BorderRadius.circular(25),
+                        splashColor: AppColors.backgroundShade4,
+                        onTap: () {
+                          RouteNavigators.route(context, const AccountScreen());
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                        .toTitleCase(),
+                                    style: TextStyle(
+                                      color: AppColors.textColor2,
+                                      fontSize: getScreenHeight(16),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '@${globals.user!.username!}',
+                                    style: TextStyle(
+                                      color: const Color(0xFF6C6A6A),
+                                      fontSize: getScreenHeight(15),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              GestureDetector(
+                                onTap: () =>
+                                    showOtherItem.value = !showOtherItem.value,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    showOtherItem.value
+                                        ? Icons.keyboard_arrow_down
+                                        : Icons.keyboard_arrow_up,
                                     color: AppColors.textColor2,
-                                    fontSize: getScreenHeight(16),
-                                    fontWeight: FontWeight.w600,
+                                    size: 20,
                                   ),
-                                ),
-                                Text(
-                                  '@${globals.user!.username!}',
-                                  style: TextStyle(
-                                    color: const Color(0xFF6C6A6A),
-                                    fontSize: getScreenHeight(15),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  showOtherItem.value = !showOtherItem.value,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(
-                                  showOtherItem.value
-                                      ? Icons.keyboard_arrow_down
-                                      : Icons.keyboard_arrow_up,
-                                  color: AppColors.textColor2,
-                                  size: 20,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: getScreenHeight(0.5)),
-                    Row(
-                      children: [
-                        InkWell(
-                          borderRadius: BorderRadius.circular(25),
-                          splashColor: AppColors.backgroundShade4,
-                          onTap: () {
-                            RouteNavigators.route(
-                                context, const AccountStatsInfo());
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      globals.user!.nReachers.toString(),
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(16),
-                                        color: AppColors.textColor2,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(width: getScreenWidth(5)),
-                                    Text(
-                                      'Reachers',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(16),
-                                        color: AppColors.greyShade2,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(20)),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(25),
-                          splashColor: AppColors.backgroundShade4,
-                          onTap: () {
-                            RouteNavigators.route(
-                                context,
-                                const AccountStatsInfo(
-                                  index: 1,
-                                ));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      globals.user!.nReaching.toString(),
-                                      style: TextStyle(
+                      SizedBox(height: getScreenHeight(0.5)),
+                      Row(
+                        children: [
+                          InkWell(
+                            borderRadius: BorderRadius.circular(25),
+                            splashColor: AppColors.backgroundShade4,
+                            onTap: () {
+                              RouteNavigators.route(
+                                  context, const AccountStatsInfo());
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReachers.toString(),
+                                        style: TextStyle(
                                           fontSize: getScreenHeight(16),
                                           color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    SizedBox(width: getScreenWidth(5)),
-                                    Text(
-                                      'Reaching',
-                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reachers',
+                                        style: TextStyle(
                                           fontSize: getScreenHeight(16),
                                           color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ],
+                          SizedBox(width: getScreenWidth(20)),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(25),
+                            splashColor: AppColors.backgroundShade4,
+                            onTap: () {
+                              RouteNavigators.route(
+                                  context,
+                                  const AccountStatsInfo(
+                                    index: 1,
+                                  ));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReaching.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reaching',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
