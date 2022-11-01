@@ -746,9 +746,8 @@ class PostFeedReacherCard extends HookWidget {
                               children: [                            
                                 
                                   Text(
-                                        globals.user!.showLocation!
-                                            ? postFeedModel!.post!.location!
-                                            : '',
+                                         postFeedModel!.post!.location! == 'nil' ? ''
+                                            : postFeedModel!.post!.location!,
                                   
                                         style: TextStyle(
                                           fontSize: getScreenHeight(10),

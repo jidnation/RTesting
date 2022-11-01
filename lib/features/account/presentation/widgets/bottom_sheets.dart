@@ -292,7 +292,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                             },
                           ),
                           KebabBottomTextButton(
-                              label: 'Download post', onPressed: downloadPost),
+                              label: 'Download Reach Card', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Copy link',
                             onPressed: () {

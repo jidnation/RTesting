@@ -1018,16 +1018,15 @@ class _ReacherCard extends HookWidget {
                                   SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              globals.user!.showLocation!
-                                  ? Text(
-                                      postModel!.location ?? 'Somewhere',
+                                  Text(
+                                      postModel!.location! ,
                                       style: TextStyle(
                                         fontSize: getScreenHeight(11),
                                         fontWeight: FontWeight.w400,
                                         color: AppColors.textColor2,
                                       ),
                                     )
-                                  : const SizedBox.shrink()
+                                  
                             ],
                           ).paddingOnly(t: 10),
                         ],
