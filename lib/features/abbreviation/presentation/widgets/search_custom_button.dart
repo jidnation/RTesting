@@ -8,7 +8,7 @@ class AbbreviationCustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: Container(
         margin: const EdgeInsets.only(bottom: 44),

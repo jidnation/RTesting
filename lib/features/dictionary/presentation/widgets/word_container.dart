@@ -6,7 +6,7 @@ class DictionaryTab extends StatelessWidget {
 final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: Container(
         alignment: Alignment.centerLeft,
