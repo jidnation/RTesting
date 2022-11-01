@@ -8,7 +8,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 230),

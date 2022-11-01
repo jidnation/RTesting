@@ -8,7 +8,6 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
-import 'package:reach_me/features/abbreviation/presentation/views/abbreviation_view.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
@@ -16,7 +15,6 @@ import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
-
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -257,12 +255,7 @@ class AppDrawer extends HookWidget {
                       onPressed: () => RouteNavigators.route(
                           context, const SavedPostScreen()),
                     ),
-                    DrawerItem(
-                      action: 'Abbreviation',
-                      icon: 'assets/svgs/abreviation.svg',
-                      onPressed: () => RouteNavigators.route(
-                          context, const AbbreviationView()),
-                    ),
+                    
                     DrawerItem(
                       action: 'Dictionary',
                       icon: 'assets/svgs/dictionary.svg',
