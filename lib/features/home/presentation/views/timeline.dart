@@ -41,7 +41,6 @@ import 'package:reach_me/features/home/presentation/views/status/view.status.dar
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
 
-
 import 'package:timeago/timeago.dart' as timeago;
 
 class TimelineScreen extends StatefulHookWidget {
@@ -642,7 +641,7 @@ class PostFeedReacherCard extends HookWidget {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
 
-   // final ScreenshotController screenshotController = ScreenshotController();
+    // final ScreenshotController screenshotController = ScreenshotController();
 
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
@@ -743,21 +742,19 @@ class PostFeedReacherCard extends HookWidget {
                               ],
                             ),
                             Row(
-                              children: [                            
-                                
-                                  Text(
-                                        globals.user!.showLocation!
-                                            ? postFeedModel!.post!.location!
-                                            : '',
-                                  
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(10),
-                                          fontFamily: 'Poppins',
-                                          letterSpacing: 0.4,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.textColor2,
-                                        ),
-                                      ),
+                              children: [
+                                Text(
+                                  globals.user!.showLocation!
+                                      ? postFeedModel!.post!.location!
+                                      : '',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(10),
+                                    fontFamily: 'Poppins',
+                                    letterSpacing: 0.4,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.textColor2,
+                                  ),
+                                ),
                                 Text(
                                   postDuration,
                                   style: TextStyle(
@@ -798,25 +795,44 @@ class PostFeedReacherCard extends HookWidget {
               ),
               postFeedModel!.post!.content == null
                   ? const SizedBox.shrink()
-                  : Flexible(
-                      child: ReadMoreText(
-                        postFeedModel!.post!.edited!
-                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                            : postFeedModel!.post!.content ?? '',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: getScreenHeight(14)),
-                        trimLines: 3,
-                        colorClickableText: const Color(0xff717F85),
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'See more',
-                        trimExpandedText: 'See less',
-                        moreStyle: TextStyle(
-                            fontSize: getScreenHeight(14),
-                            fontFamily: "Roboto",
-                            color: const Color(0xff717F85)),
-                      ).paddingSymmetric(h: 16, v: 10),
-                    ),
+                  : Row(
+                      children: [
+                        Flexible(
+                          child: ReadMoreText(
+                            "${postFeedModel!.post!.content}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: getScreenHeight(14)),
+                            trimLines: 3,
+                            colorClickableText: const Color(0xff717F85),
+                            trimMode: TrimMode.Line,
+                            trimCollapsedText: 'See more',
+                            trimExpandedText: 'See less',
+                            moreStyle: TextStyle(
+                                fontSize: getScreenHeight(14),
+                                fontFamily: "Roboto",
+                                color: const Color(0xff717F85)),
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(2)),
+                        Tooltip(
+                          message: 'This Reach has been edited by the Reacher',
+                          waitDuration: const Duration(seconds: 1),
+                          showDuration: const Duration(seconds: 2),                         
+                          child: Text(
+                            postFeedModel!.post!.edited!
+                                ? "(Reach Edited)"
+                                : "",
+                            style: TextStyle(
+                              fontSize: getScreenHeight(12),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).paddingSymmetric(h: 16, v: 10),
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
                 Helper.renderPostImages(postFeedModel!.post!, context)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)

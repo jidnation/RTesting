@@ -16,19 +16,27 @@ class ImagePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.hardEdge,
+      padding: const EdgeInsets.all(3),
       height: height,
       width: width,
-      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-          color: AppColors.primaryColor,
+        //  border: border,
+        shape: BoxShape.circle,
+        color: Colors.grey.shade50,
+      ),
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          border: border),
-      child: FittedBox(
-          child: Image.asset(
-        'assets/images/blank-dp.png',
-        fit: BoxFit.cover,
-        gaplessPlayback: true,
-      )),
+        ),
+        child: FittedBox(
+            child: Image.asset(
+              'assets/images/blank-dp.png',
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+            )),
+      ),
     );
   }
 }
