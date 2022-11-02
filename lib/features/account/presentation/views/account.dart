@@ -32,6 +32,8 @@ import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/services/database/secure_storage.dart';
+import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -366,15 +368,34 @@ class _AccountScreenState extends State<AccountScreen>
           bloc: globals.userBloc,
           listener: (context, state) {
             if (state is RecipientUserData) {
-              reachDM.value = true;
               if (reachDM.value) {
+                reachDM.value = false;
                 RouteNavigators.route(
                     context, MsgChatInterface(recipientUser: state.user));
               }
             }
+            if (state is DeleteAccountSuccess) {
+              if (state.deleted ?? false) {
+                RouteNavigators.pop(context);
+                Snackbars.success(context, message: 'Account deleted!');
+                SecureStorage.deleteSecureData();
+                RouteNavigators.routeNoWayHome(context, const LoginScreen());
+              }
+            }
+
+            if (state is DeleteAccountLoading) {
+              globals.showLoader(context);
+            }
+
+            if (state is DeleteAccountError) {
+              RouteNavigators.pop(context);
+              Snackbars.error(context, message: state.error);
+            }
+
             if (state is UserError) {
               reachDM.value = false;
             }
+
             if (state is UserData) {
               globals.user = state.user;
             }
@@ -760,7 +781,7 @@ class _AccountScreenState extends State<AccountScreen>
                                                   .vote![0].voteType
                                               : null,
                                           onMessage: () {
-                                            //  reachDM.value = true;
+                                            reachDM.value = true;
 
                                             handleTap(index);
                                             if (active.contains(index)) {
@@ -1196,17 +1217,25 @@ class _ReacherCard extends HookWidget {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: getScreenWidth(15)),
-                              IconButton(
-                                onPressed: () {},
-                                padding: const EdgeInsets.all(0),
-                                constraints: const BoxConstraints(),
-                                icon: SvgPicture.asset(
-                                  'assets/svgs/message.svg',
-                                  height: 20,
-                                  width: 20,
+                              Visibility(
+                                visible: postModel!.authId != globals.userId,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: getScreenWidth(15)),
+                                    IconButton(
+                                      onPressed: () {},
+                                      padding: const EdgeInsets.all(0),
+                                      constraints: const BoxConstraints(),
+                                      icon: SvgPicture.asset(
+                                        'assets/svgs/message.svg',
+                                        height: 20,
+                                        width: 20,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
@@ -1676,8 +1705,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
-    globals.userBloc!
-        .add(GetReachRelationshipEvent(userIdToReach: widget.recipientId));
+    globals.userBloc!.add(GetReachRelationshipEvent(
+        userIdToReach: widget.recipientId,
+        type: ReachRelationshipType.reaching));
     globals.userBloc!
         .add(GetStarRelationshipEvent(userIdToStar: widget.recipientId));
   }
@@ -1829,7 +1859,13 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserError) {
-                // Snackbars.error(context, message: state.error);
+                Snackbars.error(context, message: state.error);
+                if ((state.error ?? '')
+                    .toLowerCase()
+                    .contains('already reaching')) {
+                  _isReaching = true;
+                  setState(() {});
+                }
               }
 
               if (state is GetStarRelationshipSuccess) {
@@ -2157,97 +2193,108 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     color: const Color(0xFF767474).withOpacity(0.5),
                     thickness: 0.5,
                   ),
-                  Center(child: _tabBar),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        //REACHES TAB
-                        if (timelineLoading)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _reachoutsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!.add(GetAllPostsEvent(
-                                pageLimit: 50,
-                                pageNumber: 1,
-                                authId: widget.recipientId,
-                              ));
-                            },
-                            child: _posts.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                        title: "Reaches you’ve made",
-                                        subtitle:
-                                            "Find all posts or contributions you’ve made here ",
-                                      )
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _posts.value.length,
-                                    itemBuilder: (context, index) {
-                                      return _ReacherCard(
-                                        postModel: _posts.value[index],
-                                        // onLike: () {
-                                        //   _likePost(index);
-                                        // },
-                                      );
+                  Visibility(
+                    visible: _isReaching,
+                    child: Expanded(
+                      child: Column(
+                        children: [
+                          Center(child: _tabBar),
+                          Expanded(
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: [
+                                //REACHES TAB
+                                if (timelineLoading)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _reachoutsRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetAllPostsEvent(
+                                        pageLimit: 50,
+                                        pageNumber: 1,
+                                        authId: widget.recipientId,
+                                      ));
                                     },
+                                    child: _posts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Reaches you’ve made",
+                                                subtitle:
+                                                    "Find all posts or contributions you’ve made here ",
+                                              )
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _posts.value.length,
+                                            itemBuilder: (context, index) {
+                                              return _ReacherCard(
+                                                postModel: _posts.value[index],
+                                                // onLike: () {
+                                                //   _likePost(index);
+                                                // },
+                                              );
+                                            },
+                                          ),
                                   ),
-                          ),
 
-                        //COMMENTS TAB
-                        if (timelineLoading)
-                          const CircularLoader()
-                        else
-                          Refresher(
-                            controller: _commentsRefreshController,
-                            onRefresh: () {
-                              globals.socialServiceBloc!
-                                  .add(GetPersonalCommentsEvent(
-                                pageLimit: 50,
-                                pageNumber: 1,
-                                authId: widget.recipientId,
-                              ));
-                            },
-                            child: _comments.value.isEmpty
-                                ? ListView(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    children: const [
-                                      EmptyTabWidget(
-                                          title:
-                                              'Comments you made on a post and comments made on your post',
-                                          subtitle:
-                                              'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: _comments.value.length,
-                                    itemBuilder: (context, index) {
-                                      return _CommentReachCard(
-                                        commentModel: _comments.value[index],
-                                      );
+                                //COMMENTS TAB
+                                if (timelineLoading)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _commentsRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetPersonalCommentsEvent(
+                                        pageLimit: 50,
+                                        pageNumber: 1,
+                                        authId: widget.recipientId,
+                                      ));
                                     },
+                                    child: _comments.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                  title:
+                                                      'Comments you made on a post and comments made on your post',
+                                                  subtitle:
+                                                      'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _comments.value.length,
+                                            itemBuilder: (context, index) {
+                                              return _CommentReachCard(
+                                                commentModel:
+                                                    _comments.value[index],
+                                              );
+                                            },
+                                          ),
                                   ),
-                          ),
 
-                        //LIKES TAB
-                        ListView(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          children: const [
-                            EmptyTabWidget(
-                              title: "Likes they made",
-                              subtitle: "Find post they liked",
-                            )
-                          ],
-                        ),
-                      ],
+                                //LIKES TAB
+                                ListView(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  children: const [
+                                    EmptyTabWidget(
+                                      title: "Likes they made",
+                                      subtitle: "Find post they liked",
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

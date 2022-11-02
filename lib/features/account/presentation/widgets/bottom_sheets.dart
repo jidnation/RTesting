@@ -100,6 +100,22 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           Snackbars.success(context,
                               message: 'Profile link copied to clipboard!');
                         }),
+                    KebabBottomTextButton(
+                        label: 'Delete Account',
+                        onPressed: () async {
+                          final result = await globals.dialogAndSheetService!
+                              .showYesNoDialog(
+                                  context: context,
+                                  yesLabel: 'Yes',
+                                  noLabel: 'No',
+                                  message: 'Delete account?');
+                          if (result) {
+                            RouteNavigators.pop(context);
+                            globals.userBloc!.add(DeleteAccountEvent());
+                          } else {
+                            RouteNavigators.pop(context);
+                          }
+                        }),
                     // KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 ),

@@ -31,7 +31,6 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -45,6 +44,7 @@ import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
+import '../../../chat/presentation/views/msg_chat_interface.dart';
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -109,7 +109,9 @@ class _TimelineScreenState extends State<TimelineScreen>
     super.build(context);
 
     final reachDM = useState(false);
+    final shoutingDown = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
+    final _currentPost = useState<PostFeedModel?>(null);
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
@@ -180,14 +182,28 @@ class _TimelineScreenState extends State<TimelineScreen>
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is RecipientUserData) {
-                // reachDM.value = false;
                 if (reachDM.value) {
+                  reachDM.value = false;
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
                 }
               }
               if (state is UserError) {
                 reachDM.value = false;
+              }
+              if (state is GetReachRelationshipSuccess) {
+                if (shoutingDown.value) {
+                  shoutingDown.value = false;
+                  if ((state.isReaching ?? false)) {
+                    globals.socialServiceBloc!.add(VotePostEvent(
+                      voteType: 'Downvote',
+                      postId: _currentPost.value!.postId,
+                    ));
+                  } else {
+                    Snackbars.error(context,
+                        message: 'You cannot shout down on this user\'s posts');
+                  }
+                }
               }
             },
             builder: (context, state) {
@@ -242,7 +258,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                   if (state is VotePostSuccess) {
                     if (!(state.isVoted!)) {
                       Snackbars.success(context,
-                          message: 'Post shouted down has been removed!');
+                          message:
+                              'The post you shouted down has been removed!');
                     }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
@@ -546,18 +563,30 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+                                                        _currentPost.value =
+                                                            _posts.value[index];
                                                         if (active
                                                             .contains(index)) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  VotePostEvent(
-                                                            voteType:
-                                                                'Downvote',
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                          ));
+                                                          shoutingDown.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: _posts
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                          // globals
+                                                          //     .socialServiceBloc!
+                                                          //     .add(
+                                                          //         VotePostEvent(
+                                                          //   voteType:
+                                                          //       'Downvote',
+                                                          //   postId: _posts
+                                                          //       .value[index]
+                                                          //       .postId,
+                                                          // ));
                                                         }
                                                       },
                                                       onLike: () {
@@ -725,7 +754,7 @@ class PostFeedReacherCard extends HookWidget {
                     padding: EdgeInsets.zero,
                     onPressed: () {
                       final progress = ProgressHUD.of(context);
-                      progress?.showWithText('Viewing Reacher..');
+                      progress?.showWithText('Viewing Reacher...');
                       Future.delayed(const Duration(seconds: 3), () {
                         globals.userBloc!.add(GetRecipientProfileEvent(
                             email: postFeedModel!.postOwnerId));
@@ -975,6 +1004,16 @@ class PostFeedReacherCard extends HookWidget {
                                         width: getScreenWidth(20),
                                       ),
                               ),
+                              FittedBox(
+                                child: Text(
+                                  '${postFeedModel!.post!.nUpvotes ?? 0}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
                               Flexible(
                                   child: SizedBox(width: getScreenWidth(4))),
                               Flexible(
@@ -994,6 +1033,16 @@ class PostFeedReacherCard extends HookWidget {
                                         height: getScreenHeight(20),
                                         width: getScreenWidth(20),
                                       ),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  '${postFeedModel!.post!.nDownvotes ?? 0}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
                               ),
                               Flexible(
                                   child: SizedBox(width: getScreenWidth(4))),

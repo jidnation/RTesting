@@ -41,6 +41,15 @@ class UserRepository {
     }
   }
 
+  Future<Either<String, bool>> deleteAccount() async {
+    try {
+      final deleted = await _homeRemoteDataSource.deleteAccount();
+      return Right(deleted);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, User>> setUsername({
     required String username,
   }) async {
@@ -202,11 +211,11 @@ class UserRepository {
 
   Future<Either<String, bool>> getReachRelationship({
     required String userId,
+    required String type,
   }) async {
     try {
       final isReaching = await _homeRemoteDataSource.getReachRelationship(
-        userId: userId,
-      );
+          userId: userId, type: type);
       return Right(isReaching);
     } on GraphQLError catch (e) {
       return Left(e.message);

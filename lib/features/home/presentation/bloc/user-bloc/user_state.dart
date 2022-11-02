@@ -14,6 +14,20 @@ class UserUploadProfilePictureSuccess extends UserState {
   final User? user;
 }
 
+class DeleteAccountSuccess extends UserState {
+  DeleteAccountSuccess({this.deleted});
+  final bool? deleted;
+}
+
+class DeleteAccountError extends UserState {
+  DeleteAccountError({this.error});
+  final String? error;
+}
+
+class DeleteAccountLoading extends UserState {
+  DeleteAccountLoading();
+}
+
 class UserUploadCoverPictureSuccess extends UserState {
   UserUploadCoverPictureSuccess({this.user});
   final User? user;
