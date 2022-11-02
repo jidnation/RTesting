@@ -1717,7 +1717,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshCompleted();
           }
           if (state is GetAllPostsError) {
-           Snackbars.error(context, message: state.error);
+            Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
           if (state is GetPersonalCommentsSuccess) {
@@ -1764,8 +1764,6 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 setState(() {});
               }
 
-            
-
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
                 setState(() {});
@@ -1775,7 +1773,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 globals.userBloc!.add(
                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
-                
+
                 setState(() {});
               }
             },
@@ -1898,7 +1896,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             children: [
                               InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 0)),
+                                    context,
+                                    const AccountStatsInfo(
+                                      index: 0,
+                                      // recipientId: widget.recipientId,
+                                    )),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -1924,7 +1926,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               SizedBox(width: getScreenWidth(20)),
                               InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 1)),
+                                    context,
+                                    RecipientAccountStatsInfo(
+                                      index: 1,
+                                      recipientId: widget.recipientId,
+                                    )),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -2088,7 +2094,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               ));
                             },
                             child: _posts.value.isEmpty
-                                ? ListView( 
+                                ? ListView(
                                     padding: EdgeInsets.zero,
                                     shrinkWrap: true,
                                     children: const [

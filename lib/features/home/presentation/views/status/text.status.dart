@@ -14,6 +14,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
 
 class TextStatus extends StatefulHookWidget {
   const TextStatus({Key? key}) : super(key: key);
@@ -171,29 +172,31 @@ class _TextStatusState extends State<TextStatus> {
                               constraints: const BoxConstraints(),
                             ),
                           ),
-                          // Container(
-                          //   padding: const EdgeInsets.all(1),
-                          //   decoration: BoxDecoration(
-                          //     shape: BoxShape.circle,
-                          //     color: isAudioStatus.value
-                          //         ? AppColors.white
-                          //         : Colors.transparent,
-                          //   ),
-                          //   child: IconButton(
-                          //     onPressed: () {
-                          //       isAudioStatus.value = true;
-                          //       isTextStatus.value = false;
-                          //       isCameraStatus.value = false;
-                          //     },
-                          //     icon: SvgPicture.asset(
-                          //         'assets/svgs/status-mic.svg',
-                          //         color: isAudioStatus.value
-                          //             ? AppColors.black
-                          //             : null),
-                          //     // padding: EdgeInsets.zero,
-                          //     constraints: const BoxConstraints(),
-                          //   ),
-                          // ),
+                          Container(
+                            padding: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isAudioStatus.value
+                                  ? AppColors.white
+                                  : Colors.transparent,
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                isAudioStatus.value = true;
+                                isTextStatus.value = false;
+                                isCameraStatus.value = false;
+                                RouteNavigators.routeReplace(
+                                    context, const AudioStatus());
+                              },
+                              icon: SvgPicture.asset(
+                                  'assets/svgs/status-mic.svg',
+                                  color: isAudioStatus.value
+                                      ? AppColors.black
+                                      : null),
+                              // padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ),
                           Container(
                             padding: const EdgeInsets.all(1),
                             decoration: BoxDecoration(
@@ -340,7 +343,7 @@ class _TextStatus2State extends State<TextStatus2> {
     final showEmoji = useState(false);
     Widget buildEmoji() {
       return SizedBox(
-        height: MediaQuery.of(context).size.height *0.4,
+        height: MediaQuery.of(context).size.height * 0.4,
         child: EmojiPicker(
           textEditingController: controller,
           config: Config(

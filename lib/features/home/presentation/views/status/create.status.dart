@@ -14,6 +14,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
 
 late List<CameraDescription> _cameras;
@@ -202,29 +203,31 @@ class _CreateStatusState extends State<CreateStatus>
                                         constraints: const BoxConstraints(),
                                       ),
                                     ),
-                                    // Container(
-                                    //   padding: const EdgeInsets.all(1),
-                                    //   decoration: BoxDecoration(
-                                    //     shape: BoxShape.circle,
-                                    //     color: isAudioStatus.value
-                                    //         ? AppColors.white
-                                    //         : Colors.transparent,
-                                    //   ),
-                                    //   child: IconButton(
-                                    //     onPressed: () {
-                                    //       isAudioStatus.value = true;
-                                    //       isTextStatus.value = false;
-                                    //       isCameraStatus.value = false;
-                                    //     },
-                                    //     icon: SvgPicture.asset(
-                                    //         'assets/svgs/status-mic.svg',
-                                    //         color: isAudioStatus.value
-                                    //             ? AppColors.black
-                                    //             : null),
-                                    //     // padding: EdgeInsets.zero,
-                                    //     constraints: const BoxConstraints(),
-                                    //   ),
-                                    // ),
+                                    Container(
+                                      padding: const EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isAudioStatus.value
+                                            ? AppColors.white
+                                            : Colors.transparent,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          isAudioStatus.value = true;
+                                          isTextStatus.value = false;
+                                          isCameraStatus.value = false;
+                                          RouteNavigators.routeReplace(
+                                              context, const AudioStatus());
+                                        },
+                                        icon: SvgPicture.asset(
+                                            'assets/svgs/status-mic.svg',
+                                            color: isAudioStatus.value
+                                                ? AppColors.black
+                                                : null),
+                                        // padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      ),
+                                    ),
                                     Container(
                                       padding: const EdgeInsets.all(1),
                                       decoration: BoxDecoration(
