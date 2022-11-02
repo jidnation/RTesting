@@ -801,7 +801,7 @@ class PostFeedReacherCard extends HookWidget {
                   : Flexible(
                       child: ReadMoreText(
                         postFeedModel!.post!.edited!
-                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
+                            ? "${postFeedModel!.post!.content ?? ''} (reach edited)"
                             : postFeedModel!.post!.content ?? '',
                         style: TextStyle(
                             fontWeight: FontWeight.w400,

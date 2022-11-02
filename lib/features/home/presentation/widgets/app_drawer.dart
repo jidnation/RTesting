@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -11,6 +12,7 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
+import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 
@@ -28,7 +30,7 @@ class AppDrawer extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: size.height * 0.29,
+            height: size.height * 0.31,
             child: DrawerHeader(
               child: Material(
                 child: SingleChildScrollView(
@@ -42,13 +44,11 @@ class AppDrawer extends HookWidget {
                         onTap: () {
                           RouteNavigators.route(context, const AccountScreen());
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Helper.renderProfilePicture(
-                            globals.user!.profilePicture,
-                            size: 80,
-                          ),
-                        ),
+                        child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: ProfilePicture(
+                              height: 80,
+                            )),
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(25),
@@ -104,7 +104,7 @@ class AppDrawer extends HookWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: getScreenHeight(0.5)),
+                      SizedBox(height: getScreenHeight(5)),
                       Row(
                         children: [
                           InkWell(
@@ -122,7 +122,8 @@ class AppDrawer extends HookWidget {
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -167,7 +168,8 @@ class AppDrawer extends HookWidget {
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -255,7 +257,6 @@ class AppDrawer extends HookWidget {
                       onPressed: () => RouteNavigators.route(
                           context, const SavedPostScreen()),
                     ),
-                    
                     DrawerItem(
                       action: 'Dictionary',
                       icon: 'assets/svgs/dictionary.svg',
@@ -279,6 +280,16 @@ class AppDrawer extends HookWidget {
               action: 'Help Center',
               icon: 'assets/svgs/help.svg',
               onPressed: () {},
+            ),
+          ),
+          Visibility(
+            visible: showOtherItem.value,
+            child: DrawerItem(
+              action: 'Scan QR Code',
+              icon: 'assets/svgs/qrcode.svg',
+              onPressed: () {
+                RouteNavigators.route(context, const ScanQRCodeScreen());
+              },
             ),
           ),
           const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
@@ -343,14 +354,6 @@ class DrawerItem extends StatelessWidget {
               color: color,
             ),
           ),
-          action == 'Logout' ? const Spacer() : const SizedBox.shrink(),
-          action == 'Logout'
-              ? SizedBox(
-                  height: getScreenHeight(20),
-                  width: getScreenWidth(20),
-                  child: SvgPicture.asset('assets/svgs/qrcode.svg'),
-                )
-              : const SizedBox.shrink(),
         ],
       ),
     );
