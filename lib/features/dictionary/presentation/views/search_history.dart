@@ -43,7 +43,7 @@ class _SearchHistoryState extends State<SearchHistory> {
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20.0),
         child: ListView.builder(
-          itemCount: 3,
+          itemCount: 10,
           itemBuilder: (BuildContext context, int index) {
             return SearchHistoryContent(
               contentDate: '21-02-12',

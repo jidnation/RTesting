@@ -10,11 +10,12 @@ class RecentlyAddedAbbreviation extends StatefulHookWidget {
   const RecentlyAddedAbbreviation({Key? key}) : super(key: key);
 
   @override
-  State<RecentlyAddedAbbreviation> createState() => _RecentlyAddedAbbreviationState();
+  State<RecentlyAddedAbbreviation> createState() =>
+      _RecentlyAddedAbbreviationState();
 }
 
 class _RecentlyAddedAbbreviationState extends State<RecentlyAddedAbbreviation> {
-  @override
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -42,28 +43,17 @@ class _RecentlyAddedAbbreviationState extends State<RecentlyAddedAbbreviation> {
         toolbarHeight: 50,
       ),
       body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (BuildContext context, int index) {
-                    return const ContentContainer(
-                      fullWord: 'Character',
-                      wordMeaning:
-                          'the mental and moralthe mental and moralthe mental and moralthe mental and moral qualities distinctive to an individual.',
-                      wordText: 'Char',
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
+        margin: const EdgeInsets.symmetric(horizontal: 15.0,),
+        child: ListView.builder(
+          itemCount: 10,
+          itemBuilder: (BuildContext context, int index) {
+            return const ContentContainer(
+              fullWord: 'Character',
+              wordMeaning:
+                  'the mental and moralthe mental and moral the mental and moral the mental and moral qualities distinctive to an individual.',
+              wordText: 'Char',
+            );
+          },
         ),
       ),
     );

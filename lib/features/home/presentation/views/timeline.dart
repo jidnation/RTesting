@@ -40,7 +40,8 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
-// import 'package:screenshot/screenshot.dart';
+
+
 import 'package:timeago/timeago.dart' as timeago;
 
 class TimelineScreen extends StatefulHookWidget {
@@ -640,7 +641,9 @@ class PostFeedReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
-    // final ScreenshotController screenshotController = ScreenshotController();
+
+   // final ScreenshotController screenshotController = ScreenshotController();
+
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -798,7 +801,7 @@ class PostFeedReacherCard extends HookWidget {
                   : Flexible(
                       child: ReadMoreText(
                         postFeedModel!.post!.edited!
-                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
+                            ? "${postFeedModel!.post!.content ?? ''} (reach edited)"
                             : postFeedModel!.post!.content ?? '',
                         style: TextStyle(
                             fontWeight: FontWeight.w400,

@@ -43,12 +43,13 @@ class _SearchWordState extends State<SearchWord> {
                   child: Stack(
                     children: [
                       Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CustomButton(
-                            onPressed: () => RouteNavigators.route(
-                                context, const RemoveSearchWord()),
-                            buttonText: 'Add to Dictionary',
-                          )),
+                        alignment: Alignment.bottomCenter,
+                        child: CustomButton(
+                          onPressed: () => RouteNavigators.route(
+                              context, const RemoveSearchWord()),
+                          buttonText: 'Add to Dictionary',
+                        ),
+                      ),
                     ],
                   ),
                 ),
