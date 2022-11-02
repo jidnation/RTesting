@@ -32,7 +32,31 @@ class _SearchWordState extends State<SearchWord> {
                     const SizedBox(
                       width: 20,
                     ),
-                    const SearchCustomTextField(),
+                    SearchCustomTextField(
+                      onChanged: (value) {
+                        String lastChar = value.substring(value.length - 1);
+                        if (lastChar == '@') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("Alert!!"),
+                                content: const Text("You are awesome!"),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text("OK"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(
                       width: 30,
                     ),
@@ -43,13 +67,12 @@ class _SearchWordState extends State<SearchWord> {
                   child: Stack(
                     children: [
                       Align(
-                        alignment: Alignment.bottomCenter,
-                        child: CustomButton(
-                          onPressed: () => RouteNavigators.route(
-                              context, const RemoveSearchWord()),
-                          buttonText: 'Add to Dictionary',
-                        ),
-                      ),
+                          alignment: Alignment.bottomCenter,
+                          child: CustomButton(
+                            onPressed: () => RouteNavigators.route(
+                                context, const RemoveSearchWord()),
+                            buttonText: 'Add to Dictionary',
+                          )),
                     ],
                   ),
                 ),
