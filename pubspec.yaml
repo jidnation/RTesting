@@ -93,6 +93,8 @@ dependencies:
   path_provider: ^2.0.11
   permission_handler: ^10.2.0
   focused_menu: ^1.0.5
+  flutter_sound: ^9.2.13
+  audioplayers: ^1.1.1
 
 
 dev_dependencies:
