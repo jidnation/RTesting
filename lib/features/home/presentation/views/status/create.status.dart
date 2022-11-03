@@ -105,7 +105,11 @@ class _CreateStatusState extends State<CreateStatus>
       body: SizedBox(
         height: size.height,
         width: size.width,
-        child: ListView(
+        child: cameraLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  :  ListView(
           // shrinkWrap: true,
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
@@ -115,11 +119,7 @@ class _CreateStatusState extends State<CreateStatus>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: cameraLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : CameraPreview(
+              child:CameraPreview(
                       controller!,
                       child: Column(
                         //mainAxisSize: MainAxisSize.min,
