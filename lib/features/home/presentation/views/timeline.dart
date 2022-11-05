@@ -43,6 +43,8 @@ import 'package:readmore/readmore.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../full_post.dart';
+
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -110,7 +112,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
-    print(globals.token);
+    debugPrint(globals.token);
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
@@ -170,6 +172,7 @@ class _TimelineScreenState extends State<TimelineScreen>
           ).paddingOnly(r: 16),
         ],
       ),
+     
       body: ProgressHUD(
         child: SafeArea(
           top: false,
@@ -744,9 +747,11 @@ class PostFeedReacherCard extends HookWidget {
                             Row(
                               children: [
                                 Text(
-                                  globals.user!.showLocation!
-                                      ? postFeedModel!.post!.location!
-                                      : '',
+
+                                  postFeedModel!.post!.location! == 'nil'
+                                      ? ''
+                                      : postFeedModel!.post!.location!,
+
                                   style: TextStyle(
                                     fontSize: getScreenHeight(10),
                                     fontFamily: 'Poppins',
@@ -888,8 +893,18 @@ class PostFeedReacherCard extends HookWidget {
                           CupertinoButton(
                             minSize: 0,
                             onPressed: () {
-                              RouteNavigators.route(context,
-                                  ViewCommentsScreen(post: postFeedModel!));
+                              RouteNavigators.route(
+                                  context,
+                                  FullPostScreen(
+                                      isLiked: isLiked,
+                                      isVoted: isVoted,
+                                      postFeedModel: postFeedModel,
+                                      likingPost: likingPost,
+                                      onLike: onLike,
+                                      onMessage: onMessage,
+                                      onUpvote: onUpvote));
+
+                                      //  ViewCommentsScreen(post: postFeedModel!)
                             },
                             padding: EdgeInsets.zero,
                             child: SvgPicture.asset(
@@ -928,6 +943,7 @@ class PostFeedReacherCard extends HookWidget {
                       ),
                     ),
                   ),
+                
                   SizedBox(width: getScreenWidth(20)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -998,6 +1014,7 @@ class PostFeedReacherCard extends HookWidget {
         ),
       ),
     );
+ 
   }
 }
 
