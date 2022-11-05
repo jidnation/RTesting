@@ -96,6 +96,8 @@ dependencies:
   focused_menu: ^1.0.5
   share_files_and_screenshot_widgets: ^1.0.6
   # expandable_text: ^2.3.0
+  flutter_sound: ^9.2.13
+  audioplayers: ^1.1.1
 
 
 dev_dependencies:

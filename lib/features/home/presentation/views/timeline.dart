@@ -833,6 +833,7 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
+
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
                 Helper.renderPostImages(postFeedModel!.post!, context)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)

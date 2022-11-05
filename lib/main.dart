@@ -10,6 +10,7 @@ import 'package:reach_me/core/routes/routes.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'dart:io';
 
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
@@ -51,9 +52,16 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               title: 'ReachMe',
               theme: ThemeData(
-                fontFamily: 'Poppins',
-                primarySwatch: Colors.blue,
-              ),
+                  fontFamily: 'Poppins',
+                  primarySwatch: Colors.blue,
+                  sliderTheme: const SliderThemeData(
+                    trackHeight: 4.0,
+                    activeTickMarkColor: AppColors.textColor2,
+                    inactiveTickMarkColor: AppColors.white,
+                    thumbColor: AppColors.white,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
+                  )),
               initialRoute: SplashScreenAnimator.id,
               onGenerateRoute: RMRouter.generateRoute,
             ),

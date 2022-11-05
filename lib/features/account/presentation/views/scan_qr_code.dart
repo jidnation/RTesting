@@ -28,6 +28,7 @@ class ScanQRCode extends State<ScanQRCodeScreen> {
   late final String? imageUrl;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
   String qrcode = 'Unknown';
 
   @override

@@ -84,6 +84,7 @@ class CustomRoundTextField extends StatelessWidget {
   final int? minLines;
   final Color? fillColor;
   final bool? isDense;
+  final FocusNode? focusNode;
   final Function(String)? onChanged;
 
   const CustomRoundTextField(
@@ -107,7 +108,8 @@ class CustomRoundTextField extends StatelessWidget {
       this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
       this.textStyle =
           const TextStyle(color: AppColors.textColor2, fontSize: 15),
-      this.textCapitalization = TextCapitalization.none})
+      this.textCapitalization = TextCapitalization.none,
+      this.focusNode})
       : super(key: key);
 
   @override

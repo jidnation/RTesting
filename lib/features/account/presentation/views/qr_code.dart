@@ -40,6 +40,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                 IconButton(
                     icon: SvgPicture.asset('assets/svgs/share.svg',
                         width: 25, height: 25, color: AppColors.white),
+
                     onPressed: () {
                       ShareFilesAndScreenshotWidgets().shareScreenshot(
                           reachMeID,
@@ -98,6 +99,41 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                   const SizedBox(height: 20),
                 ]),
               ),
+              child: Column(children: [
+                SizedBox(height: getScreenHeight(350)),
+                SizedBox(
+                  child: QrImage(
+                    data: globals.user!.id.toString(),
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    foregroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.whiteBackground,
+                  ),
+                ),
+                SizedBox(height: getScreenHeight(200)),
+                TextButton(
+                  onPressed: () => RouteNavigators.pop(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/svgs/scan.svg',
+                        color: AppColors.white,
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        'Scan QR Code',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.white),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ]),
             ),
           ),
         ],
