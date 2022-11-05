@@ -21,10 +21,13 @@ import 'package:reach_me/core/utils/regex_util.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 
+import '../../../../core/models/file_result.dart';
+
 class UploadFileDto {
   File file;
   String id;
-  UploadFileDto({required this.file, required this.id});
+  FileResult? fileResult;
+  UploadFileDto({required this.file, required this.id, this.fileResult});
 }
 
 class PostReach extends StatefulHookWidget {
@@ -58,7 +61,7 @@ class _PostReachState extends State<PostReach> {
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
     final controller = useTextEditingController();
-    final _imageList = useState<List<UploadFileDto>>([]);
+    final _mediaList = useState<List<UploadFileDto>>([]);
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -97,11 +100,11 @@ class _PostReachState extends State<PostReach> {
                           icon: SvgPicture.asset('assets/svgs/send.svg'),
                           onPressed: () {
                             if (controller.text.isNotEmpty ||
-                                _imageList.value.isNotEmpty) {
-                              if (_imageList.value.isNotEmpty) {
+                                _mediaList.value.isNotEmpty) {
+                              if (_mediaList.value.isNotEmpty) {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
-                                        media: _imageList.value));
+                                        media: _mediaList.value));
                                 globals.postContent = controller.text;
                                 globals.postCommentOption = 'everyone';
                                 setState(() {});
@@ -145,7 +148,9 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.user!.showLocation! ? globals.location! : '',
+                                  globals.user!.showLocation!
+                                      ? globals.location!
+                                      : '',
                                   // globals.location == 'NIL'
                                   //     ? ''
                                   //     : globals.location!
@@ -235,19 +240,22 @@ class _PostReachState extends State<PostReach> {
                       ),
                     ).paddingSymmetric(h: 16),
                     const SizedBox(height: 10),
-                    if (_imageList.value.isNotEmpty)
+                    if (_mediaList.value.isNotEmpty)
                       SizedBox(
                           height: getScreenHeight(200),
+                          width: MediaQuery.of(context).size.width,
                           child: Center(
                             child: ListView.builder(
-                                itemCount: _imageList.value.length,
-                                shrinkWrap: true,
+                                itemCount: _mediaList.value.length,
+                                shrinkWrap: false,
                                 scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  if (_imageList.value.isEmpty) {
+                                  if (_mediaList.value.isEmpty) {
                                     return const SizedBox.shrink();
                                   }
-
+                                  UploadFileDto mediaDto =
+                                      _mediaList.value[index];
                                   return Stack(
                                     alignment: Alignment.topRight,
                                     children: [
@@ -259,29 +267,27 @@ class _PostReachState extends State<PostReach> {
                                           borderRadius:
                                               BorderRadius.circular(15),
                                         ),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            RouteNavigators.route(
-                                              context,
-                                              PhotoView(
-                                                imageProvider: FileImage(
-                                                    _imageList
-                                                        .value[index].file),
-                                              ),
-                                            );
-                                          },
-                                          child: Image.file(
-                                            _imageList.value[index].file,
-                                            fit: BoxFit.cover,
-                                          ),
+                                        child: Image.file(
+                                          mediaDto.file,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
+                                      Positioned.fill(
+                                          child: GestureDetector(onTap: () {
+                                        RouteNavigators.route(
+                                            context,
+                                            PhotoView(
+                                              imageProvider: FileImage(
+                                                mediaDto.file,
+                                              ),
+                                            ));
+                                      })),
                                       Positioned(
                                         right: getScreenWidth(4),
                                         top: getScreenWidth(5),
                                         child: GestureDetector(
                                           onTap: () {
-                                            _imageList.value.removeAt(index);
+                                            _mediaList.value.removeAt(index);
                                             setState(() {});
                                           },
                                           child: Padding(
@@ -305,6 +311,17 @@ class _PostReachState extends State<PostReach> {
                                       ),
                                     ],
                                   ).paddingOnly(r: 10);
+                                  // if (FileUtils.isImage(mediaDto.file) ||
+                                  //     FileUtils.isVideo(mediaDto.file)) {
+                                  //   return PostReachMedia(
+                                  //       fileResult: mediaDto.fileResult!,
+                                  //       onClose: () {
+                                  //         _mediaList.value.removeAt(index);
+                                  //         setState(() {});
+                                  //       });
+                                  // } else {
+                                  //   return const SizedBox.shrink();
+                                  // }
                                 }),
                           )).paddingSymmetric(h: 16)
                     else
@@ -467,10 +484,12 @@ class _PostReachState extends State<PostReach> {
                         // const SizedBox(width: 20),
                         IconButton(
                           onPressed: () async {
-                            final image = await getImage(ImageSource.gallery);
-                            if (image != null) {
-                              _imageList.value.add(UploadFileDto(
-                                  file: image,
+                            // final media = await MediaService()
+                            //     .loadMediaFromGallery(context: context);
+                            final media = await getImage(ImageSource.gallery);
+                            if (media != null) {
+                              _mediaList.value.add(UploadFileDto(
+                                  file: media,
                                   id: Random().nextInt(100).toString()));
                               setState(() {});
                             }
