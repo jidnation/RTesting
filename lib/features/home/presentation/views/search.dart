@@ -272,6 +272,7 @@ class SearchStories extends HookWidget {
               margin: const EdgeInsets.all(5.0),
               child: Image.asset(
                 item,
+                fit: BoxFit.cover,
                 gaplessPlayback: true,
               ),
             ))
@@ -284,18 +285,19 @@ class SearchStories extends HookWidget {
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(50)),
           Stack(
             alignment: Alignment.bottomCenter,
             children: [
               SizedBox(
                 width: size.width,
-                height: getScreenHeight(200),
+                height: getScreenHeight(315),
                 child: CarouselSlider.builder(
                   itemCount: imgList.length,
                   options: CarouselOptions(
                     height: getScreenHeight(200),
                     viewportFraction: 1,
+                    aspectRatio: 2.0,
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,
