@@ -79,6 +79,7 @@ dependencies:
   story_time: ^1.0.6
   qr_code_scanner: ^1.0.1
   qr_flutter: ^4.0.0
+  scan: ^1.6.0
   emoji_picker_flutter: ^1.5.0
   double_back_to_close_app: ^2.1.0
   location: ^4.4.0
@@ -93,6 +94,8 @@ dependencies:
   path_provider: ^2.0.11
   permission_handler: ^10.2.0
   focused_menu: ^1.0.5
+  share_files_and_screenshot_widgets: ^1.0.6
+  # expandable_text: ^2.3.0
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.1
 
