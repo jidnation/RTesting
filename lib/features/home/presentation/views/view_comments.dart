@@ -196,6 +196,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                               ),
                             ],
                           ).paddingSymmetric(h: 16),
+                         
                           Container(
                             padding: const EdgeInsets.only(
                                 left: 14, right: 14, bottom: 20, top: 10),

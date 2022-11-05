@@ -14,7 +14,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
-    String? day = '', month = '';
+    String? day = '', month = '';  
     final year = date!.year.toString();
     if (date.month.toString().length < 2) {
       month = '0${date.month.toString()}';
@@ -82,7 +82,7 @@ class Helper {
 
 
   static Widget renderProfilePicture(String? profilePicture,
-      {double size = 35}) {
+      {double size = 35, Color? profileColor}) {
     if (profilePicture == null) {
       return ImagePlaceholder(
         width: getScreenWidth(size),
@@ -92,7 +92,7 @@ class Helper {
       return RecipientProfilePicture(
         width: getScreenWidth(size),
         height: getScreenHeight(size),
-        border: Border.all(color: Colors.grey.shade50, width: 3.0),
+        border: Border.all(color: profileColor ?? Colors.grey.shade50, width: 3.0),
         imageUrl: profilePicture,
       );
     }
