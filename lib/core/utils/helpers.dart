@@ -337,8 +337,7 @@ class Helper {
         );
     }    
     else if (post.imageMediaItems!.length == 3) {
-      int remImageLength =
-          1; // length of extra image not seen in the grid at first
+      int remImageLength =  1; // length of extra image not seen in the grid at first
       return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
