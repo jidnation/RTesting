@@ -40,11 +40,14 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
-// import 'package:screenshot/screenshot.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
+
+import 'full_post.dart';
+
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -115,7 +118,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
-    print(globals.token);
+    debugPrint(globals.token);
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
@@ -703,7 +706,9 @@ class PostFeedReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
+
     // final ScreenshotController screenshotController = ScreenshotController();
+
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -802,31 +807,39 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-                            Row(
-                              children: [
-                                Text(
-                                  globals.user!.showLocation!
-                                      ? postFeedModel!.post!.location!
-                                      : '',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
+
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (builder) => FullPostScreen(
+                                            postFeedModel: postFeedModel,
+                                          ))),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    postFeedModel!.post!.location! == 'nil'
+                                        ? ''
+                                        : postFeedModel!.post!.location!,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  postDuration,
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
-                                  ),
-                                ).paddingOnly(l: 6),
-                              ],
+                                  Text(
+                                    postDuration,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ).paddingOnly(l: 6),
+                                ],
+                              ),
                             )
                           ],
                         ).paddingOnly(t: 10),
@@ -856,25 +869,45 @@ class PostFeedReacherCard extends HookWidget {
               ),
               postFeedModel!.post!.content == null
                   ? const SizedBox.shrink()
-                  : Flexible(
-                      child: ReadMoreText(
-                        postFeedModel!.post!.edited!
-                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                            : postFeedModel!.post!.content ?? '',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: getScreenHeight(14)),
-                        trimLines: 3,
-                        colorClickableText: const Color(0xff717F85),
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'See more',
-                        trimExpandedText: 'See less',
-                        moreStyle: TextStyle(
-                            fontSize: getScreenHeight(14),
-                            fontFamily: "Roboto",
-                            color: const Color(0xff717F85)),
-                      ).paddingSymmetric(h: 16, v: 10),
-                    ),
+                  : Row(
+                      children: [
+                        Flexible(
+                          child: ReadMoreText(
+                            "${postFeedModel!.post!.content}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: getScreenHeight(14)),
+                            trimLines: 3,
+                            colorClickableText: const Color(0xff717F85),
+                            trimMode: TrimMode.Line,
+                            trimCollapsedText: 'See more',
+                            trimExpandedText: 'See less',
+                            moreStyle: TextStyle(
+                                fontSize: getScreenHeight(14),
+                                fontFamily: "Roboto",
+                                color: const Color(0xff717F85)),
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(2)),
+                        Tooltip(
+                          message: 'This Reach has been edited by the Reacher',
+                          waitDuration: const Duration(seconds: 1),
+                          showDuration: const Duration(seconds: 2),                         
+                          child: Text(
+                            postFeedModel!.post!.edited!
+                                ? "(Reach Edited)"
+                                : "",
+                            style: TextStyle(
+                              fontSize: getScreenHeight(12),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).paddingSymmetric(h: 16, v: 10),
+
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
                 Helper.renderPostImages(postFeedModel!.post!, context)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)

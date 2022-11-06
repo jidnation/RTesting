@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:location/location.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -20,6 +21,11 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart' as permit;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -32,6 +38,11 @@ class ViewCommentsScreen extends StatefulHookWidget {
 }
 
 class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
+  bool emojiShowing = false;
+  FocusNode focusNode = FocusNode();
+  FlutterSoundRecorder? _soundRecorder;
+  bool isRecordingInit = false;
+  bool isRecording = false;
   Set active = {};
 
   handleTap(index) {
@@ -42,12 +53,43 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _soundRecorder = FlutterSoundRecorder();
+    openAudio();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        setState(() {
+          emojiShowing = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _soundRecorder!.closeRecorder();
+    isRecordingInit = false;
+  }
+
+  void openAudio() async {
+    final status = await permit.Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Mic permission not allowed');
+    }
+    await _soundRecorder!.openRecorder();
+    isRecordingInit = true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final reachDM = useState(false);
     final controller = useTextEditingController();
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
     final scrollController = useScrollController();
+    final isTyping = useState<bool>(false);
     useEffect(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
           postId: widget.post.postId, pageLimit: 50, pageNumber: 1));
@@ -115,34 +157,16 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                 builder: (context, state) {
                   bool isLoading = state is GetAllCommentsOnPostLoading;
 
-                  return ProgressHUD(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              onPressed: () => RouteNavigators.pop(context),
-                              icon: Transform.rotate(
-                                angle: 3.142,
-                                child: const Icon(
-                                  Icons.arrow_right_alt,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'View comments',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(16),
-                                color: AppColors.textColor2,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Opacity(
-                              opacity: 0,
-                              child: IconButton(
-                                onPressed: null,
+                  return WillPopScope(
+                    child: ProgressHUD(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                onPressed: () => RouteNavigators.pop(context),
                                 icon: Transform.rotate(
                                   angle: 3.142,
                                   child: const Icon(
@@ -150,187 +174,319 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ).paddingSymmetric(h: 16),
-                        Container(
-                          padding: const EdgeInsets.only(
-                              left: 14, right: 14, bottom: 20, top: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            color: AppColors.white,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                children: [
-                                  Helper.renderProfilePicture(
-                                    widget.post.profilePicture,
-                                    size: 35,
+                              Text(
+                                'View comments',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: AppColors.textColor2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Opacity(
+                                opacity: 0,
+                                child: IconButton(
+                                  onPressed: null,
+                                  icon: Transform.rotate(
+                                    angle: 3.142,
+                                    child: const Icon(
+                                      Icons.arrow_right_alt,
+                                    ),
                                   ),
-                                  SizedBox(width: getScreenHeight(12)),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '@${widget.post.username!}',
+                                ),
+                              ),
+                            ],
+                          ).paddingSymmetric(h: 16),
+                         
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 14, right: 14, bottom: 20, top: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: AppColors.white,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    Helper.renderProfilePicture(
+                                      widget.post.profilePicture,
+                                      size: 35,
+                                    ),
+                                    SizedBox(width: getScreenHeight(12)),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '@${widget.post.username!}',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        widget.post.location == null
+                                            ? const SizedBox.shrink()
+                                            : Text(
+                                                '',
+                                                style: TextStyle(
+                                                  fontSize: getScreenHeight(12),
+                                                  color: AppColors.textColor2
+                                                      .withOpacity(0.5),
+                                                ),
+                                              ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: getScreenHeight(12)),
+                                widget.post.post!.content == null
+                                    ? const SizedBox()
+                                    : Text(
+                                        widget.post.post!.content!,
                                         style: TextStyle(
-                                          fontSize: getScreenHeight(15),
+                                          fontSize: getScreenHeight(14),
                                           color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      widget.post.location == null
-                                          ? const SizedBox.shrink()
-                                          : Text(
-                                              '',
-                                              style: TextStyle(
-                                                fontSize: getScreenHeight(12),
-                                                color: AppColors.textColor2
-                                                    .withOpacity(0.5),
-                                              ),
-                                            ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: getScreenHeight(12)),
-                              widget.post.post!.content == null
-                                  ? const SizedBox()
-                                  : Text(
-                                      widget.post.post!.content!,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(14),
-                                        color: AppColors.textColor2,
-                                      ),
-                                    ),
-                              if (widget.post.post!.imageMediaItems!.isNotEmpty)
-                                Helper.renderPostImages(
-                                        widget.post.post!, context)
-                                    .paddingOnly(r: 16, l: 16, b: 16, t: 10)
-                              else
-                                const SizedBox(),
-                            ],
-                          ),
-                        ).paddingOnly(t: 16, b: 7, r: 20, l: 20),
-                        const SizedBox(height: 20),
-                        if (isLoading && triggerProgressIndicator.value)
-                          const Expanded(child: CupertinoActivityIndicator())
-                        else
-                          Expanded(
-                            child: comments.value.isEmpty
-                                ? const Center(child: Text('No comments yet'))
-                                : ListView.builder(
-                                    physics: const BouncingScrollPhysics(),
-                                    controller: scrollController,
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 15),
-                                    itemCount: comments.value.length,
-                                    itemBuilder: (context, index) {
-                                      return CommentsTile(
-                                        comment: comments.value[index],
-                                        isLiked: comments
-                                                .value[index].like!.isNotEmpty
-                                            ? true
-                                            : false,
-                                        onLike: () {
-                                          HapticFeedback.mediumImpact();
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            if (comments.value[index].like!
-                                                .isNotEmpty) {
-                                              globals.socialServiceBloc!
-                                                  .add(UnlikeCommentOnPostEvent(
-                                                commentId: comments
-                                                    .value[index].commentId,
-                                                postId: comments
-                                                    .value[index].postId,
-                                              ));
-                                            } else {
-                                              globals.socialServiceBloc!.add(
-                                                LikeCommentOnPostEvent(
-                                                  postId: comments
-                                                      .value[index].postId,
+                                if (widget
+                                    .post.post!.imageMediaItems!.isNotEmpty)
+                                  Helper.renderPostImages(
+                                          widget.post.post!, context)
+                                      .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                                else
+                                  const SizedBox(),
+                              ],
+                            ),
+                          ).paddingOnly(t: 16, b: 7, r: 20, l: 20),
+                          const SizedBox(height: 20),
+                          if (isLoading && triggerProgressIndicator.value)
+                            const Expanded(child: CupertinoActivityIndicator())
+                          else
+                            Expanded(
+                              child: comments.value.isEmpty
+                                  ? const Center(child: Text('No comments yet'))
+                                  : ListView.builder(
+                                      physics: const BouncingScrollPhysics(),
+                                      controller: scrollController,
+                                      shrinkWrap: true,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      itemCount: comments.value.length,
+                                      itemBuilder: (context, index) {
+                                        return CommentsTile(
+                                          comment: comments.value[index],
+                                          isLiked: comments
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          onLike: () {
+                                            HapticFeedback.mediumImpact();
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (comments.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!.add(
+                                                    UnlikeCommentOnPostEvent(
                                                   commentId: comments
                                                       .value[index].commentId,
-                                                ),
-                                              );
+                                                  postId: comments
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikeCommentOnPostEvent(
+                                                    postId: comments
+                                                        .value[index].postId,
+                                                    commentId: comments
+                                                        .value[index].commentId,
+                                                  ),
+                                                );
+                                              }
                                             }
-                                          }
-                                        },
-                                        onMessage: () {
-                                          HapticFeedback.mediumImpact();
-                                          reachDM.value = true;
-                                          handleTap(index);
-                                          if (active.contains(index)) {
-                                            globals.userBloc!.add(
-                                                GetRecipientProfileEvent(
-                                                    email: comments
-                                                        .value[index].authId!));
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                          ),
-                        Container(
-                          color: AppColors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 4,
-                          ),
-                          child: TextFormField(
-                            controller: controller,
-                            decoration: InputDecoration(
-                              hintText:
-                                  'Comment as ${globals.user!.username!}...',
-                              hintStyle:
-                                  TextStyle(fontSize: getScreenHeight(14)),
-                              suffixIcon: IconButton(
-                                icon: SvgPicture.asset('assets/svgs/send.svg'),
-                                onPressed: () {
-                                  if (controller.text.isNotEmpty) {
-                                    globals.socialServiceBloc!.add(
-                                        CommentOnPostEvent(
-                                            postId: widget.post.postId,
-                                            content: controller.text,
-                                            userId: globals.user!.id));
-                                    controller.clear();
-                                  }
-                                },
-                              ),
-                              prefixIcon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Helper.renderProfilePicture(
-                                    globals.user!.profilePicture,
-                                    size: 35,
-                                  ),
-                                  const SizedBox(width: 10),
-                                ],
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              border: null,
-                              focusedErrorBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              errorBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
+                                          },
+                                          onMessage: () {
+                                            HapticFeedback.mediumImpact();
+                                            reachDM.value = true;
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: comments
+                                                          .value[index]
+                                                          .authId!));
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
                             ),
-                          ),
-                        ).paddingOnly(t: 10)
-                      ],
-                    ).paddingOnly(t: 30),
+                          Container(
+                            color: AppColors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 4,
+                            ),
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty) {
+                                      isTyping.value = true;
+                                    } else {
+                                      isTyping.value = false;
+                                    }
+                                  },
+                                  focusNode: focusNode,
+                                  controller: controller,
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        'Comment as ${globals.user!.username!}...',
+                                    hintStyle: TextStyle(
+                                        fontSize: getScreenHeight(14)),
+                                    suffixIcon: isTyping.value
+                                        ? IconButton(
+                                            icon: SvgPicture.asset(
+                                                'assets/svgs/send.svg'),
+                                            onPressed: () {
+                                              if (controller.text.isNotEmpty) {
+                                                globals.socialServiceBloc!.add(
+                                                    CommentOnPostEvent(
+                                                        postId:
+                                                            widget.post.postId,
+                                                        content:
+                                                            controller.text,
+                                                        userId:
+                                                            globals.user!.id));
+                                              }
+                                              controller.clear();
+                                            },
+                                          )
+                                        : IconButton(
+                                            //constraints: const BoxConstraints(
+                                               // maxHeight: 25, maxWidth: 25),
+                                            onPressed: () async {
+                                              print('BUTTON WORKING');
+                                              var tempDir =
+                                                  await getTemporaryDirectory();
+                                              var path =
+                                                  '${tempDir.path}/flutter_sound.aac';
+
+                                              if (!isRecordingInit) {
+                                                return;
+                                              }
+                                              if (isRecording) {
+                                                await _soundRecorder!
+                                                    .stopRecorder();
+                                                print(path);
+                                                File audioMessage = File(path);
+
+                                                /*globals.chatBloc!.add(
+                                                    UploadImageFileEvent(
+                                                        file: audioMessage));*/
+                                              } else {
+                                                await _soundRecorder!
+                                                    .startRecorder(
+                                                  toFile: path,
+                                                );
+                                              }
+                                              setState(() {
+                                                isRecording = !isRecording;
+                                              });
+                                            },
+                                            icon: isRecording
+                                                ? SvgPicture.asset(
+                                                    'assets/svgs/mic.svg',
+                                                    color:
+                                                        AppColors.blackShade3,
+                                                    width: 20,
+                                                    height: 26,
+                                                  )
+                                                : SvgPicture.asset(
+                                                    'assets/svgs/dc-cancel.svg',
+                                                    color:
+                                                        AppColors.blackShade3,
+                                                    height: 20,
+                                                    width: 20,
+                                                  )),
+                                    prefixIcon: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Helper.renderProfilePicture(
+                                          globals.user!.profilePicture,
+                                          size: 35,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        GestureDetector(
+                                          onTap: () {
+                                            focusNode.unfocus();
+                                            focusNode.canRequestFocus = false;
+                                            setState(() {
+                                              emojiShowing = !emojiShowing;
+                                            });
+                                          },
+                                          child: SvgPicture.asset(
+                                            'assets/svgs/emoji.svg',
+                                          ).paddingAll(10),
+                                        ),
+                                      ],
+                                    ),
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    border: null,
+                                    focusedErrorBorder:
+                                        const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    errorBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                Offstage(
+                                  offstage: !emojiShowing,
+                                  child: SizedBox(
+                                    height: 250,
+                                    child: EmojiPicker(
+                                      textEditingController: controller,
+                                      config: const Config(
+                                        columns: 7,
+                                      ),
+                                      onEmojiSelected: (category, emoji) {
+                                        setState(() {
+                                          controller.text = controller.text;
+                                        });
+                                        if (!isTyping.value) {
+                                          setState(() {
+                                            isTyping.value = !isTyping.value;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ).paddingOnly(t: 10)
+                        ],
+                      ).paddingOnly(t: 30),
+                    ),
+                    onWillPop: (() {
+                      if (emojiShowing) {
+                        setState(() {
+                          emojiShowing = false;
+                        });
+                      } else {
+                        RouteNavigators.pop(context);
+                      }
+                      return Future.value(false);
+                    }),
                   );
                 });
           }),

@@ -61,7 +61,19 @@ class _PostReachState extends State<PostReach> {
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
     final controller = useTextEditingController();
+
     final _mediaList = useState<List<UploadFileDto>>([]);
+
+    // final _imageList = useState<List<UploadFileDto>>([]);
+
+    String getUserLoation(){
+      if(globals.user!.showLocation!){
+         return globals.location!;
+      }else{
+        return 'nil';
+      }
+    }
+    
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -112,7 +124,7 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(CreatePostEvent(
                                   content: controller.text,
                                   commentOption: 'everyone',
-                                  location: globals.location,
+                                  location: getUserLoation(),
                                 ));
                               }
                               RouteNavigators.pop(context);

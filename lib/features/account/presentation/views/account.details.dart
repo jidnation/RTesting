@@ -10,6 +10,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -288,28 +289,39 @@ class SeeMyReachersList extends StatelessWidget {
             size: 50,
           ),
           minLeadingWidth: getScreenWidth(20),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                (data!.reacher!.firstName! + ' ' + data!.reacher!.lastName!)
-                    .toTitleCase(),
-                style: TextStyle(
-                  fontSize: getScreenHeight(16),
-                  color: AppColors.textColor2,
-                  fontWeight: FontWeight.w500,
+          title: InkWell(
+            onTap: () {
+              RouteNavigators.route(
+                  context,
+                  RecipientAccountProfile(
+                    recipientEmail: data!.reacher!.email,
+                    recipientImageUrl: data!.reacher!.profilePicture,
+                    recipientId: data!.reacher!.id,
+                  ));
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (data!.reacher!.firstName! + ' ' + data!.reacher!.lastName!)
+                      .toTitleCase(),
+                  style: TextStyle(
+                    fontSize: getScreenHeight(16),
+                    color: AppColors.textColor2,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              Text(
-                '@${data!.reacher!.username}',
-                style: TextStyle(
-                  fontSize: getScreenHeight(13),
-                  color: const Color(0xFF767474),
-                  fontWeight: FontWeight.w400,
-                ),
-              )
-            ],
+                Text(
+                  '@${data!.reacher!.username}',
+                  style: TextStyle(
+                    fontSize: getScreenHeight(13),
+                    color: const Color(0xFF767474),
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              ],
+            ),
           ),
           trailing: SizedBox(
             height: getScreenHeight(40),
@@ -362,28 +374,39 @@ class SeeMyReachingsList extends StatelessWidget {
               size: 50,
             ),
             minLeadingWidth: getScreenWidth(20),
-            title: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  (data!.reaching!.firstName! + ' ' + data!.reaching!.lastName!)
-                      .toTitleCase(),
-                  style: TextStyle(
-                    fontSize: getScreenHeight(16),
-                    color: AppColors.textColor2,
-                    fontWeight: FontWeight.w500,
+            title: InkWell(
+              onTap: () => RouteNavigators.route(
+                  context,
+                  RecipientAccountProfile(
+                    recipientEmail: data!.reaching!.email,
+                    recipientImageUrl: data!.reaching!.profilePicture,
+                    recipientId: data!.reaching!.id,
+                  )),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (data!.reaching!.firstName! +
+                            ' ' +
+                            data!.reaching!.lastName!)
+                        .toTitleCase(),
+                    style: TextStyle(
+                      fontSize: getScreenHeight(16),
+                      color: AppColors.textColor2,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                Text(
-                  '@${data!.reaching!.username}',
-                  style: TextStyle(
-                    fontSize: getScreenHeight(13),
-                    color: const Color(0xFF767474),
-                    fontWeight: FontWeight.w400,
-                  ),
-                )
-              ],
+                  Text(
+                    '@${data!.reaching!.username}',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(13),
+                      color: const Color(0xFF767474),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  )
+                ],
+              ),
             ),
             trailing: SizedBox(
               height: getScreenHeight(40),
@@ -530,7 +553,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                 ),
                 child: FittedBox(
                   child: Text(
-                    '${globals.user!.nReachers} Reachers',
+                    '${globals.recipientUser!.nReachers} Reachers',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -559,7 +582,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                 ),
                 child: FittedBox(
                   child: Text(
-                    '${globals.user!.nReaching} Reaching',
+                    '${globals.recipientUser!.nReaching} Reaching',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -588,7 +611,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                 ),
                 child: FittedBox(
                   child: Text(
-                    '${globals.user!.nStaring} Star',
+                    '${globals.recipientUser!.nStaring} Star',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -644,9 +667,9 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                             onPressed: () => RouteNavigators.pop(context),
                           ),
                           Text(
-                            (globals.user!.firstName! +
+                            (globals.recipientUser!.firstName! +
                                     ' ' +
-                                    globals.user!.lastName!)
+                                    globals.recipientUser!.lastName!)
                                 .toTitleCase(),
                             style: TextStyle(
                               fontSize: getScreenHeight(18),

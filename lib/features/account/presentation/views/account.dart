@@ -539,10 +539,9 @@ class _AccountScreenState extends State<AccountScreen>
                             width: isGoingDown ? width : getScreenWidth(100),
                             height: isGoingDown ? height : getScreenHeight(100),
                             duration: const Duration(seconds: 1),
-                            child: Helper.renderProfilePicture(
-                              globals.user!.profilePicture,
-                              size: 150,
-                            ),
+                            child: const ProfilePicture(
+                              height: 90,
+                            )
                           ),
                         ),
                       ],
@@ -1133,16 +1132,15 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              globals.user!.showLocation!
-                                  ? Text(
-                                      postModel!.location ?? 'Somewhere',
+                                  Text(
+                                      postModel!.location! ,
                                       style: TextStyle(
                                         fontSize: getScreenHeight(11),
                                         fontWeight: FontWeight.w400,
                                         color: AppColors.textColor2,
                                       ),
                                     )
-                                  : const SizedBox.shrink()
+                                  
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1875,7 +1873,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     children: <Widget>[
                       /// Banner image
                       SizedBox(
-                        height: getScreenHeight(140),
+                        height: getScreenHeight(190),
                         width: size.width,
                         child: Image.asset(
                           'assets/images/cover.png',
@@ -1930,10 +1928,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               },
                               splashRadius: 20,
                             )
-                          ]).paddingOnly(t: 25),
+                          ]).paddingOnly(t: 40),
 
                       Positioned(
-                        top: size.height * 0.1,
+                        top: size.height * 0.2 - 30,
                         child: AnimatedContainer(
                           width: getScreenWidth(100),
                           height: getScreenHeight(100),
@@ -1958,7 +1956,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                   ),
                   Column(
                     children: [
-                      SizedBox(height: getScreenHeight(10)),
+                      SizedBox(height: getScreenHeight(15)),
                       Text(
                           ('@${globals.recipientUser!.username}').toLowerCase(),
                           style: TextStyle(
@@ -1980,7 +1978,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                             children: [
                               InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 0)),
+                                    context,
+                                    const AccountStatsInfo(
+                                      index: 0,
+                                      // recipientId: widget.recipientId,
+                                    )),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -2006,7 +2008,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               SizedBox(width: getScreenWidth(20)),
                               InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 1)),
+                                    context,
+                                    RecipientAccountStatsInfo(
+                                      index: 1,
+                                      recipientId: widget.recipientId,
+                                    )),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
