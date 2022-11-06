@@ -29,6 +29,8 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
+//import 'package:reach_me/features/chat/presentation/widgets/audio.waveforms.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -48,10 +50,17 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   bool isRecordingInit = false;
   bool isRecording = false;
 
+  //AUDIO_WAVEFORM RECORDER
+  RecorderController? recorderController;
+  Directory? directory;
+  File? audioFile;
+  String? filePath;
+
   @override
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
+   // _initialiseController();
     openAudio();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -75,12 +84,34 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     });
   }
 
+  //AUDIO RECORDER WAVEFORMS
+
+ /* void _initialiseController() {
+    recorderController = RecorderController()
+      ..androidEncoder = AndroidEncoder.aac
+      ..androidOutputFormat = AndroidOutputFormat.mpeg4
+      ..iosEncoder = IosEncoder.kAudioFormatMPEG4AAC
+      ..sampleRate = 16000;
+  }
+
+  void startRecording() async {
+    directory = await getApplicationDocumentsDirectory();
+    String recordPath = '${directory!.path}/test_audio.aac';
+    await recorderController!.record(recordPath);
+  }
+
+  Future<String?> stopRecording() async {
+    final recordingPath = await recorderController!.stop();
+    return recordingPath;
+  }*/
+
   @override
   void dispose() {
     timer!.cancel();
     super.dispose();
     _soundRecorder!.closeRecorder();
     isRecordingInit = false;
+    recorderController!.dispose();
   }
 
   void openAudio() async {
@@ -445,179 +476,187 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                           child: Transform.translate(
                             offset: Offset(0.0,
                                 -1 * MediaQuery.of(context).viewInsets.bottom),
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: CustomRoundTextField(
-                                    focusNode: focusNode,
-                                    controller: controller,
-                                    fillColor: AppColors.white,
-                                    textCapitalization:
-                                        TextCapitalization.sentences,
-                                    hintText: 'Type Message...',
-                                    hintStyle: const TextStyle(
-                                        color: Color(0xFF666666), fontSize: 12),
-                                    onChanged: (val) {
-                                      if (val.isNotEmpty) {
-                                        isTyping.value = true;
-                                      } else {
-                                        isTyping.value = false;
-                                      }
+                            child: Row(children: [
+                              Flexible(
+                                child: CustomRoundTextField(
+                                  focusNode: focusNode,
+                                  controller: controller,
+                                  fillColor: AppColors.white,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  hintText: 'Type Message...',
+                                  hintStyle: const TextStyle(
+                                      color: Color(0xFF666666), fontSize: 12),
+                                  onChanged: (val) {
+                                    if (val.isNotEmpty) {
+                                      isTyping.value = true;
+                                    } else {
+                                      isTyping.value = false;
+                                    }
+                                  },
+                                  prefixIcon: GestureDetector(
+                                    onTap: () {
+                                      focusNode.unfocus();
+                                      focusNode.canRequestFocus = false;
+                                      setState(() {
+                                        emojiShowing = !emojiShowing;
+                                      });
                                     },
-                                    prefixIcon: GestureDetector(
-                                      onTap: () {
-                                        focusNode.unfocus();
-                                        focusNode.canRequestFocus = false;
-                                        setState(() {
-                                          emojiShowing = !emojiShowing;
-                                        });
-                                      },
-                                      child: SvgPicture.asset(
-                                        'assets/svgs/emoji.svg',
-                                      ).paddingAll(10),
-                                    ),
-                                    suffixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {},
-                                          child: SvgPicture.asset(
-                                            'assets/svgs/attach.svg',
-                                            // width: 24,
-                                            // height: 18,
-                                          ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/emoji.svg',
+                                    ).paddingAll(10),
+                                  ),
+                                  suffixIcon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: SvgPicture.asset(
+                                          'assets/svgs/attach.svg',
+                                          // width: 24,
+                                          // height: 18,
                                         ),
-                                        const SizedBox(width: 15),
-                                        GestureDetector(
-                                          onTap: () {
-                                            showModalBottomSheet(
-                                              context: context,
-                                              builder: (context) {
-                                                return ListView(
-                                                  shrinkWrap: true,
-                                                  children: [
-                                                    Column(children: [
-                                                      ListTile(
-                                                        leading:
-                                                            SvgPicture.asset(
-                                                          'assets/svgs/Camera.svg',
-                                                          color:
-                                                              AppColors.black,
-                                                        ),
-                                                        title: const Text(
-                                                            'Camera'),
-                                                        onTap: () async {
-                                                          Navigator.pop(
-                                                              context);
-                                                          final image =
-                                                              await getImage(
-                                                                  ImageSource
-                                                                      .camera);
-                                                          if (image != null) {
-                                                            globals.chatBloc!.add(
-                                                                UploadImageFileEvent(
-                                                                    file:
-                                                                        image));
-                                                          }
-                                                        },
+                                      ),
+                                      const SizedBox(width: 15),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return ListView(
+                                                shrinkWrap: true,
+                                                children: [
+                                                  Column(children: [
+                                                    ListTile(
+                                                      leading: SvgPicture.asset(
+                                                        'assets/svgs/Camera.svg',
+                                                        color: AppColors.black,
                                                       ),
-                                                      ListTile(
-                                                        leading: SvgPicture.asset(
-                                                            'assets/svgs/gallery.svg'),
-                                                        title: const Text(
-                                                            'Gallery'),
-                                                        onTap: () async {
-                                                          Navigator.pop(
-                                                              context);
-                                                          final image =
-                                                              await getImage(
-                                                                  ImageSource
-                                                                      .gallery);
-                                                          if (image != null) {
-                                                            globals.chatBloc!.add(
-                                                                UploadImageFileEvent(
-                                                                    file:
-                                                                        image));
-                                                          }
-                                                        },
-                                                      ),
-                                                    ]).paddingSymmetric(v: 5),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: SvgPicture.asset(
-                                            'assets/svgs/gallery.svg',
-                                          ),
+                                                      title:
+                                                          const Text('Camera'),
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+                                                        final image =
+                                                            await getImage(
+                                                                ImageSource
+                                                                    .camera);
+                                                        if (image != null) {
+                                                          globals.chatBloc!.add(
+                                                              UploadImageFileEvent(
+                                                                  file: image));
+                                                        }
+                                                      },
+                                                    ),
+                                                    ListTile(
+                                                      leading: SvgPicture.asset(
+                                                          'assets/svgs/gallery.svg'),
+                                                      title:
+                                                          const Text('Gallery'),
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+                                                        final image =
+                                                            await getImage(
+                                                                ImageSource
+                                                                    .gallery);
+                                                        if (image != null) {
+                                                          globals.chatBloc!.add(
+                                                              UploadImageFileEvent(
+                                                                  file: image));
+                                                        }
+                                                      },
+                                                    ),
+                                                  ]).paddingSymmetric(v: 5),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: SvgPicture.asset(
+                                          'assets/svgs/gallery.svg',
                                         ),
-                                        const SizedBox(width: 15),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(width: 15),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(width: 7),
-                                isTyping.value
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          if (controller.text.isNotEmpty) {
-                                            final value =
-                                                controller.text.trim();
+                              ),
+                              const SizedBox(width: 7),
+                              isTyping.value
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        if (controller.text.isNotEmpty) {
+                                          final value = controller.text.trim();
 
-                                            Chat temp = Chat(
-                                                senderId: globals.user!.id,
-                                                type: 'text',
-                                                value: controller.text.trim());
-                                            globals.userChat!.add(temp);
-                                            controller.clear();
-
-                                            SchedulerBinding.instance
-                                                .addPostFrameCallback(
-                                              (_) {
-                                                _controller.animateTo(
-                                                  _controller
-                                                      .position.maxScrollExtent,
-                                                  duration: const Duration(
-                                                      milliseconds: 10),
-                                                  curve: Curves.easeOut,
-                                                );
-                                              },
-                                            );
-
-                                            globals.chatBloc!.add(
-                                              SendChatMessageEvent(
-                                                senderId: globals.user!.id,
-                                                receiverId:
-                                                    widget.recipientUser!.id,
-                                                threadId:
-                                                    '${globals.user!.id}--${widget.recipientUser!.id}',
-                                                value: value,
-                                                type: 'text',
-                                              ),
-                                            );
-                                            isSending.value = true;
-                                            showIsSending.value = true;
-                                          }
+                                          Chat temp = Chat(
+                                              senderId: globals.user!.id,
+                                              type: 'text',
+                                              value: controller.text.trim());
+                                          globals.userChat!.add(temp);
                                           controller.clear();
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.all(7),
-                                          decoration: const BoxDecoration(
-                                            color: AppColors.primaryColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: SvgPicture.asset(
-                                            'assets/svgs/send.svg',
-                                            width: 25,
-                                            height: 25,
-                                            color: AppColors.white,
-                                          ),
+
+                                          SchedulerBinding.instance
+                                              .addPostFrameCallback(
+                                            (_) {
+                                              _controller.animateTo(
+                                                _controller
+                                                    .position.maxScrollExtent,
+                                                duration: const Duration(
+                                                    milliseconds: 10),
+                                                curve: Curves.easeOut,
+                                              );
+                                            },
+                                          );
+
+                                          globals.chatBloc!.add(
+                                            SendChatMessageEvent(
+                                              senderId: globals.user!.id,
+                                              receiverId:
+                                                  widget.recipientUser!.id,
+                                              threadId:
+                                                  '${globals.user!.id}--${widget.recipientUser!.id}',
+                                              value: value,
+                                              type: 'text',
+                                            ),
+                                          );
+                                          isSending.value = true;
+                                          showIsSending.value = true;
+                                        }
+                                        controller.clear();
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primaryColor,
+                                          shape: BoxShape.circle,
                                         ),
-                                      )
-                                    : GestureDetector(
-                                        onTap: () async {
-                                          var tempDir =
+                                        child: SvgPicture.asset(
+                                          'assets/svgs/send.svg',
+                                          width: 25,
+                                          height: 25,
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onTap: () async {
+                                        /*if (isRecording) {
+                                          filePath = await stopRecording();
+                                          print(filePath);
+                                          audioFile = File(filePath!);
+
+                                          globals.chatBloc!.add(
+                                              UploadImageFileEvent(
+                                                  file: audioFile!));
+                                        } else {
+                                          startRecording();
+                                        }
+
+                                        setState(() {
+                                          isRecording = !isRecording;
+                                        }); */
+
+                                        var tempDir =
                                               await getTemporaryDirectory();
                                           var path =
                                               '${tempDir.path}/flutter_sound.aac';
@@ -638,40 +677,60 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                               toFile: path,
                                             );
                                           }
-                                          setState(() {
-                                            isRecording = !isRecording;
-                                          });
-                                        },
-                                        child: !isRecording
-                                            ? Container(
-                                                padding:
-                                                    const EdgeInsets.all(7),
-                                                decoration: const BoxDecoration(
-                                                  color: AppColors.primaryColor,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: SvgPicture.asset(
-                                                  'assets/svgs/mic.svg',
-                                                  width: 25,
-                                                  height: 25,
-                                                  color: AppColors.white,
-                                                ),
+                                         setState(() {
+                                         isRecording = !isRecording;
+                                        });
+                                      },
+                                      child: !isRecording
+                                          ? Container(
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: SvgPicture.asset(
+                                                'assets/svgs/mic.svg',
+                                                width: 25,
+                                                height: 25,
+                                                color: AppColors.white,
+                                              ),
+                                            )
+                                          : Container(
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: SvgPicture.asset(
+                                                'assets/svgs/dc-cancel.svg',
+                                                width: 25,
+                                                height: 25,
+                                                color: AppColors.white,
                                               )
-                                            : Container(
-                                                padding:
-                                                    const EdgeInsets.all(7),
-                                                decoration: const BoxDecoration(
-                                                  color: AppColors.primaryColor,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: SvgPicture.asset(
-                                                  'assets/svgs/dc-cancel.svg',
-                                                  width: 25,
-                                                  height: 25,
-                                                  color: AppColors.white,
-                                                )))
-                              ],
-                            ).paddingOnly(r: 15, l: 15, b: 15, t: 10),
+                                              )
+                                              ),
+                             /* isRecording
+                                  ? AudioWaveforms(
+                                      enableGesture: true,
+                                      size: Size(
+                                          MediaQuery.of(context).size.width / 2,
+                                          50),
+                                      waveStyle: const WaveStyle(
+                                        waveColor: Colors.white,
+                                        extendWaveform: true,
+                                        showMiddleLine: false,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        color: const Color(0xFF1E1B26),
+                                      ),
+                                      padding: const EdgeInsets.only(left: 18),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      recorderController: recorderController!)
+                                  : Container(),*/
+                            ]).paddingOnly(r: 15, l: 15, b: 15, t: 10),
                           ),
                         ),
                         Offstage(

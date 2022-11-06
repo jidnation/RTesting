@@ -1,8 +1,10 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart' as pathfile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 //import 'package:file_picker/file_picker.dart';
-//import 'dart:io';
+import 'dart:io';
+import 'package:audio_waveforms/audio_waveforms.dart';
+//import 'package:path_provider/path_provider.dart';
 
 class MyAudioPlayer extends StatefulHookWidget {
   const MyAudioPlayer({Key? key, this.sourceFile}) : super(key: key);
@@ -13,7 +15,7 @@ class MyAudioPlayer extends StatefulHookWidget {
 }
 
 class _MyAudioPlayerState extends State<MyAudioPlayer> {
-  final myAudioPlayer = AudioPlayer();
+  final myAudioPlayer = pathfile.AudioPlayer();
   bool isPlaying = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -131,5 +133,83 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
       minutes,
       seconds,
     ].join(':');
+  }
+}
+
+class PlayAudio extends StatefulWidget {
+  const PlayAudio({Key? key, this.audioFile}) : super(key: key);
+  final String? audioFile;
+
+  @override
+  State<PlayAudio> createState() => _PlayAudioState();
+}
+
+class _PlayAudioState extends State<PlayAudio> {
+  late final PlayerController playerController;
+  String? path;
+  bool isPlaying = false;
+
+  late Directory directory;
+
+  void _initaliseController() {
+    playerController = PlayerController();
+  }
+
+  /* void _playandPause() async {
+    playerController.playerState == PlayerState.playing
+        ? await playerController.pausePlayer()
+        : await playerController.startPlayer(finishMode: FinishMode.loop);
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+    _initaliseController();
+    //directory = await getApplicationDocumentsDirectory();
+    path = widget.audioFile;
+    //'${directory.path}/test_audio.aac';
+
+    playerController.preparePlayer(path!);
+    print(widget.audioFile);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    playerController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        AudioFileWaveforms(
+          size: Size(MediaQuery.of(context).size.width / 2, 70),
+          playerController: playerController,
+          density: 1.5,
+          playerWaveStyle: const PlayerWaveStyle(
+            scaleFactor: 0.8,
+            fixedWaveColor: Colors.blue,
+            liveWaveColor: Colors.yellow,
+            waveCap: StrokeCap.butt,
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            if (isPlaying) {
+              await playerController.stopPlayer();
+            } else {
+              await playerController.startPlayer();
+            }
+            setState(() {
+              isPlaying = !isPlaying;
+            });
+          },
+          icon: isPlaying
+              ? const Icon(Icons.play_arrow)
+              : const Icon(Icons.stop_circle),
+        )
+      ],
+    );
   }
 }
