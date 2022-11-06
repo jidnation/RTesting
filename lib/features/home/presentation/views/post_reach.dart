@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
@@ -35,6 +36,8 @@ class PostReach extends StatefulHookWidget {
 }
 
 class _PostReachState extends State<PostReach> {
+  GlobalKey<FlutterMentionsState> controllerKey =
+      GlobalKey<FlutterMentionsState>();
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
@@ -96,18 +99,21 @@ class _PostReachState extends State<PostReach> {
                         IconButton(
                           icon: SvgPicture.asset('assets/svgs/send.svg'),
                           onPressed: () {
-                            if (controller.text.isNotEmpty ||
+                            if (controllerKey.currentState!.controller!
+                                    .markupText.isNotEmpty ||
                                 _imageList.value.isNotEmpty) {
                               if (_imageList.value.isNotEmpty) {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _imageList.value));
-                                globals.postContent = controller.text;
+                                globals.postContent = controllerKey
+                                    .currentState!.controller!.markupText;
                                 globals.postCommentOption = 'everyone';
                                 setState(() {});
                               } else {
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-                                  content: controller.text,
+                                  content: controllerKey
+                                      .currentState!.controller!.markupText,
                                   commentOption: 'everyone',
                                   location: globals.location,
                                 ));
@@ -145,7 +151,9 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.user!.showLocation! ? globals.location! : '',
+                                  globals.user!.showLocation!
+                                      ? globals.location!
+                                      : '',
                                   // globals.location == 'NIL'
                                   //     ? ''
                                   //     : globals.location!
@@ -202,15 +210,14 @@ class _PostReachState extends State<PostReach> {
                     ).paddingSymmetric(h: 16),
                     const SizedBox(height: 20),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
-                    TextField(
+                    FlutterMentions(
+                      key: controllerKey,
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       minLines: 1,
-                      maxLines: null,
-                      controller: controller,
-                      inputFormatters: [
-                        MaxWordTextInputFormater(maxWords: 200)
-                      ],
-                      // maxLength: 200,
+                      maxLines: 3,
+                      maxLength: 200,
+
+                      suggestionPosition: SuggestionPosition.Bottom,
                       onChanged: (val) {
                         counter.value =
                             val.trim().split(RegexUtil.spaceOrNewLine).length;
@@ -233,7 +240,101 @@ class _PostReachState extends State<PostReach> {
                           vertical: 10,
                         ),
                       ),
-                    ).paddingSymmetric(h: 16),
+                      mentions: [
+                        Mention(
+                            trigger: '@',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                            ),
+                            data: [
+                              {
+                                'id': '61as61fsa',
+                                'display': 'fayeedP',
+                                'full_name': 'Fayeed Pawaskar',
+                                'photo':
+                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+                              },
+                              {
+                                'id': '61asasgasgsag6a',
+                                'display': 'khaled',
+                                'full_name': 'DJ Khaled',
+                                'style': const TextStyle(color: Colors.purple),
+                                'photo':
+                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+                              },
+                              {
+                                'id': 'asfgasga41',
+                                'display': 'markT',
+                                'full_name': 'Mark Twain',
+                                'photo':
+                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+                              },
+                              {
+                                'id': 'asfsaf451a',
+                                'display': 'JhonL',
+                                'full_name': 'Jhon Legend',
+                                'photo':
+                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+                              },
+                            ],
+                            matchAll: false,
+                            suggestionBuilder: (data) {
+                              return Container(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        data['photo'],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 20.0,
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        Text(data['full_name']),
+                                        Text('@${data['display']}'),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                      ],
+                      // child: TextField(
+                      //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      //   minLines: 1,
+                      //   maxLines: null,
+                      //   controller: controller,
+                      //   inputFormatters: [
+                      //     MaxWordTextInputFormater(maxWords: 200)
+                      //   ],
+                      //   // maxLength: 200,
+                      //   onChanged: (val) {
+                      //     counter.value =
+                      //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                      //     if (counter.value >= 200) {
+                      //       Snackbars.error(context,
+                      //           message: '200 words limit reached!');
+                      //     }
+                      //   },
+                      //   decoration: const InputDecoration(
+                      //     counterText: '',
+                      //     hintText: "What's on your mind?",
+                      //     hintStyle: TextStyle(
+                      //       fontSize: 14,
+                      //       fontWeight: FontWeight.w400,
+                      //       color: AppColors.greyShade1,
+                      //     ),
+                      //     border: InputBorder.none,
+                      //     contentPadding: EdgeInsets.symmetric(
+                      //       horizontal: 16,
+                      //       vertical: 10,
+                      //     ),
+                      //   ),
+                      // ).paddingSymmetric(h: 16),
+                    ),
                     const SizedBox(height: 10),
                     if (_imageList.value.isNotEmpty)
                       SizedBox(

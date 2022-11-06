@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -47,15 +48,17 @@ class MyApp extends StatelessWidget {
         client: chatClientFor(),
         child: LifeCycleManager(
           child: OverlaySupport.global(
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'ReachMe',
-              theme: ThemeData(
-                fontFamily: 'Poppins',
-                primarySwatch: Colors.blue,
+            child: Portal(
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'ReachMe',
+                theme: ThemeData(
+                  fontFamily: 'Poppins',
+                  primarySwatch: Colors.blue,
+                ),
+                initialRoute: SplashScreenAnimator.id,
+                onGenerateRoute: RMRouter.generateRoute,
               ),
-              initialRoute: SplashScreenAnimator.id,
-              onGenerateRoute: RMRouter.generateRoute,
             ),
           ),
         ),
