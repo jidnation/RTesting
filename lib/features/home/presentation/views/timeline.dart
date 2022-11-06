@@ -43,7 +43,7 @@ import 'package:readmore/readmore.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../full_post.dart';
+import 'full_post.dart';
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -172,7 +172,6 @@ class _TimelineScreenState extends State<TimelineScreen>
           ).paddingOnly(r: 16),
         ],
       ),
-     
       body: ProgressHUD(
         child: SafeArea(
           top: false,
@@ -744,31 +743,38 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-                            Row(
-                              children: [
-                                Text(
-                                  postFeedModel!.post!.location! == 'nil'
-                                      ? ''
-                                      : postFeedModel!.post!.location!,
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (builder) => FullPostScreen(
+                                            postFeedModel: postFeedModel,
+                                          ))),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    postFeedModel!.post!.location! == 'nil'
+                                        ? ''
+                                        : postFeedModel!.post!.location!,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  postDuration,
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
-                                  ),
-                                ).paddingOnly(l: 6),
-                              ],
+                                  Text(
+                                    postDuration,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ).paddingOnly(l: 6),
+                                ],
+                              ),
                             )
                           ],
                         ).paddingOnly(t: 10),
@@ -871,18 +877,8 @@ class PostFeedReacherCard extends HookWidget {
                           CupertinoButton(
                             minSize: 0,
                             onPressed: () {
-                              RouteNavigators.route(
-                                  context,
-                                  FullPostScreen(
-                                      isLiked: isLiked,
-                                      isVoted: isVoted,
-                                      postFeedModel: postFeedModel,
-                                      likingPost: likingPost,
-                                      onLike: onLike,
-                                      onMessage: onMessage,
-                                      onUpvote: onUpvote));
-
-                                      //  ViewCommentsScreen(post: postFeedModel!)
+                              RouteNavigators.route(context,
+                                  ViewCommentsScreen(post: postFeedModel!));
                             },
                             padding: EdgeInsets.zero,
                             child: SvgPicture.asset(
@@ -921,7 +917,6 @@ class PostFeedReacherCard extends HookWidget {
                       ),
                     ),
                   ),
-                
                   SizedBox(width: getScreenWidth(20)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -992,7 +987,6 @@ class PostFeedReacherCard extends HookWidget {
         ),
       ),
     );
- 
   }
 }
 
