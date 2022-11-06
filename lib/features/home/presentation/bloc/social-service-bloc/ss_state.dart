@@ -150,7 +150,7 @@ class MediaUploadError extends SocialServiceState {
 class DeletePostVoteLoading extends SocialServiceState {}
 
 class DeletePostVoteSuccess extends SocialServiceState {
-  final String? data;
+  final bool? data;
   DeletePostVoteSuccess({this.data});
 }
 
@@ -515,4 +515,3 @@ class DownloadPostError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
-

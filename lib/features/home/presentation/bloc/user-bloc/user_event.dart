@@ -8,6 +8,10 @@ class GetUserProfileEvent extends UserEvent {
   GetUserProfileEvent({required this.email});
 }
 
+class DeleteAccountEvent extends UserEvent {
+  DeleteAccountEvent();
+}
+
 class GetRecipientProfileEvent extends UserEvent {
   final String? email;
   GetRecipientProfileEvent({required this.email});
@@ -79,7 +83,8 @@ class StarUserEvent extends UserEvent {
 
 class GetReachRelationshipEvent extends UserEvent {
   final String? userIdToReach;
-  GetReachRelationshipEvent({required this.userIdToReach});
+  final String? type;
+  GetReachRelationshipEvent({required this.userIdToReach, required this.type});
 }
 
 class DelReachRelationshipEvent extends UserEvent {
