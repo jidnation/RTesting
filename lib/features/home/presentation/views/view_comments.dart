@@ -324,10 +324,10 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                             ),
                           Container(
                             color: AppColors.white,
-                             padding: const EdgeInsets.symmetric(
-                             horizontal: 15,
-                             vertical: 4,
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 4,
+                            ),
                             child: Column(
                               children: [
                                 TextFormField(
@@ -359,14 +359,15 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                             controller.text,
                                                         userId:
                                                             globals.user!.id));
-                                                controller.clear();
                                               }
+                                              controller.clear();
                                             },
                                           )
                                         : IconButton(
-                                            constraints: const BoxConstraints(
-                                                maxHeight: 25, maxWidth: 25),
+                                            //constraints: const BoxConstraints(
+                                               // maxHeight: 25, maxWidth: 25),
                                             onPressed: () async {
+                                              print('BUTTON WORKING');
                                               var tempDir =
                                                   await getTemporaryDirectory();
                                               var path =
@@ -394,7 +395,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                 isRecording = !isRecording;
                                               });
                                             },
-                                            icon: !isRecording
+                                            icon: isRecording
                                                 ? SvgPicture.asset(
                                                     'assets/svgs/mic.svg',
                                                     color:
