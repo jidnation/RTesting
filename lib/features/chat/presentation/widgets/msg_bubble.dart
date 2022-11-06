@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble({
@@ -22,7 +23,7 @@ class MsgBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (label.contains('amazon')) {
+    if (label.contains('jpg')) {
       return GestureDetector(
         onTap: () {
           RouteNavigators.route(
@@ -51,6 +52,16 @@ class MsgBubble extends StatelessWidget {
           ),
         ),
       );
+    } else if (label.contains('aac')) {
+      return Align(
+          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+              clipBehavior: Clip.hardEdge,
+              padding: const EdgeInsets.all(5),
+              margin: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15), color: isMe ? AppColors.primaryColor : AppColors.white),
+              child: MyAudioPlayer(sourceFile: label)));
     }
     return Column(
       children: [

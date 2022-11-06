@@ -252,10 +252,7 @@ class GetLikedPostsEvent extends SocialServiceEvent {
 }
 
 
-class DownloadPostEvent extends SocialServiceEvent {
 
-
-}
 
 class SuggestUserEvent extends SocialServiceEvent {}
 

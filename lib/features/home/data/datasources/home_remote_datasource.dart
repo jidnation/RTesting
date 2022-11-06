@@ -91,6 +91,22 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<bool> deleteAccount() async {
+    String q = r'''
+        mutation {
+          deleteAuth
+        }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return result.data['deleteAuth'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<User> setDOB({required String? dob}) async {
     String q = r'''
         mutation setDateOfBirth($dateOfBirth: String!) {
@@ -286,19 +302,18 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<bool> getReachRelationship({required String? userId}) async {
+  Future<bool> getReachRelationship(
+      {required String? userId, required String? type}) async {
     String q = r'''
-          query getReachRelationship($userIdToReach: String!) {
-            getReachRelationship(userIdToReach: $userIdToReach)
+          query getReachRelationship($userIdToReach: String!, $type: String!) {
+            getReachRelationship(userIdToReach: $userIdToReach, typeOfRelationship: $type)
           }''';
     try {
-      final result = await _client.query(gql(q), variables: {
-        'userIdToReach': userId,
-      });
+      final result = await _client
+          .query(gql(q), variables: {'userIdToReach': userId, 'type': type});
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
       return result.data['getReachRelationship'] as bool;
     } catch (e) {
       rethrow;
@@ -398,12 +413,14 @@ class HomeRemoteDataSource {
         'page_number': pageNumber,
         'authId': authId,
       });
+      Console.log('REACHERRRRRSSSS', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
       var res = result.data['getReachers'] as List;
       final data = res.map((e) => VirtualReach.fromJson(e)).toList();
+      data.removeWhere((element) => element.reacher == null);
       return data;
     } catch (e) {
       rethrow;
@@ -452,6 +469,7 @@ class HomeRemoteDataSource {
 
       var res = result.data['getReachings'] as List;
       final data = res.map((e) => VirtualReach.fromJson(e)).toList();
+      data.removeWhere((element) => element.reaching == null);
       return data;
     } catch (e) {
       rethrow;
@@ -849,7 +867,6 @@ class HomeRemoteDataSource {
         'postId': postId,
         'voteType': voteType,
       });
-      // print('RESULTSSS: ' + result.toString());
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -860,22 +877,22 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<String> deletePostVote({required String? voteId}) async {
+  Future<bool> deletePostVote({required String? voteId}) async {
     String q = r'''
-        mutation deletePostVote($voteId: String!) {
-          deletePostVote(voteId: $voteId)
+        mutation deletePostVote($postId: String!) {
+          deletePostVote(postId: $postId)
         }''';
     try {
       final result = await _client.mutate(
         gql(q),
-        variables: {'voteId': voteId},
+        variables: {'postId': voteId},
       );
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      return result.data!['deletePostVote'] as String;
+      return result.data!['deletePostVote'] as bool;
     } catch (e) {
       rethrow;
     }
@@ -1070,7 +1087,6 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      print(result.toString());
 
       return (result.data!['getAllCommentsOnPost'] as List)
           .map((e) => CommentModel.fromJson(e))
@@ -1236,10 +1252,10 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
+      // Console.log('RESSSSSPPOONSE', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
       return (result.data!['getPostFeed'] as List)
           .map((e) => PostFeedModel.fromJson(e))
           .toList();
@@ -1362,6 +1378,7 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
+      Console.log('ALL STATUS RESPONSE:', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -1418,16 +1435,17 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('get status feed', result.data);
       final tempList = (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedModel.fromJson(e))
           .toList();
-      final groupedList =
-          tempList.first.status!.groupBy((item) => item.status!.authId!);
       List<StatusFeedModel> list = [];
-      groupedList.forEach((key, value) {
-        list.add(StatusFeedModel(id: key, status: value.toList()));
-      });
+      if (tempList.isNotEmpty) {
+        final groupedList =
+            tempList.first.status!.groupBy((item) => item.status!.authId!);
+        groupedList.forEach((key, value) {
+          list.add(StatusFeedModel(id: key, status: value.toList()));
+        });
+      }
       return list;
     } catch (e) {
       rethrow;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/core/services/dialog_and_sheet_service.dart/dialog_and_sheet_service.dart';
+import 'package:reach_me/core/utils/loader.dart';
 import 'package:reach_me/features/auth/data/models/login_response.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
@@ -39,6 +40,7 @@ class AppGlobals {
   List<ProfileIndexModel>? userList;
   List<ChatsThread>? userThreads;
   LoginResponse? loginResponse;
+  DialogAndSheetService? dialogAndSheetService;
 
   void init() {
     user = User();
@@ -59,6 +61,7 @@ class AppGlobals {
     userId = '';
     location = 'NIL';
     userList = [];
+    dialogAndSheetService = DialogAndSheetService();
   }
 
   void dispose() {

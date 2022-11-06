@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
@@ -30,7 +31,6 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -42,6 +42,12 @@ import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../../core/helper/logger.dart';
+import '../../../chat/presentation/views/msg_chat_interface.dart';
+
+import 'full_post.dart';
+
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -106,11 +112,13 @@ class _TimelineScreenState extends State<TimelineScreen>
     super.build(context);
 
     final reachDM = useState(false);
+    final shoutingDown = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
+    final _currentPost = useState<PostFeedModel?>(null);
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
-    print(globals.token);
+    debugPrint(globals.token);
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
@@ -177,14 +185,28 @@ class _TimelineScreenState extends State<TimelineScreen>
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is RecipientUserData) {
-                // reachDM.value = false;
                 if (reachDM.value) {
+                  reachDM.value = false;
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
                 }
               }
               if (state is UserError) {
                 reachDM.value = false;
+              }
+              if (state is GetReachRelationshipSuccess) {
+                if (shoutingDown.value) {
+                  shoutingDown.value = false;
+                  if ((state.isReaching ?? false)) {
+                    globals.socialServiceBloc!.add(VotePostEvent(
+                      voteType: 'Downvote',
+                      postId: _currentPost.value!.postId,
+                    ));
+                  } else {
+                    Snackbars.error(context,
+                        message: 'You cannot shout down on this user\'s posts');
+                  }
+                }
               }
             },
             builder: (context, state) {
@@ -237,12 +259,22 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is VotePostSuccess) {
-                    // if (!(state.isVoted!)) {
-                    //   Snackbars.success(context,
-                    //       message: 'You shouted down on this post');
-                    // }
+                    if (!(state.isVoted!)) {
+                      Snackbars.success(context,
+                          message:
+                              'The post you shouted down has been removed!');
+                    }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteSuccess) {
+                    globals.socialServiceBloc!
+                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteError) {
+                    Snackbars.error(context, message: state.error);
                   }
 
                   if (state is GetPostFeedSuccess) {
@@ -378,7 +410,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           else
                                                             UserStory(
                                                               size: size,
-                                                              image: globals.user!
+                                                              image: globals
+                                                                      .user!
                                                                       .profilePicture ??
                                                                   '',
                                                               isMe: false,
@@ -390,14 +423,15 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                 RouteNavigators.route(
                                                                     context,
                                                                     ViewMyStatus(
-                                                                        status: _myStatus
-                                                                            .value));
+                                                                        status:
+                                                                            _myStatus.value));
                                                               },
                                                             ),
                                                           ...List.generate(
                                                             _userStatus
                                                                 .value.length,
-                                                            (index) => UserStory(
+                                                            (index) =>
+                                                                UserStory(
                                                               size: size,
                                                               isMe: false,
                                                               isLive: false,
@@ -409,7 +443,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .profilePicture!,
                                                               username: _userStatus
                                                                   .value[index]
-                                                                  .status![index]
+                                                                  .status![
+                                                                      index]
                                                                   .statusCreatorModel!
                                                                   .username!,
                                                               onTap: () {
@@ -432,7 +467,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       ),
                                                     ).paddingOnly(l: 11),
                                                   ),
-                                                  
                                                 ),
                                                 SizedBox(
                                                     height: getScreenHeight(5)),
@@ -497,41 +531,75 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+
                                                         if (active
                                                             .contains(index)) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  VotePostEvent(
-                                                            voteType: 'Upvote',
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                          ));
+                                                          if ((_posts
+                                                                      .value[
+                                                                          index]
+                                                                      .vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          }
                                                         }
                                                       },
                                                       onDownvote: () {
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+                                                        _currentPost.value =
+                                                            _posts.value[index];
                                                         if (active
                                                             .contains(index)) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  VotePostEvent(
-                                                            voteType:
-                                                                'Downvote',
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                          ));
+                                                          shoutingDown.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: _posts
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                          // globals
+                                                          //     .socialServiceBloc!
+                                                          //     .add(
+                                                          //         VotePostEvent(
+                                                          //   voteType:
+                                                          //       'Downvote',
+                                                          //   postId: _posts
+                                                          //       .value[index]
+                                                          //       .postId,
+                                                          // ));
                                                         }
                                                       },
                                                       onLike: () {
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
+                                                        Console.log(
+                                                            'Like Data',
+                                                            _posts.value[index]
+                                                                .toJson());
                                                         if (active
                                                             .contains(index)) {
                                                           if (_posts
@@ -638,14 +706,17 @@ class PostFeedReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
-   // final ScreenshotController screenshotController = ScreenshotController();
+
+    // final ScreenshotController screenshotController = ScreenshotController();
+
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
       final name = 'screenshot_${time}_reachme';
       final result = await ImageGallerySaver.saveImage(bytes!, name: name);
       debugPrint("Result ${result['filePath']}");
-        Snackbars.success(context, message: 'Image saved to Gallery');
+      Snackbars.success(context, message: 'Image saved to Gallery');
+      RouteNavigators.pop(context);
       return result['filePath'];
     }
 
@@ -659,12 +730,11 @@ class PostFeedReacherCard extends HookWidget {
       await saveImage(byteData!.buffer.asUint8List());
     }
 
-
     final size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
-        right: getScreenWidth(15),
-        left: getScreenWidth(15),
+        right: getScreenWidth(16),
+        left: getScreenWidth(16),
         bottom: getScreenHeight(16),
       ),
       child: RepaintBoundary(
@@ -689,7 +759,7 @@ class PostFeedReacherCard extends HookWidget {
                     padding: EdgeInsets.zero,
                     onPressed: () {
                       final progress = ProgressHUD.of(context);
-                      progress?.showWithText('Viewing Reacher..');
+                      progress?.showWithText('Viewing Reacher...');
                       Future.delayed(const Duration(seconds: 3), () {
                         globals.userBloc!.add(GetRecipientProfileEvent(
                             email: postFeedModel!.postOwnerId));
@@ -737,36 +807,39 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-                            Row(
-                              children: [
-                                postFeedModel!.post!.location == null ||
-                                        postFeedModel!.post!.location == 'NIL'
-                                    ? const SizedBox.shrink()
-                                    : Text(
-                                        globals.user!.showLocation!
-                                            ? postFeedModel!.post!.location!
-                                            : '',
-                                        // postFeedModel!.post!.location ??
-                                        //     'Somewhere',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(10),
-                                          fontFamily: 'Poppins',
-                                          letterSpacing: 0.4,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.textColor2,
-                                        ),
-                                      ),
-                                Text(
-                                  postDuration,
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(10),
-                                    fontFamily: 'Poppins',
-                                    letterSpacing: 0.4,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.textColor2,
+
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (builder) => FullPostScreen(
+                                            postFeedModel: postFeedModel,
+                                          ))),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    postFeedModel!.post!.location! == 'nil'
+                                        ? ''
+                                        : postFeedModel!.post!.location!,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
                                   ),
-                                ).paddingOnly(l: 6),
-                              ],
+                                  Text(
+                                    postDuration,
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(10),
+                                      fontFamily: 'Poppins',
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.textColor2,
+                                    ),
+                                  ).paddingOnly(l: 6),
+                                ],
+                              ),
                             )
                           ],
                         ).paddingOnly(t: 10),
@@ -796,25 +869,45 @@ class PostFeedReacherCard extends HookWidget {
               ),
               postFeedModel!.post!.content == null
                   ? const SizedBox.shrink()
-                  : Flexible(
-                      child: ReadMoreText(
-                        postFeedModel!.post!.edited!
-                            ? "${postFeedModel!.post!.content ?? ''} (edited)"
-                            : postFeedModel!.post!.content ?? '',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: getScreenHeight(14)),
-                        trimLines: 3,
-                        colorClickableText: const Color(0xff717F85),
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: 'See more',
-                        trimExpandedText: 'See less',
-                        moreStyle: TextStyle(
-                            fontSize: getScreenHeight(14),
-                            fontFamily: "Roboto",
-                            color: const Color(0xff717F85)),
-                      ).paddingSymmetric(h: 16, v: 10),
-                    ),
+                  : Row(
+                      children: [
+                        Flexible(
+                          child: ReadMoreText(
+                            "${postFeedModel!.post!.content}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: getScreenHeight(14)),
+                            trimLines: 3,
+                            colorClickableText: const Color(0xff717F85),
+                            trimMode: TrimMode.Line,
+                            trimCollapsedText: 'See more',
+                            trimExpandedText: 'See less',
+                            moreStyle: TextStyle(
+                                fontSize: getScreenHeight(14),
+                                fontFamily: "Roboto",
+                                color: const Color(0xff717F85)),
+                          ),
+                        ),
+                        SizedBox(width: getScreenWidth(2)),
+                        Tooltip(
+                          message: 'This Reach has been edited by the Reacher',
+                          waitDuration: const Duration(seconds: 1),
+                          showDuration: const Duration(seconds: 2),                         
+                          child: Text(
+                            postFeedModel!.post!.edited!
+                                ? "(Reach Edited)"
+                                : "",
+                            style: TextStyle(
+                              fontSize: getScreenHeight(12),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).paddingSymmetric(h: 16, v: 10),
+
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
                 Helper.renderPostImages(postFeedModel!.post!, context)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
@@ -831,7 +924,7 @@ class PostFeedReacherCard extends HookWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(8),
                         color: const Color(0xFFF5F5F5),
                       ),
                       child: Row(
@@ -921,7 +1014,7 @@ class PostFeedReacherCard extends HookWidget {
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(8),
                             color: const Color(0xFFF5F5F5),
                           ),
                           child: Row(
@@ -944,6 +1037,16 @@ class PostFeedReacherCard extends HookWidget {
                                         width: getScreenWidth(20),
                                       ),
                               ),
+                              FittedBox(
+                                child: Text(
+                                  '${postFeedModel!.post!.nUpvotes ?? 0}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
+                              ),
                               Flexible(
                                   child: SizedBox(width: getScreenWidth(4))),
                               Flexible(
@@ -963,6 +1066,16 @@ class PostFeedReacherCard extends HookWidget {
                                         height: getScreenHeight(20),
                                         width: getScreenWidth(20),
                                       ),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  '${postFeedModel!.post!.nDownvotes ?? 0}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(12),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor3,
+                                  ),
+                                ),
                               ),
                               Flexible(
                                   child: SizedBox(width: getScreenWidth(4))),

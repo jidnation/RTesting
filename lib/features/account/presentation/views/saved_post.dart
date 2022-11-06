@@ -131,7 +131,7 @@ class SavedPostScreen extends HookWidget {
                           : ListView.builder(
                               itemCount: _savedPosts.value.length,
                               itemBuilder: (context, index) {
-                                return SavedPostReacherCardd(
+                                return SavedPostReacherCard(
                                     savedPostModel: _savedPosts.value[index]);
                               },
                             ),
@@ -166,8 +166,8 @@ class SavedPostScreen extends HookWidget {
   }
 }
 
-class SavedPostReacherCardd extends HookWidget {
-  const SavedPostReacherCardd({
+class SavedPostReacherCard extends HookWidget {
+  const SavedPostReacherCard({
     Key? key,
     required this.savedPostModel,
     this.onDelete,
@@ -268,9 +268,9 @@ class SavedPostReacherCardd extends HookWidget {
                 ),
               ).paddingSymmetric(v: 10, h: 16),
             ),
-            // if (savedPostModel!.imageMediaItems!.isNotEmpty)
-            //   Helper.renderPostImages(savedPostModel!, context)
-            //       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            if (savedPostModel!.imageMediaItems!.isNotEmpty)
+              Helper.renderSavedPostImages(savedPostModel!, context)
+                  .paddingOnly(r: 16, l: 16, b: 16, t: 10)
           ],
         ),
       ),

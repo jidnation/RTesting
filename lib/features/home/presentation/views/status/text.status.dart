@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' as foundation;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,6 +14,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
 
 class TextStatus extends StatefulHookWidget {
   const TextStatus({Key? key}) : super(key: key);
@@ -35,6 +39,7 @@ class _TextStatusState extends State<TextStatus> {
     final isCameraStatus = useState(false);
     final isAudioStatus = useState(false);
     final isTextStatus = useState(true);
+
     final currentSelectedBg = useState<String>('assets/images/status-bg-1.jpg');
     final bgList = useState([
       'assets/images/status-bg-1.jpg',
@@ -167,29 +172,31 @@ class _TextStatusState extends State<TextStatus> {
                               constraints: const BoxConstraints(),
                             ),
                           ),
-                          // Container(
-                          //   padding: const EdgeInsets.all(1),
-                          //   decoration: BoxDecoration(
-                          //     shape: BoxShape.circle,
-                          //     color: isAudioStatus.value
-                          //         ? AppColors.white
-                          //         : Colors.transparent,
-                          //   ),
-                          //   child: IconButton(
-                          //     onPressed: () {
-                          //       isAudioStatus.value = true;
-                          //       isTextStatus.value = false;
-                          //       isCameraStatus.value = false;
-                          //     },
-                          //     icon: SvgPicture.asset(
-                          //         'assets/svgs/status-mic.svg',
-                          //         color: isAudioStatus.value
-                          //             ? AppColors.black
-                          //             : null),
-                          //     // padding: EdgeInsets.zero,
-                          //     constraints: const BoxConstraints(),
-                          //   ),
-                          // ),
+                          Container(
+                            padding: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isAudioStatus.value
+                                  ? AppColors.white
+                                  : Colors.transparent,
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                isAudioStatus.value = true;
+                                isTextStatus.value = false;
+                                isCameraStatus.value = false;
+                                RouteNavigators.routeReplace(
+                                    context, const AudioStatus());
+                              },
+                              icon: SvgPicture.asset(
+                                  'assets/svgs/status-mic.svg',
+                                  color: isAudioStatus.value
+                                      ? AppColors.black
+                                      : null),
+                              // padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ),
                           Container(
                             padding: const EdgeInsets.all(1),
                             decoration: BoxDecoration(
@@ -333,237 +340,288 @@ class _TextStatus2State extends State<TextStatus2> {
     ]);
 
     final controller = useTextEditingController();
-    return Scaffold(
-      backgroundColor: AppColors.black,
-      body: Container(
-        height: size.height,
-        width: size.width,
-        decoration: BoxDecoration(
-          color: selectedColour.value,
-          image: selectedColour.value == null
-              ? DecorationImage(
-                  image: AssetImage(selectedImageBg.value),
-                  fit: BoxFit.cover,
-                )
-              : null,
+    final showEmoji = useState(false);
+    Widget buildEmoji() {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.4,
+        child: EmojiPicker(
+          textEditingController: controller,
+          config: Config(
+            columns: 7,
+            emojiSizeMax:
+                32 * (!foundation.kIsWeb && Platform.isIOS ? 1.30 : 1.0),
+            verticalSpacing: 0,
+            horizontalSpacing: 0,
+            gridPadding: EdgeInsets.zero,
+            initCategory: Category.RECENT,
+            bgColor: const Color(0xFFF2F2F2),
+            indicatorColor: Colors.blue,
+            iconColor: Colors.grey,
+            iconColorSelected: Colors.blue,
+            backspaceColor: Colors.blue,
+            skinToneDialogBgColor: Colors.white,
+            skinToneIndicatorColor: Colors.grey,
+            enableSkinTones: true,
+            showRecentsTab: true,
+            recentsLimit: 28,
+            replaceEmojiOnLimitExceed: false,
+            noRecents: const Text(
+              'No Recents',
+              style: TextStyle(fontSize: 20, color: Colors.black26),
+              textAlign: TextAlign.center,
+            ),
+            loadingIndicator: const SizedBox.shrink(),
+            tabIndicatorAnimDuration: kTabScrollDuration,
+            categoryIcons: const CategoryIcons(),
+            buttonMode: ButtonMode.MATERIAL,
+            checkPlatformCompatibility: true,
+          ),
+          onBackspacePressed: () {
+            controller.text.substring(0, controller.text.length - 1);
+          },
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(getScreenWidth(24), getScreenHeight(60),
-              getScreenWidth(24), getScreenHeight(35)),
-          child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
-              bloc: globals.socialServiceBloc,
-              listener: (context, state) {
-                if (state is CreateStatusLoading) {
-                  Snackbars.success(
-                    context,
-                    message: 'Uploading status...',
-                    milliseconds: 1000,
-                  );
-                }
-              },
-              builder: (context, state) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () => RouteNavigators.pop(context),
-                          icon: Transform.scale(
-                            scale: 1.8,
-                            child: SvgPicture.asset('assets/svgs/dc-back.svg'),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            if (controller.text.isNotEmpty) {
-                              globals.socialServiceBloc!.add(
-                                CreateStatusEvent(
-                                  createStatusDto: CreateStatusDto(
-                                    caption: controller.text,
-                                    alignment: currentAlignment.value,
-                                    font: currentFont.value,
-                                    background: selectedColour.value != null
-                                        ? selectedColour.value
-                                            .toString()
-                                            .replaceAll('Color(', '')
-                                            .replaceAll(')', '')
-                                        : selectedImageBg.value,
-                                    type: 'text',
-                                  ),
-                                ),
-                              );
-                              RouteNavigators.pop(context);
-                            }
-                          },
-                          icon: Transform.scale(
-                            scale: 1.8,
-                            child: SvgPicture.asset('assets/svgs/dc-send.svg'),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: getScreenHeight(30)),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.black.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
+      );
+    }
+
+   
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      
+      backgroundColor: AppColors.black,
+      body: SingleChildScrollView(
+        child: Container(
+          height: size.height,
+          width: size.width,
+          decoration: BoxDecoration(
+            color: selectedColour.value,
+            image: selectedColour.value == null
+                ? DecorationImage(
+                    image: AssetImage(selectedImageBg.value),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(getScreenWidth(24), getScreenHeight(60),
+                getScreenWidth(24), getScreenHeight(35)),
+            child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
+                listener: (context, state) {
+                  if (state is CreateStatusLoading) {
+                    Snackbars.success(
+                      context,
+                      message: 'Uploading status...',
+                      milliseconds: 1000,
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            onPressed: () {},
-                            icon: SvgPicture.asset(
-                                'assets/svgs/status-smile.svg'),
+                            onPressed: () => RouteNavigators.pop(context),
+                            icon: Transform.scale(
+                              scale: 1.8,
+                              child: SvgPicture.asset('assets/svgs/dc-back.svg'),
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                           ),
                           IconButton(
                             onPressed: () {
-                              for (var i = 0;
-                                  i < alignments.value.length;
-                                  i++) {
-                                if (alignments.value[i] ==
-                                    currentAlignment.value) {
-                                  if (i == alignments.value.length - 1) {
-                                    currentAlignment.value =
-                                        alignments.value[0];
-                                  } else {
-                                    currentAlignment.value =
-                                        alignments.value[i + 1];
-                                  }
-                                  break;
-                                }
+                              if (controller.text.isNotEmpty) {
+                                globals.socialServiceBloc!.add(
+                                  CreateStatusEvent(
+                                    createStatusDto: CreateStatusDto(
+                                      caption: controller.text,
+                                      alignment: currentAlignment.value,
+                                      font: currentFont.value,
+                                      background: selectedColour.value != null
+                                          ? selectedColour.value
+                                              .toString()
+                                              .replaceAll('Color(', '')
+                                              .replaceAll(')', '')
+                                          : selectedImageBg.value,
+                                      type: 'text',
+                                    ),
+                                  ),
+                                );
+                                RouteNavigators.pop(context);
                               }
                             },
-                            icon: Icon(
-                              Helper.getAlignment(
-                                  currentAlignment.value)['align_icon'],
-                              color: AppColors.white,
+                            icon: Transform.scale(
+                              scale: 1.8,
+                              child: SvgPicture.asset('assets/svgs/dc-send.svg'),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              for (var i = 0; i < fontsList.value.length; i++) {
-                                if (fontsList.value[i] == currentFont.value) {
-                                  if (i == fontsList.value.length - 1) {
-                                    currentFont.value = fontsList.value[0];
-                                  } else {
-                                    currentFont.value = fontsList.value[i + 1];
-                                  }
-                                  break;
-                                }
-                              }
-                            },
-                            style: TextButton.styleFrom(
+                          )
+                        ],
+                      ),
+                      SizedBox(height: getScreenHeight(30)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                showEmoji.value = !showEmoji.value;
+                              },
+                              icon: SvgPicture.asset(
+                                  'assets/svgs/status-smile.svg'),
                               padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
                             ),
-                            child: Text(
-                              'Font',
+                            IconButton(
+                              onPressed: () {
+                                for (var i = 0;
+                                    i < alignments.value.length;
+                                    i++) {
+                                  if (alignments.value[i] ==
+                                      currentAlignment.value) {
+                                    if (i == alignments.value.length - 1) {
+                                      currentAlignment.value =
+                                          alignments.value[0];
+                                    } else {
+                                      currentAlignment.value =
+                                          alignments.value[i + 1];
+                                    }
+                                    break;
+                                  }
+                                }
+                              },
+                              icon: Icon(
+                                Helper.getAlignment(
+                                    currentAlignment.value)['align_icon'],
+                                color: AppColors.white,
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                for (var i = 0; i < fontsList.value.length; i++) {
+                                  if (fontsList.value[i] == currentFont.value) {
+                                    if (i == fontsList.value.length - 1) {
+                                      currentFont.value = fontsList.value[0];
+                                    } else {
+                                      currentFont.value = fontsList.value[i + 1];
+                                    }
+                                    break;
+                                  }
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: Text(
+                                'Font',
+                                style: Helper.getFont(currentFont.value),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                selectedColour.value = null;
+                                for (var i = 0;
+                                    i < bgImgsList.value.length;
+                                    i++) {
+                                  if (bgImgsList.value[i] ==
+                                      selectedImageBg.value) {
+                                    if (i == bgImgsList.value.length - 1) {
+                                      selectedImageBg.value = bgImgsList.value[0];
+                                    } else {
+                                      selectedImageBg.value =
+                                          bgImgsList.value[i + 1];
+                                    }
+                                    break;
+                                  }
+                                }
+                              },
+                              icon: SvgPicture.asset('assets/svgs/pallete.svg'),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                for (var i = 0; i < bgcolours.value.length; i++) {
+                                  if (bgcolours.value[i] ==
+                                          selectedColour.value ||
+                                      selectedColour.value == null) {
+                                    if (i == bgcolours.value.length - 1) {
+                                      selectedColour.value = bgcolours.value[0];
+                                    } else {
+                                      selectedColour.value =
+                                          bgcolours.value[i + 1];
+                                    }
+                                    break;
+                                  }
+                                }
+                              },
+                              icon: Container(
+                                decoration: BoxDecoration(
+                                  color: selectedColour.value ?? AppColors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: getScreenHeight(50)),
+                      Flexible(
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            TextFormField(
+                              cursorColor: AppColors.white,
+                              controller: controller,
+                              maxLength: 250,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
+                                counterText: '',
+                              ),
+                              textAlign: Helper.getAlignment(
+                                  currentAlignment.value)['align'],
                               style: Helper.getFont(currentFont.value),
+                              maxLines: 10,
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              selectedColour.value = null;
-                              for (var i = 0;
-                                  i < bgImgsList.value.length;
-                                  i++) {
-                                if (bgImgsList.value[i] ==
-                                    selectedImageBg.value) {
-                                  if (i == bgImgsList.value.length - 1) {
-                                    selectedImageBg.value = bgImgsList.value[0];
-                                  } else {
-                                    selectedImageBg.value =
-                                        bgImgsList.value[i + 1];
-                                  }
-                                  break;
-                                }
-                              }
-                            },
-                            icon: SvgPicture.asset('assets/svgs/pallete.svg'),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              for (var i = 0; i < bgcolours.value.length; i++) {
-                                if (bgcolours.value[i] ==
-                                        selectedColour.value ||
-                                    selectedColour.value == null) {
-                                  if (i == bgcolours.value.length - 1) {
-                                    selectedColour.value = bgcolours.value[0];
-                                  } else {
-                                    selectedColour.value =
-                                        bgcolours.value[i + 1];
-                                  }
-                                  break;
-                                }
-                              }
-                            },
-                            icon: Container(
-                              decoration: BoxDecoration(
-                                color: selectedColour.value ?? AppColors.white,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: getScreenHeight(50)),
-                    Flexible(
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          TextFormField(
-                            cursorColor: AppColors.white,
-                            controller: controller,
-                            maxLength: 250,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide.none,
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                borderSide: BorderSide.none,
-                              ),
-                              counterText: '',
-                            ),
-                            textAlign: Helper.getAlignment(
-                                currentAlignment.value)['align'],
-                            style: Helper.getFont(currentFont.value),
-                            maxLines: 10,
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                );
-              }),
+                      showEmoji.value ? buildEmoji() : const SizedBox.shrink()
+                    ],
+                  );
+                }),
+          ),
         ),
       ),
     );

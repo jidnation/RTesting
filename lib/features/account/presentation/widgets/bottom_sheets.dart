@@ -100,6 +100,22 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           Snackbars.success(context,
                               message: 'Profile link copied to clipboard!');
                         }),
+                    KebabBottomTextButton(
+                        label: 'Delete Account',
+                        onPressed: () async {
+                          final result = await globals.dialogAndSheetService!
+                              .showYesNoDialog(
+                                  context: context,
+                                  yesLabel: 'Yes',
+                                  noLabel: 'No',
+                                  message: 'Delete account?');
+                          if (result) {
+                            RouteNavigators.pop(context);
+                            globals.userBloc!.add(DeleteAccountEvent());
+                          } else {
+                            RouteNavigators.pop(context);
+                          }
+                        }),
                     // KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 ),
@@ -220,7 +236,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 Share.share(
-                                    'Reaching you with this: ${postFeedModel.post!.postSlug!}');
+                                    'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',
@@ -229,7 +245,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                                     postId: postFeedModel.postId));
                               }),
                           KebabBottomTextButton(
-                              label: 'Download post', onPressed: downloadPost),
+                              label: 'Download Reach Card', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Report',
                             onPressed: () {
@@ -285,14 +301,12 @@ Future showReacherCardBottomSheet(BuildContext context,
                             label: 'Share Post',
                             onPressed: () {
                               RouteNavigators.pop(context);
-                              Clipboard.setData(ClipboardData(
-                                  text: postFeedModel.post!.postSlug!));
-                              Snackbars.success(context,
-                                  message: 'Link copied to clipboard');
+                              Share.share(
+                                  'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
                             },
                           ),
                           KebabBottomTextButton(
-                              label: 'Download post', onPressed: downloadPost),
+                              label: 'Download Reach Card', onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Copy link',
                             onPressed: () {
@@ -349,18 +363,18 @@ Future showStoryBottomSheet(BuildContext context,
                     SizedBox(height: getScreenHeight(20)),
                     Column(
                       children: [
-                        KebabBottomTextButton(
-                          label: 'Report',
-                          onPressed: () {},
-                          color: const Color(0xFFE50101),
-                        ),
-                        KebabBottomTextButton(label: 'Reach', onPressed: () {}),
-                        KebabBottomTextButton(
-                            label: 'Star user', onPressed: () {}),
+                        // KebabBottomTextButton(
+                        //   label: 'Report',
+                        //   onPressed: () {},
+                        //   color: const Color(0xFFE50101),
+                        // ),
+                        // KebabBottomTextButton(label: 'Reach', onPressed: () {}),
+                        // KebabBottomTextButton(
+                        //     label: 'Star user', onPressed: () {}),
                         KebabBottomTextButton(
                             label: 'Copy link', onPressed: () {}),
                         KebabBottomTextButton(label: 'Share', onPressed: () {}),
-                        KebabBottomTextButton(label: 'Mute', onPressed: () {}),
+                        // KebabBottomTextButton(label: 'Mute', onPressed: () {}),
                       ],
                     ),
                     SizedBox(height: getScreenHeight(20)),

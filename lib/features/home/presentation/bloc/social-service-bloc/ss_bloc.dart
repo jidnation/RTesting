@@ -141,7 +141,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
         response.fold(
           (error) => emit(VotePostError(error: error)),
-          (postVote) => emit(VotePostSuccess(isVoted: postVote)),
+          (postVote) => emit(VotePostSuccess(
+              isVoted: event.voteType == 'Upvote' ? true : false)),
         );
       } on GraphQLError catch (e) {
         emit(VotePostError(error: e.message));

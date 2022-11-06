@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
@@ -31,6 +31,20 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         );
       } on GraphQLError catch (e) {
         emit(UserError(error: e.message));
+      }
+    });
+    on<DeleteAccountEvent>((event, emit) async {
+      emit(DeleteAccountLoading());
+      try {
+        final response = await userRepository.deleteAccount();
+        response.fold(
+          (error) => emit(DeleteAccountError(error: error)),
+          (deleted) {
+            emit(DeleteAccountSuccess(deleted: deleted));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(DeleteAccountError(error: e.message));
       }
     });
     on<GetRecipientProfileEvent>((event, emit) async {
@@ -236,6 +250,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       try {
         final response = await userRepository.getReachRelationship(
           userId: event.userIdToReach!,
+          type: event.type!,
         );
         response.fold(
           (error) => emit(UserError(error: error)),

@@ -39,3 +39,8 @@ class AppColors {
   static const Color greyShade7 = Color(0xFFF1F1F1);
   static const Color greyShade8 = Color(0xFFE5E5E5);
 }
+
+class ReachRelationshipType {
+  static const reacher = "reacher";
+  static const reaching = "reaching";
+}
