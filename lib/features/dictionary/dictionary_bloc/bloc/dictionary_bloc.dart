@@ -24,7 +24,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         emit(ErrorState(e.toString()));
       }
     });
-    on<GetRecentAddedWordsEvent>(((event, emit) async {
+    on<GetRecentAddedWordsEvent>((event, emit) async {
       emit(LoadingRecentlyAddedWords());
       try {
         final response = await dictionaryRepository.getRecentAddedWords(
@@ -36,6 +36,6 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       } on GraphQLError catch (e) {
         emit(DisplayRecentlyAddedWordsError(error: e.message));
       }
-    }));
+    });
   }
 }

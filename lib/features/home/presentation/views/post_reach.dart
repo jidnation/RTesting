@@ -69,14 +69,14 @@ class _PostReachState extends State<PostReach> {
 
     // final _imageList = useState<List<UploadFileDto>>([]);
 
-    String getUserLoation(){
-      if(globals.user!.showLocation!){
-         return globals.location!;
-      }else{
+    String getUserLoation() {
+      if (globals.user!.showLocation!) {
+        return globals.location!;
+      } else {
         return 'nil';
       }
     }
-    
+
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -296,22 +296,27 @@ class _PostReachState extends State<PostReach> {
                             suggestionBuilder: (data) {
                               return Container(
                                 padding: const EdgeInsets.all(10.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        data['photo'],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20.0,
-                                    ),
-                                    Column(
-                                      children: <Widget>[
-                                        Text(data['full_name']),
-                                        Text('@${data['display']}'),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const SizedBox(
+                                          width: 20.0,
+                                        ),
+                                        Column(
+                                          children: <Widget>[
+                                            Text(data['full_name']),
+                                            Text('@${data['display']}'),
+                                          ],
+                                        ),
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.add),
+                                        )
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
                               );

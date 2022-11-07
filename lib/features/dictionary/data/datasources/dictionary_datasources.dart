@@ -1,10 +1,10 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/features/dictionary/data/models/add_to_glossarry_response.dart';
-import 'package:reach_me/features/dictionary/data/models/recently_added.dart';
+import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
-class AddToGlossaryDataSource {
-  AddToGlossaryDataSource({GraphQLApiClient? client})
+class DictionaryDataSource {
+  DictionaryDataSource({GraphQLApiClient? client})
       : _client = client ?? GraphQLApiClient();
   final GraphQLApiClient _client;
 
@@ -18,10 +18,13 @@ class AddToGlossaryDataSource {
     String q = r'''
         mutation addWordToGlossary($wordInput: WordInput!){
           addWordToGlossary(wordInput: $wordInput){
-            abbr:String!
-            meaning:String!
-            language:String!
-            word:String!
+          abbr
+          meaning
+          authId
+          created_at
+          language
+          word
+          wordId
           }
         }''';
     try {
@@ -49,9 +52,10 @@ class AddToGlossaryDataSource {
   }
 
   Future<List<GetRecentlyAddedWord>> getRecentWord(
-      { required num pageLimit,required num pageNumber}) async {
+      {required num pageLimit, required num pageNumber}) async {
     const String q =
-        r'''  getRecentlyAddedWords(page_limit: $page_Limit, page_number:$page_number){
+        r'''query getRecentlyAddedWords($page_limit: Float!, $page_number:Float!){
+  getRecentlyAddedWords(page_limit: $page_limit, page_number:$page_number){
     abbr
     authId
     meaning
@@ -59,16 +63,17 @@ class AddToGlossaryDataSource {
     language
     word
     wordId
-  }  ''';
+  }
+}''';
 
     try {
       final result = await _client.query(gql(q),
-          variables: {'page_limit': pageLimit, ' page_number': pageNumber});
+          variables: {'page_limit': pageLimit, 'page_number': pageNumber});
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      var res = result.data['getRecentlyAddedWords'] as List;
+      var res = result.data["getRecentlyAddedWords"] as List;
       final data = res.map((e) => GetRecentlyAddedWord.fromJson(e)).toList();
       return data;
     } catch (e) {
@@ -76,15 +81,3 @@ class AddToGlossaryDataSource {
     }
   }
 }
-
-// class WordInput {
-//   String? abbr;
-//   String? meaning;
-//   String? authId;
-//   String? createdAt;
-//   String? language;
-//   String? word;
-//   String? wordId;
-// }
-
-

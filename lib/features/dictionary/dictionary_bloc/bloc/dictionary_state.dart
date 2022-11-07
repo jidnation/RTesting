@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:reach_me/features/dictionary/data/models/recently_added.dart';
+import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
 @immutable
 abstract class DictionaryState extends Equatable {

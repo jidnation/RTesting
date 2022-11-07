@@ -49,22 +49,25 @@ class MyApp extends StatelessWidget {
         client: chatClientFor(),
         child: LifeCycleManager(
           child: OverlaySupport.global(
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'ReachMe',
-              theme: ThemeData(
-                  fontFamily: 'Poppins',
-                  primarySwatch: Colors.blue,
-                  sliderTheme: const SliderThemeData(
-                    trackHeight: 4.0,
-                    activeTickMarkColor: AppColors.textColor2,
-                    inactiveTickMarkColor: AppColors.white,
-                    thumbColor: AppColors.white,
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
-                    overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
-                  )),
-              initialRoute: SplashScreenAnimator.id,
-              onGenerateRoute: RMRouter.generateRoute,
+            child: Portal(
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'ReachMe',
+                theme: ThemeData(
+                    fontFamily: 'Poppins',
+                    primarySwatch: Colors.blue,
+                    sliderTheme: const SliderThemeData(
+                      trackHeight: 4.0,
+                      activeTickMarkColor: AppColors.textColor2,
+                      inactiveTickMarkColor: AppColors.white,
+                      thumbColor: AppColors.white,
+                      thumbShape:
+                          RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                      overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
+                    )),
+                initialRoute: SplashScreenAnimator.id,
+                onGenerateRoute: RMRouter.generateRoute,
+              ),
             ),
           ),
         ),
