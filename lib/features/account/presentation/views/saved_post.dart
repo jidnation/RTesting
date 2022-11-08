@@ -8,12 +8,14 @@ import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+
+import '../../../home/presentation/views/post_media.dart';
 
 class SavedPostScreen extends HookWidget {
   static const String id = "saved_post_screen";
@@ -268,9 +270,16 @@ class SavedPostReacherCard extends HookWidget {
                 ),
               ).paddingSymmetric(v: 10, h: 16),
             ),
-            if (savedPostModel!.imageMediaItems!.isNotEmpty)
-              Helper.renderSavedPostImages(savedPostModel!, context)
+            if (savedPostModel!.imageMediaItems!.isNotEmpty ||
+                (savedPostModel!.videoMediaItem ?? '').isNotEmpty ||
+                (savedPostModel!.audioMediaItem ?? '').isNotEmpty)
+              PostMedia(post: savedPostModel!.toPostModel())
                   .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            else
+              const SizedBox.shrink(),
+            // if (savedPostModel!.imageMediaItems!.isNotEmpty)
+            //   Helper.renderSavedPostImages(savedPostModel!, context)
+            //       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
           ],
         ),
       ),

@@ -35,6 +35,21 @@ class FileUtils {
     }
   }
 
+  static bool isVideoPath(String filePath) {
+    final fileExt = p.extension(filePath).replaceAll(".", "");
+    return videoExts.contains(fileExt);
+  }
+
+  static bool isImagePath(String filePath) {
+    final fileExt = p.extension(filePath).replaceAll(".", "");
+    return imageExts.contains(fileExt);
+  }
+
+  static bool isAudioPath(String filePath) {
+    final fileExt = p.extension(filePath).replaceAll(".", "");
+    return audioExts.contains(fileExt);
+  }
+
   static bool isImage(File file) {
     final fileName = p.basename(file.path);
     final fileExt = p.extension(fileName).replaceAll(".", "");

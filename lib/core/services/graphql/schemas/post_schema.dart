@@ -16,6 +16,8 @@ class PostSchema {
             nComments
             nLikes
             nShares
+            nDownvotes
+            nUpvotes
             postId
             postSlug
             videoMediaItem

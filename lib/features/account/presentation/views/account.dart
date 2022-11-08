@@ -35,6 +35,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
+import '../../../home/presentation/views/post_media.dart';
 import '../../../home/presentation/views/post_reach.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -536,13 +537,13 @@ class _AccountScreenState extends State<AccountScreen>
                         Positioned(
                           top: size.height * 0.2 - 20,
                           child: AnimatedContainer(
-                            width: isGoingDown ? width : getScreenWidth(100),
-                            height: isGoingDown ? height : getScreenHeight(100),
-                            duration: const Duration(seconds: 1),
-                            child: const ProfilePicture(
-                              height: 90,
-                            )
-                          ),
+                              width: isGoingDown ? width : getScreenWidth(100),
+                              height:
+                                  isGoingDown ? height : getScreenHeight(100),
+                              duration: const Duration(seconds: 1),
+                              child: const ProfilePicture(
+                                height: 90,
+                              )),
                         ),
                       ],
                     ),
@@ -1132,15 +1133,14 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                                  Text(
-                                      postModel!.location! ,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(11),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    )
-                                  
+                              Text(
+                                postModel!.location!,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              )
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1173,11 +1173,13 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if (postModel!.imageMediaItems!.isNotEmpty)
-                    Helper.renderPostImages(postModel!, context)
+                  if (postModel!.imageMediaItems!.isNotEmpty ||
+                      (postModel?.videoMediaItem ?? '').isNotEmpty ||
+                      (postModel?.audioMediaItem ?? '').isNotEmpty)
+                    PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
-                    const SizedBox(),
+                    const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1979,8 +1981,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               InkWell(
                                 onTap: () => RouteNavigators.route(
                                     context,
-                                    const AccountStatsInfo(
-                                      index: 0,
+                                    RecipientAccountStatsInfo(
+                                      index: 0, recipientId: widget.recipientId,
                                       // recipientId: widget.recipientId,
                                     )),
                                 child: Column(

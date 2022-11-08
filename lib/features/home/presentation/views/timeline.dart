@@ -25,6 +25,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
@@ -35,19 +36,17 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/post_media.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
-
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
-
 import 'full_post.dart';
-
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -219,10 +218,22 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is UploadMediaSuccess) {
+                    List<String> mediaUrls = state.data as List<String>;
+                    List<String> imageUrls = mediaUrls
+                        .where((e) => FileUtils.fileType(e) == 'image')
+                        .toList();
+                    String videoUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'video',
+                        orElse: () => '');
+                    String audioUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'audio',
+                        orElse: () => '');
                     globals.socialServiceBloc!.add(CreatePostEvent(
                       content: globals.postContent,
                       commentOption: globals.postCommentOption,
-                      imageMediaItem: state.data as List<String>,
+                      imageMediaItem: imageUrls.isNotEmpty ? imageUrls : null,
+                      videoMediaItem: videoUrl.isNotEmpty ? videoUrl : null,
+                      audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
                       location: globals.location,
                     ));
                   }
@@ -440,7 +451,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .value[index]
                                                                   .status![0]
                                                                   .statusCreatorModel!
-                                                                  .profilePicture!,
+                                                                  .profilePicture,
                                                               username: _userStatus
                                                                   .value[index]
                                                                   .status![
@@ -807,7 +818,6 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-
                             GestureDetector(
                               onTap: () =>
                                   Navigator.of(context).push(MaterialPageRoute(
@@ -892,7 +902,7 @@ class PostFeedReacherCard extends HookWidget {
                         Tooltip(
                           message: 'This Reach has been edited by the Reacher',
                           waitDuration: const Duration(seconds: 1),
-                          showDuration: const Duration(seconds: 2),                         
+                          showDuration: const Duration(seconds: 2),
                           child: Text(
                             postFeedModel!.post!.edited!
                                 ? "(Reach Edited)"
@@ -907,9 +917,10 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
-
-              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-                Helper.renderPostImages(postFeedModel!.post!, context)
+              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
+                  (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty ||
+                  (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty)
+                PostMedia(post: postFeedModel!.post!)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
                 const SizedBox.shrink(),

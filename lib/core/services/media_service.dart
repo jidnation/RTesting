@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -25,7 +26,7 @@ class MediaService {
         pickerConfig: AssetPickerConfig(
           maxAssets: 1,
           requestType: RequestType.image,
-          textDelegate: EnglishAssetPickerTextDelegate(),
+          textDelegate: const EnglishAssetPickerTextDelegate(),
           specialPickerType: SpecialPickerType.noPreview,
         ),
       );
@@ -228,14 +229,15 @@ class MediaService {
     if (file == null) return null;
     String? thumbnail;
     if (FileUtils.isVideo(file)) {
-      thumbnail = await t.VideoThumbnail.thumbnailFile(
-        video: file.path,
-        imageFormat: t.ImageFormat.JPEG,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        maxWidth:
-            128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
-        quality: 100,
-      );
+      thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+      // thumbnail = await t.VideoThumbnail.thumbnailFile(
+      //   video: file.path,
+      //   imageFormat: t.ImageFormat.JPEG,
+      //   thumbnailPath: (await getTemporaryDirectory()).path,
+      //   maxWidth:
+      //       128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      //   quality: 100,
+      // );
     }
     return FileResult(
         path: file.path,
@@ -245,5 +247,45 @@ class MediaService {
         width: res.first.width,
         thumbnail: thumbnail,
         fileName: (file).path.split('/').last);
+  }
+
+  Future<FileResult?> getVideoThumbnail({required String videoPath}) async {
+    String? thumbnailPath;
+    int? height, width;
+    thumbnailPath = await t.VideoThumbnail.thumbnailFile(
+      video: videoPath,
+      imageFormat: t.ImageFormat.PNG,
+      thumbnailPath: (await getTemporaryDirectory()).path,
+      // maxWidth:
+      //     256, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      quality: 100,
+    );
+    if (thumbnailPath == null) return null;
+    File imageFile =
+        File(thumbnailPath); // Or any other way to get a File instance.
+    var decodedImage = await decodeImageFromList(imageFile.readAsBytesSync());
+    height = decodedImage.height;
+    width = decodedImage.width;
+    // print('WIDTH' + decodedImage.width.toString());
+    // print('HEIGHT' + decodedImage.height.toString());
+
+    // Image image = Image.file(File(thumbnailPath));
+    // Completer completer = Completer<ui.Image>();
+    // image.image
+    //     .resolve(const ImageConfiguration())
+    //     .addListener(ImageStreamListener((ImageInfo info, bool _) {
+    //   completer.complete(info.image);
+    //   height = info.image.height;
+    //   width = info.image.width;
+    //   print('height:' + height.toString());
+    //   print('width:' + width.toString());
+    // }));
+
+    return FileResult(
+        path: thumbnailPath,
+        size: File(thumbnailPath).lengthSync() / 1024,
+        height: height == null ? null : height / 1.0,
+        width: width == null ? null : width / 1.0,
+        fileName: thumbnailPath.split('/').last);
   }
 }

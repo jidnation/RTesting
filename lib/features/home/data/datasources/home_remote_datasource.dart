@@ -1251,7 +1251,7 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
-      // Console.log('RESSSSSPPOONSE', result);
+      // Console.log('POSTTTTTTSSSSS', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -1431,6 +1431,7 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
+      Console.log('STATUSSESS', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
