@@ -35,8 +35,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
-import '../../../home/presentation/views/post_media.dart';
 import '../../../home/presentation/views/post_reach.dart';
+import '../../../home/presentation/widgets/post_media.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";

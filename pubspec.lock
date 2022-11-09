@@ -39,10 +39,12 @@ packages:
   audio_waveforms:
     dependency: "direct main"
     description:
-      path: "audio_waveforms-0.1.5+1"
-      relative: true
-    source: path
-    version: "0.1.5+1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "7a266ae7e7174c08bd9fa2ed4d6c75f81df72f96"
+      url: "https://github.com/gideonoyekale/audio_waveforms.git"
+    source: git
+    version: "0.1.6"
   audioplayers:
     dependency: "direct main"
     description:

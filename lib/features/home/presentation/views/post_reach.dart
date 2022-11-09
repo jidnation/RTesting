@@ -19,7 +19,7 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/regex_util.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
-import 'package:reach_me/features/home/presentation/views/post_reach_media.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/models/file_result.dart';
@@ -274,68 +274,20 @@ class _PostReachState extends State<PostReach> {
                                   }
                                   UploadFileDto mediaDto =
                                       _mediaList.value[index];
-                                  // return Stack(
-                                  //   alignment: Alignment.topRight,
-                                  //   children: [
-                                  //     Container(
-                                  //       width: getScreenWidth(200),
-                                  //       height: getScreenHeight(200),
-                                  //       clipBehavior: Clip.hardEdge,
-                                  //       decoration: BoxDecoration(
-                                  //         borderRadius:
-                                  //             BorderRadius.circular(15),
-                                  //       ),
-                                  //       child: Image.file(
-                                  //         mediaDto.file,
-                                  //         fit: BoxFit.cover,
-                                  //       ),
-                                  //     ),
-                                  //     Positioned.fill(
-                                  //         child: GestureDetector(onTap: () {
-                                  //       RouteNavigators.route(
-                                  //           context,
-                                  //           PhotoView(
-                                  //             imageProvider: FileImage(
-                                  //               mediaDto.file,
-                                  //             ),
-                                  //           ));
-                                  //     })),
-                                  //     Positioned(
-                                  //       right: getScreenWidth(4),
-                                  //       top: getScreenWidth(5),
-                                  //       child: GestureDetector(
-                                  //         onTap: () {
-                                  //           _mediaList.value.removeAt(index);
-                                  //           setState(() {});
-                                  //         },
-                                  //         child: Padding(
-                                  //           padding: const EdgeInsets.all(10.0),
-                                  //           child: Container(
-                                  //             height: getScreenHeight(26),
-                                  //             width: getScreenWidth(26),
-                                  //             child: Center(
-                                  //               child: Icon(
-                                  //                 Icons.close,
-                                  //                 color: AppColors.grey,
-                                  //                 size: getScreenHeight(14),
-                                  //               ),
-                                  //             ),
-                                  //             decoration: const BoxDecoration(
-                                  //                 shape: BoxShape.circle,
-                                  //                 color: AppColors.white),
-                                  //           ),
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ).paddingOnly(r: 10);
-
                                   if (FileUtils.isImage(mediaDto.file) ||
                                       FileUtils.isVideo(mediaDto.file)) {
                                     return PostReachMedia(
                                         fileResult: mediaDto.fileResult!,
                                         onClose: () {
-                                          _mediaList.value.removeAt(index);
+                                          if (FileUtils.isImage(
+                                              mediaDto.file)) {
+                                            nImages.value = nImages.value - 1;
+                                          } else {
+                                            nVideos.value = nVideos.value - 1;
+                                          }
+                                          _mediaList.value = [
+                                            ..._mediaList.value
+                                          ]..removeAt(index);
                                           setState(() {});
                                         });
                                   } else {
@@ -523,27 +475,41 @@ class _PostReachState extends State<PostReach> {
                         // const SizedBox(width: 20),
                         IconButton(
                           onPressed: () async {
-                            final media = await MediaService()
-                                .loadMediaFromGallery(context: context);
+                            final media = await MediaService().pickFromGallery(
+                                context: context, maxAssets: 5);
                             if (media == null) return;
-                            if (FileUtils.isVideo(media.file) &&
-                                nVideos.value > 0) {
+                            int total = media.length;
+                            int noOfVideos = media
+                                .where((e) => FileUtils.isVideo(e.file))
+                                .length;
+                            int noOfImages = media
+                                .where((e) => FileUtils.isImage(e.file))
+                                .length;
+
+                            if ((_mediaList.value.length + total) > 5) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than 5 media');
+                              return;
+                            }
+
+                            if (noOfVideos > 1 ||
+                                (noOfVideos > 0 && nVideos.value > 0)) {
                               Snackbars.error(context,
                                   message:
                                       'Sorry, you cannot add more than one video media');
                               return;
                             }
 
-                            _mediaList.value.add(UploadFileDto(
-                                file: media.file,
-                                fileResult: media,
-                                id: Random().nextInt(100).toString()));
-
-                            if (FileUtils.isVideo(media.file)) {
-                              nVideos.value = nVideos.value + 1;
-                            } else if (FileUtils.isImage(media.file)) {
-                              nImages.value = nImages.value + 1;
+                            for (var e in media) {
+                              _mediaList.value.add(UploadFileDto(
+                                  file: e.file,
+                                  fileResult: e,
+                                  id: Random().nextInt(100).toString()));
                             }
+
+                            nVideos.value = nVideos.value + noOfVideos;
+                            nImages.value = nImages.value + noOfImages;
                             setState(() {});
                           },
                           splashColor: Colors.transparent,
@@ -558,6 +524,12 @@ class _PostReachState extends State<PostReach> {
                             final media =
                                 await MediaService().getAudio(context: context);
                             if (media == null) return;
+                            if ((_mediaList.value.length + 1) > 5) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than 5 media');
+                              return;
+                            }
                             if (!FileUtils.isAudio(media.file)) {
                               Snackbars.error(context,
                                   message: 'Audio format not supported!');

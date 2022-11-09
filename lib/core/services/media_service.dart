@@ -55,26 +55,26 @@ class MediaService {
         fileName: (file as File).path.split('/').last);
   }
 
-  Future<FileResult?> pickFromGallery() async {
-    final res = await AssetPicker.pickAssets(
-      _navigatorKey.currentContext!,
-      pickerConfig: AssetPickerConfig(
-        maxAssets: 1,
-        specialPickerType: SpecialPickerType.noPreview,
-        requestType: RequestType.common,
-      ),
-    );
-    if (res == null || res.isEmpty) return null;
-    final file = await res.first.originFile;
-    if (file == null) return null;
-    return FileResult(
-        path: file.path,
-        size: file.lengthSync() / 1024,
-        duration: res.first.videoDuration.inSeconds,
-        height: res.first.height,
-        width: res.first.width,
-        fileName: (file).path.split('/').last);
-  }
+  // Future<FileResult?> pickFromGallery() async {
+  //   final res = await AssetPicker.pickAssets(
+  //     _navigatorKey.currentContext!,
+  //     pickerConfig: AssetPickerConfig(
+  //       maxAssets: 1,
+  //       specialPickerType: SpecialPickerType.noPreview,
+  //       requestType: RequestType.common,
+  //     ),
+  //   );
+  //   if (res == null || res.isEmpty) return null;
+  //   final file = await res.first.originFile;
+  //   if (file == null) return null;
+  //   return FileResult(
+  //       path: file.path,
+  //       size: file.lengthSync() / 1024,
+  //       duration: res.first.videoDuration.inSeconds,
+  //       height: res.first.height,
+  //       width: res.first.width,
+  //       fileName: (file).path.split('/').last);
+  // }
 
   Future<FileResult?> getVideo() async {
     final res = await AssetPicker.pickAssets(
@@ -210,45 +210,44 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> loadMediaFromGallery(
-      {required BuildContext context, RequestType? requestType}) async {
+  Future<List<FileResult>?> pickFromGallery(
+      {required BuildContext context,
+      RequestType? requestType,
+      int? maxAssets}) async {
     List<AssetEntity>? res;
     if (requestType == null) {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
-            maxAssets: 1,
+            maxAssets: maxAssets ?? 1,
             specialPickerType: SpecialPickerType.noPreview,
           ));
     } else {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
               specialPickerType: SpecialPickerType.noPreview,
-              maxAssets: 1,
+              maxAssets: maxAssets ?? 1,
               requestType: requestType));
     }
     if (res == null || res.isEmpty) return null;
-    final file = await res.first.originFile;
-    if (file == null) return null;
-    String? thumbnail;
-    if (FileUtils.isVideo(file)) {
-      thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
-      // thumbnail = await t.VideoThumbnail.thumbnailFile(
-      //   video: file.path,
-      //   imageFormat: t.ImageFormat.JPEG,
-      //   thumbnailPath: (await getTemporaryDirectory()).path,
-      //   maxWidth:
-      //       128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
-      //   quality: 100,
-      // );
+
+    List<FileResult> results = [];
+    for (var e in res) {
+      final file = await e.originFile;
+      if (file == null) return null;
+      String? thumbnail;
+      if (FileUtils.isVideo(file)) {
+        thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+      }
+      results.add(FileResult(
+          path: file.path,
+          size: file.lengthSync() / 1024,
+          duration: e.videoDuration.inSeconds,
+          height: e.height,
+          width: e.width,
+          thumbnail: thumbnail,
+          fileName: (file).path.split('/').last));
     }
-    return FileResult(
-        path: file.path,
-        size: file.lengthSync() / 1024,
-        duration: res.first.videoDuration.inSeconds,
-        height: res.first.height,
-        width: res.first.width,
-        thumbnail: thumbnail,
-        fileName: (file).path.split('/').last);
+    return results;
   }
 
   Future<FileResult?> getVideoThumbnail({required String videoPath}) async {

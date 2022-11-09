@@ -108,7 +108,7 @@ dependencies:
   just_waveform: ^0.0.3
   visibility_detector: ^0.3.3
   audio_waveforms:
-    path: audio_waveforms-0.1.5+1
+    git: https://github.com/gideonoyekale/audio_waveforms.git
 
 
 dev_dependencies:

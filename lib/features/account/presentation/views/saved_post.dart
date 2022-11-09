@@ -15,7 +15,7 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 
-import '../../../home/presentation/views/post_media.dart';
+import '../../../home/presentation/widgets/post_media.dart';
 
 class SavedPostScreen extends HookWidget {
   static const String id = "saved_post_screen";
