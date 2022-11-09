@@ -106,12 +106,13 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> getAudio() async {
+  Future<FileResult?> getAudio({required BuildContext context}) async {
     final res = await AssetPicker.pickAssets(
-      _navigatorKey.currentContext!,
+      context,
       pickerConfig: AssetPickerConfig(
         maxAssets: 1,
         requestType: RequestType.audio,
+        specialPickerType: SpecialPickerType.noPreview,
       ),
     );
     if (res == null || res.isEmpty) return null;

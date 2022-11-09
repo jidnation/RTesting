@@ -344,6 +344,17 @@ class _PostReachState extends State<PostReach> {
                           )).paddingSymmetric(h: 16)
                     else
                       const SizedBox.shrink(),
+                    if (_mediaList.value
+                            .indexWhere((e) => FileUtils.isAudio(e.file)) >=
+                        0)
+                      PostReachAudioMedia(
+                          path: _mediaList
+                              .value[_mediaList.value
+                                  .indexWhere((e) => FileUtils.isAudio(e.file))]
+                              .file
+                              .path)
+                    else
+                      const SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -512,21 +523,13 @@ class _PostReachState extends State<PostReach> {
                                       'Sorry, you cannot add more than one video file');
                               return;
                             }
-                            if (FileUtils.isAudio(media.file) &&
-                                nAudios.value > 0) {
-                              Snackbars.error(context,
-                                  message:
-                                      'Sorry, you cannot add more than one audio file');
-                              return;
-                            }
 
                             _mediaList.value.add(UploadFileDto(
                                 file: media.file,
                                 fileResult: media,
                                 id: Random().nextInt(100).toString()));
-                            if (FileUtils.isAudio(media.file)) {
-                              nAudios.value = nAudios.value + 1;
-                            } else if (FileUtils.isVideo(media.file)) {
+
+                            if (FileUtils.isVideo(media.file)) {
                               nVideos.value = nVideos.value + 1;
                             } else if (FileUtils.isImage(media.file)) {
                               nImages.value = nImages.value + 1;
@@ -541,7 +544,27 @@ class _PostReachState extends State<PostReach> {
                         ),
                         const SizedBox(width: 20),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final media =
+                                await MediaService().getAudio(context: context);
+                            if (media == null) return;
+                            if (FileUtils.isAudio(media.file) &&
+                                nAudios.value > 0) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than one audio file');
+                              return;
+                            }
+
+                            _mediaList.value.add(UploadFileDto(
+                                file: media.file,
+                                fileResult: media,
+                                id: Random().nextInt(100).toString()));
+
+                            if (FileUtils.isAudio(media.file)) {
+                              nAudios.value = nAudios.value + 1;
+                            }
+                          },
                           padding: EdgeInsets.zero,
                           splashColor: Colors.transparent,
                           splashRadius: 20,

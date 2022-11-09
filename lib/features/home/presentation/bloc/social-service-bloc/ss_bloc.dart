@@ -428,6 +428,47 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(DeleteStatusError(error: e.message));
       }
     });
+    on<MuteStatusEvent>((event, emit) async {
+      emit(MuteStatusLoading());
+      try {
+        final response = await socialServiceRepository.muteStatus(
+          idToMute: event.idToMute,
+        );
+        response.fold(
+          (error) => emit(MuteStatusError(error: error)),
+          (res) => emit(MuteStatusSuccess(result: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(MuteStatusError(error: e.message));
+      }
+    });
+    on<UnmuteStatusEvent>((event, emit) async {
+      emit(UnmuteStatusLoading());
+      try {
+        final response = await socialServiceRepository.unmuteStatus(
+          idToUnmute: event.idToUnmute,
+        );
+        response.fold(
+          (error) => emit(UnmuteStatusError(error: error)),
+          (res) => emit(UnmuteStatusSuccess(unmuted: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UnmuteStatusError(error: e.message));
+      }
+    });
+    on<ReportStatusEvent>((event, emit) async {
+      emit(ReportStatusLoading());
+      try {
+        final response = await socialServiceRepository.reportStatus(
+            reportReason: event.reportReason, statusId: event.statusId);
+        response.fold(
+          (error) => emit(ReportStatusError(error: error)),
+          (res) => emit(ReportStatusSuccess(result: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(ReportStatusError(error: e.message));
+      }
+    });
     on<GetAllStatusEvent>((event, emit) async {
       emit(GetAllStatusLoading());
       try {

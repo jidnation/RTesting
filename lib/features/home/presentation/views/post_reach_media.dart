@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/models/file_result.dart';
@@ -122,5 +123,57 @@ class PostReachMedia extends StatelessWidget {
         ),
       ],
     ).paddingOnly(r: 10);
+  }
+}
+
+class PostReachAudioMedia extends StatefulWidget {
+  final String path;
+  const PostReachAudioMedia({Key? key, required this.path}) : super(key: key);
+
+  @override
+  State<PostReachAudioMedia> createState() => _PostReachAudioMediaState();
+}
+
+class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
+  late PlayerController playerController;
+  @override
+  void initState() {
+    super.initState();
+    initPlayer();
+  }
+
+  Future<void> initPlayer() async {
+    // String fileName = widget.path;
+    // String? dir = (await getDownloadsDirectory()).path;
+    // String savePath = '$dir/$fileName';
+    print('emi ni:  ---->>>>>   ' + Uri.parse(widget.path).path);
+    playerController = PlayerController();
+    await playerController.preparePlayer(widget.path);
+    await playerController.setVolume(1.0);
+    await playerController.startPlayer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.black,
+      child: AudioFileWaveforms(
+        size: Size(MediaQuery.of(context).size.width / 2, 70),
+        playerController: playerController,
+        density: 1.5,
+        playerWaveStyle: const PlayerWaveStyle(
+          scaleFactor: 0.8,
+          fixedWaveColor: Colors.white30,
+          liveWaveColor: Colors.white,
+          waveCap: StrokeCap.butt,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    playerController.dispose();
   }
 }

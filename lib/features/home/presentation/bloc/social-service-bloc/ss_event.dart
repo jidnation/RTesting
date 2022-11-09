@@ -53,7 +53,6 @@ class UnlikePostEvent extends SocialServiceEvent {
   UnlikePostEvent({required this.postId});
 }
 
-
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final String? content;
@@ -225,6 +224,25 @@ class DeleteStatusEvent extends SocialServiceEvent {
   DeleteStatusEvent({required this.statusId});
 }
 
+class MuteStatusEvent extends SocialServiceEvent {
+  final String idToMute;
+  MuteStatusEvent({required this.idToMute});
+}
+
+class UnmuteStatusEvent extends SocialServiceEvent {
+  final String idToUnmute;
+  UnmuteStatusEvent({required this.idToUnmute});
+}
+
+class ReportStatusEvent extends SocialServiceEvent {
+  final String reportReason;
+  final String statusId;
+  ReportStatusEvent({
+    required this.reportReason,
+    required this.statusId,
+  });
+}
+
 class CreateStatusEvent extends SocialServiceEvent {
   final CreateStatusDto? createStatusDto;
   CreateStatusEvent({required this.createStatusDto});
@@ -250,9 +268,6 @@ class GetLikedPostsEvent extends SocialServiceEvent {
     required this.pageNumber,
   });
 }
-
-
-
 
 class SuggestUserEvent extends SocialServiceEvent {}
 

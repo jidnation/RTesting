@@ -441,6 +441,48 @@ class DeleteStatusError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class MuteStatusLoading extends SocialServiceState {}
+
+class MuteStatusSuccess extends SocialServiceState {
+  final MutedStatusModel? result;
+  MuteStatusSuccess({this.result});
+}
+
+class MuteStatusError extends SocialServiceState {
+  final String error;
+  MuteStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class UnmuteStatusLoading extends SocialServiceState {}
+
+class UnmuteStatusSuccess extends SocialServiceState {
+  final bool? unmuted;
+  UnmuteStatusSuccess({this.unmuted});
+}
+
+class UnmuteStatusError extends SocialServiceState {
+  final String error;
+  UnmuteStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class ReportStatusLoading extends SocialServiceState {}
+
+class ReportStatusSuccess extends SocialServiceState {
+  final ReportStatusModel? result;
+  ReportStatusSuccess({this.result});
+}
+
+class ReportStatusError extends SocialServiceState {
+  final String error;
+  ReportStatusError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class CreateStatusLoading extends SocialServiceState {}
 
 class CreateStatusSuccess extends SocialServiceState {

@@ -385,6 +385,42 @@ class SocialServiceRepository {
     }
   }
 
+  Future<Either<String, MutedStatusModel>> muteStatus({
+    required String idToMute,
+  }) async {
+    try {
+      final res = await _homeRemoteDataSource.muteStatus(idToMute: idToMute);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> unmuteStatus({
+    required String idToUnmute,
+  }) async {
+    try {
+      final res =
+          await _homeRemoteDataSource.unmuteStatus(idToUnmute: idToUnmute);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, ReportStatusModel>> reportStatus({
+    required String statusId,
+    required String reportReason,
+  }) async {
+    try {
+      final res = await _homeRemoteDataSource.reportStatus(
+          statusId: statusId, reportReason: reportReason);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, List<StatusModel>>> getAllStatus({
     required int pageLimit,
     required int pageNumber,

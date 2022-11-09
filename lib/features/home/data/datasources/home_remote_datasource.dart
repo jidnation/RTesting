@@ -1354,6 +1354,89 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<MutedStatusModel> muteStatus({
+    required String idToMute,
+  }) async {
+    String q = r'''
+        mutation muteStatus(
+          $idToMute: String!
+          ) {
+          createStatus(
+            idToMute: $idToMute
+          ){   
+               authId
+               mutedAuthId
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'idToMute': idToMute,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return MutedStatusModel.fromJson(result.data!['muteStatus']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> unmuteStatus({
+    required String idToUnmute,
+  }) async {
+    String q = r'''
+        mutation unmuteStatus(
+          $idToUnmute: String!
+          ) {
+          createStatus(
+            $idToUnmute: $idToUnmute
+          )
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'idToUnmute': idToUnmute,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return result.data!['unmuteStatus'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<ReportStatusModel> reportStatus({
+    required String reportReason,
+    required String statusId,
+  }) async {
+    String q = r'''
+        mutation unmuteStatus(
+          $reportReason: String!
+          $statusId: String!
+          ) {
+          createStatus(
+            reportReason: $reportReason
+            statusId: $statusId
+          ){
+            authId
+            reason
+            statusId
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'reportReason': reportReason,
+        'statusId': statusId,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return ReportStatusModel.fromJson(result.data!['reportStatus']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<StatusModel>> getAllStatus({
     required int? pageLimit,
     required int? pageNumber,
