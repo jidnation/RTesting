@@ -918,12 +918,15 @@ class PostFeedReacherCard extends HookWidget {
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
-                  (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty ||
-                  (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty)
+                  (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
                 const SizedBox.shrink(),
+              (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
+                  ? PostAudioMedia(path: postFeedModel!.post!.audioMediaItem!)
+                      .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                  : SizedBox.shrink(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,

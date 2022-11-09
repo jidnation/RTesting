@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +9,13 @@ import 'package:reach_me/core/models/file_result.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/presentation/views/gallery_view.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../../core/helper/logger.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
+import '../../../../core/utils/string_util.dart';
 import '../../data/models/post_model.dart';
 
 class PostMedia extends StatelessWidget {
@@ -27,19 +32,17 @@ class PostMedia extends StatelessWidget {
     if (hasVideo) imageVideoList.add(post.videoMediaItem ?? '');
     int imageVideoTotal = imageVideoList.length;
     if (imageVideoTotal == 1) {
-      if (FileUtils.isImagePath(imageVideoList.first)) {
-        return PostImageMedia(
-          imageUrl: imageVideoList.first,
-          allMediaUrls: imageVideoList,
-          index: 0,
-        );
-      } else {
-        return PostVideoMedia(
-          url: imageVideoList.first,
-          allMediaUrls: imageVideoList,
-          index: 0,
-        );
-      }
+      return FileUtils.isImagePath(imageVideoList.first)
+          ? PostImageMedia(
+              imageUrl: imageVideoList.first,
+              allMediaUrls: imageVideoList,
+              index: 0,
+            )
+          : PostVideoMedia(
+              url: imageVideoList.first,
+              allMediaUrls: imageVideoList,
+              index: 0,
+            );
     } else if (imageVideoTotal == 3) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -351,7 +354,6 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   @override
   void initState() {
     super.initState();
-    if (mounted) getThumbnail();
   }
 
   getThumbnail() async {
@@ -362,53 +364,184 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        Container(
-            width: double.infinity,
-            height: getScreenHeight(widget.height ?? 300),
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: thumbnail == null
-                ? Container(
-                    color: AppColors.black,
-                  )
-                : Image.file(
-                    File(thumbnail!.path),
-                    fit: BoxFit.cover,
-                  )),
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.black.withAlpha(50),
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: Container(
-            decoration: const BoxDecoration(),
-            child: Icon(
-              Icons.play_arrow_rounded,
-              color: AppColors.white,
-              size: widget.scaleIcon == null ? 64 : (widget.scaleIcon! * 64),
+    return VisibilityDetector(
+      key: Key(widget.url),
+      onVisibilityChanged: (VisibilityInfo info) {
+        if (info.visibleFraction > 0.3 && thumbnail == null) {
+          getThumbnail();
+        }
+      },
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          Container(
+              width: double.infinity,
+              height: getScreenHeight(widget.height ?? 300),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: thumbnail == null
+                  ? Container(
+                      color: AppColors.black,
+                    )
+                  : Image.file(
+                      File(thumbnail!.path),
+                      fit: BoxFit.cover,
+                    )),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.black.withAlpha(50),
+                borderRadius: BorderRadius.circular(15),
+              ),
             ),
           ),
-        ),
-        widget.allMediaUrls != null
-            ? Positioned.fill(child: GestureDetector(onTap: () {
-                RouteNavigators.route(
-                    context,
-                    AppGalleryView(
-                      mediaPaths: widget.allMediaUrls!,
-                      initialPage: widget.index,
-                    ));
-              }))
-            : Container(),
-      ],
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(),
+              child: Icon(
+                Icons.play_arrow_rounded,
+                color: AppColors.white,
+                size: widget.scaleIcon == null ? 64 : (widget.scaleIcon! * 64),
+              ),
+            ),
+          ),
+          widget.allMediaUrls != null
+              ? Positioned.fill(child: GestureDetector(onTap: () {
+                  RouteNavigators.route(
+                      context,
+                      AppGalleryView(
+                        mediaPaths: widget.allMediaUrls!,
+                        initialPage: widget.index,
+                      ));
+                }))
+              : Container(),
+        ],
+      ),
     );
+  }
+}
+
+class PostAudioMedia extends StatefulWidget {
+  final String path;
+  final EdgeInsets? margin, padding;
+  const PostAudioMedia(
+      {Key? key, required this.path, this.margin, this.padding})
+      : super(key: key);
+
+  @override
+  State<PostAudioMedia> createState() => _PostAudioMediaState();
+}
+
+class _PostAudioMediaState extends State<PostAudioMedia> {
+  late PlayerController playerController;
+  bool isInitialised = false;
+  bool isPlaying = false;
+  final currentDurationStream = StreamController<int>();
+  int currentDuration = 0;
+  final MediaService _mediaService = MediaService();
+  @override
+  void initState() {
+    super.initState();
+    initPlayer();
+  }
+
+  Future<void> initPlayer() async {
+    final res = await _mediaService.downloadFile(url: widget.path);
+    if (res == null) return;
+    playerController = PlayerController();
+    playerController.onCurrentDurationChanged.listen((event) {
+      currentDuration = event;
+      setState(() {});
+      // Console.log('<<AUDIO-DURATION>>', event.toString());
+    });
+    playerController.addListener(() {
+      Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
+      if (playerController.playerState == PlayerState.initialized) {
+        isInitialised = true;
+        setState(() {});
+      } else if (playerController.playerState == PlayerState.playing) {
+        isPlaying = true;
+        setState(() {});
+      } else if (playerController.playerState == PlayerState.paused ||
+          playerController.playerState == PlayerState.stopped) {
+        isPlaying = false;
+        setState(() {});
+      }
+    });
+    await playerController.preparePlayer(res.path);
+    // await playerController.startPlayer();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: widget.margin,
+      height: getScreenHeight(36),
+      decoration: BoxDecoration(
+          color: AppColors.audioPlayerBg,
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              if (isPlaying) {
+                playerController.pausePlayer();
+              } else {
+                playerController.startPlayer();
+              }
+            },
+            child: Icon(
+              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              size: 32,
+              color: AppColors.black,
+            ),
+          ),
+          SizedBox(
+            width: getScreenWidth(8),
+          ),
+          isInitialised
+              ? AudioFileWaveforms(
+                  size: Size(MediaQuery.of(context).size.width / 1.7, 24),
+                  playerController: playerController,
+                  density: 2,
+                  enableSeekGesture: true,
+                  playerWaveStyle: const PlayerWaveStyle(
+                    scaleFactor: 0.2,
+                    waveThickness: 3,
+                    fixedWaveColor: AppColors.greyShade1,
+                    liveWaveColor: Colors.black,
+                    waveCap: StrokeCap.round,
+                  ),
+                )
+              : SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.7,
+                  child: LinearProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                    color: AppColors.greyShade1,
+                    backgroundColor: AppColors.greyShade1,
+                  ),
+                ),
+          Spacer(
+            flex: 1,
+          ),
+          Text(
+            StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          SizedBox(
+            width: getScreenWidth(12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    playerController.dispose();
   }
 }

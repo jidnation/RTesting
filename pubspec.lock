@@ -39,9 +39,9 @@ packages:
   audio_waveforms:
     dependency: "direct main"
     description:
-      name: audio_waveforms
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "audio_waveforms-0.1.5+1"
+      relative: true
+    source: path
     version: "0.1.5+1"
   audioplayers:
     dependency: "direct main"
@@ -884,6 +884,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.3.1"
+  just_waveform:
+    dependency: "direct main"
+    description:
+      name: just_waveform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   lints:
     dependency: transitive
     description:
@@ -1611,7 +1618,7 @@ packages:
     source: hosted
     version: "0.5.3"
   visibility_detector:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: visibility_detector
       url: "https://pub.dartlang.org"

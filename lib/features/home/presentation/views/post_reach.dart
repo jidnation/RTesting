@@ -21,6 +21,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach_media.dart';
 
+import '../../../../core/helper/logger.dart';
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
@@ -348,11 +349,20 @@ class _PostReachState extends State<PostReach> {
                             .indexWhere((e) => FileUtils.isAudio(e.file)) >=
                         0)
                       PostReachAudioMedia(
-                          path: _mediaList
-                              .value[_mediaList.value
-                                  .indexWhere((e) => FileUtils.isAudio(e.file))]
-                              .file
-                              .path)
+                        margin: EdgeInsets.all(16),
+                        path: _mediaList
+                            .value[_mediaList.value
+                                .indexWhere((e) => FileUtils.isAudio(e.file))]
+                            .file
+                            .path,
+                        onCancel: () {
+                          int pos = _mediaList.value
+                              .indexWhere((e) => FileUtils.isAudio(e.file));
+                          _mediaList.value = [..._mediaList.value]
+                            ..removeAt(pos);
+                          nAudios.value = nAudios.value - 1;
+                        },
+                      )
                     else
                       const SizedBox.shrink(),
                   ],
@@ -520,7 +530,7 @@ class _PostReachState extends State<PostReach> {
                                 nVideos.value > 0) {
                               Snackbars.error(context,
                                   message:
-                                      'Sorry, you cannot add more than one video file');
+                                      'Sorry, you cannot add more than one video media');
                               return;
                             }
 
@@ -548,22 +558,23 @@ class _PostReachState extends State<PostReach> {
                             final media =
                                 await MediaService().getAudio(context: context);
                             if (media == null) return;
-                            if (FileUtils.isAudio(media.file) &&
-                                nAudios.value > 0) {
+                            if (!FileUtils.isAudio(media.file)) {
                               Snackbars.error(context,
-                                  message:
-                                      'Sorry, you cannot add more than one audio file');
+                                  message: 'Audio format not supported!');
                               return;
                             }
-
+                            if (nAudios.value > 0) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than one audio media');
+                              return;
+                            }
+                            nAudios.value = nAudios.value + 1;
+                            Console.log('<<<PATH>>', media.path);
                             _mediaList.value.add(UploadFileDto(
                                 file: media.file,
                                 fileResult: media,
                                 id: Random().nextInt(100).toString()));
-
-                            if (FileUtils.isAudio(media.file)) {
-                              nAudios.value = nAudios.value + 1;
-                            }
                           },
                           padding: EdgeInsets.zero,
                           splashColor: Colors.transparent,

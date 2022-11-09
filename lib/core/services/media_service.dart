@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_compress/video_compress.dart';
@@ -257,8 +258,6 @@ class MediaService {
       video: videoPath,
       imageFormat: t.ImageFormat.PNG,
       thumbnailPath: (await getTemporaryDirectory()).path,
-      // maxWidth:
-      //     256, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
       quality: 100,
     );
     if (thumbnailPath == null) return null;
@@ -288,5 +287,19 @@ class MediaService {
         height: height == null ? null : height / 1.0,
         width: width == null ? null : width / 1.0,
         fileName: thumbnailPath.split('/').last);
+  }
+
+  Future<FileResult?> downloadFile({required String url}) async {
+    final filename = url.split('/').last;
+    final directory = await getTemporaryDirectory();
+    final filePath = '${directory.path}/$filename';
+    final response = await http.get(Uri.parse(url));
+    final file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+
+    return FileResult(
+        path: filePath,
+        size: File(filePath).lengthSync() / 1024,
+        fileName: url.split('/').last);
   }
 }
