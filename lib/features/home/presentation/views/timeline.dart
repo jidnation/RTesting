@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -39,7 +39,6 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
-import 'package:readmore/readmore.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -47,7 +46,6 @@ import '../../../../core/helper/logger.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 
 import 'full_post.dart';
-
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -807,7 +805,6 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-
                             GestureDetector(
                               onTap: () =>
                                   Navigator.of(context).push(MaterialPageRoute(
@@ -872,27 +869,71 @@ class PostFeedReacherCard extends HookWidget {
                   : Row(
                       children: [
                         Flexible(
-                          child: ReadMoreText(
+                          //   child: ReadMoreText(
+                          //     "${postFeedModel!.post!.content}",
+                          //     style: TextStyle(
+                          //         fontWeight: FontWeight.w400,
+                          //         fontSize: getScreenHeight(14)),
+                          //     trimLines: 3,
+                          //     colorClickableText: const Color(0xff717F85),
+                          //     trimMode: TrimMode.Line,
+                          //     trimCollapsedText: 'See more',
+                          //     trimExpandedText: 'See less',
+                          //     moreStyle: TextStyle(
+                          //         fontSize: getScreenHeight(14),
+                          //         fontFamily: "Roboto",
+                          //         color: const Color(0xff717F85)),
+                          //   ),
+
+                          child: ExpandableText(
                             "${postFeedModel!.post!.content}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: getScreenHeight(14)),
-                            trimLines: 3,
-                            colorClickableText: const Color(0xff717F85),
-                            trimMode: TrimMode.Line,
-                            trimCollapsedText: 'See more',
-                            trimExpandedText: 'See less',
-                            moreStyle: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                fontFamily: "Roboto",
-                                color: const Color(0xff717F85)),
+                            expandText: 'see more',
+                            maxLines: 2,
+                            linkColor: Colors.blue,
+
+                            collapseOnTextTap: true,
+                            collapseText: 'see less',
+                            onLinkTap: () {},
+
+                            onHashtagTap: (value) {
+                              print('Tapped Url');
+                            },
+
+                            onMentionTap: (value) {
+                              print('Tapped Url');
+                            },
+                            onUrlTap: (value) {
+                              print('Tapped Url');
+                            },
+                            // prefixText: username,
+                            // onPrefixTap: () => showProfile(username),
+                            // prefixStyle:
+                            //     const TextStyle(fontWeight: FontWeight.bold),
+                            //  onHashtagTap: (name) => showHashtag(name),
+                            // hashtagStyle: const TextStyle(
+                            //     color: Color(0xFF30B6F9),
+                            // ),
+                            //  onMentionTap: (username) => showProfile(username),
+                            // mentionStyle: const TextStyle(
+                            //     fontWeight: FontWeight.w600,
+                            // ),
+                            /// onUrlTap:,
+                            mentionStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
+                            hashtagStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
+                            urlStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
                           ),
                         ),
                         SizedBox(width: getScreenWidth(2)),
                         Tooltip(
                           message: 'This Reach has been edited by the Reacher',
                           waitDuration: const Duration(seconds: 1),
-                          showDuration: const Duration(seconds: 2),                         
+                          showDuration: const Duration(seconds: 2),
                           child: Text(
                             postFeedModel!.post!.edited!
                                 ? "(Reach Edited)"
@@ -907,7 +948,6 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
-
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
                 Helper.renderPostImages(postFeedModel!.post!, context)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)

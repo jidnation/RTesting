@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
@@ -38,6 +40,21 @@ class DictionaryRepository {
           pageLimit: pageLimit, pageNumber: pageNumber);
       return Right(getWords);
     } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<Map<String, dynamic>>>> addWordsToMentions({
+    required num pageLimit,
+    required num pageNumber,
+  }) async {
+    try {
+      final getWords = await _dictionaryDataSource.getWords(
+          pageLimit: pageLimit, pageNumber: pageNumber);
+
+      return Right(getWords);
+    } on GraphQLError catch (e) {
+      log(e.toString());
       return Left(e.message);
     }
   }

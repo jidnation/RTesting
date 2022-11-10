@@ -37,5 +37,18 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         emit(DisplayRecentlyAddedWordsError(error: e.message));
       }
     });
+    on<AddWordsToMentionsEvent>((event, emit) async {
+      emit(LoadingWordsToMentions());
+      try {
+        final response = await dictionaryRepository.addWordsToMentions(
+            pageLimit: event.pageLimit, pageNumber: event.pageNumber);
+
+        response.fold(
+            (error) => emit(GetWordToMentionsError(error: error)),
+            (data) => emit(GetWordToMentionsSuccess(mentionsData: data)));
+      } on GraphQLError catch (e) {
+        emit(DisplayRecentlyAddedWordsError(error: e.message));
+      }
+    });
   }
 }

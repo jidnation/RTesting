@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,6 +20,9 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/formatters.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/regex_util.dart';
+import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
+import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
+import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 
@@ -61,6 +65,12 @@ class _PostReachState extends State<PostReach> {
 
   @override
   Widget build(BuildContext context) {
+    final _recentWords = useState<List<Map<String, dynamic>>>([]);
+    useMemoized(() {
+      globals.dictionaryBloc!
+          .add(GetRecentAddedWordsEvent(pageLimit: 5, pageNumber: 1));
+    });
+
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
     //final controller = useTextEditingController();
@@ -114,21 +124,21 @@ class _PostReachState extends State<PostReach> {
                         IconButton(
                           icon: SvgPicture.asset('assets/svgs/send.svg'),
                           onPressed: () {
-                            if (controllerKey.currentState!.controller!
-                                    .markupText.isNotEmpty ||
+                            if (controllerKey.currentState!.controller!.text
+                                    .isNotEmpty ||
                                 _mediaList.value.isNotEmpty) {
                               if (_mediaList.value.isNotEmpty) {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
                                 globals.postContent = controllerKey
-                                    .currentState!.controller!.markupText;
+                                    .currentState!.controller!.text;
                                 globals.postCommentOption = 'everyone';
                                 setState(() {});
                               } else {
                                 globals.socialServiceBloc!.add(CreatePostEvent(
                                   content: controllerKey
-                                      .currentState!.controller!.markupText,
+                                      .currentState!.controller!.text,
                                   commentOption: 'everyone',
                                   location: getUserLoation(),
                                 ));
@@ -225,135 +235,143 @@ class _PostReachState extends State<PostReach> {
                     ).paddingSymmetric(h: 16),
                     const SizedBox(height: 20),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
-                    FlutterMentions(
-                      key: controllerKey,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      minLines: 1,
-                      maxLines: 3,
-                      maxLength: 200,
-
-                      suggestionPosition: SuggestionPosition.Bottom,
-                      onChanged: (val) {
-                        counter.value =
-                            val.trim().split(RegexUtil.spaceOrNewLine).length;
-                        if (counter.value >= 200) {
-                          Snackbars.error(context,
-                              message: '200 words limit reached!');
+                    BlocConsumer<DictionaryBloc, DictionaryState>(
+                      bloc: globals.dictionaryBloc,
+                      listener: (context, state) {
+                        if (state is GetWordToMentionsSuccess) {
+                          _recentWords.value = state.mentionsData;
+                          debugPrint(state.mentionsData.toString());
+                        }
+                        if (state is GetWordToMentionsError) {
+                          Snackbars.error(context, message: state.error);
                         }
                       },
-                      decoration: const InputDecoration(
-                        counterText: '',
-                        hintText: "What's on your mind?",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.greyShade1,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                      ),
-                      mentions: [
-                        Mention(
-                            trigger: '@',
-                            style: const TextStyle(
-                              color: Colors.amber,
+                      builder: (context, state) {
+                        bool _isLoading = state is LoadingRecentlyAddedWords;
+
+                        return FlutterMentions(
+                          key: controllerKey,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          minLines: 1,
+                          maxLines: 3,
+                          maxLength: 200,
+                          suggestionPosition: SuggestionPosition.Bottom,
+                          onChanged: (val) {
+                            counter.value = val
+                                .trim()
+                                .split(RegexUtil.spaceOrNewLine)
+                                .length;
+                            if (counter.value >= 200) {
+                              Snackbars.error(context,
+                                  message: '200 words limit reached!');
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            counterText: '',
+                            hintText: "What's on your mind?",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.greyShade1,
                             ),
-                            data: [
-                              {
-                                'id': '61as61fsa',
-                                'display': 'fayeedP',
-                                'full_name': 'Fayeed Pawaskar',
-                                'photo':
-                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                              },
-                              {
-                                'id': '61asasgasgsag6a',
-                                'display': 'khaled',
-                                'full_name': 'DJ Khaled',
-                                'style': const TextStyle(color: Colors.purple),
-                                'photo':
-                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                              },
-                              {
-                                'id': 'asfgasga41',
-                                'display': 'markT',
-                                'full_name': 'Mark Twain',
-                                'photo':
-                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                              },
-                              {
-                                'id': 'asfsaf451a',
-                                'display': 'JhonL',
-                                'full_name': 'Jhon Legend',
-                                'photo':
-                                    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                              },
-                            ],
-                            matchAll: false,
-                            suggestionBuilder: (data) {
-                              return Container(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                          ),
+
+                          mentions: [
+                            //  if(_recentWords.value.isNotEmpty)
+                            Mention(
+                                trigger: '#',
+                                style: const TextStyle(
+                                  color: Colors.blue,
+                                ),
+                                data: [
+                                  {
+                                    'id': '61asasgasgsag6a',
+                                    'display': 'Set',
+                                    'full_name':
+                                        'A sudden burst of aggressiveness',
+                                    'photo':
+                                        'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
+                                  },
+                                ],
+                                matchAll: false,
+                                suggestionBuilder: (data) {
+                                  return  Container(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const SizedBox(
                                           width: 20.0,
                                         ),
                                         Column(
-                                          children: <Widget>[
-                                            Text(data['full_name']),
-                                            Text('@${data['display']}'),
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '#${data['display']}',
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.blueAccent),
+                                            ),
+                                            Text(
+                                              data['full_name'],
+                                              textAlign: TextAlign.left,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.black),
+                                            ),
                                           ],
                                         ),
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.add),
-                                        )
+                                        // IconButton(
+                                        //   onPressed: () {},
+                                        //   icon: const Icon(Icons.add),
+                                        // ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              );
-                            }),
-                      ],
-                      // child: TextField(
-                      //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      //   minLines: 1,
-                      //   maxLines: null,
-                      //   controller: controller,
-                      //   inputFormatters: [
-                      //     MaxWordTextInputFormater(maxWords: 200)
-                      //   ],
-                      //   // maxLength: 200,
-                      //   onChanged: (val) {
-                      //     counter.value =
-                      //         val.trim().split(RegexUtil.spaceOrNewLine).length;
-                      //     if (counter.value >= 200) {
-                      //       Snackbars.error(context,
-                      //           message: '200 words limit reached!');
-                      //     }
-                      //   },
-                      //   decoration: const InputDecoration(
-                      //     counterText: '',
-                      //     hintText: "What's on your mind?",
-                      //     hintStyle: TextStyle(
-                      //       fontSize: 14,
-                      //       fontWeight: FontWeight.w400,
-                      //       color: AppColors.greyShade1,
-                      //     ),
-                      //     border: InputBorder.none,
-                      //     contentPadding: EdgeInsets.symmetric(
-                      //       horizontal: 16,
-                      //       vertical: 10,
-                      //     ),
-                      //   ),
-                      // ).paddingSymmetric(h: 16),
+                                  );
+                                }),
+                          ],
+                          // child: TextField(
+                          //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          //   minLines: 1,
+                          //   maxLines: null,
+                          //   controller: controller,
+                          //   inputFormatters: [
+                          //     MaxWordTextInputFormater(maxWords: 200)
+                          //   ],
+                          //   // maxLength: 200,
+                          //   onChanged: (val) {
+                          //     counter.value =
+                          //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                          //     if (counter.value >= 200) {
+                          //       Snackbars.error(context,
+                          //           message: '200 words limit reached!');
+                          //     }
+                          //   },
+                          //   decoration: const InputDecoration(
+                          //     counterText: '',
+                          //     hintText: "What's on your mind?",
+                          //     hintStyle: TextStyle(
+                          //       fontSize: 14,
+                          //       fontWeight: FontWeight.w400,
+                          //       color: AppColors.greyShade1,
+                          //     ),
+                          //     border: InputBorder.none,
+                          //     contentPadding: EdgeInsets.symmetric(
+                          //       horizontal: 16,
+                          //       vertical: 10,
+                          //     ),
+                          //   ),
+                          // ).paddingSymmetric(h: 16),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)

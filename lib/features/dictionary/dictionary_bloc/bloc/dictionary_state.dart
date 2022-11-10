@@ -30,3 +30,16 @@ class DisplayRecentlyAddedWordsError extends DictionaryState {
   final String error;
   DisplayRecentlyAddedWordsError({required this.error});
 }
+
+class LoadingWordsToMentions extends DictionaryState {}
+
+class GetWordToMentionsSuccess extends DictionaryState {
+  final List<Map<String, dynamic>> mentionsData;
+
+  GetWordToMentionsSuccess({required this.mentionsData});
+}
+
+class GetWordToMentionsError extends DictionaryState {
+  final String error;
+  GetWordToMentionsError({required this.error});
+}
