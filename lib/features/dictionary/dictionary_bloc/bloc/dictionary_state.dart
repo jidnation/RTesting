@@ -18,7 +18,7 @@ class ErrorState extends DictionaryState {
   final String error;
   ErrorState(this.error);
 }
-
+//*Recently Added States
 class LoadingRecentlyAddedWords extends DictionaryState {}
 
 class GetRecentlyAddedWordsSuccess extends DictionaryState {
@@ -30,7 +30,7 @@ class DisplayRecentlyAddedWordsError extends DictionaryState {
   final String error;
   DisplayRecentlyAddedWordsError({required this.error});
 }
-
+//*Mentions
 class LoadingWordsToMentions extends DictionaryState {}
 
 class GetWordToMentionsSuccess extends DictionaryState {

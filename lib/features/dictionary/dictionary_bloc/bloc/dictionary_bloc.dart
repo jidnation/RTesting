@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/features/dictionary/data/repository/dictionary_repository.dart';
@@ -38,16 +40,15 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       }
     });
     on<AddWordsToMentionsEvent>((event, emit) async {
-      emit(LoadingWordsToMentions());
+     emit(LoadingWordsToMentions());
       try {
         final response = await dictionaryRepository.addWordsToMentions(
             pageLimit: event.pageLimit, pageNumber: event.pageNumber);
-
-        response.fold(
-            (error) => emit(GetWordToMentionsError(error: error)),
+        log(response.toString());
+        response.fold((error) => emit(GetWordToMentionsError(error: error)),
             (data) => emit(GetWordToMentionsSuccess(mentionsData: data)));
       } on GraphQLError catch (e) {
-        emit(DisplayRecentlyAddedWordsError(error: e.message));
+        emit(GetWordToMentionsError(error: e.message));
       }
     });
   }
