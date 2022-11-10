@@ -890,43 +890,24 @@ class PostFeedReacherCard extends HookWidget {
                             expandText: 'see more',
                             maxLines: 2,
                             linkColor: Colors.blue,
-
-                            collapseOnTextTap: true,
+                            animation: true,
+                            expanded:false,
                             collapseText: 'see less',
-                            onLinkTap: () {},
-
+                          
                             onHashtagTap: (value) {
                               print('Tapped Url');
                             },
-
                             onMentionTap: (value) {
                               print('Tapped Url');
                             },
-                            onUrlTap: (value) {
-                              print('Tapped Url');
-                            },
-                            // prefixText: username,
-                            // onPrefixTap: () => showProfile(username),
-                            // prefixStyle:
-                            //     const TextStyle(fontWeight: FontWeight.bold),
-                            //  onHashtagTap: (name) => showHashtag(name),
-                            // hashtagStyle: const TextStyle(
-                            //     color: Color(0xFF30B6F9),
-                            // ),
-                            //  onMentionTap: (username) => showProfile(username),
-                            // mentionStyle: const TextStyle(
-                            //     fontWeight: FontWeight.w600,
-                            // ),
-                            /// onUrlTap:,
+                        
                             mentionStyle: const TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: Colors.blue),
                             hashtagStyle: const TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: Colors.blue),
-                            urlStyle: const TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue),
+                    
                           ),
                         ),
                         SizedBox(width: getScreenWidth(2)),

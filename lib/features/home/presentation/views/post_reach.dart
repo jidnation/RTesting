@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -300,7 +301,7 @@ class _PostReachState extends State<PostReach> {
                                 ],
                                 matchAll: false,
                                 suggestionBuilder: (data) {
-                                  return  Container(
+                                  return Container(
                                     padding: const EdgeInsets.all(10.0),
                                     child: Column(
                                       crossAxisAlignment:
@@ -309,26 +310,30 @@ class _PostReachState extends State<PostReach> {
                                         const SizedBox(
                                           width: 20.0,
                                         ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '#${data['display']}',
-                                              style: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.blueAccent),
-                                            ),
-                                            Text(
-                                              data['full_name'],
-                                              textAlign: TextAlign.left,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
+                                        _isLoading
+                                            ? const CircularLoader()
+                                            : Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '#${data['display']}',
+                                                    style: const TextStyle(
+                                                        fontSize: 10,
+                                                        color:
+                                                            Colors.blueAccent),
+                                                  ),
+                                                  Text(
+                                                    data['full_name'],
+                                                    textAlign: TextAlign.left,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.black),
+                                                  ),
+                                                ],
+                                              ),
                                         // IconButton(
                                         //   onPressed: () {},
                                         //   icon: const Icon(Icons.add),
