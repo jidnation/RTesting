@@ -18,6 +18,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -45,6 +46,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         img = await _cropImage(imageFile: img);
         File? image = img;
         return image;
+      }
+    } catch (e) {
+      // print(e);
+    }
+    return null;
+  }
+
+  Future<File?> getCoverImage(ImageSource source) async {
+    final _picker = ImagePicker();
+    try {
+      final imageFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 50,
+        maxHeight: 900,
+        maxWidth: 600,
+      );
+
+      if (imageFile != null) {
+        File img = File(imageFile.path);
+        return img;
       }
     } catch (e) {
       // print(e);
@@ -120,18 +141,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: <Widget>[
                     /// Banner image
                     GestureDetector(
-                      onTap: () {
-                        debugPrint('tapped on change cover photo ');
+                      onTap: () async {
+                        final image = await getCoverImage(ImageSource.gallery);
+                        if (image != null) {
+                          globals.userBloc!
+                              .add(UploadUserCoverPhotoEvent(file: image));
+                        }
                       },
                       child: SizedBox(
-                        height: getScreenHeight(200),
-                        width: size.width,
-                        child: Image.asset(
-                          'assets/images/cover.png',
-                          fit: BoxFit.cover,
-                          gaplessPlayback: true,
-                        ),
-                      ),
+                          height: getScreenHeight(200),
+                          width: size.width,
+                          child: globals.user!.coverPicture != null
+                              ? const CoverPicture()
+                              : AbsorbPointer(
+                                  child: state is UserUploadingCoverImage
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : state is UserUploadCoverPictureSuccess
+                                          ? const CoverPicture()
+                                          : Image.asset(
+                                              "assets/images/cover.png",
+                                              fit: BoxFit.cover,
+                                              gaplessPlayback: true,
+                                            ),
+                                )),
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
@@ -154,7 +187,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   color: AppColors.white,
                                 ),
                                 onPressed: () async {
-                                  //   await showKebabBottomSheet(context);
+                                  await showEditProfileBottomSheet(context);
                                 },
                                 splashRadius: 20,
                               )
@@ -212,8 +245,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       top: getScreenHeight(130),
                       right: size.width * 0.08,
                       child: GestureDetector(
-                        onTap: () {
-                          debugPrint('tapped on change cover photo ');
+                        onTap: () async {
+                          final image =
+                              await getCoverImage(ImageSource.gallery);
+                          if (image != null) {
+                            globals.userBloc!
+                                .add(UploadUserCoverPhotoEvent(file: image));
+                          }
                         },
                         child: Container(
                           width: 30,
@@ -396,7 +434,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _usernameController.text.replaceAll(' ', ''),
                           ));
                         }
-                        _isLoading ? null : Snackbars.success(context, message: "Changes Saved");
+                        _isLoading
+                            ? null
+                            : Snackbars.success(context,
+                                message: "Changes Saved");
                       },
                       size: size,
                       textColor: AppColors.white,

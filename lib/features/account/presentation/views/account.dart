@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/custom_button.dart';
@@ -478,10 +479,44 @@ class _AccountScreenState extends State<AccountScreen>
                         SizedBox(
                           height: getScreenHeight(200),
                           width: size.width,
-                          child: Image.asset(
-                            'assets/images/cover.png',
-                            fit: BoxFit.cover,
-                            gaplessPlayback: true,
+                          child: GestureDetector(child: const CoverPicture(),
+                          onTap: () {
+                            RouteNavigators.route(
+                                      context,
+                                      FullScreenWidget(
+                                        child: Stack(children: <Widget>[
+                                          Container(
+                                            color: AppColors
+                                                .black, // Your screen background color
+                                          ),
+                                          Column(children: <Widget>[
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            const CoverPicture(),
+                                          ]),
+                                          Positioned(
+                                            top: 0.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: AppBar(
+                                              title: const Text(
+                                                  'Cover Photo'), // You can add title here
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    color: AppColors.white),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                              backgroundColor: AppColors
+                                                  .black, //You can make this transparent
+                                              elevation: 0.0, //No shadow
+                                            ),
+                                          ),
+                                        ]),
+                                      ));
+                      
+                          },
                           ),
                         ),
                         Row(
@@ -536,13 +571,54 @@ class _AccountScreenState extends State<AccountScreen>
                         Positioned(
                           top: size.height * 0.2 - 20,
                           child: AnimatedContainer(
-                            width: isGoingDown ? width : getScreenWidth(100),
-                            height: isGoingDown ? height : getScreenHeight(100),
-                            duration: const Duration(seconds: 1),
-                            child: const ProfilePicture(
-                              height: 90,
-                            )
-                          ),
+                              width: isGoingDown ? width : getScreenWidth(100),
+                              height:
+                                  isGoingDown ? height : getScreenHeight(100),
+                              duration: const Duration(seconds: 1),
+                              child: GestureDetector(
+                                child: const ProfilePicture(
+                                  height: 90,
+                                ),
+                                onTap: () {
+                                  RouteNavigators.route(
+                                      context,
+                                      FullScreenWidget(
+                                        child: Stack(children: <Widget>[
+                                          Container(
+                                            color: AppColors
+                                                .black, // Your screen background color
+                                          ),
+                                          Column(children: <Widget>[
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            Image.network(
+                                              globals.user!.profilePicture!,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ]),
+                                          Positioned(
+                                            top: 0.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: AppBar(
+                                              title: const Text(
+                                                  'Profile Picture'), // You can add title here
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    color: AppColors.white),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                              backgroundColor: AppColors
+                                                  .black, //You can make this transparent
+                                              elevation: 0.0, //No shadow
+                                            ),
+                                          ),
+                                        ]),
+                                      ));
+                                },
+                              )),
                         ),
                       ],
                     ),
@@ -1132,15 +1208,14 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                                  Text(
-                                      postModel!.location! ,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(11),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    )
-                                  
+                              Text(
+                                postModel!.location!,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              )
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1635,9 +1710,16 @@ Future _showReacherCardBottomSheet(
 
 class RecipientAccountProfile extends StatefulHookWidget {
   static const String id = "recipient_account_screen";
-  final String? recipientEmail, recipientImageUrl, recipientId;
+  final String? recipientEmail,
+      recipientImageUrl,
+      recipientId,
+      recipientCoverImageUrl;
   const RecipientAccountProfile(
-      {Key? key, this.recipientEmail, this.recipientImageUrl, this.recipientId})
+      {Key? key,
+      this.recipientEmail,
+      this.recipientImageUrl,
+      this.recipientCoverImageUrl,
+      this.recipientId})
       : super(key: key);
 
   @override
@@ -1872,14 +1954,50 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     clipBehavior: Clip.none,
                     children: <Widget>[
                       /// Banner image
-                      SizedBox(
-                        height: getScreenHeight(190),
-                        width: size.width,
-                        child: Image.asset(
-                          'assets/images/cover.png',
-                          fit: BoxFit.cover,
-                          gaplessPlayback: true,
+                      GestureDetector(
+                        child: SizedBox(
+                          height: getScreenHeight(190),
+                          width: size.width,
+                          child: RecipientCoverPicture(
+                            imageUrl: globals.recipientUser!.coverPicture,
+                          ),
                         ),
+                        onTap: () {
+                          RouteNavigators.route(
+                              context,
+                              FullScreenWidget(
+                                child: Stack(children: <Widget>[
+                                  Container(
+                                    color: AppColors
+                                        .black, // Your screen background color
+                                  ),
+                                  Column(children: <Widget>[
+                                    Container(height: getScreenHeight(100)),
+                                    RecipientCoverPicture(
+                                        imageUrl: globals
+                                            .recipientUser!.coverPicture),
+                                  ]),
+                                  Positioned(
+                                    top: 0.0,
+                                    left: 0.0,
+                                    right: 0.0,
+                                    child: AppBar(
+                                      title: const Text(
+                                          'Cover Photo'), // You can add title here
+                                      leading: IconButton(
+                                        icon: const Icon(Icons.arrow_back,
+                                            color: AppColors.white),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                      backgroundColor: AppColors
+                                          .black, //You can make this transparent
+                                      elevation: 0.0, //No shadow
+                                    ),
+                                  ),
+                                ]),
+                              ));
+                        },
                       ),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1943,12 +2061,62 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   border: Border.all(
                                       color: Colors.grey.shade50, width: 3.0),
                                 )
-                              : RecipientProfilePicture(
-                                  imageUrl: widget.recipientImageUrl,
-                                  width: getScreenWidth(100),
-                                  height: getScreenHeight(100),
-                                  border: Border.all(
-                                      color: Colors.grey.shade50, width: 3.0),
+                              : GestureDetector(
+                                  child: RecipientProfilePicture(
+                                    imageUrl: widget.recipientImageUrl,
+                                    width: getScreenWidth(100),
+                                    height: getScreenHeight(100),
+                                    border: Border.all(
+                                        color: Colors.grey.shade50, width: 3.0),
+                                  ),
+                                  onTap: () {
+                                    RouteNavigators.route(
+                                        context,
+                                        FullScreenWidget(
+                                          child: Stack(children: <Widget>[
+                                            Container(
+                                              color: AppColors
+                                                  .black, // Your screen background color
+                                            ),
+                                            Column(children: <Widget>[
+                                              Container(
+                                                  height: getScreenHeight(100)),
+                                              Container(
+                                                height: size.height - 100,
+                                                width: size.width,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.rectangle,
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(widget
+                                                        .recipientImageUrl!),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ]),
+                                            Positioned(
+                                              top: 0.0,
+                                              left: 0.0,
+                                              right: 0.0,
+                                              child: AppBar(
+                                                title: const Text(
+                                                    'Profile Picture'), // You can add title here
+                                                leading: IconButton(
+                                                  icon: const Icon(
+                                                      Icons.arrow_back,
+                                                      color: AppColors.white),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                ),
+                                                backgroundColor: AppColors
+                                                    .black, //You can make this transparent
+                                                elevation: 0.0, //No shadow
+                                              ),
+                                            ),
+                                          ]),
+                                        ));
+                                  },
                                 ),
                         ),
                       ),

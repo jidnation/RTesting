@@ -32,11 +32,26 @@ class ImagePlaceholder extends StatelessWidget {
         ),
         child: FittedBox(
             child: Image.asset(
-              'assets/images/blank-dp.png',
-              fit: BoxFit.cover,
-              gaplessPlayback: true,
-            )),
+          'assets/images/blank-dp.png',
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+        )),
       ),
+    );
+  }
+}
+
+class CoverImagePlaceholder extends StatelessWidget {
+  const CoverImagePlaceholder({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/images/cover.png',
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
     );
   }
 }

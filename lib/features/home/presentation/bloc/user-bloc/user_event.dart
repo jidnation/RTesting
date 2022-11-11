@@ -52,7 +52,7 @@ class UploadUserProfilePictureEvent extends UserEvent {
 }
 
 class UploadUserCoverPhotoEvent extends UserEvent {
-  final XFile file;
+  final File file;
   UploadUserCoverPhotoEvent({required this.file});
 }
 
