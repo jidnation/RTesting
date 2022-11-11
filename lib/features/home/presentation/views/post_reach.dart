@@ -293,7 +293,7 @@ class _PostReachState extends State<PostReach> {
                                 ),
                                 mentions: [
                                   Mention(
-                                      trigger: '#',
+                                      trigger: "#",
                                       style: const TextStyle(
                                         color: Colors.blue,
                                       ),
