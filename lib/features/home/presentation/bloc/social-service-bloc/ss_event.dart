@@ -29,7 +29,7 @@ class EditContentEvent extends SocialServiceEvent {
 }
 
 class UploadPostMediaEvent extends SocialServiceEvent {
-  final List<UploadFileDto>? media;
+  final List<UploadFileDto> media;
   UploadPostMediaEvent({required this.media});
 }
 
@@ -56,11 +56,18 @@ class UnlikePostEvent extends SocialServiceEvent {
 
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
-  final String? content;
+  final String? content, location;
+    final String? audioMediaItem;
+  final String? videoMediaItem;
+  final List<String>? imageMediaItem;
   final String? userId;
   CommentOnPostEvent({
     required this.postId,
     required this.content,
+    this.location,
+    this.audioMediaItem,
+     this.videoMediaItem,
+    this.imageMediaItem,
     required this.userId,
   });
 }

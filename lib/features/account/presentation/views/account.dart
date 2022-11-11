@@ -536,13 +536,13 @@ class _AccountScreenState extends State<AccountScreen>
                         Positioned(
                           top: size.height * 0.2 - 20,
                           child: AnimatedContainer(
-                            width: isGoingDown ? width : getScreenWidth(100),
-                            height: isGoingDown ? height : getScreenHeight(100),
-                            duration: const Duration(seconds: 1),
-                            child: const ProfilePicture(
-                              height: 90,
-                            )
-                          ),
+                              width: isGoingDown ? width : getScreenWidth(100),
+                              height:
+                                  isGoingDown ? height : getScreenHeight(100),
+                              duration: const Duration(seconds: 1),
+                              child: const ProfilePicture(
+                                height: 90,
+                              )),
                         ),
                       ],
                     ),
@@ -1132,15 +1132,14 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                                  Text(
-                                      postModel!.location! ,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(11),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    )
-                                  
+                              Text(
+                                postModel!.location!,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              )
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1852,8 +1851,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserLoaded) {
-                globals.userBloc!.add(
-                    GetRecipientProfileEvent(email: widget.recipientEmail));
+                Snackbars.success(context, message: "Reached User Successfully");
+                // globals.userBloc!.add(
+                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
 
                 setState(() {});
