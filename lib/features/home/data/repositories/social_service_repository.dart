@@ -89,16 +89,17 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, CommentModel>> commentOnPost({
-    required String postId,
-    required String content,
-    required String userId,
-  }) async {
+  Future<Either<String, CommentModel>> commentOnPost(
+      {required String postId,
+      required String content,
+      required String userId,
+      required String postOwnerId}) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
         content: content,
         userId: userId,
+        postOwnerId: postOwnerId,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -502,6 +503,23 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<PostFeedModel>>> getVotedPosts(
+      {required int pageLimit,
+      required int pageNumber,
+      required String authId,
+      required String voteType}) async {
+    try {
+      final posts = await _homeRemoteDataSource.getVotedPosts(
+          pageLimit: pageLimit,
+          pageNumber: pageNumber,
+          voteType: voteType,
+          authId: authId);
       return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);

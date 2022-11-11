@@ -476,7 +476,7 @@ class _PostReachState extends State<PostReach> {
                         IconButton(
                           onPressed: () async {
                             final media = await MediaService().pickFromGallery(
-                                context: context, maxAssets: 5);
+                                context: context, maxAssets: 15);
                             if (media == null) return;
                             int total = media.length;
                             int noOfVideos = media
@@ -486,10 +486,10 @@ class _PostReachState extends State<PostReach> {
                                 .where((e) => FileUtils.isImage(e.file))
                                 .length;
 
-                            if ((_mediaList.value.length + total) > 5) {
+                            if ((_mediaList.value.length + total) > 15) {
                               Snackbars.error(context,
                                   message:
-                                      'Sorry, you cannot add more than 5 media');
+                                      'Sorry, you cannot add more than 15 media');
                               return;
                             }
 
@@ -524,10 +524,10 @@ class _PostReachState extends State<PostReach> {
                             final media =
                                 await MediaService().getAudio(context: context);
                             if (media == null) return;
-                            if ((_mediaList.value.length + 1) > 5) {
+                            if ((_mediaList.value.length + 1) > 15) {
                               Snackbars.error(context,
                                   message:
-                                      'Sorry, you cannot add more than 5 media');
+                                      'Sorry, you cannot add more than 15 media');
                               return;
                             }
                             if (!FileUtils.isAudio(media.file)) {

@@ -541,6 +541,23 @@ class GetLikedPostsError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class GetVotedPostsLoading extends SocialServiceState {}
+
+class GetVotedPostsSuccess extends SocialServiceState {
+  final List<PostFeedModel>? posts;
+  final String? voteType;
+  GetVotedPostsSuccess({this.posts, this.voteType});
+  @override
+  List<Object> get props => [posts!];
+}
+
+class GetVotedPostsError extends SocialServiceState {
+  final String error;
+  GetVotedPostsError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class DownloadPostLoading extends SocialServiceState {}
 
 class DownloadPostSuccess extends SocialServiceState {

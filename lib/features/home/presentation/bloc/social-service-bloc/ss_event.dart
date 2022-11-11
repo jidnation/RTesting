@@ -57,9 +57,11 @@ class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final String? content;
   final String? userId;
+  final String? postOwnerId;
   CommentOnPostEvent({
     required this.postId,
     required this.content,
+    required this.postOwnerId,
     required this.userId,
   });
 }
@@ -267,6 +269,19 @@ class GetLikedPostsEvent extends SocialServiceEvent {
     required this.pageLimit,
     required this.pageNumber,
   });
+}
+
+class GetVotedPostsEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  final String? voteType;
+  final String? authId;
+
+  GetVotedPostsEvent(
+      {required this.pageLimit,
+      required this.pageNumber,
+      required this.voteType,
+      this.authId});
 }
 
 class SuggestUserEvent extends SocialServiceEvent {}

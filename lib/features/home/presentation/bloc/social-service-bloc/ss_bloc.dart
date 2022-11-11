@@ -106,10 +106,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(CommentOnPostLoading());
       try {
         final response = await socialServiceRepository.commentOnPost(
-          postId: event.postId!,
-          content: event.content!,
-          userId: event.userId!,
-        );
+            postId: event.postId!,
+            content: event.content!,
+            userId: event.userId!,
+            postOwnerId: event.postOwnerId!);
         response.fold(
           (error) => emit(CommentOnPostError(error: error)),
           (comment) => emit(CommentOnPostSuccess(commentModel: comment)),
@@ -554,6 +554,23 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetLikedPostsError(error: e.message));
+      }
+    });
+    on<GetVotedPostsEvent>((event, emit) async {
+      emit(GetVotedPostsLoading());
+      try {
+        final response = await socialServiceRepository.getVotedPosts(
+            pageLimit: event.pageLimit!,
+            pageNumber: event.pageNumber!,
+            voteType: event.voteType!,
+            authId: event.authId!);
+        response.fold(
+          (error) => emit(GetVotedPostsError(error: error)),
+          (posts) => emit(
+              GetVotedPostsSuccess(posts: posts, voteType: event.voteType)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetVotedPostsError(error: e.message));
       }
     });
     on<UploadPostMediaEvent>((event, emit) async {

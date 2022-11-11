@@ -444,7 +444,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
   @override
   void initState() {
     super.initState();
-    initPlayer();
+    if (mounted) initPlayer();
   }
 
   Future<void> initPlayer() async {
@@ -453,7 +453,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
-      setState(() {});
+      if (mounted) setState(() {});
       // Console.log('<<AUDIO-DURATION>>', event.toString());
     });
     playerController.addListener(() {
@@ -463,16 +463,16 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
         setState(() {});
       } else if (playerController.playerState == PlayerState.playing) {
         isPlaying = true;
-        setState(() {});
+        if (mounted) setState(() {});
       } else if (playerController.playerState == PlayerState.paused ||
           playerController.playerState == PlayerState.stopped) {
         isPlaying = false;
-        setState(() {});
+        if (mounted) setState(() {});
       }
     });
     await playerController.preparePlayer(res.path);
     // await playerController.startPlayer();
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override

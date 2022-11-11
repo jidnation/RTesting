@@ -153,7 +153,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
   @override
   void initState() {
     super.initState();
-    initPlayer();
+    // initPlayer();
   }
 
   Future<void> initPlayer() async {

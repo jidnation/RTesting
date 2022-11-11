@@ -88,6 +88,11 @@ class CommentSchema {
         CommentLikeSchema.schema +
         '''
             }
+            postOwner {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
             profile {
               ''' +
         CommentProfileSchema.schema +

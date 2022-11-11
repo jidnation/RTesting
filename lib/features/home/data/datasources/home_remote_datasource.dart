@@ -5,7 +5,6 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -541,6 +540,7 @@ class HomeRemoteDataSource {
           $imageMediaItems: [String]
           $videoMediaItem: String
           $location: String!
+          $postRating: String!
           ) {
           createPost(
             postBody: {
@@ -550,6 +550,7 @@ class HomeRemoteDataSource {
               imageMediaItems: $imageMediaItems
               videoMediaItem: $videoMediaItem
               location: $location
+              postRating: $postRating
           }) {
             ''' +
         PostSchema.schema +
@@ -560,6 +561,7 @@ class HomeRemoteDataSource {
       Map<String, dynamic> variables = {
         'commentOption': commentOption,
         'location': location,
+        'postRating': 'normal'
       };
       if (content != null && content.isNotEmpty) {
         variables.putIfAbsent('content', () => content);
@@ -699,20 +701,19 @@ class HomeRemoteDataSource {
     required String postId,
     required String content,
     required String userId,
+    required String postOwnerId,
   }) async {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
           $content: String!
-          $userId: String!
-          $location: String!
+          $postOwnerId: String!
           ) {
           commentOnPost(
             commentBody: {
               postId: $postId
               content: $content
-              userId: $userId
-              location: $location
+              postOwnerId: $postOwnerId
           }) {
             ''' +
         CommentSchema.schema +
@@ -723,14 +724,14 @@ class HomeRemoteDataSource {
       final result = await _client.mutate(gql(q), variables: {
         'postId': postId,
         'content': content,
-        'userId': userId,
-        'location': globals.location ?? ' ',
+        // 'userId': userId,
+        // 'location': globals.location ?? ' ',
+        'postOwnerId': postOwnerId
       });
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
       return CommentModel.fromJson(result.data!['commentOnPost']);
     } catch (e) {
       rethrow;
@@ -1082,7 +1083,7 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
-
+      Console.log('comment on post', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -1104,12 +1105,12 @@ class HomeRemoteDataSource {
         query getPersonalComments(
           $page_limit: Int!
           $page_number: Int!
-       
+          $authId: String!
           ) {
           getPersonalComments(
             page_limit: $page_limit
             page_number: $page_number
-           
+            authId: $authId
             ){
                ''' +
         CommentSchema.schema +
@@ -1118,10 +1119,11 @@ class HomeRemoteDataSource {
         }''';
     try {
       final result = await _client.query(gql(q), variables: {
-        // 'authId': authId,
+        'authId': authId,
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
+      Console.log('personal comment', result);
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -1129,6 +1131,55 @@ class HomeRemoteDataSource {
 
       return (result.data!['getPersonalComments'] as List)
           .map((e) => CommentModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<PostFeedModel>> getVotedPosts({
+    String? authId,
+    required String voteType,
+    required int? pageLimit,
+    required int? pageNumber,
+  }) async {
+    String q = r'''
+        query getVotedPosts(
+          $page_limit: Int!
+          $page_number: Int!
+          $authId: String!
+          $vote_type: String!
+          ) {
+          getVotedPosts(
+            page_limit: $page_limit
+            page_number: $page_number
+            authId: $authId
+            vote_type: $vote_type
+            ){
+             post {
+                ''' +
+        PostSchema.schema +
+        '''
+                }
+                   ''' +
+        PostFeedSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'authId': authId,
+        'page_limit': pageLimit,
+        'page_number': pageNumber,
+        'vote_type': voteType,
+      });
+      Console.log('voted posts', result);
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return (result.data!['getVotedPosts'] as List)
+          .map((e) => PostFeedModel.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;
@@ -1251,13 +1302,17 @@ class HomeRemoteDataSource {
         'page_limit': pageLimit,
         'page_number': pageNumber,
       });
-      // Console.log('POSTTTTTTSSSSS', result);
+      Console.log('POSTTTTTTSSSSS', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      return (result.data!['getPostFeed'] as List)
+
+      final mapList = (result.data!['getPostFeed'] as List)
           .map((e) => PostFeedModel.fromJson(e))
           .toList();
+      mapList.removeWhere((e) => ((e.vote ?? []).isNotEmpty &&
+          ((e.vote ?? []).first.voteType ?? '') == 'Downvote'));
+      return mapList;
     } catch (e) {
       rethrow;
     }
