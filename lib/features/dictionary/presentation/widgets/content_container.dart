@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
-class ContentContainer extends StatefulHookWidget {
-  const ContentContainer(
-      {required this.wordText,
-      required this.wordMeaning,
-      required this.fullWord,
-      Key? key})
+class ContentContainer extends HookWidget {
+  const ContentContainer({required this.getRecentlyAddedWord, Key? key})
       : super(key: key);
-  final String wordText;
-  final String wordMeaning;
-  final String fullWord;
+  final GetRecentlyAddedWord getRecentlyAddedWord;
 
-  @override
-  State<ContentContainer> createState() => _ContentContainerState();
-}
-
-class _ContentContainerState extends State<ContentContainer> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -44,20 +34,21 @@ class _ContentContainerState extends State<ContentContainer> {
                     style: const TextStyle(color: Colors.black),
                     children: [
                       TextSpan(
-                          text: '${widget.wordText} : ',
+                          text: '${getRecentlyAddedWord.abbr} : ',
                           style: const TextStyle(color: Colors.blue)),
-                      TextSpan(text: '${widget.fullWord} ; '),
+                      TextSpan(text: '${getRecentlyAddedWord.word} ; '),
                       TextSpan(
-                          text: widget.wordMeaning, style: const TextStyle())
+                          text: getRecentlyAddedWord.meaning,
+                          style: const TextStyle())
                     ],
                   ),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                const Text(
-                  '2021-06-13',
-                  style: TextStyle(
+                Text(
+                  '${getRecentlyAddedWord.createdAt}',
+                  style: const TextStyle(
                       fontFamily: 'poppins', fontWeight: FontWeight.w600),
                 ),
               ],

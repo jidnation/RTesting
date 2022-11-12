@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/features/dictionary/presentation/views/add_to_glossary.dart';
 import 'package:reach_me/features/dictionary/presentation/views/recently_added.dart';
 import 'package:reach_me/features/dictionary/presentation/views/search_history.dart';
 import 'package:reach_me/features/dictionary/presentation/views/search_word.dart';
@@ -46,6 +47,11 @@ class _DictionaryViewState extends State<DictionaryView> {
       ),
       body: Column(
         children: [
+          DictionaryTab(
+            contentText: 'Add to Dictionary',
+            onPressed: () =>
+                RouteNavigators.route(context, const AddToGlossary()),
+          ),
           DictionaryTab(
             contentText: 'Search Word',
             onPressed: () => RouteNavigators.route(context, const SearchWord()),

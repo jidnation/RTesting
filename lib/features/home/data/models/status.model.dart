@@ -223,3 +223,49 @@ class StatusFeedResponseModel {
         "created_at": createdAt!.toIso8601String(),
       };
 }
+
+class MutedStatusModel {
+  String? authId;
+  String? mutedAuthId;
+
+  MutedStatusModel({
+    this.authId,
+    this.mutedAuthId,
+  });
+
+  factory MutedStatusModel.fromJson(Map<String, dynamic> json) =>
+      MutedStatusModel(
+        authId: json["authId"],
+        mutedAuthId: json["mutedAuthId"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "authId": authId,
+        "mutedAuthId": mutedAuthId,
+      };
+}
+
+class ReportStatusModel {
+  String? authId;
+  String? reason;
+  String? statusId;
+
+  ReportStatusModel({
+    this.authId,
+    this.reason,
+    this.statusId,
+  });
+
+  factory ReportStatusModel.fromJson(Map<String, dynamic> json) =>
+      ReportStatusModel(
+        authId: json["authId"],
+        reason: json["reason"],
+        statusId: json["statusId"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "authId": authId,
+        "reason": reason,
+        "statusId": statusId,
+      };
+}

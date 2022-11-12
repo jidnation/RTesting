@@ -39,8 +39,13 @@ class AppColors {
   static const Color greyShade6 = Color(0xFFF9F9F9);
   static const Color greyShade7 = Color(0xFFF1F1F1);
   static const Color greyShade8 = Color(0xFFE5E5E5);
+  
   static const Color greyShade9 = Color(0xffF5F5F5);
   static const Color greyShade10 = Color(0xffE8EAEB);
+
+  //others
+  //static const Color audioPlayerBg = Color(0xFFF5F5F5);
+  //static const Color audioPlayerClose = Color(0xFFC4C4C4);
 }
 
 class ReachRelationshipType {

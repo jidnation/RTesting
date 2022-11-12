@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,12 +25,14 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -39,15 +41,13 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:readmore/readmore.dart';
-
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
-
 import 'full_post.dart';
-
 
 class TimelineScreen extends StatefulHookWidget {
   static const String id = "timeline_screen";
@@ -219,10 +219,22 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
 
                   if (state is UploadMediaSuccess) {
+                    List<String> mediaUrls = state.data as List<String>;
+                    List<String> imageUrls = mediaUrls
+                        .where((e) => FileUtils.fileType(e) == 'image')
+                        .toList();
+                    String videoUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'video',
+                        orElse: () => '');
+                    String audioUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'audio',
+                        orElse: () => '');
                     globals.socialServiceBloc!.add(CreatePostEvent(
                       content: globals.postContent,
                       commentOption: globals.postCommentOption,
-                      imageMediaItem: state.data as List<String>,
+                      imageMediaItem: imageUrls.isNotEmpty ? imageUrls : null,
+                      videoMediaItem: videoUrl.isNotEmpty ? videoUrl : null,
+                      audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
                       location: globals.location,
                     ));
                   }
@@ -440,7 +452,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .value[index]
                                                                   .status![0]
                                                                   .statusCreatorModel!
-                                                                  .profilePicture!,
+                                                                  .profilePicture,
                                                               username: _userStatus
                                                                   .value[index]
                                                                   .status![
@@ -806,7 +818,6 @@ class PostFeedReacherCard extends HookWidget {
                                     : const SizedBox.shrink()
                               ],
                             ),
-
                             GestureDetector(
                               onTap: () =>
                                   Navigator.of(context).push(MaterialPageRoute(
@@ -871,27 +882,54 @@ class PostFeedReacherCard extends HookWidget {
                   : Row(
                       children: [
                         Flexible(
-                          child: ReadMoreText(
+                          //   child: ReadMoreText(
+                          //     "${postFeedModel!.post!.content}",
+                          //     style: TextStyle(
+                          //         fontWeight: FontWeight.w400,
+                          //         fontSize: getScreenHeight(14)),
+                          //     trimLines: 3,
+                          //     colorClickableText: const Color(0xff717F85),
+                          //     trimMode: TrimMode.Line,
+                          //     trimCollapsedText: 'See more',
+                          //     trimExpandedText: 'See less',
+                          //     moreStyle: TextStyle(
+                          //         fontSize: getScreenHeight(14),
+                          //         fontFamily: "Roboto",
+                          //         color: const Color(0xff717F85)),
+                          //   ),
+
+                          child: ExpandableText(
                             "${postFeedModel!.post!.content}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: getScreenHeight(14)),
-                            trimLines: 3,
-                            colorClickableText: const Color(0xff717F85),
-                            trimMode: TrimMode.Line,
-                            trimCollapsedText: 'See more',
-                            trimExpandedText: 'See less',
-                            moreStyle: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                fontFamily: "Roboto",
-                                color: const Color(0xff717F85)),
+                            expandText: 'see more',
+                            maxLines: 2,
+                            linkColor: Colors.blue,
+                            animation: true,
+                            expanded: false,
+                            collapseText: 'see less',
+                            onHashtagTap: (value) {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return const DictionaryDialog();
+                                  });
+                              print('Tapped Url');
+                            },
+                            onMentionTap: (value) {
+                              print('Tapped Url');
+                            },
+                            mentionStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
+                            hashtagStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
                           ),
                         ),
                         SizedBox(width: getScreenWidth(2)),
                         Tooltip(
                           message: 'This Reach has been edited by the Reacher',
                           waitDuration: const Duration(seconds: 1),
-                          showDuration: const Duration(seconds: 2),                         
+                          showDuration: const Duration(seconds: 2),
                           child: Text(
                             postFeedModel!.post!.edited!
                                 ? "(Reach Edited)"
@@ -907,11 +945,20 @@ class PostFeedReacherCard extends HookWidget {
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
 
-              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-                Helper.renderPostImages(postFeedModel!.post!, context)
+              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
+                  (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
+                PostMedia(post: postFeedModel!.post!)
+                
+              //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+               // Helper.renderPostImages(postFeedModel!.post!, context)
+
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
                 const SizedBox.shrink(),
+              (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
+                  ? PostAudioMedia(path: postFeedModel!.post!.audioMediaItem!)
+                      .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                  : SizedBox.shrink(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
