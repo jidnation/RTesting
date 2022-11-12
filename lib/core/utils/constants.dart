@@ -9,6 +9,7 @@ class AppColors {
   static const Color textColor2 = Color(0xFF252525);
   static const Color textColor3 = Color(0xFF0C0C0C);
   static const Color textColor4 = Color(0xFF686666);
+  static const Color textColor5 = Color(0xff717F85);
   static const Color textFieldLabelColor = Color(0xFFA5A3A3);
 
   static const Color whiteBackground = Color(0xFFFFFFFF);
@@ -21,7 +22,7 @@ class AppColors {
   static const Color blackShade1 = Color(0xFF3B3870);
   static const Color blackShade3 = Color(0xFF333333);
   static const Color blackShade4 = Color(0x1F000000);
-
+  static const Color blackShade5 = Color(0xff001824);
   //White
   static const Color white = Color(0xFFFFFFFF);
 
@@ -38,6 +39,13 @@ class AppColors {
   static const Color greyShade6 = Color(0xFFF9F9F9);
   static const Color greyShade7 = Color(0xFFF1F1F1);
   static const Color greyShade8 = Color(0xFFE5E5E5);
+  
+  static const Color greyShade9 = Color(0xffF5F5F5);
+  static const Color greyShade10 = Color(0xffE8EAEB);
+
+  //others
+  //static const Color audioPlayerBg = Color(0xFFF5F5F5);
+  //static const Color audioPlayerClose = Color(0xFFC4C4C4);
 }
 
 class ReachRelationshipType {

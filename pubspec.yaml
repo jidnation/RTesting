@@ -83,10 +83,11 @@ dependencies:
   double_back_to_close_app: ^2.1.0
   location: ^4.4.0
   mime: ^1.0.2
-  firebase_core: ^1.21.1
+  firebase_core: ^2.1.1
   tab_indicator_styler: ^2.0.0
   bubble_tab_indicator: ^0.1.6
   image_cropper: ^3.0.0
+  flutter_linkify: ^5.0.2
   # geocoder: ^0.2.1
   share_plus: ^5.0.0
   image_gallery_saver: ^1.7.1
@@ -105,8 +106,17 @@ dependencies:
   # expandable_text: ^2.3.0
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.1
-  audio_waveforms: ^0.1.5+1
   full_screen_image_null_safe: ^2.0.0
+
+  just_waveform: ^0.0.3
+  visibility_detector: ^0.3.3
+  audio_waveforms:
+    git: https://github.com/gideonoyekale/audio_waveforms.git
+
+  #audio_waveforms: ^0.1.5+1
+  #flutter_mentions: ^2.0.1
+  #expandable_text: ^2.3.0
+
 
 
 dev_dependencies:

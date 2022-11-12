@@ -84,7 +84,9 @@ class CustomRoundTextField extends StatelessWidget {
   final int? minLines;
   final Color? fillColor;
   final bool? isDense;
+  final void Function()? onTap;
   final FocusNode? focusNode;
+  final double? verticalHeight;
   final Function(String)? onChanged;
 
   const CustomRoundTextField(
@@ -100,9 +102,11 @@ class CustomRoundTextField extends StatelessWidget {
       this.suffixIcon,
       this.isFilled = true,
       this.borderRadius = 54,
+      this.verticalHeight,
       this.minLines = 1,
       this.maxLines = 5,
       this.isDense = false,
+      this.onTap,
       this.onChanged,
       this.fillColor = const Color(0xFFF5F5F5),
       this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
@@ -115,6 +119,7 @@ class CustomRoundTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onTap: onTap ,
       minLines: minLines,
       maxLines: maxLines,
       style: textStyle,
@@ -130,9 +135,9 @@ class CustomRoundTextField extends StatelessWidget {
         hintStyle: hintStyle,
         filled: isFilled,
         isDense: isDense,
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: 24,
-          vertical: 12,
+          vertical: verticalHeight ?? 12,
         ),
         fillColor: fillColor,
         suffixIcon: suffixIcon,

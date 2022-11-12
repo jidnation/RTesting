@@ -37,6 +37,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
+import '../../../home/presentation/widgets/post_media.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -364,6 +365,16 @@ class _AccountScreenState extends State<AccountScreen>
           .add(GetAllSavedPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!
           .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
+      globals.socialServiceBloc!.add(GetVotedPostsEvent(
+          pageLimit: 50,
+          pageNumber: 1,
+          voteType: 'Upvote',
+          authId: globals.userId));
+      globals.socialServiceBloc!.add(GetVotedPostsEvent(
+          pageLimit: 50,
+          pageNumber: 1,
+          voteType: 'Downvote',
+          authId: globals.userId));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -424,6 +435,18 @@ class _AccountScreenState extends State<AccountScreen>
                 if (state is GetLikedPostsError) {
                   Snackbars.error(context, message: state.error);
                   _likesRefreshController.refreshCompleted();
+                }
+                if (state is GetVotedPostsSuccess) {
+                  if (state.voteType == 'Upvote') {
+                    _shoutOuts.value = state.posts!;
+                    _shoutoutRefreshController.refreshCompleted();
+                  } else if (state.voteType == 'Downvote') {
+                    _shoutDowns.value = state.posts!;
+                    _shoutdownRefreshController.refreshCompleted();
+                  }
+                }
+                if (state is GetVotedPostsError) {
+                  Snackbars.error(context, message: state.error);
                 }
                 if (state is GetPersonalCommentsSuccess) {
                   _comments.value = state.data!;
@@ -575,6 +598,7 @@ class _AccountScreenState extends State<AccountScreen>
                               height:
                                   isGoingDown ? height : getScreenHeight(100),
                               duration: const Duration(seconds: 1),
+
                               child: GestureDetector(
                                 child: const ProfilePicture(
                                   height: 90,
@@ -618,6 +642,7 @@ class _AccountScreenState extends State<AccountScreen>
                                         ]),
                                       ));
                                 },
+
                               )),
                         ),
                       ],
@@ -1012,7 +1037,77 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _shoutOuts.value.length,
                                       itemBuilder: (context, index) {
-                                        return Container();
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _shoutOuts.value[index],
+                                          isLiked: _shoutOuts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _shoutOuts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _shoutOuts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _shoutOuts.value[index].vote![0]
+                                                  .voteType
+                                              : null,
+                                          onMessage: () {
+                                            reachDM.value = true;
+
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _shoutOuts
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
+                                                postId: _shoutOuts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _shoutOuts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_shoutOuts.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _shoutOuts
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _shoutOuts
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
                             ),
@@ -1046,7 +1141,77 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _shoutDowns.value.length,
                                       itemBuilder: (context, index) {
-                                        return Container();
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _shoutDowns.value[index],
+                                          isLiked: _shoutDowns
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _shoutDowns
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _shoutDowns
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _shoutDowns.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                            reachDM.value = true;
+
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _shoutDowns
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
+                                                postId: _shoutDowns
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _shoutDowns
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_shoutDowns.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _shoutDowns
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _shoutDowns
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
                             ),
@@ -1248,11 +1413,13 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if (postModel!.imageMediaItems!.isNotEmpty)
-                    Helper.renderPostImages(postModel!, context)
+                  if (postModel!.imageMediaItems!.isNotEmpty ||
+                      (postModel?.videoMediaItem ?? '').isNotEmpty ||
+                      (postModel?.audioMediaItem ?? '').isNotEmpty)
+                    PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
-                    const SizedBox(),
+                    const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1934,8 +2101,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserLoaded) {
-                globals.userBloc!.add(
-                    GetRecipientProfileEvent(email: widget.recipientEmail));
+                Snackbars.success(context, message: "Reached User Successfully");
+                // globals.userBloc!.add(
+                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
 
                 setState(() {});
@@ -2147,8 +2315,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               InkWell(
                                 onTap: () => RouteNavigators.route(
                                     context,
-                                    const AccountStatsInfo(
-                                      index: 0,
+                                    RecipientAccountStatsInfo(
+                                      index: 0, recipientId: widget.recipientId,
                                       // recipientId: widget.recipientId,
                                     )),
                                 child: Column(
