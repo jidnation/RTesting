@@ -31,7 +31,11 @@ class _RemoveSearchWordState extends State<RemoveSearchWord> {
                     const SizedBox(
                       width: 20,
                     ),
-                    const SearchCustomTextField(),
+                    SearchCustomTextField(
+                      onChanged: (value) {
+                        return null;
+                      },
+                    ),
                     const SizedBox(
                       width: 30,
                     ),

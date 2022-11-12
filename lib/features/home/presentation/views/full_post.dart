@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
@@ -14,7 +13,6 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -743,8 +741,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                       controller: controller,
                                       hintText: 'Comment on this post...',
                                       suffixIcon: IconButton(
-                                          icon:
-                                              const Icon(Icons.emoji_emotions_outlined),
+                                          icon: const Icon(
+                                              Icons.emoji_emotions_outlined),
                                           onPressed: () {
                                             showEmoji.value = !showEmoji.value;
                                           }),

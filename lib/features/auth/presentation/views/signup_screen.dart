@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -156,8 +153,14 @@ class SignUpScreen extends HookWidget {
                             ),
                           ),
                           CustomRoundTextField(
-                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            focusedBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
                             isFilled: false,
                             hintText: '',
                             keyboardType: TextInputType.name,
@@ -179,8 +182,14 @@ class SignUpScreen extends HookWidget {
                             ),
                           ),
                           CustomRoundTextField(
-                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            focusedBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
                             isFilled: false,
                             hintText: '',
                             keyboardType: TextInputType.name,
@@ -202,8 +211,14 @@ class SignUpScreen extends HookWidget {
                             ),
                           ),
                           CustomRoundTextField(
-                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            focusedBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
                             isFilled: false,
                             hintText: 'linda@framcreative.com',
                             keyboardType: TextInputType.emailAddress,
@@ -272,8 +287,14 @@ class SignUpScreen extends HookWidget {
                               ]),
                           SizedBox(height: getScreenHeight(5)),
                           CustomRoundTextField(
-                            focusedBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
-                            enabledBorderSide: const BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid),
+                            focusedBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
+                            enabledBorderSide: const BorderSide(
+                                color: Colors.black12,
+                                width: 1,
+                                style: BorderStyle.solid),
                             isFilled: false,
                             maxLines: 1,
                             obscureText: _obscureText.value,
@@ -398,7 +419,7 @@ class SignUpScreen extends HookWidget {
                             textColor: AppColors.white,
                             borderSide: BorderSide.none,
                           ),
-                           SizedBox(height: getScreenHeight(20)),
+                          SizedBox(height: getScreenHeight(20)),
                           // Row(
                           //   mainAxisAlignment: MainAxisAlignment.center,
                           //   children: const [
