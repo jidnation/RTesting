@@ -70,7 +70,7 @@ class CommentOnPostEvent extends SocialServiceEvent {
      this.videoMediaItem,
     this.imageMediaItem,
 
-    //required this.postOwnerId,
+     this.postOwnerId,
     
     required this.userId,
   });

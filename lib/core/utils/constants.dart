@@ -44,8 +44,8 @@ class AppColors {
   static const Color greyShade10 = Color(0xffE8EAEB);
 
   //others
-  //static const Color audioPlayerBg = Color(0xFFF5F5F5);
-  //static const Color audioPlayerClose = Color(0xFFC4C4C4);
+  static const Color audioPlayerBg = Color(0xFFF5F5F5);
+  static const Color audioPlayerClose = Color(0xFFC4C4C4);
 }
 
 class ReachRelationshipType {
