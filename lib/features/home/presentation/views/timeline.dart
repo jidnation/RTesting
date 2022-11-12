@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -32,6 +32,7 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -882,20 +883,47 @@ class PostFeedReacherCard extends HookWidget {
                   : Row(
                       children: [
                         Flexible(
-                          child: ReadMoreText(
+                          //   child: ReadMoreText(
+                          //     "${postFeedModel!.post!.content}",
+                          //     style: TextStyle(
+                          //         fontWeight: FontWeight.w400,
+                          //         fontSize: getScreenHeight(14)),
+                          //     trimLines: 3,
+                          //     colorClickableText: const Color(0xff717F85),
+                          //     trimMode: TrimMode.Line,
+                          //     trimCollapsedText: 'See more',
+                          //     trimExpandedText: 'See less',
+                          //     moreStyle: TextStyle(
+                          //         fontSize: getScreenHeight(14),
+                          //         fontFamily: "Roboto",
+                          //         color: const Color(0xff717F85)),
+                          //   ),
+
+                          child: ExpandableText(
                             "${postFeedModel!.post!.content}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: getScreenHeight(14)),
-                            trimLines: 3,
-                            colorClickableText: const Color(0xff717F85),
-                            trimMode: TrimMode.Line,
-                            trimCollapsedText: 'See more',
-                            trimExpandedText: 'See less',
-                            moreStyle: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                fontFamily: "Roboto",
-                                color: const Color(0xff717F85)),
+                            expandText: 'see more',
+                            maxLines: 2,
+                            linkColor: Colors.blue,
+                            animation: true,
+                            expanded: false,
+                            collapseText: 'see less',
+                            onHashtagTap: (value) {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return const DictionaryDialog();
+                                  });
+                              print('Tapped Url');
+                            },
+                            onMentionTap: (value) {
+                              print('Tapped Url');
+                            },
+                            mentionStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
+                            hashtagStyle: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
                           ),
                         ),
                         SizedBox(width: getScreenWidth(2)),
@@ -917,9 +945,14 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
+
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
+                
+              //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+               // Helper.renderPostImages(postFeedModel!.post!, context)
+
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
                 const SizedBox.shrink(),
