@@ -16,6 +16,8 @@ class PostSchema {
             nComments
             nLikes
             nShares
+            nDownvotes
+            nUpvotes
             postId
             postSlug
             videoMediaItem
@@ -84,6 +86,11 @@ class CommentSchema {
             like {
               ''' +
         CommentLikeSchema.schema +
+        '''
+            }
+            postOwner {
+              ''' +
+        CommentProfileSchema.schema +
         '''
             }
             profile {

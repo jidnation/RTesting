@@ -89,16 +89,17 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, CommentModel>> commentOnPost({
-    required String postId,
-    required String content,
-    required String userId,
-  }) async {
+  Future<Either<String, CommentModel>> commentOnPost(
+      {required String postId,
+      required String content,
+      required String userId,
+      required String postOwnerId}) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
         content: content,
         userId: userId,
+        postOwnerId: postOwnerId,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -385,6 +386,42 @@ class SocialServiceRepository {
     }
   }
 
+  Future<Either<String, MutedStatusModel>> muteStatus({
+    required String idToMute,
+  }) async {
+    try {
+      final res = await _homeRemoteDataSource.muteStatus(idToMute: idToMute);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> unmuteStatus({
+    required String idToUnmute,
+  }) async {
+    try {
+      final res =
+          await _homeRemoteDataSource.unmuteStatus(idToUnmute: idToUnmute);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, ReportStatusModel>> reportStatus({
+    required String statusId,
+    required String reportReason,
+  }) async {
+    try {
+      final res = await _homeRemoteDataSource.reportStatus(
+          statusId: statusId, reportReason: reportReason);
+      return Right(res);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, List<StatusModel>>> getAllStatus({
     required int pageLimit,
     required int pageNumber,
@@ -466,6 +503,23 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
+      return Right(posts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<PostFeedModel>>> getVotedPosts(
+      {required int pageLimit,
+      required int pageNumber,
+      required String authId,
+      required String voteType}) async {
+    try {
+      final posts = await _homeRemoteDataSource.getVotedPosts(
+          pageLimit: pageLimit,
+          pageNumber: pageNumber,
+          voteType: voteType,
+          authId: authId);
       return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);

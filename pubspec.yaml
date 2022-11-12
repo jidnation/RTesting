@@ -106,9 +106,15 @@ dependencies:
   # expandable_text: ^2.3.0
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.1
-  audio_waveforms: ^0.1.5+1
-  flutter_mentions: ^2.0.1
-  expandable_text: ^2.3.0
+  just_waveform: ^0.0.3
+  visibility_detector: ^0.3.3
+  audio_waveforms:
+    git: https://github.com/gideonoyekale/audio_waveforms.git
+
+  #audio_waveforms: ^0.1.5+1
+  #flutter_mentions: ^2.0.1
+  #expandable_text: ^2.3.0
+
 
 
 dev_dependencies:

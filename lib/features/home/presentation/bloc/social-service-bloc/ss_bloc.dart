@@ -106,10 +106,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(CommentOnPostLoading());
       try {
         final response = await socialServiceRepository.commentOnPost(
-          postId: event.postId!,
-          content: event.content!,
-          userId: event.userId!,
-        );
+            postId: event.postId!,
+            content: event.content!,
+            userId: event.userId!,
+            postOwnerId: event.postOwnerId!);
         response.fold(
           (error) => emit(CommentOnPostError(error: error)),
           (comment) => emit(CommentOnPostSuccess(commentModel: comment)),
@@ -428,6 +428,47 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(DeleteStatusError(error: e.message));
       }
     });
+    on<MuteStatusEvent>((event, emit) async {
+      emit(MuteStatusLoading());
+      try {
+        final response = await socialServiceRepository.muteStatus(
+          idToMute: event.idToMute,
+        );
+        response.fold(
+          (error) => emit(MuteStatusError(error: error)),
+          (res) => emit(MuteStatusSuccess(result: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(MuteStatusError(error: e.message));
+      }
+    });
+    on<UnmuteStatusEvent>((event, emit) async {
+      emit(UnmuteStatusLoading());
+      try {
+        final response = await socialServiceRepository.unmuteStatus(
+          idToUnmute: event.idToUnmute,
+        );
+        response.fold(
+          (error) => emit(UnmuteStatusError(error: error)),
+          (res) => emit(UnmuteStatusSuccess(unmuted: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UnmuteStatusError(error: e.message));
+      }
+    });
+    on<ReportStatusEvent>((event, emit) async {
+      emit(ReportStatusLoading());
+      try {
+        final response = await socialServiceRepository.reportStatus(
+            reportReason: event.reportReason, statusId: event.statusId);
+        response.fold(
+          (error) => emit(ReportStatusError(error: error)),
+          (res) => emit(ReportStatusSuccess(result: res)),
+        );
+      } on GraphQLError catch (e) {
+        emit(ReportStatusError(error: e.message));
+      }
+    });
     on<GetAllStatusEvent>((event, emit) async {
       emit(GetAllStatusLoading());
       try {
@@ -513,6 +554,23 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetLikedPostsError(error: e.message));
+      }
+    });
+    on<GetVotedPostsEvent>((event, emit) async {
+      emit(GetVotedPostsLoading());
+      try {
+        final response = await socialServiceRepository.getVotedPosts(
+            pageLimit: event.pageLimit!,
+            pageNumber: event.pageNumber!,
+            voteType: event.voteType!,
+            authId: event.authId!);
+        response.fold(
+          (error) => emit(GetVotedPostsError(error: error)),
+          (posts) => emit(
+              GetVotedPostsSuccess(posts: posts, voteType: event.voteType)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetVotedPostsError(error: e.message));
       }
     });
     on<UploadPostMediaEvent>((event, emit) async {

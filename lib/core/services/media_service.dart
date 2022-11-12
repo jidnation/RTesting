@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_compress/video_compress.dart';
@@ -25,7 +27,7 @@ class MediaService {
         pickerConfig: AssetPickerConfig(
           maxAssets: 1,
           requestType: RequestType.image,
-          textDelegate: EnglishAssetPickerTextDelegate(),
+          textDelegate: const EnglishAssetPickerTextDelegate(),
           specialPickerType: SpecialPickerType.noPreview,
         ),
       );
@@ -53,26 +55,26 @@ class MediaService {
         fileName: (file as File).path.split('/').last);
   }
 
-  Future<FileResult?> pickFromGallery() async {
-    final res = await AssetPicker.pickAssets(
-      _navigatorKey.currentContext!,
-      pickerConfig: AssetPickerConfig(
-        maxAssets: 1,
-        specialPickerType: SpecialPickerType.noPreview,
-        requestType: RequestType.common,
-      ),
-    );
-    if (res == null || res.isEmpty) return null;
-    final file = await res.first.originFile;
-    if (file == null) return null;
-    return FileResult(
-        path: file.path,
-        size: file.lengthSync() / 1024,
-        duration: res.first.videoDuration.inSeconds,
-        height: res.first.height,
-        width: res.first.width,
-        fileName: (file).path.split('/').last);
-  }
+  // Future<FileResult?> pickFromGallery() async {
+  //   final res = await AssetPicker.pickAssets(
+  //     _navigatorKey.currentContext!,
+  //     pickerConfig: AssetPickerConfig(
+  //       maxAssets: 1,
+  //       specialPickerType: SpecialPickerType.noPreview,
+  //       requestType: RequestType.common,
+  //     ),
+  //   );
+  //   if (res == null || res.isEmpty) return null;
+  //   final file = await res.first.originFile;
+  //   if (file == null) return null;
+  //   return FileResult(
+  //       path: file.path,
+  //       size: file.lengthSync() / 1024,
+  //       duration: res.first.videoDuration.inSeconds,
+  //       height: res.first.height,
+  //       width: res.first.width,
+  //       fileName: (file).path.split('/').last);
+  // }
 
   Future<FileResult?> getVideo() async {
     final res = await AssetPicker.pickAssets(
@@ -105,12 +107,13 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> getAudio() async {
+  Future<FileResult?> getAudio({required BuildContext context}) async {
     final res = await AssetPicker.pickAssets(
-      _navigatorKey.currentContext!,
+      context,
       pickerConfig: AssetPickerConfig(
         maxAssets: 1,
         requestType: RequestType.audio,
+        specialPickerType: SpecialPickerType.noPreview,
       ),
     );
     if (res == null || res.isEmpty) return null;
@@ -207,43 +210,95 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> loadMediaFromGallery(
-      {required BuildContext context, RequestType? requestType}) async {
+  Future<List<FileResult>?> pickFromGallery(
+      {required BuildContext context,
+      RequestType? requestType,
+      int? maxAssets}) async {
     List<AssetEntity>? res;
     if (requestType == null) {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
-            maxAssets: 1,
+            maxAssets: maxAssets ?? 1,
             specialPickerType: SpecialPickerType.noPreview,
           ));
     } else {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
               specialPickerType: SpecialPickerType.noPreview,
-              maxAssets: 1,
+              maxAssets: maxAssets ?? 1,
               requestType: requestType));
     }
     if (res == null || res.isEmpty) return null;
-    final file = await res.first.originFile;
-    if (file == null) return null;
-    String? thumbnail;
-    if (FileUtils.isVideo(file)) {
-      thumbnail = await t.VideoThumbnail.thumbnailFile(
-        video: file.path,
-        imageFormat: t.ImageFormat.JPEG,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        maxWidth:
-            128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
-        quality: 100,
-      );
+
+    List<FileResult> results = [];
+    for (var e in res) {
+      final file = await e.originFile;
+      if (file == null) return null;
+      String? thumbnail;
+      if (FileUtils.isVideo(file)) {
+        thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+      }
+      results.add(FileResult(
+          path: file.path,
+          size: file.lengthSync() / 1024,
+          duration: e.videoDuration.inSeconds,
+          height: e.height,
+          width: e.width,
+          thumbnail: thumbnail,
+          fileName: (file).path.split('/').last));
     }
+    return results;
+  }
+
+  Future<FileResult?> getVideoThumbnail({required String videoPath}) async {
+    String? thumbnailPath;
+    int? height, width;
+    thumbnailPath = await t.VideoThumbnail.thumbnailFile(
+      video: videoPath,
+      imageFormat: t.ImageFormat.PNG,
+      thumbnailPath: (await getTemporaryDirectory()).path,
+      quality: 100,
+    );
+    if (thumbnailPath == null) return null;
+    File imageFile =
+        File(thumbnailPath); // Or any other way to get a File instance.
+    var decodedImage = await decodeImageFromList(imageFile.readAsBytesSync());
+    height = decodedImage.height;
+    width = decodedImage.width;
+    // print('WIDTH' + decodedImage.width.toString());
+    // print('HEIGHT' + decodedImage.height.toString());
+
+    // Image image = Image.file(File(thumbnailPath));
+    // Completer completer = Completer<ui.Image>();
+    // image.image
+    //     .resolve(const ImageConfiguration())
+    //     .addListener(ImageStreamListener((ImageInfo info, bool _) {
+    //   completer.complete(info.image);
+    //   height = info.image.height;
+    //   width = info.image.width;
+    //   print('height:' + height.toString());
+    //   print('width:' + width.toString());
+    // }));
+
     return FileResult(
-        path: file.path,
-        size: file.lengthSync() / 1024,
-        duration: res.first.videoDuration.inSeconds,
-        height: res.first.height,
-        width: res.first.width,
-        thumbnail: thumbnail,
-        fileName: (file).path.split('/').last);
+        path: thumbnailPath,
+        size: File(thumbnailPath).lengthSync() / 1024,
+        height: height == null ? null : height / 1.0,
+        width: width == null ? null : width / 1.0,
+        fileName: thumbnailPath.split('/').last);
+  }
+
+  Future<FileResult?> downloadFile({required String url}) async {
+    final filename = url.split('/').last;
+    final directory = await getTemporaryDirectory();
+    final filePath = '${directory.path}/$filename';
+    final response = await http.get(Uri.parse(url));
+    final file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+
+    return FileResult(
+        path: filePath,
+        size: File(filePath).lengthSync() / 1024,
+        fileName: url.split('/').last);
   }
 }
