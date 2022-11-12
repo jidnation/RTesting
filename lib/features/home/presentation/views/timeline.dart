@@ -719,7 +719,6 @@ class PostFeedReacherCard extends HookWidget {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
 
-    // final ScreenshotController screenshotController = ScreenshotController();
 
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();

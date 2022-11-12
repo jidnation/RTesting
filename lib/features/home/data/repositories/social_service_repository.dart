@@ -309,6 +309,7 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
+      print("Post Feed comment options ${postFeeds[0].post!.commentOption}");
       return Right(postFeeds);
     } on GraphQLError catch (e) {
       return Left(e.message);

@@ -82,6 +82,7 @@ class _PostReachState extends State<PostReach> {
     final nAudios = useState(0);
     final nImages = useState(0);
     final controller = useTextEditingController();
+    final replyFeature = useState("everyone");
 
     final _mediaList = useState<List<UploadFileDto>>([]);
 
@@ -139,15 +140,19 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
-                                globals.postContent = controllerKey
-                                    .currentState!.controller!.text;
-                                globals.postCommentOption = 'everyone';
+
+                                globals.postContent = controller.text;
+                                globals.postCommentOption = replyFeature.value;
+
                                 setState(() {});
                               } else {
+                                debugPrint(
+                                    "reply feature: ${replyFeature.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-                                  content: controllerKey
-                                      .currentState!.controller!.text,
-                                  commentOption: 'everyone',
+
+                                  content: controller.text,
+                                  commentOption: replyFeature.value,
+
                                   location: getUserLoation(),
                                 ));
                               }
@@ -505,7 +510,12 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(20)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'everyone';
+                                          RouteNavigators.pop(context);
+                                        });
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -522,7 +532,13 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'people_you_follow';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -539,7 +555,13 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'only_people_you_mention';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -556,7 +578,12 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'none';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -574,20 +601,7 @@ class _PostReachState extends State<PostReach> {
                                   ]);
                             });
                       },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/svgs/world.svg', height: 30),
-                          const SizedBox(width: 9),
-                          const Text(
-                            'Everyone can reply',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            ),
-                          ),
-                        ],
-                      ),
+                      child: replyWidget(replyFeature.value),
                     ),
                     Row(
                       children: [
@@ -691,6 +705,93 @@ class _PostReachState extends State<PostReach> {
         ),
       ),
     );
+  }
+
+  Row replyWidget(String replyFeature) {
+    switch (replyFeature) {
+      case 'everyone':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/world.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Everyone can reply',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'people_you_follow':
+        return Row(
+          children: [
+            SvgPicture.asset(
+              'assets/svgs/people-you-follow.svg',
+              height: 30,
+            ),
+            const SizedBox(width: 9),
+            const Text(
+              'People you follow',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'only_people_you_mention':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/people-you-mention.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Only people you mention',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'none':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/none.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'None',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      default:
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/world.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Everyone can reply',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+    }
   }
 }
 
@@ -980,138 +1081,140 @@ class EditReach extends HookWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10)),
+                              ),
+                              builder: (context) {
+                                return ListView(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 27,
+                                      vertical: 10,
+                                    ),
+                                    children: [
+                                      Container(
+                                        height: 4,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.greyShade5
+                                              .withOpacity(0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ).paddingSymmetric(h: size.width / 2.7),
+                                      SizedBox(height: getScreenHeight(21)),
+                                      Center(
+                                        child: Text(
+                                          'Who can reply',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(5)),
+                                      Center(
+                                        child: Text(
+                                          'Identify who can reply to this reach.',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(14),
+                                            color: AppColors.greyShade3,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(20)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/world.svg'),
+                                          title: Text(
+                                            'Everyone can reply',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-follow.svg'),
+                                          title: Text(
+                                            'People you follow',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-mention.svg'),
+                                          title: Text(
+                                            'Only people you mention',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/none.svg'),
+                                          title: Text(
+                                            'None',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]);
+                              });
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/svgs/world.svg',
+                                height: 30),
+                            const SizedBox(width: 9),
+                            const Text(
+                              'Everyone can reply',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor2,
+                              ),
                             ),
-                            builder: (context) {
-                              return ListView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 27,
-                                    vertical: 10,
-                                  ),
-                                  children: [
-                                    Container(
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.greyShade5
-                                            .withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ).paddingSymmetric(h: size.width / 2.7),
-                                    SizedBox(height: getScreenHeight(21)),
-                                    Center(
-                                      child: Text(
-                                        'Who can reply',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(5)),
-                                    Center(
-                                      child: Text(
-                                        'Identify who can reply to this reach.',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(14),
-                                          color: AppColors.greyShade3,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(20)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/world.svg'),
-                                        title: Text(
-                                          'Everyone can reply',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-follow.svg'),
-                                        title: Text(
-                                          'People you follow',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-mention.svg'),
-                                        title: Text(
-                                          'Only people you mention',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/none.svg'),
-                                        title: Text(
-                                          'None',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ]);
-                            });
-                      },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/svgs/world.svg', height: 30),
-                          const SizedBox(width: 9),
-                          const Text(
-                            'Everyone can reply',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          ],
+                        )),
                   ],
                 ),
               ),

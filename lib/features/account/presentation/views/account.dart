@@ -2016,8 +2016,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserLoaded) {
-                globals.userBloc!.add(
-                    GetRecipientProfileEvent(email: widget.recipientEmail));
+                Snackbars.success(context, message: "Reached User Successfully");
+                // globals.userBloc!.add(
+                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
 
                 setState(() {});
