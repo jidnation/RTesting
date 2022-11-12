@@ -7,6 +7,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/custom_textfield.dart';
 
 import '../../dictionary_bloc/bloc/dictionary_bloc.dart';
 
@@ -46,33 +47,41 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                 ? const CircularLoader()
                 : _recentWords.value.isEmpty
                     ? const Center(child: Text('No Recent Words'))
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _recentWords.value.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            title: RichText(
-                              text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                      text:
-                                          '${_recentWords.value[index].abbr} : ',
-                                      style:
-                                          const TextStyle(color: Colors.blue)),
-                                  TextSpan(
-                                      text: '${_recentWords.value[index].word}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                            subtitle: Text(
-                              _recentWords.value[index].meaning.toString(),
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          );
-                        },
+                    : Column(
+                        children: [
+                          SearchCustomTextField(onChanged: (value) {
+                            return;
+                          }),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _recentWords.value.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ListTile(
+                                title: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(color: Colors.black),
+                                    children: [
+                                      TextSpan(
+                                          text:
+                                              '${_recentWords.value[index].abbr} : ',
+                                          style: const TextStyle(
+                                              color: Colors.blue)),
+                                      TextSpan(
+                                          text:
+                                              '${_recentWords.value[index].word}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  _recentWords.value[index].meaning.toString(),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       );
           },
         ),
