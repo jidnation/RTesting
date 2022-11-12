@@ -172,7 +172,53 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     //     emit(UserUploadError(error: e.message));
     //   }
     // });
-    on<UploadUserProfilePictureEvent>((event, emit) async {
+    on<UploadUserCoverPhotoEvent>((event, emit) async {
+      emit(UserUploadingCoverImage());
+      String imageUrl = '';
+      String signedUrl = '';
+      try {
+        //GET SIGNED URL
+        final response = await userRepository.getSignedURl(file: event.file);
+
+        response.fold(
+          (error) => emit(UserUploadError(error: error)),
+          (data) {
+            signedUrl = data['signedUrl'];
+            imageUrl = data['imageUrl'];
+          },
+        );
+
+        //UPLOAD FILE & GET IMAGE URL
+        if (signedUrl.isNotEmpty) {
+          final uploadRes = await userRepository.uploadPhoto(
+            url: signedUrl,
+            file: event.file,
+          );
+
+          uploadRes.fold(
+            (error) => emit(UserUploadError(error: error)),
+            (user) {},
+          );
+
+          final userRes = await userRepository.setImage(
+            imageUrl: imageUrl,
+            type: 'coverPicture',
+          );
+
+          userRes.fold(
+            (error) => emit(UserUploadError(error: error)),
+            (user) {
+              globals.user = user;
+              emit(UserUploadCoverPictureSuccess(user: user));
+            },
+          );
+        }
+      } on GraphQLError catch (e) {
+        emit(UserUploadError(error: e.message));
+      }
+    });
+
+on<UploadUserProfilePictureEvent>((event, emit) async {
       emit(UserUploadingImage());
       String imageUrl = '';
       String signedUrl = '';
@@ -217,6 +263,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserUploadError(error: e.message));
       }
     });
+
     on<ReachUserEvent>((event, emit) async {
       emit(UserLoading());
       try {

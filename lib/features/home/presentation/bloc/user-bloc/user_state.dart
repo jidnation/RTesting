@@ -9,6 +9,8 @@ class UserLoading extends UserState {}
 
 class UserUploadingImage extends UserState {}
 
+class UserUploadingCoverImage extends UserState {}
+
 class UserUploadProfilePictureSuccess extends UserState {
   UserUploadProfilePictureSuccess({this.user});
   final User? user;
