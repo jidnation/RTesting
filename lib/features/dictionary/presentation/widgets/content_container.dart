@@ -16,7 +16,7 @@ class ContentContainer extends HookWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 18.0),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 419, maxHeight: 350),
+        constraints: const BoxConstraints(maxWidth: 419, maxHeight: 190),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24.5),
