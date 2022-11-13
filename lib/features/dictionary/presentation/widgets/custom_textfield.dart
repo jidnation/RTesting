@@ -19,14 +19,15 @@ class SearchCustomTextField extends StatelessWidget {
             child: TextField(
               onChanged: onChanged,
               decoration: InputDecoration(
-                  hintText: 'Search',
-                  hintStyle: const TextStyle(color: Color(0xffCECECE)),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(33),
-                      borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(33),
-                      borderSide: BorderSide.none)),
+                hintText: 'Search',
+                hintStyle: const TextStyle(color: Color(0xffCECECE)),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(33),
+                    borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(33),
+                    borderSide: BorderSide.none),
+              ),
             ),
           )),
     );
