@@ -77,7 +77,7 @@ class DictionaryDataSource {
 
       var res = result.data["getRecentlyAddedWords"] as List;
       final data = res.map((e) => GetRecentlyAddedWord.fromJson(e)).toList();
-      log(' This is my Data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.$data');
+     
       return data;
     } catch (e) {
       rethrow;
@@ -107,9 +107,7 @@ class DictionaryDataSource {
       }
      
       List<Map<String, dynamic>> res = (result.data["getRecentlyAddedWords"] as List).map((item) => item as Map<String, dynamic>).toList();
-      // var res =
-      //     result.data["getRecentlyAddedWords"] as List<Map<String, dynamic>>;
-      log(' This is my Result>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.$res');
+     
       return res;
     } catch (e) {
       log(e.toString());
