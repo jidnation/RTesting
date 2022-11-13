@@ -190,6 +190,7 @@ class UserRepository {
       final reach = await _homeRemoteDataSource.reachUser(
         userId: userId,
       );
+      print("Reach $reach");
       return Right(reach);
     } on GraphQLError catch (e) {
       return Left(e.message);

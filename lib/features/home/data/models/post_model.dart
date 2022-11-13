@@ -192,6 +192,11 @@ class SavePostModel {
             ? null
             : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
       };
+
+  PostModel toPostModel() => PostModel(
+      imageMediaItems: imageMediaItems,
+      videoMediaItem: videoMediaItem,
+      audioMediaItem: audioMediaItem);
 }
 
 class PostLikeModel {

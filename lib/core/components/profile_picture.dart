@@ -30,7 +30,7 @@ class ProfilePicture extends StatelessWidget {
         ),
         child: CachedNetworkImage(
           imageUrl: globals.user!.profilePicture ?? '',
-          //fit: BoxFit.cover,
+          fit: BoxFit.cover,
           placeholder: (context, url) => const ImagePlaceholder(),
           errorWidget: (context, url, error) => const ImagePlaceholder(),
         ),
@@ -39,6 +39,38 @@ class ProfilePicture extends StatelessWidget {
   }
 }
 
+class CoverPicture extends StatelessWidget {
+  const CoverPicture({
+    Key? key,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      imageUrl: globals.user!.coverPicture ?? '',
+      placeholder: (context, url) => const CoverImagePlaceholder(),
+      errorWidget: (context, url, error) => const CoverImagePlaceholder(),
+      fit: BoxFit.cover,
+    );
+  }
+}
+
+class RecipientCoverPicture extends StatelessWidget {
+  const RecipientCoverPicture({
+        required this.imageUrl,
+
+    Key? key,
+  }) : super(key: key);
+    final String? imageUrl;
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      imageUrl: imageUrl ?? '',
+      placeholder: (context, url) => const CoverImagePlaceholder(),
+      errorWidget: (context, url, error) => const CoverImagePlaceholder(),
+      fit: BoxFit.cover,
+    );
+  }
+}
 
 class RecommendPicture extends StatelessWidget {
   const RecommendPicture({

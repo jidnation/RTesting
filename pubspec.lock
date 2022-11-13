@@ -39,10 +39,12 @@ packages:
   audio_waveforms:
     dependency: "direct main"
     description:
-      name: audio_waveforms
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.5+1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "7a266ae7e7174c08bd9fa2ed4d6c75f81df72f96"
+      url: "https://github.com/gideonoyekale/audio_waveforms.git"
+    source: git
+    version: "0.1.6"
   audioplayers:
     dependency: "direct main"
     description:
@@ -660,6 +662,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  full_screen_image_null_safe:
+    dependency: "direct main"
+    description:
+      name: full_screen_image_null_safe
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   fwfh_text_style:
     dependency: transitive
     description:
@@ -905,6 +914,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.3.1"
+  just_waveform:
+    dependency: "direct main"
+    description:
+      name: just_waveform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   linkify:
     dependency: transitive
     description:
@@ -1639,7 +1655,7 @@ packages:
     source: hosted
     version: "0.5.3"
   visibility_detector:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: visibility_detector
       url: "https://pub.dartlang.org"

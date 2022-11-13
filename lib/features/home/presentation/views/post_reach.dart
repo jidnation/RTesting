@@ -9,7 +9,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -25,8 +24,12 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_eve
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
 
+import '../../../../core/helper/logger.dart';
 import '../../../../core/models/file_result.dart';
+import '../../../../core/services/media_service.dart';
+import '../../../../core/utils/file_utils.dart';
 
 class UploadFileDto {
   File file;
@@ -74,7 +77,12 @@ class _PostReachState extends State<PostReach> {
 
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
-    //final controller = useTextEditingController();
+
+    final nVideos = useState(0);
+    final nAudios = useState(0);
+    final nImages = useState(0);
+    final controller = useTextEditingController();
+    final replyFeature = useState("everyone");
 
     final _mediaList = useState<List<UploadFileDto>>([]);
 
@@ -132,15 +140,19 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
-                                globals.postContent = controllerKey
-                                    .currentState!.controller!.text;
-                                globals.postCommentOption = 'everyone';
+
+                                globals.postContent = controller.text;
+                                globals.postCommentOption = replyFeature.value;
+
                                 setState(() {});
                               } else {
+                                debugPrint(
+                                    "reply feature: ${replyFeature.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-                                  content: controllerKey
-                                      .currentState!.controller!.text,
-                                  commentOption: 'everyone',
+
+                                  content: controller.text,
+                                  commentOption: replyFeature.value,
+
                                   location: getUserLoation(),
                                 ));
                               }
@@ -394,74 +406,47 @@ class _PostReachState extends State<PostReach> {
                                   }
                                   UploadFileDto mediaDto =
                                       _mediaList.value[index];
-                                  return Stack(
-                                    alignment: Alignment.topRight,
-                                    children: [
-                                      Container(
-                                        width: getScreenWidth(200),
-                                        height: getScreenHeight(200),
-                                        clipBehavior: Clip.hardEdge,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Image.file(
-                                          mediaDto.file,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Positioned.fill(
-                                          child: GestureDetector(onTap: () {
-                                        RouteNavigators.route(
-                                            context,
-                                            PhotoView(
-                                              imageProvider: FileImage(
-                                                mediaDto.file,
-                                              ),
-                                            ));
-                                      })),
-                                      Positioned(
-                                        right: getScreenWidth(4),
-                                        top: getScreenWidth(5),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _mediaList.value.removeAt(index);
-                                            setState(() {});
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Container(
-                                              height: getScreenHeight(26),
-                                              width: getScreenWidth(26),
-                                              child: Center(
-                                                child: Icon(
-                                                  Icons.close,
-                                                  color: AppColors.grey,
-                                                  size: getScreenHeight(14),
-                                                ),
-                                              ),
-                                              decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: AppColors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ).paddingOnly(r: 10);
-                                  // if (FileUtils.isImage(mediaDto.file) ||
-                                  //     FileUtils.isVideo(mediaDto.file)) {
-                                  //   return PostReachMedia(
-                                  //       fileResult: mediaDto.fileResult!,
-                                  //       onClose: () {
-                                  //         _mediaList.value.removeAt(index);
-                                  //         setState(() {});
-                                  //       });
-                                  // } else {
-                                  //   return const SizedBox.shrink();
-                                  // }
+                                  if (FileUtils.isImage(mediaDto.file) ||
+                                      FileUtils.isVideo(mediaDto.file)) {
+                                    return PostReachMedia(
+                                        fileResult: mediaDto.fileResult!,
+                                        onClose: () {
+                                          if (FileUtils.isImage(
+                                              mediaDto.file)) {
+                                            nImages.value = nImages.value - 1;
+                                          } else {
+                                            nVideos.value = nVideos.value - 1;
+                                          }
+                                          _mediaList.value = [
+                                            ..._mediaList.value
+                                          ]..removeAt(index);
+                                          setState(() {});
+                                        });
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
                                 }),
                           )).paddingSymmetric(h: 16)
+                    else
+                      const SizedBox.shrink(),
+                    if (_mediaList.value
+                            .indexWhere((e) => FileUtils.isAudio(e.file)) >=
+                        0)
+                      PostReachAudioMedia(
+                        margin: EdgeInsets.all(16),
+                        path: _mediaList
+                            .value[_mediaList.value
+                                .indexWhere((e) => FileUtils.isAudio(e.file))]
+                            .file
+                            .path,
+                        onCancel: () {
+                          int pos = _mediaList.value
+                              .indexWhere((e) => FileUtils.isAudio(e.file));
+                          _mediaList.value = [..._mediaList.value]
+                            ..removeAt(pos);
+                          nAudios.value = nAudios.value - 1;
+                        },
+                      )
                     else
                       const SizedBox.shrink(),
                   ],
@@ -525,7 +510,12 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(20)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'everyone';
+                                          RouteNavigators.pop(context);
+                                        });
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -542,7 +532,13 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'people_you_follow';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -559,7 +555,13 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'only_people_you_mention';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -576,7 +578,12 @@ class _PostReachState extends State<PostReach> {
                                     ),
                                     SizedBox(height: getScreenHeight(10)),
                                     InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'none';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
                                       child: ListTile(
                                         contentPadding: EdgeInsets.zero,
                                         minLeadingWidth: 14,
@@ -594,20 +601,7 @@ class _PostReachState extends State<PostReach> {
                                   ]);
                             });
                       },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/svgs/world.svg', height: 30),
-                          const SizedBox(width: 9),
-                          const Text(
-                            'Everyone can reply',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            ),
-                          ),
-                        ],
-                      ),
+                      child: replyWidget(replyFeature.value),
                     ),
                     Row(
                       children: [
@@ -622,15 +616,42 @@ class _PostReachState extends State<PostReach> {
                         // const SizedBox(width: 20),
                         IconButton(
                           onPressed: () async {
-                            // final media = await MediaService()
-                            //     .loadMediaFromGallery(context: context);
-                            final media = await getImage(ImageSource.gallery);
-                            if (media != null) {
-                              _mediaList.value.add(UploadFileDto(
-                                  file: media,
-                                  id: Random().nextInt(100).toString()));
-                              setState(() {});
+                            final media = await MediaService().pickFromGallery(
+                                context: context, maxAssets: 15);
+                            if (media == null) return;
+                            int total = media.length;
+                            int noOfVideos = media
+                                .where((e) => FileUtils.isVideo(e.file))
+                                .length;
+                            int noOfImages = media
+                                .where((e) => FileUtils.isImage(e.file))
+                                .length;
+
+                            if ((_mediaList.value.length + total) > 15) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than 15 media');
+                              return;
                             }
+
+                            if (noOfVideos > 1 ||
+                                (noOfVideos > 0 && nVideos.value > 0)) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than one video media');
+                              return;
+                            }
+
+                            for (var e in media) {
+                              _mediaList.value.add(UploadFileDto(
+                                  file: e.file,
+                                  fileResult: e,
+                                  id: Random().nextInt(100).toString()));
+                            }
+
+                            nVideos.value = nVideos.value + noOfVideos;
+                            nImages.value = nImages.value + noOfImages;
+                            setState(() {});
                           },
                           splashColor: Colors.transparent,
                           splashRadius: 20,
@@ -640,7 +661,34 @@ class _PostReachState extends State<PostReach> {
                         ),
                         const SizedBox(width: 20),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final media =
+                                await MediaService().getAudio(context: context);
+                            if (media == null) return;
+                            if ((_mediaList.value.length + 1) > 15) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than 15 media');
+                              return;
+                            }
+                            if (!FileUtils.isAudio(media.file)) {
+                              Snackbars.error(context,
+                                  message: 'Audio format not supported!');
+                              return;
+                            }
+                            if (nAudios.value > 0) {
+                              Snackbars.error(context,
+                                  message:
+                                      'Sorry, you cannot add more than one audio media');
+                              return;
+                            }
+                            nAudios.value = nAudios.value + 1;
+                            Console.log('<<<PATH>>', media.path);
+                            _mediaList.value.add(UploadFileDto(
+                                file: media.file,
+                                fileResult: media,
+                                id: Random().nextInt(100).toString()));
+                          },
                           padding: EdgeInsets.zero,
                           splashColor: Colors.transparent,
                           splashRadius: 20,
@@ -657,6 +705,93 @@ class _PostReachState extends State<PostReach> {
         ),
       ),
     );
+  }
+
+  Row replyWidget(String replyFeature) {
+    switch (replyFeature) {
+      case 'everyone':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/world.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Everyone can reply',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'people_you_follow':
+        return Row(
+          children: [
+            SvgPicture.asset(
+              'assets/svgs/people-you-follow.svg',
+              height: 30,
+            ),
+            const SizedBox(width: 9),
+            const Text(
+              'People you follow',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'only_people_you_mention':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/people-you-mention.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Only people you mention',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      case 'none':
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/none.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'None',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+
+      default:
+        return Row(
+          children: [
+            SvgPicture.asset('assets/svgs/world.svg', height: 30),
+            const SizedBox(width: 9),
+            const Text(
+              'Everyone can reply',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor2,
+              ),
+            ),
+          ],
+        );
+    }
   }
 }
 
@@ -946,138 +1081,140 @@ class EditReach extends HookWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10)),
+                              ),
+                              builder: (context) {
+                                return ListView(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 27,
+                                      vertical: 10,
+                                    ),
+                                    children: [
+                                      Container(
+                                        height: 4,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.greyShade5
+                                              .withOpacity(0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ).paddingSymmetric(h: size.width / 2.7),
+                                      SizedBox(height: getScreenHeight(21)),
+                                      Center(
+                                        child: Text(
+                                          'Who can reply',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(5)),
+                                      Center(
+                                        child: Text(
+                                          'Identify who can reply to this reach.',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(14),
+                                            color: AppColors.greyShade3,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(20)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/world.svg'),
+                                          title: Text(
+                                            'Everyone can reply',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-follow.svg'),
+                                          title: Text(
+                                            'People you follow',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-mention.svg'),
+                                          title: Text(
+                                            'Only people you mention',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/none.svg'),
+                                          title: Text(
+                                            'None',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]);
+                              });
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/svgs/world.svg',
+                                height: 30),
+                            const SizedBox(width: 9),
+                            const Text(
+                              'Everyone can reply',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor2,
+                              ),
                             ),
-                            builder: (context) {
-                              return ListView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 27,
-                                    vertical: 10,
-                                  ),
-                                  children: [
-                                    Container(
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.greyShade5
-                                            .withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ).paddingSymmetric(h: size.width / 2.7),
-                                    SizedBox(height: getScreenHeight(21)),
-                                    Center(
-                                      child: Text(
-                                        'Who can reply',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(5)),
-                                    Center(
-                                      child: Text(
-                                        'Identify who can reply to this reach.',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(14),
-                                          color: AppColors.greyShade3,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(20)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/world.svg'),
-                                        title: Text(
-                                          'Everyone can reply',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-follow.svg'),
-                                        title: Text(
-                                          'People you follow',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-mention.svg'),
-                                        title: Text(
-                                          'Only people you mention',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/none.svg'),
-                                        title: Text(
-                                          'None',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ]);
-                            });
-                      },
-                      child: Row(
-                        children: [
-                          SvgPicture.asset('assets/svgs/world.svg', height: 30),
-                          const SizedBox(width: 9),
-                          const Text(
-                            'Everyone can reply',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          ],
+                        )),
                   ],
                 ),
               ),

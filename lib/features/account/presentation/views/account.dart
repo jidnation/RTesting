@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/custom_button.dart';
@@ -36,6 +37,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
+import '../../../home/presentation/widgets/post_media.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -363,6 +365,16 @@ class _AccountScreenState extends State<AccountScreen>
           .add(GetAllSavedPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!
           .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
+      globals.socialServiceBloc!.add(GetVotedPostsEvent(
+          pageLimit: 50,
+          pageNumber: 1,
+          voteType: 'Upvote',
+          authId: globals.userId));
+      globals.socialServiceBloc!.add(GetVotedPostsEvent(
+          pageLimit: 50,
+          pageNumber: 1,
+          voteType: 'Downvote',
+          authId: globals.userId));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -424,6 +436,18 @@ class _AccountScreenState extends State<AccountScreen>
                   Snackbars.error(context, message: state.error);
                   _likesRefreshController.refreshCompleted();
                 }
+                if (state is GetVotedPostsSuccess) {
+                  if (state.voteType == 'Upvote') {
+                    _shoutOuts.value = state.posts!;
+                    _shoutoutRefreshController.refreshCompleted();
+                  } else if (state.voteType == 'Downvote') {
+                    _shoutDowns.value = state.posts!;
+                    _shoutdownRefreshController.refreshCompleted();
+                  }
+                }
+                if (state is GetVotedPostsError) {
+                  Snackbars.error(context, message: state.error);
+                }
                 if (state is GetPersonalCommentsSuccess) {
                   _comments.value = state.data!;
                   _commentsRefreshController.refreshCompleted();
@@ -478,10 +502,44 @@ class _AccountScreenState extends State<AccountScreen>
                         SizedBox(
                           height: getScreenHeight(200),
                           width: size.width,
-                          child: Image.asset(
-                            'assets/images/cover.png',
-                            fit: BoxFit.cover,
-                            gaplessPlayback: true,
+                          child: GestureDetector(child: const CoverPicture(),
+                          onTap: () {
+                            RouteNavigators.route(
+                                      context,
+                                      FullScreenWidget(
+                                        child: Stack(children: <Widget>[
+                                          Container(
+                                            color: AppColors
+                                                .black, // Your screen background color
+                                          ),
+                                          Column(children: <Widget>[
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            const CoverPicture(),
+                                          ]),
+                                          Positioned(
+                                            top: 0.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: AppBar(
+                                              title: const Text(
+                                                  'Cover Photo'), // You can add title here
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    color: AppColors.white),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                              backgroundColor: AppColors
+                                                  .black, //You can make this transparent
+                                              elevation: 0.0, //No shadow
+                                            ),
+                                          ),
+                                        ]),
+                                      ));
+                      
+                          },
                           ),
                         ),
                         Row(
@@ -536,13 +594,56 @@ class _AccountScreenState extends State<AccountScreen>
                         Positioned(
                           top: size.height * 0.2 - 20,
                           child: AnimatedContainer(
-                            width: isGoingDown ? width : getScreenWidth(100),
-                            height: isGoingDown ? height : getScreenHeight(100),
-                            duration: const Duration(seconds: 1),
-                            child: const ProfilePicture(
-                              height: 90,
-                            )
-                          ),
+                              width: isGoingDown ? width : getScreenWidth(100),
+                              height:
+                                  isGoingDown ? height : getScreenHeight(100),
+                              duration: const Duration(seconds: 1),
+
+                              child: GestureDetector(
+                                child: const ProfilePicture(
+                                  height: 90,
+                                ),
+                                onTap: () {
+                                  RouteNavigators.route(
+                                      context,
+                                      FullScreenWidget(
+                                        child: Stack(children: <Widget>[
+                                          Container(
+                                            color: AppColors
+                                                .black, // Your screen background color
+                                          ),
+                                          Column(children: <Widget>[
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            Image.network(
+                                              globals.user!.profilePicture!,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ]),
+                                          Positioned(
+                                            top: 0.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: AppBar(
+                                              title: const Text(
+                                                  'Profile Picture'), // You can add title here
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    color: AppColors.white),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                              backgroundColor: AppColors
+                                                  .black, //You can make this transparent
+                                              elevation: 0.0, //No shadow
+                                            ),
+                                          ),
+                                        ]),
+                                      ));
+                                },
+
+                              )),
                         ),
                       ],
                     ),
@@ -936,7 +1037,77 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _shoutOuts.value.length,
                                       itemBuilder: (context, index) {
-                                        return Container();
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _shoutOuts.value[index],
+                                          isLiked: _shoutOuts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _shoutOuts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _shoutOuts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _shoutOuts.value[index].vote![0]
+                                                  .voteType
+                                              : null,
+                                          onMessage: () {
+                                            reachDM.value = true;
+
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _shoutOuts
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
+                                                postId: _shoutOuts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _shoutOuts
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_shoutOuts.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _shoutOuts
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _shoutOuts
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
                             ),
@@ -970,7 +1141,77 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _shoutDowns.value.length,
                                       itemBuilder: (context, index) {
-                                        return Container();
+                                        return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _shoutDowns.value[index],
+                                          isLiked: _shoutDowns
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _shoutDowns
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _shoutDowns
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _shoutDowns.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                            reachDM.value = true;
+
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.userBloc!.add(
+                                                  GetRecipientProfileEvent(
+                                                      email: _shoutDowns
+                                                          .value[index]
+                                                          .postOwnerId!));
+                                            }
+                                          },
+                                          onUpvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'upvote',
+                                                postId: _shoutDowns
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onDownvote: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              globals.socialServiceBloc!
+                                                  .add(VotePostEvent(
+                                                voteType: 'downvote',
+                                                postId: _shoutDowns
+                                                    .value[index].postId,
+                                              ));
+                                            }
+                                          },
+                                          onLike: () {
+                                            handleTap(index);
+                                            if (active.contains(index)) {
+                                              if (_shoutDowns.value[index].like!
+                                                  .isNotEmpty) {
+                                                globals.socialServiceBloc!
+                                                    .add(UnlikePostEvent(
+                                                  postId: _shoutDowns
+                                                      .value[index].postId,
+                                                ));
+                                              } else {
+                                                globals.socialServiceBloc!.add(
+                                                  LikePostEvent(
+                                                      postId: _shoutDowns
+                                                          .value[index].postId),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        );
                                       },
                                     ),
                             ),
@@ -1132,15 +1373,14 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                                  Text(
-                                      postModel!.location! ,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(11),
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    )
-                                  
+                              Text(
+                                postModel!.location!,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(11),
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor2,
+                                ),
+                              )
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1173,11 +1413,13 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if (postModel!.imageMediaItems!.isNotEmpty)
-                    Helper.renderPostImages(postModel!, context)
+                  if (postModel!.imageMediaItems!.isNotEmpty ||
+                      (postModel?.videoMediaItem ?? '').isNotEmpty ||
+                      (postModel?.audioMediaItem ?? '').isNotEmpty)
+                    PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
-                    const SizedBox(),
+                    const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1635,9 +1877,16 @@ Future _showReacherCardBottomSheet(
 
 class RecipientAccountProfile extends StatefulHookWidget {
   static const String id = "recipient_account_screen";
-  final String? recipientEmail, recipientImageUrl, recipientId;
+  final String? recipientEmail,
+      recipientImageUrl,
+      recipientId,
+      recipientCoverImageUrl;
   const RecipientAccountProfile(
-      {Key? key, this.recipientEmail, this.recipientImageUrl, this.recipientId})
+      {Key? key,
+      this.recipientEmail,
+      this.recipientImageUrl,
+      this.recipientCoverImageUrl,
+      this.recipientId})
       : super(key: key);
 
   @override
@@ -1852,8 +2101,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserLoaded) {
-                globals.userBloc!.add(
-                    GetRecipientProfileEvent(email: widget.recipientEmail));
+                Snackbars.success(context, message: "Reached User Successfully");
+                // globals.userBloc!.add(
+                //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
 
                 setState(() {});
@@ -1872,14 +2122,50 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                     clipBehavior: Clip.none,
                     children: <Widget>[
                       /// Banner image
-                      SizedBox(
-                        height: getScreenHeight(190),
-                        width: size.width,
-                        child: Image.asset(
-                          'assets/images/cover.png',
-                          fit: BoxFit.cover,
-                          gaplessPlayback: true,
+                      GestureDetector(
+                        child: SizedBox(
+                          height: getScreenHeight(190),
+                          width: size.width,
+                          child: RecipientCoverPicture(
+                            imageUrl: globals.recipientUser!.coverPicture,
+                          ),
                         ),
+                        onTap: () {
+                          RouteNavigators.route(
+                              context,
+                              FullScreenWidget(
+                                child: Stack(children: <Widget>[
+                                  Container(
+                                    color: AppColors
+                                        .black, // Your screen background color
+                                  ),
+                                  Column(children: <Widget>[
+                                    Container(height: getScreenHeight(100)),
+                                    RecipientCoverPicture(
+                                        imageUrl: globals
+                                            .recipientUser!.coverPicture),
+                                  ]),
+                                  Positioned(
+                                    top: 0.0,
+                                    left: 0.0,
+                                    right: 0.0,
+                                    child: AppBar(
+                                      title: const Text(
+                                          'Cover Photo'), // You can add title here
+                                      leading: IconButton(
+                                        icon: const Icon(Icons.arrow_back,
+                                            color: AppColors.white),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                      backgroundColor: AppColors
+                                          .black, //You can make this transparent
+                                      elevation: 0.0, //No shadow
+                                    ),
+                                  ),
+                                ]),
+                              ));
+                        },
                       ),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1943,12 +2229,62 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   border: Border.all(
                                       color: Colors.grey.shade50, width: 3.0),
                                 )
-                              : RecipientProfilePicture(
-                                  imageUrl: widget.recipientImageUrl,
-                                  width: getScreenWidth(100),
-                                  height: getScreenHeight(100),
-                                  border: Border.all(
-                                      color: Colors.grey.shade50, width: 3.0),
+                              : GestureDetector(
+                                  child: RecipientProfilePicture(
+                                    imageUrl: widget.recipientImageUrl,
+                                    width: getScreenWidth(100),
+                                    height: getScreenHeight(100),
+                                    border: Border.all(
+                                        color: Colors.grey.shade50, width: 3.0),
+                                  ),
+                                  onTap: () {
+                                    RouteNavigators.route(
+                                        context,
+                                        FullScreenWidget(
+                                          child: Stack(children: <Widget>[
+                                            Container(
+                                              color: AppColors
+                                                  .black, // Your screen background color
+                                            ),
+                                            Column(children: <Widget>[
+                                              Container(
+                                                  height: getScreenHeight(100)),
+                                              Container(
+                                                height: size.height - 100,
+                                                width: size.width,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.rectangle,
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(widget
+                                                        .recipientImageUrl!),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ]),
+                                            Positioned(
+                                              top: 0.0,
+                                              left: 0.0,
+                                              right: 0.0,
+                                              child: AppBar(
+                                                title: const Text(
+                                                    'Profile Picture'), // You can add title here
+                                                leading: IconButton(
+                                                  icon: const Icon(
+                                                      Icons.arrow_back,
+                                                      color: AppColors.white),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                ),
+                                                backgroundColor: AppColors
+                                                    .black, //You can make this transparent
+                                                elevation: 0.0, //No shadow
+                                              ),
+                                            ),
+                                          ]),
+                                        ));
+                                  },
                                 ),
                         ),
                       ),
@@ -1979,8 +2315,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               InkWell(
                                 onTap: () => RouteNavigators.route(
                                     context,
-                                    const AccountStatsInfo(
-                                      index: 0,
+                                    RecipientAccountStatsInfo(
+                                      index: 0, recipientId: widget.recipientId,
                                       // recipientId: widget.recipientId,
                                     )),
                                 child: Column(

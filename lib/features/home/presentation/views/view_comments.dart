@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -5,9 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:location/location.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart' as permit;
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -21,11 +27,6 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:permission_handler/permission_handler.dart' as permit;
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -196,7 +197,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                               ),
                             ],
                           ).paddingSymmetric(h: 16),
-                         
                           Container(
                             padding: const EdgeInsets.only(
                                 left: 14, right: 14, bottom: 20, top: 10),
@@ -359,14 +359,16 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                         content:
                                                             controller.text,
                                                         userId:
-                                                            globals.user!.id));
+                                                            globals.user!.id,
+                                                        postOwnerId: widget
+                                                            .post.postOwnerId));
                                               }
                                               controller.clear();
                                             },
                                           )
                                         : IconButton(
                                             //constraints: const BoxConstraints(
-                                               // maxHeight: 25, maxWidth: 25),
+                                            // maxHeight: 25, maxWidth: 25),
                                             onPressed: () async {
                                               print('BUTTON WORKING');
                                               var tempDir =
@@ -770,7 +772,8 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                         CommentOnPostEvent(
                                             postId: widget.post.postId,
                                             content: controller.text,
-                                            userId: globals.user!.id));
+                                            userId: globals.user!.id,
+                                            postOwnerId: widget.post.authId));
                                     controller.clear();
                                   }
                                 },

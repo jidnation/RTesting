@@ -9,7 +9,10 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/views/account.details.dart';
+import 'package:reach_me/features/account/presentation/views/qr_code.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
+import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -123,6 +126,66 @@ Future showProfileMenuBottomSheet(BuildContext context,
             ],
           ),
         );
+      });
+}
+
+Future showEditProfileBottomSheet(BuildContext context) {
+  return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+            decoration: const BoxDecoration(
+              color: AppColors.greyShade7,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              ),
+            ),
+            child: ListView(shrinkWrap: true, children: [
+              Center(
+                child: Container(
+                    height: 4,
+                    width: 58,
+                    decoration: BoxDecoration(
+                        color: AppColors.greyShade4,
+                        borderRadius: BorderRadius.circular(40))),
+              ).paddingOnly(t: 23),
+              const SizedBox(height: 20),
+              KebabBottomTextButton(
+                  label: 'Dictionary',
+                  onPressed: () {
+                    RouteNavigators.route(context, const DictionaryView());
+                  }),
+              //KebabBottomTextButton(label: 'Abbreviation', onPressed: () {}),
+              KebabBottomTextButton(
+                  label: 'Starred Profile',
+                  onPressed: () {
+                    RouteNavigators.route(
+                        context, const AccountStatsInfo(index: 2));
+                  }),
+              KebabBottomTextButton(
+                  label: 'QR Code',
+                  onPressed: () {
+                    RouteNavigators.route(context, const QRCodeScreen());
+                  }),
+              KebabBottomTextButton(
+                  label: 'Saved Post',
+                  onPressed: () {
+                    RouteNavigators.route(context, const SavedPostScreen());
+                  }),
+              KebabBottomTextButton(
+                  label: 'Share Profile',
+                  onPressed: () {
+                    RouteNavigators.pop(context);
+                    Clipboard.setData(
+                        ClipboardData(text: globals.user!.profileSlug));
+                    Snackbars.success(context,
+                        message: 'Profile link copied to clipboard!');
+                  }),
+              //KebabBottomTextButton(label: 'More', onPressed: () {}),
+              const SizedBox(height: 20),
+            ]));
       });
 }
 
@@ -245,7 +308,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                                     postId: postFeedModel.postId));
                               }),
                           KebabBottomTextButton(
-                              label: 'Download Reach Card', onPressed: downloadPost),
+                              label: 'Download Reach Card',
+                              onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Report',
                             onPressed: () {
@@ -306,7 +370,8 @@ Future showReacherCardBottomSheet(BuildContext context,
                             },
                           ),
                           KebabBottomTextButton(
-                              label: 'Download Reach Card', onPressed: downloadPost),
+                              label: 'Download Reach Card',
+                              onPressed: downloadPost),
                           KebabBottomTextButton(
                             label: 'Copy link',
                             onPressed: () {

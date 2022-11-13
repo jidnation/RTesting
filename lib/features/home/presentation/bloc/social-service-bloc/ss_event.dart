@@ -29,7 +29,7 @@ class EditContentEvent extends SocialServiceEvent {
 }
 
 class UploadPostMediaEvent extends SocialServiceEvent {
-  final List<UploadFileDto>? media;
+  final List<UploadFileDto> media;
   UploadPostMediaEvent({required this.media});
 }
 
@@ -53,14 +53,25 @@ class UnlikePostEvent extends SocialServiceEvent {
   UnlikePostEvent({required this.postId});
 }
 
-
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
-  final String? content;
+  final String? content, location;
+    final String? audioMediaItem;
+  final String? videoMediaItem;
+  final List<String>? imageMediaItem;
   final String? userId;
+  final String? postOwnerId;
   CommentOnPostEvent({
     required this.postId,
     required this.content,
+
+    this.location,
+    this.audioMediaItem,
+     this.videoMediaItem,
+    this.imageMediaItem,
+
+     this.postOwnerId,
+    
     required this.userId,
   });
 }
@@ -225,6 +236,25 @@ class DeleteStatusEvent extends SocialServiceEvent {
   DeleteStatusEvent({required this.statusId});
 }
 
+class MuteStatusEvent extends SocialServiceEvent {
+  final String idToMute;
+  MuteStatusEvent({required this.idToMute});
+}
+
+class UnmuteStatusEvent extends SocialServiceEvent {
+  final String idToUnmute;
+  UnmuteStatusEvent({required this.idToUnmute});
+}
+
+class ReportStatusEvent extends SocialServiceEvent {
+  final String reportReason;
+  final String statusId;
+  ReportStatusEvent({
+    required this.reportReason,
+    required this.statusId,
+  });
+}
+
 class CreateStatusEvent extends SocialServiceEvent {
   final CreateStatusDto? createStatusDto;
   CreateStatusEvent({required this.createStatusDto});
@@ -251,8 +281,18 @@ class GetLikedPostsEvent extends SocialServiceEvent {
   });
 }
 
+class GetVotedPostsEvent extends SocialServiceEvent {
+  final int? pageLimit;
+  final int? pageNumber;
+  final String? voteType;
+  final String? authId;
 
-
+  GetVotedPostsEvent(
+      {required this.pageLimit,
+      required this.pageNumber,
+      required this.voteType,
+      this.authId});
+}
 
 class SuggestUserEvent extends SocialServiceEvent {}
 

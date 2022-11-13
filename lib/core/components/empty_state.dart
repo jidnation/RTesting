@@ -160,7 +160,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                   ? reachingUser.value
                                   : false,
                               label: active.contains(index)
-                                  ? reachLabel.value
+                                  ? "Reaching"
                                   : 'Reach',
                             );
                           },
