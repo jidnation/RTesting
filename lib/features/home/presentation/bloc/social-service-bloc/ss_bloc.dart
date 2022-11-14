@@ -580,8 +580,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
 
       try {
         //GET SIGNED URLS FOR ALL FILES
-        Console.log('event.media length', event.media!.length);
-        for (UploadFileDto media in event.media ?? []) {
+        Console.log('event.media length', event.media.length);
+        for (UploadFileDto media in event.media) {
           final response = await userRepository.getSignedURl(file: media.file);
           response.fold(
             (error) => emit(UploadMediaError(error: error)),
@@ -595,7 +595,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
 
         var tempArr = [];
 
-        for (var element in event.media!) {
+        for (var element in event.media) {
           tempMap[element.id] = element.file;
           Console.log('element in media', element);
         }

@@ -397,14 +397,27 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
               ),
             ),
           ),
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(),
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: AppColors.white,
-                size: widget.scaleIcon == null ? 64 : (widget.scaleIcon! * 64),
-              ),
+          Visibility(
+            child: Positioned.fill(
+              child: thumbnail == null
+                  ? Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        child: CircularProgressIndicator(
+                          color: AppColors.white,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: const BoxDecoration(),
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        color: AppColors.white,
+                        size: widget.scaleIcon == null
+                            ? 64
+                            : (widget.scaleIcon! * 64),
+                      ),
+                    ),
             ),
           ),
           widget.allMediaUrls != null
@@ -435,7 +448,7 @@ class PostAudioMedia extends StatefulWidget {
 }
 
 class _PostAudioMediaState extends State<PostAudioMedia> {
-  late PlayerController playerController;
+  PlayerController? playerController;
   bool isInitialised = false;
   bool isPlaying = false;
   final currentDurationStream = StreamController<int>();
@@ -451,26 +464,27 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
     final res = await _mediaService.downloadFile(url: widget.path);
     if (res == null) return;
     playerController = PlayerController();
-    playerController.onCurrentDurationChanged.listen((event) {
+    // if(playerController == null) return;
+    playerController!.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
       // Console.log('<<AUDIO-DURATION>>', event.toString());
     });
-    playerController.addListener(() {
-      Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
-      if (playerController.playerState == PlayerState.initialized) {
+    playerController!.addListener(() {
+      Console.log('<<AUDIO-LISTENER>>', playerController!.playerState.name);
+      if (playerController!.playerState == PlayerState.initialized) {
         isInitialised = true;
-        setState(() {});
-      } else if (playerController.playerState == PlayerState.playing) {
+        if (mounted) setState(() {});
+      } else if (playerController!.playerState == PlayerState.playing) {
         isPlaying = true;
         if (mounted) setState(() {});
-      } else if (playerController.playerState == PlayerState.paused ||
-          playerController.playerState == PlayerState.stopped) {
+      } else if (playerController!.playerState == PlayerState.paused ||
+          playerController!.playerState == PlayerState.stopped) {
         isPlaying = false;
         if (mounted) setState(() {});
       }
     });
-    await playerController.preparePlayer(res.path);
+    await playerController!.preparePlayer(res.path);
     // await playerController.startPlayer();
     if (mounted) setState(() {});
   }
@@ -487,10 +501,11 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
         children: [
           GestureDetector(
             onTap: () {
+              if (playerController == null) return;
               if (isPlaying) {
-                playerController.pausePlayer();
+                playerController!.pausePlayer();
               } else {
-                playerController.startPlayer();
+                playerController!.startPlayer();
               }
             },
             child: Icon(
@@ -505,7 +520,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
           isInitialised
               ? AudioFileWaveforms(
                   size: Size(MediaQuery.of(context).size.width / 1.7, 24),
-                  playerController: playerController,
+                  playerController: playerController!,
                   density: 2,
                   enableSeekGesture: true,
                   playerWaveStyle: const PlayerWaveStyle(
@@ -542,6 +557,6 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
   @override
   void dispose() {
     super.dispose();
-    playerController.dispose();
+    playerController?.dispose();
   }
 }

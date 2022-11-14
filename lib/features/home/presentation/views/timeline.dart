@@ -29,7 +29,6 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
-import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
@@ -46,6 +45,7 @@ import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
+import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
 
@@ -112,6 +112,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     super.build(context);
 
     final reachDM = useState(false);
+    final viewProfile = useState(false);
     final shoutingDown = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
     final _currentPost = useState<PostFeedModel?>(null);
@@ -184,15 +185,41 @@ class _TimelineScreenState extends State<TimelineScreen>
           child: BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
+              if (state is UserLoading) {
+                // if (viewProfile.value) {
+                //   ProgressHUD.of(context)?.showWithText('Viewing Profile');
+                // }
+              }
               if (state is RecipientUserData) {
                 if (reachDM.value) {
                   reachDM.value = false;
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
+                } else if (viewProfile.value) {
+                  viewProfile.value = false;
+                  ProgressHUD.of(context)?.dismiss();
+                  globals.recipientUser = state.user;
+                  state.user!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: 'email',
+                            recipientImageUrl: state.user!.profilePicture,
+                            recipientId: state.user!.id,
+                          ));
                 }
               }
               if (state is UserError) {
+                ProgressHUD.of(context)?.dismiss();
+                if (viewProfile.value) {
+                  Snackbars.error(context,
+                      message: (state.error ?? '').contains('Profile')
+                          ? 'Account not available!'
+                          : state.error);
+                }
                 reachDM.value = false;
+                viewProfile.value = false;
               }
               if (state is GetReachRelationshipSuccess) {
                 if (shoutingDown.value) {
@@ -523,6 +550,19 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           ? _posts.value[index]
                                                               .vote![0].voteType
                                                           : null,
+                                                      onViewProfile: () {
+                                                        viewProfile.value =
+                                                            true;
+                                                        ProgressHUD.of(context)
+                                                            ?.showWithText(
+                                                                'Viewing Profile');
+                                                        globals.userBloc!.add(
+                                                            GetRecipientProfileEvent(
+                                                                email: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postOwnerId));
+                                                      },
                                                       onMessage: () {
                                                         HapticFeedback
                                                             .mediumImpact();
@@ -702,7 +742,7 @@ class PostFeedReacherCard extends HookWidget {
     this.onLike,
     this.onMessage,
     this.onUpvote,
-    this.routeProfile,
+    this.onViewProfile,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
@@ -710,7 +750,7 @@ class PostFeedReacherCard extends HookWidget {
 
   final PostFeedModel? postFeedModel;
   final bool likingPost;
-  final Function()? onLike, onMessage, onUpvote, onDownvote, routeProfile;
+  final Function()? onLike, onMessage, onUpvote, onDownvote, onViewProfile;
   final bool isLiked, isVoted;
   final String? voteType;
 
@@ -768,24 +808,28 @@ class PostFeedReacherCard extends HookWidget {
                     minSize: 0,
                     padding: EdgeInsets.zero,
                     onPressed: () {
-                      final progress = ProgressHUD.of(context);
-                      progress?.showWithText('Viewing Reacher...');
-                      Future.delayed(const Duration(seconds: 3), () {
-                        globals.userBloc!.add(GetRecipientProfileEvent(
-                            email: postFeedModel!.postOwnerId));
-                        postFeedModel!.postOwnerId == globals.user!.id
-                            ? RouteNavigators.route(
-                                context, const AccountScreen())
-                            : RouteNavigators.route(
-                                context,
-                                RecipientAccountProfile(
-                                  recipientEmail: 'email',
-                                  recipientImageUrl:
-                                      postFeedModel!.profilePicture,
-                                  recipientId: postFeedModel!.postOwnerId,
-                                ));
-                        progress?.dismiss();
-                      });
+                      if (onViewProfile != null) {
+                        onViewProfile!();
+                      } else {
+                        final progress = ProgressHUD.of(context);
+                        progress?.showWithText('Viewing Reacher...');
+                        Future.delayed(const Duration(seconds: 3), () {
+                          globals.userBloc!.add(GetRecipientProfileEvent(
+                              email: postFeedModel!.postOwnerId));
+                          postFeedModel!.postOwnerId == globals.user!.id
+                              ? RouteNavigators.route(
+                                  context, const AccountScreen())
+                              : RouteNavigators.route(
+                                  context,
+                                  RecipientAccountProfile(
+                                    recipientEmail: 'email',
+                                    recipientImageUrl:
+                                        postFeedModel!.profilePicture,
+                                    recipientId: postFeedModel!.postOwnerId,
+                                  ));
+                          progress?.dismiss();
+                        });
+                      }
                     },
                     child: Row(
                       children: [
@@ -946,10 +990,6 @@ class PostFeedReacherCard extends HookWidget {
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
-
-                    //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-                    // Helper.renderPostImages(postFeedModel!.post!, context)
-
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
                 const SizedBox.shrink(),
