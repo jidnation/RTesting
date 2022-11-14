@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
@@ -42,7 +43,6 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
-import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
@@ -719,7 +719,6 @@ class PostFeedReacherCard extends HookWidget {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
 
-
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -944,13 +943,12 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
-
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
-                
-              //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-               // Helper.renderPostImages(postFeedModel!.post!, context)
+
+                    //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+                    // Helper.renderPostImages(postFeedModel!.post!, context)
 
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else

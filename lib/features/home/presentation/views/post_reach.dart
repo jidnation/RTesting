@@ -149,10 +149,8 @@ class _PostReachState extends State<PostReach> {
                                 debugPrint(
                                     "reply feature: ${replyFeature.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-
                                   content: controller.text,
                                   commentOption: replyFeature.value,
-
                                   location: getUserLoation(),
                                 ));
                               }
@@ -256,7 +254,7 @@ class _PostReachState extends State<PostReach> {
                               .map((item) => {
                                     "id": item["authId"],
                                     "display": item["abbr"],
-                                    "meaning":item["meaning"],
+                                    "meaning": item["meaning"],
                                   })
                               .toList();
 
@@ -271,52 +269,50 @@ class _PostReachState extends State<PostReach> {
                         }
                       },
                       builder: (context, state) {
-                        return  FlutterMentions(
-                                key: controllerKey,
-                                maxLengthEnforcement:
-                                    MaxLengthEnforcement.enforced,
-                                minLines: 1,
-                                maxLines: 3,
-                                maxLength: 200,
-                                suggestionPosition: SuggestionPosition.Bottom,
-                                onChanged: (val) {
-                                  counter.value = val
-                                      .trim()
-                                      .split(RegexUtil.spaceOrNewLine)
-                                      .length;
-                                  if (counter.value >= 200) {
-                                    Snackbars.error(context,
-                                        message: '200 words limit reached!');
-                                  }
-                                },
-                                decoration: const InputDecoration(
-                                  counterText: '',
-                                  hintText: "What's on your mind?",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.greyShade1,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 10,
-                                  ),
+                        return FlutterMentions(
+                          key: controllerKey,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          // minLines: 1,
+                          // maxLines: 3,
+                          suggestionPosition: SuggestionPosition.Bottom,
+                          onChanged: (val) {
+                            counter.value = val
+                                .trim()
+                                .split(RegexUtil.spaceOrNewLine)
+                                .length;
+                            if (counter.value >= 200) {
+                              Snackbars.error(context,
+                                  message: '200 words limit reached!');
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            counterText: '',
+                            hintText: "What's on your mind?",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.greyShade1,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                          ),
+                          mentions: [
+                            Mention(
+                                trigger: "#",
+                                style: const TextStyle(
+                                  color: Colors.blue,
                                 ),
-                                mentions: [
-                                  Mention(
-                                      trigger: "#",
-                                      style: const TextStyle(
-                                        color: Colors.blue,
-                                      ),
-                                      data: _recentWords.value,
-                                      matchAll: false,
-                                      suggestionBuilder: (data) {
-                                        return Container(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child:_isLoading.value
-                            ? const CircularProgressIndicator()
-                            : Column(
+                                data: _recentWords.value,
+                                matchAll: false,
+                                suggestionBuilder: (data) {
+                                  return Container(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: _isLoading.value
+                                        ? const CircularProgressIndicator()
+                                        : Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
@@ -351,42 +347,42 @@ class _PostReachState extends State<PostReach> {
                                               // ),
                                             ],
                                           ),
-                                        );
-                                      }),
-                                ],
-                                // child: TextField(
-                                //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                                //   minLines: 1,
-                                //   maxLines: null,
-                                //   controller: controller,
-                                //   inputFormatters: [
-                                //     MaxWordTextInputFormater(maxWords: 200)
-                                //   ],
-                                //   // maxLength: 200,
-                                //   onChanged: (val) {
-                                //     counter.value =
-                                //         val.trim().split(RegexUtil.spaceOrNewLine).length;
-                                //     if (counter.value >= 200) {
-                                //       Snackbars.error(context,
-                                //           message: '200 words limit reached!');
-                                //     }
-                                //   },
-                                //   decoration: const InputDecoration(
-                                //     counterText: '',
-                                //     hintText: "What's on your mind?",
-                                //     hintStyle: TextStyle(
-                                //       fontSize: 14,
-                                //       fontWeight: FontWeight.w400,
-                                //       color: AppColors.greyShade1,
-                                //     ),
-                                //     border: InputBorder.none,
-                                //     contentPadding: EdgeInsets.symmetric(
-                                //       horizontal: 16,
-                                //       vertical: 10,
-                                //     ),
-                                //   ),
-                                // ).paddingSymmetric(h: 16),
-                              );
+                                  );
+                                }),
+                          ],
+                          // child: TextField(
+                          //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          //   minLines: 1,
+                          //   maxLines: null,
+                          //   controller: controller,
+                          //   inputFormatters: [
+                          //     MaxWordTextInputFormater(maxWords: 200)
+                          //   ],
+                          //   // maxLength: 200,
+                          //   onChanged: (val) {
+                          //     counter.value =
+                          //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                          //     if (counter.value >= 200) {
+                          //       Snackbars.error(context,
+                          //           message: '200 words limit reached!');
+                          //     }
+                          //   },
+                          //   decoration: const InputDecoration(
+                          //     counterText: '',
+                          //     hintText: "What's on your mind?",
+                          //     hintStyle: TextStyle(
+                          //       fontSize: 14,
+                          //       fontWeight: FontWeight.w400,
+                          //       color: AppColors.greyShade1,
+                          //     ),
+                          //     border: InputBorder.none,
+                          //     contentPadding: EdgeInsets.symmetric(
+                          //       horizontal: 16,
+                          //       vertical: 10,
+                          //     ),
+                          //   ),
+                          // ).paddingSymmetric(h: 16),
+                        );
                       },
                     ),
                     const SizedBox(height: 10),
