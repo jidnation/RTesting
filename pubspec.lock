@@ -508,9 +508,11 @@ packages:
   flutter_mentions:
     dependency: "direct main"
     description:
-      name: flutter_mentions
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "99b8a322c435a5d268fc4f77aa65905dd224282a"
+      url: "https://github.com/gideonoyekale/flutter_mentions.git"
+    source: git
     version: "2.0.1"
   flutter_native_image:
     dependency: "direct main"
@@ -1632,21 +1634,21 @@ packages:
       name: video_player_android
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.9"
+    version: "2.3.7"
   video_player_avfoundation:
     dependency: transitive
     description:
       name: video_player_avfoundation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.7"
+    version: "2.3.5"
   video_player_platform_interface:
     dependency: transitive
     description:
       name: video_player_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.4"
+    version: "5.1.3"
   video_player_web:
     dependency: transitive
     description:

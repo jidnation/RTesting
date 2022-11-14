@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:reach_me/core/utils/regex_util.dart';
 
-class MaxWordTextInputFormater extends TextInputFormatter {
+class MaxWordTextInputFormatter extends TextInputFormatter {
   final int maxWords;
   final ValueChanged<int>? currentLength;
 
-  MaxWordTextInputFormater({this.maxWords = 1, this.currentLength});
+  MaxWordTextInputFormatter({this.maxWords = 1, this.currentLength});
 
   @override
   TextEditingValue formatEditUpdate(

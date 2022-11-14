@@ -141,7 +141,8 @@ class _PostReachState extends State<PostReach> {
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
 
-                                globals.postContent = controller.text;
+                                globals.postContent = controllerKey
+                                    .currentState!.controller!.text;
                                 globals.postCommentOption = replyFeature.value;
 
                                 setState(() {});
@@ -149,7 +150,8 @@ class _PostReachState extends State<PostReach> {
                                 debugPrint(
                                     "reply feature: ${replyFeature.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-                                  content: controller.text,
+                                  content: controllerKey
+                                      .currentState!.controller!.text,
                                   commentOption: replyFeature.value,
                                   location: getUserLoation(),
                                 ));
@@ -272,8 +274,11 @@ class _PostReachState extends State<PostReach> {
                         return FlutterMentions(
                           key: controllerKey,
                           maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          // minLines: 1,
-                          // maxLines: 3,
+                          // minLines: null,
+                          maxLines: null,
+                          inputFormatters: [
+                            MaxWordTextInputFormatter(maxWords: 200)
+                          ],
                           suggestionPosition: SuggestionPosition.Bottom,
                           onChanged: (val) {
                             counter.value = val
@@ -1037,7 +1042,7 @@ class EditReach extends HookWidget {
                       controller: controller,
                       // maxLength: 200,
                       inputFormatters: [
-                        MaxWordTextInputFormater(maxWords: 200)
+                        MaxWordTextInputFormatter(maxWords: 200)
                       ],
                       // maxLength: 200,
                       onChanged: (val) {
