@@ -114,7 +114,8 @@ dependencies:
     git: https://github.com/gideonoyekale/audio_waveforms.git
 
   #audio_waveforms: ^0.1.5+1
-  flutter_mentions: ^2.0.1
+  flutter_mentions:
+    git: https://github.com/gideonoyekale/flutter_mentions.git
   expandable_text: ^2.3.0
 
 

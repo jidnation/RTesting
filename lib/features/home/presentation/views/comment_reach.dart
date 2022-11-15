@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -15,10 +16,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as permit;
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:readmore/readmore.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/models/file_result.dart';
@@ -33,10 +36,6 @@ import '../../../account/presentation/views/account.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
-import 'package:flutter/foundation.dart' as foundation;
-
-import 'package:timeago/timeago.dart' as timeago;
-import 'package:permission_handler/permission_handler.dart' as permit;
 
 class UploadFileDto {
   File file;
@@ -265,7 +264,7 @@ class _CommentReachState extends State<CommentReach> {
                             globals.socialServiceBloc!.add(CommentOnPostEvent(
                                 postId: widget.postFeedModel.postId,
                                 content: controller.text,
-                                                                userId: globals.user!.id));
+                                userId: globals.user!.id));
                           }
                           controller.clear();
                         },
@@ -522,7 +521,7 @@ class _CommentReachState extends State<CommentReach> {
                     minLines: 1,
                     maxLines: null,
                     controller: controller,
-                    inputFormatters: [MaxWordTextInputFormater(maxWords: 200)],
+                    inputFormatters: [MaxWordTextInputFormatter(maxWords: 200)],
                     // maxLength: 200,
                     onChanged: (val) {
                       counter.value =

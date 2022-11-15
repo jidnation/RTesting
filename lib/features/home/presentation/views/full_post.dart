@@ -1,7 +1,10 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' as foundation;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -17,15 +20,10 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
-import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
-
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'dart:ui' as ui;
 
 import '../../../../core/components/bottom_sheet_list_tile.dart';
 import '../../../../core/components/refresher.dart';
@@ -36,7 +34,6 @@ import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../account/presentation/views/account.dart';
-import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 
 class FullPostScreen extends StatefulHookWidget {
@@ -692,9 +689,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postId),
                                                         );
                                                         setState(() {
-                                                      likePost.value =
-                                                          true;
-                                                    });
+                                                          likePost.value = true;
+                                                        });
                                                       }
                                                     }
                                                   },
@@ -1048,7 +1044,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
                             showEmoji.value
                                 ? buildEmoji()
                                 : const SizedBox.shrink(),
-                                
                             showCommentField.value
                                 ? commentField(controller, showEmoji,
                                     postFeedModel: widget.postFeedModel!)
