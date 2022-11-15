@@ -11,6 +11,8 @@ import 'package:reach_me/features/dictionary/presentation/views/search_word.dart
 import 'package:reach_me/features/dictionary/presentation/views/word_library.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/word_container.dart';
 
+import '../widgets/dummylist.dart';
+
 class DictionaryView extends StatefulHookWidget {
   const DictionaryView({Key? key, this.scaffoldKey}) : super(key: key);
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -69,7 +71,7 @@ class _DictionaryViewState extends State<DictionaryView> {
           DictionaryTab(
             contentText: 'Word Library',
             onPressed: () =>
-                RouteNavigators.route(context, const WordLibrary()),
+                RouteNavigators.route(context, const MyHomePage()),
           ),
         ],
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -10,7 +9,7 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_sta
 
 import '../../dictionary_bloc/bloc/dictionary_bloc.dart';
 
-class DictionaryDialog extends StatefulHookWidget {
+class DictionaryDialog extends StatefulWidget {
   const DictionaryDialog({Key? key}) : super(key: key);
 
   @override
@@ -18,14 +17,41 @@ class DictionaryDialog extends StatefulHookWidget {
 }
 
 class _DictionaryDialogState extends State<DictionaryDialog> {
+  final recentWords = ValueNotifier<List<GetRecentlyAddedWord>>([]);
+  var items = ValueNotifier<List<GetRecentlyAddedWord>>([]);
+
+  @override
+  void initState() {
+    super.initState();
+    globals.dictionaryBloc!
+        .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
+  }
+
+  void filterWords(String query) {
+    List<GetRecentlyAddedWord> filteredList = <GetRecentlyAddedWord>[];
+    filteredList.addAll(recentWords.value);
+    if (query.isNotEmpty) {
+      List<GetRecentlyAddedWord> dummyData = <GetRecentlyAddedWord>[];
+      for (var item in filteredList) {
+        if (item.abbr!.toLowerCase().contains(query)) {
+          dummyData.add(item);
+        }
+      }
+      setState(() {
+        items.value.clear();
+        items.value.addAll(dummyData);
+      });
+      return;
+    } else {
+      setState(() {
+        items.value.clear();
+        items.value.addAll(recentWords.value);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final recentWords = ValueNotifier<List<GetRecentlyAddedWord>>([]);
-
-    useMemoized(() {
-      globals.dictionaryBloc!
-          .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
-    });
     return AlertDialog(
       title: const Text('Word Library'),
       content: SizedBox(
@@ -35,6 +61,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
           listener: (context, state) {
             if (state is GetRecentlyAddedWordsSuccess) {
               recentWords.value = state.data!;
+              items.value = state.data!;
             }
             if (state is DisplayRecentlyAddedWordsError) {
               Snackbars.error(context, message: state.error);
@@ -66,7 +93,9 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                                onChanged: searchWord,
+                                onChanged: ((value) => filterWords(
+                                      value,
+                                    )),
                               ),
                             ),
                             const SizedBox(
@@ -74,7 +103,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                             ),
                             ListView.builder(
                               shrinkWrap: true,
-                              itemCount: recentWords.value.length,
+                              itemCount: items.value.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return ListTile(
                                   title: RichText(
@@ -84,19 +113,18 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                                       children: [
                                         TextSpan(
                                             text:
-                                                '${recentWords.value[index].abbr} : ',
+                                                '${items.value[index].abbr}: ',
                                             style: const TextStyle(
                                                 color: Colors.blue)),
                                         TextSpan(
-                                            text:
-                                                '${recentWords.value[index].word}',
+                                            text: '${items.value[index].word}',
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
                                   subtitle: Text(
-                                    recentWords.value[index].meaning.toString(),
+                                    items.value[index].meaning.toString(),
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                 );
@@ -109,17 +137,15 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
         ),
       ),
     );
-
-    
   }
 
-  
+  // searchWord(String? word, List<GetRecentlyAddedWord>? recentWords) {
+  //   final suggestions = recentWords?.where((value) {
+  //     print(value);
+  //     return value.abbr!.contains(word!);
+  //   }).toList();
+  //   print(suggestions);
+  //   return suggestions;
+  // }
+
 }
-void searchWord(String? word) {
-    // final suggestions = recentWords .where((recentWords.value) {
-    //   final text = recentWords.value.toLowerCase();
-    //   final textInput = word.toLowerCase();
-    //   return suggestions.contains(textInput);
-    // }).toList();
-   
-  }

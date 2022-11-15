@@ -42,7 +42,6 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
-import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
@@ -719,7 +718,6 @@ class PostFeedReacherCard extends HookWidget {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
 
-
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -912,10 +910,9 @@ class PostFeedReacherCard extends HookWidget {
                                   builder: (BuildContext context) {
                                     return const DictionaryDialog();
                                   });
-                              print('Tapped Url');
                             },
                             onMentionTap: (value) {
-                              print('Tapped Url');
+                           
                             },
                             mentionStyle: const TextStyle(
                                 decoration: TextDecoration.underline,
@@ -944,13 +941,12 @@ class PostFeedReacherCard extends HookWidget {
                         ),
                       ],
                     ).paddingSymmetric(h: 16, v: 10),
-
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
-                
-              //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
-               // Helper.renderPostImages(postFeedModel!.post!, context)
+
+                    //if (postFeedModel!.post!.imageMediaItems!.isNotEmpty)
+                    // Helper.renderPostImages(postFeedModel!.post!, context)
 
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
               else
@@ -958,7 +954,7 @@ class PostFeedReacherCard extends HookWidget {
               (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
                   ? PostAudioMedia(path: postFeedModel!.post!.audioMediaItem!)
                       .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
