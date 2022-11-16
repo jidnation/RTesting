@@ -275,10 +275,7 @@ class _PostReachState extends State<PostReach> {
                           key: controllerKey,
                           maxLengthEnforcement: MaxLengthEnforcement.enforced,
                           // minLines: null,
-                          maxLines: null,
-                          inputFormatters: [
-                            MaxWordTextInputFormatter(maxWords: 200)
-                          ],
+                        
                           suggestionPosition: SuggestionPosition.Bottom,
                           onChanged: (val) {
                             counter.value = val

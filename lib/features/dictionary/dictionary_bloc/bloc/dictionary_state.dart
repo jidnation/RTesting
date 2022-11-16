@@ -18,6 +18,7 @@ class ErrorState extends DictionaryState {
   final String error;
   ErrorState(this.error);
 }
+
 //*Recently Added States
 class LoadingRecentlyAddedWords extends DictionaryState {}
 
@@ -30,6 +31,7 @@ class DisplayRecentlyAddedWordsError extends DictionaryState {
   final String error;
   DisplayRecentlyAddedWordsError({required this.error});
 }
+
 //*Mentions
 class LoadingWordsToMentions extends DictionaryState {}
 
@@ -42,4 +44,20 @@ class GetWordToMentionsSuccess extends DictionaryState {
 class GetWordToMentionsError extends DictionaryState {
   final String error;
   GetWordToMentionsError({required this.error});
+}
+
+//*Searching Word States
+
+class LoadingSearchedWords extends DictionaryState {}
+
+class DisplaySearchedWordSuccess extends DictionaryState {
+  final String  wordData;
+
+  DisplaySearchedWordSuccess({required this.wordData});
+}
+
+class GetSearchedWordError extends DictionaryState {
+  final String error;
+
+  GetSearchedWordError({required this.error});
 }

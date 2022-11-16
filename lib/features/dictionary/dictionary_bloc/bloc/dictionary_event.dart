@@ -24,10 +24,16 @@ class GetRecentAddedWordsEvent extends DictionaryEvent {
 
   GetRecentAddedWordsEvent({required this.pageLimit, required this.pageNumber});
 }
+
 class AddWordsToMentionsEvent extends DictionaryEvent {
   final num pageLimit;
   final num pageNumber;
 
- AddWordsToMentionsEvent({required this.pageLimit, required this.pageNumber});
+  AddWordsToMentionsEvent({required this.pageLimit, required this.pageNumber});
 }
 
+class GetWordEvent extends DictionaryEvent {
+  final String wordInput;
+
+  GetWordEvent(this.wordInput);
+}

@@ -10,7 +10,7 @@ class DictionaryDataSource {
       : _client = client ?? GraphQLApiClient();
   final GraphQLApiClient _client;
 
-  //ADD TO GLOSSARY
+  //*ADD TO GLOSSARY MUTATION
   Future<AddWordToGlossaryResponse> addToGlossary({
     String? abbr,
     String? meaning,
@@ -53,6 +53,7 @@ class DictionaryDataSource {
     }
   }
 
+  //*Get RECENT WORDS QUERY
   Future<List<GetRecentlyAddedWord>> getRecentWord(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
@@ -77,7 +78,7 @@ class DictionaryDataSource {
 
       var res = result.data["getRecentlyAddedWords"] as List;
       final data = res.map((e) => GetRecentlyAddedWord.fromJson(e)).toList();
-     
+
       return data;
     } catch (e) {
       rethrow;
@@ -105,12 +106,44 @@ class DictionaryDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-     
-      List<Map<String, dynamic>> res = (result.data["getRecentlyAddedWords"] as List).map((item) => item as Map<String, dynamic>).toList();
-     
+
+      List<Map<String, dynamic>> res =
+          (result.data["getRecentlyAddedWords"] as List)
+              .map((item) => item as Map<String, dynamic>)
+              .toList();
+
       return res;
     } catch (e) {
       log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<GetRecentlyAddedWord> searchWords({
+    required String wordInput,
+  }) async {
+    const String q = r'''
+    query getWord($word: String!){
+    getWord(word: $word){
+    abbr
+    authId
+    meaning
+    word
+    wordId
+  }
+}
+''';
+
+    try {
+      final result =
+          await _client.query(gql(q), variables: {'word': wordInput});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Map<String, dynamic> getWordFromDb = result.data['getWord'];
+      final res = GetRecentlyAddedWord.fromJson(getWordFromDb);
+      return res;
+    } catch (e) {
       rethrow;
     }
   }
