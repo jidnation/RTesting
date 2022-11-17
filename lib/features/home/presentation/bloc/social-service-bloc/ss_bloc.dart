@@ -545,9 +545,9 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetLikedPostsLoading());
       try {
         final response = await socialServiceRepository.getLikedPosts(
-          pageLimit: event.pageLimit!,
-          pageNumber: event.pageNumber!,
-        );
+            pageLimit: event.pageLimit!,
+            pageNumber: event.pageNumber!,
+            authId: event.authId);
         response.fold(
           (error) => emit(GetLikedPostsError(error: error)),
           (posts) => emit(GetLikedPostsSuccess(posts: posts)),

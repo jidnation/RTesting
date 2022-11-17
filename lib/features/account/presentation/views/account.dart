@@ -1907,6 +1907,18 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         type: ReachRelationshipType.reaching));
     globals.userBloc!
         .add(GetStarRelationshipEvent(userIdToStar: widget.recipientId));
+    globals.socialServiceBloc!.add(GetLikedPostsEvent(
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+    globals.socialServiceBloc!.add(GetVotedPostsEvent(
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Upvote',
+        authId: widget.recipientId));
+    globals.socialServiceBloc!.add(GetVotedPostsEvent(
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Downvote',
+        authId: widget.recipientId));
   }
 
   TabBar get _tabBar => TabBar(
@@ -2025,6 +2037,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     var size = MediaQuery.of(context).size;
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
+    final _likedPosts = useState<List<PostFeedModel>>([]);
+    final _shoutDowns = useState<List<PostFeedModel>>([]);
+    final _shoutOuts = useState<List<PostFeedModel>>([]);
+    final _sharedPosts = useState<List<PostFeedModel>>([]);
     return Scaffold(
       body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,

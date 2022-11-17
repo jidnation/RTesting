@@ -180,7 +180,15 @@ class PostMedia extends StatelessWidget {
 class MediaWithCounter extends StatelessWidget {
   final Widget child;
   final int count;
-  const MediaWithCounter({Key? key, required this.child, required this.count})
+  final double? left, right, width, height;
+  const MediaWithCounter(
+      {Key? key,
+      required this.child,
+      required this.count,
+      this.left,
+      this.right,
+      this.width,
+      this.height})
       : super(key: key);
 
   @override
@@ -189,18 +197,23 @@ class MediaWithCounter extends StatelessWidget {
       children: [
         child,
         Positioned.fill(
-            child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15), color: Colors.black38),
-          child: Text(
-            "+$count",
-            style: TextStyle(
-                fontSize: getScreenHeight(28),
-                fontWeight: FontWeight.w400,
-                color: Colors.white),
+          right: right,
+          left: left,
+          child: Container(
+            width: width,
+            height: height,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15), color: Colors.black38),
+            child: Text(
+              "+$count",
+              style: TextStyle(
+                  fontSize: getScreenHeight(28),
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white),
+            ),
           ),
-        ))
+        )
       ],
     );
   }

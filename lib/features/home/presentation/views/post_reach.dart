@@ -48,6 +48,19 @@ class PostReach extends StatefulHookWidget {
 class _PostReachState extends State<PostReach> {
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
+
+  final ScrollController _controller = ScrollController();
+
+// This is what you're looking for!
+  void _scrollDown() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 1),
+      curve: Curves.fastOutSlowIn,
+    );
+    // _controller.jumpTo(_controller.position.maxScrollExtent);
+  }
+
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
@@ -78,14 +91,16 @@ class _PostReachState extends State<PostReach> {
     var size = MediaQuery.of(context).size;
     final counter = useState(0);
 
-    final nVideos = useState(0);
-    final nAudios = useState(0);
-    final nImages = useState(0);
     final controller = useTextEditingController();
     final replyFeature = useState("everyone");
 
     final _mediaList = useState<List<UploadFileDto>>([]);
-
+    int nVideos =
+        _mediaList.value.where((e) => FileUtils.isVideo(e.file)).length;
+    int nAudios =
+        _mediaList.value.where((e) => FileUtils.isAudio(e.file)).length;
+    int nImages =
+        _mediaList.value.where((e) => FileUtils.isImage(e.file)).length;
     // final _imageList = useState<List<UploadFileDto>>([]);
 
     String getUserLoation() {
@@ -392,42 +407,54 @@ class _PostReachState extends State<PostReach> {
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)
-                      SizedBox(
-                          height: getScreenHeight(200),
-                          width: MediaQuery.of(context).size.width,
-                          child: Center(
-                            child: ListView.builder(
-                                itemCount: _mediaList.value.length,
-                                shrinkWrap: false,
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  if (_mediaList.value.isEmpty) {
-                                    return const SizedBox.shrink();
-                                  }
-                                  UploadFileDto mediaDto =
-                                      _mediaList.value[index];
-                                  if (FileUtils.isImage(mediaDto.file) ||
-                                      FileUtils.isVideo(mediaDto.file)) {
-                                    return PostReachMedia(
-                                        fileResult: mediaDto.fileResult!,
-                                        onClose: () {
-                                          if (FileUtils.isImage(
-                                              mediaDto.file)) {
-                                            nImages.value = nImages.value - 1;
-                                          } else {
-                                            nVideos.value = nVideos.value - 1;
-                                          }
-                                          _mediaList.value = [
-                                            ..._mediaList.value
-                                          ]..removeAt(index);
-                                          setState(() {});
-                                        });
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                }),
-                          )).paddingSymmetric(h: 16)
+                      PostReachMediaGrid(
+                        mediaList: _mediaList.value
+                            .where((e) =>
+                                FileUtils.isImage(e.file) ||
+                                FileUtils.isVideo(e.file))
+                            .toList(),
+                        onUpdateList: (val) {
+                          if (val.length != _mediaList.value.length) {
+                            _mediaList.value = val;
+                          }
+                        },
+                        onRemove: (index) {
+                          _mediaList.value = [..._mediaList.value]
+                            ..removeAt(index);
+                        },
+                      ).paddingSymmetric(h: 16)
+                    // Center(
+                    // child: ListView.builder(
+                    //     itemCount: _mediaList.value.length,
+                    //     shrinkWrap: false,
+                    //     controller: _controller,
+                    //     scrollDirection: Axis.horizontal,
+                    //     physics: const BouncingScrollPhysics(),
+                    //     itemBuilder: (context, index) {
+                    //       if (_mediaList.value.isEmpty) {
+                    //         return const SizedBox.shrink();
+                    //       }
+                    //       UploadFileDto mediaDto =
+                    //           _mediaList.value[index];
+                    //       if (FileUtils.isImage(mediaDto.file) ||
+                    //           FileUtils.isVideo(mediaDto.file)) {
+                    //         return PostReachMedia(
+                    //             fileResult: mediaDto.fileResult!,
+                    //             onClose: () {
+                    //               if (FileUtils.isImage(mediaDto.file)) {
+                    //                 nImages.value = nImages.value - 1;
+                    //               } else {
+                    //                 nVideos.value = nVideos.value - 1;
+                    //               }
+                    //               _mediaList.value = [..._mediaList.value]
+                    //                 ..removeAt(index);
+                    //               setState(() {});
+                    //             });
+                    //       } else {
+                    //         return const SizedBox.shrink();
+                    //       }
+                    //     }),
+                    // ).paddingSymmetric(h: 16)
                     else
                       const SizedBox.shrink(),
                     if (_mediaList.value
@@ -445,7 +472,6 @@ class _PostReachState extends State<PostReach> {
                               .indexWhere((e) => FileUtils.isAudio(e.file));
                           _mediaList.value = [..._mediaList.value]
                             ..removeAt(pos);
-                          nAudios.value = nAudios.value - 1;
                         },
                       )
                     else
@@ -636,22 +662,18 @@ class _PostReachState extends State<PostReach> {
                             }
 
                             if (noOfVideos > 1 ||
-                                (noOfVideos > 0 && nVideos.value > 0)) {
+                                (noOfVideos > 0 && nVideos > 0)) {
                               Snackbars.error(context,
                                   message:
                                       'Sorry, you cannot add more than one video media');
                               return;
                             }
-
                             for (var e in media) {
                               _mediaList.value.add(UploadFileDto(
                                   file: e.file,
                                   fileResult: e,
                                   id: Random().nextInt(100).toString()));
                             }
-
-                            nVideos.value = nVideos.value + noOfVideos;
-                            nImages.value = nImages.value + noOfImages;
                             setState(() {});
                           },
                           splashColor: Colors.transparent,
@@ -677,18 +699,19 @@ class _PostReachState extends State<PostReach> {
                                   message: 'Audio format not supported!');
                               return;
                             }
-                            if (nAudios.value > 0) {
+                            if (nAudios > 0) {
                               Snackbars.error(context,
                                   message:
                                       'Sorry, you cannot add more than one audio media');
                               return;
                             }
-                            nAudios.value = nAudios.value + 1;
+
                             Console.log('<<<PATH>>', media.path);
                             _mediaList.value.add(UploadFileDto(
                                 file: media.file,
                                 fileResult: media,
                                 id: Random().nextInt(100).toString()));
+                            setState(() {});
                           },
                           padding: EdgeInsets.zero,
                           splashColor: Colors.transparent,

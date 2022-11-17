@@ -3,10 +3,13 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/models/file_result.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
 import '../../../../core/helper/logger.dart';
@@ -14,12 +17,162 @@ import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
+import 'gallery_view.dart';
+
+class PostReachMediaGrid extends HookWidget {
+  final List<UploadFileDto> mediaList;
+  final Function(int)? onRemove;
+  final Function(List<UploadFileDto>)? onUpdateList;
+  const PostReachMediaGrid(
+      {Key? key, required this.mediaList, this.onRemove, this.onUpdateList})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // final imageVideoList = useState(mediaList);
+    // int imageVideoTotal = imageVideoList.value.length;
+    if (mediaList.length == 1) {
+      return Row(
+        children: [
+          PostReachMedia(
+            onClose: () {
+              onRemove!(0);
+            },
+            fileResult: mediaList.first.fileResult!,
+          ),
+        ],
+      );
+    } else if (mediaList.length == 3) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+              child: PostReachMedia(
+            onClose: () {
+              onRemove!(0);
+            },
+            fileResult: mediaList[0].fileResult!,
+            size: 400,
+          )),
+          SizedBox(width: getScreenWidth(0)),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PostReachMedia(
+                  onClose: () {
+                    onRemove!(1);
+                  },
+                  fileResult: mediaList[1].fileResult!,
+                  size: 195,
+                ),
+                SizedBox(height: getScreenHeight(10)),
+                PostReachMedia(
+                  onClose: () {
+                    onRemove!(2);
+                  },
+                  fileResult: mediaList[2].fileResult!,
+                  size: 195,
+                )
+              ],
+            ),
+          )
+        ],
+      );
+    } else if (mediaList.length > 4) {
+      int remMedia = mediaList.length - 4;
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PostReachMedia(
+                  onClose: () {
+                    onRemove!(0);
+                  },
+                  fileResult: mediaList[0].fileResult!,
+                ),
+                SizedBox(height: getScreenHeight(5)),
+                PostReachMedia(
+                  onClose: () {
+                    onRemove!(1);
+                  },
+                  fileResult: mediaList[1].fileResult!,
+                )
+              ],
+            ),
+          ),
+          SizedBox(width: getScreenWidth(0)),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PostReachMedia(
+                  onClose: () {
+                    onRemove!(2);
+                  },
+                  fileResult: mediaList[2].fileResult!,
+                ),
+                SizedBox(height: getScreenHeight(10)),
+                GestureDetector(
+                  onTap: () async {
+                    final res = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => PostReachGalleryView(
+                                  mediaList: mediaList,
+                                  initialPage: 3,
+                                )));
+                    if (onUpdateList == null || res == null) return;
+                    onUpdateList!(res);
+                  },
+                  child: MediaWithCounter(
+                    count: remMedia,
+                    left: 0,
+                    width: getScreenWidth(178),
+                    child: PostReachMedia(
+                      fileResult: mediaList[3].fileResult!,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      );
+    } else {
+      // return const Text('media display under construction');
+      return GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(0),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
+              childAspectRatio: 178 / 164,
+              crossAxisSpacing: 2,
+              mainAxisSpacing: 10),
+          shrinkWrap: true,
+          itemCount: mediaList.length,
+          itemBuilder: (context, index) {
+            String path = mediaList[index].file.path;
+            return PostReachMedia(
+              onClose: () {
+                onRemove!(index);
+              },
+              fileResult: mediaList[index].fileResult!,
+            );
+          });
+    }
+  }
+}
 
 class PostReachMedia extends StatelessWidget {
   final FileResult fileResult;
-  final Function() onClose;
+  final Function()? onClose;
+  final double? size;
   const PostReachMedia(
-      {Key? key, required this.onClose, required this.fileResult})
+      {Key? key, this.onClose, required this.fileResult, this.size})
       : super(key: key);
 
   @override
@@ -32,8 +185,8 @@ class PostReachMedia extends StatelessWidget {
       alignment: Alignment.topRight,
       children: [
         Container(
-          width: getScreenWidth(200),
-          height: getScreenHeight(200),
+          width: getScreenWidth(size ?? 200),
+          height: getScreenHeight(size ?? 200),
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
@@ -100,29 +253,31 @@ class PostReachMedia extends StatelessWidget {
                       ),
                     ));
         })),
-        Positioned(
-          right: getScreenWidth(4),
-          top: getScreenWidth(5),
-          child: GestureDetector(
-            onTap: onClose,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                height: getScreenHeight(26),
-                width: getScreenWidth(26),
-                child: Center(
-                  child: Icon(
-                    Icons.close,
-                    color: AppColors.grey,
-                    size: getScreenHeight(14),
+        onClose != null
+            ? Positioned(
+                right: getScreenWidth(4),
+                top: getScreenWidth(5),
+                child: GestureDetector(
+                  onTap: onClose,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      height: getScreenHeight(26),
+                      width: getScreenWidth(26),
+                      child: Center(
+                        child: Icon(
+                          Icons.close,
+                          color: AppColors.grey,
+                          size: getScreenHeight(14),
+                        ),
+                      ),
+                      decoration: const BoxDecoration(
+                          shape: BoxShape.circle, color: AppColors.white),
+                    ),
                   ),
                 ),
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: AppColors.white),
-              ),
-            ),
-          ),
-        ),
+              )
+            : Container(),
       ],
     ).paddingOnly(r: 10);
   }
@@ -153,7 +308,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
   @override
   void initState() {
     super.initState();
-    // initPlayer();
+    initPlayer();
   }
 
   Future<void> initPlayer() async {
@@ -164,7 +319,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       setState(() {});
-      // Console.log('<<AUDIO-DURATION>>', event.toString());
+      Console.log('<<AUDIO-DURATION>>', event.toString());
     });
     playerController.addListener(() {
       Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
