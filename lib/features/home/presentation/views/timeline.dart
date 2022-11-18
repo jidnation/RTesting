@@ -33,7 +33,7 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';

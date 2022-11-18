@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:reach_me/features/dictionary/data/models/get_word_model.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
 @immutable
@@ -51,7 +52,7 @@ class GetWordToMentionsError extends DictionaryState {
 class LoadingSearchedWords extends DictionaryState {}
 
 class DisplaySearchedWordSuccess extends DictionaryState {
-  final String  wordData;
+  final GetWordClass  wordData;
 
   DisplaySearchedWordSuccess({required this.wordData});
 }

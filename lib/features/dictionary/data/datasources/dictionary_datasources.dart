@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/features/dictionary/data/models/add_to_glossarry_response.dart';
+import 'package:reach_me/features/dictionary/data/models/get_word_model.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
 class DictionaryDataSource {
@@ -119,7 +120,7 @@ class DictionaryDataSource {
     }
   }
 
-  Future<GetRecentlyAddedWord> searchWords({
+  Future<GetWordClass> searchWords({
     required String wordInput,
   }) async {
     const String q = r'''
@@ -141,7 +142,8 @@ class DictionaryDataSource {
         throw GraphQLError(message: result.message);
       }
       Map<String, dynamic> getWordFromDb = result.data['getWord'];
-      final res = GetRecentlyAddedWord.fromJson(getWordFromDb);
+      final res = GetWordClass.fromJson(getWordFromDb);
+      log('message>>>>>>>>> $res');
       return res;
     } catch (e) {
       rethrow;
