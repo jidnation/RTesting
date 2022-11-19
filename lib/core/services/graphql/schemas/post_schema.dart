@@ -17,7 +17,6 @@ class PostSchema {
             mentionList
             nComments
             nLikes
-            nShares
             nDownvotes
             nUpvotes
             postId
@@ -28,19 +27,20 @@ class PostSchema {
         PostProfileSchema.schema +
         '''
             }
-            repostedPost {''' +
-        PostSchema.schema +
-        ''' }
-            repostedPostId
-            repostedPostOwnerId
-            repostedPostOwnerProfile {''' +
-        PostProfileSchema.schema +
-        ''' }
             updated_at
             videoMediaItem
         ''';
   }
 }
+
+// repostedPost {''' +
+//         PostSchema.schema +
+//         ''' }
+// repostedPostId
+// repostedPostOwnerId
+// repostedPostOwnerProfile {''' +
+//         PostProfileSchema.schema +
+//         ''' }
 
 class SavePostSchema {
   SavePostSchema._();
