@@ -524,7 +524,6 @@ class HomeRemoteDataSource {
     }
   }
 
-
   Future<PostModel> createPost({
     String? audioMediaItem,
     String? commentOption,
@@ -1668,11 +1667,6 @@ class HomeRemoteDataSource {
             page_number: $page_number
             authId: $authId
           ){   
-             post {
-                ''' +
-        PostSchema.schema +
-        '''
-            }
                ''' +
         PostFeedSchema.schema +
         '''

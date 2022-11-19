@@ -2,6 +2,7 @@ import 'dart:io';
 //import 'dart:js_util';
 import 'dart:math';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -724,12 +725,40 @@ class _PostReachState extends State<PostReach> {
                   ],
                 ),
               ),
+              IconButton(
+                  onPressed: () {
+                    if (_isPlaying) {
+                      _soundRecorderController.stop();
+                    } else {
+                      _soundRecorderController.record();
+                    }
+                    setState(() {
+                      _isPlaying = !_isPlaying;
+                    });
+                  },
+                  icon: const Icon(Icons.mic)),
+              AudioWaveforms(
+                size: Size(MediaQuery.of(context).size.width, 100.0),
+                waveStyle: const WaveStyle(
+                  waveColor: Colors.red,
+                  showDurationLabel: true,
+                  spacing: 8.0,
+                  showBottom: true,
+                  showTop: true,
+                  showMiddleLine: true,
+                  extendWaveform: true,
+                ),
+                recorderController: _soundRecorderController,
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  bool _isPlaying = false;
+  final _soundRecorderController = RecorderController();
 
   Row replyWidget(String replyFeature) {
     switch (replyFeature) {

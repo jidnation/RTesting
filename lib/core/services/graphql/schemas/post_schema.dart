@@ -4,13 +4,15 @@ class PostSchema {
   static String get schema {
     return r'''
             audioMediaItem
-            authId
             commentOption
             content
+            created_at
             edited
             hashTags
-            created_at
             imageMediaItems
+            isLiked
+            isRepost
+            isVoted
             location
             mentionList
             nComments
@@ -19,21 +21,23 @@ class PostSchema {
             nDownvotes
             nUpvotes
             postId
+            postRating
             postSlug
-            videoMediaItem
-            like {
-              ''' +
-        PostLikeSchema.schema +
-        '''}
-          vote {
-              ''' +
-        PostVoteSchema.schema +
-        '''}
-          profile {
+            profile {
               ''' +
         PostProfileSchema.schema +
         '''
             }
+            repostedPost {''' +
+        PostSchema.schema +
+        ''' }
+            repostedPostId
+            repostedPostOwnerId
+            repostedPostOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+            updated_at
+            videoMediaItem
         ''';
   }
 }
@@ -107,13 +111,14 @@ class PostProfileSchema {
 
   static String get schema {
     return r'''
+            authId
             firstName
             lastName
             location
             profilePicture
             profileSlug
-            verified
             username
+            verified
         ''';
   }
 }
@@ -139,26 +144,29 @@ class PostFeedSchema {
 
   static String get schema {
     return r'''
-            feedOwnerId
-            created_at
-            firstName
-            lastName
-            location
-            postId
-            profilePicture
-            profileSlug
-            username
-            like {
-              ''' +
-        PostLikeSchema.schema +
-        '''}
-            vote {
-              ''' +
-        PostVoteSchema.schema +
-        '''}
-            verified
-            reachingRelationship
-            postOwnerId
+              created_at
+              isLiked
+              isRepost
+              isVoted
+              post {''' +
+        PostSchema.schema +
+        ''' }
+              postOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              reachingRelationship
+              repostedPost {''' +
+        PostSchema.schema +
+        ''' }
+              repostedPostId
+              repostedPostOwnerId
+              repostedPostOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              updated_at
+              voterProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
         ''';
   }
 }
