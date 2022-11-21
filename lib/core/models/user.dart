@@ -20,6 +20,7 @@ class User {
   int? nReachers;
   int? nReaching;
   int? nStaring;
+  int? nBlocked;
   ReachingRelationship? reaching;
 
   User({
@@ -45,6 +46,7 @@ class User {
     this.nReaching,
     this.nStaring,
     this.reaching,
+    this.nBlocked,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -69,6 +71,7 @@ class User {
         nReachers: json["nReachers"],
         nReaching: json["nReaching"],
         nStaring: json["nStaring"],
+        nBlocked: json["nBlocked"],
         username: json["username"],
         verified: json["verified"],
         reaching: json["reaching"] != null
@@ -97,6 +100,7 @@ class User {
         "nReachers": nReachers,
         "nReaching": nReaching,
         "nStaring": nStaring,
+        "nBlocked": nBlocked,
         "username": username,
         "verified": verified,
         "reaching": reaching!.toJson(),

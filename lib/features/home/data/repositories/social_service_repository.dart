@@ -162,12 +162,12 @@ class SocialServiceRepository {
 
   Future<Either<String, bool>> unlikeCommentOnPost({
     required String commentLikeId,
-    required String postId,
+    required String likeId,
   }) async {
     try {
       final comment = await _homeRemoteDataSource.unlikeCommentOnPost(
         commentId: commentLikeId,
-        postId: postId,
+        likeId: likeId,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -495,15 +495,11 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, List<PostFeedModel>>> getLikedPosts({
-    required int pageLimit,
-    required int pageNumber,
-  }) async {
+  Future<Either<String, List<PostFeedModel>>> getLikedPosts(
+      {required int pageLimit, required int pageNumber, String? authId}) async {
     try {
       final posts = await _homeRemoteDataSource.getLikedPosts(
-        pageLimit: pageLimit,
-        pageNumber: pageNumber,
-      );
+          pageLimit: pageLimit, pageNumber: pageNumber, authId: authId);
       return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);

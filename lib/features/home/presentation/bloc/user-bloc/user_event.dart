@@ -136,3 +136,17 @@ class GetUserLocationEvent extends UserEvent {
   final String lat, lng;
   GetUserLocationEvent({required this.lat, required this.lng});
 }
+
+class BlockUserEvent extends UserEvent {
+  final String idToBlock;
+  BlockUserEvent({required this.idToBlock});
+}
+
+class UnBlockUserEvent extends UserEvent {
+  final String idToUnblock;
+  UnBlockUserEvent({required this.idToUnblock});
+}
+
+class GetBlockedListEvent extends UserEvent { 
+  GetBlockedListEvent();
+}

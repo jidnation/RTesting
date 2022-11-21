@@ -312,4 +312,38 @@ class UserRepository {
       return Left(e.message);
     }
   }
+ 
+  Future<Either<String, Block>> blocKUser({
+    required String idToBlock,
+  }) async {
+    try {
+      final blocked =
+          await _homeRemoteDataSource.blockProfile(idToBlock: idToBlock);
+      return Right(blocked);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> unblockUser({
+    required String? idToUnblock,
+  }) async {
+    try {
+      final unblocked =
+          await _homeRemoteDataSource.unblockProfile(idToUnblock: idToUnblock);
+
+      return Right(unblocked);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+  
+  Future<Either<String, List<Block>>> getBlockedList() async {
+    try {
+      final getBlockedList = await _homeRemoteDataSource.getBlockList();
+      return Right(getBlockedList);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
 }

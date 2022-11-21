@@ -7,11 +7,13 @@ class Refresher extends StatelessWidget {
     required this.controller,
     required this.onRefresh,
     required this.child,
+    this.enablePullDown,
   }) : super(key: key);
 
   final RefreshController controller;
   final Function() onRefresh;
   final Widget child;
+  final bool? enablePullDown;
 
   @override
   Widget build(BuildContext context) {
