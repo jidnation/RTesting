@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';

@@ -1160,11 +1160,6 @@ class HomeRemoteDataSource {
             authId: $authId
             vote_type: $vote_type
             ){
-             post {
-                ''' +
-        PostSchema.schema +
-        '''
-                }
                    ''' +
         PostFeedSchema.schema +
         '''
@@ -1291,11 +1286,6 @@ class HomeRemoteDataSource {
             page_limit: $page_limit
             page_number: $page_number
           ){
-              post {
-                ''' +
-        PostSchema.schema +
-        '''
-            }
                ''' +
         PostFeedSchema.schema +
         '''
@@ -1671,11 +1661,6 @@ class HomeRemoteDataSource {
             page_number: $page_number
             authId: $authId
           ){   
-             post {
-                ''' +
-        PostSchema.schema +
-        '''
-            }
                ''' +
         PostFeedSchema.schema +
         '''

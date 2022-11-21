@@ -48,25 +48,40 @@ class AccountScreen extends StatefulHookWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen>
-    with
-        SingleTickerProviderStateMixin,
-        AutomaticKeepAliveClientMixin<AccountScreen> {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
   TabController? _tabController;
 
-  late final _reachoutsRefreshController = RefreshController();
-  late final _commentsRefreshController = RefreshController();
-  late final _savedPostsRefreshController = RefreshController();
-  late final _likesRefreshController = RefreshController();
-  late final _shoutoutRefreshController = RefreshController();
-  late final _shoutdownRefreshController = RefreshController();
-  late final _shareRefreshController = RefreshController();
+  late final _reachoutsRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _commentsRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _savedPostsRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _likesRefreshController = RefreshController(initialRefresh: false);
+  late final _shoutoutRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _shoutdownRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _shareRefreshController = RefreshController(initialRefresh: false);
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 7, vsync: this);
+    // _reachoutsRefreshController =
+    // RefreshController(initialRefresh: false);
+    // _commentsRefreshController =
+    // RefreshController(initialRefresh: false);
+    // _savedPostsRefreshController =
+    // RefreshController(initialRefresh: false);
+    // _likesRefreshController = RefreshController(initialRefresh: false);
+    // _shoutoutRefreshController =
+    // RefreshController(initialRefresh: false);
+    // _shoutdownRefreshController =
+    // RefreshController(initialRefresh: false);
+    // _shareRefreshController = RefreshController(initialRefresh: false);
   }
 
   Set active = {};
@@ -316,32 +331,32 @@ class _AccountScreenState extends State<AccountScreen>
   ScrollController scrollViewController = ScrollController();
 
   void refreshPage() {
-    switch (_tabController!.index) {
-      case 0:
-        _reachoutsRefreshController.requestRefresh();
-        break;
-      case 1:
-        _likesRefreshController.requestRefresh();
-        break;
-      case 2:
-        _commentsRefreshController.requestRefresh();
-        break;
-      case 3:
-        _shoutoutRefreshController.requestRefresh();
-        break;
-      case 4:
-        _shoutdownRefreshController.requestRefresh();
-        break;
-      case 5:
-        _shareRefreshController.requestRefresh();
-        break;
-      case 6:
-        _savedPostsRefreshController.requestRefresh();
-        break;
-      default:
-        _reachoutsRefreshController.requestRefresh();
-        break;
-    }
+    // switch (_tabController!.index) {
+    //   case 0:
+    //     _reachoutsRefreshController.requestRefresh();
+    //     break;
+    //   case 1:
+    //     _likesRefreshController.requestRefresh();
+    //     break;
+    //   case 2:
+    //     _commentsRefreshController.requestRefresh();
+    //     break;
+    //   case 3:
+    //     _shoutoutRefreshController.requestRefresh();
+    //     break;
+    //   case 4:
+    //     _shoutdownRefreshController.requestRefresh();
+    //     break;
+    //   case 5:
+    //     _shareRefreshController.requestRefresh();
+    //     break;
+    //   case 6:
+    //     _savedPostsRefreshController.requestRefresh();
+    //     break;
+    //   default:
+    //     _reachoutsRefreshController.requestRefresh();
+    //     break;
+    // }
   }
 
   @override
@@ -1438,12 +1453,15 @@ class _ReacherCard extends HookWidget {
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
                   if (postModel!.imageMediaItems!.isNotEmpty ||
-                      (postModel?.videoMediaItem ?? '').isNotEmpty ||
-                      (postModel?.audioMediaItem ?? '').isNotEmpty)
+                      (postModel!.videoMediaItem ?? '').isNotEmpty)
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
+                  (postModel!.audioMediaItem ?? '').isNotEmpty
+                      ? PostAudioMedia(path: postModel!.audioMediaItem!)
+                          .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      : SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1695,30 +1713,6 @@ class _CommentReachCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  // if (commentModel!.imageMediaItems!.isNotEmpty &&
-                  //     commentModel!.audioMediaItem!.isNotEmpty &&
-                  //     commentModel!.audioMediaItem!.isNotEmpty)
-                  //   Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Flexible(
-                  //         child: Container(
-                  //           height: getScreenHeight(152),
-                  //           width: getScreenWidth(152),
-                  //           clipBehavior: Clip.hardEdge,
-                  //           decoration: BoxDecoration(
-                  //             borderRadius: BorderRadius.circular(15),
-                  //             image: const DecorationImage(
-                  //               image: AssetImage('assets/images/post.png'),
-                  //               fit: BoxFit.fitHeight,
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       SizedBox(width: getScreenWidth(8)),
-                  //       Flexible(child: MediaCard(size: size)),
-                  //     ],
-                  //   ).paddingOnly(r: 16, l: 16, b: 16, t: 10),
                   SizedBox(height: getScreenHeight(10)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1922,8 +1916,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
-  late final _reachoutsRefreshController = RefreshController();
-  late final _commentsRefreshController = RefreshController();
+  late final _reachoutsRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _commentsRefreshController =
+      RefreshController(initialRefresh: false);
 
   @override
   void initState() {
@@ -1933,12 +1929,24 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
-    globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
+    // globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!.add(GetReachRelationshipEvent(
         userIdToReach: widget.recipientId,
         type: ReachRelationshipType.reaching));
     globals.userBloc!
         .add(GetStarRelationshipEvent(userIdToStar: widget.recipientId));
+    globals.socialServiceBloc!.add(GetLikedPostsEvent(
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+    globals.socialServiceBloc!.add(GetVotedPostsEvent(
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Upvote',
+        authId: widget.recipientId));
+    globals.socialServiceBloc!.add(GetVotedPostsEvent(
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Downvote',
+        authId: widget.recipientId));
   }
 
   TabBar get _tabBar => TabBar(
@@ -2057,6 +2065,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     var size = MediaQuery.of(context).size;
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
+    final _likedPosts = useState<List<PostFeedModel>>([]);
+    final _shoutDowns = useState<List<PostFeedModel>>([]);
+    final _shoutOuts = useState<List<PostFeedModel>>([]);
+    final _sharedPosts = useState<List<PostFeedModel>>([]);
     return Scaffold(
       body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
@@ -2082,10 +2094,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is RecipientUserData) {
-                globals.recipientUser = state.user;
-                setState(() {});
-              }
+              // if (state is RecipientUserData) {
+              //   globals.recipientUser = state.user;
+              //   setState(() {});
+              // }
 
               if (state is UserError) {
                 Snackbars.error(context, message: state.error);
@@ -2135,6 +2147,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
             },
             builder: (context, state) {
+              // bool _isLoading = false;
+              // bool timelineLoading = false;
+              // timelineLoading = false;
               bool _isLoading = state is UserLoading;
               bool timelineLoading = state is GetAllPostsLoading;
               timelineLoading = state is GetPersonalCommentsLoading;

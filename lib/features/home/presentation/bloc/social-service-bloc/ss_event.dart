@@ -56,7 +56,7 @@ class UnlikePostEvent extends SocialServiceEvent {
 class CommentOnPostEvent extends SocialServiceEvent {
   final String? postId;
   final String? content, location;
-    final String? audioMediaItem;
+  final String? audioMediaItem;
   final String? videoMediaItem;
   final List<String>? imageMediaItem;
   final String? userId;
@@ -64,14 +64,11 @@ class CommentOnPostEvent extends SocialServiceEvent {
   CommentOnPostEvent({
     required this.postId,
     required this.content,
-
     this.location,
     this.audioMediaItem,
-     this.videoMediaItem,
+    this.videoMediaItem,
     this.imageMediaItem,
-
-     this.postOwnerId,
-    
+    this.postOwnerId,
     required this.userId,
   });
 }
@@ -274,10 +271,12 @@ class SearchProfileEvent extends SocialServiceEvent {
 class GetLikedPostsEvent extends SocialServiceEvent {
   final int? pageLimit;
   final int? pageNumber;
+  final String? authId;
 
   GetLikedPostsEvent({
     required this.pageLimit,
     required this.pageNumber,
+    this.authId,
   });
 }
 
