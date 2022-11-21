@@ -222,8 +222,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                   borderRadius: BorderRadius.circular(40))),
                         ).paddingOnly(t: 23),
                         SizedBox(height: getScreenHeight(20)),
-                        if (postFeedModel.postOwnerId !=
-                            postFeedModel.feedOwnerId)
+                        if (postFeedModel.postOwnerId != globals.userId)
                           Column(
                             children: [
                               KebabBottomTextButton(
@@ -768,8 +767,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               children: [
                                                 if (widget.postFeedModel!
                                                         .postOwnerId !=
-                                                    widget.postFeedModel!
-                                                        .feedOwnerId)
+                                                    globals.userId)
                                                   CupertinoButton(
                                                     minSize: 0,
                                                     onPressed: () {

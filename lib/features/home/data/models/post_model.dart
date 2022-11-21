@@ -21,34 +21,46 @@ class PostModel {
   List<PostLikeModel>? like;
   List<PostVoteModel>? vote;
 
-  PostModel({
-    this.audioMediaItem,
-    this.authId,
-    this.commentOption,
-    this.content,
-    this.edited,
-    this.hashTags,
-    this.imageMediaItems,
-    this.location,
-    this.mentionList,
-    this.nComments,
-    this.nDownvotes,
-    this.nLikes,
-    this.nShares,
-    this.nUpvotes,
-    this.postId,
-    this.postSlug,
-    this.videoMediaItem,
-    this.createdAt,
-    this.profile,
-    this.like,
-    this.vote,
-  });
+  bool? isLiked;
+  bool? isVoted;
+  bool? isRepost;
+  String? postRating;
+  DateTime? updatedAt;
 
-  factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
+  PostModel(
+      {this.audioMediaItem,
+      this.authId,
+      this.commentOption,
+      this.content,
+      this.edited,
+      this.hashTags,
+      this.imageMediaItems,
+      this.location,
+      this.mentionList,
+      this.nComments,
+      this.nDownvotes,
+      this.nLikes,
+      this.nShares,
+      this.nUpvotes,
+      this.postId,
+      this.postSlug,
+      this.videoMediaItem,
+      this.createdAt,
+      this.profile,
+      this.like,
+      this.vote,
+      this.isLiked,
+      this.isVoted,
+      this.isRepost,
+      this.postRating,
+      this.updatedAt});
+
+  factory PostModel.fromJson(Map<String, dynamic> json,
+          {Map<String, dynamic>? postFeedJson}) =>
+      PostModel(
         location: json["location"],
         audioMediaItem: json["audioMediaItem"],
-        authId: json["authId"],
+        authId: postFeedJson?["postOwnerProfile"]["authId"],
         commentOption: json["commentOption"],
         content: json["content"],
         edited: json["edited"],
@@ -83,6 +95,12 @@ class PostModel {
             ? null
             : List<PostVoteModel>.from(
                 json["vote"].map((x) => PostVoteModel.fromJson(x))),
+        isLiked: json["isLiked"],
+        isVoted: json["isVoted"],
+        isRepost: json["isRepost"],
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -286,6 +304,17 @@ class PostFeedModel {
   bool? verified;
   DateTime? createdAt;
 
+  bool? isLiked;
+  String? isVoted;
+  bool? isRepost;
+  DateTime? updatedAt;
+  PostModel? repostedPost;
+  String? repostedPostId;
+  String? repostedPostOwnerId;
+  PostProfileModel? voterProfile;
+  PostProfileModel? repostedPostOwnerProfile;
+  PostProfileModel? postOwnerProfile;
+
   PostFeedModel({
     this.firstName,
     this.feedOwnerId,
@@ -302,61 +331,62 @@ class PostFeedModel {
     this.like,
     this.vote,
     this.reachingRelationship,
+    this.isLiked,
+    this.isVoted,
+    this.isRepost,
+    this.updatedAt,
+    this.repostedPost,
+    this.repostedPostId,
+    this.repostedPostOwnerId,
+    this.voterProfile,
+    this.repostedPostOwnerProfile,
+    this.postOwnerProfile,
   });
 
   factory PostFeedModel.fromJson(Map<String, dynamic> json) {
     return PostFeedModel(
-      location: json["location"],
-      firstName: json["firstName"],
-      feedOwnerId: json["feedOwnerId"],
-      lastName: json["lastName"],
-      profilePicture: json["profilePicture"],
-      profileSlug: json["profileSlug"],
-      postOwnerId: json["postOwnerId"],
-      username: json["username"],
-      postId: json["postId"],
-      verified: json["verified"],
-      post: json["post"] == null ? null : PostModel.fromJson(json["post"]),
-      createdAt: json["created_at"] == null
-          ? null
-          : DateTime.parse(json["created_at"]),
-      reachingRelationship: json["reachingRelationship"],
-      like: json["like"] == null
-          ? null
-          : List<PostLikeModel>.from(
-              json["like"].map((x) => PostLikeModel.fromJson(x))),
-      vote: json["vote"] == null
-          ? null
-          : List<PostVoteModel>.from(json["vote"].map((x) {
-              return PostVoteModel.fromJson(x);
-            })),
-    );
+        location: json["post"]["location"],
+        // feedOwnerId: json["feedOwnerProfile"]["authId"],
+        firstName: json["postOwnerProfile"]["firstName"],
+        lastName: json["postOwnerProfile"]["lastName"],
+        profilePicture: json["postOwnerProfile"]["profilePicture"],
+        profileSlug: json["postOwnerProfile"]["profileSlug"],
+        postOwnerId: json["postOwnerProfile"]["authId"],
+        username: json["postOwnerProfile"]["username"],
+        verified: json["postOwnerProfile"]["verified"],
+        postId: json["post"]["postId"],
+        post: json["post"] == null
+            ? null
+            : PostModel.fromJson(json["post"], postFeedJson: json),
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+        reachingRelationship: json["reachingRelationship"],
+        like: json["isLiked"] ?? false ? [PostLikeModel()] : [],
+        vote: json["isVoted"] == null
+            ? []
+            : [PostVoteModel(voteType: json["isVoted"])],
+        isLiked: json["isLiked"],
+        isRepost: json["isRepost"],
+        isVoted: json["isVoted"],
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.parse(json["updated_at"]),
+        repostedPost: json["repostedPost"] == null
+            ? null
+            : PostModel.fromJson(json["repostedPost"]),
+        repostedPostId: json["repostedPostId"],
+        repostedPostOwnerId: json["repostedPostOwnerId"],
+        voterProfile: json["voterProfile"] == null
+            ? null
+            : PostProfileModel.fromJson(json["voterProfile"]),
+        repostedPostOwnerProfile: json["repostedPostOwnerProfile"] == null
+            ? null
+            : PostProfileModel.fromJson(json["repostedPostOwnerProfile"]),
+        postOwnerProfile: json["postOwnerProfile"] == null
+            ? null
+            : PostProfileModel.fromJson(json["postOwnerProfile"]));
   }
-  // factory PostFeedModel.fromJson(Map<String, dynamic> json) => PostFeedModel(
-  //       location: json["location"],
-  //       firstName: json["firstName"],
-  //       feedOwnerId: json["feedOwnerId"],
-  //       lastName: json["lastName"],
-  //       profilePicture: json["profilePicture"],
-  //       profileSlug: json["profileSlug"],
-  //       postOwnerId: json["postOwnerId"],
-  //       username: json["username"],
-  //       postId: json["postId"],
-  //       verified: json["verified"],
-  //       post: json["post"] == null ? null : PostModel.fromJson(json["post"]),
-  //       createdAt: json["created_at"] == null
-  //           ? null
-  //           : DateTime.parse(json["created_at"]),
-  //       reachingRelationship: json["reachingRelationship"],
-  //       like: json["like"] == null
-  //           ? null
-  //           : List<PostLikeModel>.from(
-  //               json["like"].map((x) => PostLikeModel.fromJson(x))),
-  //       vote: json["vote"] == null
-  //           ? null
-  //           : List<PostVoteModel>.from(
-  //               json["vote"].map((x) => PostVoteModel.fromJson(x))),
-  //     );
 
   Map<String, dynamic> toJson() => {
         "location": location,
@@ -370,14 +400,25 @@ class PostFeedModel {
         "postId": postId,
         "post": post == null ? null : post!.toJson(),
         "verified": verified,
-        "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
         "reachingRelationship": reachingRelationship,
         "like": like == null ? null : List.from(like!.map((x) => x.toJson())),
         // "vote": vote == null ? null : List.from(vote!.map((x) => x.toJson())),
+        "isLiked": isLiked,
+        "isVoted": isVoted,
+        "isRepost": isRepost,
+        "updated_at": updatedAt,
+        "repostedPost": repostedPost,
+        "repostedPostId": repostedPostId,
+        "repostedPostOwnerId": repostedPostOwnerId,
+        "voterProfile": voterProfile,
+        "repostedPostOwnerProfile": repostedPostOwnerProfile,
+        "postOwnerProfile": postOwnerProfile
       };
 }
 
 class PostProfileModel {
+  String? authId;
   String? firstName;
   String? lastName;
   String? location;
@@ -387,6 +428,7 @@ class PostProfileModel {
   String? username;
 
   PostProfileModel({
+    this.authId,
     this.firstName,
     this.lastName,
     this.location,
@@ -398,6 +440,7 @@ class PostProfileModel {
 
   factory PostProfileModel.fromJson(Map<String, dynamic> json) =>
       PostProfileModel(
+        authId: json["authId"],
         location: json["location"],
         firstName: json["firstName"],
         lastName: json["lastName"],
@@ -408,6 +451,7 @@ class PostProfileModel {
       );
 
   Map<String, dynamic> toJson() => {
+        "authId": authId,
         "location": location,
         "firstName": firstName,
         "lastName": lastName,
