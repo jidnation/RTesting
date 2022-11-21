@@ -434,7 +434,7 @@ class _PostReachState extends State<PostReach> {
                             .indexWhere((e) => FileUtils.isAudio(e.file)) >=
                         0)
                       PostReachAudioMedia(
-                        margin: EdgeInsets.all(16),
+                        margin: const EdgeInsets.all(16),
                         path: _mediaList
                             .value[_mediaList.value
                                 .indexWhere((e) => FileUtils.isAudio(e.file))]

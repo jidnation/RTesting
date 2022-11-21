@@ -502,44 +502,42 @@ class _AccountScreenState extends State<AccountScreen>
                         SizedBox(
                           height: getScreenHeight(200),
                           width: size.width,
-                          child: GestureDetector(child: const CoverPicture(),
-                          onTap: () {
-                            RouteNavigators.route(
-                                      context,
-                                      FullScreenWidget(
-                                        child: Stack(children: <Widget>[
-                                          Container(
-                                            color: AppColors
-                                                .black, // Your screen background color
+                          child: GestureDetector(
+                            child: const CoverPicture(),
+                            onTap: () {
+                              RouteNavigators.route(
+                                  context,
+                                  FullScreenWidget(
+                                    child: Stack(children: <Widget>[
+                                      Container(
+                                        color: AppColors
+                                            .black, // Your screen background color
+                                      ),
+                                      Column(children: <Widget>[
+                                        Container(height: getScreenHeight(100)),
+                                        const CoverPicture(),
+                                      ]),
+                                      Positioned(
+                                        top: 0.0,
+                                        left: 0.0,
+                                        right: 0.0,
+                                        child: AppBar(
+                                          title: const Text(
+                                              'Cover Photo'), // You can add title here
+                                          leading: IconButton(
+                                            icon: const Icon(Icons.arrow_back,
+                                                color: AppColors.white),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
                                           ),
-                                          Column(children: <Widget>[
-                                            Container(
-                                                height: getScreenHeight(100)),
-                                            const CoverPicture(),
-                                          ]),
-                                          Positioned(
-                                            top: 0.0,
-                                            left: 0.0,
-                                            right: 0.0,
-                                            child: AppBar(
-                                              title: const Text(
-                                                  'Cover Photo'), // You can add title here
-                                              leading: IconButton(
-                                                icon: const Icon(
-                                                    Icons.arrow_back,
-                                                    color: AppColors.white),
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                              ),
-                                              backgroundColor: AppColors
-                                                  .black, //You can make this transparent
-                                              elevation: 0.0, //No shadow
-                                            ),
-                                          ),
-                                        ]),
-                                      ));
-                      
-                          },
+                                          backgroundColor: AppColors
+                                              .black, //You can make this transparent
+                                          elevation: 0.0, //No shadow
+                                        ),
+                                      ),
+                                    ]),
+                                  ));
+                            },
                           ),
                         ),
                         Row(
@@ -598,7 +596,6 @@ class _AccountScreenState extends State<AccountScreen>
                               height:
                                   isGoingDown ? height : getScreenHeight(100),
                               duration: const Duration(seconds: 1),
-
                               child: GestureDetector(
                                 child: const ProfilePicture(
                                   height: 90,
@@ -642,7 +639,6 @@ class _AccountScreenState extends State<AccountScreen>
                                         ]),
                                       ));
                                 },
-
                               )),
                         ),
                       ],
@@ -742,6 +738,34 @@ class _AccountScreenState extends State<AccountScreen>
                                       SizedBox(width: getScreenWidth(5)),
                                       Text(
                                         'Star',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 3)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        //nblock Variable here
+                                        globals.user!.nBlocked.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Block',
                                         style: TextStyle(
                                             fontSize: getScreenHeight(15),
                                             color: AppColors.greyShade2,
@@ -2101,7 +2125,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
 
               if (state is UserLoaded) {
-                Snackbars.success(context, message: "Reached User Successfully");
+                Snackbars.success(context,
+                    message: "Reached User Successfully");
                 // globals.userBloc!.add(
                 //     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
@@ -2371,10 +2396,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   ],
                                 ),
                               ),
-                              SizedBox(width: getScreenWidth(20)),
-                              InkWell(
+                              //SizedBox(width: getScreenWidth(20)),
+                              /*InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 2)),
+                                    context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -2396,7 +2421,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     ),
                                   ],
                                 ),
-                              )
+                              )*/
                             ],
                           ),
                         ],

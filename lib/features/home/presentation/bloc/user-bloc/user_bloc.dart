@@ -218,7 +218,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
-on<UploadUserProfilePictureEvent>((event, emit) async {
+    on<UploadUserProfilePictureEvent>((event, emit) async {
       emit(UserUploadingImage());
       String imageUrl = '';
       String signedUrl = '';
@@ -432,6 +432,45 @@ on<UploadUserProfilePictureEvent>((event, emit) async {
         );
       } on GraphQLError catch (e) {
         emit(UpdateUserLastSeenError(error: e.message));
+      }
+    });
+    on<BlockUserEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.blocKUser(
+          idToBlock: event.idToBlock,
+        );
+        response.fold((error) => emit(UserError(error: error)),
+            (blockedUser) => emit(BlockUserSuccess(blockedUser: blockedUser)));
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<UnBlockUserEvent>((event, emit) async {
+      emit(UserLoading());
+
+      try {
+        final response =
+            await userRepository.unblockUser(idToUnblock: event.idToUnblock);
+        response.fold(
+            (error) => emit(UserError(error: error)),
+            (unblockUser) =>
+                emit(UnBlockUserSuccess(unblockUser: unblockUser)));
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+    on<GetBlockedListEvent>((event, emit) async {
+      emit(UserLoading());
+      try {
+        final response = await userRepository.getBlockedList();
+        response.fold(
+          (error) => emit(UserError(error: error)),
+          (blockedList) =>
+              emit(GetBlockedListSuccess(blockedList: blockedList)),
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
       }
     });
   }

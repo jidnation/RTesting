@@ -60,11 +60,11 @@ class PostReachMedia extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                     child: Center(
                         child: Text(
                       duration ?? '',
-                      style: TextStyle(color: AppColors.grey),
+                      style: const TextStyle(color: AppColors.grey),
                     )),
                     decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -76,8 +76,8 @@ class PostReachMedia extends StatelessWidget {
         (isVideo)
             ? Positioned.fill(
                 child: Container(
-                  decoration: BoxDecoration(),
-                  child: Icon(
+                  decoration: const BoxDecoration(),
+                  child: const Icon(
                     Icons.play_arrow_rounded,
                     color: AppColors.white,
                     size: 52,
@@ -127,6 +127,9 @@ class PostReachMedia extends StatelessWidget {
     ).paddingOnly(r: 10);
   }
 }
+
+
+
 
 class PostReachAudioMedia extends StatefulWidget {
   final String path;
@@ -190,7 +193,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
     return Container(
       margin: widget.margin,
       height: getScreenHeight(36),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: AppColors.audioPlayerBg,
           borderRadius: BorderRadius.all(Radius.circular(15))),
       child: Row(
@@ -209,7 +212,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
               color: AppColors.black,
             ),
           ),
-          Spacer(
+          const Spacer(
             flex: 1,
           ),
           isInitialised
@@ -228,7 +231,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
                 )
               : SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
-                  child: LinearProgressIndicator(
+                  child: const LinearProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     color: AppColors.greyShade1,
                     backgroundColor: AppColors.greyShade1,
@@ -239,19 +242,19 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
           ),
           Text(
             StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
-          Spacer(
+          const Spacer(
             flex: 1,
           ),
           GestureDetector(
             onTap: widget.onCancel,
-            child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 8),
-                padding: EdgeInsets.all(4),
+            child:  Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.all(4),
                 alignment: Alignment.center,
                 height: getScreenHeight(36),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     shape: BoxShape.circle, color: AppColors.white),
                 child: Icon(
                   Icons.close_rounded,

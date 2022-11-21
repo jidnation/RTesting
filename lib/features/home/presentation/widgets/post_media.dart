@@ -423,6 +423,8 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   }
 }
 
+
+
 class PostAudioMedia extends StatefulWidget {
   final String path;
   final EdgeInsets? margin, padding;
@@ -480,7 +482,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
     return Container(
       margin: widget.margin,
       height: getScreenHeight(36),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: AppColors.audioPlayerBg,
           borderRadius: BorderRadius.all(Radius.circular(15))),
       child: Row(
@@ -518,18 +520,18 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
                 )
               : SizedBox(
                   width: MediaQuery.of(context).size.width / 1.7,
-                  child: LinearProgressIndicator(
+                  child: const LinearProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     color: AppColors.greyShade1,
                     backgroundColor: AppColors.greyShade1,
                   ),
                 ),
-          Spacer(
+          const Spacer(
             flex: 1,
           ),
           Text(
             StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           SizedBox(
             width: getScreenWidth(12),
