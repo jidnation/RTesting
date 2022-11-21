@@ -22,7 +22,7 @@ import 'package:reach_me/core/utils/regex_util.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
-import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
+import 'package:reach_me/features/dictionary/presentation/views/add_to_glossary.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
@@ -318,13 +318,15 @@ class _PostReachState extends State<PostReach> {
                                         : _recentWords.value.isEmpty
                                             ? TextButton(
                                                 onPressed: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return const AddToGlossaryDialog();
-                                                      });
-                                                  Navigator.pop(context);
+                                                  // showDialog(
+                                                  //     context: context,
+                                                  //     builder: (BuildContext
+                                                  //         context) {
+                                                  //       return const AddToGlossaryDialog();
+                                                  //     });
+                                                  // Navigator.pop(context);
+                                                  RouteNavigators.route(context,
+                                                      const AddToGlossary());
                                                 },
                                                 child: const Text(
                                                     'Add to glossary'))
