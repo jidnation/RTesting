@@ -531,15 +531,17 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       likingPost: false,
                                                       postFeedModel:
                                                           _posts.value[index],
-                                                      isLiked: _posts
-                                                              .value[index]
-                                                              .like!
-                                                              .isNotEmpty
+                                                      isLiked: (_posts
+                                                                  .value[index]
+                                                                  .isLiked ??
+                                                              false)
                                                           ? true
                                                           : false,
-                                                      isVoted: _posts
-                                                              .value[index]
-                                                              .vote!
+                                                      isVoted: (_posts
+                                                                      .value[
+                                                                          index]
+                                                                      .isVoted ??
+                                                                  '')
                                                               .isNotEmpty
                                                           ? true
                                                           : false,
@@ -1067,11 +1069,9 @@ class PostFeedReacherCard extends HookWidget {
                               ),
                             ),
                           ),
-                          if (postFeedModel!.postOwnerId !=
-                              postFeedModel!.feedOwnerId)
+                          if (postFeedModel!.postOwnerId != globals.userId)
                             SizedBox(width: getScreenWidth(15)),
-                          if (postFeedModel!.postOwnerId !=
-                              postFeedModel!.feedOwnerId)
+                          if (postFeedModel!.postOwnerId != globals.userId)
                             CupertinoButton(
                               minSize: 0,
                               onPressed: onMessage,

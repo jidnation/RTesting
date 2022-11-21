@@ -55,10 +55,12 @@ class PostModel {
       this.postRating,
       this.updatedAt});
 
-  factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
+  factory PostModel.fromJson(Map<String, dynamic> json,
+          {Map<String, dynamic>? postFeedJson}) =>
+      PostModel(
         location: json["location"],
         audioMediaItem: json["audioMediaItem"],
-        authId: json["profile"]["authId"],
+        authId: postFeedJson?["postOwnerProfile"]["authId"],
         commentOption: json["commentOption"],
         content: json["content"],
         edited: json["edited"],
@@ -303,7 +305,7 @@ class PostFeedModel {
   DateTime? createdAt;
 
   bool? isLiked;
-  bool? isVoted;
+  String? isVoted;
   bool? isRepost;
   DateTime? updatedAt;
   PostModel? repostedPost;
@@ -344,7 +346,7 @@ class PostFeedModel {
   factory PostFeedModel.fromJson(Map<String, dynamic> json) {
     return PostFeedModel(
         location: json["post"]["location"],
-        feedOwnerId: json["feedOwnerProfile"]["authId"],
+        // feedOwnerId: json["feedOwnerProfile"]["authId"],
         firstName: json["postOwnerProfile"]["firstName"],
         lastName: json["postOwnerProfile"]["lastName"],
         profilePicture: json["postOwnerProfile"]["profilePicture"],
@@ -353,20 +355,17 @@ class PostFeedModel {
         username: json["postOwnerProfile"]["username"],
         verified: json["postOwnerProfile"]["verified"],
         postId: json["post"]["postId"],
-        post: json["post"] == null ? null : PostModel.fromJson(json["post"]),
+        post: json["post"] == null
+            ? null
+            : PostModel.fromJson(json["post"], postFeedJson: json),
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
         reachingRelationship: json["reachingRelationship"],
-        like: json["like"] == null
-            ? null
-            : List<PostLikeModel>.from(
-                json["like"].map((x) => PostLikeModel.fromJson(x))),
-        vote: json["vote"] == null
-            ? null
-            : List<PostVoteModel>.from(json["vote"].map((x) {
-                return PostVoteModel.fromJson(x);
-              })),
+        like: json["isLiked"] ?? false ? [PostLikeModel()] : [],
+        vote: json["isVoted"] == null
+            ? []
+            : [PostVoteModel(voteType: json["isVoted"])],
         isLiked: json["isLiked"],
         isRepost: json["isRepost"],
         isVoted: json["isVoted"],

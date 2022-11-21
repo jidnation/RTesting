@@ -47,29 +47,26 @@ class SavePostSchema {
 
   static String get schema {
     return r'''
-            audioMediaItem
-            authId
-            content
-            imageMediaItems
-            postId
-            savedPostId
-            videoMediaItem
-            like {
+            created_at
+            isLiked
+            isVoted
+            post{
               ''' +
-        PostLikeSchema.schema +
+        PostSchema.schema +
         '''
             }
-            vote {
+            postOwnerProfile {
               ''' +
-        PostVoteSchema.schema +
+        PostProfileSchema.schema +
         '''
             }
-            postId
             profile {
               ''' +
         PostProfileSchema.schema +
         '''
             }
+            savedPostId
+            updated_at
         ''';
   }
 }
@@ -145,6 +142,9 @@ class PostFeedSchema {
   static String get schema {
     return r'''
               created_at
+              feedOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
               isLiked
               isRepost
               isVoted
@@ -231,7 +231,7 @@ class CommentLikeSchema {
             commentId
             profile {
               ''' +
-        PostProfileSchema.schema +
+        CommentProfileSchema.schema +
         '''
             }
         ''';

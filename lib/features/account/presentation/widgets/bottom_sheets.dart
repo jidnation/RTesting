@@ -291,7 +291,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               borderRadius: BorderRadius.circular(40))),
                     ).paddingOnly(t: 23),
                     SizedBox(height: getScreenHeight(20)),
-                    if (postFeedModel.postOwnerId != postFeedModel.feedOwnerId)
+                    if (postFeedModel.postOwnerId != globals.userId)
                       Column(
                         children: [
                           KebabBottomTextButton(
