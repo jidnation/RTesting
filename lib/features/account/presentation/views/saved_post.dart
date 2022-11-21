@@ -271,12 +271,15 @@ class SavedPostReacherCard extends HookWidget {
               ).paddingSymmetric(v: 10, h: 16),
             ),
             if (savedPostModel!.imageMediaItems!.isNotEmpty ||
-                (savedPostModel!.videoMediaItem ?? '').isNotEmpty ||
-                (savedPostModel!.audioMediaItem ?? '').isNotEmpty)
+                (savedPostModel!.videoMediaItem ?? '').isNotEmpty)
               PostMedia(post: savedPostModel!.toPostModel())
                   .paddingOnly(r: 16, l: 16, b: 16, t: 10)
             else
               const SizedBox.shrink(),
+            (savedPostModel!.audioMediaItem ?? '').isNotEmpty
+                ? PostAudioMedia(path: savedPostModel!.audioMediaItem!)
+                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                : SizedBox.shrink(),
             // if (savedPostModel!.imageMediaItems!.isNotEmpty)
             //   Helper.renderSavedPostImages(savedPostModel!, context)
             //       .paddingOnly(r: 16, l: 16, b: 16, t: 10)

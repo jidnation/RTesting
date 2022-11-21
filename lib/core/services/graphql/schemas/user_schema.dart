@@ -19,6 +19,7 @@ class UserSchema {
             nReachers
             nReaching
             nStaring
+            nBlocked
             verified
             email
             firstName
@@ -62,3 +63,5 @@ class ProfileIndexSchema {
         ''';
   }
 }
+
+

@@ -4,68 +4,69 @@ class PostSchema {
   static String get schema {
     return r'''
             audioMediaItem
-            authId
             commentOption
             content
+            created_at
             edited
             hashTags
-            created_at
             imageMediaItems
+            isLiked
+            isRepost
+            isVoted
             location
             mentionList
             nComments
             nLikes
-            nShares
             nDownvotes
             nUpvotes
             postId
+            postRating
             postSlug
-            videoMediaItem
-            like {
-              ''' +
-        PostLikeSchema.schema +
-        '''}
-          vote {
-              ''' +
-        PostVoteSchema.schema +
-        '''}
-          profile {
+            profile {
               ''' +
         PostProfileSchema.schema +
         '''
             }
+            updated_at
+            videoMediaItem
         ''';
   }
 }
+
+// repostedPost {''' +
+//         PostSchema.schema +
+//         ''' }
+// repostedPostId
+// repostedPostOwnerId
+// repostedPostOwnerProfile {''' +
+//         PostProfileSchema.schema +
+//         ''' }
 
 class SavePostSchema {
   SavePostSchema._();
 
   static String get schema {
     return r'''
-            audioMediaItem
-            authId
-            content
-            imageMediaItems
-            postId
-            savedPostId
-            videoMediaItem
-            like {
+            created_at
+            isLiked
+            isVoted
+            post{
               ''' +
-        PostLikeSchema.schema +
+        PostSchema.schema +
         '''
             }
-            vote {
+            postOwnerProfile {
               ''' +
-        PostVoteSchema.schema +
+        PostProfileSchema.schema +
         '''
             }
-            postId
             profile {
               ''' +
         PostProfileSchema.schema +
         '''
             }
+            savedPostId
+            updated_at
         ''';
   }
 }
@@ -107,13 +108,14 @@ class PostProfileSchema {
 
   static String get schema {
     return r'''
+            authId
             firstName
             lastName
             location
             profilePicture
             profileSlug
-            verified
             username
+            verified
         ''';
   }
 }
@@ -139,26 +141,32 @@ class PostFeedSchema {
 
   static String get schema {
     return r'''
-            feedOwnerId
-            created_at
-            firstName
-            lastName
-            location
-            postId
-            profilePicture
-            profileSlug
-            username
-            like {
-              ''' +
-        PostLikeSchema.schema +
-        '''}
-            vote {
-              ''' +
-        PostVoteSchema.schema +
-        '''}
-            verified
-            reachingRelationship
-            postOwnerId
+              created_at
+              feedOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              isLiked
+              isRepost
+              isVoted
+              post {''' +
+        PostSchema.schema +
+        ''' }
+              postOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              reachingRelationship
+              repostedPost {''' +
+        PostSchema.schema +
+        ''' }
+              repostedPostId
+              repostedPostOwnerId
+              repostedPostOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              updated_at
+              voterProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
         ''';
   }
 }
@@ -223,7 +231,7 @@ class CommentLikeSchema {
             commentId
             profile {
               ''' +
-        PostProfileSchema.schema +
+        CommentProfileSchema.schema +
         '''
             }
         ''';

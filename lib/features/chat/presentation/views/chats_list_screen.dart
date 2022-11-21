@@ -46,7 +46,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final usersList = useState<List<ChatUser>>([]);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
-    
+
     useMemoized(() {
       globals.chatBloc!.add(GetUserThreadsEvent(id: globals.user!.id));
     });
@@ -164,7 +164,6 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                       style: TextStyle(
                                         fontSize: getScreenHeight(15),
                                         fontWeight: FontWeight.w400,
-                                        
                                       ),
                                     ),
                                   ),
@@ -181,7 +180,6 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                       style: TextStyle(
                                         fontSize: getScreenHeight(15),
                                         fontWeight: FontWeight.w400,
-                                        
                                       ),
                                     ),
                                   ),
@@ -196,7 +194,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                               .paddingOnly(t: 10)
                           : const SizedBox.shrink(),
                       _isLoading
-                          ? const Center( 
+                          ? const Center(
                               child: SizedBox(
                                 height: 20,
                                 width: 20,
