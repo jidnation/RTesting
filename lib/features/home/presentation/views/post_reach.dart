@@ -725,31 +725,31 @@ class _PostReachState extends State<PostReach> {
                   ],
                 ),
               ),
-              IconButton(
-                  onPressed: () {
-                    if (_isPlaying) {
-                      _soundRecorderController.stop();
-                    } else {
-                      _soundRecorderController.record();
-                    }
-                    setState(() {
-                      _isPlaying = !_isPlaying;
-                    });
-                  },
-                  icon: const Icon(Icons.mic)),
-              AudioWaveforms(
-                size: Size(MediaQuery.of(context).size.width, 100.0),
-                waveStyle: const WaveStyle(
-                  waveColor: Colors.red,
-                  showDurationLabel: true,
-                  spacing: 8.0,
-                  showBottom: true,
-                  showTop: true,
-                  showMiddleLine: true,
-                  extendWaveform: true,
-                ),
-                recorderController: _soundRecorderController,
-              ),
+              // IconButton(
+              //     onPressed: () {
+              //       if (_isPlaying) {
+              //         _soundRecorderController.stop();
+              //       } else {
+              //         _soundRecorderController.record();
+              //       }
+              //       setState(() {
+              //         _isPlaying = !_isPlaying;
+              //       });
+              //     },
+              //     icon: const Icon(Icons.mic)),
+              // AudioWaveforms(
+              //   size: Size(MediaQuery.of(context).size.width, 100.0),
+              //   waveStyle: const WaveStyle(
+              //     waveColor: Colors.red,
+              //     showDurationLabel: true,
+              //     spacing: 8.0,
+              //     showBottom: true,
+              //     showTop: true,
+              //     showMiddleLine: true,
+              //     extendWaveform: true,
+              //   ),
+              //   recorderController: _soundRecorderController,
+              // ),
             ],
           ),
         ),
