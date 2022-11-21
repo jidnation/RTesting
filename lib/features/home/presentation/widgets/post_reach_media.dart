@@ -426,6 +426,75 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
   }
 }
 
+class AudioRecordWidget extends StatelessWidget {
+  final RecorderController recorderController;
+  final Function() onDelete, onSend;
+  const AudioRecordWidget(
+      {Key? key,
+      required this.recorderController,
+      required this.onDelete,
+      required this.onSend})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          border:
+              Border(top: BorderSide(color: AppColors.primaryColor, width: 1))),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: onDelete,
+            child: Icon(Icons.delete,
+                size: 32, color: AppColors.primaryColor.withOpacity(0.5)),
+          ),
+          SizedBox(
+            width: 12,
+          ),
+          Expanded(
+            child: AudioWaveforms(
+              // size: Size(MediaQuery.of(context).size.width-64 , 24.0),
+              size: const Size(double.infinity, 24.0),
+              waveStyle: const WaveStyle(
+                waveColor: AppColors.primaryColor,
+                // showDurationLabel: true,
+                spacing: 6.0,
+                // showBottom: true,
+                waveCap: StrokeCap.round,
+                scaleFactor: 0.2,
+                waveThickness: 3,
+                showTop: true,
+                showMiddleLine: false,
+                extendWaveform: true,
+              ),
+              recorderController: recorderController,
+            ),
+          ),
+          SizedBox(
+            width: 12,
+          ),
+          GestureDetector(
+            onTap: onSend,
+            child: Container(
+                height: 40,
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: AppColors.primaryColor),
+                child: Icon(
+                  Icons.send,
+                  color: AppColors.white,
+                  size: 16,
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // class PostReachAudioMedia extends StatefulWidget {
 //   final String path;
 //   final Function() onCancel;

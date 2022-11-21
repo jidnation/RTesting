@@ -2,7 +2,6 @@ import 'dart:io';
 //import 'dart:js_util';
 import 'dart:math';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +11,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/core/services/audio_recording_service.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -27,7 +28,6 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
 
-import '../../../../core/helper/logger.dart';
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
@@ -51,6 +51,14 @@ class _PostReachState extends State<PostReach> {
       GlobalKey<FlutterMentionsState>();
 
   final ScrollController _controller = ScrollController();
+  // bool _isPlaying = false;
+  // final _soundRecorderController = RecorderController()
+  //   ..androidEncoder = AndroidEncoder.aac
+  //   ..androidOutputFormat = AndroidOutputFormat.aac_adts
+  //   ..iosEncoder = IosEncoder.kAudioFormatMPEG4AAC
+  //   ..sampleRate = 16000;
+
+  final AudioRecordingService _recordingService = AudioRecordingService();
 
 // This is what you're looking for!
   void _scrollDown() {
@@ -462,7 +470,7 @@ class _PostReachState extends State<PostReach> {
                             .indexWhere((e) => FileUtils.isAudio(e.file)) >=
                         0)
                       PostReachAudioMedia(
-                        margin: EdgeInsets.all(16),
+                        margin: const EdgeInsets.all(16),
                         path: _mediaList
                             .value[_mediaList.value
                                 .indexWhere((e) => FileUtils.isAudio(e.file))]
@@ -684,20 +692,12 @@ class _PostReachState extends State<PostReach> {
                           constraints: const BoxConstraints(),
                         ),
                         const SizedBox(width: 20),
-                        IconButton(
-                          onPressed: () async {
-                            final media =
-                                await MediaService().getAudio(context: context);
-                            if (media == null) return;
+                        PopupMenuButton(
+                          onSelected: (value) async {
                             if ((_mediaList.value.length + 1) > 15) {
                               Snackbars.error(context,
                                   message:
                                       'Sorry, you cannot add more than 15 media');
-                              return;
-                            }
-                            if (!FileUtils.isAudio(media.file)) {
-                              Snackbars.error(context,
-                                  message: 'Audio format not supported!');
                               return;
                             }
                             if (nAudios > 0) {
@@ -706,49 +706,107 @@ class _PostReachState extends State<PostReach> {
                                       'Sorry, you cannot add more than one audio media');
                               return;
                             }
-
-                            Console.log('<<<PATH>>', media.path);
-                            _mediaList.value.add(UploadFileDto(
-                                file: media.file,
-                                fileResult: media,
-                                id: Random().nextInt(100).toString()));
-                            setState(() {});
+                            if (value == null) return;
+                            if (value == 1) {
+                              final media = await MediaService()
+                                  .getAudio(context: context);
+                              if (media == null) return;
+                              if (!FileUtils.isAudio(media.file)) {
+                                Snackbars.error(context,
+                                    message: 'Audio format not supported!');
+                                return;
+                              }
+                              Console.log('<<<PATH>>', media.path);
+                              _mediaList.value.add(UploadFileDto(
+                                  file: media.file,
+                                  fileResult: media,
+                                  id: Random().nextInt(100).toString()));
+                              setState(() {});
+                            } else if (value == 2) {
+                              _recordingService.record(
+                                  fileName: 'post_reach_aud.aac');
+                            }
                           },
-                          padding: EdgeInsets.zero,
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          icon: SvgPicture.asset('assets/svgs/mic.svg'),
-                          constraints: const BoxConstraints(),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                                value: 1,
+                                child: Text(
+                                  'Upload',
+                                  style: TextStyle(color: AppColors.black),
+                                )),
+                            PopupMenuItem(
+                                value: 2,
+                                child: Text(
+                                  'Record',
+                                  style: TextStyle(color: AppColors.black),
+                                )),
+                          ],
+                          child: SvgPicture.asset('assets/svgs/mic.svg'),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
+              ValueListenableBuilder(
+                  valueListenable: _recordingService.recording,
+                  builder: (BuildContext context, bool value, Widget? child) {
+                    return Visibility(
+                      visible: value,
+                      child: AudioRecordWidget(
+                        recorderController:
+                            _recordingService.recorderController,
+                        onSend: () async {
+                          final res = await _recordingService.stop();
+                          if (res == null) return;
+                          _mediaList.value = [
+                            ..._mediaList.value,
+                            UploadFileDto(
+                                file: res.file,
+                                id: Random().nextInt(100).toString(),
+                                fileResult: res)
+                          ];
+                        },
+                        onDelete: () {
+                          _recordingService.stop();
+                        },
+                      ),
+                    );
+                  })
+
               // IconButton(
-              //     onPressed: () {
-              //       if (_isPlaying) {
-              //         _soundRecorderController.stop();
+              //     onPressed: () async {
+              //       if (_recordingService.isRecording) {
+              //         final res = await _recordingService.stop();
+              //         if (res == null) return;
+              //         _mediaList.value = [
+              //           ..._mediaList.value,
+              //           UploadFileDto(
+              //               file: res.file,
+              //               id: Random().nextInt(100).toString(),
+              //               fileResult: res)
+              //         ];
+              //         setState(() {});
               //       } else {
-              //         _soundRecorderController.record();
+              //         _recordingService.record(fileName: 'post_reach_aud.aac');
               //       }
-              //       setState(() {
-              //         _isPlaying = !_isPlaying;
-              //       });
               //     },
               //     icon: const Icon(Icons.mic)),
               // AudioWaveforms(
-              //   size: Size(MediaQuery.of(context).size.width, 100.0),
+              //   size: Size(MediaQuery.of(context).size.width, 24.0),
               //   waveStyle: const WaveStyle(
-              //     waveColor: Colors.red,
+              //     waveColor: Colors.black,
               //     showDurationLabel: true,
-              //     spacing: 8.0,
-              //     showBottom: true,
-              //     showTop: true,
-              //     showMiddleLine: true,
-              //     extendWaveform: true,
+              //     spacing: 6.0,
+              //     // showBottom: true,
+              //     waveCap: StrokeCap.round,
+              //     scaleFactor: 0.2,
+              //     waveThickness: 3,
+              //     // showTop: true,
+              //     // showMiddleLine: true,
+              //     // extendWaveform: true,
               //   ),
-              //   recorderController: _soundRecorderController,
+              //   recorderController: _recordingService.recorderController,
               // ),
             ],
           ),
@@ -756,9 +814,6 @@ class _PostReachState extends State<PostReach> {
       ),
     );
   }
-
-  bool _isPlaying = false;
-  final _soundRecorderController = RecorderController();
 
   Row replyWidget(String replyFeature) {
     switch (replyFeature) {
