@@ -518,13 +518,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             setState(() {
                                               emojiShowing = true;
                                             });
-                                     await Future.delayed(const Duration(milliseconds: 100));
+                                            await Future.delayed(const Duration(
+                                                milliseconds: 100));
                                             focusNode.unfocus();
                                             FocusScope.of(context).unfocus();
-                                            FocusManager.instance.primaryFocus?.unfocus();
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
                                             await SystemChannels.textInput
-                                               .invokeMethod('TextInput.hide');
-                                                                                  }
+                                                .invokeMethod('TextInput.hide');
+                                          }
                                           /*if (isKeyboardVisible) {
                                             FocusScope.of(context).unfocus();
                                           }
