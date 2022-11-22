@@ -47,6 +47,10 @@ class PostReach extends StatefulHookWidget {
 }
 
 class _PostReachState extends State<PostReach> {
+  bool nudity = false;
+  bool graphicViolence = false;
+  bool sensitive = false;
+  String postRating = "normal";
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
 
@@ -103,8 +107,7 @@ class _PostReachState extends State<PostReach> {
     int nImages =
         _mediaList.value.where((e) => FileUtils.isImage(e.file)).length;
     // final _imageList = useState<List<UploadFileDto>>([]);
-
-    String getUserLoation() {
+    String getUserLocation() {
       if (globals.user!.showLocation!) {
         return globals.location!;
       } else {
@@ -160,17 +163,24 @@ class _PostReachState extends State<PostReach> {
                                 globals.postContent = controllerKey
                                     .currentState!.controller!.text;
                                 globals.postCommentOption = replyFeature.value;
-
+                                if (nudity == true ||
+                                    graphicViolence == true ||
+                                    sensitive == true) {
+                                  globals.postRating = "sensitive";
+                                } else {
+                                  globals.postRating = "normal";
+                                }
                                 setState(() {});
                               } else {
-                                debugPrint(
-                                    "reply feature: ${replyFeature.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
-                                  content: controllerKey
-                                      .currentState!.controller!.text,
-                                  commentOption: replyFeature.value,
-                                  location: getUserLoation(),
-                                ));
+                                    content: controllerKey
+                                        .currentState!.controller!.text,
+                                    commentOption: replyFeature.value,
+                                    location: getUserLocation(),
+                                    postRating:
+                                        nudity || graphicViolence || sensitive
+                                            ? globals.postRating = "sensitive"
+                                            : "normal"));
                               }
                               RouteNavigators.pop(context);
                             }
@@ -205,12 +215,9 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.user!.showLocation!
-                                      ? globals.location!
-                                      : '',
-                                  // globals.location == 'NIL'
-                                  //     ? ''
-                                  //     : globals.location!
+                                  globals.location == 'NIL'
+                                      ? ''
+                                      : globals.location!,
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
@@ -642,6 +649,124 @@ class _PostReachState extends State<PostReach> {
                         //   constraints: const BoxConstraints(),
                         // ),
                         // const SizedBox(width: 20),
+                        IconButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                  context: context,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10)),
+                                  ),
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                      builder: ((context, setState) {
+                                        return ListView(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 27,
+                                              vertical: 10,
+                                            ),
+                                            children: [
+                                              Container(
+                                                height: 4,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.greyShade5
+                                                      .withOpacity(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                              ).paddingSymmetric(
+                                                  h: size.width / 2.7),
+                                              SizedBox(
+                                                  height: getScreenHeight(21)),
+                                              Center(
+                                                child: Text(
+                                                  'Content warning',
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(16),
+                                                    color: AppColors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: getScreenHeight(5)),
+                                              Center(
+                                                child: Text(
+                                                  "Select a category and we'll put a content warning. This helps people avoid content they don't want to see",
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(14),
+                                                    color: AppColors.greyShade3,
+                                                  ),
+                                                ),
+                                              ),
+                                              CheckboxListTile(
+                                                title: const Text(
+                                                  'Nudity',
+                                                  style: TextStyle(
+                                                      color: Color(0xff001824)),
+                                                ),
+                                                autofocus: false,
+                                                activeColor: Colors.green,
+                                                checkColor: Colors.white,
+                                                selected: nudity,
+                                                value: nudity,
+                                                onChanged: (value) {
+                                                  debugPrint("Nudity $nudity");
+                                                  setState(() {
+                                                    nudity = value!;
+                                                    debugPrint(
+                                                        "Nudity $nudity");
+                                                  });
+                                                  debugPrint("Nudity $nudity");
+                                                },
+                                              ),
+                                              CheckboxListTile(
+                                                title: const Text(
+                                                  'Graphic Violence',
+                                                  style: TextStyle(
+                                                      color: Color(0xff001824)),
+                                                ),
+                                                autofocus: false,
+                                                activeColor: Colors.green,
+                                                checkColor: Colors.white,
+                                                selected: graphicViolence,
+                                                value: graphicViolence,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    graphicViolence = value!;
+                                                  });
+                                                },
+                                              ),
+                                              CheckboxListTile(
+                                                title: const Text(
+                                                  'Sensitive',
+                                                  style: TextStyle(
+                                                      color: Color(0xff001824)),
+                                                ),
+                                                autofocus: false,
+                                                activeColor: Colors.green,
+                                                checkColor: Colors.white,
+                                                selected: sensitive,
+                                                value: sensitive,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    sensitive = value!;
+                                                    print("Value: $sensitive");
+                                                  });
+                                                },
+                                              ),
+                                            ]);
+                                      }),
+                                    );
+                                  });
+                            },
+                            icon: const Icon(Icons.flag)),
                         IconButton(
                           onPressed: () async {
                             final media = await MediaService().pickFromGallery(

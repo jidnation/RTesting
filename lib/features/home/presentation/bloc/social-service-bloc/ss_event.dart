@@ -8,7 +8,7 @@ class CreatePostEvent extends SocialServiceEvent {
   final String? videoMediaItem;
   final List<String>? imageMediaItem;
   final String? commentOption;
-  final String? content, location;
+  final String? content, location, postRating;
   CreatePostEvent({
     this.audioMediaItem,
     this.videoMediaItem,
@@ -16,6 +16,7 @@ class CreatePostEvent extends SocialServiceEvent {
     this.commentOption,
     this.content,
     this.location,
+    this.postRating
   });
 }
 

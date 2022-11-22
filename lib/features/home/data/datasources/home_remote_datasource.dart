@@ -531,6 +531,7 @@ class HomeRemoteDataSource {
     String? location,
     List<String>? imageMediaItems,
     String? videoMediaItem,
+    String? postRating,
   }) async {
     String q = r'''
         mutation createPost(
@@ -561,7 +562,7 @@ class HomeRemoteDataSource {
       Map<String, dynamic> variables = {
         'commentOption': commentOption,
         'location': location,
-        'postRating': 'normal'
+        'postRating': postRating
       };
       if (content != null && content.isNotEmpty) {
         variables.putIfAbsent('content', () => content);
@@ -583,6 +584,9 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
+      var post = PostModel.fromJson(result.data!['createPost']);
+      print("Postrating: ${post.postRating}");
 
       return PostModel.fromJson(result.data!['createPost']);
     } catch (e) {
