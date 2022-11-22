@@ -1,20 +1,27 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
@@ -23,13 +30,6 @@ import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 import 'package:reach_me/features/video-call/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/voice_call_screen.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/extensions.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 //import 'package:reach_me/features/chat/presentation/widgets/audio.waveforms.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
@@ -60,7 +60,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
-   // _initialiseController();
+    // _initialiseController();
     openAudio();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -86,7 +86,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
   //AUDIO RECORDER WAVEFORMS
 
- /* void _initialiseController() {
+  /* void _initialiseController() {
     recorderController = RecorderController()
       ..androidEncoder = AndroidEncoder.aac
       ..androidOutputFormat = AndroidOutputFormat.mpeg4
@@ -109,9 +109,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void dispose() {
     timer!.cancel();
     super.dispose();
-    _soundRecorder!.closeRecorder();
+    _soundRecorder?.closeRecorder();
     isRecordingInit = false;
-    recorderController!.dispose();
+    recorderController?.dispose();
   }
 
   void openAudio() async {
@@ -128,9 +128,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     try {
       final imageFile = await _picker.pickImage(
         source: source,
-        imageQuality: 50,
-        maxHeight: 900,
-        maxWidth: 600,
+        imageQuality: 100,
+        // maxHeight: 900,
+        // maxWidth: 600,
       );
 
       if (imageFile != null) {
@@ -657,28 +657,27 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                         }); */
 
                                         var tempDir =
-                                              await getTemporaryDirectory();
-                                          var path =
-                                              '${tempDir.path}/flutter_sound.aac';
-                                          if (!isRecordingInit) {
-                                            return;
-                                          }
-                                          if (isRecording) {
-                                            await _soundRecorder!
-                                                .stopRecorder();
-                                            print(path);
-                                            File audioMessage = File(path);
+                                            await getTemporaryDirectory();
+                                        var path =
+                                            '${tempDir.path}/flutter_sound.aac';
+                                        if (!isRecordingInit) {
+                                          return;
+                                        }
+                                        if (isRecording) {
+                                          await _soundRecorder!.stopRecorder();
+                                          print(path);
+                                          File audioMessage = File(path);
 
-                                            globals.chatBloc!.add(
-                                                UploadImageFileEvent(
-                                                    file: audioMessage));
-                                          } else {
-                                            await _soundRecorder!.startRecorder(
-                                              toFile: path,
-                                            );
-                                          }
-                                         setState(() {
-                                         isRecording = !isRecording;
+                                          globals.chatBloc!.add(
+                                              UploadImageFileEvent(
+                                                  file: audioMessage));
+                                        } else {
+                                          await _soundRecorder!.startRecorder(
+                                            toFile: path,
+                                          );
+                                        }
+                                        setState(() {
+                                          isRecording = !isRecording;
                                         });
                                       },
                                       child: !isRecording
@@ -706,10 +705,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 width: 25,
                                                 height: 25,
                                                 color: AppColors.white,
-                                              )
-                                              )
-                                              ),
-                             /* isRecording
+                                              ))),
+                              /* isRecording
                                   ? AudioWaveforms(
                                       enableGesture: true,
                                       size: Size(

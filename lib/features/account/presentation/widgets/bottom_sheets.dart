@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -537,6 +538,42 @@ Future showUserStoryBottomSheet(BuildContext context,
                     ]));
               });
         },
+      );
+    },
+  );
+}
+
+Future<int?> showMediaUploadOption({
+  required BuildContext context,
+  String? iconPath1,
+  String? iconPath2,
+  required String title1,
+  required String title2,
+}) {
+  return showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return ListView(
+        shrinkWrap: true,
+        children: [
+          Column(children: [
+            ListTile(
+              leading: iconPath1 != null
+                  ? SvgPicture.asset(
+                      iconPath1,
+                      color: AppColors.black,
+                    )
+                  : null,
+              title: Text(title1),
+              onTap: () => Navigator.pop(context, 1),
+            ),
+            ListTile(
+              leading: iconPath2 != null ? SvgPicture.asset(iconPath2) : null,
+              title: Text(title2),
+              onTap: () => Navigator.pop(context, 2),
+            ),
+          ]).paddingSymmetric(v: 5),
+        ],
       );
     },
   );

@@ -21,6 +21,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/formatters.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/regex_util.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
@@ -652,16 +653,32 @@ class _PostReachState extends State<PostReach> {
                         // const SizedBox(width: 20),
                         IconButton(
                           onPressed: () async {
-                            final media = await MediaService().pickFromGallery(
-                                context: context, maxAssets: 15);
+                            final res = await showMediaUploadOption(
+                                context: context,
+                                iconPath1: 'assets/svgs/Camera.svg',
+                                iconPath2: 'assets/svgs/gallery.svg',
+                                title1: 'Camera',
+                                title2: 'Gallery');
+                            if (res == null) return;
+                            List<FileResult>? media;
+                            if (res == 1) {
+                              final cMedia = await MediaService()
+                                  .pickFromCamera(
+                                      enableRecording: true, context: context);
+                              media = cMedia != null ? [cMedia] : null;
+                            } else {
+                              media = await MediaService().pickFromGallery(
+                                  context: context, maxAssets: 15);
+                            }
+
                             if (media == null) return;
                             int total = media.length;
-                            int noOfVideos = media
-                                .where((e) => FileUtils.isVideo(e.file))
-                                .length;
-                            int noOfImages = media
-                                .where((e) => FileUtils.isImage(e.file))
-                                .length;
+                            // int noOfVideos = media
+                            //     .where((e) => FileUtils.isVideo(e.file))
+                            //     .length;
+                            // int noOfImages = media
+                            //     .where((e) => FileUtils.isImage(e.file))
+                            //     .length;
 
                             if ((_mediaList.value.length + total) > 15) {
                               Snackbars.error(context,
@@ -670,8 +687,7 @@ class _PostReachState extends State<PostReach> {
                               return;
                             }
 
-                            if (noOfVideos > 1 ||
-                                (noOfVideos > 0 && nVideos > 0)) {
+                            if (nVideos > 0) {
                               Snackbars.error(context,
                                   message:
                                       'Sorry, you cannot add more than one video media');
