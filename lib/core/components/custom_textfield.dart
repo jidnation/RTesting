@@ -88,6 +88,8 @@ class CustomRoundTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final double? verticalHeight;
   final Function(String)? onChanged;
+  final FocusScope? focusScope;
+  final FocusManager? focusManager;
 
   const CustomRoundTextField(
       {Key? key,
@@ -113,13 +115,15 @@ class CustomRoundTextField extends StatelessWidget {
       this.textStyle =
           const TextStyle(color: AppColors.textColor2, fontSize: 15),
       this.textCapitalization = TextCapitalization.none,
-      this.focusNode})
+      this.focusNode,
+      this.focusScope,
+      this.focusManager,})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTap: onTap ,
+      onTap: onTap,
       minLines: minLines,
       maxLines: maxLines,
       style: textStyle,

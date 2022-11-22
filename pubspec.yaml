@@ -117,6 +117,7 @@ dependencies:
   flutter_mentions:
     git: https://github.com/gideonoyekale/flutter_mentions.git
   expandable_text: ^2.3.0
+  flutter_keyboard_visibility: ^5.4.0
 
 
 

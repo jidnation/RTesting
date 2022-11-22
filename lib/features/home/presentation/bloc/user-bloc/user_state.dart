@@ -133,3 +133,18 @@ class UpdateUserLastSeenError extends UserState {
   UpdateUserLastSeenError({this.error});
   final String? error;
 }
+
+class BlockUserSuccess extends UserState {
+  BlockUserSuccess({this.blockedUser});
+  final Block? blockedUser;
+}
+
+class UnBlockUserSuccess extends UserState {
+  UnBlockUserSuccess({this.unblockUser});
+  final bool? unblockUser;
+}
+
+class GetBlockedListSuccess extends UserState {
+  GetBlockedListSuccess({this.blockedList});
+  final List<Block>? blockedList;
+}

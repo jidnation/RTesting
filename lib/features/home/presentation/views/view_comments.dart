@@ -286,14 +286,19 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                             HapticFeedback.mediumImpact();
                                             handleTap(index);
                                             if (active.contains(index)) {
+                                              String like = (comments.value[index].like!)
+                                              .firstWhere((e) =>
+                                               e.authId == globals.userId).likeId!;
                                               if (comments.value[index].like!
                                                   .isNotEmpty) {
                                                 globals.socialServiceBloc!.add(
                                                     UnlikeCommentOnPostEvent(
+                                                  
                                                   commentId: comments
                                                       .value[index].commentId,
-                                                  postId: comments
-                                                      .value[index].postId,
+                                                  likeId: like,
+                                                  // comments
+                                                    //  .value[index].like.,
                                                 ));
                                               } else {
                                                 globals.socialServiceBloc!.add(
@@ -721,7 +726,7 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                                   .add(UnlikeCommentOnPostEvent(
                                                 commentId: comments
                                                     .value[index].commentId,
-                                                postId: comments
+                                                likeId: comments
                                                     .value[index].postId,
                                               ));
                                             } else {

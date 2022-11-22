@@ -760,6 +760,34 @@ class _AccountScreenState extends State<AccountScreen>
                                       ),
                                     ],
                                   ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 3)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        //nblock Variable here
+                                        globals.user!.nBlocked.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Block',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
@@ -2383,10 +2411,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   ],
                                 ),
                               ),
-                              SizedBox(width: getScreenWidth(20)),
-                              InkWell(
+                              //SizedBox(width: getScreenWidth(20)),
+                              /*InkWell(
                                 onTap: () => RouteNavigators.route(
-                                    context, const AccountStatsInfo(index: 2)),
+                                    context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -2408,7 +2436,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     ),
                                   ],
                                 ),
-                              )
+                              )*/
                             ],
                           ),
                         ],
