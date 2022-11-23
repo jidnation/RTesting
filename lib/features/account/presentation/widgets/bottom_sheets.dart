@@ -99,7 +99,7 @@ Future showProfileMenuBottomSheet(BuildContext context,
                         onPressed: () {
                           RouteNavigators.pop(context);
                           Share.share(
-                        'Hi\n This is my ReachMe Profile: https://$globals.user!.profileSlug}');
+                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -177,7 +177,7 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   onPressed: () {
                     RouteNavigators.pop(context);
                     Share.share(
-                        'Hi\n This is my ReachMe Profile: https://$globals.user!.profileSlug}');
+                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),
