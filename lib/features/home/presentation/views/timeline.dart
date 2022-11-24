@@ -989,8 +989,8 @@ class PostFeedReacherCard extends HookWidget {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return const DictionaryDialog(
-                                abbr: '',
+                              return  DictionaryDialog(
+                                abbr: value,
                                 meaning: '',
                                 word: '',
                               );

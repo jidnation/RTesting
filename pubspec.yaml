@@ -110,7 +110,6 @@ dependencies:
   full_screen_image_null_safe: ^2.0.0
 
   just_waveform: ^0.0.3
-  fwfh_text_style: 2.22.8+1
   visibility_detector: ^0.3.3
   audio_waveforms:
     git: https://github.com/gideonoyekale/audio_waveforms.git

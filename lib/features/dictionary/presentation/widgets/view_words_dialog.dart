@@ -82,21 +82,6 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                         scrollDirection: Axis.vertical,
                         child: Column(
                           children: [
-                            RichText(
-                              text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                      text: widget.abbr,
-                                      style:
-                                          const TextStyle(color: Colors.blue)),
-                                  TextSpan(
-                                      text: widget.word ,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
                             Container(
                               alignment: Alignment.center,
                               height: 50,
@@ -121,6 +106,37 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                             const SizedBox(
                               height: 10,
                             ),
+                            Builder(builder: (context) {
+                              final word = items.value.firstWhere(
+                                (element) => element.abbr == widget.abbr,
+                                orElse: () => GetRecentlyAddedWord(),
+                              );
+                              if (word.abbr == null) {
+                                return const SizedBox.shrink();
+                              }
+
+                              return ListTile(
+                                title: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(color: Colors.black),
+                                    children: [
+                                      TextSpan(
+                                          text: '${word.abbr}: ',
+                                          style: const TextStyle(
+                                              color: Colors.blue)),
+                                      TextSpan(
+                                          text: '${word.word}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  word.meaning.toString(),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              );
+                            }),
                             SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: SizedBox(
