@@ -117,6 +117,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(0);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -149,6 +150,7 @@ class _AccountScreenState extends State<AccountScreen>
                 GestureDetector(
                   onTap: () => setState(() {
                     _tabController?.animateTo(1);
+                    collapseProfile();
                   }),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -180,6 +182,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(2);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -209,6 +212,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(3);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -238,6 +242,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(4);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -267,6 +272,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(5);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -296,6 +302,7 @@ class _AccountScreenState extends State<AccountScreen>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(6);
+                collapseProfile();
               }),
               child: Container(
                 padding:
@@ -326,9 +333,12 @@ class _AccountScreenState extends State<AccountScreen>
   String message = '';
   bool isGoingDown = false;
   bool isGoingUp = false;
+  bool isCollapsed = true;
   double width = getScreenWidth(100);
   double height = getScreenHeight(100);
   ScrollController scrollViewController = ScrollController();
+
+  void collapseProfile() => isCollapsed = false;
 
   void refreshPage() {
     // switch (_tabController!.index) {
@@ -508,334 +518,407 @@ class _AccountScreenState extends State<AccountScreen>
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Stack(
-                      alignment: Alignment.topCenter,
-                      fit: StackFit.passthrough,
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        /// Banner image
-                        SizedBox(
-                          height: getScreenHeight(200),
-                          width: size.width,
-                          child: GestureDetector(
-                            child: const CoverPicture(),
-                            onTap: () {
-                              RouteNavigators.route(
-                                  context,
-                                  FullScreenWidget(
-                                    child: Stack(children: <Widget>[
-                                      Container(
-                                        color: AppColors
-                                            .black, // Your screen background color
-                                      ),
-                                      Column(children: <Widget>[
-                                        Container(height: getScreenHeight(100)),
-                                        const CoverPicture(),
-                                      ]),
-                                      Positioned(
-                                        top: 0.0,
-                                        left: 0.0,
-                                        right: 0.0,
-                                        child: AppBar(
-                                          title: const Text(
-                                              'Cover Photo'), // You can add title here
-                                          leading: IconButton(
-                                            icon: const Icon(Icons.arrow_back,
-                                                color: AppColors.white),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                          ),
-                                          backgroundColor: AppColors
-                                              .black, //You can make this transparent
-                                          elevation: 0.0, //No shadow
+                    Visibility(
+                      visible: isCollapsed,
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        fit: StackFit.passthrough,
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          /// Banner image
+                          SizedBox(
+                            height: getScreenHeight(200),
+                            width: size.width,
+                            child: GestureDetector(
+                              child: const CoverPicture(),
+                              onTap: () {
+                                RouteNavigators.route(
+                                    context,
+                                    FullScreenWidget(
+                                      child: Stack(children: <Widget>[
+                                        Container(
+                                          color: AppColors
+                                              .black, // Your screen background color
                                         ),
-                                      ),
-                                    ]),
-                                  ));
-                            },
-                          ),
-                        ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Container(
-                                  width: getScreenWidth(40),
-                                  height: getScreenHeight(40),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors.textColor2.withOpacity(0.5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/back.svg',
-                                    color: AppColors.white,
-                                    width: getScreenWidth(50),
-                                    height: getScreenHeight(50),
-                                  ),
-                                ),
-                                onPressed: () => RouteNavigators.route(
-                                    context, const HomeScreen()),
-                              ),
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Container(
-                                  width: getScreenWidth(40),
-                                  height: getScreenHeight(40),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors.textColor2.withOpacity(0.5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/pop-vertical.svg',
-                                    color: AppColors.white,
-                                    width: getScreenWidth(50),
-                                    height: getScreenHeight(50),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  await showProfileMenuBottomSheet(context,
-                                      user: globals.user!);
-                                },
-                                splashRadius: 20,
-                              )
-                            ]).paddingOnly(t: 40),
-                        Positioned(
-                          top: size.height * 0.2 - 20,
-                          child: AnimatedContainer(
-                              width: isGoingDown ? width : getScreenWidth(100),
-                              height:
-                                  isGoingDown ? height : getScreenHeight(100),
-                              duration: const Duration(seconds: 1),
-                              child: GestureDetector(
-                                child: const ProfilePicture(
-                                  height: 90,
-                                ),
-                                onTap: () {
-                                  RouteNavigators.route(
-                                      context,
-                                      FullScreenWidget(
-                                        child: Stack(children: <Widget>[
+                                        Column(children: <Widget>[
                                           Container(
-                                            color: AppColors
-                                                .black, // Your screen background color
+                                              height: getScreenHeight(100)),
+                                          const CoverPicture(),
+                                        ]),
+                                        Positioned(
+                                          top: 0.0,
+                                          left: 0.0,
+                                          right: 0.0,
+                                          child: AppBar(
+                                            title: const Text(
+                                                'Cover Photo'), // You can add title here
+                                            leading: IconButton(
+                                              icon: const Icon(Icons.arrow_back,
+                                                  color: AppColors.white),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                            ),
+                                            backgroundColor: AppColors
+                                                .black, //You can make this transparent
+                                            elevation: 0.0, //No shadow
                                           ),
-                                          Column(children: <Widget>[
+                                        ),
+                                      ]),
+                                    ));
+                              },
+                            ),
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/back.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
+                                  ),
+                                  onPressed: () => RouteNavigators.route(
+                                      context, const HomeScreen()),
+                                ),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/pop-vertical.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    await showProfileMenuBottomSheet(context,
+                                        user: globals.user!);
+                                  },
+                                  splashRadius: 20,
+                                )
+                              ]).paddingOnly(t: 40),
+                          Positioned(
+                            top: size.height * 0.2 - 20,
+                            child: AnimatedContainer(
+                                width:
+                                    isGoingDown ? width : getScreenWidth(100),
+                                height:
+                                    isGoingDown ? height : getScreenHeight(100),
+                                duration: const Duration(seconds: 1),
+                                child: GestureDetector(
+                                  child: const ProfilePicture(
+                                    height: 90,
+                                  ),
+                                  onTap: () {
+                                    RouteNavigators.route(
+                                        context,
+                                        FullScreenWidget(
+                                          child: Stack(children: <Widget>[
                                             Container(
-                                                height: getScreenHeight(100)),
-                                            Image.network(
-                                              globals.user!.profilePicture!,
-                                              fit: BoxFit.contain,
+                                              color: AppColors
+                                                  .black, // Your screen background color
+                                            ),
+                                            Column(children: <Widget>[
+                                              Container(
+                                                  height: getScreenHeight(100)),
+                                              Image.network(
+                                                globals.user!.profilePicture!,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ]),
+                                            Positioned(
+                                              top: 0.0,
+                                              left: 0.0,
+                                              right: 0.0,
+                                              child: AppBar(
+                                                title: const Text(
+                                                    'Profile Picture'), // You can add title here
+                                                leading: IconButton(
+                                                  icon: const Icon(
+                                                      Icons.arrow_back,
+                                                      color: AppColors.white),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                ),
+                                                backgroundColor: AppColors
+                                                    .black, //You can make this transparent
+                                                elevation: 0.0, //No shadow
+                                              ),
                                             ),
                                           ]),
-                                          Positioned(
-                                            top: 0.0,
-                                            left: 0.0,
-                                            right: 0.0,
-                                            child: AppBar(
-                                              title: const Text(
-                                                  'Profile Picture'), // You can add title here
-                                              leading: IconButton(
-                                                icon: const Icon(
-                                                    Icons.arrow_back,
-                                                    color: AppColors.white),
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(),
-                                              ),
-                                              backgroundColor: AppColors
-                                                  .black, //You can make this transparent
-                                              elevation: 0.0, //No shadow
-                                            ),
-                                          ),
-                                        ]),
-                                      ));
-                                },
-                              )),
-                        ),
-                      ],
+                                        ));
+                                  },
+                                )),
+                          ),
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: [
-                        SizedBox(height: getScreenHeight(10)),
-                        Text(
-                            ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                .toTitleCase(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(17),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor2,
-                            )),
-                        Text('@${globals.user!.username ?? 'username'}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(13),
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textColor2,
-                            )),
-                        SizedBox(height: getScreenHeight(15)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    Visibility(
+                      visible: isCollapsed,
+                      child: Column(
+                        children: [
+                          SizedBox(height: getScreenHeight(10)),
+                          Text(
+                              ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                  .toTitleCase(),
+                              style: TextStyle(
+                                fontSize: getScreenHeight(17),
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColor2,
+                              )),
+                          Text('@${globals.user!.username ?? 'username'}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(13),
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor2,
+                              )),
+                          SizedBox(height: getScreenHeight(15)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 0)),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nReachers.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(width: getScreenWidth(5)),
+                                        Text(
+                                          'Reachers',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(20)),
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 1)),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nReaching.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(width: getScreenWidth(5)),
+                                        Text(
+                                          'Reaching',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(20)),
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 2)),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          globals.user!.nStaring.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(width: getScreenWidth(5)),
+                                        Text(
+                                          'Star',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: getScreenWidth(20)),
+                                  InkWell(
+                                    onTap: () => RouteNavigators.route(context,
+                                        const AccountStatsInfo(index: 3)),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          //nblock Variable here
+                                          globals.user!.nBlocked.toString(),
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.textColor2,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(width: getScreenWidth(5)),
+                                        Text(
+                                          'Block',
+                                          style: TextStyle(
+                                              fontSize: getScreenHeight(15),
+                                              color: AppColors.greyShade2,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          globals.user!.bio != null && globals.user!.bio != ''
+                              ? SizedBox(height: getScreenHeight(20))
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                              width: getScreenWidth(290),
+                              child: Text(
+                                globals.user!.bio ?? '',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(13),
+                                  color: AppColors.greyShade2,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              )),
+                          globals.user!.bio != null && globals.user!.bio != ''
+                              ? SizedBox(height: getScreenHeight(20))
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                              width: getScreenWidth(145),
+                              height: getScreenHeight(45),
+                              child: CustomButton(
+                                label: 'Edit Profile',
+                                labelFontSize: getScreenHeight(14),
+                                color: AppColors.white,
+                                onPressed: () {
+                                  RouteNavigators.route(
+                                      context, const EditProfileScreen());
+                                },
+                                size: size,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 9,
+                                  horizontal: 21,
+                                ),
+                                textColor: AppColors.textColor2,
+                                borderSide: const BorderSide(
+                                    color: AppColors.greyShade5),
+                              )),
+                          SizedBox(height: getScreenHeight(15)),
+                        ],
+                      ).paddingOnly(t: 50),
+                    ),
+                    Visibility(
+                      visible: isCollapsed ? true : false,
+                      child: Divider(
+                        color: const Color(0xFF767474).withOpacity(0.5),
+                        thickness: 0.5,
+                      ),
+                    ),
+                    Visibility(
+                      visible: isCollapsed ? false : true,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 0)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReachers.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Reachers',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/back.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
                                   ),
+                                  onPressed: () =>
+                                      setState(() => isCollapsed = true),
                                 ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 1)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReaching.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Reaching',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 2)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.user!.nStaring.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Star',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(context,
-                                      const AccountStatsInfo(index: 3)),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        //nblock Variable here
-                                        globals.user!.nBlocked.toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Block',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
+                                Text(
+                                  globals.user!.username.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500),
                                 )
                               ],
                             ),
-                          ],
-                        ),
-                        globals.user!.bio != null && globals.user!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(290),
-                            child: Text(
-                              globals.user!.bio ?? '',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: getScreenHeight(13),
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400,
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: Container(
+                                width: getScreenWidth(40),
+                                height: getScreenHeight(40),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.textColor2.withOpacity(0.5),
+                                ),
+                                child: SvgPicture.asset(
+                                  'assets/svgs/pop-vertical.svg',
+                                  color: AppColors.white,
+                                  width: getScreenWidth(50),
+                                  height: getScreenHeight(50),
+                                ),
                               ),
-                            )),
-                        globals.user!.bio != null && globals.user!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(145),
-                            height: getScreenHeight(45),
-                            child: CustomButton(
-                              label: 'Edit Profile',
-                              labelFontSize: getScreenHeight(14),
-                              color: AppColors.white,
-                              onPressed: () {
-                                RouteNavigators.route(
-                                    context, const EditProfileScreen());
+                              onPressed: () async {
+                                await showProfileMenuBottomSheet(context,
+                                    user: globals.user!);
                               },
-                              size: size,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 9,
-                                horizontal: 21,
-                              ),
-                              textColor: AppColors.textColor2,
-                              borderSide:
-                                  const BorderSide(color: AppColors.greyShade5),
-                            )),
-                        SizedBox(height: getScreenHeight(15)),
-                      ],
-                    ).paddingOnly(t: 50),
-                    Divider(
-                      color: const Color(0xFF767474).withOpacity(0.5),
-                      thickness: 0.5,
+                              splashRadius: 20,
+                            )
+                          ]).paddingOnly(t: 40),
                     ),
                     Center(child: _tabBar),
                     Expanded(
@@ -1461,7 +1544,7 @@ class _ReacherCard extends HookWidget {
                   (postModel!.audioMediaItem ?? '').isNotEmpty
                       ? PostAudioMedia(path: postModel!.audioMediaItem!)
                           .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
@@ -1971,6 +2054,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(0);
+                collapseUserProfile();
               }),
               child: Container(
                 padding:
@@ -2000,6 +2084,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(1);
+                collapseUserProfile();
               }),
               child: Container(
                 padding:
@@ -2029,6 +2114,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             child: GestureDetector(
               onTap: () => setState(() {
                 _tabController?.animateTo(2);
+                collapseUserProfile();
               }),
               child: Container(
                 padding:
@@ -2060,6 +2146,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
 
   bool _isReaching = false;
   bool _isStarring = false;
+  bool isUserCollapsed = true;
+
+  void collapseUserProfile() => isUserCollapsed = false;
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -2156,382 +2246,461 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Stack(
-                    alignment: Alignment.topCenter,
-                    fit: StackFit.passthrough,
-                    clipBehavior: Clip.none,
-                    children: <Widget>[
-                      /// Banner image
-                      GestureDetector(
-                        child: SizedBox(
-                          height: getScreenHeight(190),
-                          width: size.width,
-                          child: RecipientCoverPicture(
-                            imageUrl: globals.recipientUser!.coverPicture,
-                          ),
-                        ),
-                        onTap: () {
-                          RouteNavigators.route(
-                              context,
-                              FullScreenWidget(
-                                child: Stack(children: <Widget>[
-                                  Container(
-                                    color: AppColors
-                                        .black, // Your screen background color
-                                  ),
-                                  Column(children: <Widget>[
-                                    Container(height: getScreenHeight(100)),
-                                    RecipientCoverPicture(
-                                        imageUrl: globals
-                                            .recipientUser!.coverPicture),
-                                  ]),
-                                  Positioned(
-                                    top: 0.0,
-                                    left: 0.0,
-                                    right: 0.0,
-                                    child: AppBar(
-                                      title: const Text(
-                                          'Cover Photo'), // You can add title here
-                                      leading: IconButton(
-                                        icon: const Icon(Icons.arrow_back,
-                                            color: AppColors.white),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                      ),
-                                      backgroundColor: AppColors
-                                          .black, //You can make this transparent
-                                      elevation: 0.0, //No shadow
-                                    ),
-                                  ),
-                                ]),
-                              ));
-                        },
-                      ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () => RouteNavigators.route(
-                                  context, const HomeScreen()),
+                  Visibility(
+                    visible: isUserCollapsed,
+                    child: Stack(
+                      alignment: Alignment.topCenter,
+                      fit: StackFit.passthrough,
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        /// Banner image
+                        GestureDetector(
+                          child: SizedBox(
+                            height: getScreenHeight(190),
+                            width: size.width,
+                            child: RecipientCoverPicture(
+                              imageUrl: globals.recipientUser!.coverPicture,
                             ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
+                          ),
+                          onTap: () {
+                            RouteNavigators.route(
+                                context,
+                                FullScreenWidget(
+                                  child: Stack(children: <Widget>[
+                                    Container(
+                                      color: AppColors
+                                          .black, // Your screen background color
+                                    ),
+                                    Column(children: <Widget>[
+                                      Container(height: getScreenHeight(100)),
+                                      RecipientCoverPicture(
+                                          imageUrl: globals
+                                              .recipientUser!.coverPicture),
+                                    ]),
+                                    Positioned(
+                                      top: 0.0,
+                                      left: 0.0,
+                                      right: 0.0,
+                                      child: AppBar(
+                                        title: const Text(
+                                            'Cover Photo'), // You can add title here
+                                        leading: IconButton(
+                                          icon: const Icon(Icons.arrow_back,
+                                              color: AppColors.white),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
+                                        backgroundColor: AppColors
+                                            .black, //You can make this transparent
+                                        elevation: 0.0, //No shadow
+                                      ),
+                                    ),
+                                  ]),
+                                ));
+                          },
+                        ),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
+                                onPressed: () => RouteNavigators.route(
+                                    context, const HomeScreen()),
                               ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.recipientUser!,
-                                    isStarring: _isStarring);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]).paddingOnly(t: 40),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/pop-vertical.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  await showProfileMenuBottomSheet(context,
+                                      user: globals.recipientUser!,
+                                      isStarring: _isStarring);
+                                },
+                                splashRadius: 20,
+                              )
+                            ]).paddingOnly(t: 40),
 
-                      Positioned(
-                        top: size.height * 0.2 - 30,
-                        child: AnimatedContainer(
-                          width: getScreenWidth(100),
-                          height: getScreenHeight(100),
-                          duration: const Duration(seconds: 1),
-                          child: widget.recipientImageUrl == null
-                              ? ImagePlaceholder(
-                                  width: getScreenWidth(100),
-                                  height: getScreenHeight(100),
-                                  border: Border.all(
-                                      color: Colors.grey.shade50, width: 3.0),
-                                )
-                              : GestureDetector(
-                                  child: RecipientProfilePicture(
-                                    imageUrl: widget.recipientImageUrl,
+                        Positioned(
+                          top: size.height * 0.2 - 30,
+                          child: AnimatedContainer(
+                            width: getScreenWidth(100),
+                            height: getScreenHeight(100),
+                            duration: const Duration(seconds: 1),
+                            child: globals.recipientUser!.profilePicture == null
+                                ? ImagePlaceholder(
                                     width: getScreenWidth(100),
                                     height: getScreenHeight(100),
                                     border: Border.all(
                                         color: Colors.grey.shade50, width: 3.0),
-                                  ),
-                                  onTap: () {
-                                    RouteNavigators.route(
-                                        context,
-                                        FullScreenWidget(
-                                          child: Stack(children: <Widget>[
-                                            Container(
-                                              color: AppColors
-                                                  .black, // Your screen background color
-                                            ),
-                                            Column(children: <Widget>[
+                                  )
+                                : GestureDetector(
+                                    child: RecipientProfilePicture(
+                                      imageUrl:
+                                          globals.recipientUser!.profilePicture,
+                                      width: getScreenWidth(100),
+                                      height: getScreenHeight(100),
+                                      border: Border.all(
+                                          color: Colors.grey.shade50,
+                                          width: 3.0),
+                                    ),
+                                    onTap: () {
+                                      RouteNavigators.route(
+                                          context,
+                                          FullScreenWidget(
+                                            child: Stack(children: <Widget>[
                                               Container(
-                                                  height: getScreenHeight(100)),
-                                              Container(
-                                                height: size.height - 100,
-                                                width: size.width,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.rectangle,
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(widget
-                                                        .recipientImageUrl!),
-                                                    fit: BoxFit.cover,
+                                                color: AppColors
+                                                    .black, // Your screen background color
+                                              ),
+                                              Column(children: <Widget>[
+                                                Container(
+                                                    height:
+                                                        getScreenHeight(100)),
+                                                Container(
+                                                  height: size.height - 100,
+                                                  width: size.width,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.rectangle,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(widget
+                                                          .recipientImageUrl!),
+                                                      fit: BoxFit.cover,
+                                                    ),
                                                   ),
+                                                ),
+                                              ]),
+                                              Positioned(
+                                                top: 0.0,
+                                                left: 0.0,
+                                                right: 0.0,
+                                                child: AppBar(
+                                                  title: const Text(
+                                                      'Profile Picture'), // You can add title here
+                                                  leading: IconButton(
+                                                    icon: const Icon(
+                                                        Icons.arrow_back,
+                                                        color: AppColors.white),
+                                                    onPressed: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                  ),
+                                                  backgroundColor: AppColors
+                                                      .black, //You can make this transparent
+                                                  elevation: 0.0, //No shadow
                                                 ),
                                               ),
                                             ]),
-                                            Positioned(
-                                              top: 0.0,
-                                              left: 0.0,
-                                              right: 0.0,
-                                              child: AppBar(
-                                                title: const Text(
-                                                    'Profile Picture'), // You can add title here
-                                                leading: IconButton(
-                                                  icon: const Icon(
-                                                      Icons.arrow_back,
-                                                      color: AppColors.white),
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(),
-                                                ),
-                                                backgroundColor: AppColors
-                                                    .black, //You can make this transparent
-                                                elevation: 0.0, //No shadow
-                                              ),
-                                            ),
-                                          ]),
-                                        ));
-                                  },
-                                ),
+                                          ));
+                                    },
+                                  ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Column(
-                    children: [
-                      SizedBox(height: getScreenHeight(15)),
-                      Text(
-                          ('@${globals.recipientUser!.username}').toLowerCase(),
-                          style: TextStyle(
-                            fontSize: getScreenHeight(15),
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textColor2,
-                          )),
-                      // Text('@${globals.recipientUser!.username ?? 'username'}',
-                      //     style: TextStyle(
-                      //       fontSize: getScreenHeight(13),
-                      //       fontWeight: FontWeight.w400,
-                      //       color: AppColors.textColor2,
-                      //     )),
-                      SizedBox(height: getScreenHeight(15)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
-                            children: [
-                              InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context,
-                                    RecipientAccountStatsInfo(
-                                      index: 0, recipientId: widget.recipientId,
-                                      // recipientId: widget.recipientId,
-                                    )),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.recipientUser!.nReachers
-                                          .toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Reachers',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(width: getScreenWidth(20)),
-                              InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context,
-                                    RecipientAccountStatsInfo(
-                                      index: 1,
-                                      recipientId: widget.recipientId,
-                                    )),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.recipientUser!.nReaching
-                                          .toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Reaching',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //SizedBox(width: getScreenWidth(20)),
-                              /*InkWell(
-                                onTap: () => RouteNavigators.route(
-                                    context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      globals.recipientUser!.nStaring
-                                          .toString(),
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(15),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Text(
-                                      'Starring',
-                                      style: TextStyle(
-                                          fontSize: getScreenHeight(13),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
-                              )*/
-                            ],
-                          ),
-                        ],
-                      ),
-                      globals.recipientUser!.bio != null &&
-                              globals.recipientUser!.bio != ''
-                          ? SizedBox(height: getScreenHeight(20))
-                          : const SizedBox.shrink(),
-                      SizedBox(
-                          width: getScreenWidth(290),
-                          child: Text(
-                            globals.recipientUser!.bio ?? '',
-                            textAlign: TextAlign.center,
+                  Visibility(
+                    visible: isUserCollapsed,
+                    child: Column(
+                      children: [
+                        SizedBox(height: getScreenHeight(15)),
+                        Text(
+                            ('@${globals.recipientUser!.username}')
+                                .toLowerCase(),
                             style: TextStyle(
-                              fontSize: getScreenHeight(13),
-                              color: AppColors.greyShade2,
-                              fontWeight: FontWeight.w400,
+                              fontSize: getScreenHeight(15),
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColor2,
+                            )),
+                        // Text('@${globals.recipientUser!.username ?? 'username'}',
+                        //     style: TextStyle(
+                        //       fontSize: getScreenHeight(13),
+                        //       fontWeight: FontWeight.w400,
+                        //       color: AppColors.textColor2,
+                        //     )),
+                        SizedBox(height: getScreenHeight(15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(
+                                      context,
+                                      RecipientAccountStatsInfo(
+                                        index: 0,
+                                        recipientId: widget.recipientId,
+                                        // recipientId: widget.recipientId,
+                                      )),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.recipientUser!.nReachers
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Reachers',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(
+                                      context,
+                                      RecipientAccountStatsInfo(
+                                        index: 1,
+                                        recipientId: widget.recipientId,
+                                      )),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.recipientUser!.nReaching
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Reaching',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                //SizedBox(width: getScreenWidth(20)),
+                                /*InkWell(
+                                  onTap: () => RouteNavigators.route(
+                                      context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.recipientUser!.nStaring
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        'Starring',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                )*/
+                              ],
                             ),
-                          )),
-                      globals.recipientUser!.bio != null &&
-                              globals.recipientUser!.bio != ''
-                          ? SizedBox(height: getScreenHeight(20))
-                          : const SizedBox.shrink(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: getScreenWidth(130),
-                            height: getScreenHeight(41),
-                            child: CustomButton(
-                              isLoading: _isLoading,
-                              loaderColor: _isReaching
-                                  ? AppColors.primaryColor
-                                  : AppColors.white,
-                              label: _isReaching ? 'Reaching' : 'Reach',
-                              color: _isReaching
-                                  ? AppColors.white
-                                  : AppColors.primaryColor,
-                              onPressed: () {
-                                if (!_isReaching) {
-                                  globals.userBloc!.add(ReachUserEvent(
-                                      userIdToReach:
-                                          globals.recipientUser!.id));
-                                } else {
-                                  globals.userBloc!.add(
-                                      DelReachRelationshipEvent(
-                                          userIdToDelete:
-                                              globals.recipientUser!.id));
-                                }
-                              },
-                              size: size,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 9,
-                                horizontal: 21,
+                          ],
+                        ),
+                        globals.recipientUser!.bio != null &&
+                                globals.recipientUser!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(290),
+                            child: Text(
+                              globals.recipientUser!.bio ?? '',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: getScreenHeight(13),
+                                color: AppColors.greyShade2,
+                                fontWeight: FontWeight.w400,
                               ),
-                              textColor: _isReaching
-                                  ? AppColors.black
-                                  : AppColors.white,
-                              borderSide: _isReaching
-                                  ? const BorderSide(
-                                      color: AppColors.greyShade5)
-                                  : BorderSide.none,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
+                            )),
+                        globals.recipientUser!.bio != null &&
+                                globals.recipientUser!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
                               width: getScreenWidth(130),
                               height: getScreenHeight(41),
                               child: CustomButton(
-                                label: 'Message',
-                                color: AppColors.white,
+                                isLoading: _isLoading,
+                                loaderColor: _isReaching
+                                    ? AppColors.primaryColor
+                                    : AppColors.white,
+                                label: _isReaching ? 'Reaching' : 'Reach',
+                                color: _isReaching
+                                    ? AppColors.white
+                                    : AppColors.primaryColor,
                                 onPressed: () {
-                                  RouteNavigators.route(
-                                      context,
-                                      MsgChatInterface(
-                                        recipientUser: globals.recipientUser,
-                                      ));
+                                  if (!_isReaching) {
+                                    globals.userBloc!.add(ReachUserEvent(
+                                        userIdToReach:
+                                            globals.recipientUser!.id));
+                                  } else {
+                                    globals.userBloc!.add(
+                                        DelReachRelationshipEvent(
+                                            userIdToDelete:
+                                                globals.recipientUser!.id));
+                                  }
                                 },
                                 size: size,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 9,
                                   horizontal: 21,
                                 ),
-                                textColor: AppColors.textColor2,
-                                borderSide: const BorderSide(
-                                    color: AppColors.greyShade5),
-                              )),
-                        ],
-                      ),
-                      SizedBox(height: getScreenHeight(15)),
-                    ],
-                  ).paddingOnly(t: 50),
-                  Divider(
-                    color: const Color(0xFF767474).withOpacity(0.5),
-                    thickness: 0.5,
+                                textColor: _isReaching
+                                    ? AppColors.black
+                                    : AppColors.white,
+                                borderSide: _isReaching
+                                    ? const BorderSide(
+                                        color: AppColors.greyShade5)
+                                    : BorderSide.none,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                                width: getScreenWidth(130),
+                                height: getScreenHeight(41),
+                                child: CustomButton(
+                                  label: 'Message',
+                                  color: AppColors.white,
+                                  onPressed: () {
+                                    RouteNavigators.route(
+                                        context,
+                                        MsgChatInterface(
+                                          recipientUser: globals.recipientUser,
+                                        ));
+                                  },
+                                  size: size,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 9,
+                                    horizontal: 21,
+                                  ),
+                                  textColor: AppColors.textColor2,
+                                  borderSide: const BorderSide(
+                                      color: AppColors.greyShade5),
+                                )),
+                          ],
+                        ),
+                        SizedBox(height: getScreenHeight(15)),
+                      ],
+                    ).paddingOnly(t: 50),
+                  ),
+                  Visibility(
+                    visible: isUserCollapsed ? true : false,
+                    child: Divider(
+                      color: const Color(0xFF767474).withOpacity(0.5),
+                      thickness: 0.5,
+                    ),
+                  ),
+                  Visibility(
+                    visible: isUserCollapsed ? false : true,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
+                                ),
+                                onPressed: () =>
+                                    setState(() => isUserCollapsed = true),
+                              ),
+                              Text(
+                                globals.recipientUser!.username.toString(),
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w500),
+                              )
+                            ],
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Container(
+                              width: getScreenWidth(40),
+                              height: getScreenHeight(40),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.textColor2.withOpacity(0.5),
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/svgs/pop-vertical.svg',
+                                color: AppColors.white,
+                                width: getScreenWidth(50),
+                                height: getScreenHeight(50),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await showProfileMenuBottomSheet(context,
+                                  user: globals.recipientUser!,
+                                  isStarring: _isStarring);
+                            },
+                            splashRadius: 20,
+                          )
+                        ]).paddingOnly(t: 40),
                   ),
                   Visibility(
                     visible: _isReaching,

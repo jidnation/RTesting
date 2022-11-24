@@ -147,15 +147,23 @@ class _TimelineScreenState extends State<TimelineScreen>
             ),
           ),
         ),
-        titleSpacing: 5,
+        titleSpacing: -10,
         leadingWidth: getScreenWidth(70),
-        title: Text(
-          'Reachme',
-          style: TextStyle(
-            color: const Color(0xFF001824),
-            fontSize: getScreenHeight(20),
-            fontWeight: FontWeight.w600,
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.asset(
+              'assets/images/hd-icon.png',
+              fit: BoxFit.contain,
+              height: 25,
+            ),
+            Container(
+                padding: const EdgeInsets.all(2.0),
+                child: const Text(
+                  'eachme',
+                  style: TextStyle(color: AppColors.primaryColor, fontSize: 20),
+                ))
+          ],
         ),
         actions: [
           IconButton(
@@ -335,11 +343,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
                 },
                 builder: (context, state) {
-                  bool _isLoading = state is CreatePostLoading;
-                  _isLoading = state is GetPostFeedLoading;
-                  _isLoading = state is DeletePostLoading;
-                  _isLoading = state is EditContentLoading;
-
                   bool _likingPost = state is LikePostLoading;
                   bool _unLikingPost = state is UnlikePostLoading;
                   // _likingPost = state is GetPostFeedLoading;
@@ -377,7 +380,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         SizedBox(
                                             height: kToolbarHeight +
                                                 getScreenHeight(22)), //30
-                                        _isLoading
+                                        state is CreatePostLoading ||
+                                                state is GetPostFeedLoading ||
+                                                state is DeletePostLoading ||
+                                                state is EditContentLoading
                                             ? const LinearLoader()
                                             : const SizedBox.shrink(),
                                         Visibility(
@@ -491,7 +497,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         SizedBox(
                                           child: _posts.value.isEmpty
                                               ? EmptyTimelineWidget(
-                                                  loading: _isLoading)
+                                                  loading: state
+                                                      is GetPostFeedLoading)
                                               : ListView.builder(
                                                   shrinkWrap: true,
                                                   padding: EdgeInsets.zero,
@@ -731,6 +738,7 @@ class PostFeedReacherCard extends HookWidget {
       return result['filePath'];
     }
 
+    final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
     void takeScreenShot() async {
       RenderRepaintBoundary boundary = scr.currentContext!.findRenderObject()
           as RenderRepaintBoundary; // the key provided
@@ -961,71 +969,49 @@ class PostFeedReacherCard extends HookWidget {
               ),
               postFeedModel!.post!.content == null
                   ? const SizedBox.shrink()
-                  : Row(
-                      children: [
-                        Flexible(
-                          //   child: ReadMoreText(
-                          //     "${postFeedModel!.post!.content}",
-                          //     style: TextStyle(
-                          //         fontWeight: FontWeight.w400,
-                          //         fontSize: getScreenHeight(14)),
-                          //     trimLines: 3,
-                          //     colorClickableText: const Color(0xff717F85),
-                          //     trimMode: TrimMode.Line,
-                          //     trimCollapsedText: 'See more',
-                          //     trimExpandedText: 'See less',
-                          //     moreStyle: TextStyle(
-                          //         fontSize: getScreenHeight(14),
-                          //         fontFamily: "Roboto",
-                          //         color: const Color(0xff717F85)),
-                          //   ),
-
-                          child: ExpandableText(
-                            "${postFeedModel!.post!.content}",
-                            expandText: 'see more',
-                            maxLines: 2,
-                            linkColor: Colors.blue,
-                            animation: true,
-                            expanded: false,
-                            collapseText: 'see less',
-                            onHashtagTap: (value) {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return const DictionaryDialog();
-                                  });
-                              print('Tapped Url');
-                            },
-                            onMentionTap: (value) {
-                              print('Tapped Url');
-                            },
-                            mentionStyle: const TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue),
-                            hashtagStyle: const TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue),
-                          ),
-                        ),
-                        SizedBox(width: getScreenWidth(2)),
-                        Tooltip(
-                          message: 'This Reach has been edited by the Reacher',
-                          waitDuration: const Duration(seconds: 1),
-                          showDuration: const Duration(seconds: 2),
-                          child: Text(
-                            postFeedModel!.post!.edited!
-                                ? "(Reach Edited)"
-                                : "",
-                            style: TextStyle(
-                              fontSize: getScreenHeight(12),
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                        ),
-                      ],
+                  : ExpandableText(
+                      "${postFeedModel!.post!.content}",
+                      prefixText: postFeedModel!.post!.edited!
+                          ? "(Reach Edited)"
+                          : null,
+                      prefixStyle: TextStyle(
+                          fontSize: getScreenHeight(12),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryColor),
+                      onPrefixTap: () {
+                        tooltipkey.currentState?.ensureTooltipVisible();
+                      },
+                      expandText: 'see more',
+                      maxLines: 2,
+                      linkColor: Colors.blue,
+                      animation: true,
+                      expanded: false,
+                      collapseText: 'see less',
+                      onHashtagTap: (value) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const DictionaryDialog();
+                            });
+                        print('Tapped Url');
+                      },
+                      onMentionTap: (value) {
+                        print('Tapped Url');
+                      },
+                      mentionStyle: const TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue),
+                      hashtagStyle: const TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue),
                     ).paddingSymmetric(h: 16, v: 10),
+              Tooltip(
+                key: tooltipkey,
+                triggerMode: TooltipTriggerMode.manual,
+                showDuration: const Duration(seconds: 1),
+                message: 'This reach has been edited',
+              ),
               if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
