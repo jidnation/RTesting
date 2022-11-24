@@ -18,23 +18,23 @@ class SocialServiceRepository {
   final HomeRemoteDataSource _homeRemoteDataSource;
   final ApiClient _apiClient;
 
-  Future<Either<String, PostModel>> createPost({
-    String? audioMediaItem,
-    String? commentOption,
-    String? content,
-    List<String>? imageMediaItems,
-    String? videoMediaItem,
-    String? location,
-  }) async {
+  Future<Either<String, PostModel>> createPost(
+      {String? audioMediaItem,
+      String? commentOption,
+      String? content,
+      List<String>? imageMediaItems,
+      String? videoMediaItem,
+      String? location,
+      String? postRating}) async {
     try {
       final post = await _homeRemoteDataSource.createPost(
-        audioMediaItem: audioMediaItem,
-        commentOption: commentOption,
-        content: content,
-        imageMediaItems: imageMediaItems,
-        videoMediaItem: videoMediaItem,
-        location: location,
-      );
+          audioMediaItem: audioMediaItem,
+          commentOption: commentOption,
+          content: content,
+          imageMediaItems: imageMediaItems,
+          videoMediaItem: videoMediaItem,
+          location: location,
+          postRating: postRating);
       return Right(post);
     } on GraphQLError catch (e) {
       return Left(e.message);

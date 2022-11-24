@@ -436,7 +436,9 @@ packages:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
+
     version: "2.2.0"
+
   firebase_core_platform_interface:
     dependency: transitive
     description:
@@ -733,7 +735,7 @@ packages:
       name: gap
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   get_it:
     dependency: "direct main"
     description:
@@ -1349,7 +1351,9 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
+
     version: "0.27.6"
+
   scan:
     dependency: "direct main"
     description:

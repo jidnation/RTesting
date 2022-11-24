@@ -29,6 +29,7 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/location.helper.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
@@ -45,7 +46,6 @@ import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/helper/logger.dart';
-import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
 
@@ -112,7 +112,6 @@ class _TimelineScreenState extends State<TimelineScreen>
     super.build(context);
 
     final reachDM = useState(false);
-    final viewProfile = useState(false);
     final shoutingDown = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
     final _currentPost = useState<PostFeedModel?>(null);
@@ -120,6 +119,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
     debugPrint(globals.token);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
@@ -185,41 +185,15 @@ class _TimelineScreenState extends State<TimelineScreen>
           child: BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is UserLoading) {
-                // if (viewProfile.value) {
-                //   ProgressHUD.of(context)?.showWithText('Viewing Profile');
-                // }
-              }
               if (state is RecipientUserData) {
                 if (reachDM.value) {
                   reachDM.value = false;
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
-                } else if (viewProfile.value) {
-                  viewProfile.value = false;
-                  ProgressHUD.of(context)?.dismiss();
-                  globals.recipientUser = state.user;
-                  state.user!.id == globals.user!.id
-                      ? RouteNavigators.route(context, const AccountScreen())
-                      : RouteNavigators.route(
-                          context,
-                          RecipientAccountProfile(
-                            recipientEmail: 'email',
-                            recipientImageUrl: state.user!.profilePicture,
-                            recipientId: state.user!.id,
-                          ));
                 }
               }
               if (state is UserError) {
-                ProgressHUD.of(context)?.dismiss();
-                if (viewProfile.value) {
-                  Snackbars.error(context,
-                      message: (state.error ?? '').contains('Profile')
-                          ? 'Account not available!'
-                          : state.error);
-                }
                 reachDM.value = false;
-                viewProfile.value = false;
               }
               if (state is GetReachRelationshipSuccess) {
                 if (shoutingDown.value) {
@@ -257,13 +231,13 @@ class _TimelineScreenState extends State<TimelineScreen>
                         (e) => FileUtils.fileType(e) == 'audio',
                         orElse: () => '');
                     globals.socialServiceBloc!.add(CreatePostEvent(
-                      content: globals.postContent,
-                      commentOption: globals.postCommentOption,
-                      imageMediaItem: imageUrls.isNotEmpty ? imageUrls : null,
-                      videoMediaItem: videoUrl.isNotEmpty ? videoUrl : null,
-                      audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
-                      location: globals.location,
-                    ));
+                        content: globals.postContent,
+                        commentOption: globals.postCommentOption,
+                        imageMediaItem: imageUrls.isNotEmpty ? imageUrls : null,
+                        videoMediaItem: videoUrl.isNotEmpty ? videoUrl : null,
+                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
+                        location: globals.location,
+                        postRating: globals.postRating));
                   }
                   if (state is CreatePostError) {
                     Snackbars.error(context, message: state.error);
@@ -531,17 +505,15 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       likingPost: false,
                                                       postFeedModel:
                                                           _posts.value[index],
-                                                      isLiked: (_posts
-                                                                  .value[index]
-                                                                  .isLiked ??
-                                                              false)
+                                                      isLiked: _posts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty
                                                           ? true
                                                           : false,
-                                                      isVoted: (_posts
-                                                                      .value[
-                                                                          index]
-                                                                      .isVoted ??
-                                                                  '')
+                                                      isVoted: _posts
+                                                              .value[index]
+                                                              .vote!
                                                               .isNotEmpty
                                                           ? true
                                                           : false,
@@ -552,19 +524,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           ? _posts.value[index]
                                                               .vote![0].voteType
                                                           : null,
-                                                      onViewProfile: () {
-                                                        viewProfile.value =
-                                                            true;
-                                                        ProgressHUD.of(context)
-                                                            ?.showWithText(
-                                                                'Viewing Profile');
-                                                        globals.userBloc!.add(
-                                                            GetRecipientProfileEvent(
-                                                                email: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postOwnerId));
-                                                      },
                                                       onMessage: () {
                                                         HapticFeedback
                                                             .mediumImpact();
@@ -744,7 +703,7 @@ class PostFeedReacherCard extends HookWidget {
     this.onLike,
     this.onMessage,
     this.onUpvote,
-    this.onViewProfile,
+    this.routeProfile,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
@@ -752,7 +711,7 @@ class PostFeedReacherCard extends HookWidget {
 
   final PostFeedModel? postFeedModel;
   final bool likingPost;
-  final Function()? onLike, onMessage, onUpvote, onDownvote, onViewProfile;
+  final Function()? onLike, onMessage, onUpvote, onDownvote, routeProfile;
   final bool isLiked, isVoted;
   final String? voteType;
 
@@ -842,62 +801,97 @@ class PostFeedReacherCard extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: CupertinoButton(
-                      minSize: 0,
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        if (onViewProfile != null) {
-                          onViewProfile!();
-                        } else {
-                          final progress = ProgressHUD.of(context);
-                          progress?.showWithText('Viewing Reacher...');
-                          Future.delayed(const Duration(seconds: 3), () {
-                            globals.userBloc!.add(GetRecipientProfileEvent(
-                                email: postFeedModel!.postOwnerId));
-                            postFeedModel!.postOwnerId == globals.user!.id
-                                ? RouteNavigators.route(
-                                    context, const AccountScreen())
-                                : RouteNavigators.route(
-                                    context,
-                                    RecipientAccountProfile(
-                                      recipientEmail: 'email',
-                                      recipientImageUrl:
-                                          postFeedModel!.profilePicture,
-                                      recipientId: postFeedModel!.postOwnerId,
-                                    ));
-                            progress?.dismiss();
-                          });
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Helper.renderProfilePicture(
-                            postFeedModel!.profilePicture,
-                            size: 33,
-                          ).paddingOnly(l: 13, t: 10),
-                          SizedBox(width: getScreenWidth(9)),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
+
+                  CupertinoButton(
+                    minSize: 0,
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      final progress = ProgressHUD.of(context);
+                      progress?.showWithText('Viewing Reacher...');
+                      Future.delayed(const Duration(seconds: 3), () {
+                        globals.userBloc!.add(GetRecipientProfileEvent(
+                            email: postFeedModel!.postOwnerId));
+                        postFeedModel!.postOwnerId == globals.user!.id
+                            ? RouteNavigators.route(
+                                context, const AccountScreen())
+                            : RouteNavigators.route(
+                                context,
+                                RecipientAccountProfile(
+                                  recipientEmail: 'email',
+                                  recipientImageUrl:
+                                      postFeedModel!.profilePicture,
+                                  recipientId: postFeedModel!.postOwnerId,
+                                ));
+                        progress?.dismiss();
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Helper.renderProfilePicture(
+                          postFeedModel!.profilePicture,
+                          size: 33,
+                        ).paddingOnly(l: 13, t: 10),
+                        SizedBox(width: getScreenWidth(9)),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '@${postFeedModel!.username!}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(14),
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2,
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                postFeedModel!.verified!
+                                    ? SvgPicture.asset(
+                                        'assets/svgs/verified.svg')
+                                    : const SizedBox.shrink()
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (builder) => FullPostScreen(
+                                            postFeedModel: postFeedModel,
+                                          ))),
+                              child: Row(
                                 children: [
+                                  postFeedModel!.post!.location! == 'nil' ||
+                                          postFeedModel!.post!.location! ==
+                                              'NIL'
+                                      ? const SizedBox.shrink()
+                                      : SizedBox(
+                                          width: 93,
+                                          child: Text(
+                                            postFeedModel!.post!.location!,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(10),
+                                              fontFamily: 'Poppins',
+                                              letterSpacing: 0.4,
+                                              fontWeight: FontWeight.w400,
+                                              color: AppColors.textColor2,
+                                            ),
+                                          ),
+                                        ),
                                   Text(
-                                    '@${postFeedModel!.username!}',
+                                    postDuration,
                                     style: TextStyle(
-                                      fontSize: getScreenHeight(14),
+                                      fontSize: getScreenHeight(10),
                                       fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.4,
+                                      fontWeight: FontWeight.w400,
                                       color: AppColors.textColor2,
                                     ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  postFeedModel!.verified!
-                                      ? SvgPicture.asset(
-                                          'assets/svgs/verified.svg')
-                                      : const SizedBox.shrink()
+                                  ).paddingOnly(l: 4),
+
                                 ],
                               ),
                               GestureDetector(
@@ -1041,7 +1035,7 @@ class PostFeedReacherCard extends HookWidget {
               (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
                   ? PostAudioMedia(path: postFeedModel!.post!.audioMediaItem!)
                       .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.max,
@@ -1112,9 +1106,11 @@ class PostFeedReacherCard extends HookWidget {
                               ),
                             ),
                           ),
-                          if (postFeedModel!.postOwnerId != globals.userId)
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
                             SizedBox(width: getScreenWidth(15)),
-                          if (postFeedModel!.postOwnerId != globals.userId)
+                          if (postFeedModel!.postOwnerId !=
+                              postFeedModel!.feedOwnerId)
                             CupertinoButton(
                               minSize: 0,
                               onPressed: onMessage,

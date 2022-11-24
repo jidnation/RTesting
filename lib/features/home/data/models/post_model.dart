@@ -58,6 +58,7 @@ class PostModel {
   factory PostModel.fromJson(Map<String, dynamic> json,
           {Map<String, dynamic>? postFeedJson}) =>
       PostModel(
+        postRating: json["postRating"],
         location: json["location"],
         audioMediaItem: json["audioMediaItem"],
         authId: postFeedJson?["postOwnerProfile"]["authId"],
