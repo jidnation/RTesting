@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +16,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart' as permit;
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -23,10 +25,15 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
+import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -41,7 +48,8 @@ class ViewCommentsScreen extends StatefulHookWidget {
 class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   bool emojiShowing = false;
   FocusNode focusNode = FocusNode();
-  FlutterSoundRecorder? _soundRecorder;
+  late final RecorderController recorderController;
+//FlutterSoundRecorder? _soundRecorder;
   bool isRecordingInit = false;
   bool isRecording = false;
   Set active = {};
@@ -56,8 +64,9 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   @override
   void initState() {
     super.initState();
-    _soundRecorder = FlutterSoundRecorder();
-    openAudio();
+    _initialiseController();
+    //_soundRecorder = FlutterSoundRecorder();
+    //openAudio();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -70,17 +79,26 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   @override
   void dispose() {
     super.dispose();
-    _soundRecorder!.closeRecorder();
+    // _soundRecorder!.closeRecorder();
     isRecordingInit = false;
+    recorderController.dispose();
   }
 
-  void openAudio() async {
-    final status = await permit.Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      throw RecordingPermissionException('Mic permission not allowed');
-    }
-    await _soundRecorder!.openRecorder();
-    isRecordingInit = true;
+/*void openAudio() async {
+  final status = await permit.Permission.microphone.request();
+  if (status != PermissionStatus.granted) {
+    throw RecordingPermissionException('Mic permission not allowed');
+  }
+  await _soundRecorder!.openRecorder();
+  isRecordingInit = true;
+}*/
+
+  void _initialiseController() {
+    recorderController = RecorderController()
+      ..androidEncoder = AndroidEncoder.aac
+      ..androidOutputFormat = AndroidOutputFormat.mpeg4
+      ..iosEncoder = IosEncoder.kAudioFormatLinearPCM
+      ..sampleRate = 16000;
   }
 
   @override
@@ -91,6 +109,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
     final comments = useState<List<CommentModel>>([]);
     final scrollController = useScrollController();
     final isTyping = useState<bool>(false);
+    final mediaList = useState<List<UploadFileDto>>([]);
+
     useEffect(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
           postId: widget.post.postId, pageLimit: 50, pageNumber: 1));
@@ -153,6 +173,15 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                         postId: widget.post.postId,
                         pageLimit: 50,
                         pageNumber: 1));
+                  }
+                  if (state is MediaUploadSuccess) {
+                    String? audioUrl = state.image!;
+                    globals.socialServiceBloc!.add(CommentOnPostEvent(
+                        content: " ",
+                        postId: widget.post.postId,
+                        userId: globals.user!.id,
+                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
+                        postOwnerId: widget.post.postOwnerId));
                   }
                 },
                 builder: (context, state) {
@@ -286,19 +315,21 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                             HapticFeedback.mediumImpact();
                                             handleTap(index);
                                             if (active.contains(index)) {
-                                              String like = (comments.value[index].like!)
-                                              .firstWhere((e) =>
-                                               e.authId == globals.userId).likeId!;
+                                              String like =
+                                                  (comments.value[index].like!)
+                                                      .firstWhere((e) =>
+                                                          e.authId ==
+                                                          globals.userId)
+                                                      .likeId!;
                                               if (comments.value[index].like!
                                                   .isNotEmpty) {
                                                 globals.socialServiceBloc!.add(
                                                     UnlikeCommentOnPostEvent(
-                                                  
                                                   commentId: comments
                                                       .value[index].commentId,
                                                   likeId: like,
                                                   // comments
-                                                    //  .value[index].like.,
+                                                  //  .value[index].like.,
                                                 ));
                                               } else {
                                                 globals.socialServiceBloc!.add(
@@ -336,124 +367,296 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                             ),
                             child: Column(
                               children: [
-                                TextFormField(
-                                  onChanged: (value) {
-                                    if (value.isNotEmpty) {
-                                      isTyping.value = true;
-                                    } else {
-                                      isTyping.value = false;
-                                    }
-                                  },
-                                  focusNode: focusNode,
-                                  controller: controller,
-                                  decoration: InputDecoration(
-                                    hintText:
-                                        'Comment as ${globals.user!.username!}...',
-                                    hintStyle: TextStyle(
-                                        fontSize: getScreenHeight(14)),
-                                    suffixIcon: isTyping.value
-                                        ? IconButton(
-                                            icon: SvgPicture.asset(
-                                                'assets/svgs/send.svg'),
-                                            onPressed: () {
-                                              if (controller.text.isNotEmpty) {
-                                                globals.socialServiceBloc!.add(
-                                                    CommentOnPostEvent(
-                                                        postId:
-                                                            widget.post.postId,
-                                                        content:
-                                                            controller.text,
-                                                        userId:
-                                                            globals.user!.id,
-                                                        postOwnerId: widget
-                                                            .post.postOwnerId));
-                                              }
-                                              controller.clear();
-                                            },
-                                          )
-                                        : IconButton(
-                                            //constraints: const BoxConstraints(
-                                            // maxHeight: 25, maxWidth: 25),
-                                            onPressed: () async {
-                                              print('BUTTON WORKING');
-                                              var tempDir =
-                                                  await getTemporaryDirectory();
-                                              var path =
-                                                  '${tempDir.path}/flutter_sound.aac';
-
-                                              if (!isRecordingInit) {
-                                                return;
-                                              }
-                                              if (isRecording) {
-                                                await _soundRecorder!
-                                                    .stopRecorder();
-                                                print(path);
-                                                File audioMessage = File(path);
-
-                                                /*globals.chatBloc!.add(
-                                                    UploadImageFileEvent(
-                                                        file: audioMessage));*/
-                                              } else {
-                                                await _soundRecorder!
-                                                    .startRecorder(
-                                                  toFile: path,
-                                                );
-                                              }
-                                              setState(() {
-                                                isRecording = !isRecording;
-                                              });
-                                            },
-                                            icon: isRecording
-                                                ? SvgPicture.asset(
-                                                    'assets/svgs/mic.svg',
-                                                    color:
-                                                        AppColors.blackShade3,
-                                                    width: 20,
-                                                    height: 26,
-                                                  )
-                                                : SvgPicture.asset(
-                                                    'assets/svgs/dc-cancel.svg',
-                                                    color:
-                                                        AppColors.blackShade3,
-                                                    height: 20,
-                                                    width: 20,
-                                                  )),
-                                    prefixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Helper.renderProfilePicture(
-                                          globals.user!.profilePicture,
-                                          size: 35,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        GestureDetector(
-                                          onTap: () {
-                                            focusNode.unfocus();
-                                            focusNode.canRequestFocus = false;
-                                            setState(() {
-                                              emojiShowing = !emojiShowing;
-                                            });
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 1),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          onChanged: (value) {
+                                            if (value.isNotEmpty) {
+                                              isTyping.value = true;
+                                            } else {
+                                              isTyping.value = false;
+                                            }
                                           },
-                                          child: SvgPicture.asset(
-                                            'assets/svgs/emoji.svg',
-                                          ).paddingAll(10),
+                                          focusNode: focusNode,
+                                          controller: controller,
+                                          decoration: InputDecoration(
+                                            hintText:
+                                                'Comment as ${globals.user!.username!}...',
+                                            hintStyle: TextStyle(
+                                                fontSize: getScreenHeight(14)),
+                                            suffixIcon: GestureDetector(
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return ListView(
+                                                      shrinkWrap: true,
+                                                      children: [
+                                                        Column(children: [
+                                                          ListTile(
+                                                              leading:
+                                                                  SvgPicture
+                                                                      .asset(
+                                                                'assets/svgs/Camera.svg',
+                                                                color: AppColors
+                                                                    .black,
+                                                              ),
+                                                              title: const Text(
+                                                                  'Camera'),
+                                                              onTap: () async {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                /* final image =
+                                                                await getImage(
+                                                                    ImageSource
+                                                                        .camera);
+                                                            if (image != null) {
+                                                              globals.chatBloc!.add(
+                                                                  UploadImageFileEvent(
+                                                                      file:
+                                                                          image));
+                                                            }*/
+                                                              }),
+                                                          ListTile(
+                                                            leading: SvgPicture
+                                                                .asset(
+                                                                    'assets/svgs/gallery.svg'),
+                                                            title: const Text(
+                                                                'Gallery'),
+                                                            onTap: () async {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              final image = await MediaService()
+                                                                  .pickFromGallery(
+                                                                      context:
+                                                                          context,
+                                                                      maxAssets:
+                                                                          5);
+                                                              if (image == null)
+                                                                return;
+
+                                                              if (image !=
+                                                                  null) {
+                                                                for (var e
+                                                                    in image) {
+                                                                  mediaList.value.add(UploadFileDto(
+                                                                      file: e
+                                                                          .file,
+                                                                      fileResult:
+                                                                          e,
+                                                                      id: Random()
+                                                                          .nextInt(
+                                                                              100)
+                                                                          .toString()));
+                                                                }
+                                                              }
+                                                            },
+                                                          ),
+                                                        ]).paddingSymmetric(
+                                                            v: 5),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                                  child: SvgPicture.asset(
+                                                  'assets/svgs/gallery.svg',
+                                                  //width: 25,
+                                                  //height: 20,
+                                                ).paddingAll(10),
+                                              
+                                            ),
+                                            prefixIcon: !isRecording
+                                                ? Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Helper
+                                                          .renderProfilePicture(
+                                                        globals.user!
+                                                            .profilePicture,
+                                                        size: 35,
+                                                      ),
+                                                      const SizedBox(width: 10),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          focusNode.unfocus();
+                                                          focusNode
+                                                                  .canRequestFocus =
+                                                              false;
+                                                          setState(() {
+                                                            emojiShowing =
+                                                                !emojiShowing;
+                                                          });
+                                                        },
+                                                        child: SvgPicture.asset(
+                                                          'assets/svgs/emoji.svg',
+                                                        ).paddingAll(10),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : AudioWaveforms(
+                                                    size: Size(
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            2,
+                                                        20),
+                                                    recorderController:
+                                                        recorderController,
+                                                    enableGesture: true,
+                                                    waveStyle: const WaveStyle(
+                                                      waveColor: Colors.white,
+                                                      extendWaveform: true,
+                                                      showMiddleLine: false,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12.0),
+                                                      color: const Color(
+                                                          0xFF1E1B26),
+                                                    ),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 18,
+                                                            right: 20,
+                                                            top: 15,
+                                                            bottom: 15),
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 15),
+                                                  ),
+                                            enabledBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            focusedBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            border: null,
+                                            focusedErrorBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            errorBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide.none,
+                                            ),
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    border: null,
-                                    focusedErrorBorder:
-                                        const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    errorBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                    ),
+                                      ),
+                                      isTyping.value
+                                          ? IconButton(
+                                              icon: SvgPicture.asset(
+                                                  'assets/svgs/send.svg'),
+                                              onPressed: () {
+                                                if (controller
+                                                    .text.isNotEmpty) {
+                                                  globals.socialServiceBloc!
+                                                      .add(CommentOnPostEvent(
+                                                          postId: widget
+                                                              .post.postId,
+                                                          content:
+                                                              controller.text,
+                                                          userId:
+                                                              globals.user!.id,
+                                                          postOwnerId: widget
+                                                              .post
+                                                              .postOwnerId));
+                                                }
+                                                controller.clear();
+                                              },
+                                            )
+                                          : IconButton(
+                                              //constraints: const BoxConstraints(
+                                              // maxHeight: 25, maxWidth: 25),
+                                              onPressed: () async {
+                                                print('BUTTON WORKING');
+                                                /* var tempDir =
+                                                          await getTemporaryDirectory();
+                                                      var path =
+                                                          '${tempDir.path}/flutter_sound.aac';
+                              
+                                                      if (!isRecordingInit) {
+                                                        return;
+                                                      }
+                                                      if (isRecording) {
+                                                        await _soundRecorder!
+                                                            .stopRecorder();
+                                                        print(path);
+                                                        File audioMessage = File(path);
+                              
+                                                        /*globals.chatBloc!.add(
+                                                            UploadImageFileEvent(
+                                                                file: audioMessage));*/
+                                                      } else {
+                                                        await _soundRecorder!
+                                                            .startRecorder(
+                                                          toFile: path,
+                                                        );
+                                                      }
+                                                      setState(() {
+                                                        isRecording = !isRecording;
+                              
+                                                      });*/
+                                                var tempDir =
+                                                    await getTemporaryDirectory();
+                                                String? path =
+                                                    '${tempDir.path}/comment_sound.aac';
+
+                                                if (isRecording) {
+                                                  path =
+                                                      await recorderController
+                                                          .stop();
+                                                  File audio = File(path!);
+                                                  globals.socialServiceBloc!
+                                                      .add(CommentOnPostEvent(
+                                                          content: " ",
+                                                          audioMediaItem:
+                                                              audio.path,
+                                                          postId: widget
+                                                              .post.postId,
+                                                          userId:
+                                                              globals.user!.id!,
+                                                          postOwnerId: widget
+                                                              .post
+                                                              .postOwnerId));
+                                                  globals.socialServiceBloc!
+                                                      .add(MediaUploadEvent(
+                                                          media: audio));
+                                                  print(path);
+                                                } else {
+                                                  await recorderController
+                                                      .record(path);
+                                                }
+
+                                                setState(() {
+                                                  isRecording = !isRecording;
+                                                });
+                                              },
+                                              icon: !isRecording
+                                                  ? SvgPicture.asset(
+                                                      'assets/svgs/mic.svg',
+                                                      color:
+                                                          AppColors.blackShade3,
+                                                      width: 20,
+                                                      height: 26,
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      'assets/svgs/dc-cancel.svg',
+                                                      color:
+                                                          AppColors.blackShade3,
+                                                      height: 20,
+                                                      width: 20,
+                                                    )),
+                                    ],
                                   ),
                                 ),
                                 Offstage(
@@ -753,6 +956,7 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                           }
                                         },
                                       );
+                                   
                                     },
                                   ),
                           ),
@@ -894,13 +1098,22 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            Text(
-              comment.content!,
-              style: TextStyle(
-                fontSize: getScreenHeight(14),
-                color: AppColors.textColor2,
-              ),
-            ),
+            comment.content!.isNotEmpty
+                ? Text(
+                    comment.content!,
+                    style: TextStyle(
+                      fontSize: getScreenHeight(14),
+                      color: AppColors.textColor2,
+                    ),
+                  )
+                : comment.audioMediaItem!.isNotEmpty
+                    //? PostAudioMedia(path: comment.audioMediaItem!)
+                    ? PostAudioMedia(path: comment.audioMediaItem!)
+                        .paddingOnly(r: 16, l: 16, b: 10, t: 0)
+                    : comment.imageMediaItems!.isNotEmpty
+                        ? CommentMedia(comment: comment)
+                            .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                        : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

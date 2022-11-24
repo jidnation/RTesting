@@ -27,13 +27,13 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(CreatePostLoading());
       try {
         final response = await socialServiceRepository.createPost(
-          audioMediaItem: event.audioMediaItem,
-          imageMediaItems: event.imageMediaItem,
-          videoMediaItem: event.videoMediaItem,
-          commentOption: event.commentOption,
-          content: event.content,
-          location: event.location,
-        );
+            audioMediaItem: event.audioMediaItem,
+            imageMediaItems: event.imageMediaItem,
+            videoMediaItem: event.videoMediaItem,
+            commentOption: event.commentOption,
+            content: event.content,
+            location: event.location,
+            postRating: event.postRating);
         response.fold(
           (error) => emit(CreatePostError(error: error)),
           (post) {
@@ -117,6 +117,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
             postId: event.postId!,
             content: event.content!,
             userId: event.userId!,
+            imageMediaItems: event.imageMediaItems,
+            audioMediaItem: event.audioMediaItem,
             postOwnerId: event.postOwnerId!);
         response.fold(
           (error) => emit(CommentOnPostError(error: error)),

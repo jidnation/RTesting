@@ -8,7 +8,7 @@ class CreatePostEvent extends SocialServiceEvent {
   final String? videoMediaItem;
   final List<String>? imageMediaItem;
   final String? commentOption;
-  final String? content, location;
+  final String? content, location, postRating;
   CreatePostEvent({
     this.audioMediaItem,
     this.videoMediaItem,
@@ -16,6 +16,7 @@ class CreatePostEvent extends SocialServiceEvent {
     this.commentOption,
     this.content,
     this.location,
+    this.postRating
   });
 }
 
@@ -58,16 +59,17 @@ class CommentOnPostEvent extends SocialServiceEvent {
   final String? content, location;
   final String? audioMediaItem;
   final String? videoMediaItem;
-  final List<String>? imageMediaItem;
+  final List<String>? imageMediaItems;
   final String? userId;
   final String? postOwnerId;
+
   CommentOnPostEvent({
     required this.postId,
-    required this.content,
+    this.content,
     this.location,
     this.audioMediaItem,
     this.videoMediaItem,
-    this.imageMediaItem,
+    this.imageMediaItems,
     this.postOwnerId,
     required this.userId,
   });
@@ -105,7 +107,7 @@ class UnlikeCommentOnPostEvent extends SocialServiceEvent {
   final String? commentId, likeId;
   UnlikeCommentOnPostEvent({
     required this.commentId,
-    required this.likeId,
+    required this.likeId, String? postId,
   });
 }
 
