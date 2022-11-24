@@ -53,12 +53,14 @@ class LikePostLoading extends SocialServiceState {}
 
 class LikePostSuccess extends SocialServiceState {
   final PostLikeModel? isLiked;
-  LikePostSuccess({this.isLiked});
+  final String? postId;
+  LikePostSuccess({this.isLiked, this.postId});
 }
 
 class LikePostError extends SocialServiceState {
   final String error;
-  LikePostError({required this.error});
+  final String postId;
+  LikePostError({required this.error, required this.postId});
   @override
   List<Object> get props => [error];
 }
@@ -67,12 +69,14 @@ class UnlikePostLoading extends SocialServiceState {}
 
 class UnlikePostSuccess extends SocialServiceState {
   final bool? isUnliked;
-  UnlikePostSuccess({this.isUnliked});
+  final String? postId;
+  UnlikePostSuccess({this.isUnliked, this.postId});
 }
 
 class UnlikePostError extends SocialServiceState {
   final String error;
-  UnlikePostError({required this.error});
+  final String postId;
+  UnlikePostError({required this.error, required this.postId});
   @override
   List<Object> get props => [error];
 }
@@ -114,6 +118,7 @@ class VotePostSuccess extends SocialServiceState {
 
 class VotePostError extends SocialServiceState {
   final String error;
+  // final String
   VotePostError({required this.error});
   @override
   List<Object> get props => [error];

@@ -44,7 +44,6 @@ import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/helper/logger.dart';
 import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
@@ -325,9 +324,26 @@ class _TimelineScreenState extends State<TimelineScreen>
                     _refreshController.refreshCompleted();
                   }
 
-                  if (state is LikePostSuccess || state is UnlikePostSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  if (state is UnlikePostSuccess) {}
+
+                  if (state is LikePostSuccess) {}
+
+                  if (state is UnlikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _posts.value[pos].isLiked = true;
+                    _posts.value[pos].post?.nLikes =
+                        (_posts.value[pos].post?.nLikes ?? 0) + 1;
+                  }
+
+                  if (state is LikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _posts.value[pos].isLiked = false;
+                    _posts.value[pos].post?.nLikes =
+                        (_posts.value[pos].post?.nLikes ?? 1) - 1;
                   }
 
                   if (state is DeletePostSuccess) {
@@ -634,32 +650,35 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                       .postOwnerId,
                                                                   type: ReachRelationshipType
                                                                       .reacher));
-                                                          // globals
-                                                          //     .socialServiceBloc!
-                                                          //     .add(
-                                                          //         VotePostEvent(
-                                                          //   voteType:
-                                                          //       'Downvote',
-                                                          //   postId: _posts
-                                                          //       .value[index]
-                                                          //       .postId,
-                                                          // ));
                                                         }
                                                       },
                                                       onLike: () {
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
-                                                        Console.log(
-                                                            'Like Data',
-                                                            _posts.value[index]
-                                                                .toJson());
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
                                                         if (active
                                                             .contains(index)) {
                                                           if (_posts
-                                                              .value[index]
-                                                              .like!
-                                                              .isNotEmpty) {
+                                                                  .value[index]
+                                                                  .isLiked ??
+                                                              false) {
+                                                            _posts.value[index]
+                                                                    .isLiked =
+                                                                false;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    1) -
+                                                                1;
                                                             globals
                                                                 .socialServiceBloc!
                                                                 .add(
@@ -669,6 +688,18 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .postId,
                                                             ));
                                                           } else {
+                                                            _posts.value[index]
+                                                                .isLiked = true;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    0) +
+                                                                1;
                                                             globals
                                                                 .socialServiceBloc!
                                                                 .add(
