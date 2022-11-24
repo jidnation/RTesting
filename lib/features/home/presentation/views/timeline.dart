@@ -45,7 +45,6 @@ import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/helper/logger.dart';
 import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
