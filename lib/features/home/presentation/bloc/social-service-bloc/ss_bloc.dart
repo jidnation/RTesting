@@ -109,6 +109,8 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
             postId: event.postId!,
             content: event.content!,
             userId: event.userId!,
+            imageMediaItems: event.imageMediaItems,
+            audioMediaItem: event.audioMediaItem,
             postOwnerId: event.postOwnerId!);
         response.fold(
           (error) => emit(CommentOnPostError(error: error)),

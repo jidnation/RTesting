@@ -84,6 +84,8 @@ class CommentSchema {
             nComments
             nLikes
             postId
+            imageMediaItems
+            audioMediaItem
             like {
               ''' +
         CommentLikeSchema.schema +
