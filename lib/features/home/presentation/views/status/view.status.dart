@@ -15,6 +15,7 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 import 'package:story_time/story_page_view/story_page_view.dart';
 
 class ViewMyStatus extends HookWidget {
@@ -24,12 +25,22 @@ class ViewMyStatus extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final duration = useState(5);
+    final indicatorController = useState(IndicatorAnimationCommand());
 
     return Scaffold(
       body: StoryPageView(
-        indicatorDuration: const Duration(seconds: 7),
+        indicatorAnimationController: indicatorController,
+        // indicatorDuration: Duration(seconds: duration.value),
         itemBuilder: (context, pageIndex, storyIndex) {
           final story = status[storyIndex];
+          if (story.statusData?.videoMedia != null) {
+            indicatorController.value = IndicatorAnimationCommand(
+                duration: const Duration(seconds: 30));
+          } else {
+            indicatorController.value =
+                IndicatorAnimationCommand(duration: const Duration(seconds: 5));
+          }
           //final image = images[storyIndex];
           if (story.statusData!.imageMedia != null ||
               (story.statusData!.imageMedia ?? '').isNotEmpty) {
@@ -90,7 +101,7 @@ class ViewMyStatus extends HookWidget {
               ),
               //check typename from model and display widgets accordingly
 
-              if (story.statusData!.background!.contains('0x'))
+              if ((story.statusData!.background ?? '').contains('0x'))
                 Positioned.fill(
                   child: Container(
                     height: size.height,
@@ -111,24 +122,36 @@ class ViewMyStatus extends HookWidget {
                 )
               else
                 Positioned.fill(
-                  child: Container(
-                    height: size.height,
-                    width: size.width,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(story.statusData!.background!),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        story.statusData!.caption!,
-                        textAlign: Helper.getAlignment(
-                            story.statusData!.alignment!)['align'],
-                        style: Helper.getFont(story.statusData!.font!),
-                      ),
-                    ),
-                  ),
+                  child: story.type == 'video'
+                      ? Container(
+                          height: size.height,
+                          width: size.width,
+                          color: AppColors.black,
+                          child: VideoPreview(
+                            isLocalVideo: false,
+                            loop: true,
+                            showControls: false,
+                            path: story.statusData!.videoMedia!,
+                          ),
+                        )
+                      : Container(
+                          height: size.height,
+                          width: size.width,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(story.statusData!.background!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              story.statusData!.caption!,
+                              textAlign: Helper.getAlignment(
+                                  story.statusData!.alignment!)['align'],
+                              style: Helper.getFont(story.statusData!.font!),
+                            ),
+                          ),
+                        ),
                 ),
               Padding(
                 padding: const EdgeInsets.only(top: 44, left: 8),
