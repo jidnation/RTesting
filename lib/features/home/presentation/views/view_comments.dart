@@ -35,6 +35,17 @@ import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 
+import '../../../../core/models/file_result.dart';
+
+
+class UploadFileDto {
+  File file;
+  String id;
+  FileResult? fileResult;
+  UploadFileDto({required this.file, required this.id, this.fileResult});
+}
+
+
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
   const ViewCommentsScreen({Key? key, required this.post}) : super(key: key);
@@ -437,14 +448,16 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                           context,
                                                                       maxAssets:
                                                                           5);
-                                                              if (image == null)
+                                                              if (image ==
+                                                                  null) {
                                                                 return;
+                                                              }
 
                                                               if (image !=
                                                                   null) {
                                                                 for (var e
-                                                                    in image) {
-                                                                  mediaList.value.add(UploadFileDto(
+                                                                    in image) {                                                        
+                                                                 mediaList.value.add(UploadFileDto(
                                                                       file: e
                                                                           .file,
                                                                       fileResult:
@@ -455,6 +468,22 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                           .toString()));
                                                                 }
                                                               }
+                                                              //globals.socialServiceBloc!.add(UploadPostMediaEvent(media:mediaList.value!));
+
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                      CommentOnPostEvent(
+                                                               postId: widget
+                                                              .post.postId,
+                                                          content: " ",                                                              
+                                                          userId:
+                                                              globals.user!.id,
+                                                          postOwnerId: widget
+                                                              .post
+                                                              .postOwnerId
+                                                           // imageMediaItems: image.
+                                                              ));
                                                             },
                                                           ),
                                                         ]).paddingSymmetric(
@@ -464,12 +493,11 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                   },
                                                 );
                                               },
-                                                  child: SvgPicture.asset(
-                                                  'assets/svgs/gallery.svg',
-                                                  //width: 25,
-                                                  //height: 20,
-                                                ).paddingAll(10),
-                                              
+                                              child: SvgPicture.asset(
+                                                'assets/svgs/gallery.svg',
+                                                //width: 25,
+                                                //height: 20,
+                                              ).paddingAll(10),
                                             ),
                                             prefixIcon: !isRecording
                                                 ? Row(
@@ -511,7 +539,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                         recorderController,
                                                     enableGesture: true,
                                                     waveStyle: const WaveStyle(
-                                                      waveColor: Colors.white,
+                                                      waveColor: Colors.black,
                                                       extendWaveform: true,
                                                       showMiddleLine: false,
                                                     ),
@@ -519,8 +547,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12.0),
-                                                      color: const Color(
-                                                          0xFF1E1B26),
+                                                      color: Colors.grey,
                                                     ),
                                                     padding:
                                                         const EdgeInsets.only(

@@ -185,7 +185,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                   _blockedList.value = state.blockedList!;
                 }
                 if (state is DelStarRelationshipSuccess) {
-                  Snackbars.success(context, message: 'User unstar Successful');
+                  Snackbars.success(context, message: 'User unstar Successfully');
                   globals.userBloc!
                       .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
                   globals.userBloc!
@@ -200,13 +200,13 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is UnBlockUserSuccess) {
                   Snackbars.success(context,
-                      message: 'User Unblock Successful');
+                      message: 'User Unblocked Successfully');
                   globals.userBloc!.add(GetBlockedListEvent());
                   globals.userBloc!
                       .add(GetUserProfileEvent(email: globals.user!.email!));
                 }
                 if (state is BlockUserSuccess) {
-                  Snackbars.success(context, message: 'User Block Successful');
+                  Snackbars.success(context, message: 'User Blocked Successfuly');
                   globals.userBloc!.add(GetBlockedListEvent());
                   globals.userBloc!
                       .add(GetUserProfileEvent(email: globals.user!.email!));
