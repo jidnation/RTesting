@@ -36,8 +36,8 @@ class MediaService {
     } else {
       res = await CameraPicker.pickFromCamera(
         _navigatorKey.currentContext!,
-        locale: Locale('en'),
-        pickerConfig: CameraPickerConfig(
+        locale: const Locale('en'),
+        pickerConfig: const CameraPickerConfig(
           enableRecording: false,
         ),
       );
@@ -79,7 +79,7 @@ class MediaService {
   Future<FileResult?> getVideo() async {
     final res = await AssetPicker.pickAssets(
       _navigatorKey.currentContext!,
-      pickerConfig: AssetPickerConfig(
+      pickerConfig: const AssetPickerConfig(
         maxAssets: 1,
         requestType: RequestType.video,
       ),

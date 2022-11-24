@@ -102,10 +102,10 @@ class LikeCommentOnPostEvent extends SocialServiceEvent {
 }
 
 class UnlikeCommentOnPostEvent extends SocialServiceEvent {
-  final String? commentId, postId;
+  final String? commentId, likeId;
   UnlikeCommentOnPostEvent({
     required this.commentId,
-    required this.postId,
+    required this.likeId,
   });
 }
 

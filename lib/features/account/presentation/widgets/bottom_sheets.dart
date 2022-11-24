@@ -99,10 +99,8 @@ Future showProfileMenuBottomSheet(BuildContext context,
                         label: 'Share Profile',
                         onPressed: () {
                           RouteNavigators.pop(context);
-                          Clipboard.setData(
-                              ClipboardData(text: globals.user!.profileSlug));
-                          Snackbars.success(context,
-                              message: 'Profile link copied to clipboard!');
+                          Share.share(
+                        'Hi\n This is my ReachMe Profile: https://$globals.user!.profileSlug}');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -179,10 +177,8 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   label: 'Share Profile',
                   onPressed: () {
                     RouteNavigators.pop(context);
-                    Clipboard.setData(
-                        ClipboardData(text: globals.user!.profileSlug));
-                    Snackbars.success(context,
-                        message: 'Profile link copied to clipboard!');
+                    Share.share(
+                        'Hi\n This is my ReachMe Profile: https://$globals.user!.profileSlug}');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),
@@ -367,7 +363,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                             onPressed: () {
                               RouteNavigators.pop(context);
                               Share.share(
-                                  'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
+                                  'Have fun viewing this: https://${postFeedModel.post!.postSlug!}');
                             },
                           ),
                           KebabBottomTextButton(

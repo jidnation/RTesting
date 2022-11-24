@@ -1,4 +1,5 @@
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 
 class VirtualReach {
@@ -6,12 +7,14 @@ class VirtualReach {
   String? reacherId;
   User? reacher;
   User? reaching;
+  bool? isReaching;
 
   VirtualReach({
     this.reacher,
     this.reacherId,
     this.reaching,
     this.reachingId,
+    this.isReaching,
   });
 
   factory VirtualReach.fromJson(Map<String, dynamic> json) => VirtualReach(
@@ -21,6 +24,7 @@ class VirtualReach {
             json["reaching"] != null ? User.fromJson(json["reaching"]) : null,
         reachingId: json["reachingId"],
         reacherId: json["reacherId"],
+        isReaching: json["isReaching"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +32,7 @@ class VirtualReach {
         "reaching": reaching == null ? null : reaching!.toJson(),
         "reachingId": reachingId,
         "reacherId": reacherId,
+        "isReaching":isReaching,
       };
 }
 
@@ -61,6 +66,11 @@ class VirtualStar {
         "starredId": starredId,
         "authId": authId,
       };
+
+  @override
+  String toString() {
+    return 'VirtualStar(starredId: $starredId, authId: $authId, user: $user, starred: $starred)';
+  }
 }
 
 class VirtualCommentModel {
@@ -234,5 +244,28 @@ class VirtualPostModel {
         "postSlug": postSlug,
         "videoMediaItem": videoMediaItem,
         "profile": profile == null ? null : profile!.toJson(),
+      };
+}
+
+class Block {
+  String? authId;
+  String? blockedAuthId;
+  CommentProfileModel? blockedProfile;
+
+  Block({this.authId, this.blockedAuthId, this.blockedProfile});
+
+  factory Block.fromJson(Map<String, dynamic> json) => Block(
+        authId: json["authId"],
+        blockedAuthId: json["blockedAuthId"],
+        blockedProfile: json["blockedProfile"] != null
+            ? CommentProfileModel.fromJson(json["blockedProfile"])
+            : null,
+      );
+
+  Map<String, dynamic> tojson() => {
+        "authId": authId,
+        "blockedAuthId": blockedAuthId,
+        "blockedProfile":
+            blockedProfile == null ? null : blockedProfile!.toJson(),
       };
 }
