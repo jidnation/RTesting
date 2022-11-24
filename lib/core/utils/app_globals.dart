@@ -33,6 +33,7 @@ class AppGlobals {
   String? location;
   String? postContent;
   String? postCommentOption;
+  String? postRating;
 
   User? user;
   List<Chat>? userChat;
@@ -59,6 +60,7 @@ class AppGlobals {
     postContent = '';
     fname = '';
     userId = '';
+    postRating = '';
     location = 'NIL';
     userList = [];
     dialogAndSheetService = DialogAndSheetService();

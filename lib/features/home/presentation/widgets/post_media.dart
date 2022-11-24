@@ -32,10 +32,12 @@ class PostMedia extends StatelessWidget {
     if (hasVideo) imageVideoList.add(post.videoMediaItem ?? '');
     int imageVideoTotal = imageVideoList.length;
     if (imageVideoTotal == 1) {
+      debugPrint("Post Rating: ${post.postRating}");
       return FileUtils.isImagePath(imageVideoList.first)
           ? PostImageMedia(
               imageUrl: imageVideoList.first,
               allMediaUrls: imageVideoList,
+              postModel: post,
               index: 0,
             )
           : PostVideoMedia(
@@ -49,6 +51,7 @@ class PostMedia extends StatelessWidget {
         children: [
           Expanded(
               child: PostImageMedia(
+            postModel: post,
             imageUrl: imageVideoList[0],
             allMediaUrls: imageVideoList,
             index: 0,
@@ -59,6 +62,7 @@ class PostMedia extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PostImageMedia(
+                  postModel: post,
                   imageUrl: imageVideoList[1],
                   height: 150,
                   allMediaUrls: imageVideoList,
@@ -67,6 +71,7 @@ class PostMedia extends StatelessWidget {
                 SizedBox(height: getScreenHeight(5)),
                 FileUtils.isImagePath(imageVideoList[2])
                     ? PostImageMedia(
+                        postModel: post,
                         imageUrl: imageVideoList[2],
                         height: 150,
                         allMediaUrls: imageVideoList,
@@ -93,6 +98,7 @@ class PostMedia extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PostImageMedia(
+                  postModel: post,
                   imageUrl: imageVideoList[0],
                   height: 150,
                   allMediaUrls: imageVideoList,
@@ -100,6 +106,7 @@ class PostMedia extends StatelessWidget {
                 ),
                 SizedBox(height: getScreenHeight(5)),
                 PostImageMedia(
+                  postModel: post,
                   index: 1,
                   imageUrl: imageVideoList[1],
                   height: 150,
@@ -114,6 +121,7 @@ class PostMedia extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PostImageMedia(
+                  postModel: post,
                   index: 2,
                   imageUrl: imageVideoList[2],
                   height: 150,
@@ -130,6 +138,7 @@ class PostMedia extends StatelessWidget {
                   child: MediaWithCounter(
                     count: remMedia,
                     child: PostImageMedia(
+                      postModel: post,
                       imageUrl: imageVideoList[3],
                       height: 150,
                     ),
@@ -161,6 +170,7 @@ class PostMedia extends StatelessWidget {
                   BoxDecoration(borderRadius: BorderRadius.circular(15)),
               child: FileUtils.isImagePath(path)
                   ? PostImageMedia(
+                      postModel: post,
                       imageUrl: path,
                       allMediaUrls: imageVideoList,
                       index: index,
@@ -219,42 +229,148 @@ class MediaWithCounter extends StatelessWidget {
   }
 }
 
-class PostImageMedia extends StatelessWidget {
+class PostImageMedia extends StatefulWidget {
   final String imageUrl;
   final List<String>? allMediaUrls;
   final int? index;
   final double? height, width;
+  final PostModel? postModel;
+
   const PostImageMedia(
       {Key? key,
       required this.imageUrl,
       this.height,
       this.width,
       this.allMediaUrls,
+      this.postModel,
       this.index})
       : super(key: key);
 
   @override
+  State<PostImageMedia> createState() => _PostImageMediaState();
+}
+
+class _PostImageMediaState extends State<PostImageMedia> {
+  bool show = false;
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: allMediaUrls == null
-          ? null
-          : (() => RouteNavigators.route(
-              context,
-              AppGalleryView(
-                mediaPaths: allMediaUrls!,
-                initialPage: index,
-              ))),
-      child: Container(
-        height: getScreenHeight(height ?? 300),
-        width: double.infinity,
-        clipBehavior: Clip.hardEdge,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
-        child: CachedNetworkImage(
-          imageUrl: imageUrl,
-          fit: BoxFit.cover,
+    // debugPrint("Post Rating ${widget.postModel!.postRating}");
+    if (widget.postModel!.postRating == "sensitive") {
+      if (show == true) {
+        return GestureDetector(
+          onTap: widget.allMediaUrls == null
+              ? null
+              : (() => RouteNavigators.route(
+                  context,
+                  AppGalleryView(
+                    mediaPaths: widget.allMediaUrls!,
+                    initialPage: widget.index,
+                  ))),
+          child: Container(
+            height: getScreenHeight(widget.height ?? 300),
+            width: double.infinity,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+            child: CachedNetworkImage(
+              imageUrl: widget.imageUrl,
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      } else {
+        return SizedBox(
+          height: 300,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.center,
+            children: [
+              Container(
+                height: getScreenHeight(widget.height ?? 300),
+                width: double.infinity,
+                clipBehavior: Clip.hardEdge,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                child: CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                  child: Container(
+                alignment: Alignment.center,
+                height: getScreenHeight(50),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                width: getScreenWidth(50),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.disabled),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "This is a  sensitive content",
+                      style: TextStyle(
+                          fontSize: getScreenHeight(18),
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            show = true;
+                          });
+                        },
+                        child: Container(
+                          width: 50,
+                          decoration: BoxDecoration(
+                              border: Border.all(),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Center(
+                            child: Text("Show",
+                                style: TextStyle(
+                                    fontSize: getScreenHeight(16),
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white)),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ))
+            ],
+          ),
+        );
+      }
+    } else {
+      return GestureDetector(
+        onTap: widget.allMediaUrls == null
+            ? null
+            : (() => RouteNavigators.route(
+                context,
+                AppGalleryView(
+                  mediaPaths: widget.allMediaUrls!,
+                  initialPage: widget.index,
+                ))),
+        child: Container(
+          height: getScreenHeight(widget.height ?? 300),
+          width: double.infinity,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+          child: CachedNetworkImage(
+            imageUrl: widget.imageUrl,
+            fit: BoxFit.cover,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
 
@@ -469,6 +585,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
   final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
   final MediaService _mediaService = MediaService();
+
   @override
   void initState() {
     super.initState();
