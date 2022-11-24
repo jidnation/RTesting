@@ -761,10 +761,47 @@ class PostFeedReacherCard extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
+              Visibility(
+                visible: (postFeedModel!.isVoted ?? '') == 'Upvote',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                      child: RichText(
+                        text: TextSpan(
+                            text:
+                                '@${postFeedModel!.voterProfile != null ? postFeedModel!.voterProfile!.username!.appendOverflow(15) : 'You'}',
+                            style: TextStyle(
+                                color: AppColors.black,
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500),
+                            children: [
+                              TextSpan(
+                                  text: ' shouted out this reach',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: AppColors.grey,
+                                      fontWeight: FontWeight.w500))
+                            ]),
+                      ),
+                    ),
+                    SizedBox(
+                      height: getScreenHeight(8),
+                    ),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                    ),
+                  ],
+                ),
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+
                   CupertinoButton(
                     minSize: 0,
                     padding: EdgeInsets.zero,
@@ -854,12 +891,51 @@ class PostFeedReacherCard extends HookWidget {
                                       color: AppColors.textColor2,
                                     ),
                                   ).paddingOnly(l: 4),
+
                                 ],
                               ),
-                            )
-                          ],
-                        ).paddingOnly(t: 10),
-                      ],
+                              GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                        builder: (builder) => FullPostScreen(
+                                              postFeedModel: postFeedModel,
+                                            ))),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      postFeedModel!.post!.location! == 'nil'
+                                          ? ''
+                                          : postFeedModel!
+                                                      .post!.location!.length >
+                                                  23
+                                              ? postFeedModel!.post!.location!
+                                                  .substring(0, 23)
+                                              : postFeedModel!.post!.location!,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                                    Text(
+                                      postDuration,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ).paddingOnly(l: 6),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ).paddingOnly(t: 10),
+                        ],
+                      ),
                     ),
                   ),
                   Row(

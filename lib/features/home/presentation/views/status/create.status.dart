@@ -1,21 +1,24 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
+import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
 late List<CameraDescription> _cameras;
 
@@ -73,9 +76,9 @@ class _CreateStatusState extends State<CreateStatus>
     try {
       final imageFile = await _picker.pickImage(
         source: source,
-        imageQuality: 50,
-        maxHeight: 900,
-        maxWidth: 600,
+        imageQuality: 100,
+        // maxHeight: 900,
+        // maxWidth: 600,
       );
 
       if (imageFile != null) {
@@ -106,20 +109,20 @@ class _CreateStatusState extends State<CreateStatus>
         height: size.height,
         width: size.width,
         child: cameraLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  :  ListView(
-          // shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            Container(
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child:CameraPreview(
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView(
+                // shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: CameraPreview(
                       controller!,
                       child: Column(
                         //mainAxisSize: MainAxisSize.min,
@@ -260,110 +263,125 @@ class _CreateStatusState extends State<CreateStatus>
                         ],
                       ).paddingOnly(t: 50),
                     ),
-            ),
-            Container(
-              // height: size.height,
-              width: size.width,
-              decoration: const BoxDecoration(
-                  //  color: AppColors.black.withOpacity(0.9),
                   ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: getScreenHeight(44)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: IconButton(
-                          onPressed: () async {
-                            final image = await getImage(ImageSource.gallery);
-                            if (image != null) {
-                              RouteNavigators.route(context,
-                                  BuildCameraPreview(image: XFile(image.path)));
-                            }
-                          },
-                          icon: Transform.scale(
-                            scale: 1.8,
-                            child: SvgPicture.asset(
-                              'assets/svgs/check-gallery.svg',
-                              height: getScreenHeight(71),
-                            ),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+                  Container(
+                    // height: size.height,
+                    width: size.width,
+                    decoration: const BoxDecoration(
+                        //  color: AppColors.black.withOpacity(0.9),
                         ),
-                      ),
-                      SizedBox(width: getScreenWidth(70)),
-                      Flexible(
-                        child: InkWell(
-                          onTap: () async {
-                            await controller!.takePicture().then((value) =>
-                                RouteNavigators.route(
-                                    context, BuildCameraPreview(image: value)));
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.white,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: getScreenHeight(44)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: IconButton(
+                                onPressed: () async {
+                                  // final image =
+                                  //     await getImage(ImageSource.gallery);
+                                  final res = await MediaService()
+                                      .pickFromGallery(context: context);
+                                  if (res != null) {
+                                    RouteNavigators.route(
+                                        context,
+                                        BuildMediaPreview(
+                                          path: res.first.path,
+                                          isVideo:
+                                              FileUtils.isVideo(res.first.file),
+                                        ));
+                                  }
+                                },
+                                icon: Transform.scale(
+                                  scale: 1.8,
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/check-gallery.svg',
+                                    height: getScreenHeight(71),
+                                  ),
+                                ),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ),
-                            padding: const EdgeInsets.all(20),
-                            child: SvgPicture.asset(
-                              'assets/svgs/Camera.svg',
-                              color: AppColors.black,
+                            SizedBox(width: getScreenWidth(70)),
+                            Flexible(
+                              child: InkWell(
+                                onTap: () async {
+                                  await controller!.takePicture().then(
+                                      (value) => RouteNavigators.route(
+                                          context,
+                                          BuildMediaPreview(
+                                              path: value.path,
+                                              isVideo: false)));
+                                },
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.white,
+                                  ),
+                                  padding: const EdgeInsets.all(20),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/Camera.svg',
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(width: getScreenWidth(70)),
+                            Flexible(
+                              child: IconButton(
+                                onPressed: () {
+                                  if (_cameras.isNotEmpty &&
+                                      _cameras.length > 1) {
+                                    if (_cameras.length == 2) {
+                                      if (controller!
+                                              .description.lensDirection ==
+                                          CameraLensDirection.front) {
+                                        initializeCamera(_cameras[0]);
+                                      } else {
+                                        initializeCamera(_cameras[1]);
+                                      }
+                                    } else {
+                                      initializeCamera(_cameras[1]);
+                                    }
+                                  }
+                                  setState(() {});
+                                },
+                                icon: Transform.scale(
+                                  scale: 1.8,
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/flip-camera.svg',
+                                    height: getScreenHeight(71),
+                                  ),
+                                ),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(width: getScreenWidth(70)),
-                      Flexible(
-                        child: IconButton(
-                          onPressed: () {
-                            if (_cameras.isNotEmpty && _cameras.length > 1) {
-                              if (_cameras.length == 2) {
-                                if (controller!.description.lensDirection ==
-                                    CameraLensDirection.front) {
-                                  initializeCamera(_cameras[0]);
-                                } else {
-                                  initializeCamera(_cameras[1]);
-                                }
-                              } else {
-                                initializeCamera(_cameras[1]);
-                              }
-                            }
-                            setState(() {});
-                          },
-                          icon: Transform.scale(
-                            scale: 1.8,
-                            child: SvgPicture.asset(
-                              'assets/svgs/flip-camera.svg',
-                              height: getScreenHeight(71),
-                            ),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ),
-                    ],
+                        SizedBox(height: getScreenHeight(44))
+                      ],
+                    ),
                   ),
-                  SizedBox(height: getScreenHeight(44))
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
-class BuildCameraPreview extends StatelessWidget {
-  const BuildCameraPreview({
+class BuildMediaPreview extends StatelessWidget {
+  const BuildMediaPreview({
     Key? key,
-    required this.image,
+    required this.path,
+    required this.isVideo,
   }) : super(key: key);
-  final XFile image;
+  final String path;
+  final bool isVideo;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -386,8 +404,9 @@ class BuildCameraPreview extends StatelessWidget {
                 CreateStatusEvent(
                   createStatusDto: CreateStatusDto(
                     caption: 'NIL',
-                    type: 'image',
-                    imageMedia: state.image,
+                    type: isVideo ? 'video' : 'image',
+                    imageMedia: !isVideo ? state.image : null,
+                    videoMedia: isVideo ? state.image : null,
                   ),
                 ),
               );
@@ -398,10 +417,15 @@ class BuildCameraPreview extends StatelessWidget {
             return Stack(
               children: [
                 Positioned.fill(
-                  child: Image.file(
-                    File(image.path),
-                    fit: BoxFit.fitWidth,
-                  ),
+                  child: isVideo
+                      ? VideoPreview(
+                          path: path,
+                          isLocalVideo: true,
+                        )
+                      : Image.file(
+                          File(path),
+                          fit: BoxFit.fitWidth,
+                        ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: getScreenHeight(50)),
@@ -426,8 +450,8 @@ class BuildCameraPreview extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: () {
-                              globals.socialServiceBloc!.add(
-                                  MediaUploadEvent(media: File(image.path)));
+                              globals.socialServiceBloc!
+                                  .add(MediaUploadEvent(media: File(path)));
                             },
                             icon: Transform.scale(
                               scale: 1.8,
@@ -448,5 +472,15 @@ class BuildCameraPreview extends StatelessWidget {
             );
           }),
     );
+  }
+}
+
+class BuildVideoPreview extends StatelessWidget {
+  final String video;
+  const BuildVideoPreview({Key? key, required this.video}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack();
   }
 }

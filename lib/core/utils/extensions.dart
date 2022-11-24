@@ -41,3 +41,13 @@ extension Group<T> on Iterable<T> {
     return map;
   }
 }
+
+extension StringExtention on String {
+  String appendOverflow(int cropLen) {
+    if (length > cropLen) {
+      return '${substring(0, cropLen)}...';
+    } else {
+      return this;
+    }
+  }
+}
