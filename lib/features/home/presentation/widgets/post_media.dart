@@ -469,6 +469,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
   final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
   final MediaService _mediaService = MediaService();
+
   @override
   void initState() {
     super.initState();
