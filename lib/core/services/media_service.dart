@@ -36,8 +36,8 @@ class MediaService {
     } else {
       res = await CameraPicker.pickFromCamera(
         _navigatorKey.currentContext!,
-        locale: Locale('en'),
-        pickerConfig: CameraPickerConfig(
+        locale: const Locale('en'),
+        pickerConfig: const CameraPickerConfig(
           enableRecording: false,
         ),
       );
@@ -79,7 +79,7 @@ class MediaService {
   Future<FileResult?> getVideo() async {
     final res = await AssetPicker.pickAssets(
       _navigatorKey.currentContext!,
-      pickerConfig: AssetPickerConfig(
+      pickerConfig: const AssetPickerConfig(
         maxAssets: 1,
         requestType: RequestType.video,
       ),
@@ -193,20 +193,23 @@ class MediaService {
         fileName: res.path!.split('/').last);
   }
 
-  Future<FileResult?> loadMediaFromCamera({bool? enableRecording}) async {
-    final res = await CameraPicker.pickFromCamera(_navigatorKey.currentContext!,
+  Future<FileResult?> pickFromCamera(
+      {required BuildContext context, bool? enableRecording}) async {
+    final res = await CameraPicker.pickFromCamera(context,
         locale: Locale('en'),
         pickerConfig:
             CameraPickerConfig(enableRecording: enableRecording ?? false));
     if (res == null) return null;
     final file = await res.originFile;
     if (file == null) return null;
+    String? thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
     return FileResult(
         path: file.path,
         size: file.lengthSync() / 1024,
         duration: res.videoDuration.inSeconds,
         height: res.height,
         width: res.width,
+        thumbnail: thumbnail,
         fileName: (file).path.split('/').last);
   }
 

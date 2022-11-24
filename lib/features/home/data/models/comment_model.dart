@@ -6,6 +6,8 @@ class CommentModel {
   String? content;
   int? nComments;
   int? nLikes;
+  List<String>? imageMediaItems;
+  String? audioMediaItem;
   DateTime? createdAt;
   CommentProfileModel? commentProfile;
   List<CommentLikeModel>? like;
@@ -18,6 +20,8 @@ class CommentModel {
     this.content,
     this.nComments,
     this.nLikes,
+    this.imageMediaItems,
+    this.audioMediaItem,
     this.commentProfile,
     this.createdAt,
     this.like,
@@ -31,6 +35,9 @@ class CommentModel {
         content: json["content"],
         nComments: json["nComments"],
         nLikes: json["nLikes"],
+        imageMediaItems: json["imageMediaItems"] == null ? null 
+        : List<String>.from(json["imageMediaItems"].map((x) => x)),
+        audioMediaItem: json["audioMediaItem"],
         createdAt: DateTime.parse(json["created_at"]),
         commentProfile: json["profile"] != null
             ? CommentProfileModel.fromJson(json["profile"])
@@ -48,6 +55,10 @@ class CommentModel {
         "commentSlug": commentSlug,
         "content": content,
         "nComments": nComments,
+        "audioMediaItem": audioMediaItem,
+        "imageMediaItem": imageMediaItems == null 
+        ? null 
+        : List<dynamic>.from(imageMediaItems!.map((x) => x)),
         "nLikes": nLikes,
         "created_at": createdAt!.toIso8601String(),
         "profile": commentProfile == null ? null : commentProfile!.toJson(),

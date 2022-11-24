@@ -4,13 +4,16 @@ import 'package:reach_me/core/utils/constants.dart';
 
 class VideoPreview extends StatefulWidget {
   final bool isLocalVideo;
+  final bool? showControls, loop;
   final String path;
   final double? aspectRatio;
   const VideoPreview(
       {Key? key,
       required this.isLocalVideo,
       required this.path,
-      this.aspectRatio})
+      this.aspectRatio,
+      this.showControls,
+      this.loop})
       : super(key: key);
 
   @override
@@ -26,16 +29,23 @@ class _VideoPreviewState extends State<VideoPreview> {
 
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
+            placeholder: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.white,
+              ),
+            ),
             overlay: Container(
               width: double.infinity,
               color: AppColors.black.withOpacity(0.1),
             ),
-            controlsConfiguration: const BetterPlayerControlsConfiguration(
+            controlsConfiguration: BetterPlayerControlsConfiguration(
                 enableQualities: false,
                 enableSubtitles: false,
                 enableAudioTracks: false,
+                showControls: widget.showControls ?? true,
                 enableOverflowMenu: false),
-            autoPlay: true);
+            autoPlay: true,
+            looping: widget.loop ?? false);
 
     BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource(
         widget.isLocalVideo

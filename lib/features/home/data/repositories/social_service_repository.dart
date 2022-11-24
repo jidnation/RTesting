@@ -18,23 +18,23 @@ class SocialServiceRepository {
   final HomeRemoteDataSource _homeRemoteDataSource;
   final ApiClient _apiClient;
 
-  Future<Either<String, PostModel>> createPost({
-    String? audioMediaItem,
-    String? commentOption,
-    String? content,
-    List<String>? imageMediaItems,
-    String? videoMediaItem,
-    String? location,
-  }) async {
+  Future<Either<String, PostModel>> createPost(
+      {String? audioMediaItem,
+      String? commentOption,
+      String? content,
+      List<String>? imageMediaItems,
+      String? videoMediaItem,
+      String? location,
+      String? postRating}) async {
     try {
       final post = await _homeRemoteDataSource.createPost(
-        audioMediaItem: audioMediaItem,
-        commentOption: commentOption,
-        content: content,
-        imageMediaItems: imageMediaItems,
-        videoMediaItem: videoMediaItem,
-        location: location,
-      );
+          audioMediaItem: audioMediaItem,
+          commentOption: commentOption,
+          content: content,
+          imageMediaItems: imageMediaItems,
+          videoMediaItem: videoMediaItem,
+          location: location,
+          postRating: postRating);
       return Right(post);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -91,15 +91,20 @@ class SocialServiceRepository {
 
   Future<Either<String, CommentModel>> commentOnPost(
       {required String postId,
-      required String content,
+      String? content,
       required String userId,
-      required String postOwnerId}) async {
+      required String postOwnerId,
+      String? audioMediaItem,
+      List<String>? imageMediaItems,
+      }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
         content: content,
         userId: userId,
         postOwnerId: postOwnerId,
+        imageMediaItems: imageMediaItems,
+        audioMediaItem: audioMediaItem,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -162,12 +167,12 @@ class SocialServiceRepository {
 
   Future<Either<String, bool>> unlikeCommentOnPost({
     required String commentLikeId,
-    required String postId,
+    required String likeId,
   }) async {
     try {
       final comment = await _homeRemoteDataSource.unlikeCommentOnPost(
         commentId: commentLikeId,
-        postId: postId,
+        likeId: likeId,
       );
       return Right(comment);
     } on GraphQLError catch (e) {

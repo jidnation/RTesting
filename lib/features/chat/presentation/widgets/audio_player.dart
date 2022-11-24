@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart' as pathfile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 //import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:audio_waveforms/audio_waveforms.dart';
-//import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:reach_me/core/services/media_service.dart';
+
+import '../../../../core/helper/logger.dart';
 
 class MyAudioPlayer extends StatefulHookWidget {
   const MyAudioPlayer({Key? key, this.sourceFile}) : super(key: key);
@@ -137,22 +142,57 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
 }
 
 class PlayAudio extends StatefulWidget {
-  const PlayAudio({Key? key, this.audioFile}) : super(key: key);
+  const PlayAudio({Key? key, this.audioFile, required this.isMe})
+      : super(key: key);
   final String? audioFile;
-
+  final bool isMe;
   @override
   State<PlayAudio> createState() => _PlayAudioState();
 }
 
 class _PlayAudioState extends State<PlayAudio> {
   late final PlayerController playerController;
-  String? path;
   bool isPlaying = false;
+  //bool isInitialised = false;
+  final currentDurationStream = StreamController<int>();
+  int currentDuration = 0;
+  final MediaService _mediaService = MediaService();
 
-  late Directory directory;
+  @override
+  void initState() {
+    super.initState();
+    if (mounted) _initaliseController();
+    //directory = await getApplicationDocumentsDirectory();
+  }
 
-  void _initaliseController() {
+  void _initaliseController() async {
+    final res = await _mediaService.downloadFile(url: widget.audioFile!);
+    if (res == null) {
+      print("THE URL FIELD IS NULL!!!!");
+      return;
+    }
     playerController = PlayerController();
+    playerController.onCurrentDurationChanged.listen((event) {
+      currentDuration = event;
+      if (mounted) setState(() {});
+    });
+    playerController.addListener(() {
+      Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
+
+      if (playerController.playerState == PlayerState.initialized) {
+        //isInitialised = true;
+        setState(() {});
+      } else if (playerController.playerState == PlayerState.playing) {
+        isPlaying = true;
+        if (mounted) setState(() {});
+      } else if (playerController.playerState == PlayerState.paused ||
+          playerController.playerState == PlayerState.stopped) {
+        isPlaying = false;
+        if (mounted) setState(() {});
+      }
+    });
+    await playerController.preparePlayer(res.path);
+    if (mounted) setState(() {});
   }
 
   /* void _playandPause() async {
@@ -162,54 +202,66 @@ class _PlayAudioState extends State<PlayAudio> {
   }*/
 
   @override
-  void initState() {
-    super.initState();
-    _initaliseController();
-    //directory = await getApplicationDocumentsDirectory();
-    path = widget.audioFile;
-    //'${directory.path}/test_audio.aac';
-
-    playerController.preparePlayer(path!);
-    print(widget.audioFile);
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Align(
+          child: IconButton(
+            onPressed: () {
+              if (isPlaying) {
+                playerController.pausePlayer();
+              } else {
+                playerController.startPlayer(finishMode: FinishMode.pause);
+              }
+              setState(() {
+                isPlaying = !isPlaying;
+              });
+            },
+            icon: isPlaying
+                ? Icon(
+                    Icons.play_arrow,
+                    size: 30,
+                    color: widget.isMe ? Colors.white : Colors.blue,
+                  )
+                : Icon(
+                    Icons.pause_circle,
+                    size: 30,
+                    color: widget.isMe ? Colors.white : Colors.blue,
+                  ),
+          ),
+        ),
+        //Expanded(
+        // child:
+        //Container(
+        // padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        //child:
+        AudioFileWaveforms(
+          margin: const EdgeInsets.only(top: 7, bottom: 7, right: 7),
+          size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+          playerController: playerController,
+          density: 1.5,
+          enableSeekGesture: true,
+          playerWaveStyle: PlayerWaveStyle(
+            scaleFactor: 0.8,
+            fixedWaveColor: widget.isMe ? Colors.grey : Colors.lightBlueAccent,
+            liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
+            waveCap: StrokeCap.round,
+          ),
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          animationDuration: const Duration(milliseconds: 1000),
+        ),
+        // ),
+        //),
+      ],
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
     playerController.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        AudioFileWaveforms(
-          size: Size(MediaQuery.of(context).size.width / 2, 70),
-          playerController: playerController,
-          density: 1.5,
-          playerWaveStyle: const PlayerWaveStyle(
-            scaleFactor: 0.8,
-            fixedWaveColor: Colors.blue,
-            liveWaveColor: Colors.yellow,
-            waveCap: StrokeCap.butt,
-          ),
-        ),
-        IconButton(
-          onPressed: () async {
-            if (isPlaying) {
-              await playerController.stopPlayer();
-            } else {
-              await playerController.startPlayer();
-            }
-            setState(() {
-              isPlaying = !isPlaying;
-            });
-          },
-          icon: isPlaying
-              ? const Icon(Icons.play_arrow)
-              : const Icon(Icons.stop_circle),
-        )
-      ],
-    );
   }
 }

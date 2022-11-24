@@ -404,6 +404,7 @@ class HomeRemoteDataSource {
         '''
               }
               reachingId
+              isReaching
             }
           }''';
     try {
@@ -454,6 +455,7 @@ class HomeRemoteDataSource {
         '''
               }
               reachingId
+              isReaching
             }
           }''';
     try {
@@ -462,6 +464,7 @@ class HomeRemoteDataSource {
         'page_number': pageNumber,
         'authId': authId,
       });
+      Console.log('REACHING!!!!!!!', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -531,6 +534,7 @@ class HomeRemoteDataSource {
     String? location,
     List<String>? imageMediaItems,
     String? videoMediaItem,
+    String? postRating,
   }) async {
     String q = r'''
         mutation createPost(
@@ -561,7 +565,7 @@ class HomeRemoteDataSource {
       Map<String, dynamic> variables = {
         'commentOption': commentOption,
         'location': location,
-        'postRating': 'normal'
+        'postRating': postRating
       };
       if (content != null && content.isNotEmpty) {
         variables.putIfAbsent('content', () => content);
@@ -583,6 +587,9 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+
+      var post = PostModel.fromJson(result.data!['createPost']);
+      print("Postrating: ${post.postRating}");
 
       return PostModel.fromJson(result.data!['createPost']);
     } catch (e) {
@@ -699,21 +706,27 @@ class HomeRemoteDataSource {
 
   Future<CommentModel> commentOnPost({
     required String postId,
-    required String content,
+    String? content,
     required String userId,
     required String postOwnerId,
+    List<String>? imageMediaItems,
+    String? audioMediaItem,
   }) async {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
           $content: String!
           $postOwnerId: String!
+          $imageMediaItems:[String]
+          $audioMediaItem:String
           ) {
           commentOnPost(
             commentBody: {
               postId: $postId
               content: $content
               postOwnerId: $postOwnerId
+              imageMediaItems:$imageMediaItems
+              audioMediaItem:$audioMediaItem
           }) {
             ''' +
         CommentSchema.schema +
@@ -721,13 +734,21 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      final result = await _client.mutate(gql(q), variables: {
+      Map<String, dynamic> variables = {
         'postId': postId,
-        'content': content,
-        // 'userId': userId,
-        // 'location': globals.location ?? ' ',
         'postOwnerId': postOwnerId
-      });
+      };
+      if (content != null && content.isNotEmpty) {
+        variables.putIfAbsent('content', () => content);
+      }
+      if (audioMediaItem != null) {
+        variables.putIfAbsent('audioMediaItem', () => audioMediaItem);
+      }
+      if (imageMediaItems != null) {
+        variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
+      }
+
+      final result = await _client.mutate(gql(q), variables: variables );
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -737,6 +758,8 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+
 
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
@@ -914,6 +937,7 @@ class HomeRemoteDataSource {
            authId
            commentId
            postId
+           likeId
           }
         }''';
     try {
@@ -934,16 +958,16 @@ class HomeRemoteDataSource {
 
   Future<bool> unlikeCommentOnPost({
     required String commentId,
-    required String postId,
+    required String likeId,
   }) async {
     String q = r'''
         mutation unlikeCommentOnPost(
           $commentId: String!
-          $postId: String!
+          $likeId: String!
           ) {
           unlikeCommentOnPost(
-             postId: $postId
-            commentId: $commentId
+             commentId: $commentId
+             likeId: $likeId
           )
         }''';
     try {
@@ -951,7 +975,7 @@ class HomeRemoteDataSource {
         gql(q),
         variables: {
           'commentId': commentId,
-          'postId': postId,
+          'likeId': likeId,
         },
       );
 
@@ -1674,6 +1698,84 @@ class HomeRemoteDataSource {
       Console.log('get liked posts', result.data);
       return (result.data!['getLikedPosts'] as List)
           .map((e) => PostFeedModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Block> blockProfile({
+    required String? idToBlock,
+  }) async {
+    String q = r'''
+            mutation blockProfile( $idToBlock: String! ) {
+              blockProfile( idToBlock: $idToBlock) {
+                authId
+                blockedAuthId
+              }
+               }''';
+
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'idToBlock': idToBlock,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('block profile', result.data);
+      return Block.fromJson(result.data!['blockProfile']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> unblockProfile({
+    required String? idToUnblock,
+  }) async {
+    String q = r'''
+             mutation unblockProfile(
+              $idToUnblock:String!
+             ){
+               unblockProfile(
+                idToUnblock: $idToUnblock
+               )
+             }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'idToUnblock': idToUnblock,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('Unblock Profile', result.data);
+      return result.data!['unblockProfile'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<Block>> getBlockList() async {
+    String q = r'''
+         query getBlockList() {
+          getBlockList() {  
+              
+                authId
+                blockedAuthId
+                blockedProfile {
+                  ''' +
+        CommentProfileSchema.schema +
+        '''
+                }
+          }
+         }''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('GetBlockedList', result.data);
+      return (result.data['getBlockList'] as List)
+          .map((e) => Block.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;

@@ -102,6 +102,7 @@ dependencies:
   video_compress: ^3.1.1
   video_thumbnail: ^0.5.3
   focused_menu: ^1.0.5
+  fwfh_text_style: 2.22.8+1
   share_files_and_screenshot_widgets: ^1.0.6
   # expandable_text: ^2.3.0
   flutter_sound: ^9.2.13
@@ -118,6 +119,7 @@ dependencies:
   flutter_mentions:
     git: https://github.com/gideonoyekale/flutter_mentions.git
   expandable_text: ^2.3.0
+  flutter_keyboard_visibility: ^5.4.0
 
 
 
