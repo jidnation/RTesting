@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
@@ -955,12 +954,14 @@ class PostFeedReacherCard extends HookWidget {
                               showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return const DictionaryDialog();
+                                    return const DictionaryDialog(
+                                      meaning: '',
+                                      word: '',
+                                      abbr: '',
+                                    );
                                   });
                             },
-                            onMentionTap: (value) {
-                           
-                            },
+                            onMentionTap: (value) {},
                             mentionStyle: const TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: Colors.blue),

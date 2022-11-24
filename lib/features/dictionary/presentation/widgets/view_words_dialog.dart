@@ -10,7 +10,12 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_sta
 import '../../dictionary_bloc/bloc/dictionary_bloc.dart';
 
 class DictionaryDialog extends StatefulWidget {
-  const DictionaryDialog({Key? key}) : super(key: key);
+  const DictionaryDialog(
+      {Key? key, required this.abbr, required this.word, required this.meaning})
+      : super(key: key);
+  final String abbr;
+  final String word;
+  final String meaning;
 
   @override
   State<DictionaryDialog> createState() => _DictionaryDialogState();
@@ -77,6 +82,21 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                         scrollDirection: Axis.vertical,
                         child: Column(
                           children: [
+                            RichText(
+                              text: TextSpan(
+                                style: const TextStyle(color: Colors.black),
+                                children: [
+                                  TextSpan(
+                                      text: widget.abbr,
+                                      style:
+                                          const TextStyle(color: Colors.blue)),
+                                  TextSpan(
+                                      text: widget.word ,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
                             Container(
                               alignment: Alignment.center,
                               height: 50,
@@ -101,34 +121,43 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                             const SizedBox(
                               height: 10,
                             ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: items.value.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  title: RichText(
-                                    text: TextSpan(
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      children: [
-                                        TextSpan(
-                                            text:
-                                                '${items.value[index].abbr}: ',
-                                            style: const TextStyle(
-                                                color: Colors.blue)),
-                                        TextSpan(
-                                            text: '${items.value[index].word}',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    items.value[index].meaning.toString(),
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                );
-                              },
+                            SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: SizedBox(
+                                height: MediaQuery.of(context).size.height,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: items.value.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return ListTile(
+                                      title: RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    '${items.value[index].abbr}: ',
+                                                style: const TextStyle(
+                                                    color: Colors.blue)),
+                                            TextSpan(
+                                                text:
+                                                    '${items.value[index].word}',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        items.value[index].meaning.toString(),
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -138,14 +167,4 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
       ),
     );
   }
-
-  // searchWord(String? word, List<GetRecentlyAddedWord>? recentWords) {
-  //   final suggestions = recentWords?.where((value) {
-  //     print(value);
-  //     return value.abbr!.contains(word!);
-  //   }).toList();
-  //   print(suggestions);
-  //   return suggestions;
-  // }
-
 }

@@ -87,7 +87,7 @@ class _PostReachState extends State<PostReach> {
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     useMemoized(() {
       globals.dictionaryBloc!
-          .add(AddWordsToMentionsEvent(pageLimit: 100, pageNumber: 1));
+          .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
     });
 
     var size = MediaQuery.of(context).size;
@@ -773,7 +773,7 @@ class _PostReachState extends State<PostReach> {
     );
   }
 
-  bool _isPlaying = false;
+  final bool _isPlaying = false;
   final _soundRecorderController = RecorderController();
 
   Row replyWidget(String replyFeature) {
