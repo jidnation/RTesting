@@ -706,21 +706,27 @@ class HomeRemoteDataSource {
 
   Future<CommentModel> commentOnPost({
     required String postId,
-    required String content,
+    String? content,
     required String userId,
     required String postOwnerId,
+    List<String>? imageMediaItems,
+    String? audioMediaItem,
   }) async {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
           $content: String!
           $postOwnerId: String!
+          $imageMediaItems:[String]
+          $audioMediaItem:String
           ) {
           commentOnPost(
             commentBody: {
               postId: $postId
               content: $content
               postOwnerId: $postOwnerId
+              imageMediaItems:$imageMediaItems
+              audioMediaItem:$audioMediaItem
           }) {
             ''' +
         CommentSchema.schema +
@@ -728,13 +734,21 @@ class HomeRemoteDataSource {
           }
         }''';
     try {
-      final result = await _client.mutate(gql(q), variables: {
+      Map<String, dynamic> variables = {
         'postId': postId,
-        'content': content,
-        // 'userId': userId,
-        // 'location': globals.location ?? ' ',
         'postOwnerId': postOwnerId
-      });
+      };
+      if (content != null && content.isNotEmpty) {
+        variables.putIfAbsent('content', () => content);
+      }
+      if (audioMediaItem != null) {
+        variables.putIfAbsent('audioMediaItem', () => audioMediaItem);
+      }
+      if (imageMediaItems != null) {
+        variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
+      }
+
+      final result = await _client.mutate(gql(q), variables: variables );
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -744,6 +758,8 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+
 
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
