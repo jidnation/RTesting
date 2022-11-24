@@ -39,11 +39,6 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
     super.initState();
     _tabController =
         TabController(length: 4, vsync: this, initialIndex: widget.index ?? 0);
-    globals.userBloc!.add(FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-    globals.userBloc!
-        .add(FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
-    globals.userBloc!.add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
-    globals.userBloc!.add(GetBlockedListEvent());
   }
 
   TabBar get _tabBar => TabBar(
@@ -153,10 +148,16 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
     final _starsList = useState<List<VirtualStar>>([]);
     final _blockedList = useState<List<Block>>([]);
 
-    /* useEffect(() {
-     
+    useEffect(() {
+      globals.userBloc!
+          .add(FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!
+          .add(FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!
+          .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!.add(GetBlockedListEvent());
       return null;
-    }, []);*/
+    }, []);
 
     print('This is the Blcoked List: ${_blockedList.value}');
 
@@ -432,11 +433,14 @@ class SeeMyReachersList extends StatelessWidget {
                           : AppColors.primaryColor,
                   onPressed: () {
                     // Block or Unblock user and render button according to userBlockRelationship //
-                    isReaching!
-                        ? globals.userBloc!.add(DelReachRelationshipEvent(
-                            userIdToDelete: data!.reacher!.id!))
-                        : globals.userBloc!.add(
-                            ReachUserEvent(userIdToReach: data!.reacher!.id));
+                    isRecipientAccount!
+                        ? isReaching!
+                            ? globals.userBloc!.add(DelReachRelationshipEvent(
+                                userIdToDelete: data!.reacher!.id!))
+                            : globals.userBloc!.add(ReachUserEvent(
+                                userIdToReach: data!.reacher!.id))
+                        : globals.userBloc!
+                            .add(BlockUserEvent(idToBlock: data!.reacher!.id!));
                   },
                   size: size,
                   padding: const EdgeInsets.symmetric(
@@ -524,11 +528,11 @@ class SeeMyReachingsList extends StatelessWidget {
               width: getScreenWidth(80),
               child: CustomButton(
                 loaderColor: AppColors.primaryColor,
-                label: !isRecipientAccount!
-                    ? 'Unreach'
-                    : isReaching!
+                label: isRecipientAccount!
+                    ? isReaching!
                         ? 'Unreach'
-                        : 'reach',
+                        : 'reach'
+                    : 'Unreach',
                 labelFontSize: getScreenHeight(13),
                 color: !isRecipientAccount!
                     ? AppColors.white
@@ -537,6 +541,7 @@ class SeeMyReachingsList extends StatelessWidget {
                         : AppColors.primaryColor,
                 onPressed: () {
                   // Remove User from Reaching UI //
+
                   globals.userBloc!.add(DelReachRelationshipEvent(
                       userIdToDelete: data!.reaching!.id));
                   globals.userBloc!.add(DelStarRelationshipEvent(
@@ -736,12 +741,12 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
     super.initState();
     _tabController =
         TabController(length: 2, vsync: this, initialIndex: widget.index ?? 0);
-    globals.userBloc!.add(FetchUserReachersEvent(
+    /* globals.userBloc!.add(FetchUserReachersEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.userBloc!.add(FetchUserReachingsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.userBloc!.add(FetchUserStarredEvent(
-        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+        pageLimit: 50, pageNumber: 1, authId: widget.recipientId));*/
   }
 
   TabBar get _tabBar => TabBar(
@@ -836,6 +841,17 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
     final _reachingList = useState<List<VirtualReach>>([]);
     final _starsList = useState<List<VirtualStar>>([]);
 
+    useEffect(() {
+      globals.userBloc!
+          .add(FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!
+          .add(FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!
+          .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!.add(GetBlockedListEvent());
+      return null;
+    }, []);
+
     print('This is the star_laist ${_starsList.value}');
 
     return Scaffold(
@@ -862,8 +878,8 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                     state is UserLoaded) {
                   globals.userBloc!.add(
                       FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-                  // globals.userBloc!.add(
-                  //  FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
+                   globals.userBloc!.add(
+                    FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
                 }*/
               },
               builder: (context, state) {

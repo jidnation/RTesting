@@ -142,9 +142,10 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
 }
 
 class PlayAudio extends StatefulWidget {
-  const PlayAudio({Key? key, this.audioFile}) : super(key: key);
+  const PlayAudio({Key? key, this.audioFile, required this.isMe})
+      : super(key: key);
   final String? audioFile;
-
+  final bool isMe;
   @override
   State<PlayAudio> createState() => _PlayAudioState();
 }
@@ -166,7 +167,10 @@ class _PlayAudioState extends State<PlayAudio> {
 
   void _initaliseController() async {
     final res = await _mediaService.downloadFile(url: widget.audioFile!);
-    if (res == null) return;
+    if (res == null) {
+      print("THE URL FIELD IS NULL!!!!");
+      return;
+    }
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
@@ -214,30 +218,43 @@ class _PlayAudioState extends State<PlayAudio> {
               });
             },
             icon: isPlaying
-                ? const Icon(
+                ? Icon(
                     Icons.play_arrow,
-                    size: 40,
+                    size: 30,
+                    color: widget.isMe ? Colors.white : Colors.blue,
                   )
-                : const Icon(Icons.pause_circle, size: 40),
+                : Icon(
+                    Icons.pause_circle,
+                    size: 30,
+                    color: widget.isMe ? Colors.white : Colors.blue,
+                  ),
           ),
         ),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: AudioFileWaveforms(
-              size: Size(MediaQuery.of(context).size.width / 2, 30),
-              playerController: playerController,
-              density: 1.5,
-              enableSeekGesture: true,
-              playerWaveStyle: const PlayerWaveStyle(
-                scaleFactor: 0.8,
-                fixedWaveColor: Colors.grey,
-                liveWaveColor: Colors.white,
-                waveCap: StrokeCap.butt,
-              ),
-            ),
+        //Expanded(
+        // child:
+        //Container(
+        // padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        //child:
+        AudioFileWaveforms(
+          margin: const EdgeInsets.only(top: 7, bottom: 7, right: 7),
+          size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+          playerController: playerController,
+          density: 1.5,
+          enableSeekGesture: true,
+          playerWaveStyle: PlayerWaveStyle(
+            scaleFactor: 0.8,
+            fixedWaveColor: widget.isMe ? Colors.grey : Colors.lightBlueAccent,
+            liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
+            waveCap: StrokeCap.round,
           ),
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          animationDuration: const Duration(milliseconds: 1000),
         ),
+        // ),
+        //),
       ],
     );
   }

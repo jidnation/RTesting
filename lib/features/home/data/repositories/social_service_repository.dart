@@ -91,15 +91,20 @@ class SocialServiceRepository {
 
   Future<Either<String, CommentModel>> commentOnPost(
       {required String postId,
-      required String content,
+      String? content,
       required String userId,
-      required String postOwnerId}) async {
+      required String postOwnerId,
+      String? audioMediaItem,
+      List<String>? imageMediaItems,
+      }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
         content: content,
         userId: userId,
         postOwnerId: postOwnerId,
+        imageMediaItems: imageMediaItems,
+        audioMediaItem: audioMediaItem,
       );
       return Right(comment);
     } on GraphQLError catch (e) {

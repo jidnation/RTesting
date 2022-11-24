@@ -28,6 +28,7 @@ class PostMedia extends StatelessWidget {
     int nImages = (post.imageMediaItems ?? []).length;
     bool hasVideo = (post.videoMediaItem ?? '').isNotEmpty;
     bool hasAudio = (post.audioMediaItem ?? '').isNotEmpty;
+    
     if (nImages > 0) imageVideoList.addAll(post.imageMediaItems ?? []);
     if (hasVideo) imageVideoList.add(post.videoMediaItem ?? '');
     int imageVideoTotal = imageVideoList.length;
@@ -413,7 +414,7 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
           Visibility(
             child: Positioned.fill(
               child: thumbnail == null
-                  ? Align(
+                  ? const Align(
                       alignment: Alignment.center,
                       child: SizedBox(
                         child: CircularProgressIndicator(

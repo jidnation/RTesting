@@ -64,6 +64,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
+    //if (mounted)
     openAudio();
     /*focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -740,11 +741,27 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     height: 25,
                                                     color: AppColors.white,
                                                   ))),
-                                ]),
-                                //.paddingOnly(r: 15, l: 15, b: 15, t: 10),
-                                emojiShowing
-                                    ? showemoji()
-                                    : const SizedBox.shrink(),
+                                ]).paddingOnly(r: 15, l: 15, b: 15, t: 10),
+                                // emojiShowing
+                                //  ? showemoji()
+                                //: const SizedBox.shrink(),
+
+                                Offstage(
+                                  offstage: !emojiShowing,
+                                  child: SizedBox(
+                                      height: 250,
+                                      child: EmojiPicker(
+                                        config: const Config(
+                                          columns: 7,
+                                        ),
+                                        onEmojiSelected: (category, emoji) {
+                                          setState(() {
+                                            isTyping = !isTyping;
+                                          });
+
+                                        },
+                                      )),
+                                )
                                 //const Spacer(),
                               ],
                             ),
@@ -769,9 +786,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     );
   }
 
-  Widget showemoji() {
-    return Container(
-      height: 300,
+  /*Widget showemoji() {
+    return SizedBox(
+      height: 250,
       child: EmojiPicker(
         onBackspacePressed: () {
           RouteNavigators.pop(context);
@@ -816,5 +833,5 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
         },
       ),
     );
-  }
+  }*/
 }

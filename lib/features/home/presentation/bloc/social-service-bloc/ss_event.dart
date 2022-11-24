@@ -58,16 +58,17 @@ class CommentOnPostEvent extends SocialServiceEvent {
   final String? content, location;
   final String? audioMediaItem;
   final String? videoMediaItem;
-  final List<String>? imageMediaItem;
+  final List<String>? imageMediaItems;
   final String? userId;
   final String? postOwnerId;
+
   CommentOnPostEvent({
     required this.postId,
-    required this.content,
+    this.content,
     this.location,
     this.audioMediaItem,
     this.videoMediaItem,
-    this.imageMediaItem,
+    this.imageMediaItems,
     this.postOwnerId,
     required this.userId,
   });
