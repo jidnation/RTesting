@@ -58,4 +58,16 @@ class DictionaryRepository {
       return Left(e.message);
     }
   }
+
+  Future<Either<String, dynamic>> searchWords(
+      {required String wordInput}) async {
+    try {
+      final searchWords =
+          await _dictionaryDataSource.searchWords(wordInput: wordInput);
+
+      return Right(searchWords);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
 }
