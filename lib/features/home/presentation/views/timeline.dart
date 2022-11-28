@@ -33,7 +33,7 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -120,6 +120,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _userStatus = useState<List<StatusFeedModel>>([]);
     var size = MediaQuery.of(context).size;
     debugPrint(globals.token);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
@@ -854,12 +855,12 @@ class PostFeedReacherCard extends HookWidget {
                         text: TextSpan(
                             text:
                                 '@${postFeedModel!.voterProfile != null ? postFeedModel!.voterProfile!.username!.appendOverflow(15) : 'You'}',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: AppColors.black,
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500),
-                            children: [
+                            children: const [
                               TextSpan(
                                   text: ' shouted out this reach',
                                   style: TextStyle(
@@ -872,7 +873,7 @@ class PostFeedReacherCard extends HookWidget {
                     SizedBox(
                       height: getScreenHeight(8),
                     ),
-                    Divider(
+                    const Divider(
                       height: 1,
                       thickness: 1,
                     ),
@@ -1031,7 +1032,11 @@ class PostFeedReacherCard extends HookWidget {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return const DictionaryDialog();
+                              return DictionaryDialog(
+                                abbr: value,
+                                meaning: '',
+                                word: '',
+                              );
                             });
                         print('Tapped Url');
                       },

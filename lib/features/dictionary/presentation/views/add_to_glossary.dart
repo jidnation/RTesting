@@ -124,7 +124,7 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                                   } else {
                                     return;
                                   }
-                                }
+                                 }
                               : () {},
                         )
                       ],

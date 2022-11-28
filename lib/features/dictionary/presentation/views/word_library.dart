@@ -27,7 +27,7 @@ class _WordLibraryState extends State<WordLibrary> {
     final _recentWords = useState<List<GetRecentlyAddedWord>>([]);
     useMemoized(() {
       globals.dictionaryBloc!
-          .add(GetRecentAddedWordsEvent(pageLimit: 50, pageNumber: 1));
+          .add(GetRecentAddedWordsEvent(pageLimit: 10000, pageNumber: 1));
     });
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
