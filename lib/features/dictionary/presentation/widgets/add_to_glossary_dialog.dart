@@ -1,125 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
+import 'package:reach_me/core/utils/validator.dart';
+import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_textbox.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/search_custom_button.dart';
 
-import '../../dictionary_bloc/bloc/dictionary_bloc.dart';
-
-class DictionaryDialog extends StatefulHookWidget {
-  const DictionaryDialog({Key? key}) : super(key: key);
+class AddToGlossaryDialog extends StatefulWidget {
+  const AddToGlossaryDialog({Key? key}) : super(key: key);
 
   @override
-  State<DictionaryDialog> createState() => _DictionaryDialogState();
+  State<AddToGlossaryDialog> createState() => _AddToGlossaryDialogState();
 }
 
-class _DictionaryDialogState extends State<DictionaryDialog> {
+class _AddToGlossaryDialogState extends State<AddToGlossaryDialog> {
+  TextEditingController abbrController = TextEditingController();
+  TextEditingController wordController = TextEditingController();
+  TextEditingController languageController = TextEditingController();
+  TextEditingController meaningController = TextEditingController();
+  final _formValidationKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    final recentWords = ValueNotifier<List<GetRecentlyAddedWord>>([]);
-
-    useMemoized(() {
-      globals.dictionaryBloc!
-          .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
-    });
     return AlertDialog(
-      title: const Text('Word Library'),
-      content: SizedBox(
-        width: double.minPositive,
-        child: BlocConsumer<DictionaryBloc, DictionaryState>(
-          bloc: globals.dictionaryBloc,
-          listener: (context, state) {
-            if (state is GetRecentlyAddedWordsSuccess) {
-              recentWords.value = state.data!;
-            }
-            if (state is DisplayRecentlyAddedWordsError) {
-              Snackbars.error(context, message: state.error);
-            }
-          },
-          builder: (context, state) {
-            bool _isLoading = state is LoadingRecentlyAddedWords;
-            return _isLoading
-                ? const CircularLoader()
-                : recentWords.value.isEmpty
-                    ? const Center(child: Text('No Recent Words'))
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  hintText: 'Search',
-                                  prefixIcon: const Icon(Icons.search),
-                                  hintStyle:
-                                      const TextStyle(color: Color(0xffCECECE)),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                onChanged: searchWord,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: recentWords.value.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  title: RichText(
-                                    text: TextSpan(
-                                      style:
-                                          const TextStyle(color: Colors.black),
-                                      children: [
-                                        TextSpan(
-                                            text:
-                                                '${recentWords.value[index].abbr} : ',
-                                            style: const TextStyle(
-                                                color: Colors.blue)),
-                                        TextSpan(
-                                            text:
-                                                '${recentWords.value[index].word}',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    recentWords.value[index].meaning.toString(),
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-          },
-        ),
+      title: const Text('Add to Dictionary'),
+      content: BlocConsumer<DictionaryBloc, DictionaryState>(
+        bloc: globals.dictionaryBloc,
+        listener: (context, state) {
+          if (state is AddedToDBState) {
+            Snackbars.success(context, message: 'Added to dictionary');
+            RouteNavigators.pop(context);
+          } else if (state is ErrorState) {
+            Snackbars.error(context, message: state.error);
+          }
+        },
+        builder: (context, state) {
+          bool _isLoading = state is AddingToDBState;
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 68.0),
+                child: Form(
+                  key: _formValidationKey,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      AddToGlossaryTextBox(
+                        controller: abbrController,
+                        height: 80,
+                        hintText: 'Abbreviaton',
+                        validator: (value) =>
+                            Validator.validateText(value ?? ''),
+                      ),
+                      AddToGlossaryTextBox(
+                        controller: wordController,
+                        hintText: 'word',
+                        validator: (value) =>
+                            Validator.validateText(value ?? ''),
+                      ),
+                      AddToGlossaryTextBox(
+                        controller: languageController,
+                        hintText: 'Language',
+                        validator: (value) =>
+                            Validator.validateText(value ?? ''),
+                      ),
+                      AddToGlossaryTextBox(
+                        controller: meaningController,
+                        hintText: 'Meaning',
+                        maxLines: 5,
+                        validator: (value) =>
+                            Validator.validateText(value ?? ''),
+                      ),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      CustomButton(
+                        isLoading: _isLoading,
+                        buttonText: 'Save',
+                        onPressed: !_isLoading
+                            ? () {
+                                if (_formValidationKey.currentState!
+                                    .validate()) {
+                                  globals.dictionaryBloc!
+                                      .add(SaveDataToGlossaryEvent(
+                                    abbr: abbrController.text,
+                                    language: languageController.text,
+                                    meaning: meaningController.text,
+                                    word: wordController.text,
+                                  ));
+                                } else {
+                                  return;
+                                }
+                              }
+                            : () {},
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
-
-    
   }
-
-  
 }
-void searchWord(String? word) {
-    // final suggestions = recentWords .where((recentWords.value) {
-    //   final text = recentWords.value.toLowerCase();
-    //   final textInput = word.toLowerCase();
-    //   return suggestions.contains(textInput);
-    // }).toList();
-   
-  }

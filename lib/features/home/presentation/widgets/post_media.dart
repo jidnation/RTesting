@@ -566,8 +566,6 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   }
 }
 
-
-
 class PostAudioMedia extends StatefulWidget {
   final String path;
   final EdgeInsets? margin, padding;
@@ -638,6 +636,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
               if (isPlaying) {
                 playerController!.pausePlayer();
               } else {
+                playerController!.stopAllPlayers();
                 playerController!.startPlayer();
               }
             },

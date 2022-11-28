@@ -25,6 +25,7 @@ import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dar
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
+import 'package:reach_me/features/dictionary/presentation/views/add_to_glossary.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
@@ -99,7 +100,7 @@ class _PostReachState extends State<PostReach> {
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     useMemoized(() {
       globals.dictionaryBloc!
-          .add(AddWordsToMentionsEvent(pageLimit: 100, pageNumber: 1));
+          .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
     });
 
     var size = MediaQuery.of(context).size;
@@ -307,10 +308,7 @@ class _PostReachState extends State<PostReach> {
                           key: controllerKey,
                           maxLengthEnforcement: MaxLengthEnforcement.enforced,
                           // minLines: null,
-                          maxLines: null,
-                          inputFormatters: [
-                            MaxWordTextInputFormatter(maxWords: 200)
-                          ],
+
                           suggestionPosition: SuggestionPosition.Bottom,
                           onChanged: (val) {
                             counter.value = val
@@ -349,41 +347,59 @@ class _PostReachState extends State<PostReach> {
                                     padding: const EdgeInsets.all(10.0),
                                     child: _isLoading.value
                                         ? const CircularProgressIndicator()
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const SizedBox(
-                                                width: 20.0,
-                                              ),
-                                              Column(
+                                        : _recentWords.value.isEmpty
+                                            ? TextButton(
+                                                onPressed: () {
+                                                  // showDialog(
+                                                  //     context: context,
+                                                  //     builder: (BuildContext
+                                                  //         context) {
+                                                  //       return const AddToGlossaryDialog();
+                                                  //     });
+                                                  // Navigator.pop(context);
+                                                  RouteNavigators.route(context,
+                                                      const AddToGlossary());
+                                                },
+                                                child: const Text(
+                                                    'Add to glossary'))
+                                            : Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    '#${data['display']}',
-                                                    style: const TextStyle(
-                                                        fontSize: 10,
-                                                        color:
-                                                            Colors.blueAccent),
+                                                  const SizedBox(
+                                                    width: 20.0,
                                                   ),
-                                                  Text(
-                                                    data['meaning'],
-                                                    textAlign: TextAlign.left,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                        fontSize: 10,
-                                                        color: Colors.black),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '#${data['display']}',
+                                                        style: const TextStyle(
+                                                            fontSize: 10,
+                                                            color: Colors
+                                                                .blueAccent),
+                                                      ),
+                                                      Text(
+                                                        data['meaning'],
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontSize: 10,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    ],
                                                   ),
+                                                  // IconButton(
+                                                  //   onPressed: () {},
+                                                  //   icon: const Icon(Icons.add),
+                                                  // ),
                                                 ],
                                               ),
-                                              // IconButton(
-                                              //   onPressed: () {},
-                                              //   icon: const Icon(Icons.add),
-                                              // ),
-                                            ],
-                                          ),
                                   );
                                 }),
                           ],
@@ -869,13 +885,13 @@ class _PostReachState extends State<PostReach> {
                             }
                           },
                           itemBuilder: (context) => [
-                            PopupMenuItem(
+                            const PopupMenuItem(
                                 value: 1,
                                 child: Text(
                                   'Upload',
                                   style: TextStyle(color: AppColors.black),
                                 )),
-                            PopupMenuItem(
+                            const PopupMenuItem(
                                 value: 2,
                                 child: Text(
                                   'Record',

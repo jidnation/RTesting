@@ -22,16 +22,64 @@ class PostSchema {
             postId
             postRating
             postSlug
-            profile {
-              ''' +
+            postOwnerProfile {''' +
         PostProfileSchema.schema +
-        '''
-            }
+        ''' }
+         repostedPost {''' +
+        RepostedPostSchema.schema +
+        ''' }
+              repostedPostId
+              repostedPostOwnerId
+              repostedPostOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
             updated_at
             videoMediaItem
         ''';
   }
 }
+
+class RepostedPostSchema {
+  RepostedPostSchema._();
+
+  static String get schema {
+    return r'''
+            audioMediaItem
+            commentOption
+            content
+            created_at
+            edited
+            hashTags
+            imageMediaItems
+            isLiked
+            isRepost
+            isVoted
+            location
+            mentionList
+            nComments
+            nLikes
+            nDownvotes
+            nUpvotes
+            postId
+            postRating
+            postSlug
+            postOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+              repostedPostId
+              repostedPostOwnerId
+              repostedPostOwnerProfile {''' +
+        PostProfileSchema.schema +
+        ''' }
+            updated_at
+            videoMediaItem
+        ''';
+  }
+}
+
+// repostedPost {''' +
+//         PostSchema.schema +
+//         ''' }
 
 // repostedPost {''' +
 //         PostSchema.schema +
@@ -147,24 +195,10 @@ class PostFeedSchema {
               feedOwnerProfile {''' +
         PostProfileSchema.schema +
         ''' }
-              isLiked
-              isRepost
-              isVoted
               post {''' +
         PostSchema.schema +
         ''' }
-              postOwnerProfile {''' +
-        PostProfileSchema.schema +
-        ''' }
               reachingRelationship
-              repostedPost {''' +
-        PostSchema.schema +
-        ''' }
-              repostedPostId
-              repostedPostOwnerId
-              repostedPostOwnerProfile {''' +
-        PostProfileSchema.schema +
-        ''' }
               updated_at
               voterProfile {''' +
         PostProfileSchema.schema +

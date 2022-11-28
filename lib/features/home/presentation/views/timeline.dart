@@ -33,7 +33,7 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -45,7 +45,7 @@ import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/helper/logger.dart';
+import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
 
@@ -112,6 +112,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     super.build(context);
 
     final reachDM = useState(false);
+    final viewProfile = useState(false);
     final shoutingDown = useState(false);
     final _posts = useState<List<PostFeedModel>>([]);
     final _currentPost = useState<PostFeedModel?>(null);
@@ -198,10 +199,31 @@ class _TimelineScreenState extends State<TimelineScreen>
                   reachDM.value = false;
                   RouteNavigators.route(
                       context, MsgChatInterface(recipientUser: state.user));
+                } else if (viewProfile.value) {
+                  viewProfile.value = false;
+                  ProgressHUD.of(context)?.dismiss();
+                  globals.recipientUser = state.user;
+                  state.user!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: 'email',
+                            recipientImageUrl: state.user!.profilePicture,
+                            recipientId: state.user!.id,
+                          ));
                 }
               }
               if (state is UserError) {
+                ProgressHUD.of(context)?.dismiss();
+                if (viewProfile.value) {
+                  Snackbars.error(context,
+                      message: (state.error ?? '').contains('Profile')
+                          ? 'Account not available!'
+                          : state.error);
+                }
                 reachDM.value = false;
+                viewProfile.value = false;
               }
               if (state is GetReachRelationshipSuccess) {
                 if (shoutingDown.value) {
@@ -307,9 +329,26 @@ class _TimelineScreenState extends State<TimelineScreen>
                     _refreshController.refreshCompleted();
                   }
 
-                  if (state is LikePostSuccess || state is UnlikePostSuccess) {
-                    globals.socialServiceBloc!
-                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  if (state is UnlikePostSuccess) {}
+
+                  if (state is LikePostSuccess) {}
+
+                  if (state is UnlikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _posts.value[pos].post?.isLiked = true;
+                    _posts.value[pos].post?.nLikes =
+                        (_posts.value[pos].post?.nLikes ?? 0) + 1;
+                  }
+
+                  if (state is LikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _posts.value[pos].post?.isLiked = false;
+                    _posts.value[pos].post?.nLikes =
+                        (_posts.value[pos].post?.nLikes ?? 1) - 1;
                   }
 
                   if (state is DeletePostSuccess) {
@@ -343,6 +382,11 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
                 },
                 builder: (context, state) {
+                  bool _isLoading = state is CreatePostLoading;
+                  _isLoading = state is GetPostFeedLoading;
+                  _isLoading = state is DeletePostLoading;
+                  _isLoading = state is EditContentLoading;
+
                   bool _likingPost = state is LikePostLoading;
                   bool _unLikingPost = state is UnlikePostLoading;
                   // _likingPost = state is GetPostFeedLoading;
@@ -380,10 +424,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         SizedBox(
                                             height: kToolbarHeight +
                                                 getScreenHeight(22)), //30
-                                        state is CreatePostLoading ||
-                                                state is GetPostFeedLoading ||
-                                                state is DeletePostLoading ||
-                                                state is EditContentLoading
+                                        _isLoading
                                             ? const LinearLoader()
                                             : const SizedBox.shrink(),
                                         Visibility(
@@ -497,8 +538,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                         SizedBox(
                                           child: _posts.value.isEmpty
                                               ? EmptyTimelineWidget(
-                                                  loading: state
-                                                      is GetPostFeedLoading)
+                                                  loading: _isLoading)
                                               : ListView.builder(
                                                   shrinkWrap: true,
                                                   padding: EdgeInsets.zero,
@@ -512,16 +552,18 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       likingPost: false,
                                                       postFeedModel:
                                                           _posts.value[index],
-                                                      isLiked: _posts
-                                                              .value[index]
-                                                              .like!
-                                                              .isNotEmpty
+                                                      isLiked: (_posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false)
                                                           ? true
                                                           : false,
-                                                      isVoted: _posts
-                                                              .value[index]
-                                                              .vote!
-                                                              .isNotEmpty
+                                                      isVoted: (_posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isVoted ??
+                                                              false)
                                                           ? true
                                                           : false,
                                                       voteType: _posts
@@ -531,6 +573,19 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           ? _posts.value[index]
                                                               .vote![0].voteType
                                                           : null,
+                                                      onViewProfile: () {
+                                                        viewProfile.value =
+                                                            true;
+                                                        ProgressHUD.of(context)
+                                                            ?.showWithText(
+                                                                'Viewing Profile');
+                                                        globals.userBloc!.add(
+                                                            GetRecipientProfileEvent(
+                                                                email: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postOwnerId));
+                                                      },
                                                       onMessage: () {
                                                         HapticFeedback
                                                             .mediumImpact();
@@ -600,32 +655,38 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                       .postOwnerId,
                                                                   type: ReachRelationshipType
                                                                       .reacher));
-                                                          // globals
-                                                          //     .socialServiceBloc!
-                                                          //     .add(
-                                                          //         VotePostEvent(
-                                                          //   voteType:
-                                                          //       'Downvote',
-                                                          //   postId: _posts
-                                                          //       .value[index]
-                                                          //       .postId,
-                                                          // ));
                                                         }
                                                       },
                                                       onLike: () {
                                                         HapticFeedback
                                                             .mediumImpact();
                                                         handleTap(index);
-                                                        Console.log(
-                                                            'Like Data',
-                                                            _posts.value[index]
-                                                                .toJson());
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
                                                         if (active
                                                             .contains(index)) {
                                                           if (_posts
-                                                              .value[index]
-                                                              .like!
-                                                              .isNotEmpty) {
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false) {
+                                                            _posts
+                                                                    .value[index]
+                                                                    .post
+                                                                    ?.isLiked =
+                                                                false;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    1) -
+                                                                1;
                                                             globals
                                                                 .socialServiceBloc!
                                                                 .add(
@@ -635,6 +696,20 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .postId,
                                                             ));
                                                           } else {
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.isLiked = true;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    0) +
+                                                                1;
                                                             globals
                                                                 .socialServiceBloc!
                                                                 .add(
@@ -710,7 +785,7 @@ class PostFeedReacherCard extends HookWidget {
     this.onLike,
     this.onMessage,
     this.onUpvote,
-    this.routeProfile,
+    this.onViewProfile,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
@@ -718,7 +793,7 @@ class PostFeedReacherCard extends HookWidget {
 
   final PostFeedModel? postFeedModel;
   final bool likingPost;
-  final Function()? onLike, onMessage, onUpvote, onDownvote, routeProfile;
+  final Function()? onLike, onMessage, onUpvote, onDownvote, onViewProfile;
   final bool isLiked, isVoted;
   final String? voteType;
 
@@ -770,7 +845,7 @@ class PostFeedReacherCard extends HookWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Visibility(
-                visible: (postFeedModel!.isVoted ?? '') == 'Upvote',
+                visible: (postFeedModel!.post?.isVoted ?? '') == 'Upvote',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -780,12 +855,12 @@ class PostFeedReacherCard extends HookWidget {
                         text: TextSpan(
                             text:
                                 '@${postFeedModel!.voterProfile != null ? postFeedModel!.voterProfile!.username!.appendOverflow(15) : 'You'}',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: AppColors.black,
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500),
-                            children: [
+                            children: const [
                               TextSpan(
                                   text: ' shouted out this reach',
                                   style: TextStyle(
@@ -798,7 +873,7 @@ class PostFeedReacherCard extends HookWidget {
                     SizedBox(
                       height: getScreenHeight(8),
                     ),
-                    Divider(
+                    const Divider(
                       height: 1,
                       thickness: 1,
                     ),
@@ -809,142 +884,108 @@ class PostFeedReacherCard extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
-                  CupertinoButton(
-                    minSize: 0,
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      final progress = ProgressHUD.of(context);
-                      progress?.showWithText('Viewing Reacher...');
-                      Future.delayed(const Duration(seconds: 3), () {
-                        globals.userBloc!.add(GetRecipientProfileEvent(
-                            email: postFeedModel!.postOwnerId));
-                        postFeedModel!.postOwnerId == globals.user!.id
-                            ? RouteNavigators.route(
-                                context, const AccountScreen())
-                            : RouteNavigators.route(
-                                context,
-                                RecipientAccountProfile(
-                                  recipientEmail: 'email',
-                                  recipientImageUrl:
-                                      postFeedModel!.profilePicture,
-                                  recipientId: postFeedModel!.postOwnerId,
-                                ));
-                        progress?.dismiss();
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Helper.renderProfilePicture(
-                          postFeedModel!.profilePicture,
-                          size: 33,
-                        ).paddingOnly(l: 13, t: 10),
-                        SizedBox(width: getScreenWidth(9)),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '@${postFeedModel!.username!}',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(14),
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textColor2,
-                                  ),
-                                ),
-                                const SizedBox(width: 3),
-                                postFeedModel!.verified!
-                                    ? SvgPicture.asset(
-                                        'assets/svgs/verified.svg')
-                                    : const SizedBox.shrink()
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: () =>
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (builder) => FullPostScreen(
-                                            postFeedModel: postFeedModel,
-                                          ))),
-                              child: Row(
+                  Expanded(
+                    child: CupertinoButton(
+                      minSize: 0,
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        if (onViewProfile != null) {
+                          onViewProfile!();
+                        } else {
+                          final progress = ProgressHUD.of(context);
+                          progress?.showWithText('Viewing Reacher...');
+                          Future.delayed(const Duration(seconds: 3), () {
+                            globals.userBloc!.add(GetRecipientProfileEvent(
+                                email: postFeedModel!.postOwnerId));
+                            postFeedModel!.postOwnerId == globals.user!.id
+                                ? RouteNavigators.route(
+                                    context, const AccountScreen())
+                                : RouteNavigators.route(
+                                    context,
+                                    RecipientAccountProfile(
+                                      recipientEmail: 'email',
+                                      recipientImageUrl:
+                                          postFeedModel!.profilePicture,
+                                      recipientId: postFeedModel!.postOwnerId,
+                                    ));
+                            progress?.dismiss();
+                          });
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                            postFeedModel!.profilePicture,
+                            size: 33,
+                          ).paddingOnly(l: 13, t: 10),
+                          SizedBox(width: getScreenWidth(9)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
                                 children: [
-                                  postFeedModel!.post!.location! == 'nil' ||
-                                          postFeedModel!.post!.location! ==
-                                              'NIL'
-                                      ? const SizedBox.shrink()
-                                      : SizedBox(
-                                          width: 93,
-                                          child: Text(
-                                            postFeedModel!.post!.location!,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(10),
-                                              fontFamily: 'Poppins',
-                                              letterSpacing: 0.4,
-                                              fontWeight: FontWeight.w400,
-                                              color: AppColors.textColor2,
-                                            ),
-                                          ),
-                                        ),
                                   Text(
-                                    postDuration,
+                                    '@${postFeedModel!.username!}',
                                     style: TextStyle(
-                                      fontSize: getScreenHeight(10),
+                                      fontSize: getScreenHeight(14),
                                       fontFamily: 'Poppins',
-                                      letterSpacing: 0.4,
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
                                       color: AppColors.textColor2,
                                     ),
-                                  ).paddingOnly(l: 4),
-
+                                  ),
+                                  const SizedBox(width: 3),
+                                  postFeedModel!.verified!
+                                      ? SvgPicture.asset(
+                                          'assets/svgs/verified.svg')
+                                      : const SizedBox.shrink()
                                 ],
                               ),
-                              // GestureDetector(
-                              //   onTap: () => Navigator.of(context)
-                              //       .push(MaterialPageRoute(
-                              //           builder: (builder) => FullPostScreen(
-                              //                 postFeedModel: postFeedModel,
-                              //               ))),
-                              //   child: Row(
-                              //     children: [
-                              //       Text(
-                              //         postFeedModel!.post!.location! == 'nil'
-                              //             ? ''
-                              //             : postFeedModel!
-                              //                         .post!.location!.length >
-                              //                     23
-                              //                 ? postFeedModel!.post!.location!
-                              //                     .substring(0, 23)
-                              //                 : postFeedModel!.post!.location!,
-                              //         style: TextStyle(
-                              //           fontSize: getScreenHeight(10),
-                              //           fontFamily: 'Poppins',
-                              //           letterSpacing: 0.4,
-                              //           fontWeight: FontWeight.w400,
-                              //           color: AppColors.textColor2,
-                              //         ),
-                              //       ),
-                              //       Text(
-                              //         postDuration,
-                              //         style: TextStyle(
-                              //           fontSize: getScreenHeight(10),
-                              //           fontFamily: 'Poppins',
-                              //           letterSpacing: 0.4,
-                              //           fontWeight: FontWeight.w400,
-                              //           color: AppColors.textColor2,
-                              //         ),
-                              //       ).paddingOnly(l: 6),
-                              //     ],
-                              //   ),
-                              // )
-                            )],
-                            ).paddingOnly(t: 10),
+                              GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                        builder: (builder) => FullPostScreen(
+                                              postFeedModel: postFeedModel,
+                                            ))),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      postFeedModel!.post!.location! == 'nil'
+                                          ? ''
+                                          : postFeedModel!
+                                                      .post!.location!.length >
+                                                  23
+                                              ? postFeedModel!.post!.location!
+                                                  .substring(0, 23)
+                                              : postFeedModel!.post!.location!,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                                    Text(
+                                      postDuration,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ).paddingOnly(l: 6),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ).paddingOnly(t: 10),
                         ],
                       ),
                     ),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -991,7 +1032,11 @@ class PostFeedReacherCard extends HookWidget {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return const DictionaryDialog();
+                              return DictionaryDialog(
+                                abbr: value,
+                                meaning: '',
+                                word: '',
+                              );
                             });
                         print('Tapped Url');
                       },
@@ -1091,11 +1136,9 @@ class PostFeedReacherCard extends HookWidget {
                               ),
                             ),
                           ),
-                          if (postFeedModel!.postOwnerId !=
-                              postFeedModel!.feedOwnerId)
+                          if (postFeedModel!.postOwnerId != globals.userId)
                             SizedBox(width: getScreenWidth(15)),
-                          if (postFeedModel!.postOwnerId !=
-                              postFeedModel!.feedOwnerId)
+                          if (postFeedModel!.postOwnerId != globals.userId)
                             CupertinoButton(
                               minSize: 0,
                               onPressed: onMessage,

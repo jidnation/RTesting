@@ -4,57 +4,24 @@
 // class ReusableAudioController{
 //
 //   final PlayerController _playerController = ;
-//   final PlayerController _usedController = [];
-//   bool isListPlaying = false;
+//   bool _isBeingUsed = false;
+//   bool isPlaying = false;
 //   // final BetterPlayerController? _activePlayer;
 //
-//   ReusableVideoListController() {
-//     for (int index = 0; index < 2; index++) {
-//       _betterPlayerControllerRegistry.add(
-//         BetterPlayerController(
-//           BetterPlayerConfiguration(
-//             handleLifecycle: true,
-//             autoDispose: false,
-//             fit: BoxFit.contain,
-//             autoPlay: false,
-//             expandToFill: true,
-//             looping: true,
-//             autoDetectFullscreenAspectRatio: true,
-//             controlsConfiguration: BetterPlayerControlsConfiguration(
-//                 showControlsOnInitialize: false,
-//                 enableSkips: false,
-//                 enableOverflowMenu: true,
-//                 playIcon: Icons.play_arrow_sharp,
-//                 enableQualities: true,
-//                 enableSubtitles: false,
-//                 controlBarColor: Colors.black.withOpacity(0.3)),
-//           ),
-//         ),
-//       );
-//     }
+//   ReusableAudioController() {
+//
 //   }
 //
-//   BetterPlayerController? getBetterPlayerController() {
-//     // return _betterPlayerControllerRegistry[0];
-//     final freeController = _betterPlayerControllerRegistry.firstWhereOrNull(
-//             (controller) =>
-//         !_usedBetterPlayerControllerRegistry.contains(controller));
-//
-//     if (freeController != null) {
-//       _usedBetterPlayerControllerRegistry.add(freeController);
+//   PlayerController? getAudioPlayerController() {
+//     if (_isBeingUsed) {
+//       _isBeingUsed = true;
 //     }
-//     // else {
-//     //   //  pausePlayingVideos();
-//     //   //  freeBetterPlayerController();
-//     //    return _usedBetterPlayerControllerRegistry[0];
-//     // }
-//
-//     return freeController;
+//     return _playerController;
 //   }
 //
-//   void freeBetterPlayerController(
-//       BetterPlayerController? betterPlayerController) {
-//     _usedBetterPlayerControllerRegistry.remove(betterPlayerController);
+//   void freeAudioPlayerController() {
+//     _isBeingUsed = false;
+//     _playerController.stopAllPlayers();
 //   }
 //
 //   Future<bool> pausePlayingVideos() async {

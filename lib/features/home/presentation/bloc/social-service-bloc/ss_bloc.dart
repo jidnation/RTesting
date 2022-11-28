@@ -81,11 +81,12 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           postId: event.postId!,
         );
         response.fold(
-          (error) => emit(LikePostError(error: error)),
-          (postLike) => emit(LikePostSuccess(isLiked: postLike)),
+          (error) => emit(LikePostError(error: error, postId: event.postId!)),
+          (postLike) =>
+              emit(LikePostSuccess(isLiked: postLike, postId: event.postId)),
         );
       } on GraphQLError catch (e) {
-        emit(LikePostError(error: e.message));
+        emit(LikePostError(error: e.message, postId: event.postId!));
       }
     });
     on<UnlikePostEvent>((event, emit) async {
@@ -95,11 +96,18 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           postId: event.postId!,
         );
         response.fold(
-          (error) => emit(UnlikePostError(error: error)),
-          (isUnliked) => emit(UnlikePostSuccess(isUnliked: isUnliked)),
+          (error) => emit(UnlikePostError(
+            error: error,
+            postId: event.postId!,
+          )),
+          (isUnliked) => emit(
+              UnlikePostSuccess(isUnliked: isUnliked, postId: event.postId)),
         );
       } on GraphQLError catch (e) {
-        emit(UnlikePostError(error: e.message));
+        emit(UnlikePostError(
+          error: e.message,
+          postId: event.postId!,
+        ));
       }
     });
     on<CommentOnPostEvent>((event, emit) async {
