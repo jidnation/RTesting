@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:location/location.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart' as permit;
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
@@ -25,12 +23,10 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
-import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
@@ -464,12 +460,11 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                   },
                                                 );
                                               },
-                                                  child: SvgPicture.asset(
-                                                  'assets/svgs/gallery.svg',
-                                                  //width: 25,
-                                                  //height: 20,
-                                                ).paddingAll(10),
-                                              
+                                              child: SvgPicture.asset(
+                                                'assets/svgs/gallery.svg',
+                                                //width: 25,
+                                                //height: 20,
+                                              ).paddingAll(10),
                                             ),
                                             prefixIcon: !isRecording
                                                 ? Row(
@@ -583,7 +578,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                           await getTemporaryDirectory();
                                                       var path =
                                                           '${tempDir.path}/flutter_sound.aac';
-                              
+
                                                       if (!isRecordingInit) {
                                                         return;
                                                       }
@@ -592,7 +587,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                             .stopRecorder();
                                                         print(path);
                                                         File audioMessage = File(path);
-                              
+
                                                         /*globals.chatBloc!.add(
                                                             UploadImageFileEvent(
                                                                 file: audioMessage));*/
@@ -604,7 +599,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       }
                                                       setState(() {
                                                         isRecording = !isRecording;
-                              
+
                                                       });*/
                                                 var tempDir =
                                                     await getTemporaryDirectory();
@@ -849,7 +844,8 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                               Row(
                                 children: [
                                   Helper.renderProfilePicture(
-                                    widget.post.profile!.profilePicture,
+                                    widget
+                                        .post.postOwnerProfile!.profilePicture,
                                     size: 35,
                                   ),
                                   SizedBox(width: getScreenHeight(12)),
@@ -859,7 +855,7 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '@${widget.post.profile!.username!}',
+                                        '@${widget.post.postOwnerProfile!.username!}',
                                         style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           color: AppColors.textColor2,
@@ -956,7 +952,6 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                           }
                                         },
                                       );
-                                   
                                     },
                                   ),
                           ),
