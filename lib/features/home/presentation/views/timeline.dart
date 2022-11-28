@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
@@ -33,7 +32,7 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -780,12 +779,12 @@ class PostFeedReacherCard extends HookWidget {
                         text: TextSpan(
                             text:
                                 '@${postFeedModel!.voterProfile != null ? postFeedModel!.voterProfile!.username!.appendOverflow(15) : 'You'}',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: AppColors.black,
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500),
-                            children: [
+                            children: const [
                               TextSpan(
                                   text: ' shouted out this reach',
                                   style: TextStyle(
@@ -798,7 +797,7 @@ class PostFeedReacherCard extends HookWidget {
                     SizedBox(
                       height: getScreenHeight(8),
                     ),
-                    Divider(
+                    const Divider(
                       height: 1,
                       thickness: 1,
                     ),
@@ -809,7 +808,6 @@ class PostFeedReacherCard extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   CupertinoButton(
                     minSize: 0,
                     padding: EdgeInsets.zero,
@@ -899,7 +897,6 @@ class PostFeedReacherCard extends HookWidget {
                                       color: AppColors.textColor2,
                                     ),
                                   ).paddingOnly(l: 4),
-
                                 ],
                               ),
                               // GestureDetector(
@@ -940,11 +937,12 @@ class PostFeedReacherCard extends HookWidget {
                               //     ],
                               //   ),
                               // )
-                            )],
-                            ).paddingOnly(t: 10),
-                        ],
-                      ),
+                            )
+                          ],
+                        ).paddingOnly(t: 10),
+                      ],
                     ),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -991,7 +989,11 @@ class PostFeedReacherCard extends HookWidget {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return const DictionaryDialog();
+                              return  DictionaryDialog(
+                                abbr: value,
+                                meaning: '',
+                                word: '',
+                              );
                             });
                         print('Tapped Url');
                       },
