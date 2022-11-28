@@ -336,7 +336,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                     Snackbars.error(context, message: state.error);
                     int pos = _posts.value
                         .indexWhere((e) => e.postId == state.postId);
-                    _posts.value[pos].isLiked = true;
+                    _posts.value[pos].post?.isLiked = true;
                     _posts.value[pos].post?.nLikes =
                         (_posts.value[pos].post?.nLikes ?? 0) + 1;
                   }
@@ -345,7 +345,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                     Snackbars.error(context, message: state.error);
                     int pos = _posts.value
                         .indexWhere((e) => e.postId == state.postId);
-                    _posts.value[pos].isLiked = false;
+                    _posts.value[pos].post?.isLiked = false;
                     _posts.value[pos].post?.nLikes =
                         (_posts.value[pos].post?.nLikes ?? 1) - 1;
                   }
@@ -553,16 +553,16 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           _posts.value[index],
                                                       isLiked: (_posts
                                                                   .value[index]
-                                                                  .isLiked ??
+                                                                  .post
+                                                                  ?.isLiked ??
                                                               false)
                                                           ? true
                                                           : false,
                                                       isVoted: (_posts
-                                                                      .value[
-                                                                          index]
-                                                                      .isVoted ??
-                                                                  '')
-                                                              .isNotEmpty
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isVoted ??
+                                                              false)
                                                           ? true
                                                           : false,
                                                       voteType: _posts
@@ -668,10 +668,13 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             .contains(index)) {
                                                           if (_posts
                                                                   .value[index]
-                                                                  .isLiked ??
+                                                                  .post
+                                                                  ?.isLiked ??
                                                               false) {
-                                                            _posts.value[index]
-                                                                    .isLiked =
+                                                            _posts
+                                                                    .value[index]
+                                                                    .post
+                                                                    ?.isLiked =
                                                                 false;
                                                             _posts
                                                                 .value[index]
@@ -692,8 +695,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .postId,
                                                             ));
                                                           } else {
-                                                            _posts.value[index]
-                                                                .isLiked = true;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.isLiked = true;
                                                             _posts
                                                                 .value[index]
                                                                 .post
@@ -839,7 +844,7 @@ class PostFeedReacherCard extends HookWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Visibility(
-                visible: (postFeedModel!.isVoted ?? '') == 'Upvote',
+                visible: (postFeedModel!.post?.isVoted ?? '') == 'Upvote',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

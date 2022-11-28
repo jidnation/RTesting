@@ -1484,7 +1484,7 @@ class _ReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '@${postModel!.profile!.username}',
+                                    '@${postModel!.postOwnerProfile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w500,

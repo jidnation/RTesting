@@ -737,6 +737,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     child: likePost.value ||
                                                             widget
                                                                 .postFeedModel!
+                                                                .post!
                                                                 .isLiked!
                                                         ? SvgPicture.asset(
                                                             'assets/svgs/like-active.svg',
@@ -1144,11 +1145,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   .isNotEmpty) {
                                                 globals.socialServiceBloc!.add(
                                                     UnlikeCommentOnPostEvent(
-                                                      commentId: comments
-                                                          .value[index].commentId,
-                                                      postId: comments
-                                                          .value[index].postId, likeId: '',
-                                                    ));
+                                                  commentId: comments
+                                                      .value[index].commentId,
+                                                  postId: comments
+                                                      .value[index].postId,
+                                                  likeId: '',
+                                                ));
                                                 // globals.socialServiceBloc!.add(
                                                 //     UnlikeCommentOnPostEvent(
                                                 //   commentId: comments
