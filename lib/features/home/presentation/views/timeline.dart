@@ -382,11 +382,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                   }
                 },
                 builder: (context, state) {
-                  bool _isLoading = state is CreatePostLoading;
-                  _isLoading = state is GetPostFeedLoading;
-                  _isLoading = state is DeletePostLoading;
-                  _isLoading = state is EditContentLoading;
-
+                  bool _isLoading = state is CreatePostLoading ||
+                      state is GetPostFeedLoading ||
+                      state is DeletePostLoading ||
+                      state is EditContentLoading;
                   bool _likingPost = state is LikePostLoading;
                   bool _unLikingPost = state is UnlikePostLoading;
                   // _likingPost = state is GetPostFeedLoading;
