@@ -21,7 +21,7 @@ class PostModel {
   List<PostVoteModel>? vote;
 
   bool? isLiked;
-  bool? isVoted;
+  String? isVoted;
   bool? isRepost;
   String? postRating;
   DateTime? updatedAt;
@@ -67,7 +67,7 @@ class PostModel {
       postRating: json["postRating"],
       location: json["location"],
       audioMediaItem: json["audioMediaItem"],
-      authId: json["postOwnerProfile"]["authId"],
+      authId: json["postOwnerProfile"]?["authId"],
       commentOption: json["commentOption"],
       content: json["content"],
       edited: json["edited"],

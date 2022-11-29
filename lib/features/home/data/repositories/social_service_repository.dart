@@ -89,14 +89,14 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, CommentModel>> commentOnPost(
-      {required String postId,
-      String? content,
-      required String userId,
-      required String postOwnerId,
-      String? audioMediaItem,
-      List<String>? imageMediaItems,
-      }) async {
+  Future<Either<String, CommentModel>> commentOnPost({
+    required String postId,
+    String? content,
+    required String userId,
+    required String postOwnerId,
+    String? audioMediaItem,
+    List<String>? imageMediaItems,
+  }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
         postId: postId,
@@ -314,7 +314,7 @@ class SocialServiceRepository {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
-      print("Post Feed comment options ${postFeeds[0].post!.commentOption}");
+      // print("Post Feed comment options ${postFeeds[0].post!.commentOption}");
       return Right(postFeeds);
     } on GraphQLError catch (e) {
       return Left(e.message);
