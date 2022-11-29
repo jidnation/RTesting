@@ -86,6 +86,7 @@ class DictionaryDataSource {
     }
   }
 
+//*GeT Words from database
   Future<List<Map<String, dynamic>>> getWords(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
@@ -120,6 +121,7 @@ class DictionaryDataSource {
     }
   }
 
+//* Search Words
   Future<GetWordClass> searchWords({
     required String wordInput,
   }) async {
@@ -143,10 +145,13 @@ class DictionaryDataSource {
       }
       Map<String, dynamic> getWordFromDb = result.data['getWord'];
       final res = GetWordClass.fromJson(getWordFromDb);
-      log('message>>>>>>>>> $res');
+
       return res;
     } catch (e) {
       rethrow;
     }
   }
+
+  //*Get searched Words List
+
 }
