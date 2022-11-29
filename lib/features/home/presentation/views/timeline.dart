@@ -552,6 +552,9 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       likingPost: false,
                                                       postFeedModel:
                                                           _posts.value[index],
+                                                      voterProfile: _posts
+                                                          .value[index]
+                                                          .voterProfile,
                                                       isLiked: (_posts
                                                                   .value[index]
                                                                   .post
@@ -563,16 +566,12 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   .value[index]
                                                                   .post
                                                                   ?.isVoted ??
-                                                              false)
-                                                          ? true
-                                                          : false,
+                                                              '')
+                                                          .isNotEmpty,
                                                       voteType: _posts
-                                                              .value[index]
-                                                              .vote!
-                                                              .isNotEmpty
-                                                          ? _posts.value[index]
-                                                              .vote![0].voteType
-                                                          : null,
+                                                          .value[index]
+                                                          .post
+                                                          ?.isVoted,
                                                       onViewProfile: () {
                                                         viewProfile.value =
                                                             true;
@@ -786,6 +785,7 @@ class PostFeedReacherCard extends HookWidget {
     this.onMessage,
     this.onUpvote,
     this.onViewProfile,
+    this.voterProfile,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
@@ -796,6 +796,7 @@ class PostFeedReacherCard extends HookWidget {
   final Function()? onLike, onMessage, onUpvote, onDownvote, onViewProfile;
   final bool isLiked, isVoted;
   final String? voteType;
+  final PostProfileModel? voterProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -845,7 +846,7 @@ class PostFeedReacherCard extends HookWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Visibility(
-                visible: (postFeedModel!.post?.isVoted ?? '') == 'Upvote',
+                visible: voterProfile != null,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -854,7 +855,7 @@ class PostFeedReacherCard extends HookWidget {
                       child: RichText(
                         text: TextSpan(
                             text:
-                                '@${postFeedModel!.voterProfile != null ? postFeedModel!.voterProfile!.username!.appendOverflow(15) : 'You'}',
+                                '@${voterProfile?.authId != globals.userId ? voterProfile?.username?.appendOverflow(15) : 'You'}',
                             style: const TextStyle(
                                 color: AppColors.black,
                                 fontFamily: 'Poppins',
