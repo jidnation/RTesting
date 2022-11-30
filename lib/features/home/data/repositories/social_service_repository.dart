@@ -3,6 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
+import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -35,6 +36,16 @@ class SocialServiceRepository {
           videoMediaItem: videoMediaItem,
           location: location,
           postRating: postRating);
+      return Right(post);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, PostModel>> createRepost(
+      {required CreateRepostInput input}) async {
+    try {
+      final post = await _homeRemoteDataSource.createRepost(input: input);
       return Right(post);
     } on GraphQLError catch (e) {
       return Left(e.message);

@@ -9,15 +9,14 @@ class CreatePostEvent extends SocialServiceEvent {
   final List<String>? imageMediaItem;
   final String? commentOption;
   final String? content, location, postRating;
-  CreatePostEvent({
-    this.audioMediaItem,
-    this.videoMediaItem,
-    this.imageMediaItem,
-    this.commentOption,
-    this.content,
-    this.location,
-    this.postRating
-  });
+  CreatePostEvent(
+      {this.audioMediaItem,
+      this.videoMediaItem,
+      this.imageMediaItem,
+      this.commentOption,
+      this.content,
+      this.location,
+      this.postRating});
 }
 
 class EditContentEvent extends SocialServiceEvent {
@@ -107,7 +106,8 @@ class UnlikeCommentOnPostEvent extends SocialServiceEvent {
   final String? commentId, likeId;
   UnlikeCommentOnPostEvent({
     required this.commentId,
-    required this.likeId, String? postId,
+    required this.likeId,
+    String? postId,
   });
 }
 
@@ -251,6 +251,13 @@ class ReportStatusEvent extends SocialServiceEvent {
   ReportStatusEvent({
     required this.reportReason,
     required this.statusId,
+  });
+}
+
+class CreateRepostEvent extends SocialServiceEvent {
+  final CreateRepostInput input;
+  CreateRepostEvent({
+    required this.input,
   });
 }
 

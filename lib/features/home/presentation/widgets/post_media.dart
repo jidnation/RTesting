@@ -28,7 +28,7 @@ class PostMedia extends StatelessWidget {
     int nImages = (post.imageMediaItems ?? []).length;
     bool hasVideo = (post.videoMediaItem ?? '').isNotEmpty;
     bool hasAudio = (post.audioMediaItem ?? '').isNotEmpty;
-    
+
     if (nImages > 0) imageVideoList.addAll(post.imageMediaItems ?? []);
     if (hasVideo) imageVideoList.add(post.videoMediaItem ?? '');
     int imageVideoTotal = imageVideoList.length;
@@ -615,6 +615,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
         if (mounted) setState(() {});
       }
     });
+
     await playerController!.preparePlayer(res.path);
     // await playerController.startPlayer();
     if (mounted) setState(() {});
@@ -636,7 +637,7 @@ class _PostAudioMediaState extends State<PostAudioMedia> {
               if (isPlaying) {
                 playerController!.pausePlayer();
               } else {
-                playerController!.stopAllPlayers();
+                // playerController!.stopAllPlayers();
                 playerController!.startPlayer();
               }
             },
