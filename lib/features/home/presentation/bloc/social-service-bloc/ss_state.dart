@@ -21,6 +21,20 @@ class CreatePostError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class CreateRepostLoading extends SocialServiceState {}
+
+class CreateRepostSuccess extends SocialServiceState {
+  final PostModel? post;
+  CreateRepostSuccess({this.post});
+}
+
+class CreateRepostError extends SocialServiceState {
+  final String error;
+  CreateRepostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class EditContentLoading extends SocialServiceState {}
 
 class EditContentSuccess extends SocialServiceState {
