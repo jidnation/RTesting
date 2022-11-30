@@ -6,6 +6,7 @@ import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
@@ -597,6 +598,36 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<PostModel> createRepost({required CreateRepostInput input}) async {
+    String q = r'''
+        mutation createRepost(
+          $repostBody: CreateRepostInput!
+          ) {
+          createRepost(
+            repostBody: $repostBody
+            ) {
+            ''' +
+        PostSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.mutate(
+        gql(q),
+        variables: {'repostBody': input.toJson()},
+      );
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      var post = PostModel.fromJson(result.data!['createRepost']);
+
+      return PostModel.fromJson(result.data!['createRepost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<PostModel> editContent({
     required String postId,
     required String content,
@@ -748,7 +779,7 @@ class HomeRemoteDataSource {
         variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
       }
 
-      final result = await _client.mutate(gql(q), variables: variables );
+      final result = await _client.mutate(gql(q), variables: variables);
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -758,8 +789,6 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
-
-
 
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''

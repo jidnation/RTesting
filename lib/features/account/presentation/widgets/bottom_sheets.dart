@@ -18,6 +18,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -100,7 +101,7 @@ Future showProfileMenuBottomSheet(BuildContext context,
                         onPressed: () {
                           RouteNavigators.pop(context);
                           Share.share(
-                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                              'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -297,6 +298,13 @@ Future showReacherCardBottomSheet(BuildContext context,
                                 RouteNavigators.pop(context);
                                 Share.share(
                                     'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
+                              }),
+                          KebabBottomTextButton(
+                              label: 'Repost',
+                              onPressed: () {
+                                RouteNavigators.pop(context);
+                                RouteNavigators.route(context,
+                                    CommentReach(postFeedModel: postFeedModel));
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',

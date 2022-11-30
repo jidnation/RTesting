@@ -16,6 +16,8 @@ import 'package:reach_me/features/home/data/repositories/social_service_reposito
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 
+import '../../../data/dtos/create.repost.input.dart';
+
 part 'ss_event.dart';
 part 'ss_state.dart';
 
@@ -58,6 +60,20 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(EditContentError(error: e.message));
+      }
+    });
+    on<CreateRepostEvent>((event, emit) async {
+      emit(CreateRepostLoading());
+      // Console.log('kkk', event.input.toJson());
+      try {
+        final response =
+            await socialServiceRepository.createRepost(input: event.input);
+        response.fold(
+          (error) => emit(CreateRepostError(error: error)),
+          (post) => emit(CreateRepostSuccess(post: post)),
+        );
+      } on GraphQLError catch (e) {
+        emit(CreateRepostError(error: e.message));
       }
     });
     on<DeletePostEvent>((event, emit) async {

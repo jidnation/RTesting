@@ -43,6 +43,7 @@ import 'package:reach_me/features/home/presentation/views/status/create.status.d
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../account/presentation/views/account.dart';
@@ -927,7 +928,7 @@ class PostFeedReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '@${postFeedModel!.username!}',
+                                    '@${postFeedModel!.username ?? ''}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(14),
                                       fontFamily: 'Poppins',
@@ -936,7 +937,7 @@ class PostFeedReacherCard extends HookWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 3),
-                                  postFeedModel!.verified!
+                                  postFeedModel!.verified ?? false
                                       ? SvgPicture.asset(
                                           'assets/svgs/verified.svg')
                                       : const SizedBox.shrink()
@@ -1056,7 +1057,7 @@ class PostFeedReacherCard extends HookWidget {
                 showDuration: const Duration(seconds: 1),
                 message: 'This reach has been edited',
               ),
-              if (postFeedModel!.post!.imageMediaItems!.isNotEmpty ||
+              if ((postFeedModel?.post?.imageMediaItems ?? []).isNotEmpty ||
                   (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
                 PostMedia(post: postFeedModel!.post!)
                     .paddingOnly(r: 16, l: 16, b: 16, t: 10)
@@ -1065,6 +1066,11 @@ class PostFeedReacherCard extends HookWidget {
               (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
                   ? PostAudioMedia(path: postFeedModel!.post!.audioMediaItem!)
                       .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                  : const SizedBox.shrink(),
+              (postFeedModel?.post?.repostedPost != null)
+                  ? RepostedPost(
+                      post: postFeedModel!.post!,
+                    ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
                   : const SizedBox.shrink(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
