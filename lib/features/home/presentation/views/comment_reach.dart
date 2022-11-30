@@ -5,7 +5,6 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,6 +18,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart' as permit;
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -71,6 +71,60 @@ class _CommentReachState extends State<CommentReach> {
     return null;
   }
 
+  void openAudio() async {
+    final status = await permit.Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Mic permission not allowed');
+    }
+    await _soundRecorder!.openRecorder();
+    isRecordingInit = true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _soundRecorder = FlutterSoundRecorder();
+    openAudio();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        setState(() {
+          emojiShowing = false;
+        });
+      }
+    });
+  }
+
+  FlutterSoundRecorder? _soundRecorder;
+
+  bool isRecordingInit = false;
+  bool isRecording = false;
+
+  bool emojiShowing = false;
+  FocusNode focusNode = FocusNode();
+
+  // final isTyping = useState<bool>(false);
+  // useEffect(() {
+  //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+  //       postId: widget.postFeedModel.postId, pageLimit: 50, pageNumber: 1));
+  //   return null;
+  // }, []);
+
+  @override
+  void dispose() {
+    super.dispose();
+    _soundRecorder!.closeRecorder();
+    isRecordingInit = false;
+  }
+  // final _imageList = useState<List<UploadFileDto>>([]);
+
+  String getUserLoation() {
+    if (globals.user!.showLocation!) {
+      return globals.location!;
+    } else {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final postDuration = timeago.format(widget.postFeedModel.post!.createdAt!);
@@ -78,61 +132,10 @@ class _CommentReachState extends State<CommentReach> {
     final counter = useState(0);
     final controller = useTextEditingController();
     final replyFeature = useState("everyone");
-    bool emojiShowing = false;
-    FocusNode focusNode = FocusNode();
-    FlutterSoundRecorder? _soundRecorder;
-    bool isRecordingInit = false;
-    bool isRecording = false;
     final _mediaList = useState<List<UploadFileDto>>([]);
-
-    void openAudio() async {
-      final status = await permit.Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        throw RecordingPermissionException('Mic permission not allowed');
-      }
-      await _soundRecorder!.openRecorder();
-      isRecordingInit = true;
-    }
-
-    @override
-    void initState() {
-      super.initState();
-      _soundRecorder = FlutterSoundRecorder();
-      openAudio();
-      focusNode.addListener(() {
-        if (focusNode.hasFocus) {
-          setState(() {
-            emojiShowing = false;
-          });
-        }
-      });
-    }
-
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
     final scrollController = useScrollController();
-    // final isTyping = useState<bool>(false);
-    // useEffect(() {
-    //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-    //       postId: widget.postFeedModel.postId, pageLimit: 50, pageNumber: 1));
-    //   return null;
-    // }, []);
-
-    @override
-    void dispose() {
-      super.dispose();
-      _soundRecorder!.closeRecorder();
-      isRecordingInit = false;
-    }
-    // final _imageList = useState<List<UploadFileDto>>([]);
-
-    String getUserLoation() {
-      if (globals.user!.showLocation!) {
-        return globals.location!;
-      } else {
-        return '';
-      }
-    }
 
     Widget buildEmoji() {
       return SizedBox(
@@ -179,42 +182,59 @@ class _CommentReachState extends State<CommentReach> {
     return BlocConsumer<SocialServiceBloc, SocialServiceState>(
       bloc: globals.socialServiceBloc,
       listener: (context, state) {
-        if (state is CommentOnPostSuccess) {
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-            scrollController.animateTo(
-              scrollController.position.minScrollExtent,
-              duration: const Duration(milliseconds: 10),
-              curve: Curves.easeOut,
-            );
-          });
-          Snackbars.success(context, message: "Your commment has been posted");
-          triggerProgressIndicator.value = false;
-          globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-              postId: widget.postFeedModel.postId,
-              pageLimit: 50,
-              pageNumber: 1));
+        if (state is CreateRepostSuccess) {
+          Snackbars.success(context,
+              message: "Reach has been reposted on your timeline");
+
+          globals.socialServiceBloc!
+              .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
+          Navigator.pop(context);
         }
-        if (state is CommentOnPostError) {
+        if (state is CreateRepostError) {
           Snackbars.error(context, message: state.error);
         }
-        if (state is CommentOnPostLoading) {
-          toast('Posting comment...',
+        if (state is CreateRepostLoading) {
+          toast('Reposting reach...',
               duration: const Duration(milliseconds: 100));
         }
-        if (state is GetAllCommentsOnPostSuccess) {
-          comments.value = state.data!.reversed.toList();
-        }
 
-        if (state is GetAllCommentsOnPostError) {
-          Snackbars.error(context, message: state.error);
-        }
-        if (state is UnlikeCommentOnPostSuccess ||
-            state is LikeCommentOnPostSuccess) {
-          globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-              postId: widget.postFeedModel.postId,
-              pageLimit: 50,
-              pageNumber: 1));
-        }
+        //
+        // if (state is CommentOnPostSuccess) {
+        //   SchedulerBinding.instance.addPostFrameCallback((_) {
+        //     scrollController.animateTo(
+        //       scrollController.position.minScrollExtent,
+        //       duration: const Duration(milliseconds: 10),
+        //       curve: Curves.easeOut,
+        //     );
+        //   });
+        //   Snackbars.success(context, message: "Your commment has been posted");
+        //   triggerProgressIndicator.value = false;
+        //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+        //       postId: widget.postFeedModel.postId,
+        //       pageLimit: 50,
+        //       pageNumber: 1));
+        // }
+        // if (state is CommentOnPostError) {
+        //   Snackbars.error(context, message: state.error);
+        // }
+        // if (state is CommentOnPostLoading) {
+        //   toast('Posting comment...',
+        //       duration: const Duration(milliseconds: 100));
+        // }
+        // if (state is GetAllCommentsOnPostSuccess) {
+        //   comments.value = state.data!.reversed.toList();
+        // }
+        //
+        // if (state is GetAllCommentsOnPostError) {
+        //   Snackbars.error(context, message: state.error);
+        // }
+        // if (state is UnlikeCommentOnPostSuccess ||
+        //     state is LikeCommentOnPostSuccess) {
+        //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+        //       postId: widget.postFeedModel.postId,
+        //       pageLimit: 50,
+        //       pageNumber: 1));
+        // }
       },
       builder: (context, state) {
         return Scaffold(
@@ -254,12 +274,24 @@ class _CommentReachState extends State<CommentReach> {
                     icon: SvgPicture.asset('assets/svgs/send.svg'),
                     onPressed: () {
                       if (controller.text.isNotEmpty) {
-                        globals.socialServiceBloc!.add(CommentOnPostEvent(
-                            postId: widget.postFeedModel.postId,
-                            content: controller.text,
-                            userId: globals.user!.id));
+                        // globals.socialServiceBloc!.add(CommentOnPostEvent(
+                        //     postId: widget.postFeedModel.postId,
+                        //     content: controller.text,
+                        //     userId: globals.user!.id));
+
+                        globals.socialServiceBloc!.add(CreateRepostEvent(
+                            input: CreateRepostInput(
+                                repostedPostId: widget.postFeedModel.postId,
+                                repostedPostOwnerId:
+                                    widget.postFeedModel.postOwnerId,
+                                content: controller.text,
+                                location: globals.user!.showLocation!
+                                    ? globals.location!
+                                    : 'nil',
+                                postRating: 'normal',
+                                commentOption: 'everyone')));
                       }
-                      controller.clear();
+                      // controller.clear();
                     },
                   ),
                 ],
@@ -277,84 +309,79 @@ class _CommentReachState extends State<CommentReach> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Helper.renderProfilePicture(
-                                globals.user!.profilePicture,
-                                size: 38,
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        (globals.user!.firstName! +
-                                                ' ' +
-                                                globals.user!.lastName!)
-                                            .toTitleCase(),
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.textColor2,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          width: 93,
-                                          child: Text(
-                                            getUserLoation(),
-                                            overflow: TextOverflow.ellipsis,
-                                          ))
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.2,
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.2,
-                                height:
-                                    MediaQuery.of(context).size.width * 0.08,
-                                decoration: BoxDecoration(
-                                    color: AppColors.greyShade9,
-                                    borderRadius: BorderRadius.circular(15),
-                                    border: Border.all(
-                                        color: AppColors.greyShade9)),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: const [
-                                    Icon(
-                                      Icons.location_on,
-                                      size: 12,
-                                    ),
+                          Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 38,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      "Location",
-                                      style: TextStyle(
-                                          color: AppColors.blackShade5,
-                                          fontFamily: "Poppins",
-                                          fontSize: 11),
-                                    )
+                                      (globals.user!.firstName! +
+                                              ' ' +
+                                              globals.user!.lastName!)
+                                          .toTitleCase(),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width: 93,
+                                        child: Text(
+                                          getUserLoation(),
+                                          overflow: TextOverflow.ellipsis,
+                                        ))
                                   ],
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                              Text(
-                                counter.value.toString() + '/' + '200',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: counter.value == 200
-                                      ? Colors.red
-                                      : AppColors.textColor2,
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.03,
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: MediaQuery.of(context).size.width * 0.08,
+                            decoration: BoxDecoration(
+                                color: AppColors.greyShade9,
+                                borderRadius: BorderRadius.circular(15),
+                                border:
+                                    Border.all(color: AppColors.greyShade9)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: const [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 12,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Location",
+                                  style: TextStyle(
+                                      color: AppColors.blackShade5,
+                                      fontFamily: "Poppins",
+                                      fontSize: 11),
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Text(
+                            counter.value.toString() + '/' + '200',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: counter.value == 200
+                                  ? Colors.red
+                                  : AppColors.textColor2,
+                            ),
                           ),
                         ],
                       ).paddingSymmetric(h: 16),
@@ -1218,7 +1245,7 @@ class _CommentReachState extends State<CommentReach> {
           ],
         );
 
-      default: 
+      default:
         return Row(
           children: [
             SvgPicture.asset('assets/svgs/world.svg', height: 30),
