@@ -714,12 +714,12 @@ packages:
     source: hosted
     version: "2.0.0"
   fwfh_text_style:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: fwfh_text_style
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.22.08"
+    version: "2.22.08+1"
   gap:
     dependency: "direct main"
     description:
@@ -1798,4 +1798,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.17.0 <3.0.0"
-  flutter: ">=3.0.0"
+  flutter: ">=3.1.0-0"
