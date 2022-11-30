@@ -287,8 +287,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                           color: AppColors.textColor2,
                                         ),
                                       ),
-                                if (widget
-                                    .post.post!.imageMediaItems!.isNotEmpty)
+                                if ((widget
+                                    .post.post!.imageMediaItems??[]).isNotEmpty)
                                   Helper.renderPostImages(
                                           widget.post.post!, context)
                                       .paddingOnly(r: 16, l: 16, b: 16, t: 10)

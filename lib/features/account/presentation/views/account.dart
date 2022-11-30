@@ -32,6 +32,7 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
+import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/services/database/secure_storage.dart';
@@ -1535,7 +1536,7 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if (postModel!.imageMediaItems!.isNotEmpty ||
+                  if ((postModel!.imageMediaItems ?? []).isNotEmpty ||
                       (postModel!.videoMediaItem ?? '').isNotEmpty)
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
@@ -1544,6 +1545,11 @@ class _ReacherCard extends HookWidget {
                   (postModel!.audioMediaItem ?? '').isNotEmpty
                       ? PostAudioMedia(path: postModel!.audioMediaItem!)
                           .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      : const SizedBox.shrink(),
+                  (postModel?.repostedPost != null)
+                      ? RepostedPost(
+                          post: postModel!,
+                        ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
                       : const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1570,7 +1576,9 @@ class _ReacherCard extends HookWidget {
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
-                                  'assets/svgs/like.svg',
+                                  postModel!.isLiked ?? false
+                                      ? 'assets/svgs/like-active.svg'
+                                      : 'assets/svgs/like.svg',
                                   color: likeColour,
                                   height: 20,
                                   width: 20,
@@ -1662,7 +1670,7 @@ class _ReacherCard extends HookWidget {
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
-                                      (postModel?.vote ?? []).isNotEmpty
+                                      (postModel?.isVoted ?? '') == 'Upvote'
                                           ? 'assets/svgs/shoutup-active.svg'
                                           : 'assets/svgs/shoutup.svg',
                                       height: 20,
