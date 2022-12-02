@@ -83,19 +83,19 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                           height: 80,
                           hintText: 'Abbreviaton',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: wordController,
                           hintText: 'word',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: languageController,
                           hintText: 'Language',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: meaningController,
