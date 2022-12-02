@@ -1497,7 +1497,13 @@ class _ReacherCard extends HookWidget {
                                 ],
                               ),
                               Text(
-                                postModel!.location!,
+                                  postModel!.location! == 'nil' ||  postModel!.location! == 'NIL' ||  postModel!.location == null
+                                          ? ''
+                                          : postModel!.location!.length >
+                                                  23
+                                              ? postModel!.location!
+                                                  .substring(0, 23)
+                                              : postModel!.location!,
                                 style: TextStyle(
                                   fontSize: getScreenHeight(11),
                                   fontWeight: FontWeight.w400,
