@@ -10,9 +10,6 @@ class ContentContainer extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    var date = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(getRecentlyAddedWord.createdAt!));
-    var dateParse = DateFormat.yMMMMd('en_US').format(date);
     return Padding(
       padding: const EdgeInsets.only(top: 18.0),
       child: ConstrainedBox(
@@ -53,7 +50,7 @@ class ContentContainer extends HookWidget {
                     height: 5,
                   ),
                   Text(
-                    dateParse,
+                    dateFormatter(getRecentlyAddedWord.createdAt!),
                     style: const TextStyle(
                         fontFamily: 'poppins', fontWeight: FontWeight.w600),
                   ),
@@ -64,5 +61,11 @@ class ContentContainer extends HookWidget {
         ),
       ),
     );
+  }
+
+  String dateFormatter(String dateToFormat) {
+    var date = DateTime.fromMillisecondsSinceEpoch(int.parse(dateToFormat));
+    var dateParse = DateFormat.yMMMMd('en_US').format(date);
+    return dateParse;
   }
 }

@@ -15,8 +15,9 @@ class DialogAndSheetService extends IDialogAndSheetService {
       useSafeArea: true,
       context: context,
       builder: (context) => AlertDialog(
-        contentPadding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        insetPadding: EdgeInsets.symmetric(horizontal: 100),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 100),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(25))),
         backgroundColor: AppColors.white,
@@ -32,7 +33,7 @@ class DialogAndSheetService extends IDialogAndSheetService {
                   fontSize: getScreenHeight(16),
                   color: const Color(0xFF767474)),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
             Row(
