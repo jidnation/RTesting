@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reach_me/features/dictionary/data/models/get_word_model.dart';
+import 'package:reach_me/features/dictionary/data/models/gethistory_model.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
 @immutable
@@ -52,7 +53,7 @@ class GetWordToMentionsError extends DictionaryState {
 class LoadingSearchedWords extends DictionaryState {}
 
 class DisplaySearchedWordSuccess extends DictionaryState {
-  final GetWordClass  wordData;
+  final GetWordClass wordData;
 
   DisplaySearchedWordSuccess({required this.wordData});
 }
@@ -61,4 +62,46 @@ class GetSearchedWordError extends DictionaryState {
   final String error;
 
   GetSearchedWordError({required this.error});
+}
+
+///* GeT SEARCHED HISTORY
+class LoadingSearchedHistory extends DictionaryState {}
+
+class SearchedHistorySuccess extends DictionaryState {
+  final List<GetSearchedWordsHistory>? data;
+
+  SearchedHistorySuccess({required this.data});
+}
+
+class SearchHistoryErrorState extends DictionaryState {
+  final String error;
+  SearchHistoryErrorState({required this.error});
+}
+
+class DeletingWordLoading extends DictionaryState {}
+
+class DeletingWordSuccess extends DictionaryState {
+  final String historyId;
+  final bool isDeleted;
+
+  DeletingWordSuccess({
+    required this.historyId,
+    required this.isDeleted,
+  });
+}
+
+class DeletingWordError extends DictionaryState {
+  final String error;
+  final String historyId;
+
+  DeletingWordError({required this.historyId, required this.error});
+}
+
+class DeleteAllHistoryLoading extends DictionaryState {}
+
+class DeleteAllHistorySuccess extends DictionaryState {}
+
+class DeleteAllHistoryError extends DictionaryState {
+  final String error;
+  DeleteAllHistoryError({required this.error});
 }

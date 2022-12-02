@@ -61,5 +61,43 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         emit(GetSearchedWordError(error: e.message));
       }
     });
+    on<GetSearchHistoryEvent>((event, emit) async {
+      emit(LoadingSearchedHistory());
+      try {
+        final historyResponse = await dictionaryRepository.getWordHistory(
+            pageLimit: event.pageLimit, pageNumber: event.pageNumber);
+        historyResponse.fold(
+            (error) => emit(SearchHistoryErrorState(error: error)),
+            (historyData) => emit(SearchedHistorySuccess(data: historyData)));
+      } on GraphQLError catch (e) {
+        emit(SearchHistoryErrorState(error: e.message));
+      }
+    });
+    on<DeleteWordEvent>((event, emit) async {
+      emit(DeletingWordLoading());
+      try {
+        final deletingHistory = await dictionaryRepository.deleteWordHistory(
+            historyId: event.historyId);
+        deletingHistory.fold(
+            (error) => emit(
+                DeletingWordError(error: error, historyId: event.historyId)),
+            (deleteResponse) => emit(DeletingWordSuccess(
+                isDeleted: deleteResponse, historyId: event.historyId)));
+      } on GraphQLError catch (e) {
+        emit(DeletingWordError(error: e.message, historyId: event.historyId));
+      }
+    });
+    on<DeleteAllWordsEvent>((event, emit) async {
+      emit(DeleteAllHistoryLoading());
+      try {
+        final deletingAllHistory =
+            await dictionaryRepository.deleteAllHistory();
+        deletingAllHistory.fold(
+            (error) => emit(DeleteAllHistoryError(error: error)),
+            (success) => emit(DeleteAllHistorySuccess()));
+      } on GraphQLError catch (e) {
+        emit(DeleteAllHistoryError(error: e.message));
+      }
+    });
   }
 }
