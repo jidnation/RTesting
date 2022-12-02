@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/rm_spinner.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -14,7 +13,7 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_eve
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/content_container.dart';
 
-class RecentlyAdded extends StatefulHookWidget {
+class RecentlyAdded extends StatefulWidget {
   const RecentlyAdded({Key? key}) : super(key: key);
 
   @override
@@ -22,13 +21,16 @@ class RecentlyAdded extends StatefulHookWidget {
 }
 
 class _RecentlyAddedState extends State<RecentlyAdded> {
+  final _recentWords = ValueNotifier<List<GetRecentlyAddedWord>>([]);
+  @override
+  void initState() {
+    super.initState();
+    globals.dictionaryBloc!
+        .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final _recentWords = useState<List<GetRecentlyAddedWord>>([]);
-    useMemoized(() {
-      globals.dictionaryBloc!
-          .add(GetRecentAddedWordsEvent(pageLimit: 5, pageNumber: 1));
-    });
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -69,7 +71,7 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 15.0),
             child: _isLoading
-                ? const CircularLoader()
+                ? const Center(child: CircularLoader())
                 : _recentWords.value.isEmpty
                     ? const Center(child: Text('No Recent Words'))
                     : ListView.builder(
