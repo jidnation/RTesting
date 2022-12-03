@@ -39,6 +39,7 @@ import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -1446,6 +1447,7 @@ class _ReacherCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+     final postDuration = timeago.format(postModel!.createdAt!);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 13,
@@ -1496,20 +1498,42 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              Text(
-                                  postModel!.location! == 'nil' ||  postModel!.location! == 'NIL' ||  postModel!.location == null
+                               Row(
+                                  children: [
+                                    Text(
+                                      postModel!.location! == 'nil' ||
+                                              postModel!.location! ==
+                                                  'NIL' ||
+                                              postModel!.location ==
+                                                  null
                                           ? ''
-                                          : postModel!.location!.length >
+                                          : postModel!
+                                                      .location!.length >
                                                   23
                                               ? postModel!.location!
                                                   .substring(0, 23)
                                               : postModel!.location!,
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                                    Text(
+                                      postDuration,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ).paddingOnly(l: 6),
+                                  ],
                                 ),
-                              )
+                             
                             ],
                           ).paddingOnly(t: 10),
                         ],
