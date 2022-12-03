@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
@@ -33,8 +34,11 @@ import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../account/presentation/views/account.dart';
+import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
+import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../data/models/comment_model.dart';
+import '../widgets/post_media.dart';
 
 class FullPostScreen extends StatefulHookWidget {
   static String id = 'full_post_screen';
@@ -77,13 +81,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final commentOption = widget.postFeedModel!.post!.commentOption;
     Set active = {};
 
-    handleTap() {
-      if (active.isNotEmpty) {
-        active.clear();
-      }
-
+    handleTap(index) {
+      if (active.isNotEmpty) active.clear();
       setState(() {
-        active.add(widget.postFeedModel!.postId);
+        active.add(index);
       });
     }
 
@@ -138,6 +139,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
     }
 
     var scr = GlobalKey();
+    final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
 
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
@@ -160,198 +162,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
       await saveImage(byteData!.buffer.asUint8List());
     }
 
-    Future showFullPostReacherCardBottomSheet(BuildContext context,
-        {required PostFeedModel postFeedModel, void Function()? downloadPost}) {
-      return showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        builder: (context) {
-          return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-            bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              if (state is GetPostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostEvent(postId: widget.postFeedModel!.postId));
-                _refreshController.refreshCompleted();
-              }
-              if (state is GetPostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is SavePostSuccess) {
-                RouteNavigators.pop(context);
-                Snackbars.success(context, message: 'Post saved successfully');
-              }
-              if (state is SavePostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is DeleteSavedPostSuccess) {
-                RouteNavigators.pop(context);
-                Snackbars.success(context,
-                    message: 'Post removed successfully');
-              }
-              if (state is DeleteSavedPostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-            },
-            builder: (context, state) {
-              bool _isLoading = state is GetPostLoading;
-              return BlocConsumer<UserBloc, UserState>(
-                bloc: globals.userBloc,
-                listener: (context, state) {
-                  if (state is UserLoading) {
-                    // globals.showLoader(context);
-                  }
-                  if (state is UserError) {
-                    RouteNavigators.pop(context);
-                    RouteNavigators.pop(context);
-                    Snackbars.error(context, message: state.error);
-                  }
-                  if (state is StarUserSuccess) {
-                    RouteNavigators.pop(context);
-                    Snackbars.success(context,
-                        message: 'User starred successfully!');
-                  }
-                },
-                builder: (context, state) {
-                  return Container(
-                      decoration: const BoxDecoration(
-                        color: AppColors.greyShade7,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                      child: ListView(shrinkWrap: true, children: [
-                        Center(
-                          child: Container(
-                              height: getScreenHeight(4),
-                              width: getScreenWidth(58),
-                              decoration: BoxDecoration(
-                                  color: AppColors.greyShade4,
-                                  borderRadius: BorderRadius.circular(40))),
-                        ).paddingOnly(t: 23),
-                        SizedBox(height: getScreenHeight(20)),
-                        if (postFeedModel.postOwnerId !=
-                            postFeedModel.feedOwnerId)
-                          Column(
-                            children: [
-                              KebabBottomTextButton(
-                                  label: 'Share post',
-                                  onPressed: () {
-                                    RouteNavigators.pop(context);
-                                    Share.share(
-                                        'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'Save post',
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(
-                                        SavePostEvent(
-                                            postId: postFeedModel.postId));
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'takeScreenShot',
-                                  onPressed: takeScreenShot),
-                              KebabBottomTextButton(
-                                label: reachUser.value
-                                    ? "Unreach user"
-                                    : 'Reach user',
-                                onPressed: () {
-                                  globals.showLoader(context);
-                                  if (reachUser.value) {
-                                  } else {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            postFeedModel.postOwnerId));
-                                  }
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                label: starUser.value
-                                    ? 'Unstar user'
-                                    : 'Star user',
-                                onPressed: () {
-                                  if (starUser.value) {
-                                    setState(() {
-                                      starUser.value = true;
-                                    });
-                                  } else {
-                                    globals.showLoader(context);
-                                    globals.userBloc!.add(StarUserEvent(
-                                        userIdToStar:
-                                            postFeedModel.postOwnerId));
-                                    setState(() {
-                                      starUser.value = false;
-                                    });
-                                  }
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                label: 'Copy link',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Clipboard.setData(ClipboardData(
-                                      text: postFeedModel.post!.postSlug!));
-                                  Snackbars.success(context,
-                                      message: 'Link copied to clipboard');
-                                },
-                              ),
-                            ],
-                          )
-                        else
-                          Column(
-                            children: [
-                              KebabBottomTextButton(
-                                  label: 'Edit content',
-                                  isLoading: _isLoading,
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(GetPostEvent(
-                                        postId: postFeedModel.postId));
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'Delete post',
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(
-                                        DeletePostEvent(
-                                            postId: postFeedModel.postId));
-                                    RouteNavigators.pop(context);
-                                  }),
-                              KebabBottomTextButton(
-                                label: 'Share Post',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Share.share(
-                                      'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                  label: 'take ScreenShot',
-                                  onPressed: takeScreenShot),
-                              KebabBottomTextButton(
-                                label: 'Copy link',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Clipboard.setData(ClipboardData(
-                                      text: postFeedModel.post!.postSlug!));
-                                  Snackbars.success(context,
-                                      message: 'Link copied to clipboard');
-                                },
-                              ),
-                            ],
-                          ),
-                        SizedBox(height: getScreenHeight(20)),
-                      ]));
-                },
-              );
-            },
-          );
-        },
-      );
-    }
-
+   
     final reachDM = useState(false);
     return BlocConsumer<UserBloc, UserState>(
       bloc: globals.userBloc,
@@ -464,38 +275,29 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               minSize: 0,
                                               padding: EdgeInsets.zero,
                                               onPressed: () {
-                                                final progress =
-                                                    ProgressHUD.of(context);
-                                                progress?.showWithText(
-                                                    'Viewing Reacher...');
-                                                Future.delayed(
-                                                    const Duration(seconds: 3),
-                                                    () {
-                                                  globals.userBloc!.add(
-                                                      GetRecipientProfileEvent(
-                                                          email: widget
+                                                globals.userBloc!.add(
+                                                    GetRecipientProfileEvent(
+                                                        email: widget
+                                                            .postFeedModel!
+                                                            .postOwnerId));
+                                                widget.postFeedModel!
+                                                            .postOwnerId ==
+                                                        globals.user!.id
+                                                    ? RouteNavigators.route(
+                                                        context,
+                                                        const AccountScreen())
+                                                    : RouteNavigators.route(
+                                                        context,
+                                                        RecipientAccountProfile(
+                                                          recipientEmail:
+                                                              'email',
+                                                          recipientImageUrl: widget
                                                               .postFeedModel!
-                                                              .postOwnerId));
-                                                  widget.postFeedModel!
-                                                              .postOwnerId ==
-                                                          globals.user!.id
-                                                      ? RouteNavigators.route(
-                                                          context,
-                                                          const AccountScreen())
-                                                      : RouteNavigators.route(
-                                                          context,
-                                                          RecipientAccountProfile(
-                                                            recipientEmail:
-                                                                'email',
-                                                            recipientImageUrl: widget
-                                                                .postFeedModel!
-                                                                .profilePicture,
-                                                            recipientId: widget
-                                                                .postFeedModel!
-                                                                .postOwnerId,
-                                                          ));
-                                                  progress?.dismiss();
-                                                });
+                                                              .profilePicture,
+                                                          recipientId: widget
+                                                              .postFeedModel!
+                                                              .postOwnerId,
+                                                        ));
                                               },
                                               child: Row(
                                                 children: [
@@ -545,19 +347,33 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       Row(
                                                         children: [
                                                           Text(
-                                                            widget.postFeedModel!.post!
+                                                            widget.postFeedModel!.post!.location! == 'nil' ||
+                                                                    widget.postFeedModel!.post!
                                                                             .location! ==
-                                                                        'nil' ||
+                                                                        'NIL' ||
                                                                     widget
                                                                             .postFeedModel!
                                                                             .post!
-                                                                            .location! ==
-                                                                        'NIL'
+                                                                            .location ==
+                                                                        null
                                                                 ? ''
                                                                 : widget
-                                                                    .postFeedModel!
-                                                                    .post!
-                                                                    .location!,
+                                                                            .postFeedModel!
+                                                                            .post!
+                                                                            .location!
+                                                                            .length >
+                                                                        23
+                                                                    ? widget
+                                                                        .postFeedModel!
+                                                                        .post!
+                                                                        .location!
+                                                                        .substring(
+                                                                            0,
+                                                                            23)
+                                                                    : widget
+                                                                        .postFeedModel!
+                                                                        .post!
+                                                                        .location!,
                                                             style: TextStyle(
                                                               fontSize:
                                                                   getScreenHeight(
@@ -606,10 +422,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     width: getScreenWidth(9)),
                                                 IconButton(
                                                   onPressed: () async {
-                                                    await showFullPostReacherCardBottomSheet(
-                                                        context,
-                                                        postFeedModel: widget
-                                                            .postFeedModel!);
+                                                    await showReacherCardBottomSheet(
+                                                      context,
+                                                      downloadPost:
+                                                          takeScreenShot,
+                                                      postFeedModel:
+                                                          widget.postFeedModel!,
+                                                    );
                                                   },
                                                   iconSize: getScreenHeight(19),
                                                   padding:
@@ -624,43 +443,89 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                         widget.postFeedModel!.post!.content ==
                                                 null
                                             ? const SizedBox.shrink()
-                                            : Flexible(
-                                                child: ReadMoreText(
-                                                  widget.postFeedModel!.post!
-                                                          .edited!
-                                                      ? "${widget.postFeedModel!.post!.content ?? ''} (reach edited)"
-                                                      : widget.postFeedModel!
-                                                              .post!.content ??
-                                                          '',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize:
-                                                          getScreenHeight(14)),
-                                                  trimLines: 3,
-                                                  colorClickableText:
-                                                      const Color(0xff717F85),
-                                                  trimMode: TrimMode.Line,
-                                                  trimCollapsedText: 'See more',
-                                                  trimExpandedText: 'See less',
-                                                  moreStyle: TextStyle(
-                                                      fontSize:
-                                                          getScreenHeight(14),
-                                                      fontFamily: "Roboto",
-                                                      color: const Color(
-                                                          0xff717F85)),
-                                                ).paddingSymmetric(
-                                                    h: 16, v: 10),
-                                              ),
-                                        if (widget.postFeedModel!.post!
-                                            .imageMediaItems!.isNotEmpty)
-                                          Helper.renderPostImages(
-                                                  widget.postFeedModel!.post!,
-                                                  context)
+                                            : ExpandableText(
+                                                "${widget.postFeedModel!.post!.content}",
+                                                prefixText: widget
+                                                        .postFeedModel!
+                                                        .post!
+                                                        .edited!
+                                                    ? "(Reach Edited)"
+                                                    : null,
+                                                prefixStyle: TextStyle(
+                                                    fontSize:
+                                                        getScreenHeight(12),
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        AppColors.primaryColor),
+                                                onPrefixTap: () {
+                                                  tooltipkey.currentState
+                                                      ?.ensureTooltipVisible();
+                                                },
+                                                expandText: 'see more',
+                                                maxLines: 2,
+                                                linkColor: Colors.blue,
+                                                animation: true,
+                                                expanded: false,
+                                                collapseText: 'see less',
+                                                onHashtagTap: (value) {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return DictionaryDialog(
+                                                          abbr: value,
+                                                          meaning: '',
+                                                          word: '',
+                                                        );
+                                                      });
+                                                  print('Tapped Url');
+                                                },
+                                                onMentionTap: (value) {
+                                                  print('Tapped Url');
+                                                },
+                                                mentionStyle: const TextStyle(
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                    color: Colors.blue),
+                                                hashtagStyle: const TextStyle(
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                    color: Colors.blue),
+                                              ).paddingSymmetric(h: 16, v: 10),
+                                        Tooltip(
+                                          key: tooltipkey,
+                                          triggerMode:
+                                              TooltipTriggerMode.manual,
+                                          showDuration:
+                                              const Duration(seconds: 1),
+                                          message: 'This reach has been edited',
+                                        ),
+                                        if ((widget.postFeedModel?.post
+                                                        ?.imageMediaItems ??
+                                                    [])
+                                                .isNotEmpty ||
+                                            (widget.postFeedModel?.post
+                                                        ?.videoMediaItem ??
+                                                    '')
+                                                .isNotEmpty)
+                                          PostMedia(
+                                                  post: widget
+                                                      .postFeedModel!.post!)
                                               .paddingOnly(
                                                   r: 16, l: 16, b: 16, t: 10)
                                         else
                                           const SizedBox.shrink(),
+                                        (widget.postFeedModel?.post
+                                                        ?.audioMediaItem ??
+                                                    '')
+                                                .isNotEmpty
+                                            ? PostAudioMedia(
+                                                    path: widget.postFeedModel!
+                                                        .post!.audioMediaItem!)
+                                                .paddingOnly(
+                                                    l: 16, r: 16, b: 10, t: 0)
+                                            : const SizedBox.shrink(),
 
                                         // likes and message
                                         Row(
@@ -693,45 +558,65 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     onPressed: () {
                                                       HapticFeedback
                                                           .mediumImpact();
-
-                                                      likePost.value
-                                                          ? {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      UnlikePostEvent(
+                                                      handleTap(widget
+                                                          .postFeedModel!.post);
+                                                      // Console.log(
+                                                      //     'Like Data',
+                                                      //     _posts.value[index]
+                                                      //         .toJson());
+                                                      if (active.contains(widget
+                                                          .postFeedModel!
+                                                          .post)) {
+                                                        if (widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.isLiked ??
+                                                            false) {
+                                                          widget
+                                                              .postFeedModel!
+                                                              .post
+                                                              ?.isLiked = false;
+                                                          widget
+                                                              .postFeedModel!
+                                                              .post
+                                                              ?.nLikes = (widget
+                                                                      .postFeedModel!
+                                                                      .post
+                                                                      ?.nLikes ??
+                                                                  1) -
+                                                              1;
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  UnlikePostEvent(
+                                                            postId: widget
+                                                                .postFeedModel!
+                                                                .postId,
+                                                          ));
+                                                        } else {
+                                                          widget
+                                                              .postFeedModel!
+                                                              .post
+                                                              ?.isLiked = true;
+                                                          widget
+                                                              .postFeedModel!
+                                                              .post
+                                                              ?.nLikes = (widget
+                                                                      .postFeedModel!
+                                                                      .post
+                                                                      ?.nLikes ??
+                                                                  0) +
+                                                              1;
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                            LikePostEvent(
                                                                 postId: widget
                                                                     .postFeedModel!
-                                                                    .postId,
-                                                              )),
-                                                              debugPrint(
-                                                                  "Unlike post"),
-                                                              setState(() {
-                                                                likePost.value =
-                                                                    false;
-
-                                                                debugPrint(
-                                                                    "Unlike post ${likePost.value}");
-                                                              })
-                                                            }
-                                                          : {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                LikePostEvent(
-                                                                    postId: widget
-                                                                        .postFeedModel!
-                                                                        .postId),
-                                                              ),
-                                                              debugPrint(
-                                                                  "like post success"),
-                                                              setState(() {
-                                                                likePost.value =
-                                                                    true;
-                                                                debugPrint(
-                                                                    "like post ${likePost.value}");
-                                                              })
-                                                            };
+                                                                    .postId),
+                                                          );
+                                                        }
+                                                      }
                                                     },
                                                     padding: EdgeInsets.zero,
                                                     child: likePost.value ||
@@ -828,9 +713,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             .mediumImpact();
                                                         reachDM.value = true;
 
-                                                        handleTap();
-                                                        if (active.contains(widget
-                                                            .postFeedModel)) {
+                                                        handleTap(widget
+                                                            .postFeedModel!
+                                                            .post);
+                                                        if (active.contains(
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post)) {
                                                           globals.userBloc!.add(
                                                               GetRecipientProfileEvent(
                                                                   email: widget
@@ -850,7 +739,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   ).paddingOnly(r: 8),
                                                   FittedBox(
                                                     child: Text(
-                                                      'Message user',
+                                                      widget.postFeedModel!
+                                                                  .postOwnerId !=
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .feedOwnerId
+                                                          ? "Message"
+                                                          : 'Message user',
                                                       style: TextStyle(
                                                         fontSize:
                                                             getScreenHeight(12),
@@ -898,37 +793,36 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     onPressed: () {
                                                       HapticFeedback
                                                           .mediumImpact();
+                                                      handleTap(widget
+                                                          .postFeedModel!.post);
 
-                                                      shoutoutPost.value
-                                                          ? {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(DeletePostVoteEvent(
-                                                                      voteId: widget
-                                                                          .postFeedModel!
-                                                                          .post!
-                                                                          .postId)),
-                                                              setState(() {
-                                                                shoutoutPost
-                                                                        .value =
-                                                                    false;
-                                                              })
-                                                            }
-                                                          : {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(VotePostEvent(
-                                                                      voteType:
-                                                                          'UpVote',
-                                                                      postId: widget
-                                                                          .postFeedModel!
-                                                                          .postId)),
-                                                              setState(() {
-                                                                shoutoutPost
-                                                                        .value =
-                                                                    true;
-                                                              })
-                                                            };
+                                                      if (active.contains(widget
+                                                          .postFeedModel!
+                                                          .post)) {
+                                                        if ((widget.postFeedModel!
+                                                                    .vote ??
+                                                                [])
+                                                            .isEmpty) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType: 'Upvote',
+                                                            postId: widget
+                                                                .postFeedModel!
+                                                                .postId,
+                                                          ));
+                                                        } else {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  DeletePostVoteEvent(
+                                                            voteId: widget
+                                                                .postFeedModel!
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      }
                                                     },
                                                     padding: EdgeInsets.zero,
                                                     child: shoutoutPost.value
@@ -1011,38 +905,22 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     onPressed: () {
                                                       HapticFeedback
                                                           .mediumImpact();
+                                                      handleTap(widget
+                                                          .postFeedModel!.post);
 
-                                                      shoutdownPost.value
-                                                          ? {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(DeletePostVoteEvent(
-                                                                      voteId: widget
-                                                                          .postFeedModel!
-                                                                          .postId)),
-                                                              setState(() {
-                                                                shoutdownPost
-                                                                        .value =
-                                                                    false;
-                                                              })
-                                                            }
-                                                          : {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      VotePostEvent(
-                                                                voteType:
-                                                                    'Downvote',
-                                                                postId: widget
+                                                      if (active.contains(widget
+                                                          .postFeedModel!
+                                                          .post)) {
+                                                        shoutdownPost.value =
+                                                            true;
+                                                        globals.userBloc!.add(
+                                                            GetReachRelationshipEvent(
+                                                                userIdToReach: widget
                                                                     .postFeedModel!
-                                                                    .postId,
-                                                              )),
-                                                              setState(() {
-                                                                shoutdownPost
-                                                                        .value =
-                                                                    true;
-                                                              })
-                                                            };
+                                                                    .postOwnerId,
+                                                                type: ReachRelationshipType
+                                                                    .reacher));
+                                                      }
                                                     },
                                                     padding: EdgeInsets.zero,
                                                     child: shoutdownPost.value
@@ -1139,7 +1017,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               : false,
                                           onLike: () {
                                             HapticFeedback.mediumImpact();
-                                            handleTap();
+                                            handleTap(comments.value[index]);
                                             if (active.contains(index)) {
                                               if (comments.value[index].like!
                                                   .isNotEmpty) {
@@ -1173,7 +1051,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           onMessage: () {
                                             HapticFeedback.mediumImpact();
                                             reachDM.value = true;
-                                            handleTap();
+                                            handleTap(
+                                                widget.postFeedModel!.post);
                                             if (active.contains(index)) {
                                               globals.userBloc!.add(
                                                   GetRecipientProfileEvent(

@@ -112,261 +112,271 @@ class _CreateStatusState extends State<CreateStatus>
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : ListView(
-                // shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
+            : Stack(
                 children: [
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: CameraPreview(
-                      controller!,
-                      child: Column(
-                        //mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+                  ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      Container(
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: CameraPreview(
+                          controller!,
+                          child: Column(
+                            //mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/dc-cancel.svg',
-                                    height: getScreenHeight(71),
-                                  ),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  if (controller!.value.flashMode ==
-                                      FlashMode.off) {
-                                    controller!.setFlashMode(FlashMode.always);
-                                  } else {
-                                    controller!.setFlashMode(FlashMode.off);
-                                  }
-                                  setState(() {});
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/dc-flashlight.svg',
-                                    height: getScreenHeight(71),
-                                  ),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ).paddingSymmetric(h: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.black.withOpacity(0.50),
-                                  borderRadius: BorderRadius.circular(33),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(1),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isTextStatus.value
-                                            ? AppColors.white
-                                            : Colors.transparent,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      RouteNavigators.pop(context);
+                                    },
+                                    icon: Transform.scale(
+                                      scale: 1.8,
+                                      child: SvgPicture.asset(
+                                        'assets/svgs/dc-cancel.svg',
+                                        height: getScreenHeight(71),
                                       ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          isTextStatus.value = true;
-                                          isCameraStatus.value = false;
-                                          isAudioStatus.value = false;
-                                          RouteNavigators.routeReplace(
-                                              context, const TextStatus());
-                                        },
-                                        icon: SvgPicture.asset(
-                                            'assets/svgs/pen.svg',
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      if (controller!.value.flashMode ==
+                                          FlashMode.off) {
+                                        controller!
+                                            .setFlashMode(FlashMode.always);
+                                      } else {
+                                        controller!.setFlashMode(FlashMode.off);
+                                      }
+                                      setState(() {});
+                                    },
+                                    icon: Transform.scale(
+                                      scale: 1.8,
+                                      child: SvgPicture.asset(
+                                        'assets/svgs/dc-flashlight.svg',
+                                        height: getScreenHeight(71),
+                                      ),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ],
+                              ).paddingSymmetric(h: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.black.withOpacity(0.50),
+                                      borderRadius: BorderRadius.circular(33),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(1),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
                                             color: isTextStatus.value
-                                                ? AppColors.black
-                                                : null),
-                                        //  padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(1),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isAudioStatus.value
-                                            ? AppColors.white
-                                            : Colors.transparent,
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          isAudioStatus.value = true;
-                                          isTextStatus.value = false;
-                                          isCameraStatus.value = false;
-                                          RouteNavigators.routeReplace(
-                                              context, const AudioStatus());
-                                        },
-                                        icon: SvgPicture.asset(
-                                            'assets/svgs/status-mic.svg',
+                                                ? AppColors.white
+                                                : Colors.transparent,
+                                          ),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              isTextStatus.value = true;
+                                              isCameraStatus.value = false;
+                                              isAudioStatus.value = false;
+                                              RouteNavigators.routeReplace(
+                                                  context, const TextStatus());
+                                            },
+                                            icon: SvgPicture.asset(
+                                                'assets/svgs/pen.svg',
+                                                color: isTextStatus.value
+                                                    ? AppColors.black
+                                                    : null),
+                                            //  padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.all(1),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
                                             color: isAudioStatus.value
-                                                ? AppColors.black
-                                                : null),
-                                        // padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(1),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: isCameraStatus.value
-                                            ? AppColors.white
-                                            : Colors.transparent,
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          isCameraStatus.value = true;
-                                          isAudioStatus.value = false;
-                                          isTextStatus.value = false;
-                                        },
-                                        icon: SvgPicture.asset(
-                                            'assets/svgs/Camera.svg',
+                                                ? AppColors.white
+                                                : Colors.transparent,
+                                          ),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              isAudioStatus.value = true;
+                                              isTextStatus.value = false;
+                                              isCameraStatus.value = false;
+                                              RouteNavigators.routeReplace(
+                                                  context, const AudioStatus());
+                                            },
+                                            icon: SvgPicture.asset(
+                                                'assets/svgs/status-mic.svg',
+                                                color: isAudioStatus.value
+                                                    ? AppColors.black
+                                                    : null),
+                                            // padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.all(1),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
                                             color: isCameraStatus.value
-                                                ? AppColors.black
-                                                : null),
-                                        //padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      ),
+                                                ? AppColors.white
+                                                : Colors.transparent,
+                                          ),
+                                          child: IconButton(
+                                            onPressed: () {
+                                              isCameraStatus.value = true;
+                                              isAudioStatus.value = false;
+                                              isTextStatus.value = false;
+                                            },
+                                            icon: SvgPicture.asset(
+                                                'assets/svgs/Camera.svg',
+                                                color: isCameraStatus.value
+                                                    ? AppColors.black
+                                                    : null),
+                                            //padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              )
+                                  )
+                                ],
+                              ).paddingSymmetric(h: 20),
+                              const SizedBox.shrink(),
                             ],
-                          ).paddingSymmetric(h: 20),
-                          const SizedBox.shrink(),
-                        ],
-                      ).paddingOnly(t: 50),
-                    ),
-                  ),
-                  Container(
-                    // height: size.height,
-                    width: size.width,
-                    decoration: const BoxDecoration(
-                        //  color: AppColors.black.withOpacity(0.9),
+                          ).paddingOnly(t: 50),
                         ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(height: getScreenHeight(44)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: IconButton(
-                                onPressed: () async {
-                                  // final image =
-                                  //     await getImage(ImageSource.gallery);
-                                  final res = await MediaService()
-                                      .pickFromGallery(context: context);
-                                  if (res != null) {
-                                    RouteNavigators.route(
-                                        context,
-                                        BuildMediaPreview(
-                                          path: res.first.path,
-                                          isVideo:
-                                              FileUtils.isVideo(res.first.file),
-                                        ));
-                                  }
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/check-gallery.svg',
-                                    height: getScreenHeight(71),
-                                  ),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ),
-                            SizedBox(width: getScreenWidth(70)),
-                            Flexible(
-                              child: InkWell(
-                                onTap: () async {
-                                  await controller!.takePicture().then(
-                                      (value) => RouteNavigators.route(
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    top: 700,
+                    child: Container(
+                      // height: size.height,
+                      width: size.width,
+                      decoration: const BoxDecoration(
+                          //  color: AppColors.black.withOpacity(0.9),
+                          ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: getScreenHeight(44)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: IconButton(
+                                  onPressed: () async {
+                                    // final image =
+                                    //     await getImage(ImageSource.gallery);
+                                    final res = await MediaService()
+                                        .pickFromGallery(context: context);
+                                    if (res != null) {
+                                      RouteNavigators.route(
                                           context,
                                           BuildMediaPreview(
-                                              path: value.path,
-                                              isVideo: false)));
-                                },
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.white,
+                                            path: res.first.path,
+                                            isVideo: FileUtils.isVideo(
+                                                res.first.file),
+                                          ));
+                                    }
+                                  },
+                                  icon: Transform.scale(
+                                    scale: 1.8,
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/check-gallery.svg',
+                                      height: getScreenHeight(71),
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.all(20),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/Camera.svg',
-                                    color: AppColors.black,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ),
+                              SizedBox(width: getScreenWidth(70)),
+                              Flexible(
+                                child: InkWell(
+                                  onTap: () async {
+                                    await controller!.takePicture().then(
+                                        (value) => RouteNavigators.route(
+                                            context,
+                                            BuildMediaPreview(
+                                                path: value.path,
+                                                isVideo: false)));
+                                  },
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.white,
+                                    ),
+                                    padding: const EdgeInsets.all(20),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/Camera.svg',
+                                      color: AppColors.black,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: getScreenWidth(70)),
-                            Flexible(
-                              child: IconButton(
-                                onPressed: () {
-                                  if (_cameras.isNotEmpty &&
-                                      _cameras.length > 1) {
-                                    if (_cameras.length == 2) {
-                                      if (controller!
-                                              .description.lensDirection ==
-                                          CameraLensDirection.front) {
-                                        initializeCamera(_cameras[0]);
+                              SizedBox(width: getScreenWidth(70)),
+                              Flexible(
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (_cameras.isNotEmpty &&
+                                        _cameras.length > 1) {
+                                      if (_cameras.length == 2) {
+                                        if (controller!
+                                                .description.lensDirection ==
+                                            CameraLensDirection.front) {
+                                          initializeCamera(_cameras[0]);
+                                        } else {
+                                          initializeCamera(_cameras[1]);
+                                        }
                                       } else {
                                         initializeCamera(_cameras[1]);
                                       }
-                                    } else {
-                                      initializeCamera(_cameras[1]);
                                     }
-                                  }
-                                  setState(() {});
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/flip-camera.svg',
-                                    height: getScreenHeight(71),
+                                    setState(() {});
+                                  },
+                                  icon: Transform.scale(
+                                    scale: 1.8,
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/flip-camera.svg',
+                                      height: getScreenHeight(71),
+                                    ),
                                   ),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
                                 ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: getScreenHeight(44))
-                      ],
+                            ],
+                          ),
+                          SizedBox(height: getScreenHeight(44))
+                        ],
+                      ),
                     ),
-                  ),
+                  )
                 ],
               ),
       ),
