@@ -37,3 +37,19 @@ class GetWordEvent extends DictionaryEvent {
 
   GetWordEvent(this.wordInput);
 }
+
+class GetSearchHistoryEvent extends DictionaryEvent {
+  final num pageLimit;
+  final num pageNumber;
+
+  GetSearchHistoryEvent({required this.pageLimit, required this.pageNumber});
+}
+
+class DeleteWordEvent extends DictionaryEvent {
+  final String historyId;
+  DeleteWordEvent({
+    required this.historyId,
+  });
+}
+
+class DeleteAllWordsEvent extends DictionaryEvent {}
