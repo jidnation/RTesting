@@ -1770,7 +1770,7 @@ class _CommentReachCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '@${commentModel!.commentProfile!.username}',
+                                    '@${commentModel!.commentOwnerProfile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w500,
@@ -1782,7 +1782,7 @@ class _CommentReachCard extends HookWidget {
                                 ],
                               ),
                               Text(
-                                'Comment on @${commentModel!.commentProfile!.username}',
+                                'Comment on @${commentModel!.commentOwnerProfile!.username}',
                                 style: TextStyle(
                                   fontSize: getScreenHeight(11),
                                   fontWeight: FontWeight.w400,
@@ -2020,7 +2020,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
-    // globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
+     globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!.add(GetReachRelationshipEvent(
         userIdToReach: widget.recipientId,
         type: ReachRelationshipType.reaching));
@@ -2192,10 +2192,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              // if (state is RecipientUserData) {
-              //   globals.recipientUser = state.user;
-              //   setState(() {});
-              // }
+               if (state is RecipientUserData) {
+                globals.recipientUser = state.user;
+                setState(() {});
+               }
 
               if (state is UserError) {
                 Snackbars.error(context, message: state.error);
@@ -2237,8 +2237,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               if (state is UserLoaded) {
                 Snackbars.success(context,
                     message: "Reached User Successfully");
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
+                 globals.userBloc!.add(
+                     GetRecipientProfileEvent(email: widget.recipientEmail));
                 _isReaching = true;
 
                 setState(() {});

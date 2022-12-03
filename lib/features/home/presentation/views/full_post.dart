@@ -1146,7 +1146,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 globals.socialServiceBloc!.add(
                                                     UnlikeCommentOnPostEvent(
                                                   commentId: comments
-                                                      .value[index].commentId,
+                                                      .value[index].commentId!,
                                                   postId: comments
                                                       .value[index].postId,
                                                   likeId: '',
@@ -1331,7 +1331,7 @@ class CommentsTile extends StatelessWidget {
                           RecipientAccountProfile(
                             recipientEmail: 'email',
                             recipientImageUrl:
-                                comment.commentProfile!.profilePicture,
+                                comment.commentOwnerProfile!.profilePicture,
                             recipientId: comment.authId,
                           ));
                   progress?.dismiss();
@@ -1340,7 +1340,7 @@ class CommentsTile extends StatelessWidget {
               child: Row(
                 children: [
                   Helper.renderProfilePicture(
-                    comment.commentProfile!.profilePicture,
+                    comment.commentOwnerProfile!.profilePicture,
                     size: 30,
                   ),
                   const SizedBox(width: 10),
@@ -1349,7 +1349,7 @@ class CommentsTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '@${comment.commentProfile!.username!}',
+                        '@${comment.commentOwnerProfile!.username!}',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontFamily: 'Poppins',

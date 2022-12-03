@@ -185,7 +185,8 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                   _blockedList.value = state.blockedList!;
                 }
                 if (state is DelStarRelationshipSuccess) {
-                  Snackbars.success(context, message: 'User unstar Successfully');
+                  Snackbars.success(context,
+                      message: 'User unstarred Successfully');
                   globals.userBloc!
                       .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
                   globals.userBloc!
@@ -206,7 +207,8 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                       .add(GetUserProfileEvent(email: globals.user!.email!));
                 }
                 if (state is BlockUserSuccess) {
-                  Snackbars.success(context, message: 'User Blocked Successfuly');
+                  Snackbars.success(context,
+                      message: 'User Blocked Successfully');
                   globals.userBloc!.add(GetBlockedListEvent());
                   globals.userBloc!
                       .add(GetUserProfileEvent(email: globals.user!.email!));
@@ -215,7 +217,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is DelReachRelationshipSuccess) {
                   Snackbars.success(context,
-                      message: 'User Unreach Successful');
+                      message: 'User Unreached Successfully');
                   globals.userBloc!.add(
                       FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
                   globals.userBloc!.add(
@@ -377,13 +379,17 @@ class SeeMyReachersList extends StatelessWidget {
               minLeadingWidth: getScreenWidth(20),
               title: InkWell(
                 onTap: () {
-                  RouteNavigators.route(
-                      context,
-                      RecipientAccountProfile(
-                        recipientEmail: data!.reacher!.email,
-                        recipientImageUrl: data!.reacher!.profilePicture,
-                        recipientId: data!.reacher!.id,
-                      ));
+                  globals.userBloc!
+                      .add(GetRecipientProfileEvent(email: data!.reacher!.id));
+                  data!.reacher!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: data!.reacher!.email,
+                            recipientImageUrl: data!.reacher!.profilePicture,
+                            recipientId: data!.reacher!.id,
+                          ));
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -490,13 +496,19 @@ class SeeMyReachingsList extends StatelessWidget {
             ),
             minLeadingWidth: getScreenWidth(20),
             title: InkWell(
-              onTap: () => RouteNavigators.route(
-                  context,
-                  RecipientAccountProfile(
-                    recipientEmail: data!.reaching!.email,
-                    recipientImageUrl: data!.reaching!.profilePicture,
-                    recipientId: data!.reaching!.id,
-                  )),
+              onTap: () {
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: data!.reaching!.id));
+                data!.reaching!.id == globals.user!.id
+                    ? RouteNavigators.route(context, const AccountScreen())
+                    : RouteNavigators.route(
+                        context,
+                        RecipientAccountProfile(
+                          recipientEmail: data!.reaching!.email,
+                          recipientImageUrl: data!.reaching!.profilePicture,
+                          recipientId: data!.reaching!.id,
+                        ));
+              },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,11 +553,21 @@ class SeeMyReachingsList extends StatelessWidget {
                         : AppColors.primaryColor,
                 onPressed: () {
                   // Remove User from Reaching UI //
+                  if(isRecipientAccount!){
+                    if(isReaching!) {
+                     globals.userBloc!.add(DelReachRelationshipEvent(
+                              userIdToDelete: data!.reaching!.id));
+                   globals.userBloc!.add(DelStarRelationshipEvent(
+                              starIdToDelete: data!.reaching!.id));
+                    } else {
+                       globals.userBloc!.add(ReachUserEvent(userIdToReach: data!.reaching!.id));
+                    }
 
-                  globals.userBloc!.add(DelReachRelationshipEvent(
-                      userIdToDelete: data!.reaching!.id));
-                  globals.userBloc!.add(DelStarRelationshipEvent(
-                      starIdToDelete: data!.reaching!.id));
+                  } else {
+                    globals.userBloc!.add(DelReachRelationshipEvent(
+                          userIdToDelete: data!.reaching!.id));
+                  } 
+                      
                 },
                 textColor: !isRecipientAccount!
                     ? AppColors.black
@@ -650,7 +672,7 @@ class SeeMyBlockList extends StatelessWidget {
           bloc: globals.userBloc,
           listener: (context, state) {
             if (state is UnBlockUserSuccess) {
-              print('User Unblock Successful');
+              print('User Unblocked Successfully');
             }
           },
           builder: (context, state) {
@@ -842,12 +864,12 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
     final _starsList = useState<List<VirtualStar>>([]);
 
     useEffect(() {
-      globals.userBloc!
-          .add(FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-      globals.userBloc!
-          .add(FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
-      globals.userBloc!
-          .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!.add(FetchUserReachersEvent(
+          pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+      globals.userBloc!.add(FetchUserReachingsEvent(
+          pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+      //globals.userBloc!
+      // .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
       globals.userBloc!.add(GetBlockedListEvent());
       return null;
     }, []);
@@ -862,6 +884,18 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
           child: BlocConsumer<UserBloc, UserState>(
               bloc: globals.userBloc,
               listener: (context, state) {
+                if (state is DelReachRelationshipSuccess ||
+                    state is UserLoaded) {
+                  globals.userBloc!.add(FetchUserReachersEvent(
+                      pageLimit: 50,
+                      pageNumber: 1,
+                      authId: widget.recipientId));
+                  globals.userBloc!.add(FetchUserReachingsEvent(
+                      pageLimit: 50,
+                      pageNumber: 1,
+                      authId: widget.recipientId));
+                }
+
                 if (state is FetchUserReachersSuccess) {
                   _reachersList.value = state.reachers!;
                 }
@@ -874,13 +908,6 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                 if (state is UserError) {
                   Snackbars.error(context, message: state.error);
                 }
-                /*if (state is DelReachRelationshipSuccess ||
-                    state is UserLoaded) {
-                  globals.userBloc!.add(
-                      FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-                   globals.userBloc!.add(
-                    FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
-                }*/
               },
               builder: (context, state) {
                 bool _isLoading = state is UserLoading;

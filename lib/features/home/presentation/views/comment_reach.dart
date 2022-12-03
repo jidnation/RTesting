@@ -20,6 +20,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -37,12 +38,7 @@ import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 
-class UploadFileDto {
-  File file;
-  String id;
-  FileResult? fileResult;
-  UploadFileDto({required this.file, required this.id, this.fileResult});
-}
+
 
 class CommentReach extends StatefulHookWidget {
   final PostFeedModel postFeedModel;

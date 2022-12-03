@@ -20,6 +20,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
@@ -27,20 +28,15 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+//import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 
 import '../../../../core/models/file_result.dart';
-
-
-class UploadFileDto {
-  File file;
-  String id;
-  FileResult? fileResult;
-  UploadFileDto({required this.file, required this.id, this.fileResult});
-}
-
+import '../../../chat/presentation/widgets/audio_player.dart';
+import '../widgets/post_media.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -114,9 +110,10 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
     final controller = useTextEditingController();
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
+    final commentLike = useState<CommentLikeModel?>(null);
     final scrollController = useScrollController();
     final isTyping = useState<bool>(false);
-    final mediaList = useState<List<UploadFileDto>>([]);
+    final imageList = useState<List<UploadFileDto>>([]);
 
     useEffect(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
@@ -152,6 +149,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                         curve: Curves.easeOut,
                       );
                     });
+
                     Snackbars.success(context,
                         message: "Your commment has been posted");
                     triggerProgressIndicator.value = false;
@@ -174,26 +172,49 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                   if (state is GetAllCommentsOnPostError) {
                     Snackbars.error(context, message: state.error);
                   }
-                  if (state is UnlikeCommentOnPostSuccess ||
-                      state is LikeCommentOnPostSuccess) {
-                    globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-                        postId: widget.post.postId,
-                        pageLimit: 50,
-                        pageNumber: 1));
+
+                  //if (state is UnlikeCommentOnPostSuccess ||
+                  // state is LikeCommentOnPostSuccess) {
+                  //globals.socialServiceBloc!.add(GetAllCommentLikesEvent(
+                  //  commentId: comments.value[index].commentId));
+
+                  //}
+
+                  if (state is LikeCommentOnPostSuccess) {
+                    commentLike.value = state.commentLikeModel;
                   }
+
+                  if (state is UnlikeCommentOnPostSuccess) {
+                    // commentUnlike.value = state.unlikeComment;
+                    //isLiked.value = false;
+                  }
+
                   if (state is MediaUploadSuccess) {
                     String? audioUrl = state.image!;
                     globals.socialServiceBloc!.add(CommentOnPostEvent(
-                        content: " ",
+                        content: ' ',
                         postId: widget.post.postId,
                         userId: globals.user!.id,
                         audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
                         postOwnerId: widget.post.postOwnerId));
                   }
+                  if (state is UploadMediaSuccess) {
+                    List<String> mediaUrls = state.data as List<String>;
+                    List<String> imageUrls = mediaUrls
+                        .where((e) => FileUtils.fileType(e) == 'image')
+                        .toList();
+                    globals.socialServiceBloc!.add(CommentOnPostEvent(
+                        content: ' ',
+                        postId: widget.post.postId,
+                        userId: globals.user!.id,
+                        imageMediaItems:
+                            imageUrls.isNotEmpty ? imageUrls : null,
+                        postOwnerId: widget.post.postOwnerId));
+                  }
                 },
                 builder: (context, state) {
                   bool isLoading = state is GetAllCommentsOnPostLoading;
-
+                  print('${commentLike.value}');
                   return WillPopScope(
                     child: ProgressHUD(
                       child: Column(
@@ -287,8 +308,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                           color: AppColors.textColor2,
                                         ),
                                       ),
-                                if ((widget
-                                    .post.post!.imageMediaItems??[]).isNotEmpty)
+                                if ((widget.post.post!.imageMediaItems ?? [])
+                                    .isNotEmpty)
                                   Helper.renderPostImages(
                                           widget.post.post!, context)
                                       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
@@ -312,41 +333,59 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                           horizontal: 15),
                                       itemCount: comments.value.length,
                                       itemBuilder: (context, index) {
+                                        // if (comments
+                                        //         .value[index].audioMediaItem ==
+                                        //     null) {
+                                        //   comments.value[index].audioMediaItem =
+                                        //       ' ';
+                                        // }
                                         return CommentsTile(
                                           comment: comments.value[index],
-                                          isLiked: comments
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
+                                          isLiked:
+                                              comments.value[index].isLiked ??
+                                                      false
+                                                  ? true
+                                                  : false,
                                           onLike: () {
+                                            print(
+                                                "${comments.value[index].isLiked}");
                                             HapticFeedback.mediumImpact();
                                             handleTap(index);
                                             if (active.contains(index)) {
-                                              String like =
-                                                  (comments.value[index].like!)
-                                                      .firstWhere((e) =>
-                                                          e.authId ==
-                                                          globals.userId)
-                                                      .likeId!;
-                                              if (comments.value[index].like!
-                                                  .isNotEmpty) {
+                                              if (comments
+                                                  .value[index].isLiked!) {
+                                                comments.value[index].isLiked =
+                                                    false;
+
+                                                comments.value[index].nLikes =
+                                                    (comments.value[index]
+                                                                .nLikes ??
+                                                            1) -
+                                                        1;
                                                 globals.socialServiceBloc!.add(
-                                                    UnlikeCommentOnPostEvent(
-                                                  commentId: comments
-                                                      .value[index].commentId,
-                                                  likeId: like,
-                                                  // comments
-                                                  //  .value[index].like.,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikeCommentOnPostEvent(
-                                                    postId: comments
-                                                        .value[index].postId,
+                                                  UnlikeCommentOnPostEvent(
                                                     commentId: comments
-                                                        .value[index].commentId,
+                                                        .value[index]
+                                                        .commentId!,
+                                                    likeId: commentLike
+                                                        .value!.likeId!,
                                                   ),
                                                 );
+                                              } else {
+                                                comments.value[index].isLiked =
+                                                    true;
+                                                comments.value[index].nLikes =
+                                                    (comments.value[index]
+                                                                .nLikes ??
+                                                            0) +
+                                                        1;
+                                                globals.socialServiceBloc!
+                                                    .add(LikeCommentOnPostEvent(
+                                                  postId: comments
+                                                      .value[index].postId,
+                                                  commentId: comments
+                                                      .value[index].commentId,
+                                                ));
                                               }
                                             }
                                           },
@@ -452,8 +491,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               if (image !=
                                                                   null) {
                                                                 for (var e
-                                                                    in image) {                                                        
-                                                                 mediaList.value.add(UploadFileDto(
+                                                                    in image) {
+                                                                  imageList.value.add(UploadFileDto(
                                                                       file: e
                                                                           .file,
                                                                       fileResult:
@@ -464,22 +503,27 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                           .toString()));
                                                                 }
                                                               }
-                                                              //globals.socialServiceBloc!.add(UploadPostMediaEvent(media:mediaList.value!));
-
                                                               globals
                                                                   .socialServiceBloc!
-                                                                  .add(
-                                                                      CommentOnPostEvent(
-                                                               postId: widget
-                                                              .post.postId,
-                                                          content: " ",                                                              
-                                                          userId:
-                                                              globals.user!.id,
-                                                          postOwnerId: widget
-                                                              .post
-                                                              .postOwnerId
-                                                           // imageMediaItems: image.
-                                                              ));
+                                                                  .add(UploadPostMediaEvent(
+                                                                      media: imageList
+                                                                          .value));
+
+                                                              /*globals.socialServiceBloc!.add(CommentOnPostEvent(
+                                                                  postId: widget
+                                                                      .post
+                                                                      .postId,
+                                                                  content: " ",
+                                                                  userId:
+                                                                      globals
+                                                                          .user!
+                                                                          .id,
+                                                                  postOwnerId:
+                                                                      widget
+                                                                          .post
+                                                                          .postOwnerId
+                                                                  // imageMediaItems: image.
+                                                                  ));*/
                                                             },
                                                           ),
                                                         ]).paddingSymmetric(
@@ -588,7 +632,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               .post.postId,
                                                           content:
                                                               controller.text,
-                                                          userId:
+                                                             userId:
                                                               globals.user!.id,
                                                           postOwnerId: widget
                                                               .post
@@ -639,7 +683,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       await recorderController
                                                           .stop();
                                                   File audio = File(path!);
-                                                  globals.socialServiceBloc!
+                                                  /* globals.socialServiceBloc!
                                                       .add(CommentOnPostEvent(
                                                           content: " ",
                                                           audioMediaItem:
@@ -650,10 +694,11 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               globals.user!.id!,
                                                           postOwnerId: widget
                                                               .post
-                                                              .postOwnerId));
+                                                              .postOwnerId));*/
                                                   globals.socialServiceBloc!
                                                       .add(MediaUploadEvent(
                                                           media: audio));
+
                                                   print(path);
                                                 } else {
                                                   await recorderController
@@ -952,9 +997,9 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                               globals.socialServiceBloc!
                                                   .add(UnlikeCommentOnPostEvent(
                                                 commentId: comments
-                                                    .value[index].commentId,
+                                                    .value[index].commentId!,
                                                 likeId: comments
-                                                    .value[index].postId,
+                                                    .value[index].postId!,
                                               ));
                                             } else {
                                               globals.socialServiceBloc!.add(
@@ -1089,7 +1134,7 @@ class CommentsTile extends StatelessWidget {
                           RecipientAccountProfile(
                             recipientEmail: 'email',
                             recipientImageUrl:
-                                comment.commentProfile!.profilePicture,
+                                comment.commentOwnerProfile!.profilePicture,
                             recipientId: comment.authId,
                           ));
                   progress?.dismiss();
@@ -1098,7 +1143,7 @@ class CommentsTile extends StatelessWidget {
               child: Row(
                 children: [
                   Helper.renderProfilePicture(
-                    comment.commentProfile!.profilePicture,
+                    comment.commentOwnerProfile!.profilePicture,
                     size: 30,
                   ),
                   const SizedBox(width: 10),
@@ -1107,7 +1152,7 @@ class CommentsTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '@${comment.commentProfile!.username!}',
+                        '@${comment.commentOwnerProfile!.username!}',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontFamily: 'Poppins',
@@ -1121,22 +1166,26 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            comment.content!.isNotEmpty
-                ? Text(
-                    comment.content!,
-                    style: TextStyle(
-                      fontSize: getScreenHeight(14),
-                      color: AppColors.textColor2,
-                    ),
-                  )
-                : comment.audioMediaItem!.isNotEmpty
-                    //? PostAudioMedia(path: comment.audioMediaItem!)
-                    ? PostAudioMedia(path: comment.audioMediaItem!)
-                        .paddingOnly(r: 16, l: 16, b: 10, t: 0)
-                    : comment.imageMediaItems!.isNotEmpty
-                        ? CommentMedia(comment: comment)
-                            .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                        : const SizedBox.shrink(),
+            if (comment.content!.isNotEmpty)
+              Text(
+                comment.content!,
+                style: TextStyle(
+                  fontSize: getScreenHeight(14),
+                  color: AppColors.textColor2,
+                ),
+              ),
+            // if (comment.audioMediaItem!.isNotEmpty)
+            //   PostAudioMedia(path: comment.audioMediaItem!)
+            //   //PlayAudio(
+            //     //audioFile: comment.audioMediaItem!,
+            //     //isMe: true,
+            //   //)
+            //              .paddingOnly(r: 16, l: 16, b: 10, t: 0)
+            // else if (comment.imageMediaItems!.isNotEmpty)
+            //   CommentMedia(comment: comment)
+            //       .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+            // else
+            //   const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

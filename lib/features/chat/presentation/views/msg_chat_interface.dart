@@ -65,7 +65,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
 
-   // if (mounted)_initialiseController();
+    // if (mounted)_initialiseController();
 
     openAudio();
     focusNode.addListener(() {
@@ -505,10 +505,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       },
                                       prefixIcon: GestureDetector(
                                         onTap: () async {
+                                          print('HELLO TETING MIC 123');
                                           focusNode.unfocus();
                                           focusNode.canRequestFocus = false;
                                           setState(() {
-                                            emojiShowing != emojiShowing;
+                                            emojiShowing = !emojiShowing;
                                           });
                                         },
                                         child: SvgPicture.asset(
