@@ -34,6 +34,7 @@ import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../account/presentation/views/account.dart';
+import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../data/models/comment_model.dart';
@@ -161,198 +162,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
       await saveImage(byteData!.buffer.asUint8List());
     }
 
-    Future showFullPostReacherCardBottomSheet(BuildContext context,
-        {required PostFeedModel postFeedModel, void Function()? downloadPost}) {
-      return showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        builder: (context) {
-          return BlocConsumer<SocialServiceBloc, SocialServiceState>(
-            bloc: globals.socialServiceBloc,
-            listener: (context, state) {
-              if (state is GetPostSuccess) {
-                globals.socialServiceBloc!
-                    .add(GetPostEvent(postId: widget.postFeedModel!.postId));
-                _refreshController.refreshCompleted();
-              }
-              if (state is GetPostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is SavePostSuccess) {
-                RouteNavigators.pop(context);
-                Snackbars.success(context, message: 'Post saved successfully');
-              }
-              if (state is SavePostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-              if (state is DeleteSavedPostSuccess) {
-                RouteNavigators.pop(context);
-                Snackbars.success(context,
-                    message: 'Post removed successfully');
-              }
-              if (state is DeleteSavedPostError) {
-                RouteNavigators.pop(context);
-                Snackbars.error(context, message: state.error);
-              }
-            },
-            builder: (context, state) {
-              bool _isLoading = state is GetPostLoading;
-              return BlocConsumer<UserBloc, UserState>(
-                bloc: globals.userBloc,
-                listener: (context, state) {
-                  if (state is UserLoading) {
-                    // globals.showLoader(context);
-                  }
-                  if (state is UserError) {
-                    RouteNavigators.pop(context);
-                    RouteNavigators.pop(context);
-                    Snackbars.error(context, message: state.error);
-                  }
-                  if (state is StarUserSuccess) {
-                    RouteNavigators.pop(context);
-                    Snackbars.success(context,
-                        message: 'User starred successfully!');
-                  }
-                },
-                builder: (context, state) {
-                  return Container(
-                      decoration: const BoxDecoration(
-                        color: AppColors.greyShade7,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                      child: ListView(shrinkWrap: true, children: [
-                        Center(
-                          child: Container(
-                              height: getScreenHeight(4),
-                              width: getScreenWidth(58),
-                              decoration: BoxDecoration(
-                                  color: AppColors.greyShade4,
-                                  borderRadius: BorderRadius.circular(40))),
-                        ).paddingOnly(t: 23),
-                        SizedBox(height: getScreenHeight(20)),
-                        if (postFeedModel.postOwnerId !=
-                            postFeedModel.feedOwnerId)
-                          Column(
-                            children: [
-                              KebabBottomTextButton(
-                                  label: 'Share post',
-                                  onPressed: () {
-                                    RouteNavigators.pop(context);
-                                    Share.share(
-                                        'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'Save post',
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(
-                                        SavePostEvent(
-                                            postId: postFeedModel.postId));
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'takeScreenShot',
-                                  onPressed: takeScreenShot),
-                              KebabBottomTextButton(
-                                label: reachUser.value
-                                    ? "Unreach user"
-                                    : 'Reach user',
-                                onPressed: () {
-                                  globals.showLoader(context);
-                                  if (reachUser.value) {
-                                  } else {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            postFeedModel.postOwnerId));
-                                  }
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                label: starUser.value
-                                    ? 'Unstar user'
-                                    : 'Star user',
-                                onPressed: () {
-                                  if (starUser.value) {
-                                    setState(() {
-                                      starUser.value = true;
-                                    });
-                                  } else {
-                                    globals.showLoader(context);
-                                    globals.userBloc!.add(StarUserEvent(
-                                        userIdToStar:
-                                            postFeedModel.postOwnerId));
-                                    setState(() {
-                                      starUser.value = false;
-                                    });
-                                  }
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                label: 'Copy link',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Clipboard.setData(ClipboardData(
-                                      text: postFeedModel.post!.postSlug!));
-                                  Snackbars.success(context,
-                                      message: 'Link copied to clipboard');
-                                },
-                              ),
-                            ],
-                          )
-                        else
-                          Column(
-                            children: [
-                              KebabBottomTextButton(
-                                  label: 'Edit content',
-                                  isLoading: _isLoading,
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(GetPostEvent(
-                                        postId: postFeedModel.postId));
-                                  }),
-                              KebabBottomTextButton(
-                                  label: 'Delete post',
-                                  onPressed: () {
-                                    globals.socialServiceBloc!.add(
-                                        DeletePostEvent(
-                                            postId: postFeedModel.postId));
-                                    RouteNavigators.pop(context);
-                                  }),
-                              KebabBottomTextButton(
-                                label: 'Share Post',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Share.share(
-                                      'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
-                                },
-                              ),
-                              KebabBottomTextButton(
-                                  label: 'take ScreenShot',
-                                  onPressed: takeScreenShot),
-                              KebabBottomTextButton(
-                                label: 'Copy link',
-                                onPressed: () {
-                                  RouteNavigators.pop(context);
-                                  Clipboard.setData(ClipboardData(
-                                      text: postFeedModel.post!.postSlug!));
-                                  Snackbars.success(context,
-                                      message: 'Link copied to clipboard');
-                                },
-                              ),
-                            ],
-                          ),
-                        SizedBox(height: getScreenHeight(20)),
-                      ]));
-                },
-              );
-            },
-          );
-        },
-      );
-    }
-
+   
     final reachDM = useState(false);
     return BlocConsumer<UserBloc, UserState>(
       bloc: globals.userBloc,
@@ -612,10 +422,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     width: getScreenWidth(9)),
                                                 IconButton(
                                                   onPressed: () async {
-                                                    await showFullPostReacherCardBottomSheet(
-                                                        context,
-                                                        postFeedModel: widget
-                                                            .postFeedModel!);
+                                                    await showReacherCardBottomSheet(
+                                                      context,
+                                                      downloadPost:
+                                                          takeScreenShot,
+                                                      postFeedModel:
+                                                          widget.postFeedModel!,
+                                                    );
                                                   },
                                                   iconSize: getScreenHeight(19),
                                                   padding:
