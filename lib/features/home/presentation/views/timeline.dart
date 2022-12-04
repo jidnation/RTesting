@@ -949,7 +949,8 @@ class PostFeedReacherCard extends HookWidget {
                                         builder: (builder) => FullPostScreen(
                                               postFeedModel: postFeedModel,
                                             ))),
-                                child: Row(
+                                child: 
+                                Row(
                                   children: [
                                     Text(
                                       postFeedModel!.post!.location! == 'nil' ||
@@ -984,6 +985,7 @@ class PostFeedReacherCard extends HookWidget {
                                     ).paddingOnly(l: 6),
                                   ],
                                 ),
+                             
                               )
                             ],
                           ).paddingOnly(t: 10),
