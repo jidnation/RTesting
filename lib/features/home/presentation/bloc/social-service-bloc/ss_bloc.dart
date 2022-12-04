@@ -35,6 +35,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
             commentOption: event.commentOption,
             content: event.content,
             location: event.location,
+            mentionList: event.mentionList,
             postRating: event.postRating);
         response.fold(
           (error) => emit(CreatePostError(error: error)),
