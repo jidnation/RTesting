@@ -52,8 +52,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   bool isRecording = false;
   bool isTyping = false;
   final TextEditingController controller = TextEditingController();
-  bool isKeyboardVisible = false;
-  var keyboardVisibilityController = KeyboardVisibilityController();
+  //bool isKeyboardVisible = false;
+  //var keyboardVisibilityController = KeyboardVisibilityController();
 
   //AUDIO_WAVEFORM RECORDER
   RecorderController? recorderController;
@@ -65,16 +65,16 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
 
-   // if (mounted)_initialiseController();
+    // if (mounted)_initialiseController();
 
     openAudio();
-    /*focusNode.addListener(() {
+    focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
           emojiShowing = false;
         });
       }
-    });*/
+    });
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _controller.animateTo(
         _controller.position.maxScrollExtent,
@@ -87,16 +87,16 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
     });
 
-    keyboardVisibilityController.onChange.listen((value) {
+    /*keyboardVisibilityController.onChange.listen((value) {
       setState(() {
         isKeyboardVisible = value;
       });
-      /* if (isKeyboardVisible && emojiShowing) {
+            /* if (isKeyboardVisible && emojiShowing) {
         setState(() {
           emojiShowing = false;
         });
       }*/
-    });
+    });*/
   }
 
   @override
@@ -505,37 +505,12 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       },
                                       prefixIcon: GestureDetector(
                                         onTap: () async {
-                                          if (emojiShowing &&
-                                              !isKeyboardVisible) {
-                                            //keyboardVisibilityController.
-                                            //focusNode.requestFocus();
-                                            //FocusScope.of(context).unfocus();
-                                            setState(() {
-                                              emojiShowing = false;
-                                            });
-                                            focusNode.requestFocus();
-                                            FocusScope.of(context)
-                                                .requestFocus(focusNode);
-                                          } else if (isKeyboardVisible &&
-                                              !emojiShowing) {
-                                            setState(() {
-                                              emojiShowing = true;
-                                            });
-                                            await Future.delayed(const Duration(
-                                                milliseconds: 100));
-                                            focusNode.unfocus();
-                                            FocusScope.of(context).unfocus();
-                                            FocusManager.instance.primaryFocus
-                                                ?.unfocus();
-                                            await SystemChannels.textInput
-                                                .invokeMethod('TextInput.hide');
-                                          }
-                                          /*if (isKeyboardVisible) {
-                                            FocusScope.of(context).unfocus();
-                                          }
+                                          print('HELLO TETING MIC 123');
+                                          focusNode.unfocus();
+                                          focusNode.canRequestFocus = false;
                                           setState(() {
                                             emojiShowing = !emojiShowing;
-                                          });*/
+                                          });
                                         },
                                         child: SvgPicture.asset(
                                           'assets/svgs/emoji.svg',
@@ -753,6 +728,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   child: SizedBox(
                                       height: 250,
                                       child: EmojiPicker(
+                                        textEditingController: controller,
                                         config: const Config(
                                           columns: 7,
                                         ),
@@ -760,7 +736,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                           setState(() {
                                             isTyping = !isTyping;
                                           });
-
+                                          setState(() {
+                                            controller.text = controller.text;
+                                          });
                                         },
                                       )),
                                 )
