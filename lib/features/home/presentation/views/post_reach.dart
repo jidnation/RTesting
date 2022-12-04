@@ -107,7 +107,7 @@ class _PostReachState extends State<PostReach> {
     });
 
     useMemoized(() {
-      globals.userBloc!.add(FetchUserReachersEvent(
+      globals.userBloc!.add(FetchUserReachingsEvent(
           pageLimit: 50, pageNumber: 1, authId: globals.userId));
     });
 
@@ -177,11 +177,15 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
-
+                                setState(() {
+                                  _mentionList.value.add(controllerKey
+                                      .currentState!.controller!.text);
+                                });
                                 globals.postContent = controllerKey
                                     .currentState!.controller!.text;
                                 globals.postCommentOption = replyFeature.value;
                                 globals.postRating = postRating;
+                                globals.mentionList = _mentionList.value;
 
                                 // globals.mentionList!.add(controllerKey
                                 //     .currentState!.controller!.markupText);
@@ -193,17 +197,17 @@ class _PostReachState extends State<PostReach> {
                               } else {
                                 setState(() {
                                   _mentionList.value.add(controllerKey
-                                      .currentState!.controller!.markupText);
+                                      .currentState!.controller!.text);
                                 });
+                                debugPrint(
+                                    "Mentions Value List: ${_mentionList.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
                                     content: controllerKey
                                         .currentState!.controller!.text,
                                     commentOption: replyFeature.value,
                                     location: getUserLocation(),
-                                    postRating: postRating
-
-                                    // mentionList: _mentionList.value
-                                    ));
+                                    postRating: postRating,
+                                    mentionList: _mentionList.value));
 
                                 debugPrint(
                                     "Mention: ${controllerKey.currentState!.controller!.markupText}");
@@ -304,12 +308,12 @@ class _PostReachState extends State<PostReach> {
                     BlocListener<UserBloc, UserState>(
                       bloc: globals.userBloc,
                       listener: (context, userState) {
-                        if (userState is FetchUserReachersSuccess) {
-                          if (userState.reachers != null) {
-                            _mentionUsers.value = userState.reachers!
-                                .map((reachers) => {
-                                      "id": reachers.reacherId,
-                                      "display": reachers.reacher!.username
+                        if (userState is FetchUserReachingsSuccess) {
+                          if (userState.reachings != null) {
+                            _mentionUsers.value = userState.reachings!
+                                .map((reachings) => {
+                                      "id": reachings.reachingId,
+                                      "display": reachings.reaching!.username
                                     })
                                 .toList();
                           }

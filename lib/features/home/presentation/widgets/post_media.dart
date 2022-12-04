@@ -459,29 +459,31 @@ class _PostMediaState extends State<PostMedia> {
                           ));
               } else {
                 return ImageBlur(
-                    widget.post,
-                    Container(
-                        height: getScreenHeight(300),
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: FileUtils.isImagePath(path)
-                            ? PostImageMedia(
-                                postModel: widget.post,
-                                imageUrl: path,
-                                allMediaUrls: imageVideoList,
-                                index: index,
-                              )
-                            : PostVideoMedia(
-                                url: path,
-                                scaleIcon: 0.7,
-                                allMediaUrls: imageVideoList,
-                                index: index,
-                              )), () {
-                  setState(() {
-                    show = true;
-                  });
-                });
+                  widget.post,
+                  Container(
+                      height: getScreenHeight(300),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15)),
+                      child: FileUtils.isImagePath(path)
+                          ? PostImageMedia(
+                              postModel: widget.post,
+                              imageUrl: path,
+                              allMediaUrls: imageVideoList,
+                              index: index,
+                            )
+                          : PostVideoMedia(
+                              url: path,
+                              scaleIcon: 0.7,
+                              allMediaUrls: imageVideoList,
+                              index: index,
+                            )),
+                  () {
+                    setState(() {
+                      show = true;
+                    });
+                  },
+                );
               }
             } else {
               return Container(
@@ -816,7 +818,7 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
                           color: Colors.white),
                     ),
                     const SizedBox(
-                      height: 20,
+                      height: 10,
                     ),
                     Align(
                       alignment: Alignment.bottomRight,

@@ -6,7 +6,7 @@ abstract class SocialServiceEvent {}
 class CreatePostEvent extends SocialServiceEvent {
   final String? audioMediaItem;
   final String? videoMediaItem;
-  final List<String>? imageMediaItem;
+  final List<String>? imageMediaItem, mentionList;
   final String? commentOption;
   final String? content, location, postRating;
   CreatePostEvent(
@@ -16,6 +16,7 @@ class CreatePostEvent extends SocialServiceEvent {
       this.commentOption,
       this.content,
       this.location,
+      this.mentionList,
       this.postRating});
 }
 

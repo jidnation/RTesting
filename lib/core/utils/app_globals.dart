@@ -34,6 +34,7 @@ class AppGlobals {
   String? postContent;
   String? postCommentOption;
   String? postRating;
+  List<String>? mentionList;
 
   User? user;
   List<Chat>? userChat;
@@ -47,6 +48,7 @@ class AppGlobals {
     user = User();
     recipientUser = User();
     userChat = [];
+    mentionList = [];
     userThreads = [];
     loginResponse = LoginResponse();
     authBloc = AuthBloc();

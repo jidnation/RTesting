@@ -536,6 +536,7 @@ class HomeRemoteDataSource {
     List<String>? imageMediaItems,
     String? videoMediaItem,
     String? postRating,
+    List<String>? mentionList,
   }) async {
     String q = r'''
         mutation createPost(
@@ -546,6 +547,7 @@ class HomeRemoteDataSource {
           $videoMediaItem: String
           $location: String!
           $postRating: String!
+          $mentionList: [String]
           ) {
           createPost(
             postBody: {
@@ -556,6 +558,7 @@ class HomeRemoteDataSource {
               videoMediaItem: $videoMediaItem
               location: $location
               postRating: $postRating
+              mentionList: $mentionList
           }) {
             ''' +
         PostSchema.schema +
@@ -580,6 +583,9 @@ class HomeRemoteDataSource {
       if (videoMediaItem != null) {
         variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
       }
+      if (mentionList != null) {
+        variables.putIfAbsent('mentionList', () => mentionList);
+      }
 
       final result = await _client.mutate(
         gql(q),
@@ -590,7 +596,8 @@ class HomeRemoteDataSource {
       }
 
       var post = PostModel.fromJson(result.data!['createPost']);
-      print("Postrating: ${post.postRating}");
+
+      print("MentionListValue: ${post.mentionList}");
 
       return PostModel.fromJson(result.data!['createPost']);
     } catch (e) {
@@ -601,7 +608,7 @@ class HomeRemoteDataSource {
   Future<PostModel> createRepost({required CreateRepostInput input}) async {
     String q = r'''
         mutation createRepost(
-          $repostBody: CreateRepostInput!
+          $repostBody: PostRepostInputDto!
           ) {
           createRepost(
             repostBody: $repostBody
