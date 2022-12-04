@@ -42,6 +42,13 @@ class Validator {
       return null;
     }
   }
+  static String? emptyField(String value) {
+    if (value.isEmpty) {
+      return '🚩 Fields cannot be empty.';
+    } else {
+      return null;
+    }
+  }
 
   static String? fullNameValidate(String fullName) {
     String patttern = r'^[a-z A-Z,.\-]+$';

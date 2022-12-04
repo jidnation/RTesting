@@ -32,6 +32,7 @@ import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dar
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
+import '../bloc/user-bloc/user_bloc.dart';
 
 class UploadFileDto {
   File file;
@@ -97,9 +98,16 @@ class _PostReachState extends State<PostReach> {
   Widget build(BuildContext context) {
     final _isLoading = useState<bool>(true);
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
+    final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
+    final _mentionList = useState<List<String>>([]);
     useMemoized(() {
       globals.dictionaryBloc!
           .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
+    });
+
+    useMemoized(() {
+      globals.userBloc!.add(FetchUserReachersEvent(
+          pageLimit: 50, pageNumber: 1, authId: globals.userId));
     });
 
     var size = MediaQuery.of(context).size;
@@ -120,7 +128,7 @@ class _PostReachState extends State<PostReach> {
       if (globals.user!.showLocation!) {
         return globals.location!;
       } else {
-        return 'nil';
+        return '';
       }
     }
 
@@ -172,24 +180,34 @@ class _PostReachState extends State<PostReach> {
                                 globals.postContent = controllerKey
                                     .currentState!.controller!.text;
                                 globals.postCommentOption = replyFeature.value;
-                                if (nudity == true ||
-                                    graphicViolence == true ||
-                                    sensitive == true) {
-                                  globals.postRating = "sensitive";
-                                } else {
-                                  globals.postRating = "normal";
-                                }
+                                globals.postRating = postRating;
+
+                                // globals.mentionList!.add(controllerKey
+                                //     .currentState!.controller!.markupText);
+
+                                debugPrint(
+                                    "Mention: ${controllerKey.currentState!.controller!.markupText}");
+
                                 setState(() {});
                               } else {
+                                setState(() {
+                                  _mentionList.value.add(controllerKey
+                                      .currentState!.controller!.markupText);
+                                });
                                 globals.socialServiceBloc!.add(CreatePostEvent(
                                     content: controllerKey
                                         .currentState!.controller!.text,
                                     commentOption: replyFeature.value,
                                     location: getUserLocation(),
-                                    postRating:
-                                        nudity || graphicViolence || sensitive
-                                            ? globals.postRating = "sensitive"
-                                            : "normal"));
+                                    postRating: postRating
+
+                                    // mentionList: _mentionList.value
+                                    ));
+
+                                debugPrint(
+                                    "Mention: ${controllerKey.currentState!.controller!.markupText}");
+                                debugPrint(
+                                    "Mention: ${controllerKey.currentState!.controller!.text}");
                               }
                               RouteNavigators.pop(context);
                             }
@@ -224,7 +242,9 @@ class _PostReachState extends State<PostReach> {
                                   ),
                                 ),
                                 Text(
-                                  globals.location == 'NIL'
+                                  globals.location == 'NIL' ||
+                                          globals.location == 'nil' ||
+                                          globals.location == null
                                       ? ''
                                       : globals.location!,
                                   style: const TextStyle(
@@ -280,162 +300,224 @@ class _PostReachState extends State<PostReach> {
                     ).paddingSymmetric(h: 16),
                     const SizedBox(height: 20),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
-                    BlocConsumer<DictionaryBloc, DictionaryState>(
-                      bloc: globals.dictionaryBloc,
-                      listener: (context, state) {
-                        if (state is GetWordToMentionsSuccess) {
-                          _recentWords.value = state.mentionsData
-                              .map((item) => {
-                                    "id": item["authId"],
-                                    "display": item["abbr"],
-                                    "meaning": item["meaning"],
-                                  })
-                              .toList();
+                    BlocListener<UserBloc, UserState>(
+                      bloc: globals.userBloc,
+                      listener: (context, userState) {
+                        if (userState is FetchUserReachersSuccess) {
+                          if (userState.reachers != null) {
+                            _mentionUsers.value = userState.reachers!
+                                .map((reachers) => {
+                                      "id": reachers.reacherId,
+                                      "display": reachers.reacher!.username
+                                    })
+                                .toList();
+                          }
 
                           _isLoading.value = false;
                         }
-
-                        if (state is LoadingWordsToMentions) {
-                          _isLoading.value = true;
-                        }
-                        if (state is GetWordToMentionsError) {
-                          Snackbars.error(context, message: state.error);
-                        }
                       },
-                      builder: (context, state) {
-                        return FlutterMentions(
-                          key: controllerKey,
-                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          // minLines: null,
+                      child: BlocConsumer<DictionaryBloc, DictionaryState>(
+                        bloc: globals.dictionaryBloc,
+                        listener: (context, state) {
+                          if (state is GetWordToMentionsSuccess) {
+                            _recentWords.value = state.mentionsData
+                                .map((item) => {
+                                      "id": item["authId"],
+                                      "display": item["abbr"],
+                                      "meaning": item["meaning"],
+                                    })
+                                .toList();
 
-                          suggestionPosition: SuggestionPosition.Bottom,
-                          onChanged: (val) {
-                            counter.value = val
-                                .trim()
-                                .split(RegexUtil.spaceOrNewLine)
-                                .length;
-                            if (counter.value >= 200) {
-                              Snackbars.error(context,
-                                  message: '200 words limit reached!');
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            counterText: '',
-                            hintText: "What's on your mind?",
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.greyShade1,
+                            _isLoading.value = false;
+                          }
+
+                          if (state is LoadingWordsToMentions) {
+                            _isLoading.value = true;
+                          }
+                          if (state is GetWordToMentionsError) {
+                            Snackbars.error(context, message: state.error);
+                          }
+                        },
+                        builder: (context, state) {
+                          return FlutterMentions(
+                            key: controllerKey,
+                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                            // minLines: null,
+
+                            suggestionPosition: SuggestionPosition.Bottom,
+                            onChanged: (val) {
+                              counter.value = val
+                                  .trim()
+                                  .split(RegexUtil.spaceOrNewLine)
+                                  .length;
+                              if (counter.value >= 200) {
+                                Snackbars.error(context,
+                                    message: '200 words limit reached!');
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              counterText: '',
+                              hintText: "What's on your mind?",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.greyShade1,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
                             ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                          mentions: [
-                            Mention(
-                                trigger: "#",
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                ),
-                                data: _recentWords.value,
-                                matchAll: false,
-                                suggestionBuilder: (data) {
-                                  return Container(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: _isLoading.value
-                                        ? const CircularProgressIndicator()
-                                        : _recentWords.value.isEmpty
-                                            ? TextButton(
-                                                onPressed: () {
-                                                  // showDialog(
-                                                  //     context: context,
-                                                  //     builder: (BuildContext
-                                                  //         context) {
-                                                  //       return const AddToGlossaryDialog();
-                                                  //     });
-                                                  // Navigator.pop(context);
-                                                  RouteNavigators.route(context,
-                                                      const AddToGlossary());
-                                                },
-                                                child: const Text(
-                                                    'Add to glossary'))
-                                            : Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const SizedBox(
-                                                    width: 20.0,
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        '#${data['display']}',
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            color: Colors
-                                                                .blueAccent),
-                                                      ),
-                                                      Text(
-                                                        data['meaning'],
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  // IconButton(
-                                                  //   onPressed: () {},
-                                                  //   icon: const Icon(Icons.add),
-                                                  // ),
-                                                ],
-                                              ),
-                                  );
-                                }),
-                          ],
-                          // child: TextField(
-                          //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                          //   minLines: 1,
-                          //   maxLines: null,
-                          //   controller: controller,
-                          //   inputFormatters: [
-                          //     MaxWordTextInputFormater(maxWords: 200)
-                          //   ],
-                          //   // maxLength: 200,
-                          //   onChanged: (val) {
-                          //     counter.value =
-                          //         val.trim().split(RegexUtil.spaceOrNewLine).length;
-                          //     if (counter.value >= 200) {
-                          //       Snackbars.error(context,
-                          //           message: '200 words limit reached!');
-                          //     }
-                          //   },
-                          //   decoration: const InputDecoration(
-                          //     counterText: '',
-                          //     hintText: "What's on your mind?",
-                          //     hintStyle: TextStyle(
-                          //       fontSize: 14,
-                          //       fontWeight: FontWeight.w400,
-                          //       color: AppColors.greyShade1,
-                          //     ),
-                          //     border: InputBorder.none,
-                          //     contentPadding: EdgeInsets.symmetric(
-                          //       horizontal: 16,
-                          //       vertical: 10,
-                          //     ),
-                          //   ),
-                          // ).paddingSymmetric(h: 16),
-                        );
-                      },
+                            mentions: [
+                              Mention(
+                                  trigger: "#",
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                  data: _recentWords.value,
+                                  matchAll: false,
+                                  suggestionBuilder: (data) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: _isLoading.value
+                                          ? const CircularProgressIndicator()
+                                          : _recentWords.value.isEmpty
+                                              ? TextButton(
+                                                  onPressed: () {
+                                                    // showDialog(
+                                                    //     context: context,
+                                                    //     builder: (BuildContext
+                                                    //         context) {
+                                                    //       return const AddToGlossaryDialog();
+                                                    //     });
+                                                    // Navigator.pop(context);
+                                                    RouteNavigators.route(
+                                                        context,
+                                                        const AddToGlossary());
+                                                  },
+                                                  child: const Text(
+                                                      'Add to glossary'))
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          '#${data['display']}',
+                                                          style: const TextStyle(
+                                                              fontSize: 10,
+                                                              color: Colors
+                                                                  .blueAccent),
+                                                        ),
+                                                        Text(
+                                                          data['meaning'],
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 10,
+                                                                  color: Colors
+                                                                      .black),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    // IconButton(
+                                                    //   onPressed: () {},
+                                                    //   icon: const Icon(Icons.add),
+                                                    // ),
+                                                  ],
+                                                ),
+                                    );
+                                  }),
+                              Mention(
+                                  trigger: "@",
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                  ),
+                                  data: _mentionUsers.value,
+                                  matchAll: false,
+                                  suggestionBuilder: (data) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: _isLoading.value
+                                          ? const CircularProgressIndicator()
+                                          : _mentionUsers.value.isEmpty
+                                              ? const SizedBox.shrink()
+                                              : Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const SizedBox(
+                                                      width: 20.0,
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          '${data['display']}',
+                                                          style: const TextStyle(
+                                                              fontSize: 10,
+                                                              color: Colors
+                                                                  .blueAccent),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    // IconButton(
+                                                    //   onPressed: () {},
+                                                    //   icon: const Icon(Icons.add),
+                                                    // ),
+                                                  ],
+                                                ),
+                                    );
+                                  }),
+                            ],
+                            // child: TextField(
+                            //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                            //   minLines: 1,
+                            //   maxLines: null,
+                            //   controller: controller,
+                            //   inputFormatters: [
+                            //     MaxWordTextInputFormater(maxWords: 200)
+                            //   ],
+                            //   // maxLength: 200,
+                            //   onChanged: (val) {
+                            //     counter.value =
+                            //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                            //     if (counter.value >= 200) {
+                            //       Snackbars.error(context,
+                            //           message: '200 words limit reached!');
+                            //     }
+                            //   },
+                            //   decoration: const InputDecoration(
+                            //     counterText: '',
+                            //     hintText: "What's on your mind?",
+                            //     hintStyle: TextStyle(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: AppColors.greyShade1,
+                            //     ),
+                            //     border: InputBorder.none,
+                            //     contentPadding: EdgeInsets.symmetric(
+                            //       horizontal: 16,
+                            //       vertical: 10,
+                            //     ),
+                            //   ),
+                            // ).paddingSymmetric(h: 16),
+                          );
+                        },
+                      ),
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)
@@ -729,59 +811,40 @@ class _PostReachState extends State<PostReach> {
                                                   ),
                                                 ),
                                               ),
-                                              CheckboxListTile(
-                                                title: const Text(
-                                                  'Nudity',
-                                                  style: TextStyle(
-                                                      color: Color(0xff001824)),
-                                                ),
-                                                autofocus: false,
-                                                activeColor: Colors.green,
-                                                checkColor: Colors.white,
-                                                selected: nudity,
-                                                value: nudity,
-                                                onChanged: (value) {
-                                                  debugPrint("Nudity $nudity");
+                                              RadioListTile(
+                                                title: const Text('Nudity'),
+                                                value: 'Nudity',
+                                                groupValue: postRating,
+                                                activeColor:
+                                                    AppColors.primaryColor,
+                                                onChanged: (String? value) {
                                                   setState(() {
-                                                    nudity = value!;
-                                                    debugPrint(
-                                                        "Nudity $nudity");
-                                                  });
-                                                  debugPrint("Nudity $nudity");
-                                                },
-                                              ),
-                                              CheckboxListTile(
-                                                title: const Text(
-                                                  'Graphic Violence',
-                                                  style: TextStyle(
-                                                      color: Color(0xff001824)),
-                                                ),
-                                                autofocus: false,
-                                                activeColor: Colors.green,
-                                                checkColor: Colors.white,
-                                                selected: graphicViolence,
-                                                value: graphicViolence,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    graphicViolence = value!;
+                                                    postRating = value!;
                                                   });
                                                 },
                                               ),
-                                              CheckboxListTile(
+                                              RadioListTile(
                                                 title: const Text(
-                                                  'Sensitive',
-                                                  style: TextStyle(
-                                                      color: Color(0xff001824)),
-                                                ),
-                                                autofocus: false,
-                                                activeColor: Colors.green,
-                                                checkColor: Colors.white,
-                                                selected: sensitive,
-                                                value: sensitive,
-                                                onChanged: (value) {
+                                                    'Graphic Violence'),
+                                                value: 'Graphic Violence',
+                                                activeColor:
+                                                    AppColors.primaryColor,
+                                                groupValue: postRating,
+                                                onChanged: (String? value) {
                                                   setState(() {
-                                                    sensitive = value!;
-                                                    print("Value: $sensitive");
+                                                    postRating = value!;
+                                                  });
+                                                },
+                                              ),
+                                              RadioListTile(
+                                                title: const Text('Sensitive'),
+                                                value: 'Sensitive',
+                                                activeColor:
+                                                    AppColors.primaryColor,
+                                                groupValue: postRating,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    postRating = value!;
                                                   });
                                                 },
                                               ),

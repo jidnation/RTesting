@@ -5,6 +5,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/dictionary/data/datasources/dictionary_datasources.dart';
 import 'package:reach_me/features/dictionary/data/models/add_to_glossarry_response.dart';
+import 'package:reach_me/features/dictionary/data/models/gethistory_model.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
 class DictionaryRepository {
@@ -44,6 +45,19 @@ class DictionaryRepository {
     }
   }
 
+  Future<Either<String, List<GetSearchedWordsHistory>>> getWordHistory({
+    required num pageLimit,
+    required num pageNumber,
+  }) async {
+    try {
+      final getHistory = await _dictionaryDataSource.getSearchList(
+          pageLimit: pageLimit, pageNumber: pageNumber);
+      return Right(getHistory);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, List<Map<String, dynamic>>>> addWordsToMentions({
     required num pageLimit,
     required num pageNumber,
@@ -66,6 +80,26 @@ class DictionaryRepository {
           await _dictionaryDataSource.searchWords(wordInput: wordInput);
 
       return Right(searchWords);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteWordHistory(
+      {required String historyId}) async {
+    try {
+      final deleteWordHistory =
+          await _dictionaryDataSource.deleteFromHistory(historyId: historyId);
+      return Right(deleteWordHistory);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteAllHistory() async {
+    try {
+      final deleteWordHistory = await _dictionaryDataSource.deleteAllHistory();
+      return Right(deleteWordHistory);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

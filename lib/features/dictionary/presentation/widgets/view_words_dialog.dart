@@ -82,30 +82,6 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                         scrollDirection: Axis.vertical,
                         child: Column(
                           children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  hintText: 'Search',
-                                  prefixIcon: const Icon(Icons.search),
-                                  hintStyle:
-                                      const TextStyle(color: Color(0xffCECECE)),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                onChanged: ((value) => filterWords(
-                                      value,
-                                    )),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
                             Builder(builder: (context) {
                               final word = items.value.firstWhere(
                                 (element) => element.abbr == widget.abbr,
@@ -137,6 +113,30 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                                 ),
                               );
                             }),
+                            Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Search words',
+                                  prefixIcon: const Icon(Icons.search),
+                                  hintStyle:
+                                      const TextStyle(color: Color(0xffCECECE)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                onChanged: ((value) => filterWords(
+                                      value,
+                                    )),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: SizedBox(

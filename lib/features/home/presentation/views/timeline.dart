@@ -952,7 +952,11 @@ class PostFeedReacherCard extends HookWidget {
                                 child: Row(
                                   children: [
                                     Text(
-                                      postFeedModel!.post!.location! == 'nil'
+                                      postFeedModel!.post!.location! == 'nil' ||
+                                              postFeedModel!.post!.location! ==
+                                                  'NIL' ||
+                                              postFeedModel!.post!.location ==
+                                                  null
                                           ? ''
                                           : postFeedModel!
                                                       .post!.location!.length >
