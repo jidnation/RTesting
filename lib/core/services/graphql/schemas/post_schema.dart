@@ -134,17 +134,13 @@ class CommentSchema {
             postId
             imageMediaItems
             audioMediaItem
-            like {
-              ''' +
-        CommentLikeSchema.schema +
-        '''
-            }
-            postOwner {
+            isLiked
+            postOwnerProfile {
               ''' +
         CommentProfileSchema.schema +
         '''
             }
-            profile {
+            commentOwnerProfile {
               ''' +
         CommentProfileSchema.schema +
         '''

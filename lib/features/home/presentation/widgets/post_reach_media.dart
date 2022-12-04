@@ -19,7 +19,7 @@ import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
 import 'gallery_view.dart';
 
-class PostReachMediaGrid extends HookWidget {
+class PostReachMediaGrid extends HookWidget { 
   final List<UploadFileDto> mediaList;
   final Function(int)? onRemove;
   final Function(List<UploadFileDto>)? onUpdateList;
@@ -442,8 +442,8 @@ class AudioRecordWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding:const EdgeInsets.all(16),
+      decoration:const BoxDecoration(
           border:
               Border(top: BorderSide(color: AppColors.primaryColor, width: 1))),
       child: Row(
@@ -454,7 +454,7 @@ class AudioRecordWidget extends StatelessWidget {
             child: Icon(Icons.delete,
                 size: 32, color: AppColors.primaryColor.withOpacity(0.5)),
           ),
-          SizedBox(
+          const SizedBox(
             width: 12,
           ),
           Expanded(
@@ -476,17 +476,17 @@ class AudioRecordWidget extends StatelessWidget {
               recorderController: recorderController,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 12,
           ),
           GestureDetector(
             onTap: onSend,
             child: Container(
                 height: 40,
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
                     shape: BoxShape.circle, color: AppColors.primaryColor),
-                child: Icon(
+                child: const Icon(
                   Icons.send,
                   color: AppColors.white,
                   size: 16,
