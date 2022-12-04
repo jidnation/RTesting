@@ -415,7 +415,7 @@ class HomeRemoteDataSource {
         'authId': authId,
       });
       Console.log('REACHERRRRRSSSS', result);
-      if (result is GraphQLError) {
+           if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
@@ -466,7 +466,7 @@ class HomeRemoteDataSource {
         'authId': authId,
       });
       Console.log('REACHING!!!!!!!', result);
-      if (result is GraphQLError) {
+           if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
