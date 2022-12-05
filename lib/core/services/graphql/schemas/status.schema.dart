@@ -15,7 +15,9 @@ class StatusSchema {
                 caption
                 videoMedia
             }
-            profile {
+            isMuted
+            statusSlug
+            statusOwnerProfile {
               ''' +
         StatusProfileSchema.schema +
         '''
@@ -37,6 +39,9 @@ class StatusProfileSchema {
             profilePicture
             profileSlug
             username
+            authId
+            bio
+            verified
         ''';
   }
 }
@@ -61,26 +66,24 @@ class StatusFeedResponse {
 
   static String get schema {
     return r'''
-            authId
             created_at
-            firstName
-            lastName
-            location
-            profilePicture
-            profileSlug
-            username
-            reacherId
+             feedOwnerProfile {
+              ''' +
+              StatusProfileSchema.schema +
+              '''
+             }
+             reachingRelationship
             status {
               ''' +
         StatusSchema.schema +
         '''
             }
-            statusId
-            status_creator_profile {
+            statusOwnerProfile {
                ''' +
         StatusProfileSchema.schema +
         '''
             }
+          username
         ''';
   }
 }

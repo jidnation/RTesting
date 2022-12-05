@@ -543,7 +543,7 @@ class SeeMyReachingsList extends StatelessWidget {
                 label: isRecipientAccount!
                     ? isReaching!
                         ? 'Unreach'
-                        : 'reach'
+                        : 'Reach'
                     : 'Unreach',
                 labelFontSize: getScreenHeight(13),
                 color: !isRecipientAccount!
@@ -553,21 +553,20 @@ class SeeMyReachingsList extends StatelessWidget {
                         : AppColors.primaryColor,
                 onPressed: () {
                   // Remove User from Reaching UI //
-                  if(isRecipientAccount!){
-                    if(isReaching!) {
-                     globals.userBloc!.add(DelReachRelationshipEvent(
-                              userIdToDelete: data!.reaching!.id));
-                   globals.userBloc!.add(DelStarRelationshipEvent(
-                              starIdToDelete: data!.reaching!.id));
+                  if (isRecipientAccount!) {
+                    if (isReaching!) {
+                      globals.userBloc!.add(DelReachRelationshipEvent(
+                          userIdToDelete: data!.reaching!.id));
+                      globals.userBloc!.add(DelStarRelationshipEvent(
+                          starIdToDelete: data!.reaching!.id));
                     } else {
-                       globals.userBloc!.add(ReachUserEvent(userIdToReach: data!.reaching!.id));
+                      globals.userBloc!.add(
+                          ReachUserEvent(userIdToReach: data!.reaching!.id));
                     }
-
                   } else {
                     globals.userBloc!.add(DelReachRelationshipEvent(
-                          userIdToDelete: data!.reaching!.id));
-                  } 
-                      
+                        userIdToDelete: data!.reaching!.id));
+                  }
                 },
                 textColor: !isRecipientAccount!
                     ? AppColors.black
@@ -1003,15 +1002,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                                     );
                                   },
                                 ),
-                                /*ListView.builder(
-                                  itemCount: _starsList.value.length,
-                                  itemBuilder: (context, index) {
-                                    return SeeMyStarsList(
-                                      data: _starsList.value[index],
-                                    );
-                                  },
-                                ),*/
-                              ],
+                                ],
                             ).paddingSymmetric(h: 13),
                     ),
                   ],
