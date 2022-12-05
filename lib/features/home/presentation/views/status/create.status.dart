@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,17 +10,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
-import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
 import '../../../../../core/services/media_service.dart';
+import '../../../../../core/utils/constants.dart';
 import '../../../../../core/utils/file_utils.dart';
+import 'audio.status.dart';
+import 'widgets/status_widgets.dart';
 
 late List<CameraDescription> _cameras;
 
@@ -43,33 +45,33 @@ class _CreateStatusState extends State<CreateStatus>
     getAvailableCameras();
   }
 
-  Future<void> getAvailableCameras() async {
-    _cameras = await availableCameras().then((value) {
+  getAvailableCameras() {
+    availableCameras().then((value) {
       initializeCamera(value[1]);
       return value;
     });
   }
 
   Future<void> initializeCamera(CameraDescription description) async {
-    controller = CameraController(description, ResolutionPreset.max);
-    controller!.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      cameraLoading = false;
-      setState(() {});
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            print('User denied camera access.');
-            break;
-          default:
-            print('Handle other errors.');
-            break;
+    controller = CameraController(description, ResolutionPreset.high);
+    try {
+      await controller?.initialize().then((_) {
+        if (!mounted) {
+          return;
         }
+        cameraLoading = false;
+        setState(() {});
+      });
+    } on CameraException catch (e) {
+      switch (e.code) {
+        case 'CameraAccessDenied':
+          print('User denied camera access.');
+          break;
+        default:
+          print('Handle other errors.');
+          break;
       }
-    });
+    }
   }
 
   Future<File?> getImage(ImageSource source) async {
@@ -103,269 +105,573 @@ class _CreateStatusState extends State<CreateStatus>
     final size = MediaQuery.of(context).size;
     final isCameraStatus = useState(true);
     final isAudioStatus = useState(false);
+    int currentTab = 0;
     final isTextStatus = useState(false);
     return Scaffold(
-      backgroundColor: const Color(0xFF001824),
-      body: SizedBox(
-        height: size.height,
-        width: size.width,
-        child: cameraLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(children: [
-                Expanded(
-                  child: Container(
-                    width: size.width,
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: CameraPreview(
-                      controller!,
-                      child: Column(
-                          //mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    RouteNavigators.pop(context);
-                                  },
-                                  icon: Transform.scale(
-                                    scale: 1.8,
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/dc-cancel.svg',
-                                      height: getScreenHeight(71),
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    if (controller!.value.flashMode ==
-                                        FlashMode.off) {
-                                      controller!
-                                          .setFlashMode(FlashMode.always);
-                                    } else {
-                                      controller!.setFlashMode(FlashMode.off);
-                                    }
-                                    setState(() {});
-                                  },
-                                  icon: Transform.scale(
-                                    scale: 1.8,
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/dc-flashlight.svg',
-                                      height: getScreenHeight(71),
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ).paddingSymmetric(h: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.black.withOpacity(0.50),
-                                    borderRadius: BorderRadius.circular(33),
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(1),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: isTextStatus.value
-                                              ? AppColors.white
-                                              : Colors.transparent,
-                                        ),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            isTextStatus.value = true;
-                                            isCameraStatus.value = false;
-                                            isAudioStatus.value = false;
-                                            RouteNavigators.routeReplace(
-                                                context, const TextStatus());
-                                          },
-                                          icon: SvgPicture.asset(
-                                              'assets/svgs/pen.svg',
-                                              color: isTextStatus.value
-                                                  ? AppColors.black
-                                                  : null),
-                                          //  padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.all(1),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: isAudioStatus.value
-                                              ? AppColors.white
-                                              : Colors.transparent,
-                                        ),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            isAudioStatus.value = true;
-                                            isTextStatus.value = false;
-                                            isCameraStatus.value = false;
-                                            RouteNavigators.routeReplace(
-                                                context, const AudioStatus());
-                                          },
-                                          icon: SvgPicture.asset(
-                                              'assets/svgs/status-mic.svg',
-                                              color: isAudioStatus.value
-                                                  ? AppColors.black
-                                                  : null),
-                                          // padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.all(1),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: isCameraStatus.value
-                                              ? AppColors.white
-                                              : Colors.transparent,
-                                        ),
-                                        child: IconButton(
-                                          onPressed: () {
-                                            isCameraStatus.value = true;
-                                            isAudioStatus.value = false;
-                                            isTextStatus.value = false;
-                                          },
-                                          icon: SvgPicture.asset(
-                                              'assets/svgs/Camera.svg',
-                                              color: isCameraStatus.value
-                                                  ? AppColors.black
-                                                  : null),
-                                          //padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ).paddingSymmetric(h: 20),
-                            const SizedBox.shrink(),
-                          ]).paddingOnly(t: 50),
+        backgroundColor: const Color(0xFF001824),
+        body: SizedBox(
+          height: size.height,
+          width: size.width,
+          child: cameraLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(children: [
+                  Expanded(
+                    child: Swiper(
+                      itemBuilder: (BuildContext context, int index) {
+                        return Stack(children: [
+                          buildStatusPosting(
+                            size,
+                            context,
+                            isTextStatus,
+                            isCameraStatus,
+                            isAudioStatus,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xff7e8587).withOpacity(0.5),
+                                  borderRadius: const BorderRadius.vertical(
+                                    bottom: Radius.circular(8),
+                                  )),
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          PosingType(
+                                            label: 'Status',
+                                            isSelected: index == 0,
+                                          ),
+                                          const SizedBox(width: 20),
+                                          PosingType(
+                                            label: 'Moments',
+                                            isSelected: index == 1,
+                                          ),
+                                          const SizedBox(width: 20),
+                                          PosingType(
+                                            label: 'Live',
+                                            isSelected: index == 2,
+                                          ),
+                                        ]),
+                                    const SizedBox(height: 2),
+                                  ]),
+                            ),
+                          )
+                        ]);
+                      },
+                      itemCount: 3,
+                      scrollDirection: Axis.horizontal,
                     ),
                   ),
-                ),
-                Container(
-                  width: size.width,
-                  decoration: const BoxDecoration(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: getScreenHeight(44)),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: IconButton(
-                                onPressed: () async {
-                                  // final image =
-                                  //     await getImage(ImageSource.gallery);
-                                  final res = await MediaService()
-                                      .pickFromGallery(context: context);
-                                  if (res != null) {
-                                    RouteNavigators.route(
-                                        context,
-                                        BuildMediaPreview(
-                                          path: res.first.path,
-                                          isVideo:
-                                              FileUtils.isVideo(res.first.file),
-                                        ));
-                                  }
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/check-gallery.svg',
-                                    height: getScreenHeight(71),
-                                  ),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ),
-                            SizedBox(width: getScreenWidth(70)),
-                            Flexible(
-                              child: InkWell(
-                                onTap: () async {
-                                  await controller!.takePicture().then(
-                                      (value) => RouteNavigators.route(
-                                          context,
-                                          BuildMediaPreview(
-                                              path: value.path,
-                                              isVideo: false)));
-                                },
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.white,
-                                  ),
-                                  padding: const EdgeInsets.all(20),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/Camera.svg',
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: getScreenWidth(70)),
-                            Flexible(
-                              child: IconButton(
-                                onPressed: () {
-                                  if (_cameras.isNotEmpty &&
-                                      _cameras.length > 1) {
-                                    if (_cameras.length == 2) {
-                                      if (controller!
-                                              .description.lensDirection ==
-                                          CameraLensDirection.front) {
-                                        initializeCamera(_cameras[0]);
-                                      } else {
-                                        initializeCamera(_cameras[1]);
-                                      }
-                                    } else {
-                                      initializeCamera(_cameras[1]);
-                                    }
-                                  }
-                                  setState(() {});
-                                },
-                                icon: Transform.scale(
-                                  scale: 1.8,
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/flip-camera.svg',
-                                    height: getScreenHeight(71),
-                                  ),
-                                ),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ),
-                          ]),
-                      SizedBox(height: getScreenHeight(10))
-                    ],
-                  ),
-                ),
-              ]),
+                  buildPostingActions(size, context),
+                  const SizedBox(height: 10),
+                  // Column(children: [
+                  //         Expanded(
+                  //           child: Container(
+                  //             width: size.width,
+                  //             clipBehavior: Clip.hardEdge,
+                  //             decoration: BoxDecoration(
+                  //               borderRadius: BorderRadius.circular(15),
+                  //             ),
+                  //             child: CameraPreview(
+                  //               controller!,
+                  //               child: Column(
+                  //                   //mainAxisSize: MainAxisSize.min,
+                  //                   crossAxisAlignment: CrossAxisAlignment.center,
+                  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     Row(
+                  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                       children: [
+                  //                         IconButton(
+                  //                           onPressed: () {
+                  //                             RouteNavigators.pop(context);
+                  //                           },
+                  //                           icon: Transform.scale(
+                  //                             scale: 1.8,
+                  //                             child: SvgPicture.asset(
+                  //                               'assets/svgs/dc-cancel.svg',
+                  //                               height: getScreenHeight(71),
+                  //                             ),
+                  //                           ),
+                  //                           padding: EdgeInsets.zero,
+                  //                           constraints: const BoxConstraints(),
+                  //                         ),
+                  //                         IconButton(
+                  //                           onPressed: () {
+                  //                             if (controller!.value.flashMode ==
+                  //                                 FlashMode.off) {
+                  //                               controller!
+                  //                                   .setFlashMode(FlashMode.always);
+                  //                             } else {
+                  //                               controller!.setFlashMode(FlashMode.off);
+                  //                             }
+                  //                             setState(() {});
+                  //                           },
+                  //                           icon: Transform.scale(
+                  //                             scale: 1.8,
+                  //                             child: SvgPicture.asset(
+                  //                               'assets/svgs/dc-flashlight.svg',
+                  //                               height: getScreenHeight(71),
+                  //                             ),
+                  //                           ),
+                  //                           padding: EdgeInsets.zero,
+                  //                           constraints: const BoxConstraints(),
+                  //                         ),
+                  //                       ],
+                  //                     ).paddingSymmetric(h: 24),
+                  //                     Row(
+                  //                       mainAxisAlignment: MainAxisAlignment.end,
+                  //                       children: [
+                  //                         Container(
+                  //                           padding: const EdgeInsets.all(4),
+                  //                           decoration: BoxDecoration(
+                  //                             color: AppColors.black.withOpacity(0.50),
+                  //                             borderRadius: BorderRadius.circular(33),
+                  //                           ),
+                  //                           child: Column(
+                  //                             mainAxisSize: MainAxisSize.min,
+                  //                             crossAxisAlignment:
+                  //                                 CrossAxisAlignment.center,
+                  //                             children: [
+                  //                               Container(
+                  //                                 padding: const EdgeInsets.all(1),
+                  //                                 decoration: BoxDecoration(
+                  //                                   shape: BoxShape.circle,
+                  //                                   color: isTextStatus.value
+                  //                                       ? AppColors.white
+                  //                                       : Colors.transparent,
+                  //                                 ),
+                  //                                 child: IconButton(
+                  //                                   onPressed: () {
+                  //                                     isTextStatus.value = true;
+                  //                                     isCameraStatus.value = false;
+                  //                                     isAudioStatus.value = false;
+                  //                                     RouteNavigators.routeReplace(
+                  //                                         context, const TextStatus());
+                  //                                   },
+                  //                                   icon: SvgPicture.asset(
+                  //                                       'assets/svgs/pen.svg',
+                  //                                       color: isTextStatus.value
+                  //                                           ? AppColors.black
+                  //                                           : null),
+                  //                                   //  padding: EdgeInsets.zero,
+                  //                                   constraints: const BoxConstraints(),
+                  //                                 ),
+                  //                               ),
+                  //                               Container(
+                  //                                 padding: const EdgeInsets.all(1),
+                  //                                 decoration: BoxDecoration(
+                  //                                   shape: BoxShape.circle,
+                  //                                   color: isAudioStatus.value
+                  //                                       ? AppColors.white
+                  //                                       : Colors.transparent,
+                  //                                 ),
+                  //                                 child: IconButton(
+                  //                                   onPressed: () {
+                  //                                     isAudioStatus.value = true;
+                  //                                     isTextStatus.value = false;
+                  //                                     isCameraStatus.value = false;
+                  //                                     RouteNavigators.routeReplace(
+                  //                                         context, const AudioStatus());
+                  //                                   },
+                  //                                   icon: SvgPicture.asset(
+                  //                                       'assets/svgs/status-mic.svg',
+                  //                                       color: isAudioStatus.value
+                  //                                           ? AppColors.black
+                  //                                           : null),
+                  //                                   // padding: EdgeInsets.zero,
+                  //                                   constraints: const BoxConstraints(),
+                  //                                 ),
+                  //                               ),
+                  //                               Container(
+                  //                                 padding: const EdgeInsets.all(1),
+                  //                                 decoration: BoxDecoration(
+                  //                                   shape: BoxShape.circle,
+                  //                                   color: isCameraStatus.value
+                  //                                       ? AppColors.white
+                  //                                       : Colors.transparent,
+                  //                                 ),
+                  //                                 child: IconButton(
+                  //                                   onPressed: () {
+                  //                                     isCameraStatus.value = true;
+                  //                                     isAudioStatus.value = false;
+                  //                                     isTextStatus.value = false;
+                  //                                   },
+                  //                                   icon: SvgPicture.asset(
+                  //                                       'assets/svgs/Camera.svg',
+                  //                                       color: isCameraStatus.value
+                  //                                           ? AppColors.black
+                  //                                           : null),
+                  //                                   //padding: EdgeInsets.zero,
+                  //                                   constraints: const BoxConstraints(),
+                  //                                 ),
+                  //                               ),
+                  //                             ],
+                  //                           ),
+                  //                         )
+                  //                       ],
+                  //                     ).paddingSymmetric(h: 20),
+                  //                     const SizedBox.shrink(),
+                  //                   ]).paddingOnly(t: 50),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         Container(
+                  //           width: size.width,
+                  //           decoration: const BoxDecoration(),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.end,
+                  //             mainAxisSize: MainAxisSize.min,
+                  //             children: [
+                  //               SizedBox(height: getScreenHeight(44)),
+                  //               Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.center,
+                  //                   children: [
+                  //                     Flexible(
+                  //                       child: IconButton(
+                  //                         onPressed: () async {
+                  //                           // final image =
+                  //                           //     await getImage(ImageSource.gallery);
+                  //                           final res = await MediaService()
+                  //                               .pickFromGallery(context: context);
+                  //                           if (res != null) {
+                  //                             RouteNavigators.route(
+                  //                                 context,
+                  //                                 BuildMediaPreview(
+                  //                                   path: res.first.path,
+                  //                                   isVideo:
+                  //                                       FileUtils.isVideo(res.first.file),
+                  //                                 ));
+                  //                           }
+                  //                         },
+                  //                         icon: Transform.scale(
+                  //                           scale: 1.8,
+                  //                           child: SvgPicture.asset(
+                  //                             'assets/svgs/check-gallery.svg',
+                  //                             height: getScreenHeight(71),
+                  //                           ),
+                  //                         ),
+                  //                         padding: EdgeInsets.zero,
+                  //                         constraints: const BoxConstraints(),
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(width: getScreenWidth(70)),
+                  //                     Flexible(
+                  //                       child: InkWell(
+                  //                         onTap: () async {
+                  //                           await controller!.takePicture().then(
+                  //                               (value) => RouteNavigators.route(
+                  //                                   context,
+                  //                                   BuildMediaPreview(
+                  //                                       path: value.path,
+                  //                                       isVideo: false)));
+                  //                         },
+                  //                         child: Container(
+                  //                           decoration: const BoxDecoration(
+                  //                             shape: BoxShape.circle,
+                  //                             color: AppColors.white,
+                  //                           ),
+                  //                           padding: const EdgeInsets.all(20),
+                  //                           child: SvgPicture.asset(
+                  //                             'assets/svgs/Camera.svg',
+                  //                             color: AppColors.black,
+                  //                           ),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                     SizedBox(width: getScreenWidth(70)),
+                  //                     Flexible(
+                  //                       child: IconButton(
+                  //                         onPressed: () {
+                  //                           if (_cameras.isNotEmpty &&
+                  //                               _cameras.length > 1) {
+                  //                             if (_cameras.length == 2) {
+                  //                               if (controller!
+                  //                                       .description.lensDirection ==
+                  //                                   CameraLensDirection.front) {
+                  //                                 initializeCamera(_cameras[0]);
+                  //                               } else {
+                  //                                 initializeCamera(_cameras[1]);
+                  //                               }
+                  //                             } else {
+                  //                               initializeCamera(_cameras[1]);
+                  //                             }
+                  //                           }
+                  //                           setState(() {});
+                  //                         },
+                  //                         icon: Transform.scale(
+                  //                           scale: 1.8,
+                  //                           child: SvgPicture.asset(
+                  //                             'assets/svgs/flip-camera.svg',
+                  //                             height: getScreenHeight(71),
+                  //                           ),
+                  //                         ),
+                  //                         padding: EdgeInsets.zero,
+                  //                         constraints: const BoxConstraints(),
+                  //                       ),
+                  //                     ),
+                  //                   ]),
+                  //               SizedBox(height: getScreenHeight(10))
+                  //             ]
+                  //           ),
+                  //         ),
+                  //       ]),
+                ]),
+        ));
+  }
+
+  Container buildStatusPosting(
+      Size size,
+      BuildContext context,
+      ValueNotifier<bool> isTextStatus,
+      ValueNotifier<bool> isCameraStatus,
+      ValueNotifier<bool> isAudioStatus) {
+    return Container(
+      width: size.width,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
       ),
+      child: CameraPreview(
+        controller!,
+        child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      RouteNavigators.pop(context);
+                    },
+                    icon: Transform.scale(
+                      scale: 1.8,
+                      child: SvgPicture.asset(
+                        'assets/svgs/dc-cancel.svg',
+                        height: getScreenHeight(71),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      if (controller!.value.flashMode == FlashMode.off) {
+                        controller!.setFlashMode(FlashMode.always);
+                      } else {
+                        controller!.setFlashMode(FlashMode.off);
+                      }
+                      setState(() {});
+                    },
+                    icon: Transform.scale(
+                      scale: 1.8,
+                      child: SvgPicture.asset(
+                        'assets/svgs/dc-flashlight.svg',
+                        height: getScreenHeight(71),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ).paddingSymmetric(h: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.black.withOpacity(0.50),
+                      borderRadius: BorderRadius.circular(33),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isTextStatus.value
+                                ? AppColors.white
+                                : Colors.transparent,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              isTextStatus.value = true;
+                              isCameraStatus.value = false;
+                              isAudioStatus.value = false;
+                              RouteNavigators.routeReplace(
+                                  context, const TextStatus());
+                            },
+                            icon: SvgPicture.asset('assets/svgs/pen.svg',
+                                color: isTextStatus.value
+                                    ? AppColors.black
+                                    : null),
+                            //  padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isAudioStatus.value
+                                ? AppColors.white
+                                : Colors.transparent,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              isAudioStatus.value = true;
+                              isTextStatus.value = false;
+                              isCameraStatus.value = false;
+                              RouteNavigators.routeReplace(
+                                  context, const AudioStatus());
+                            },
+                            icon: SvgPicture.asset('assets/svgs/status-mic.svg',
+                                color: isAudioStatus.value
+                                    ? AppColors.black
+                                    : null),
+                            // padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isCameraStatus.value
+                                ? AppColors.white
+                                : Colors.transparent,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              isCameraStatus.value = true;
+                              isAudioStatus.value = false;
+                              isTextStatus.value = false;
+                            },
+                            icon: SvgPicture.asset('assets/svgs/Camera.svg',
+                                color: isCameraStatus.value
+                                    ? AppColors.black
+                                    : null),
+                            //padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ).paddingSymmetric(h: 20),
+              const SizedBox.shrink(),
+            ]).paddingOnly(t: 50),
+      ),
+    );
+  }
+
+  Container buildPostingActions(Size size, BuildContext context) {
+    return Container(
+      width: size.width,
+      decoration: const BoxDecoration(),
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: getScreenHeight(44)),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Flexible(
+                child: IconButton(
+                  onPressed: () async {
+                    // final image =
+                    //     await getImage(ImageSource.gallery);
+                    final res =
+                        await MediaService().pickFromGallery(context: context);
+                    if (res != null) {
+                      RouteNavigators.route(
+                          context,
+                          BuildMediaPreview(
+                            path: res.first.path,
+                            isVideo: FileUtils.isVideo(res.first.file),
+                          ));
+                    }
+                  },
+                  icon: Transform.scale(
+                    scale: 1.8,
+                    child: SvgPicture.asset(
+                      'assets/svgs/check-gallery.svg',
+                      height: getScreenHeight(71),
+                    ),
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+              SizedBox(width: getScreenWidth(70)),
+              Flexible(
+                child: InkWell(
+                  onTap: () async {
+                    await controller!.takePicture().then((value) =>
+                        RouteNavigators.route(
+                            context,
+                            BuildMediaPreview(
+                                path: value.path, isVideo: false)));
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: SvgPicture.asset(
+                      'assets/svgs/Camera.svg',
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: getScreenWidth(70)),
+              Flexible(
+                child: IconButton(
+                  onPressed: () {
+                    if (_cameras.isNotEmpty && _cameras.length > 1) {
+                      if (_cameras.length == 2) {
+                        if (controller!.description.lensDirection ==
+                            CameraLensDirection.front) {
+                          initializeCamera(_cameras[0]);
+                        } else {
+                          initializeCamera(_cameras[1]);
+                        }
+                      } else {
+                        initializeCamera(_cameras[1]);
+                      }
+                    }
+                    setState(() {});
+                  },
+                  icon: Transform.scale(
+                    scale: 1.8,
+                    child: SvgPicture.asset(
+                      'assets/svgs/flip-camera.svg',
+                      height: getScreenHeight(71),
+                    ),
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+            ]),
+          ]),
     );
   }
 }
