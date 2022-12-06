@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
@@ -11,10 +12,9 @@ import 'package:reach_me/features/dictionary/data/models/recently_added_model.da
 class DictionaryRepository {
   DictionaryRepository(
       {DictionaryDataSource? dictionaryDataSource, ApiClient? apiClient})
-      : _dictionaryDataSource = dictionaryDataSource ?? DictionaryDataSource(),
-        _apiClient = apiClient ?? ApiClient();
+      : _dictionaryDataSource = dictionaryDataSource ?? DictionaryDataSource();
+  // _apiClient = apiClient ?? ApiClient();
   final DictionaryDataSource _dictionaryDataSource;
-  final ApiClient _apiClient;
 
   Future<Either<String, AddWordToGlossaryResponse>> addToGlossary({
     String? abbr,
@@ -38,6 +38,19 @@ class DictionaryRepository {
   }) async {
     try {
       final getWords = await _dictionaryDataSource.getRecentWord(
+          pageLimit: pageLimit, pageNumber: pageNumber);
+      return Right(getWords);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<GetRecentlyAddedWord>>> getLibraryWords({
+    required num pageLimit,
+    required num pageNumber,
+  }) async {
+    try {
+      final getWords = await _dictionaryDataSource.getWordsLibrary(
           pageLimit: pageLimit, pageNumber: pageNumber);
       return Right(getWords);
     } on GraphQLError catch (e) {
@@ -100,6 +113,17 @@ class DictionaryRepository {
     try {
       final deleteWordHistory = await _dictionaryDataSource.deleteAllHistory();
       return Right(deleteWordHistory);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteCurrentUserWord(
+      {required String wordId}) async {
+    try {
+      final deleteUserWord =
+          await _dictionaryDataSource.deleteUserWord(wordId: wordId);
+      return Right(deleteUserWord);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

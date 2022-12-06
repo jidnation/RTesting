@@ -26,7 +26,7 @@ class _WordLibraryState extends State<WordLibrary> {
   void initState() {
     super.initState();
     globals.dictionaryBloc!
-        .add(GetRecentAddedWordsEvent(pageLimit: 10000, pageNumber: 1));
+        .add(GetLibraryWordsEvent(pageLimit: 10000, pageNumber: 1));
   }
 
   @override
@@ -59,25 +59,26 @@ class _WordLibraryState extends State<WordLibrary> {
       body: BlocConsumer<DictionaryBloc, DictionaryState>(
         bloc: globals.dictionaryBloc,
         listener: (context, state) {
-          if (state is GetRecentlyAddedWordsSuccess) {
+          if (state is LoadingWordsLibrarySuccess) {
             _recentWords.value = state.data!;
           }
-          if (state is DisplayRecentlyAddedWordsError) {
+          if (state is LoadingWordsLibraryError) {
             Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {
-          bool _isLoading = state is LoadingRecentlyAddedWords;
+          bool _isLoading = state is LoadingWordsLibrary;
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 15.0),
             child: _isLoading
                 ? const CircularLoader()
                 : _recentWords.value.isEmpty
-                    ? const Center(child: Text('No Recent Words'))
+                    ? const Center(child: Text('No Words in Library'))
                     : ListView.builder(
                         itemCount: _recentWords.value.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ContentContainer(
+                            showButtons: false,
                             getRecentlyAddedWord: _recentWords.value[index],
                           );
                         },

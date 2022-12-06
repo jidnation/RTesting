@@ -21,7 +21,11 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
             language: event.language);
         emit(AddedToDBState());
       } catch (e) {
-        emit(ErrorState(e.toString()));
+        emit(
+          ErrorState(
+            e.toString(),
+          ),
+        );
       }
     });
     on<GetRecentAddedWordsEvent>((event, emit) async {
@@ -35,6 +39,18 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
             (data) => emit(GetRecentlyAddedWordsSuccess(data: data)));
       } on GraphQLError catch (e) {
         emit(DisplayRecentlyAddedWordsError(error: e.message));
+      }
+    });
+    on<GetLibraryWordsEvent>((event, emit) async {
+      emit(LoadingWordsLibrary());
+      try {
+        final response = await dictionaryRepository.getLibraryWords(
+            pageLimit: event.pageLimit, pageNumber: event.pageNumber);
+
+        response.fold((error) => emit(LoadingWordsLibraryError(error: error)),
+            (data) => emit(LoadingWordsLibrarySuccess(data: data)));
+      } on GraphQLError catch (e) {
+        emit(LoadingWordsLibraryError(error: e.message));
       }
     });
     on<AddWordsToMentionsEvent>((event, emit) async {
@@ -67,10 +83,19 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         final historyResponse = await dictionaryRepository.getWordHistory(
             pageLimit: event.pageLimit, pageNumber: event.pageNumber);
         historyResponse.fold(
-            (error) => emit(SearchHistoryErrorState(error: error)),
-            (historyData) => emit(SearchedHistorySuccess(data: historyData)));
+          (error) => emit(
+            SearchHistoryErrorState(error: error),
+          ),
+          (historyData) => emit(
+            SearchedHistorySuccess(
+              data: historyData,
+            ),
+          ),
+        );
       } on GraphQLError catch (e) {
-        emit(SearchHistoryErrorState(error: e.message));
+        emit(
+          SearchHistoryErrorState(error: e.message),
+        );
       }
     });
     on<DeleteWordEvent>((event, emit) async {
@@ -79,24 +104,70 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         final deletingHistory = await dictionaryRepository.deleteWordHistory(
             historyId: event.historyId);
         deletingHistory.fold(
-            (error) => emit(
-                DeletingWordError(error: error, historyId: event.historyId)),
-            (deleteResponse) => emit(DeletingWordSuccess(
-                isDeleted: deleteResponse, historyId: event.historyId)));
+          (error) => emit(
+            DeletingWordError(
+              error: error,
+              historyId: event.historyId,
+            ),
+          ),
+          (deleteResponse) => emit(
+            DeletingWordSuccess(
+                isDeleted: deleteResponse, historyId: event.historyId),
+          ),
+        );
       } on GraphQLError catch (e) {
-        emit(DeletingWordError(error: e.message, historyId: event.historyId));
+        emit(
+          DeletingWordError(
+            error: e.message,
+            historyId: event.historyId,
+          ),
+        );
       }
     });
+    on<DeleteUserWordEvent>(
+      (event, emit) async {
+        try {
+          final deleteUserWord = await dictionaryRepository
+              .deleteCurrentUserWord(wordId: event.wordId);
+          deleteUserWord.fold(
+            (error) => emit(
+              DeleteUserWordFailure(
+                error: error,
+                wordId: event.wordId,
+              ),
+            ),
+            (deleteResponse) => emit(
+              DeleteUserWordSuccess(
+                  historyId: event.wordId, isDeleted: deleteResponse),
+            ),
+          );
+        } on GraphQLError catch (e) {
+          emit(
+            DeleteUserWordFailure(
+              error: e.message,
+              wordId: event.wordId,
+            ),
+          );
+        }
+      },
+    );
     on<DeleteAllWordsEvent>((event, emit) async {
       emit(DeleteAllHistoryLoading());
       try {
         final deletingAllHistory =
             await dictionaryRepository.deleteAllHistory();
         deletingAllHistory.fold(
-            (error) => emit(DeleteAllHistoryError(error: error)),
-            (success) => emit(DeleteAllHistorySuccess()));
+          (error) => emit(DeleteAllHistoryError(error: error)),
+          (success) => emit(
+            DeleteAllHistorySuccess(),
+          ),
+        );
       } on GraphQLError catch (e) {
-        emit(DeleteAllHistoryError(error: e.message));
+        emit(
+          DeleteAllHistoryError(
+            error: e.message,
+          ),
+        );
       }
     });
   }

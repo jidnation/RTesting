@@ -81,6 +81,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                     : SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Builder(builder: (context) {
                               final word = items.value.firstWhere(
@@ -88,7 +89,11 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                                 orElse: () => GetRecentlyAddedWord(),
                               );
                               if (word.abbr == null) {
-                                return const SizedBox.shrink();
+                                return const Text(
+                                  'Word not found',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.red),
+                                );
                               }
 
                               return ListTile(
@@ -113,6 +118,9 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                                 ),
                               );
                             }),
+                            const SizedBox(
+                              height: 10,
+                            ),
                             Container(
                               alignment: Alignment.center,
                               height: 50,

@@ -26,7 +26,7 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
   void initState() {
     super.initState();
     globals.dictionaryBloc!
-        .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
+        .add(GetRecentAddedWordsEvent(pageLimit: 1000, pageNumber: 1));
   }
 
   @override
@@ -65,9 +65,16 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
           if (state is DisplayRecentlyAddedWordsError) {
             Snackbars.error(context, message: state.error);
           }
+          if (state is DeleteUserWordFailure) {
+            Snackbars.error(context, message: 'Error deleting content');
+          }
+          if (state is DeleteUserWordSuccess) {
+            Snackbars.success(context, message: 'Word Deleted Succesfully');
+          }
         },
         builder: (context, state) {
           bool _isLoading = state is LoadingRecentlyAddedWords;
+
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 15.0),
             child: _isLoading
@@ -78,6 +85,18 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
                         itemCount: _recentWords.value.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ContentContainer(
+                            onDelete: () {
+                              globals.dictionaryBloc?.add(DeleteUserWordEvent(
+                                  wordId: _recentWords.value[index].wordId!));
+
+                              setState(() {
+                                globals.dictionaryBloc!.add(
+                                    GetRecentAddedWordsEvent(
+                                        pageLimit: 1000, pageNumber: 1));
+                              });
+                            },
+                            onEdit: () {},
+                            showButtons: true,
                             getRecentlyAddedWord: _recentWords.value[index],
                           );
                         },

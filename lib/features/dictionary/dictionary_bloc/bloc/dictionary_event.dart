@@ -25,6 +25,13 @@ class GetRecentAddedWordsEvent extends DictionaryEvent {
   GetRecentAddedWordsEvent({required this.pageLimit, required this.pageNumber});
 }
 
+class GetLibraryWordsEvent extends DictionaryEvent {
+  final num pageLimit;
+  final num pageNumber;
+
+  GetLibraryWordsEvent({required this.pageLimit, required this.pageNumber});
+}
+
 class AddWordsToMentionsEvent extends DictionaryEvent {
   final num pageLimit;
   final num pageNumber;
@@ -36,6 +43,12 @@ class GetWordEvent extends DictionaryEvent {
   final String wordInput;
 
   GetWordEvent(this.wordInput);
+}
+
+class DeleteUserWordEvent extends DictionaryEvent {
+  final String wordId;
+
+  DeleteUserWordEvent({required this.wordId});
 }
 
 class GetSearchHistoryEvent extends DictionaryEvent {

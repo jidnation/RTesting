@@ -21,6 +21,21 @@ class ErrorState extends DictionaryState {
   ErrorState(this.error);
 }
 
+//*GET USER WORDS STATES
+class LoadingWordsLibrary extends DictionaryState {}
+
+class LoadingWordsLibrarySuccess extends DictionaryState {
+  final List<GetRecentlyAddedWord>? data;
+
+  LoadingWordsLibrarySuccess({required this.data});
+}
+
+class LoadingWordsLibraryError extends DictionaryState {
+  final String error;
+
+  LoadingWordsLibraryError({required this.error});
+}
+
 //*Recently Added States
 class LoadingRecentlyAddedWords extends DictionaryState {}
 
@@ -78,6 +93,7 @@ class SearchHistoryErrorState extends DictionaryState {
   SearchHistoryErrorState({required this.error});
 }
 
+//*DELETING WORDS
 class DeletingWordLoading extends DictionaryState {}
 
 class DeletingWordSuccess extends DictionaryState {
@@ -97,6 +113,8 @@ class DeletingWordError extends DictionaryState {
   DeletingWordError({required this.historyId, required this.error});
 }
 
+//*DELETING WORD HISTORY
+
 class DeleteAllHistoryLoading extends DictionaryState {}
 
 class DeleteAllHistorySuccess extends DictionaryState {}
@@ -104,4 +122,24 @@ class DeleteAllHistorySuccess extends DictionaryState {}
 class DeleteAllHistoryError extends DictionaryState {
   final String error;
   DeleteAllHistoryError({required this.error});
+}
+//* DELETE USER WORD
+
+class DeleteUserWordLoading extends DictionaryState {}
+
+class DeleteUserWordSuccess extends DictionaryState {
+  final String historyId;
+  final bool isDeleted;
+
+  DeleteUserWordSuccess({required this.historyId, required this.isDeleted});
+}
+
+class DeleteUserWordFailure extends DictionaryState {
+  final String error;
+  final String wordId;
+
+  DeleteUserWordFailure({
+    required this.error,
+    required this.wordId,
+  });
 }

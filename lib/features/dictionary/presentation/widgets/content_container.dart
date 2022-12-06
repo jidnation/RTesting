@@ -3,10 +3,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:intl/intl.dart';
 import 'package:reach_me/features/dictionary/data/models/recently_added_model.dart';
 
-class ContentContainer extends HookWidget {
-  const ContentContainer({required this.getRecentlyAddedWord, Key? key})
+class ContentContainer extends StatelessWidget {
+  const ContentContainer(
+      {required this.getRecentlyAddedWord, this.showButtons = false, Key? key, this.onDelete, this.onEdit})
       : super(key: key);
   final GetRecentlyAddedWord getRecentlyAddedWord;
+  final bool showButtons;
+  final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class ContentContainer extends HookWidget {
             borderRadius: BorderRadius.circular(24.5),
             color: Colors.white,
           ),
-          height: 121,
+          height: 130,
           width: 410,
           child: Padding(
             padding: const EdgeInsets.only(
@@ -33,6 +37,8 @@ class ContentContainer extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RichText(
+                    maxLines: 5,
+                    softWrap: true,
                     text: TextSpan(
                       style: const TextStyle(color: Colors.black),
                       children: [
@@ -47,13 +53,40 @@ class ContentContainer extends HookWidget {
                     ),
                   ),
                   const SizedBox(
-                    height: 5,
+                    height: 10,
                   ),
                   Text(
                     dateFormatter(getRecentlyAddedWord.createdAt!),
                     style: const TextStyle(
                         fontFamily: 'poppins', fontWeight: FontWeight.w600),
                   ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  showButtons
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 240.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                onPressed: onEdit,
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: onDelete,
+                                icon: const Icon(
+                                  Icons.delete_forever_outlined,
+                                  color: Colors.red,
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      : const SizedBox()
                 ],
               ),
             ),
