@@ -113,6 +113,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
     final commentLike = useState<CommentLikeModel?>(null);
     final scrollController = useScrollController();
     final isTyping = useState<bool>(false);
+    final likeId = useState<String?>(null);
     final imageList = useState<List<UploadFileDto>>([]);
 
     useEffect(() {
@@ -180,9 +181,16 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
 
                   //}
 
-                  if (state is LikeCommentOnPostSuccess) {
-                    commentLike.value = state.commentLikeModel;
+                  if (state is GetAllCommentLikesSuccess) {
+                    commentLike.value = state.data!.firstWhere(
+                        (element) => element.authId == globals.user!.id);
+                    likeId.value = state.data!
+                        .firstWhere((e) => e.authId == globals.user!.id)
+                        .likeId;
+                    print(likeId);
                   }
+
+                  if (state is LikeCommentOnPostSuccess) {}
 
                   if (state is UnlikeCommentOnPostSuccess) {
                     // commentUnlike.value = state.unlikeComment;
@@ -195,7 +203,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                         content: ' ',
                         postId: widget.post.postId,
                         userId: globals.user!.id,
-                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
+                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : ' ',
                         postOwnerId: widget.post.postOwnerId));
                   }
                   if (state is UploadMediaSuccess) {
@@ -214,7 +222,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                 },
                 builder: (context, state) {
                   bool isLoading = state is GetAllCommentsOnPostLoading;
-                  print('${commentLike.value}');
+                  print('like uers here: ${commentLike.value}');
                   return WillPopScope(
                     child: ProgressHUD(
                       child: Column(
@@ -363,14 +371,25 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                             1) -
                                                         1;
                                                 globals.socialServiceBloc!.add(
-                                                  UnlikeCommentOnPostEvent(
-                                                    commentId: comments
-                                                        .value[index]
-                                                        .commentId!,
-                                                    likeId: commentLike
-                                                        .value!.likeId!,
-                                                  ),
-                                                );
+                                                    GetAllCommentLikesEvent(
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId));
+
+                                                if (likeId.value != null) {
+                                                  globals.socialServiceBloc!
+                                                      .add(
+                                                    UnlikeCommentOnPostEvent(
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId!,
+                                                        likeId: likeId.value
+
+                                                        //commentLike
+                                                        //  .value!.likeId!,
+                                                        ),
+                                                  );
+                                                }
                                               } else {
                                                 comments.value[index].isLiked =
                                                     true;
@@ -508,22 +527,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                   .add(UploadPostMediaEvent(
                                                                       media: imageList
                                                                           .value));
-
-                                                              /*globals.socialServiceBloc!.add(CommentOnPostEvent(
-                                                                  postId: widget
-                                                                      .post
-                                                                      .postId,
-                                                                  content: " ",
-                                                                  userId:
-                                                                      globals
-                                                                          .user!
-                                                                          .id,
-                                                                  postOwnerId:
-                                                                      widget
-                                                                          .post
-                                                                          .postOwnerId
-                                                                  // imageMediaItems: image.
-                                                                  ));*/
                                                             },
                                                           ),
                                                         ]).paddingSymmetric(
@@ -632,7 +635,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               .post.postId,
                                                           content:
                                                               controller.text,
-                                                             userId:
+                                                          //audioMediaItem: ' ',
+                                                          userId:
                                                               globals.user!.id,
                                                           postOwnerId: widget
                                                               .post
@@ -646,33 +650,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                               // maxHeight: 25, maxWidth: 25),
                                               onPressed: () async {
                                                 print('BUTTON WORKING');
-                                                /* var tempDir =
-                                                          await getTemporaryDirectory();
-                                                      var path =
-                                                          '${tempDir.path}/flutter_sound.aac';
-
-                                                      if (!isRecordingInit) {
-                                                        return;
-                                                      }
-                                                      if (isRecording) {
-                                                        await _soundRecorder!
-                                                            .stopRecorder();
-                                                        print(path);
-                                                        File audioMessage = File(path);
-
-                                                        /*globals.chatBloc!.add(
-                                                            UploadImageFileEvent(
-                                                                file: audioMessage));*/
-                                                      } else {
-                                                        await _soundRecorder!
-                                                            .startRecorder(
-                                                          toFile: path,
-                                                        );
-                                                      }
-                                                      setState(() {
-                                                        isRecording = !isRecording;
-
-                                                      });*/
                                                 var tempDir =
                                                     await getTemporaryDirectory();
                                                 String? path =
@@ -1166,26 +1143,40 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            if (comment.content!.isNotEmpty)
+            //  comment.content!.isNotEmpty ?
+            //   Text(comment.content!,
+            //    style: TextStyle(
+            //     fontSize: getScreenHeight(14),
+            //     color: AppColors.textColor2
+            //    ),)
+            //    : comment.audioMediaItem!.isNotEmpty ?
+            //      PostAudioMedia(path: comment.audioMediaItem!)
+            //      .paddingOnly(r: 16, l: 16, b: 10, t: 0)
+            //     : comment.imageMediaItems!.isNotEmpty ?
+            //       CommentMedia(comment: comment)
+            //      .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+            //      :  const SizedBox.shrink(),
+
+            if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
               Text(
                 comment.content!,
                 style: TextStyle(
                   fontSize: getScreenHeight(14),
                   color: AppColors.textColor2,
                 ),
-              ),
-            // if (comment.audioMediaItem!.isNotEmpty)
-            //   PostAudioMedia(path: comment.audioMediaItem!)
-            //   //PlayAudio(
-            //     //audioFile: comment.audioMediaItem!,
-            //     //isMe: true,
-            //   //)
-            //              .paddingOnly(r: 16, l: 16, b: 10, t: 0)
-            // else if (comment.imageMediaItems!.isNotEmpty)
-            //   CommentMedia(comment: comment)
-            //       .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-            // else
-            //   const SizedBox.shrink(),
+              )
+            else if (comment.audioMediaItem!.isNotEmpty)
+              PostAudioMedia(path: comment.audioMediaItem!)
+                  //PlayAudio(
+                  //audioFile: comment.audioMediaItem!,
+                  //isMe: true,
+                  //)
+                  .paddingOnly(r: 15, l:0, b: 10, t: 0)
+            else if (comment.imageMediaItems!.isNotEmpty)
+              CommentMedia(comment: comment)
+                  .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+            else
+              const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1253,6 +1244,7 @@ class CommentsTile extends StatelessWidget {
               ],
             )
           ],
-        )).paddingOnly(b: 10, r: 20, l: 20);
+        )
+        ).paddingOnly(b: 10, r: 20, l: 20);
   }
 }

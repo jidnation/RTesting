@@ -1,3 +1,4 @@
+
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -415,7 +416,7 @@ class HomeRemoteDataSource {
         'authId': authId,
       });
       Console.log('REACHERRRRRSSSS', result);
-           if (result is GraphQLError) {
+      if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
@@ -466,7 +467,7 @@ class HomeRemoteDataSource {
         'authId': authId,
       });
       Console.log('REACHING!!!!!!!', result);
-           if (result is GraphQLError) {
+      if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
@@ -1103,6 +1104,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'commentId': commentId,
       });
+      Console.log("alllikes", result);
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
