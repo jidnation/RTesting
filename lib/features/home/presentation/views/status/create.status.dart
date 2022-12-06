@@ -47,6 +47,7 @@ class _CreateStatusState extends State<CreateStatus>
 
   getAvailableCameras() {
     availableCameras().then((value) {
+      _cameras = value;
       initializeCamera(value[1]);
       return value;
     });
@@ -121,13 +122,15 @@ class _CreateStatusState extends State<CreateStatus>
                     child: Swiper(
                       itemBuilder: (BuildContext context, int index) {
                         return Stack(children: [
-                          buildStatusPosting(
-                            size,
-                            context,
-                            isTextStatus,
-                            isCameraStatus,
-                            isAudioStatus,
-                          ),
+                          index == 0
+                              ? buildStatusPosting(
+                                  size,
+                                  context,
+                                  isTextStatus,
+                                  isCameraStatus,
+                                  isAudioStatus,
+                                )
+                              : MomentPosting(cameras: _cameras),
                           Positioned(
                             bottom: 0,
                             right: 0,
