@@ -38,8 +38,6 @@ import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 
-
-
 class CommentReach extends StatefulHookWidget {
   final PostFeedModel postFeedModel;
   const CommentReach({required this.postFeedModel, Key? key}) : super(key: key);
@@ -183,7 +181,7 @@ class _CommentReachState extends State<CommentReach> {
               message: "Reach has been reposted on your timeline");
 
           globals.socialServiceBloc!
-              .add(GetAllPostsEvent(pageLimit: 50, pageNumber: 1));
+              .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
           Navigator.pop(context);
         }
         if (state is CreateRepostError) {

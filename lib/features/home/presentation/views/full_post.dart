@@ -19,6 +19,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
@@ -79,6 +80,18 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final shoutoutPost = useState(false);
     final shoutdownPost = useState(false);
     final commentOption = widget.postFeedModel!.post!.commentOption;
+    final reachingList = useState<List<VirtualReach>?>([]);
+  final isReaching = useState(false);
+    useMemoized(() {
+      globals.userBloc!.add(
+                                                            GetReachRelationshipEvent(
+                                                                userIdToReach: widget
+                                                                    .postFeedModel!
+                                                                    .postOwnerId,
+                                                                type: ReachRelationshipType
+                                                                    .reacher));
+    });
+
     Set active = {};
 
     handleTap(index) {
@@ -162,7 +175,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
       await saveImage(byteData!.buffer.asUint8List());
     }
 
-   
     final reachDM = useState(false);
     return BlocConsumer<UserBloc, UserState>(
       bloc: globals.userBloc,
@@ -174,6 +186,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 context, MsgChatInterface(recipientUser: state.user));
           }
         }
+
+    if(state is GetReachRelationshipSuccess){
+       isReaching.value =   state.isReaching!;
+    }
       },
       builder: (context, state) {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
@@ -1068,7 +1084,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                           Positioned(
                               top: 710,
                               child: commentField(controller, showEmoji,
-                                  postFeedModel: widget.postFeedModel!))
+                                  postFeedModel: widget.postFeedModel!,isReaching: isReaching.value
+                                  
+                                  ))
                         ],
                       ),
                     )));
@@ -1080,49 +1098,51 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
   Widget commentField(TextEditingController controller,
       foundation.ValueNotifier<bool> showEmoji,
-      {required PostFeedModel postFeedModel}) {
-    switch (widget.postFeedModel!.post!.commentOption) {
+      {required PostFeedModel postFeedModel,
+      bool isReaching = false}) {
+           switch (widget.postFeedModel!.post!.commentOption) {
       case "people_you_follow":
-        if (widget.postFeedModel!.reachingRelationship == true) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: CustomRoundTextField(
-                      onTap: () {
-                        RouteNavigators.route(
-                            context,
-                            CommentReach(
-                              postFeedModel: postFeedModel,
-                            ));
-                      },
-                      verticalHeight: 0,
-                      controller: controller,
-                      hintText: 'Comment on this post...',
-                      suffixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined),
-                          onPressed: () {
-                            showEmoji.value = !showEmoji.value;
-                          }),
+      
+          if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching
+             ) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 21.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: CustomRoundTextField(
+                        onTap: () {
+                          RouteNavigators.route(
+                              context,
+                              CommentReach(
+                                postFeedModel: postFeedModel,
+                              ));
+                        },
+                        verticalHeight: 0,
+                        controller: controller,
+                        hintText: 'Comment on this post...',
+                        suffixIcon: IconButton(
+                            icon: const Icon(Icons.emoji_emotions_outlined),
+                            onPressed: () {
+                              showEmoji.value = !showEmoji.value;
+                            }),
+                      ),
                     ),
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.camera_alt_outlined,
-                      ))
-                ],
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.camera_alt_outlined,
+                        ))
+                  ],
+                ),
               ),
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
       case "none":
         return const SizedBox.shrink();
 

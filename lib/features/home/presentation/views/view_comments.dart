@@ -28,11 +28,12 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:audio_waveforms/audio_waveforms.dart';
+
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 //import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+
 
 import '../../../../core/models/file_result.dart';
 import '../../../chat/presentation/widgets/audio_player.dart';
@@ -632,7 +633,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               .post.postId,
                                                           content:
                                                               controller.text,
-                                                             userId:
+                                                          userId:
                                                               globals.user!.id,
                                                           postOwnerId: widget
                                                               .post
