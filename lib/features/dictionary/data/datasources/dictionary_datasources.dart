@@ -61,7 +61,7 @@ class DictionaryDataSource {
     String? language,
   }) async {
     String q = r'''
-        mutation addWordToGlossary($wordInput: WordInput!){
+        mutation addWordToGlossary($wordInput: WordInputDto!){
           addWordToGlossary(wordInput: $wordInput){
           abbr
           meaning

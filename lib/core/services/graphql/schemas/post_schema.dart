@@ -96,25 +96,13 @@ class SavePostSchema {
   static String get schema {
     return r'''
             created_at
-            isLiked
-            isVoted
-            post{
+            post {
               ''' +
         PostSchema.schema +
         '''
             }
-            postOwnerProfile {
-              ''' +
-        PostProfileSchema.schema +
-        '''
-            }
-            profile {
-              ''' +
-        PostProfileSchema.schema +
-        '''
-            }
-            savedPostId
-            updated_at
+          savedPostId
+          updated_at
         ''';
   }
 }
