@@ -4,7 +4,10 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
+import '../../../../../../core/utils/constants.dart';
+import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
+import 'moment_preview_editor.dart';
 
 class VideoPreviewer extends StatefulWidget {
   final VideoPlayerController videoController;
@@ -44,68 +47,121 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     });
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.4),
-      body: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: AspectRatio(
-          aspectRatio: widget.videoController.value.aspectRatio,
-          child: Stack(children: [
-            VideoPlayer(widget.videoController),
-            Positioned(
-                top: size.height * 0.42,
-                right: size.width * 0.42,
-                child: InkWell(
-                  onTap: () async {
-                    isPlaying
-                        ? widget.videoController.pause()
-                        : widget.videoController.play();
-                  },
-                  child: Icon(
-                    isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                )),
-            Positioned(
-                top: 20,
-                left: 20,
-                right: 20,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          RouteNavigators.pop(context);
-                        },
-                        icon: Transform.scale(
-                          scale: 1.8,
-                          child: SvgPicture.asset(
-                            'assets/svgs/dc-cancel.svg',
-                            height: getScreenHeight(71),
+      body: Column(children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: AspectRatio(
+            aspectRatio: widget.videoController.value.aspectRatio,
+            child: Stack(children: [
+              VideoPlayer(widget.videoController),
+              Positioned(
+                  top: size.height * 0.42,
+                  right: size.width * 0.42,
+                  child: InkWell(
+                    onTap: () async {
+                      isPlaying
+                          ? widget.videoController.pause()
+                          : widget.videoController.play();
+                    },
+                    child: Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 50,
+                    ),
+                  )),
+              Positioned(
+                  top: 20,
+                  left: 20,
+                  right: 20,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            RouteNavigators.pop(context);
+                          },
+                          icon: Transform.scale(
+                            scale: 1.8,
+                            child: SvgPicture.asset(
+                              'assets/svgs/dc-cancel.svg',
+                              height: getScreenHeight(71),
+                            ),
                           ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          var res = await MomentQuery.postMoment();
-                          // globals.socialServiceBloc!
-                          //     .add(MediaUploadEvent(media: File(path)));
-                        },
-                        icon: Transform.scale(
-                          scale: 1.8,
-                          child: SvgPicture.asset(
-                            'assets/svgs/dc-send.svg',
-                            height: getScreenHeight(71),
+                        IconButton(
+                          onPressed: () async {
+                            var res = await MomentQuery.postMoment();
+                            // globals.socialServiceBloc!
+                            //     .add(MediaUploadEvent(media: File(path)));
+                          },
+                          icon: Transform.scale(
+                            scale: 1.8,
+                            child: SvgPicture.asset(
+                              'assets/svgs/dc-send.svg',
+                              height: getScreenHeight(71),
+                            ),
                           ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ]))
-          ]),
+                      ]))
+            ]),
+          ),
         ),
-      ),
+        SizedBox(height: getScreenHeight(10)),
+        Padding(
+          padding: EdgeInsets.only(
+            left: getScreenWidth(25),
+            right: getScreenWidth(25),
+            top: getScreenHeight(30),
+          ),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(children: [
+              const MomentPreviewEditor(
+                label: 'Sticker',
+                icon: Icons.emoji_emotions_outlined,
+              ),
+              SizedBox(width: getScreenWidth(20)),
+              const MomentPreviewEditor(
+                label: 'Pen',
+                icon: Icons.edit,
+              ),
+              SizedBox(width: getScreenWidth(20)),
+              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                SvgPicture.asset(
+                  'assets/svgs/text.svg',
+                  height: 33,
+                  width: 33,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 3),
+                const CustomText(
+                  text: 'Text',
+                  // color: Colors.white,
+                  weight: FontWeight.w600,
+                  size: 9.44,
+                )
+              ])
+            ]),
+            Container(
+              height: 40,
+              width: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+            )
+          ]),
+        )
+      ]),
     );
   }
 }
