@@ -1,182 +1,301 @@
 import 'package:camera/camera.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+
+import '../../../../../../core/services/navigation/navigation_service.dart';
+import '../../../../../../core/utils/custom_text.dart';
+import '../../../../../../core/utils/dimensions.dart';
+import 'status_widgets.dart';
 
 class MomentPosting extends StatefulWidget {
-  final List<CameraDescription> cameras;
-  const MomentPosting({Key? key, required this.cameras}) : super(key: key);
+  final CameraController? controller;
+  final CarouselController slidingController;
+  const MomentPosting({
+    Key? key,
+    required this.controller,
+    required this.slidingController,
+  }) : super(key: key);
 
   @override
   State<MomentPosting> createState() => _MomentPostingState();
 }
 
+String selectedTime = '15s';
+
 class _MomentPostingState extends State<MomentPosting> {
-  CameraController? controller;
-  bool _isCameraInitialized = false;
-  bool _isVideoCameraSelected = false;
-  FlashMode? _currentFlashMode;
-  bool _isRecordingInProgress = false;
-
-  void onNewCameraSelected(CameraDescription cameraDescription) async {
-    _currentFlashMode = controller!.value.flashMode;
-    final previousCameraController = controller;
-    // Instantiating the camera controller
-    final CameraController cameraController = CameraController(
-      cameraDescription,
-      ResolutionPreset.high,
-      imageFormatGroup: ImageFormatGroup.jpeg,
-    );
-
-    // Dispose the previous controller
-    await previousCameraController?.dispose();
-
-    // Replace with the new controller
-    if (mounted) {
-      setState(() {
-        controller = cameraController;
-      });
-    }
-
-    // Update UI if controller updated
-    cameraController.addListener(() {
-      if (mounted) setState(() {});
-    });
-
-    // Initialize controller
-    try {
-      await cameraController.initialize();
-    } on CameraException catch (e) {
-      print('Error initializing camera: $e');
-    }
-
-    // Update the Boolean
-    if (mounted) {
-      setState(() {
-        _isCameraInitialized = controller!.value.isInitialized;
-      });
-    }
-  }
-
-  //taking picture
-  Future<XFile?> takePicture() async {
-    final CameraController? cameraController = controller;
-    if (cameraController!.value.isTakingPicture) {
-      // A capture is already pending, do nothing.
-      return null;
-    }
-    try {
-      XFile file = await cameraController.takePicture();
-      return file;
-    } on CameraException catch (e) {
-      print('Error occurred while taking picture: $e');
-      return null;
-    }
-  }
-
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    onNewCameraSelected(widget.cameras[0]);
+    widget.controller!.setFlashMode(FlashMode.off);
     super.initState();
   }
 
   @override
-  void dispose() {
-    controller?.dispose();
-    super.dispose();
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = controller;
-
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
-
-    if (state == AppLifecycleState.inactive) {
-      // Free up memory when camera not active
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      // Reinitialize the camera with same properties
-      onNewCameraSelected(cameraController.description);
-    }
-  }
-
-  //Start video recording
-  Future<void> startVideoRecording() async {
-    final CameraController? cameraController = controller;
-    if (controller!.value.isRecordingVideo) {
-      // A recording has already started, do nothing.
-      return;
-    }
-    try {
-      await cameraController!.startVideoRecording();
-      setState(() {
-        _isRecordingInProgress = true;
-        print(_isRecordingInProgress);
-      });
-    } on CameraException catch (e) {
-      print('Error starting to record video: $e');
-    }
-  }
-
-  //Stop video recording
-  Future<XFile?> stopVideoRecording() async {
-    if (!controller!.value.isRecordingVideo) {
-      // Recording is already is stopped state
-      return null;
-    }
-    try {
-      XFile file = await controller!.stopVideoRecording();
-      setState(() {
-        _isRecordingInProgress = false;
-        print(_isRecordingInProgress);
-      });
-      return file;
-    } on CameraException catch (e) {
-      print('Error stopping video recording: $e');
-      return null;
-    }
-  }
-
-  //pause video recording
-  Future<void> pauseVideoRecording() async {
-    if (!controller!.value.isRecordingVideo) {
-      // Video recording is not in progress
-      return;
-    }
-    try {
-      await controller!.pauseVideoRecording();
-    } on CameraException catch (e) {
-      print('Error pausing video recording: $e');
-    }
-  }
-
-  //Resume recording
-  Future<void> resumeVideoRecording() async {
-    if (!controller!.value.isRecordingVideo) {
-      // No video recording was in progress
-      return;
-    }
-    try {
-      await controller!.resumeVideoRecording();
-    } on CameraException catch (e) {
-      print('Error resuming video recording: $e');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return _isCameraInitialized
-        ? AspectRatio(
-            aspectRatio: 1 / controller!.value.aspectRatio,
-            child: controller!.buildPreview(),
-          )
-        : const Center(child: CircularProgressIndicator());
-
-    // Container(
-    //   // color: Colors.red,
-    //   );
+    final size = MediaQuery.of(context).size;
+    return Column(children: [
+      Expanded(
+        child: Container(
+          width: size.width,
+          clipBehavior: Clip.hardEdge,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
+          // height: size.height * 0.8,
+          child: CameraPreview(
+            widget.controller!,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Stack(children: [
+                const SizedBox(height: 40),
+                Positioned(
+                  top: 15,
+                  right: 0,
+                  left: 0,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            widget.slidingController.jumpToPage(0);
+                            RouteNavigators.pop(context);
+                          },
+                          icon: Transform.scale(
+                            scale: 1.8,
+                            child: SvgPicture.asset(
+                              'assets/svgs/dc-cancel.svg',
+                              height: getScreenHeight(71),
+                            ),
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        Container(
+                          height: 30,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          width: getScreenWidth(126),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: Colors.black.withOpacity(0.4),
+                          ),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/svgs/music-note.svg',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                                const CustomText(
+                                  text: 'Add Sound',
+                                  size: 12.44,
+                                  weight: FontWeight.w700,
+                                  color: Colors.white,
+                                )
+                              ]),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (widget.controller!.value.flashMode ==
+                                FlashMode.off) {
+                              widget.controller!.setFlashMode(FlashMode.always);
+                              print(
+                                  '...............${widget.controller!.value.flashMode}');
+                            } else {
+                              widget.controller!.setFlashMode(FlashMode.off);
+                            }
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: widget.controller!.value.flashMode ==
+                                      FlashMode.off
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.white,
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/svgs/flash-icon.svg',
+                              height: 10,
+                              color: widget.controller!.value.flashMode ==
+                                      FlashMode.off
+                                  ? Colors.white
+                                  : Colors.black,
+                              width: 10,
+                              // fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ]),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        MomentActions(
+                          label: 'Speed',
+                          svgUrl: 'assets/svgs/speeding.svg',
+                        ),
+                        SizedBox(height: 20),
+                        MomentActions(
+                          label: 'Filters',
+                          svgUrl: 'assets/svgs/filter-n.svg',
+                        ),
+                        SizedBox(height: 20),
+                        MomentActions(
+                          label: 'Beautify',
+                          svgUrl: 'assets/svgs/beautify-n.svg',
+                        ),
+                        SizedBox(height: 20),
+                        MomentActions(
+                          label: 'Timer',
+                          svgUrl: 'assets/svgs/timer-n.svg',
+                        ),
+                      ]),
+                ),
+                Positioned(
+                    bottom: 70,
+                    right: 0,
+                    left: 0,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          MomentPostingTimer(
+                            time: '3m',
+                            isSelected: selectedTime == '3m',
+                            onClick: () {
+                              setState(() {
+                                selectedTime = '3m';
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                          MomentPostingTimer(
+                            time: '60s',
+                            isSelected: selectedTime == '60s',
+                            onClick: () {
+                              setState(() {
+                                selectedTime = '60s';
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                          MomentPostingTimer(
+                            time: '15s',
+                            isSelected: selectedTime == '15s',
+                            onClick: () {
+                              setState(() {
+                                selectedTime = '15s';
+                              });
+                            },
+                          )
+                        ]))
+              ]),
+            ),
+          ),
+        ),
+      ),
+    ]);
   }
 }
+
+// Container(
+//   width: MediaQuery.of(context).size.width,
+//   decoration: const BoxDecoration(
+//       borderRadius: BorderRadius.vertical(bottom: Radius.circular(15))),
+//   child: CameraPreview(
+//     widget.controller!,
+//     child: Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 20),
+//       child: Column(children: [
+//         const SizedBox(height: 40),
+//         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+//           IconButton(
+//             onPressed: () {
+//               RouteNavigators.pop(context);
+//             },
+//             icon: Transform.scale(
+//               scale: 1.8,
+//               child: SvgPicture.asset(
+//                 'assets/svgs/dc-cancel.svg',
+//                 height: getScreenHeight(71),
+//               ),
+//             ),
+//             padding: EdgeInsets.zero,
+//             constraints: const BoxConstraints(),
+//           ),
+//           Container(
+//             height: 30,
+//             padding: const EdgeInsets.symmetric(horizontal: 10),
+//             width: getScreenWidth(126),
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(25),
+//               color: Colors.black.withOpacity(0.4),
+//             ),
+//             child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                 children: [
+//                   SvgPicture.asset(
+//                     'assets/svgs/music-note.svg',
+//                     height: 20,
+//                     width: 20,
+//                   ),
+//                   const CustomText(
+//                     text: 'Add Sound',
+//                     size: 12.44,
+//                     weight: FontWeight.w700,
+//                     color: Colors.white,
+//                   )
+//                 ]),
+//           ),
+//           InkWell(
+//             onTap: () async {
+//               if (widget.controller!.value.flashMode == FlashMode.off) {
+//                 widget.controller!.setFlashMode(FlashMode.always);
+//                 print(
+//                     '...............${widget.controller!.value.flashMode}');
+//               } else {
+//                 widget.controller!.setFlashMode(FlashMode.off);
+//               }
+//             },
+//             child: Container(
+//               height: 46,
+//               width: 46,
+//               padding: const EdgeInsets.all(10),
+//               decoration: BoxDecoration(
+//                 borderRadius: BorderRadius.circular(30),
+//                 color: widget.controller!.value.flashMode == FlashMode.off
+//                     ? Colors.black.withOpacity(0.4)
+//                     : Colors.white,
+//               ),
+//               child: SvgPicture.asset(
+//                 'assets/svgs/flash-icon.svg',
+//                 height: 10,
+//                 color: widget.controller!.value.flashMode == FlashMode.off
+//                     ? Colors.white
+//                     : Colors.black,
+//                 width: 10,
+//                 // fit: BoxFit.contain,
+//               ),
+//             ),
+//           ),
+//         ]),
+//       ]),
+//     ),
+//   ),
+// ),
+// Expanded(
+//   child: Container(
+//     height: 200,
+//     color: Colors.orange,
+//     width: 300,
+//   ),
+// )

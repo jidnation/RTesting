@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,12 +15,12 @@ import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../../../core/services/media_service.dart';
 import '../../../../../core/utils/constants.dart';
 import '../../../../../core/utils/file_utils.dart';
 import 'audio.status.dart';
-import 'widgets/status_widgets.dart';
 
 late List<CameraDescription> _cameras;
 
@@ -106,7 +105,6 @@ class _CreateStatusState extends State<CreateStatus>
     final size = MediaQuery.of(context).size;
     final isCameraStatus = useState(true);
     final isAudioStatus = useState(false);
-    int currentTab = 0;
     final isTextStatus = useState(false);
     return Scaffold(
         backgroundColor: const Color(0xFF001824),
@@ -118,62 +116,12 @@ class _CreateStatusState extends State<CreateStatus>
                   child: CircularProgressIndicator(),
                 )
               : Column(children: [
-                  Expanded(
-                    child: Swiper(
-                      itemBuilder: (BuildContext context, int index) {
-                        return Stack(children: [
-                          index == 0
-                              ? buildStatusPosting(
-                                  size,
-                                  context,
-                                  isTextStatus,
-                                  isCameraStatus,
-                                  isAudioStatus,
-                                )
-                              : MomentPosting(cameras: _cameras),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            left: 0,
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xff7e8587).withOpacity(0.5),
-                                  borderRadius: const BorderRadius.vertical(
-                                    bottom: Radius.circular(8),
-                                  )),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          PosingType(
-                                            label: 'Status',
-                                            isSelected: index == 0,
-                                          ),
-                                          const SizedBox(width: 20),
-                                          PosingType(
-                                            label: 'Moments',
-                                            isSelected: index == 1,
-                                          ),
-                                          const SizedBox(width: 20),
-                                          PosingType(
-                                            label: 'Live',
-                                            isSelected: index == 2,
-                                          ),
-                                        ]),
-                                    const SizedBox(height: 2),
-                                  ]),
-                            ),
-                          )
-                        ]);
-                      },
-                      itemCount: 3,
-                      scrollDirection: Axis.horizontal,
-                    ),
+                  buildStatusPosting(
+                    size,
+                    context,
+                    isTextStatus,
+                    isCameraStatus,
+                    isAudioStatus,
                   ),
                   buildPostingActions(size, context),
                   const SizedBox(height: 10),
@@ -898,3 +846,4 @@ class BuildVideoPreview extends StatelessWidget {
     return Stack();
   }
 }
+
