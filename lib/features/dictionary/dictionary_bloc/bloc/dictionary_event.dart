@@ -18,6 +18,22 @@ class SaveDataToGlossaryEvent extends DictionaryEvent {
       required this.meaning});
 }
 
+class EditGlossaryEvent extends DictionaryEvent {
+  final String abbr;
+  final String word;
+  final String language;
+  final String meaning;
+  final String wordId;
+
+  EditGlossaryEvent({
+    required this.abbr,
+    required this.word,
+    required this.wordId,
+    required this.language,
+    required this.meaning,
+  });
+}
+
 class GetRecentAddedWordsEvent extends DictionaryEvent {
   final num pageLimit;
   final num pageNumber;

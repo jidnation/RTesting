@@ -65,7 +65,7 @@ class _SearchHistoryState extends State<SearchHistory> {
           appBar: AppBar(
             actions: [
               TextButton(
-                onPressed: (){
+                onPressed: () {
                   globals.dictionaryBloc?.add(DeleteAllWordsEvent());
                   setState(() {
                     globals.dictionaryBloc!.add(
@@ -109,37 +109,45 @@ class _SearchHistoryState extends State<SearchHistory> {
             elevation: 0,
             toolbarHeight: 50,
           ),
-          body: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: _isLoading
-                ? const Center(child: CircularLoader())
-                : _getHistory.value.isEmpty
-                    ? const Center(child: Text('No search history'))
-                    : ListView.builder(
-                        itemCount: _getHistory.value.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return SearchHistoryContent(
-                            contentDate: dateFormatter(
-                                _getHistory.value[index].createdAt!),
-                            contentText: _getHistory.value[index].word!,
-                            onPressed: () {
-                              globals.dictionaryBloc?.add(DeleteWordEvent(
-                                  historyId:
-                                      _getHistory.value[index].historyId!));
+          body: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: _isLoading
+                  ? const Center(child: CircularLoader())
+                  : _getHistory.value.isEmpty
+                      ? const Center(child: Text('No search history'))
+                      : ListView.builder(
+                          itemCount: _getHistory.value.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SearchHistoryContent(
+                              contentDate: dateFormatter(
+                                  _getHistory.value[index].createdAt!),
+                              contentText: _getHistory.value[index].word!,
+                              onPressed: () {
+                                globals.dictionaryBloc?.add(DeleteWordEvent(
+                                    historyId:
+                                        _getHistory.value[index].historyId!));
 
-                              setState(() {
-                                globals.dictionaryBloc!.add(
-                                    GetSearchHistoryEvent(
-                                        pageLimit: 1000, pageNumber: 1));
-                              });
-                            },
-                          );
-                        },
-                      ),
+                                setState(() {
+                                  globals.dictionaryBloc!.add(
+                                      GetSearchHistoryEvent(
+                                          pageLimit: 1000, pageNumber: 1));
+                                });
+                              },
+                            );
+                          },
+                        ),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<void> onRefresh() async {
+    globals.dictionaryBloc!
+        .add(GetSearchHistoryEvent(pageLimit: 1000, pageNumber: 1));
   }
 
   String dateFormatter(String dateToFormat) {

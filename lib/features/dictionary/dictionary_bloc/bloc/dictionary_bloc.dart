@@ -28,6 +28,26 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
         );
       }
     });
+    on<EditGlossaryEvent>((event, emit) async {
+      emit(EditGlossaryLoadingState());
+      await Future.delayed(
+        const Duration(seconds: 2),
+      );
+      try {
+        await dictionaryRepository.editGlossary(
+            abbr: event.abbr,
+            meaning: event.meaning,
+            word: event.word,
+            language: event.language);
+        emit(EditGlossarySuccessState());
+      } catch (e) {
+        emit(
+          EditGlossaryErrorState(
+            e.toString(),
+          ),
+        );
+      }
+    });
     on<GetRecentAddedWordsEvent>((event, emit) async {
       emit(LoadingRecentlyAddedWords());
       try {

@@ -32,6 +32,24 @@ class DictionaryRepository {
     }
   }
 
+
+  Future<Either<String, AddWordToGlossaryResponse>> editGlossary({
+    String? abbr,
+    String? meaning,
+    String? word,
+    String? language,
+    String? wordId
+  }) async {
+    try {
+      final addGlossary = await _dictionaryDataSource.editWordInGlossary(
+          abbr: abbr, meaning: meaning, word: word, language: language);
+
+      return Right(addGlossary);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, List<GetRecentlyAddedWord>>> getRecentAddedWords({
     required num pageLimit,
     required num pageNumber,

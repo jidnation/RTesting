@@ -37,7 +37,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
     return AlertDialog(
       title: const Text('Word Library'),
       content: SizedBox(
-        height: 150.0,
+        height: 100.0,
         child: BlocConsumer<DictionaryBloc, DictionaryState>(
           bloc: globals.dictionaryBloc,
           listener: (context, state) {
@@ -67,25 +67,28 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
                               style: TextStyle(fontSize: 14, color: Colors.red),
                             );
                           }
-                          return ListTile(
-                            title: RichText(
-                              text: TextSpan(
-                                style: const TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                      text: '${word.abbr}: ',
-                                      style:
-                                          const TextStyle(color: Colors.blue)),
-                                  TextSpan(
-                                      text: '${word.word}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: ListTile(
+                              title: RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(color: Colors.black),
+                                  children: [
+                                    TextSpan(
+                                        text: '${word.abbr}: ',
+                                        style: const TextStyle(
+                                            color: Colors.blue)),
+                                    TextSpan(
+                                        text: '${word.word}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            subtitle: Text(
-                              word.meaning.toString(),
-                              style: const TextStyle(fontSize: 12),
+                              subtitle: Text(
+                                word.meaning.toString(),
+                                style: const TextStyle(fontSize: 12),
+                              ),
                             ),
                           );
                         },

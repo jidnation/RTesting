@@ -75,6 +75,48 @@ deleteWord(wordId:$wordId)
       return false;
     }
   }
+//*EDIT WORD IN GLOSSARY
+
+  Future<AddWordToGlossaryResponse> editWordInGlossary(
+      {String? abbr,
+      String? meaning,
+      String? word,
+      String? language,
+      String? wordId}) async {
+    String q = r'''mutation editWord($wordInput:WordEditInputDto!){
+  editWord(editContent:$wordInput)
+  {
+    abbr
+    authId,
+    language
+    word
+    wordId
+  }
+}''';
+
+    try {
+      Map<String, dynamic> wordInput = {
+        "abbr": abbr,
+        "meaning": meaning,
+        "language": language,
+        "word": word,
+        "wordId": wordId
+      };
+      final result = await _client.mutate(
+        gql(q),
+        variables: {'wordInput': wordInput},
+      );
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      return AddWordToGlossaryResponse.fromJson(
+          result.data!['addWordToGlossary']);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   //*ADD TO GLOSSARY MUTATION
   Future<AddWordToGlossaryResponse> addToGlossary({

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -11,8 +13,8 @@ import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossar
 import 'package:reach_me/features/dictionary/presentation/widgets/search_custom_button.dart';
 
 class EditGlossaryDialog extends StatefulWidget {
-  const EditGlossaryDialog({Key? key}) : super(key: key);
-
+  const EditGlossaryDialog({Key? key, required this.wordId}) : super(key: key);
+  final String wordId;
   @override
   State<EditGlossaryDialog> createState() => _EditGlossaryDialogState();
 }
@@ -30,15 +32,15 @@ class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
       content: BlocConsumer<DictionaryBloc, DictionaryState>(
         bloc: globals.dictionaryBloc,
         listener: (context, state) {
-          if (state is AddedToDBState) {
-            Snackbars.success(context, message: 'Added to dictionary');
+          if (state is EditGlossarySuccessState) {
+            Snackbars.success(context, message: 'Word Edited Succesfully');
             RouteNavigators.pop(context);
-          } else if (state is ErrorState) {
+          } else if (state is EditGlossaryErrorState) {
             Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {
-          bool _isLoading = state is AddingToDBState;
+          bool _isLoading = state is EditGlossaryLoadingState;
           return SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Container(
@@ -83,13 +85,16 @@ class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
                             ? () {
                                 if (_formValidationKey.currentState!
                                     .validate()) {
-                                  globals.dictionaryBloc!
-                                      .add(SaveDataToGlossaryEvent(
-                                    abbr: abbrController.text,
-                                    language: languageController.text,
-                                    meaning: meaningController.text,
-                                    word: wordController.text,
-                                  ));
+                                  globals.dictionaryBloc!.add(
+                                    EditGlossaryEvent(
+                                        abbr: abbrController.text,
+                                        language: languageController.text,
+                                        meaning: meaningController.text,
+                                        word: wordController.text,
+                                        wordId: widget.wordId),
+                                  );
+
+                                  log('message: ${widget.wordId}');
                                 } else {
                                   return;
                                 }
