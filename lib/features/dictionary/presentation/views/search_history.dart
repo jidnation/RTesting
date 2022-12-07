@@ -28,7 +28,7 @@ class _SearchHistoryState extends State<SearchHistory> {
   void initState() {
     super.initState();
     globals.dictionaryBloc!
-        .add(GetSearchHistoryEvent(pageLimit: 300, pageNumber: 1));
+        .add(GetSearchHistoryEvent(pageLimit: 1000, pageNumber: 1));
   }
 
   @override
@@ -130,7 +130,7 @@ class _SearchHistoryState extends State<SearchHistory> {
                               setState(() {
                                 globals.dictionaryBloc!.add(
                                     GetSearchHistoryEvent(
-                                        pageLimit: 300, pageNumber: 1));
+                                        pageLimit: 1000, pageNumber: 1));
                               });
                             },
                           );

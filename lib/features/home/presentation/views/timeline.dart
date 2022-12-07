@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
@@ -46,7 +45,6 @@ import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../account/presentation/views/account.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import 'full_post.dart';
 
@@ -949,8 +947,7 @@ class PostFeedReacherCard extends HookWidget {
                                         builder: (builder) => FullPostScreen(
                                               postFeedModel: postFeedModel,
                                             ))),
-                                child: 
-                                Row(
+                                child: Row(
                                   children: [
                                     Text(
                                       postFeedModel!.post!.location! == 'nil' ||
@@ -985,7 +982,6 @@ class PostFeedReacherCard extends HookWidget {
                                     ).paddingOnly(l: 6),
                                   ],
                                 ),
-                             
                               )
                             ],
                           ).paddingOnly(t: 10),
@@ -1045,11 +1041,8 @@ class PostFeedReacherCard extends HookWidget {
                                 word: '',
                               );
                             });
-                        print('Tapped Url');
                       },
-                      onMentionTap: (value) {
-                        print('Tapped Url');
-                      },
+                      onMentionTap: (value) {},
                       mentionStyle: const TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.blue),

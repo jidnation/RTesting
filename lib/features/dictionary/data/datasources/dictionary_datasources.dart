@@ -12,7 +12,30 @@ class DictionaryDataSource {
       : _client = client ?? GraphQLApiClient();
   final GraphQLApiClient _client;
 
-  //*DELETE WORD FROM HSITORY
+//*DELETE USERS ADDED WORD
+  Future<bool> deleteUserWord({required String wordId}) async {
+    String q = r'''
+mutation deleteWord($wordId: String!){
+deleteWord(wordId:$wordId) 
+  } 
+''';
+
+    try {
+      Map<String, dynamic> wordIdInput = {
+        "wordId": wordId,
+      };
+      final deleteUserWord =
+          await _client.mutate(gql(q), variables: wordIdInput);
+      if (deleteUserWord is GraphQLError) {
+        throw GraphQLError(message: deleteUserWord.message);
+      }
+      return deleteUserWord.data["deleteWord"] as bool;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  //*DELETE WORD FROM SEARCH HSITORY
   Future<bool> deleteFromHistory({required String historyId}) async {
     String q = r'''mutation deleteSingleWordHistory($historyId:String!) {
   deleteSingleWordHistory(
@@ -95,9 +118,9 @@ class DictionaryDataSource {
       rethrow;
     }
   }
+  //*GET USERS ADDED WORDS
 
-  //*Get RECENT WORDS QUERY
-  Future<List<GetRecentlyAddedWord>> getRecentWord(
+  Future<List<GetRecentlyAddedWord>> getWordsLibrary(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
         r'''query getRecentlyAddedWords($page_limit: Float!, $page_number:Float!){
@@ -120,6 +143,38 @@ class DictionaryDataSource {
       }
 
       final List<dynamic> res = result.data["getRecentlyAddedWords"] as List;
+      final data = res.map((e) => GetRecentlyAddedWord.fromJson(e)).toList();
+
+      return data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //*Get RECENT WORDS QUERY
+  Future<List<GetRecentlyAddedWord>> getRecentWord(
+      {required num pageLimit, required num pageNumber}) async {
+    const String q =
+        r'''query getPersonalWords($page_limit: Float!, $page_number:Float!){
+ getPersonalWords(page_limit: $page_limit, page_number:$page_number){
+    abbr
+    authId
+    meaning
+    created_at
+    language
+    word
+    wordId
+  }
+}''';
+
+    try {
+      final result = await _client.query(gql(q),
+          variables: {'page_limit': pageLimit, 'page_number': pageNumber});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      final List<dynamic> res = result.data["getPersonalWords"] as List;
       final data = res.map((e) => GetRecentlyAddedWord.fromJson(e)).toList();
 
       return data;

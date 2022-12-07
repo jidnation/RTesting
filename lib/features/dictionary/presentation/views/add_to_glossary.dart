@@ -102,7 +102,7 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                           hintText: 'Meaning',
                           maxLines: 5,
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         const SizedBox(
                           height: 40,
@@ -124,7 +124,7 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                                   } else {
                                     return;
                                   }
-                                 }
+                                }
                               : () {},
                         )
                       ],

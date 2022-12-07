@@ -10,14 +10,14 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_sta
 import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_textbox.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/search_custom_button.dart';
 
-class AddToGlossaryDialog extends StatefulWidget {
-  const AddToGlossaryDialog({Key? key}) : super(key: key);
+class EditGlossaryDialog extends StatefulWidget {
+  const EditGlossaryDialog({Key? key}) : super(key: key);
 
   @override
-  State<AddToGlossaryDialog> createState() => _AddToGlossaryDialogState();
+  State<EditGlossaryDialog> createState() => _EditGlossaryDialogState();
 }
 
-class _AddToGlossaryDialogState extends State<AddToGlossaryDialog> {
+class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
   TextEditingController abbrController = TextEditingController();
   TextEditingController wordController = TextEditingController();
   TextEditingController languageController = TextEditingController();
@@ -26,7 +26,7 @@ class _AddToGlossaryDialogState extends State<AddToGlossaryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add to Dictionary'),
+      title: const Text('Edit Word'),
       content: BlocConsumer<DictionaryBloc, DictionaryState>(
         bloc: globals.dictionaryBloc,
         listener: (context, state) {
@@ -44,7 +44,7 @@ class _AddToGlossaryDialogState extends State<AddToGlossaryDialog> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               child: Padding(
-                padding: const EdgeInsets.only(top: 68.0),
+                padding: const EdgeInsets.only(top: 10.0),
                 child: Form(
                   key: _formValidationKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -55,27 +55,23 @@ class _AddToGlossaryDialogState extends State<AddToGlossaryDialog> {
                         controller: abbrController,
                         height: 80,
                         hintText: 'Abbreviaton',
-                        validator: (value) =>
-                            Validator.validateText(value ?? ''),
+                        validator: (value) => Validator.emptyField(value ?? ''),
                       ),
                       AddToGlossaryTextBox(
                         controller: wordController,
                         hintText: 'word',
-                        validator: (value) =>
-                            Validator.validateText(value ?? ''),
+                        validator: (value) => Validator.emptyField(value ?? ''),
                       ),
                       AddToGlossaryTextBox(
                         controller: languageController,
                         hintText: 'Language',
-                        validator: (value) =>
-                            Validator.validateText(value ?? ''),
+                        validator: (value) => Validator.emptyField(value ?? ''),
                       ),
                       AddToGlossaryTextBox(
                         controller: meaningController,
                         hintText: 'Meaning',
                         maxLines: 5,
-                        validator: (value) =>
-                            Validator.validateText(value ?? ''),
+                        validator: (value) => Validator.emptyField(value ?? ''),
                       ),
                       const SizedBox(
                         height: 40,
