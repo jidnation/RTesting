@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:camera/camera.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
@@ -393,7 +395,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                     onHorizontalDragEnd: (dragEndDetails) {
                       if (dragEndDetails.primaryVelocity! < 0) {
                         // Swipe Right
-
                       } else if (dragEndDetails.primaryVelocity! > 0) {
                         // Swipe Left
                         widget.scaffoldKey!.currentState!.openDrawer();
@@ -453,12 +454,26 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             hasWatched: false,
                                                             username:
                                                                 'Add Status',
-                                                            isMeOnTap: () {
-                                                              RouteNavigators.route(
-                                                                  context,
-                                                                  const CreateStatus());
+                                                            isMeOnTap:
+                                                                () async {
+                                                              var cameras =
+                                                                  await availableCameras();
+                                                              RouteNavigators
+                                                                  .route(
+                                                                      context,
+                                                                      UserPosting(
+                                                                        phoneCameras:
+                                                                            cameras,
+                                                                        initialIndex:
+                                                                            0,
+                                                                      ));
                                                               return;
                                                             },
+                                                            //   RouteNavigators.route(
+                                                            //       context,
+                                                            //       const CreateStatus());
+                                                            //   return;
+                                                            // },
                                                           ),
 
                                                           if (_myStatus
