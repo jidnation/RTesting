@@ -69,7 +69,7 @@ class _RLoaderState extends State<RLoader> with TickerProviderStateMixin {
               Text(
                 widget.text,
                 style:
-                    widget.textStyle ?? Theme.of(context).textTheme.bodyText1!,
+                    widget.textStyle ?? Theme.of(context).textTheme.bodyLarge!,
               ),
             ],
           )

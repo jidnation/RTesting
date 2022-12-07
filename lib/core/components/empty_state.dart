@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -6,7 +7,6 @@ import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
-import 'package:card_swiper/card_swiper.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
@@ -111,7 +111,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                       ),
                       SizedBox(height: getScreenHeight(15)),
                       SizedBox(
-                        height: getScreenHeight(300),
+                        height: getScreenHeight(305),
                         width: getScreenWidth(100),
                         child: Swiper(
                           loop: false,
@@ -119,7 +119,8 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                           itemBuilder: (BuildContext context, int index) {
                             return SuggestedUserContainer(
                               size: size,
-                              profilePicture: suggestedUsers.value[index].profilePicture,
+                              profilePicture:
+                                  suggestedUsers.value[index].profilePicture,
                               user: suggestedUsers.value[index],
                               onReach: () {
                                 handleTap(index);
@@ -159,9 +160,8 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                               isLoading: active.contains(index)
                                   ? reachingUser.value
                                   : false,
-                              label: active.contains(index)
-                                  ? "Reaching"
-                                  : 'Reach',
+                              label:
+                                  active.contains(index) ? "Reaching" : 'Reach',
                             );
                           },
                           itemCount: suggestedUsers.value.length,
@@ -226,21 +226,26 @@ class SuggestedUserContainer extends StatelessWidget {
             ),
           ),
           Helper.renderRecommendPicture(
-                            profilePicture,
-                            size: 80,
-                          ),
+            profilePicture,
+            size: 80,
+          ),
           SizedBox(height: getScreenHeight(5)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FittedBox(
-                child: Text(
-                  "@${user.username}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textColor2,
-                    fontSize: getScreenHeight(16),
-                    fontWeight: FontWeight.w600,
+              Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 162,
+                ),
+                child: FittedBox(
+                  child: Text(
+                    "@${user.username}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.textColor2,
+                      fontSize: getScreenHeight(16),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

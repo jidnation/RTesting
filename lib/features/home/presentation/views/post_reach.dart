@@ -53,6 +53,8 @@ class _PostReachState extends State<PostReach> {
   bool graphicViolence = false;
   bool sensitive = false;
   String postRating = "normal";
+  bool showCursor = true;
+  bool enabled = true;
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
 
@@ -176,6 +178,16 @@ class _PostReachState extends State<PostReach> {
                                 globals.socialServiceBloc!.add(
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
+
+                                for (int i = 0;
+                                    i <
+                                        controllerKey.currentState!.controller!
+                                            .text.length;
+                                    i++) {
+                                  if (controllerKey
+                                      .currentState!.controller!.text
+                                      .contains("@")) {}
+                                }
                                 setState(() {
                                   _mentionList.value.add(controllerKey
                                       .currentState!.controller!.text);
@@ -346,6 +358,7 @@ class _PostReachState extends State<PostReach> {
                           return FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                            maxLength: 1100,
                             // minLines: null,
 
                             suggestionPosition: SuggestionPosition.Bottom,
@@ -357,6 +370,10 @@ class _PostReachState extends State<PostReach> {
                               if (counter.value >= 200) {
                                 Snackbars.error(context,
                                     message: '200 words limit reached!');
+                                // setState(() {
+                                //   showCursor = false;
+                                //   enabled = false;
+                                // });
                               }
                             },
                             decoration: const InputDecoration(
