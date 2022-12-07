@@ -15,7 +15,6 @@ import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../../../core/services/media_service.dart';
 import '../../../../../core/utils/constants.dart';
@@ -762,6 +761,11 @@ class BuildMediaPreview extends StatelessWidget {
               Snackbars.error(context, message: state.error);
             }
             if (state is MediaUploadSuccess) {
+              Snackbars.success(
+                context,
+                message: 'Image Successfully Uploaded',
+                milliseconds: 1600,
+              );
               globals.socialServiceBloc!.add(
                 CreateStatusEvent(
                   createStatusDto: CreateStatusDto(
@@ -846,4 +850,3 @@ class BuildVideoPreview extends StatelessWidget {
     return Stack();
   }
 }
-

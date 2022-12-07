@@ -259,7 +259,9 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(70),
-                            color: Colors.black.withOpacity(0.5),
+                            color: _isRecording
+                                ? Colors.red
+                                : Colors.black.withOpacity(0.5),
                           ),
                           child: Container(
                             height: 80,
