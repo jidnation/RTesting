@@ -389,13 +389,6 @@ class _PostReachState extends State<PostReach> {
                                           : _recentWords.value.isEmpty
                                               ? TextButton(
                                                   onPressed: () {
-                                                    // showDialog(
-                                                    //     context: context,
-                                                    //     builder: (BuildContext
-                                                    //         context) {
-                                                    //       return const AddToGlossaryDialog();
-                                                    //     });
-                                                    // Navigator.pop(context);
                                                     RouteNavigators.route(
                                                         context,
                                                         const AddToGlossary());
