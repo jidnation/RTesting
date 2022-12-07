@@ -29,7 +29,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
   void initState() {
     super.initState();
     globals.dictionaryBloc!
-        .add(GetRecentAddedWordsEvent(pageLimit: 100, pageNumber: 1));
+        .add(GetLibraryWordsEvent(pageLimit: 1000, pageNumber: 1));
   }
 
   void filterWords(String query) {
@@ -64,16 +64,16 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
         child: BlocConsumer<DictionaryBloc, DictionaryState>(
           bloc: globals.dictionaryBloc,
           listener: (context, state) {
-            if (state is GetRecentlyAddedWordsSuccess) {
+            if (state is LoadingWordsLibrarySuccess) {
               recentWords.value = state.data!;
               items.value = state.data!;
             }
-            if (state is DisplayRecentlyAddedWordsError) {
+            if (state is LoadingWordsLibraryError) {
               Snackbars.error(context, message: state.error);
             }
           },
           builder: (context, state) {
-            bool _isLoading = state is LoadingRecentlyAddedWords;
+            bool _isLoading = state is LoadingWordsLibrary;
             return _isLoading
                 ? const CircularLoader()
                 : recentWords.value.isEmpty

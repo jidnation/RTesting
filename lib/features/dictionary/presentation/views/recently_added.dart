@@ -11,6 +11,7 @@ import 'package:reach_me/features/dictionary/data/models/recently_added_model.da
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
+import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossary_dialog.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/content_container.dart';
 
 class RecentlyAdded extends StatefulWidget {
@@ -95,7 +96,14 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
                                         pageLimit: 1000, pageNumber: 1));
                               });
                             },
-                            onEdit: () {},
+                            onEdit: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const EditGlossaryDialog();
+                                },
+                              );
+                            },
                             showButtons: true,
                             getRecentlyAddedWord: _recentWords.value[index],
                           );
