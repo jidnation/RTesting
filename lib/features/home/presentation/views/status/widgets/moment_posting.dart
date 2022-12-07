@@ -22,8 +22,6 @@ class MomentPosting extends StatefulWidget {
   State<MomentPosting> createState() => _MomentPostingState();
 }
 
-String selectedTime = '15s';
-
 class _MomentPostingState extends State<MomentPosting> {
   @override
   void initState() {
@@ -161,43 +159,43 @@ class _MomentPostingState extends State<MomentPosting> {
                         ),
                       ]),
                 ),
-                Positioned(
-                    bottom: 70,
-                    right: 0,
-                    left: 0,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MomentPostingTimer(
-                            time: '3m',
-                            isSelected: selectedTime == '3m',
-                            onClick: () {
-                              setState(() {
-                                selectedTime = '3m';
-                              });
-                            },
-                          ),
-                          const SizedBox(width: 5),
-                          MomentPostingTimer(
-                            time: '60s',
-                            isSelected: selectedTime == '60s',
-                            onClick: () {
-                              setState(() {
-                                selectedTime = '60s';
-                              });
-                            },
-                          ),
-                          const SizedBox(width: 5),
-                          MomentPostingTimer(
-                            time: '15s',
-                            isSelected: selectedTime == '15s',
-                            onClick: () {
-                              setState(() {
-                                selectedTime = '15s';
-                              });
-                            },
-                          )
-                        ]))
+                // Positioned(
+                //     bottom: 70,
+                //     right: 0,
+                //     left: 0,
+                //     child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           MomentPostingTimer(
+                //             time: '3m',
+                //             isSelected: selectedTime == '3m',
+                //             onClick: () {
+                //               setState(() {
+                //                 selectedTime = '3m';
+                //               });
+                //             },
+                //           ),
+                //           const SizedBox(width: 5),
+                //           MomentPostingTimer(
+                //             time: '60s',
+                //             isSelected: selectedTime == '60s',
+                //             onClick: () {
+                //               setState(() {
+                //                 selectedTime = '60s';
+                //               });
+                //             },
+                //           ),
+                //           const SizedBox(width: 5),
+                //           MomentPostingTimer(
+                //             time: '15s',
+                //             isSelected: selectedTime == '15s',
+                //             onClick: () {
+                //               setState(() {
+                //                 selectedTime = '15s';
+                //               });
+                //             },
+                //           )
+                //         ]))
               ]),
             ),
           ),
