@@ -7,6 +7,7 @@ import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
+import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
 
 class VideoPreviewer extends StatefulWidget {
@@ -106,7 +107,28 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
-                      ]))
+                      ])),
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        MomentActions(
+                          label: 'Filters',
+                          svgUrl: 'assets/svgs/filter-n.svg',
+                        ),
+                        SizedBox(height: 20),
+                        MomentActions(
+                          label: 'Voice over',
+                          svgUrl: 'assets/svgs/mic.svg',
+                        ),
+                      ]),
+                ),
+              ),
             ]),
           ),
         ),
@@ -131,8 +153,8 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
               ),
               SizedBox(width: getScreenWidth(20)),
               Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                SvgPicture.asset(
-                  'assets/svgs/text.svg',
+                Image.asset(
+                  'assets/images/text.png',
                   height: 33,
                   width: 33,
                   fit: BoxFit.contain,
@@ -140,7 +162,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                 const SizedBox(height: 3),
                 const CustomText(
                   text: 'Text',
-                  // color: Colors.white,
+                  color: Colors.white,
                   weight: FontWeight.w600,
                   size: 9.44,
                 )
