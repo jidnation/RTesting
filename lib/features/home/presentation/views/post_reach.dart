@@ -127,7 +127,7 @@ class _PostReachState extends State<PostReach> {
         _mediaList.value.where((e) => FileUtils.isImage(e.file)).length;
     // final _imageList = useState<List<UploadFileDto>>([]);
     String getUserLocation() {
-      if (globals.user!.showLocation!) {
+      if (globals.user!.showLocation == true) {
         return globals.location!;
       } else {
         return '';
