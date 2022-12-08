@@ -81,15 +81,11 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final shoutdownPost = useState(false);
     final commentOption = widget.postFeedModel!.post!.commentOption;
     final reachingList = useState<List<VirtualReach>?>([]);
-  final isReaching = useState(false);
+    final isReaching = useState(false);
     useMemoized(() {
-      globals.userBloc!.add(
-                                                            GetReachRelationshipEvent(
-                                                                userIdToReach: widget
-                                                                    .postFeedModel!
-                                                                    .postOwnerId,
-                                                                type: ReachRelationshipType
-                                                                    .reacher));
+      globals.userBloc!.add(GetReachRelationshipEvent(
+          userIdToReach: widget.postFeedModel!.postOwnerId,
+          type: ReachRelationshipType.reacher));
     });
 
     Set active = {};
@@ -187,9 +183,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
           }
         }
 
-    if(state is GetReachRelationshipSuccess){
-       isReaching.value =   state.isReaching!;
-    }
+        if (state is GetReachRelationshipSuccess) {
+          isReaching.value = state.isReaching!;
+          debugPrint("State isReahing ${state.isReaching}");
+        }
       },
       builder: (context, state) {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
@@ -1082,11 +1079,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                             ],
                           ),
                           Positioned(
-                              top: 710,
+                              top: 660,
                               child: commentField(controller, showEmoji,
-                                  postFeedModel: widget.postFeedModel!,isReaching: isReaching.value
-                                  
-                                  ))
+                                  postFeedModel: widget.postFeedModel!,
+                                  isReaching: isReaching.value))
                         ],
                       ),
                     )));
@@ -1098,51 +1094,49 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
   Widget commentField(TextEditingController controller,
       foundation.ValueNotifier<bool> showEmoji,
-      {required PostFeedModel postFeedModel,
-      bool isReaching = false}) {
-           switch (widget.postFeedModel!.post!.commentOption) {
+      {required PostFeedModel postFeedModel, bool isReaching = false}) {
+    switch (widget.postFeedModel!.post!.commentOption) {
       case "people_you_follow":
-      
-          if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching
-             ) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 21.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: CustomRoundTextField(
-                        onTap: () {
-                          RouteNavigators.route(
-                              context,
-                              CommentReach(
-                                postFeedModel: postFeedModel,
-                              ));
-                        },
-                        verticalHeight: 0,
-                        controller: controller,
-                        hintText: 'Comment on this post...',
-                        suffixIcon: IconButton(
-                            icon: const Icon(Icons.emoji_emotions_outlined),
-                            onPressed: () {
-                              showEmoji.value = !showEmoji.value;
-                            }),
-                      ),
+        debugPrint("ïsReaching $isReaching");
+        if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 21.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: CustomRoundTextField(
+                      onTap: () {
+                        RouteNavigators.route(
+                            context,
+                            CommentReach(
+                              postFeedModel: postFeedModel,
+                            ));
+                      },
+                      verticalHeight: 0,
+                      controller: controller,
+                      hintText: 'Comment on this post...',
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.emoji_emotions_outlined),
+                          onPressed: () {
+                            showEmoji.value = !showEmoji.value;
+                          }),
                     ),
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.camera_alt_outlined,
-                        ))
-                  ],
-                ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                      ))
+                ],
               ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
       case "none":
         return const SizedBox.shrink();
 
