@@ -81,4 +81,4 @@ class DeleteWordEvent extends DictionaryEvent {
   });
 }
 
-class DeleteAllWordsEvent extends DictionaryEvent {}
+class DeleteAllHistoryEvent extends DictionaryEvent {}

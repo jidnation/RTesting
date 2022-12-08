@@ -29,7 +29,7 @@ class EditGlossarySuccessState extends DictionaryState {}
 
 class EditGlossaryErrorState extends DictionaryState {
   final String error;
-EditGlossaryErrorState (this.error);
+  EditGlossaryErrorState({required this.error});
 }
 
 //*GET USER WORDS STATES

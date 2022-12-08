@@ -66,7 +66,9 @@ class _SearchHistoryState extends State<SearchHistory> {
             actions: [
               TextButton(
                 onPressed: () {
-                  globals.dictionaryBloc?.add(DeleteAllWordsEvent());
+                  globals.dictionaryBloc?.add(
+                    DeleteAllHistoryEvent(),
+                  );
                   setState(() {
                     globals.dictionaryBloc!.add(
                       GetSearchHistoryEvent(pageLimit: 300, pageNumber: 1),
@@ -74,7 +76,9 @@ class _SearchHistoryState extends State<SearchHistory> {
                   });
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(
+                    8.0,
+                   ),
                   child: Text(
                     _getHistory.value.isEmpty ? "" : 'Clear History',
                     style: TextStyle(
