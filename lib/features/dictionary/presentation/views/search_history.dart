@@ -65,8 +65,10 @@ class _SearchHistoryState extends State<SearchHistory> {
           appBar: AppBar(
             actions: [
               TextButton(
-                onPressed: (){
-                  globals.dictionaryBloc?.add(DeleteAllWordsEvent());
+                onPressed: () {
+                  globals.dictionaryBloc?.add(
+                    DeleteAllHistoryEvent(),
+                  );
                   setState(() {
                     globals.dictionaryBloc!.add(
                       GetSearchHistoryEvent(pageLimit: 300, pageNumber: 1),
@@ -74,7 +76,9 @@ class _SearchHistoryState extends State<SearchHistory> {
                   });
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(
+                    8.0,
+                   ),
                   child: Text(
                     _getHistory.value.isEmpty ? "" : 'Clear History',
                     style: TextStyle(
@@ -109,37 +113,45 @@ class _SearchHistoryState extends State<SearchHistory> {
             elevation: 0,
             toolbarHeight: 50,
           ),
-          body: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: _isLoading
-                ? const Center(child: CircularLoader())
-                : _getHistory.value.isEmpty
-                    ? const Center(child: Text('No search history'))
-                    : ListView.builder(
-                        itemCount: _getHistory.value.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return SearchHistoryContent(
-                            contentDate: dateFormatter(
-                                _getHistory.value[index].createdAt!),
-                            contentText: _getHistory.value[index].word!,
-                            onPressed: () {
-                              globals.dictionaryBloc?.add(DeleteWordEvent(
-                                  historyId:
-                                      _getHistory.value[index].historyId!));
+          body: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: _isLoading
+                  ? const Center(child: CircularLoader())
+                  : _getHistory.value.isEmpty
+                      ? const Center(child: Text('No search history'))
+                      : ListView.builder(
+                          itemCount: _getHistory.value.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SearchHistoryContent(
+                              contentDate: dateFormatter(
+                                  _getHistory.value[index].createdAt!),
+                              contentText: _getHistory.value[index].word!,
+                              onPressed: () {
+                                globals.dictionaryBloc?.add(DeleteWordEvent(
+                                    historyId:
+                                        _getHistory.value[index].historyId!));
 
-                              setState(() {
-                                globals.dictionaryBloc!.add(
-                                    GetSearchHistoryEvent(
-                                        pageLimit: 1000, pageNumber: 1));
-                              });
-                            },
-                          );
-                        },
-                      ),
+                                setState(() {
+                                  globals.dictionaryBloc!.add(
+                                      GetSearchHistoryEvent(
+                                          pageLimit: 1000, pageNumber: 1));
+                                });
+                              },
+                            );
+                          },
+                        ),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<void> onRefresh() async {
+    globals.dictionaryBloc!
+        .add(GetSearchHistoryEvent(pageLimit: 1000, pageNumber: 1));
   }
 
   String dateFormatter(String dateToFormat) {

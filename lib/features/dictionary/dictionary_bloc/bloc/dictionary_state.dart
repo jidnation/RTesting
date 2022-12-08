@@ -11,6 +11,7 @@ abstract class DictionaryState extends Equatable {
 }
 
 class InitialState extends DictionaryState {}
+//*Adding to Glossary States
 
 class AddingToDBState extends DictionaryState {}
 
@@ -19,6 +20,16 @@ class AddedToDBState extends DictionaryState {}
 class ErrorState extends DictionaryState {
   final String error;
   ErrorState(this.error);
+}
+
+//*EDIT GLOSSARY STATES
+class EditGlossaryLoadingState extends DictionaryState {}
+
+class EditGlossarySuccessState extends DictionaryState {}
+
+class EditGlossaryErrorState extends DictionaryState {
+  final String error;
+  EditGlossaryErrorState({required this.error});
 }
 
 //*GET USER WORDS STATES
