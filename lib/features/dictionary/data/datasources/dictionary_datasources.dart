@@ -111,8 +111,7 @@ deleteWord(wordId:$wordId)
         throw GraphQLError(message: result.message);
       }
 
-      return AddWordToGlossaryResponse.fromJson(
-          result.data!['addWordToGlossary']);
+      return AddWordToGlossaryResponse.fromJson(result.data!['editWord']);
     } catch (e) {
       rethrow;
     }

@@ -32,17 +32,19 @@ class DictionaryRepository {
     }
   }
 
-
-  Future<Either<String, AddWordToGlossaryResponse>> editGlossary({
-    String? abbr,
-    String? meaning,
-    String? word,
-    String? language,
-    String? wordId
-  }) async {
+  Future<Either<String, AddWordToGlossaryResponse>> editGlossary(
+      {String? abbr,
+      String? meaning,
+      String? word,
+      String? language,
+      String? wordId}) async {
     try {
       final addGlossary = await _dictionaryDataSource.editWordInGlossary(
-          abbr: abbr, meaning: meaning, word: word, language: language);
+          abbr: abbr,
+          meaning: meaning,
+          word: word,
+          language: language,
+          wordId: wordId);
 
       return Right(addGlossary);
     } on GraphQLError catch (e) {

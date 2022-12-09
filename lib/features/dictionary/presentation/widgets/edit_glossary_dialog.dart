@@ -85,16 +85,16 @@ class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
                             ? () {
                                 if (_formValidationKey.currentState!
                                     .validate()) {
+                                 
                                   globals.dictionaryBloc!.add(
                                     EditGlossaryEvent(
-                                        abbr: abbrController.text,
-                                        language: languageController.text,
-                                        meaning: meaningController.text,
-                                        word: wordController.text,
-                                        wordId: widget.wordId),
+                                      abbr: abbrController.text,
+                                      language: languageController.text,
+                                      meaning: meaningController.text,
+                                      word: wordController.text,
+                                      wordId: widget.wordId,
+                                    ),
                                   );
-
-                                  log('message: ${widget.wordId}');
                                 } else {
                                   return;
                                 }

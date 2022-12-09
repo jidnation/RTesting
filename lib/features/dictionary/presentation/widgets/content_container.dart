@@ -85,7 +85,7 @@ class ContentContainer extends StatelessWidget {
                               onPressed: onEdit,
                               icon: const Icon(
                                 Icons.edit_outlined,
-                                color: Colors.black87,
+                                color: AppColors.primaryColor,
                                 size: 20,
                               ),
                             ),
