@@ -108,6 +108,10 @@ class _RecentlyAddedState extends State<RecentlyAdded> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return EditGlossaryDialog(
+                                      word: _recentWords.value[index].word!,
+                                      abbr: _recentWords.value[index].abbr!,
+                                      language: _recentWords.value[index].language!,
+                                      meaning: _recentWords.value[index].meaning!,
                                       wordId: _recentWords.value[index].wordId!,
                                     );
                                   },
