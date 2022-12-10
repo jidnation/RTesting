@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -13,8 +11,19 @@ import 'package:reach_me/features/dictionary/presentation/widgets/add_to_glossar
 import 'package:reach_me/features/dictionary/presentation/widgets/search_custom_button.dart';
 
 class EditGlossaryDialog extends StatefulWidget {
-  const EditGlossaryDialog({Key? key, required this.wordId}) : super(key: key);
+  const EditGlossaryDialog(
+      {Key? key,
+      required this.wordId,
+      required this.word,
+      required this.language,
+      required this.meaning,
+      required this.abbr})
+      : super(key: key);
   final String wordId;
+  final String abbr;
+  final String word;
+  final String language;
+  final String meaning;
   @override
   State<EditGlossaryDialog> createState() => _EditGlossaryDialogState();
 }
@@ -25,6 +34,25 @@ class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
   TextEditingController languageController = TextEditingController();
   TextEditingController meaningController = TextEditingController();
   final _formValidationKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    abbrController.text = widget.abbr;
+    wordController.text = widget.word;
+    languageController.text = widget.language;
+    meaningController.text = widget.meaning;
+  }
+
+  @override
+  void dispose() {
+    abbrController.dispose();
+    wordController.dispose();
+    languageController.dispose();
+    meaningController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -87,14 +115,13 @@ class _EditGlossaryDialogState extends State<EditGlossaryDialog> {
                                     .validate()) {
                                   globals.dictionaryBloc!.add(
                                     EditGlossaryEvent(
-                                        abbr: abbrController.text,
-                                        language: languageController.text,
-                                        meaning: meaningController.text,
-                                        word: wordController.text,
-                                        wordId: widget.wordId),
+                                      abbr: abbrController.text,
+                                      language: languageController.text,
+                                      meaning: meaningController.text,
+                                      word: wordController.text,
+                                      wordId: widget.wordId,
+                                    ),
                                   );
-
-                                  log('message: ${widget.wordId}');
                                 } else {
                                   return;
                                 }

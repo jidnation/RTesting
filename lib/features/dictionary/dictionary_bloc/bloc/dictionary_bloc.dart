@@ -38,16 +38,19 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       emit(
         EditGlossaryLoadingState(),
       );
+
       await Future.delayed(
         const Duration(seconds: 2),
       );
+
       try {
         final result = await dictionaryRepository.editGlossary(
-          abbr: event.abbr,
-          meaning: event.meaning,
-          word: event.word,
-          language: event.language,
-        );
+            abbr: event.abbr,
+            meaning: event.meaning,
+            word: event.word,
+            language: event.language,
+            wordId: event.wordId);
+
         result.fold(
           (error) => emit(
             EditGlossaryErrorState(
