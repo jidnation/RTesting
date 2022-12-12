@@ -358,7 +358,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
               if (isPlaying) {
                 playerController.pausePlayer();
               } else {
-                playerController.startPlayer();
+                playerController.startPlayer(finishMode: FinishMode.pause);
               }
             },
             child: Icon(

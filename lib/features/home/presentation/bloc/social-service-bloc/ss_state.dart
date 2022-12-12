@@ -189,7 +189,8 @@ class LikeCommentOnPostSuccess extends SocialServiceState {
 
 class LikeCommentOnPostError extends SocialServiceState {
   final String error;
-  LikeCommentOnPostError({required this.error});
+  final String commentId;
+  LikeCommentOnPostError({required this.error, required this.commentId});
   @override
   List<Object> get props => [error];
 }
@@ -203,7 +204,8 @@ class UnlikeCommentOnPostSuccess extends SocialServiceState {
 
 class UnlikeCommentOnPostError extends SocialServiceState {
   final String error;
-  UnlikeCommentOnPostError({required this.error});
+  final String commentId;
+  UnlikeCommentOnPostError({required this.error, required this.commentId});
   @override
   List<Object> get props => [error];
 }
@@ -421,7 +423,7 @@ class GetAllStatusError extends SocialServiceState {
 class GetStatusFeedLoading extends SocialServiceState {}
 
 class GetStatusFeedSuccess extends SocialServiceState {
-  final List<StatusFeedModel>? status;
+  final List<StatusFeedResponseModel>? status;
   GetStatusFeedSuccess({this.status});
 }
 

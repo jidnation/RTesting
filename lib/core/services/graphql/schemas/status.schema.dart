@@ -46,23 +46,23 @@ class StatusProfileSchema {
   }
 }
 
-class StatusFeedSchema {
-  StatusFeedSchema._();
+class StatusFeedResponseSchema {
+  StatusFeedResponseSchema._();
 
   static String get schema {
     return r'''
             _id
             status {
               ''' +
-        StatusFeedResponse.schema +
+        StatusFeedSchema.schema +
         '''
             }
         ''';
   }
 }
 
-class StatusFeedResponse {
-  StatusFeedResponse._();
+class StatusFeedSchema {
+  StatusFeedSchema._();
 
   static String get schema {
     return r'''

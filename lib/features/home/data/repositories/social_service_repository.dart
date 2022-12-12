@@ -458,7 +458,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, List<StatusFeedModel>>> getStatusFeed({
+  Future<Either<String, List<StatusFeedResponseModel>>> getStatusFeed({
     required int pageLimit,
     required int pageNumber,
   }) async {

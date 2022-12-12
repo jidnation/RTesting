@@ -458,7 +458,7 @@ Future showStoryBottomSheet(BuildContext context,
 }
 
 Future showUserStoryBottomSheet(BuildContext context,
-    {required StatusFeedResponseModel status}) async {
+    {required StatusFeedModel status}) async {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
@@ -514,14 +514,14 @@ Future showUserStoryBottomSheet(BuildContext context,
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(ReachUserEvent(
-                                    userIdToReach: status.authId));
+                                    userIdToReach: status.statusOwnerProfile!.authId));
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(
-                                    StarUserEvent(userIdToStar: status.authId));
+                                    StarUserEvent(userIdToStar: status.statusOwnerProfile!.authId));
                               }),
                           // KebabBottomTextButton(
                           //     label: 'Copy link',

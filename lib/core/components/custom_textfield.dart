@@ -134,6 +134,7 @@ class CustomRoundTextField extends StatelessWidget {
       textCapitalization: textCapitalization,
       onChanged: onChanged,
       validator: validator,
+      focusNode: focusNode,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: hintStyle,
