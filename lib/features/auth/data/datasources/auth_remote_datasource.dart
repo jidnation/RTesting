@@ -114,7 +114,9 @@ class AuthRemoteDataSource {
       {required String? email, required int? pin}) async {
     const String q = r'''
         query verifyResetPin($email: String!, $pin: Int!) {
-          verifyResetPin(email: $email, pin: $pin) 
+          verifyResetPin(email: $email, pin: $pin) {
+            token
+          }
         }''';
     try {
       final result = await _client.query(

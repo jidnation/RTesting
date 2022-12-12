@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -47,6 +48,12 @@ class CommentReach extends StatefulHookWidget {
 }
 
 class _CommentReachState extends State<CommentReach> {
+  late final RecorderController recorderController;
+  bool isRecordingInit = false;
+  bool isRecording = false;
+  bool emojiShowing = false;
+  FocusNode focusNode = FocusNode();
+
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
@@ -65,20 +72,18 @@ class _CommentReachState extends State<CommentReach> {
     return null;
   }
 
-  void openAudio() async {
-    final status = await permit.Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      throw RecordingPermissionException('Mic permission not allowed');
-    }
-    await _soundRecorder!.openRecorder();
-    isRecordingInit = true;
+  void _initialiseController() {
+    recorderController = RecorderController()
+      ..androidEncoder = AndroidEncoder.aac
+      ..androidOutputFormat = AndroidOutputFormat.mpeg4
+      ..iosEncoder = IosEncoder.kAudioFormatLinearPCM
+      ..sampleRate = 16000;
   }
 
   @override
   void initState() {
     super.initState();
-    _soundRecorder = FlutterSoundRecorder();
-    openAudio();
+    _initialiseController();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -88,26 +93,11 @@ class _CommentReachState extends State<CommentReach> {
     });
   }
 
-  FlutterSoundRecorder? _soundRecorder;
-
-  bool isRecordingInit = false;
-  bool isRecording = false;
-
-  bool emojiShowing = false;
-  FocusNode focusNode = FocusNode();
-
-  // final isTyping = useState<bool>(false);
-  // useEffect(() {
-  //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-  //       postId: widget.postFeedModel.postId, pageLimit: 50, pageNumber: 1));
-  //   return null;
-  // }, []);
-
   @override
   void dispose() {
     super.dispose();
-    _soundRecorder!.closeRecorder();
-    isRecordingInit = false;
+    focusNode.dispose();
+    recorderController.dispose();
   }
   // final _imageList = useState<List<UploadFileDto>>([]);
 
@@ -130,48 +120,7 @@ class _CommentReachState extends State<CommentReach> {
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
     final scrollController = useScrollController();
-
-    Widget buildEmoji() {
-      return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.3,
-        child: EmojiPicker(
-          textEditingController: controller,
-          config: Config(
-            columns: 7,
-            emojiSizeMax:
-                32 * (!foundation.kIsWeb && Platform.isIOS ? 1.30 : 1.0),
-            verticalSpacing: 0,
-            horizontalSpacing: 0,
-            gridPadding: EdgeInsets.zero,
-            initCategory: Category.RECENT,
-            bgColor: const Color(0xFFF2F2F2),
-            indicatorColor: Colors.blue,
-            iconColor: Colors.grey,
-            iconColorSelected: Colors.blue,
-            backspaceColor: Colors.blue,
-            skinToneDialogBgColor: Colors.white,
-            skinToneIndicatorColor: Colors.grey,
-            enableSkinTones: true,
-            showRecentsTab: true,
-            recentsLimit: 28,
-            replaceEmojiOnLimitExceed: false,
-            noRecents: const Text(
-              'No Recents',
-              style: TextStyle(fontSize: 20, color: Colors.black26),
-              textAlign: TextAlign.center,
-            ),
-            loadingIndicator: const SizedBox.shrink(),
-            tabIndicatorAnimDuration: kTabScrollDuration,
-            categoryIcons: const CategoryIcons(),
-            buttonMode: ButtonMode.MATERIAL,
-            checkPlatformCompatibility: true,
-          ),
-          onBackspacePressed: () {
-            controller.text.substring(0, controller.text.length - 1);
-          },
-        ),
-      );
-    }
+    final isTyping = useState<bool>(false);
 
     return BlocConsumer<SocialServiceBloc, SocialServiceState>(
       bloc: globals.socialServiceBloc,
@@ -555,6 +504,7 @@ class _CommentReachState extends State<CommentReach> {
                       ),
                       const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                       TextField(
+                        focusNode: focusNode,
                         maxLengthEnforcement: MaxLengthEnforcement.enforced,
                         minLines: 1,
                         maxLines: null,
@@ -1086,8 +1036,10 @@ class _CommentReachState extends State<CommentReach> {
                       children: [
                         IconButton(
                           onPressed: () {
+                            focusNode.unfocus();
+                            focusNode.canRequestFocus = false;
                             setState(() {
-                              //  showEmoji.value = !showEmoji.value;
+                              emojiShowing = !emojiShowing;
                             });
                           },
                           padding: EdgeInsets.zero,
@@ -1120,28 +1072,23 @@ class _CommentReachState extends State<CommentReach> {
                           //constraints: const BoxConstraints(
                           // maxHeight: 25, maxWidth: 25),
                           onPressed: () async {
+                            var tempDir = await getTemporaryDirectory();
+                            String? path =
+                                '${tempDir.path}/commentReach_sound.aac';
+
+                            if (isRecording) {
+                              path = await recorderController.stop();
+                              File audio = File(path!);
+                              globals.socialServiceBloc!
+                                  .add(MediaUploadEvent(media: audio));
+                              print(path);
+                            } else {
+                              await recorderController.record(path);
+                            }
+
                             setState(() {
                               isRecording = !isRecording;
                             });
-                            var tempDir = await getTemporaryDirectory();
-                            var path = '${tempDir.path}/flutter_sound.aac';
-
-                            if (!isRecordingInit) {
-                              return;
-                            }
-                            if (isRecording) {
-                              await _soundRecorder!.stopRecorder();
-                              print(path);
-                              File audioMessage = File(path);
-
-                              /*globals.chatBloc!.add(
-                                                        UploadImageFileEvent(
-                                                            file: audioMessage));*/
-                            } else {
-                              await _soundRecorder!.startRecorder(
-                                toFile: path,
-                              );
-                            }
                           },
                           icon: !isRecording
                               ? SvgPicture.asset(
@@ -1163,7 +1110,53 @@ class _CommentReachState extends State<CommentReach> {
                   ],
                 ),
               ),
-            )
+            ),
+            Offstage(
+              offstage: emojiShowing,
+              child: SizedBox(
+                height: 227,
+                child: EmojiPicker(
+                  textEditingController: controller,
+                  config: Config(
+                      columns: 7,
+                      emojiSizeMax: 28 * (Platform.isIOS ? 1.30 : 1.0),
+                      verticalSpacing: 0,
+                      horizontalSpacing: 0,
+                      gridPadding: EdgeInsets.zero,
+                      initCategory: Category.RECENT,
+                      bgColor: Colors.white,
+                      indicatorColor: Theme.of(context).primaryColor,
+                      iconColor: Colors.grey,
+                      iconColorSelected: Theme.of(context).primaryColor,
+                      backspaceColor: Theme.of(context).primaryColor,
+                      skinToneDialogBgColor: Colors.white,
+                      skinToneIndicatorColor: Colors.grey,
+                      enableSkinTones: true,
+                      showRecentsTab: true,
+                      recentsLimit: 32,
+                      noRecents: const Text(
+                        'Pas d\'émojis récents',
+                        style: TextStyle(fontSize: 20, color: Colors.black26),
+                        textAlign: TextAlign.center,
+                      )),
+                  onEmojiSelected: (category, emoji) {
+                    controller
+                      ..text += emoji.emoji
+                      ..selection = TextSelection.fromPosition(
+                          TextPosition(offset: controller.text.length));
+                    setState(() {
+                      controller.text = controller.text;
+                    });
+                    if (!isTyping.value) {
+                      setState(() {
+                        isTyping.value = !isTyping.value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
+            isRecording? audioRecording() : const SizedBox.shrink(),
           ],
         )));
       },
@@ -1255,5 +1248,63 @@ class _CommentReachState extends State<CommentReach> {
           ],
         );
     }
+  }
+
+  Widget audioRecording() {
+    return Container(
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              recorderController.stop();
+            },
+            child: Icon(
+              Icons.delete,
+              size: 32,
+              color: AppColors.primaryColor.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(
+            width: 12,
+          ),
+          Expanded(
+            child: AudioWaveforms(
+              size: Size(MediaQuery.of(context).size.width / 2, 20),
+              recorderController: recorderController,
+              enableGesture: true,
+              waveStyle: const WaveStyle(
+                waveColor: Colors.blueAccent,
+                extendWaveform: true,
+                showMiddleLine: false,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.only(
+                  left: 18, right: 20, top: 15, bottom: 15),
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+            ),
+          ),
+         GestureDetector(
+          onTap: () {
+            
+          },
+          child: Container(
+            height: 40,
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle, color: AppColors.primaryColor
+            ),
+            child: const Icon(
+              Icons.send,
+              color: AppColors.white,
+              size: 16,
+            ),
+          ),
+         ) 
+        ],
+      ),
+    );
   }
 }

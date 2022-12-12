@@ -118,7 +118,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _posts = useState<List<PostFeedModel>>([]);
     final _currentPost = useState<PostFeedModel?>(null);
     final _myStatus = useState<List<StatusModel>>([]);
-    final _userStatus = useState<List<StatusFeedModel>>([]);
+    final _userStatus = useState<List<StatusFeedResponseModel>>([]);
     var size = MediaQuery.of(context).size;
     debugPrint(globals.token);
 
@@ -469,11 +469,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                       ));
                                                               return;
                                                             },
-                                                            //   RouteNavigators.route(
-                                                            //       context,
-                                                            //       const CreateStatus());
-                                                            //   return;
-                                                            // },
+                                                           
                                                           ),
 
                                                           if (_myStatus
@@ -512,13 +508,13 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                               image: _userStatus
                                                                   .value[index]
                                                                   .status![0]
-                                                                  .statusCreatorModel!
+                                                                  .statusOwnerProfile!
                                                                   .profilePicture,
                                                               username: _userStatus
                                                                   .value[index]
                                                                   .status![
                                                                       index]
-                                                                  .statusCreatorModel!
+                                                                  .statusOwnerProfile!
                                                                   .username!,
                                                               onTap: () {
                                                                 RouteNavigators

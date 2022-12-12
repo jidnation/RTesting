@@ -2294,7 +2294,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
-     globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
+    globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!.add(GetReachRelationshipEvent(
         userIdToReach: widget.recipientId,
         type: ReachRelationshipType.reaching));
@@ -2435,10 +2435,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-               if (state is RecipientUserData) {
+              if (state is RecipientUserData) {
                 globals.recipientUser = state.user;
                 setState(() {});
-               }
+              }
 
               if (state is UserError) {
                 Snackbars.error(context, message: state.error);
@@ -2474,14 +2474,16 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
 
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: widget.recipientId));
                 setState(() {});
               }
 
               if (state is UserLoaded) {
                 Snackbars.success(context,
                     message: "Reached User Successfully");
-                 globals.userBloc!.add(
-                     GetRecipientProfileEvent(email: widget.recipientEmail));
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: widget.recipientId));
                 _isReaching = true;
 
                 setState(() {});
@@ -2679,211 +2681,256 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                       ],
                     ),
                   ),
-                  Visibility(
-                    visible: isUserCollapsed,
-                    child: Column(
-                      children: [
-                        SizedBox(height: getScreenHeight(15)),
-                        Text(
-                            ('@${globals.recipientUser!.username}')
-                                .toLowerCase(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(15),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor2,
-                            )),
-                        // Text('@${globals.recipientUser!.username ?? 'username'}',
-                        //     style: TextStyle(
-                        //       fontSize: getScreenHeight(13),
-                        //       fontWeight: FontWeight.w400,
-                        //       color: AppColors.textColor2,
-                        //     )),
-                        SizedBox(height: getScreenHeight(15)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  Stack(
+                    children: [
+                      Visibility(
+                        visible: isUserCollapsed,
+                        child: Column(
                           children: [
+                            SizedBox(height: getScreenHeight(15)),
+                            Text(
+                                ('@${globals.recipientUser!.username}')
+                                    .toLowerCase(),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(15),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor2,
+                                )),
+                            // Text('@${globals.recipientUser!.username ?? 'username'}',
+                            //     style: TextStyle(
+                            //       fontSize: getScreenHeight(13),
+                            //       fontWeight: FontWeight.w400,
+                            //       color: AppColors.textColor2,
+                            //     )),
+                            SizedBox(height: getScreenHeight(15)),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context,
-                                      RecipientAccountStatsInfo(
-                                        index: 0,
-                                        recipientId: widget.recipientId,
-                                        // recipientId: widget.recipientId,
-                                      )),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nReachers
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
+                                Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context,
+                                          RecipientAccountStatsInfo(
+                                            index: 0,
+                                            recipientId: widget.recipientId,
+                                            // recipientId: widget.recipientId,
+                                          )),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nReachers
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Reachers',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        'Reachers',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
+                                    ),
+                                    SizedBox(width: getScreenWidth(20)),
+                                    InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context,
+                                          RecipientAccountStatsInfo(
+                                            index: 1,
+                                            recipientId: widget.recipientId,
+                                          )),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nReaching
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Reaching',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    //SizedBox(width: getScreenWidth(20)),
+                                    /*InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nStaring
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Starring',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    )*/
+                                  ],
                                 ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context,
-                                      RecipientAccountStatsInfo(
-                                        index: 1,
-                                        recipientId: widget.recipientId,
-                                      )),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nReaching
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                        'Reaching',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                //SizedBox(width: getScreenWidth(20)),
-                                /*InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nStaring
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                        'Starring',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                )*/
                               ],
                             ),
-                          ],
-                        ),
-                        globals.recipientUser!.bio != null &&
-                                globals.recipientUser!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(290),
-                            child: Text(
-                              globals.recipientUser!.bio ?? '',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: getScreenHeight(13),
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            )),
-                        globals.recipientUser!.bio != null &&
-                                globals.recipientUser!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                            globals.recipientUser!.bio != null &&
+                                    globals.recipientUser!.bio != ''
+                                ? SizedBox(height: getScreenHeight(20))
+                                : const SizedBox.shrink(),
                             SizedBox(
-                              width: getScreenWidth(130),
-                              height: getScreenHeight(41),
-                              child: CustomButton(
-                                isLoading: _isLoading,
-                                loaderColor: _isReaching
-                                    ? AppColors.primaryColor
-                                    : AppColors.white,
-                                label: _isReaching ? 'Reaching' : 'Reach',
-                                color: _isReaching
-                                    ? AppColors.white
-                                    : AppColors.primaryColor,
-                                onPressed: () {
-                                  if (!_isReaching) {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            globals.recipientUser!.id));
-                                  } else {
-                                    globals.userBloc!.add(
-                                        DelReachRelationshipEvent(
-                                            userIdToDelete:
-                                                globals.recipientUser!.id));
-                                  }
-                                },
-                                size: size,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 9,
-                                  horizontal: 21,
-                                ),
-                                textColor: _isReaching
-                                    ? AppColors.black
-                                    : AppColors.white,
-                                borderSide: _isReaching
-                                    ? const BorderSide(
-                                        color: AppColors.greyShade5)
-                                    : BorderSide.none,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                                width: getScreenWidth(130),
-                                height: getScreenHeight(41),
-                                child: CustomButton(
-                                  label: 'Message',
-                                  color: AppColors.white,
-                                  onPressed: () {
-                                    RouteNavigators.route(
-                                        context,
-                                        MsgChatInterface(
-                                          recipientUser: globals.recipientUser,
-                                        ));
-                                  },
-                                  size: size,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 9,
-                                    horizontal: 21,
+                                width: getScreenWidth(290),
+                                child: Text(
+                                  globals.recipientUser!.bio ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(13),
+                                    color: AppColors.greyShade2,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  textColor: AppColors.textColor2,
-                                  borderSide: const BorderSide(
-                                      color: AppColors.greyShade5),
                                 )),
+                            globals.recipientUser!.bio != null &&
+                                    globals.recipientUser!.bio != ''
+                                ? SizedBox(height: getScreenHeight(20))
+                                : const SizedBox.shrink(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: getScreenWidth(130),
+                                  height: getScreenHeight(41),
+                                  child: CustomButton(
+                                    isLoading: _isLoading,
+                                    loaderColor: _isReaching
+                                        ? AppColors.primaryColor
+                                        : AppColors.white,
+                                    label: _isReaching ? 'Reaching' : 'Reach',
+                                    color: _isReaching
+                                        ? AppColors.white
+                                        : AppColors.primaryColor,
+                                    onPressed: () {
+                                      if (!_isReaching) {
+                                        globals.userBloc!.add(ReachUserEvent(
+                                            userIdToReach:
+                                                globals.recipientUser!.id));
+                                      } else {
+                                        globals.userBloc!.add(
+                                            DelReachRelationshipEvent(
+                                                userIdToDelete:
+                                                    globals.recipientUser!.id));
+                                      }
+                                    },
+                                    size: size,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 9,
+                                      horizontal: 21,
+                                    ),
+                                    textColor: _isReaching
+                                        ? AppColors.black
+                                        : AppColors.white,
+                                    borderSide: _isReaching
+                                        ? const BorderSide(
+                                            color: AppColors.greyShade5)
+                                        : BorderSide.none,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                    width: getScreenWidth(130),
+                                    height: getScreenHeight(41),
+                                    child: CustomButton(
+                                      label: 'Message',
+                                      color: AppColors.white,
+                                      onPressed: () {
+                                        RouteNavigators.route(
+                                            context,
+                                            MsgChatInterface(
+                                              recipientUser:
+                                                  globals.recipientUser,
+                                            ));
+                                      },
+                                      size: size,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 9,
+                                        horizontal: 21,
+                                      ),
+                                      textColor: AppColors.textColor2,
+                                      borderSide: const BorderSide(
+                                          color: AppColors.greyShade5),
+                                    )),
+                              ],
+                            ),
+                            SizedBox(height: getScreenHeight(15)),
                           ],
-                        ),
-                        SizedBox(height: getScreenHeight(15)),
-                      ],
-                    ).paddingOnly(t: 50),
+                        ).paddingOnly(t: 50),
+                      ),
+                      Visibility(
+                        visible: _isReaching,
+                        child: Positioned(
+                            top: size.height * 0.1 - 55,
+                            right: size.width * 0.4,
+                            //child: FractionalTranslation(
+                            //translation: const Offset(0.1, 0.1),
+                            child: InkWell(
+                              onTap: () {
+                                print("User Tap for starring");
+                                if (!_isStarring) {
+                                  globals.userBloc!.add(StarUserEvent(
+                                      userIdToStar: widget.recipientId));
+                                } else {
+                                  globals.userBloc!.add(
+                                      DelStarRelationshipEvent(
+                                          starIdToDelete: widget.recipientId));
+                                }
+                              },
+                              child: Container(
+                                width: getScreenHeight(30),
+                                height: getScreenHeight(30),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: !_isStarring
+                                          ? Colors.grey
+                                          : Colors.yellowAccent),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.star,
+                                    size: 19,
+                                    color: !_isStarring
+                                        ? Colors.grey
+                                        : Colors.yellowAccent),
+                              ),
+                            )
+                            //),
+                            ),
+                      ),
+                    ],
                   ),
                   Visibility(
                     visible: isUserCollapsed ? true : false,
