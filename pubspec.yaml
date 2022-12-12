@@ -119,6 +119,12 @@ dependencies:
     git: https://github.com/gideonoyekale/flutter_mentions.git
   expandable_text: ^2.3.0
   flutter_keyboard_visibility: ^5.4.0
+  stop_watch_timer: ^2.0.0
+  neon_circular_timer: ^0.0.7
+  cloudinary: ^1.0.3
+  get: ^4.6.5
+  path: ^1.8.2
+  flutter_audio_cutter: ^1.0.3+1
 
 
 

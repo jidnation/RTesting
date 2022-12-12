@@ -36,7 +36,7 @@ class MomentVideoControl {
       return null;
     }
     try {
-      XFile file = await videoController!.stopVideoRecording();
+      XFile file = await videoController.stopVideoRecording();
       // setState(() {
       //   _isRecordingInProgress = false;
       //   print(_isRecordingInProgress);
@@ -87,7 +87,7 @@ class MomentVideoControl {
         RouteNavigators.route(
           context,
           VideoPreviewer(
-            video: videoFile.path,
+            videoFile: videoFile,
             videoController: videoController!,
           ),
         );

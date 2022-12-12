@@ -19,7 +19,10 @@ class MomentActions extends StatelessWidget {
     return InkWell(
       onTap: onClick,
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        SvgPicture.asset(svgUrl),
+        SvgPicture.asset(
+          svgUrl,
+          color: Colors.white,
+        ),
         const SizedBox(height: 2),
         CustomText(
           text: label,
