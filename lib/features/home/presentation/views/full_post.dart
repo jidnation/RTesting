@@ -1021,19 +1021,19 @@ class _FullPostScreenState extends State<FullPostScreen> {
                               Expanded(
                                   child: ListView.builder(
                                       itemCount: comments.value.length,
-                                      itemBuilder: ((context, index) {
+                                      itemBuilder: (context, index) {
                                         return CommentsTile(
                                           comment: comments.value[index],
                                           isLiked: comments
-                                                  .value[index].like!.isNotEmpty
+                                                  .value[index].isLiked ?? false
                                               ? true
                                               : false,
                                           onLike: () {
                                             HapticFeedback.mediumImpact();
                                             handleTap(comments.value[index]);
                                             if (active.contains(index)) {
-                                              if (comments.value[index].like!
-                                                  .isNotEmpty) {
+                                              if (comments.value[index].isLiked!
+                                  ) {
                                                 globals.socialServiceBloc!.add(
                                                     UnlikeCommentOnPostEvent(
                                                   commentId: comments
@@ -1075,7 +1075,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             }
                                           },
                                         );
-                                      })))
+                                      }))
                             ],
                           ),
                           Positioned(

@@ -221,7 +221,8 @@ class ViewMyStatus extends HookWidget {
 
 class ViewUserStatus extends HookWidget {
   const ViewUserStatus({Key? key, required this.status}) : super(key: key);
-  final List<StatusFeedResponseModel> status;
+  //final List<StatusFeedResponseModel> status;
+  final List<StatusFeedModel> status;
 
   @override
   Widget build(BuildContext context) {
@@ -272,16 +273,16 @@ class ViewUserStatus extends HookWidget {
                             Row(
                               children: [
                                 Helper.renderProfilePicture(
-                                    story.statusCreatorModel!.profilePicture),
+                                    story.statusOwnerProfile!.profilePicture),
                                 SizedBox(width: getScreenWidth(12)),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      (story.statusCreatorModel!.firstName! +
+                                      (story.statusOwnerProfile!.firstName! +
                                               ' ' +
-                                              story.statusCreatorModel!
+                                              story.statusOwnerProfile!
                                                   .lastName!)
                                           .toTitleCase(),
                                       style: TextStyle(
@@ -291,7 +292,7 @@ class ViewUserStatus extends HookWidget {
                                       ),
                                     ),
                                     Text(
-                                      '@${story.statusCreatorModel!.username!}',
+                                      '@${story.statusOwnerProfile!.username!}',
                                       style: TextStyle(
                                         fontSize: getScreenHeight(13),
                                         color: Colors.white,
@@ -365,16 +366,16 @@ class ViewUserStatus extends HookWidget {
                           Row(
                             children: [
                               Helper.renderProfilePicture(
-                                  story.statusCreatorModel!.profilePicture),
+                                  story.statusOwnerProfile!.profilePicture),
                               SizedBox(width: getScreenWidth(12)),
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    (story.statusCreatorModel!.firstName! +
+                                    (story.statusOwnerProfile!.firstName! +
                                             ' ' +
-                                            story.statusCreatorModel!.lastName!)
+                                            story.statusOwnerProfile!.lastName!)
                                         .toTitleCase(),
                                     style: TextStyle(
                                       fontSize: getScreenHeight(16),
@@ -383,7 +384,7 @@ class ViewUserStatus extends HookWidget {
                                     ),
                                   ),
                                   Text(
-                                    '@${story.statusCreatorModel!.username!}',
+                                    '@${story.statusOwnerProfile!.username!}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(13),
                                       color: Colors.white,
@@ -546,9 +547,9 @@ class ViewUserStatus extends HookWidget {
                             globals.chatBloc!.add(
                               SendChatMessageEvent(
                                 senderId: globals.user!.id,
-                                receiverId: story.authId,
+                                receiverId: story.statusOwnerProfile!.authId,
                                 threadId:
-                                    '${globals.user!.id}--${story.authId}',
+                                    '${globals.user!.id}--${story.statusOwnerProfile!.authId}',
                                 value: controller.text.trim(),
                                 type: 'text',
                               ),

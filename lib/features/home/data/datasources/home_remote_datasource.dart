@@ -1418,7 +1418,7 @@ class HomeRemoteDataSource {
   }) async {
     String q = r'''
         mutation createStatus(
-          $statusBody: CreateStatus!
+          $statusBody: StatusInputDto!
           ) {
           createStatus(
             statusBody: $statusBody
@@ -1598,7 +1598,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<StatusFeedModel>> getStatusFeed({
+  Future<List<StatusFeedResponseModel>> getStatusFeed({
     required int? pageLimit,
     required int? pageNumber,
   }) async {
@@ -1612,7 +1612,7 @@ class HomeRemoteDataSource {
             page_number: $page_number
           ){   
                ''' +
-        StatusFeedSchema.schema +
+        StatusFeedResponseSchema.schema +
         '''
           }
         }''';
@@ -1626,14 +1626,14 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       final tempList = (result.data!['getStatusFeed'] as List)
-          .map((e) => StatusFeedModel.fromJson(e))
+          .map((e) => StatusFeedResponseModel.fromJson(e))
           .toList();
-      List<StatusFeedModel> list = [];
+      List<StatusFeedResponseModel> list = [];
       if (tempList.isNotEmpty) {
         final groupedList =
             tempList.first.status!.groupBy((item) => item.status!.authId!);
         groupedList.forEach((key, value) {
-          list.add(StatusFeedModel(id: key, status: value.toList()));
+          list.add(StatusFeedResponseModel(id: key, status: value.toList()));
         });
       }
       return list;

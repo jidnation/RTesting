@@ -49,3 +49,18 @@ class LoginResponse {
         "lastLogin": lastLogin,
       };
 }
+
+class PayLoadWithToken {
+  String? token;
+
+  PayLoadWithToken({this.token});
+
+  factory PayLoadWithToken.fromJson(Map<String, dynamic> json) =>
+      PayLoadWithToken(
+        token: json["token"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "token": token,
+      };
+}
