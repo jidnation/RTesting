@@ -8,8 +8,7 @@ import 'graphql_strings.dart' as gql_string;
 
 class MomentQuery {
   static Future<bool> postMoment(
-      {required String caption,
-      required String videoMediaItem,
+      {required String videoMediaItem,
       List<String>? hashTags,
       List<String>? mentionList,
       String? sound}) async {
@@ -25,7 +24,8 @@ class MomentQuery {
       cache: GraphQLCache(),
     );
     Map<String, dynamic> momentVariables = {
-      'caption': caption,
+      'caption':
+          momentCtrl.caption.value.isNotEmpty ? momentCtrl.caption.value : '',
       'videoMediaItem': videoMediaItem,
     };
 

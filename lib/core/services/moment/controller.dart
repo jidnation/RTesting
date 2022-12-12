@@ -7,7 +7,7 @@ import '../media_service.dart';
 class MomentController extends GetxController {
   final RxString audioUrl = ''.obs;
   final RxString audioFilePath = ''.obs;
-  // final RxString videoFilePath = ''.obs;
+  final RxString caption = ''.obs;
   // final RxString noAudioVideoFilePath = ''.obs;
   // final RxString videoUrl = ''.obs;
   final RxInt endTime = 0.obs;
@@ -30,6 +30,7 @@ class MomentController extends GetxController {
 
   clearPostingData() {
     audioUrl('');
+    caption('');
     audioFilePath('');
     endTime(0);
   }

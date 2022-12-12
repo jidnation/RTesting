@@ -84,6 +84,7 @@ class CustomRoundTextField extends StatelessWidget {
   final int? minLines;
   final Color? fillColor;
   final bool? isDense;
+  final bool? autoFocus;
   final void Function()? onTap;
   final FocusNode? focusNode;
   final double? verticalHeight;
@@ -98,6 +99,7 @@ class CustomRoundTextField extends StatelessWidget {
       this.obscureText = false,
       this.validator,
       this.controller,
+        this.autoFocus,
       this.prefixIcon,
       this.enabledBorderSide = BorderSide.none,
       this.focusedBorderSide = BorderSide.none,
@@ -125,6 +127,7 @@ class CustomRoundTextField extends StatelessWidget {
     return TextFormField(
       onTap: onTap,
       minLines: minLines,
+      autofocus: autoFocus ?? false,
       maxLines: maxLines,
       style: textStyle,
       keyboardType: keyboardType,
