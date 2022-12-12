@@ -792,7 +792,8 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
 
 Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
     {double? height}) {
-  return SizedBox(
+  return Container(
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
     height: height ?? 300,
     width: double.infinity,
     child: Stack(
@@ -802,8 +803,9 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
         Positioned(
             child: Center(
           child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 1.0),
                 child: Column(
@@ -811,14 +813,24 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Content warning: ${post.postRating} content",
+                      "Content warning",
                       style: TextStyle(
                           fontSize: getScreenHeight(18),
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w200,
                           color: Colors.white),
                     ),
                     const SizedBox(
                       height: 10,
+                    ),
+                    Text(
+                      "The author flagged this post as  ${post.postRating} content",
+                      style: TextStyle(
+                          fontSize: getScreenHeight(14),
+                          fontWeight: FontWeight.w200,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(
+                      height: 15,
                     ),
                     Align(
                       alignment: Alignment.bottomRight,
