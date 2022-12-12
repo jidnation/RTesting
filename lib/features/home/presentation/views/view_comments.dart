@@ -425,6 +425,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                       },
                                     ),
                             ),
+                          
+                          
                           Container(
                             color: AppColors.white,
                             padding: const EdgeInsets.symmetric(

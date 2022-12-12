@@ -61,7 +61,8 @@ class AuthRemoteDataSource {
     }
   }
 
-  Future<LoginResponse> verifyAccount({required String? email, required int pin}) async {
+  Future<LoginResponse> verifyAccount(
+      {required String? email, required int pin}) async {
     const String q = r'''
       query activateAccount($email: String!, $pin: Int!) {
         activateAccount(email: $email, pin: $pin) {
@@ -160,9 +161,10 @@ class AuthRemoteDataSource {
     }
   }
 
-  Future<LoginResponse> login({required String? email, required String password}) async {
+  Future<LoginResponse> login(
+      {required String? email, required String password}) async {
     const String q = r'''
-      query login($email: String!, $password: String) {
+      query login($email: String!, $password: String!) {
       login(email: $email, password: $password) {
         id
         email
