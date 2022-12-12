@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
@@ -13,6 +15,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../models/file_result.dart';
+import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
 
 class MediaService {
@@ -179,11 +182,28 @@ class MediaService {
     return file.copyWith(path: res.path);
   }
 
+  //cutting the audio file based on the time frame
+  Future<File> audioCutter(
+      {required String audioPath, required int endTime}) async {
+    File outputFile = File('');
+    var result = await AudioCutter.cutAudio(audioPath, 0.0, endTime.toDouble());
+    outputFile = File(result);
+
+    return outputFile;
+  }
+
+  //converting the file to url
+  Future<String?>? urlConverter({required String filePath}) async {
+    String? fileUrl = await FileConverter().convertMe(filePath: filePath);
+    return fileUrl;
+  }
+
   Future<FileResult> compressVideo({required FileResult file}) async {
     final res = await VideoCompress.compressVideo(
       file.path,
       quality: VideoQuality.MediumQuality,
     );
+
     return FileResult(
         path: res!.path!,
         size: res.filesize! / 1024,
@@ -191,6 +211,38 @@ class MediaService {
         height: file.height,
         width: file.width,
         fileName: res.path!.split('/').last);
+  }
+
+  Future<String> removeAudio({required String filePath}) async {
+    final MediaInfo? res = await VideoCompress.compressVideo(
+      filePath,
+      includeAudio: false,
+      quality: VideoQuality.MediumQuality,
+    );
+    return res!.path!;
+  }
+
+  Future<PlatformFile?> getAudioFiles() async {
+    print('....function called....');
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: false,
+        onFileLoading: (FilePickerStatus status) => print(status),
+      );
+      PlatformFile file = result!.files.first;
+      int fileSize = file.size;
+      print('....file size:::: $fileSize');
+      // String? audioUrl =
+      //     await FileConverter().convertMe(filePath: file.path!);
+      // return audioUrl;
+      return file;
+    } on PlatformException catch (e) {
+      print('Unsupported operation' + e.toString());
+    } catch (e) {
+      print(e.toString());
+    }
+    return null;
   }
 
   Future<FileResult?> pickFromCamera(

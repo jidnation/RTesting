@@ -1,20 +1,30 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:reach_me/core/components/custom_bottom_sheet.dart';
+import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../../core/components/snackbar.dart';
+import '../../../../../../core/models/file_result.dart';
+import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
+import '../../../../../../core/utils/file_url_converter.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
 
-class VideoPreviewer extends StatefulWidget {
+class VideoPreviewer extends StatefulHookWidget {
   final VideoPlayerController videoController;
-  final String video;
+  final File videoFile;
   const VideoPreviewer(
-      {Key? key, required this.video, required this.videoController})
+      {Key? key, required this.videoController, required this.videoFile})
       : super(key: key);
 
   @override
@@ -29,13 +39,13 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
   }
 
   bool isPlaying = false;
+  bool isUploading = false;
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    TextEditingController textController = useTextEditingController();
     widget.videoController.addListener(() {
-      // print('......... ${widget.videoController.setPlaybackSpeed(2)}');
-      print('......... ${widget.videoController.value.playbackSpeed}');
       if (widget.videoController.value.isPlaying) {
         setState(() {
           isPlaying = true;
@@ -48,7 +58,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     });
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.4),
-      body: Column(children: [
+      body: Column(mainAxisSize: MainAxisSize.min, children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: AspectRatio(
@@ -77,36 +87,30 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          onPressed: () {
+                        InkWell(
+                          onTap: () {
                             RouteNavigators.pop(context);
                           },
-                          icon: Transform.scale(
-                            scale: 1.8,
+                          child: Container(
+                            height: 46,
+                            width: 46,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.black.withOpacity(0.5),
+                            ),
                             child: SvgPicture.asset(
-                              'assets/svgs/dc-cancel.svg',
-                              height: getScreenHeight(71),
+                              'assets/svgs/back.svg',
+                              color: Colors.white,
                             ),
                           ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
                         ),
-                        IconButton(
-                          onPressed: () async {
-                            var res = await MomentQuery.postMoment();
-                            // globals.socialServiceBloc!
-                            //     .add(MediaUploadEvent(media: File(path)));
-                          },
-                          icon: Transform.scale(
-                            scale: 1.8,
-                            child: SvgPicture.asset(
-                              'assets/svgs/dc-send.svg',
-                              height: getScreenHeight(71),
-                            ),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+                        CustomText(
+                          text: 'Video Preview',
+                          color: Colors.black.withOpacity(0.4),
+                          size: 15,
                         ),
+                        const SizedBox(),
                       ])),
               Padding(
                 padding: const EdgeInsets.only(right: 10),
@@ -152,37 +156,119 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                 icon: Icons.edit,
               ),
               SizedBox(width: getScreenWidth(20)),
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                Image.asset(
-                  'assets/images/text.png',
-                  height: 33,
-                  width: 33,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 3),
-                const CustomText(
-                  text: 'Text',
-                  color: Colors.white,
-                  weight: FontWeight.w600,
-                  size: 9.44,
-                )
-              ])
+              InkWell(
+                onTap: () {
+                  CustomBottomSheet.open(context,
+                      child: Container(
+                        height: 200,
+                        padding: const EdgeInsets.only(
+                          top: 10,
+                          right: 15,
+                          left: 15,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(25),
+                          ),
+                        ),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Icon(
+                                Icons.keyboard_double_arrow_down,
+                                color: Colors.grey,
+                                size: 30,
+                              ),
+                              CustomRoundTextField(),
+                              SizedBox(),
+                            ]),
+                      ));
+                },
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/text.png',
+                        height: 25,
+                        width: 25,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: 3),
+                      const CustomText(
+                        text: 'Add Caption',
+                        color: Colors.white,
+                        weight: FontWeight.w600,
+                        size: 9.44,
+                      )
+                    ]),
+              )
             ]),
-            Container(
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: BorderRadius.circular(30),
+            Visibility(
+              visible: !isUploading,
+              child: InkWell(
+                onTap: () async {
+                  setState(() {
+                    isUploading = true;
+                  });
+                  if (momentCtrl.audioFilePath.value.isNotEmpty) {
+                    var noAudioFile = await MediaService()
+                        .removeAudio(filePath: widget.videoFile.path);
+                    FileResult fileResult = FileResult(path: noAudioFile);
+                    FileResult vFile =
+                        await MediaService().compressVideo(file: fileResult);
+                    String? videoUrl =
+                        await FileConverter().convertMe(filePath: vFile.path);
+                    if (videoUrl != null) {
+                      var res = await MomentQuery.postMoment(
+                          caption: 'just testing', videoMediaItem: videoUrl);
+                      if (res) {
+                        Snackbars.success(
+                          context,
+                          message: 'Moment successfully created',
+                          milliseconds: 1300,
+                        );
+                        momentCtrl.clearPostingData();
+                        RouteNavigators.pop(context);
+                      } else {
+                        Snackbars.error(
+                          context,
+                          message: 'Operation Failed, Try again.',
+                          milliseconds: 1400,
+                        );
+                      }
+                      setState(() {
+                        isUploading = false;
+                      });
+                    }
+                  }
+                },
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              child: const Icon(
-                Icons.check,
-                color: Colors.white,
-              ),
-            )
+            ),
+            if (isUploading)
+              const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 5,
+                  color: AppColors.primaryColor,
+                ),
+              )
           ]),
-        )
+        ),
       ]),
     );
   }

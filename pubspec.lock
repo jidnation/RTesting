@@ -274,6 +274,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  cloudinary:
+    dependency: "direct main"
+    description:
+      name: cloudinary
+      sha256: "6802410152eaa6a50100192cb32fe8ba57d59faf496b4c4ac3923602bbb2bef3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   collection:
     dependency: transitive
     description:
@@ -466,6 +474,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  ffmpeg_kit_flutter:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter
+      sha256: d915ccb87b7e99e4de8112e0c32e42f5dd3cd7a22ad4340fa13aac12e87beb98
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.5.1"
+  ffmpeg_kit_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_platform_interface
+      sha256: addf046ae44e190ad0101b2fde2ad909a3cd08a2a109f6106d2f7048b7abedee
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   file:
     dependency: transitive
     description:
@@ -511,6 +535,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_audio_cutter:
+    dependency: "direct main"
+    description:
+      name: flutter_audio_cutter
+      sha256: "9658556af7e6025fa3af2874f914a8caf63a5fb3b925756bee97d160b24e2590"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3+1"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -826,6 +858,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  get:
+    dependency: "direct main"
+    description:
+      name: get
+      sha256: "2ba20a47c8f1f233bed775ba2dd0d3ac97b4cf32fc17731b3dfc672b06b0e92a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.6.5"
   get_it:
     dependency: "direct main"
     description:
@@ -1251,7 +1291,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: db9d4f58c908a4ba5953fcee2ae317c94889433e5024c27ce74a37f94267945b

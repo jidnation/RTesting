@@ -5,11 +5,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:neon_circular_timer/neon_circular_timer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/posting_type.dart';
 
 import '../../../../../../core/services/media_service.dart';
+import '../../../../../../core/services/moment/controller.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/count_down_timer.dart';
@@ -34,6 +36,7 @@ class UserPosting extends StatefulHookWidget {
   State<UserPosting> createState() => _UserPostingState();
 }
 
+final MomentController momentCtrl = Get.find();
 CarouselController sliderController = CarouselController();
 final CountDownController timeController = CountDownController();
 final MomentVideoControl momentVideoControl = MomentVideoControl();
@@ -183,16 +186,25 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                   PosingType(
                                     label: 'Status',
                                     isSelected: index == 0,
+                                    onClick: () {
+                                      sliderController.jumpToPage(0);
+                                    },
                                   ),
                                   const SizedBox(width: 20),
                                   PosingType(
                                     label: 'Moments',
                                     isSelected: index == 1,
+                                    onClick: () {
+                                      sliderController.jumpToPage(1);
+                                    },
                                   ),
                                   const SizedBox(width: 20),
                                   PosingType(
                                     label: 'Live',
                                     isSelected: index == 2,
+                                    onClick: () {
+                                      sliderController.jumpToPage(2);
+                                    },
                                   ),
                                 ]),
                             const SizedBox(height: 2),
@@ -549,6 +561,8 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
     XFile? rawVideo = await momentVideoControl.stopVideoRecording(
       videoController: controller,
     );
+    momentCtrl.endTime(time);
+    momentCtrl.getAudioUrl();
     File videoFile = File(rawVideo!.path);
 
     int currentUnix = DateTime.now().millisecondsSinceEpoch;

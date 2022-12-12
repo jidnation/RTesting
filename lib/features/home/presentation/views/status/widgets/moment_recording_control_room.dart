@@ -87,7 +87,7 @@ class MomentVideoControl {
         RouteNavigators.route(
           context,
           VideoPreviewer(
-            video: videoFile.path,
+            videoFile: videoFile,
             videoController: videoController!,
           ),
         );
