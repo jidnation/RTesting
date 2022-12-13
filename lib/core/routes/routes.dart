@@ -22,10 +22,10 @@ import 'package:reach_me/features/auth/presentation/views/reset_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/onboarding/welcome_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:reach_me/features/video-call/video_call_screen.dart';
+import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
 import 'package:reach_me/features/video-call/video_calling_screen.dart';
-import 'package:reach_me/features/voice-call/voice_call_screen.dart';
-import 'package:reach_me/features/voice-call/voice_calling_screen.dart';
+import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
+import 'package:reach_me/features/voice-call/presentation/views/voice_calling_screen.dart';
 
 class RMRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {

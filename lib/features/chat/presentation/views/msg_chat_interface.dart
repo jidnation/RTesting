@@ -28,8 +28,8 @@ import 'package:reach_me/features/account/presentation/widgets/image_placeholder
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
-import 'package:reach_me/features/video-call/video_call_screen.dart';
-import 'package:reach_me/features/voice-call/voice_call_screen.dart';
+import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
+import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
 
 import '../../../../core/utils/string_util.dart';
 

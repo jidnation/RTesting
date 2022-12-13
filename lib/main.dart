@@ -12,6 +12,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/routes/routes.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
+import 'package:reach_me/core/services/notification_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
@@ -28,6 +29,7 @@ void main() async {
   await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
   await OneSignal.shared.setAppId("4f584eee-135c-46bc-8986-8dfd980f4d3c");
   await OneSignal.shared.promptUserForPushNotificationPermission();
+  NotifcationService.handleNotifications();
   Bloc.observer = AppBlocObserver();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

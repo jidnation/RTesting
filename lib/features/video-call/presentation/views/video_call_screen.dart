@@ -5,12 +5,12 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/voice-call/voice_calling_screen.dart';
+import 'package:reach_me/features/video-call/presentation/views/video_calling_screen.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
-class VoiceCallScreen extends StatelessWidget {
-  static const String id = 'voice_call';
-  const VoiceCallScreen({Key? key}) : super(key: key);
+class VideoCallScreen extends StatelessWidget {
+  static const String id = 'video_call';
+  const VideoCallScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,12 +23,12 @@ class VoiceCallScreen extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                RouteNavigators.route(context, const VoiceCallingScreen());
+                RouteNavigators.route(context, const VideoCallingScreen());
               },
               child: Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/voice-call.png'),
+                    image: AssetImage('assets/images/video-call.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -83,7 +83,14 @@ class VoiceCallScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const SizedBox(height: 48, width: 48),
+                IconButton(
+                  onPressed: () {},
+                  icon: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: SvgPicture.asset('assets/svgs/flip-camera.svg'),
+                  ),
+                ),
                 SizedBox(
                   width: 65,
                   height: 65,
