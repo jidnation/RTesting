@@ -1146,7 +1146,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                             ],
                           ),
                           Positioned(
-                              top: 700,
+                              //top: 670,
+                              bottom:
+                                  ((MediaQuery.of(context).size.height) * 0.01),
                               child: commentField(controller, showEmoji,
                                   postFeedModel: widget.postFeedModel!,
                                   isReaching: isReaching.value))
