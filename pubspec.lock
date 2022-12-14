@@ -510,7 +510,7 @@ packages:
     dependency: "direct main"
     description:
       name: firebase_core
-      sha256: "904bd270364cf4dfaf3c58dc6939c4c7ad26e2877d820dc295ade2cd589d70f3"
+      sha256: "01962872df08437d9be593caeab8c700624c93b629f3d3d60f061612d6263666"
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
@@ -526,7 +526,7 @@ packages:
     dependency: transitive
     description:
       name: firebase_core_web
-      sha256: a2acf43001a7fcd2997ce6b487b17666077be507d885c9941dd870a16aef3040
+      sha256: b2917618cbe75196261621d676a992e05215ce6a70daca5f655794d5a008d369
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
@@ -1955,10 +1955,10 @@ packages:
     dependency: "direct main"
     description:
       name: video_player
-      sha256: "10eec2911ad6b7e8e98cd79ad1ccbf7fdf3be7193a2ebd4e35c89c9925d1b329"
+      sha256: "460f2acac1d4fe73046262a36fe4e06a2166d097eac2a823a27825326152ecd9"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.4"
+    version: "2.4.9"
   video_player_android:
     dependency: transitive
     description:

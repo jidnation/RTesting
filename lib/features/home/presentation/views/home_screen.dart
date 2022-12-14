@@ -1,17 +1,18 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/notification.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/presentation/views/video_moment.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
-import 'package:reach_me/features/home/presentation/views/notification.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:flutter/material.dart';
+
+import 'moment_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
   static const String id = "home_screen";
@@ -24,12 +25,15 @@ class HomeScreen extends StatefulHookWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final _currentIndex = useState<int>(0);
+    final _pageController = usePageController(initialPage: _currentIndex.value);
     final scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     final pages = [
       TimelineScreen(scaffoldKey: scaffoldKey.value),
       SearchScreen(scaffoldKey: scaffoldKey.value),
-      const VideoMomentScreen(),
+      // const VideoMomentScreen(),
+      MomentFeed(pageController: _pageController),
       const NotificationsScreen(),
       const AccountScreen(),
     ];
@@ -37,16 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
       globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
       return null;
     });
-    final _currentIndex = useState<int>(0);
-    final _pageController = usePageController(initialPage: _currentIndex.value);
+
     Console.log('last seen', globals.user!.lastSeen);
 
     int backPressCounter = 0;
     bool onWillPop() {
-      if (_pageController.page!.round() == _pageController.initialPage){
+      if (_pageController.page!.round() == _pageController.initialPage) {
         if (backPressCounter < 1) {
-          Fluttertoast.showToast(msg: "Tap again to leave app",
-              backgroundColor: Colors.blue);
+          Fluttertoast.showToast(
+              msg: "Tap again to leave app", backgroundColor: Colors.blue);
           backPressCounter++;
           Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
             backPressCounter--;
@@ -54,12 +57,13 @@ class _HomeScreenState extends State<HomeScreen> {
           return false;
         }
         return true;
-      }
-      else {
-          _pageController.previousPage(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.linear,
-          ).then((index) => _currentIndex.value--);
+      } else {
+        _pageController
+            .previousPage(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.linear,
+            )
+            .then((index) => _currentIndex.value--);
         return false;
       }
     }
@@ -83,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-
 // int backPressCounter = 0;
 // int backPressTotal = 2;
 //
@@ -100,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
 //     return Future.value(true);
 //   }
 // }
-
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
