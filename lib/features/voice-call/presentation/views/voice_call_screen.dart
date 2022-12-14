@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
-import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/voice-call/presentation/views/voice_calling_screen.dart';
-import 'package:reach_me/core/utils/constants.dart';
 
-class VoiceCallScreen extends StatelessWidget {
+import '../../../../core/models/user.dart';
+
+class VoiceCallScreen extends StatefulWidget {
   static const String id = 'voice_call';
-  const VoiceCallScreen({Key? key}) : super(key: key);
+  const VoiceCallScreen({Key? key, this.recipient}) : super(key: key);
 
+  final User? recipient;
+
+  @override
+  State<VoiceCallScreen> createState() => _VoiceCallScreenState();
+}
+
+class _VoiceCallScreenState extends State<VoiceCallScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -22,9 +29,6 @@ class VoiceCallScreen extends StatelessWidget {
         child: Stack(
           children: [
             GestureDetector(
-              onTap: () {
-                RouteNavigators.route(context, const VoiceCallingScreen());
-              },
               child: Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -49,17 +53,23 @@ class VoiceCallScreen extends StatelessWidget {
                           width: getScreenWidth(100),
                           height: getScreenHeight(100),
                         ),
-                  const Text('Bad Guy',
-                      style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.white)),
+                  Text(
+                    widget.recipient!.firstName ?? '',
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.white,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  const Text('Calling...',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.white)),
+                  const Text(
+                    'Calling...',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.white,
+                    ),
+                  ),
                 ],
               ),
             ),

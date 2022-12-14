@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
-import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/video-call/presentation/bloc/video_call_bloc.dart';
-import 'package:reach_me/features/video-call/presentation/views/video_calling_screen.dart';
 
 import '../../../../core/models/user.dart';
 
@@ -40,16 +38,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         width: size.width,
         child: Stack(
           children: [
-            GestureDetector(
-              onTap: () {
-                RouteNavigators.route(context, const VideoCallingScreen());
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/video-call.png'),
-                    fit: BoxFit.cover,
-                  ),
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/video-call.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

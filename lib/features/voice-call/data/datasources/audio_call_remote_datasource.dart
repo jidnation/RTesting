@@ -1,13 +1,11 @@
 import '../../../../core/services/graphql/gql_client.dart';
-import '../../presentation/bloc/video_call_bloc.dart';
-
-class VideoCallRemoteDataSource {
-  VideoCallRemoteDataSource({GraphQLChatClient? client})
+class VoiceCallRemoteDataSource {
+  VoiceCallRemoteDataSource({GraphQLChatClient? client})
       : _client = client ?? GraphQLChatClient();
   final GraphQLChatClient _client;
 
   Future<dynamic> initiatePrivateCall(
-    InitiatePrivateCall privateCall) async {}
+   ) async {}
 
   Future<dynamic> answerPrivateCall() async {}
 

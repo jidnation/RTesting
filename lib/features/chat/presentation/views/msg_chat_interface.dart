@@ -231,7 +231,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/call.svg'),
               onPressed: () {
-                RouteNavigators.route(context, const VoiceCallScreen());
+                RouteNavigators.route(
+                    context, VoiceCallScreen(recipient: widget.recipientUser));
               },
               splashRadius: 20,
             ),
