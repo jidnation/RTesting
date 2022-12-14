@@ -6,6 +6,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/video-call/presentation/bloc/video_call_bloc.dart';
 import 'package:reach_me/features/video-call/presentation/views/video_calling_screen.dart';
 
 class VideoCallScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class VideoCallScreen extends StatefulWidget {
 class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
+    globals.videoCallBloc!.add(InitiateCall());
     super.initState();
   }
 

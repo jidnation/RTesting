@@ -1,5 +1,7 @@
-import '../../../core/services/api/api_client.dart';
-import '../data/call_remote_datasource.dart';
+import 'package:reach_me/core/helper/logger.dart';
+
+import '../../../../core/services/api/api_client.dart';
+import '../datasources/call_remote_datasource.dart';
 
 class VideoCallRepository {
   VideoCallRepository(
@@ -12,9 +14,10 @@ class VideoCallRepository {
   final VideoCallRemoteDataSource videoCallRemoteDataSource;
   final ApiClient _apiClient;
 
+  initiateCall() async {
+    var test = await videoCallRemoteDataSource.testNotifications();
+    Console.log('test notifications', test);
+  }
 
-  initiateCall()async{}
-
-  endCall()async{}
-
+  endCall() async {}
 }

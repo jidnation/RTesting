@@ -1,7 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import '../../../core/helper/logger.dart';
-import '../../../core/services/graphql/gql_client.dart';
+import '../../../../core/helper/logger.dart';
+import '../../../../core/services/graphql/gql_client.dart';
 
 class VideoCallRemoteDataSource {
   VideoCallRemoteDataSource({GraphQLNotificationClient? client})
@@ -22,6 +22,7 @@ class VideoCallRemoteDataSource {
     try {
       final result = await _client.mutate(gql(q), variables: {});
       if (result is GraphQLError) {
+        Console.log('error message', result);
         throw GraphQLError(message: result.message);
       }
       Console.log('notification response', result.data);
