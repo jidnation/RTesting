@@ -5,9 +5,9 @@ import '../../../core/services/graphql/gql_client.dart';
 import '../../home/data/models/virtual_models.dart';
 
 class HomeRemoteDataSource {
-  HomeRemoteDataSource({GraphQLCallClient? client})
-      : _client = client ?? GraphQLCallClient();
-  final GraphQLCallClient _client;
+  HomeRemoteDataSource({GraphQLNotificationClient? client})
+      : _client = client ?? GraphQLNotificationClient();
+  final GraphQLNotificationClient _client;
 
   Future<dynamic> getBlockList() async {
     String q = r'''

@@ -59,13 +59,15 @@ class MyApp extends StatelessWidget {
       client: clientFor(),
       child: GraphQLProvider(
         client: chatClientFor(),
-        child: LifeCycleManager(
-          child: OverlaySupport.global(
-            child: Portal(
-              child: GetMaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: 'ReachMe',
-                theme: ThemeData(
+        child: GraphQLProvider(
+          client: notificationClientFor(),
+          child: LifeCycleManager(
+            child: OverlaySupport.global(
+              child: Portal(
+                child: GetMaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'ReachMe',
+                  theme: ThemeData(
                     fontFamily: 'Poppins',
                     primarySwatch: Colors.blue,
                     sliderTheme: const SliderThemeData(
@@ -76,9 +78,11 @@ class MyApp extends StatelessWidget {
                       thumbShape:
                           RoundSliderThumbShape(enabledThumbRadius: 6.0),
                       overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
-                    )),
-                initialRoute: SplashScreenAnimator.id,
-                onGenerateRoute: RMRouter.generateRoute,
+                    ),
+                  ),
+                  initialRoute: SplashScreenAnimator.id,
+                  onGenerateRoute: RMRouter.generateRoute,
+                ),
               ),
             ),
           ),

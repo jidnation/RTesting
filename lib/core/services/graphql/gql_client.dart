@@ -216,13 +216,13 @@ class GraphQLChatClient {
   }
 }
 
-class GraphQLCallClient {
-  GraphQLCallClient()
+class GraphQLNotificationClient {
+  GraphQLNotificationClient()
       : graphQLClient = ValueNotifier<GraphQLClient>(
           GraphQLClient(
             cache: GraphQLCache(store: InMemoryStore()),
             link: HttpLink(
-              Endpoints.graphQLCallUrl,
+              Endpoints.graphQLNotificationUrl,
               httpClient: LoggerHttpClient(http.Client()),
               defaultHeaders: <String, String>{
                 'Authorization': 'Bearer ${globals.token}',

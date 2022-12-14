@@ -8,5 +8,5 @@ class Endpoints {
       "wss://185.3.95.146:4400/graphql";
 
   //calls api
-  static const String graphQLCallUrl = 'http://185.3.95.146:4400/graphql';
+  static const String graphQLNotificationUrl = 'http://185.3.95.146:4500/graphql';
 }
