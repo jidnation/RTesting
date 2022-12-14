@@ -9,9 +9,12 @@ import 'package:reach_me/features/account/presentation/widgets/image_placeholder
 import 'package:reach_me/features/video-call/presentation/bloc/video_call_bloc.dart';
 import 'package:reach_me/features/video-call/presentation/views/video_calling_screen.dart';
 
+import '../../../../core/models/user.dart';
+
 class VideoCallScreen extends StatefulWidget {
   static const String id = 'video_call';
-  const VideoCallScreen({Key? key}) : super(key: key);
+  const VideoCallScreen({Key? key, this.recipient}) : super(key: key);
+  final User? recipient;
 
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
@@ -20,7 +23,11 @@ class VideoCallScreen extends StatefulWidget {
 class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
-    globals.videoCallBloc!.add(InitiateCall());
+    globals.videoCallBloc!.add(InitiatePrivateCall(
+      callMode: CallMode.video,
+      callType: CallType.private,
+      receiverId: widget.recipient!.id!,
+    ));
     super.initState();
   }
 
@@ -61,8 +68,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           width: getScreenWidth(100),
                           height: getScreenHeight(100),
                         ),
-                  const Text('Bad Guy',
-                      style: TextStyle(
+                  Text(widget.recipient!.firstName!,
+                      style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w400,
                           color: AppColors.white)),

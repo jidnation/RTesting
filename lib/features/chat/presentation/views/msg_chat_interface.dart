@@ -31,8 +31,6 @@ import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
 
-import '../../../../core/utils/string_util.dart';
-
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
   const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);
@@ -217,7 +215,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/video.svg'),
               onPressed: () {
-                RouteNavigators.route(context, const VideoCallScreen());
+                RouteNavigators.route(
+                    context,
+                    VideoCallScreen(
+                      recipient: widget.recipientUser,
+                    ));
               },
               splashRadius: 20,
             ),

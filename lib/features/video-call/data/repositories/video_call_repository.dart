@@ -1,23 +1,19 @@
-import 'package:reach_me/core/helper/logger.dart';
-
-import '../../../../core/services/api/api_client.dart';
 import '../datasources/call_remote_datasource.dart';
 
 class VideoCallRepository {
-  VideoCallRepository(
-      {VideoCallRemoteDataSource? videoCallRemoteDataSource,
-      ApiClient? apiClient})
+  VideoCallRepository({VideoCallRemoteDataSource? videoCallRemoteDataSource})
       : videoCallRemoteDataSource =
-            videoCallRemoteDataSource ?? VideoCallRemoteDataSource(),
-        _apiClient = apiClient ?? ApiClient();
+            videoCallRemoteDataSource ?? VideoCallRemoteDataSource();
 
   final VideoCallRemoteDataSource videoCallRemoteDataSource;
-  final ApiClient _apiClient;
 
-  initiateCall() async {
-    var test = await videoCallRemoteDataSource.testNotifications();
-    Console.log('test notifications', test);
-  }
+  initiatePrivateCall() {}
 
-  endCall() async {}
+  answerPrivateCall() {}
+
+  completePrivateCall() {}
+
+  rejectPrivateCall() {}
+
+  updatePrivateCall() {}
 }
