@@ -7,7 +7,7 @@ class VideoCallRemoteDataSource {
   final GraphQLChatClient _client;
 
   Future<dynamic> initiatePrivateCall(
-    InitiatePrivateCall privateCall) async {}
+    InitiatePrivateVideoCall privateCall) async {}
 
   Future<dynamic> answerPrivateCall() async {}
 

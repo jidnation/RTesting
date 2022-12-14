@@ -3,19 +3,19 @@ part of 'voice_call_bloc.dart';
 @immutable
 abstract class VoiceCallEvent {}
 
-class InitiatePrivateCall extends VoiceCallEvent {
+class InitiatePrivateAudioCall extends VoiceCallEvent {
   final CallMode callMode;
   final CallType callType;
   final DateTime? dateTime = DateTime.now();
   final String receiverId;
 
-  InitiatePrivateCall({required this.callMode, required this.callType,required this.receiverId,});
+  InitiatePrivateAudioCall({required this.callMode, required this.callType,required this.receiverId,});
 }
 
-class AnswerPrivateCall extends VoiceCallEvent {}
+class AnswerPrivateAudioCall extends VoiceCallEvent {}
 
-class RejectPrivateCall extends VoiceCallEvent {}
+class RejectPrivateAudioCall extends VoiceCallEvent {}
 
-class UpdatePrivateCall extends VoiceCallEvent {}
+class UpdatePrivateAudioCall extends VoiceCallEvent {}
 
-class CompletePrivateCall extends VoiceCallEvent {}
+class CompletePrivateAudioCall extends VoiceCallEvent {}

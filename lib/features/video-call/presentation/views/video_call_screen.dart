@@ -21,7 +21,7 @@ class VideoCallScreen extends StatefulWidget {
 class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
-    globals.videoCallBloc!.add(InitiatePrivateCall(
+    globals.videoCallBloc!.add(InitiatePrivateVideoCall(
       callMode: CallMode.video,
       callType: CallType.private,
       receiverId: widget.recipient!.id!,

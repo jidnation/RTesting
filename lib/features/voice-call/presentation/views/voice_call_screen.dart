@@ -5,6 +5,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/voice-call/presentation/bloc/voice_call_bloc.dart';
 
 import '../../../../core/models/user.dart';
 
@@ -19,6 +20,16 @@ class VoiceCallScreen extends StatefulWidget {
 }
 
 class _VoiceCallScreenState extends State<VoiceCallScreen> {
+  @override
+  void initState() {
+    globals.voiceCallBloc!.add(InitiatePrivateAudioCall(
+      callMode: CallMode.audio,
+      callType: CallType.private,
+      receiverId: widget.recipient!.id!,
+    ));
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;

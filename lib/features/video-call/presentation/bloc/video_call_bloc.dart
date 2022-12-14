@@ -13,24 +13,24 @@ enum CallType { private, livestream }
 class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
   final VideoCallRepository videoCallRepository = VideoCallRepository();
   VideoCallBloc() : super(VideoCallInitial()) {
-    on<InitiatePrivateCall>((event, emit) => _initiateCall(event, emit));
-    on<AnswerPrivateCall>((event, emit) => _answerPrivateCall(event, emit));
-    on<RejectPrivateCall>((event, emit) => _rejectPrivateCall(event, emit));
-    on<UpdatePrivateCall>((event, emit) => _updatePrivateCall(event, emit));
-    on<CompletePrivateCall>((event, emit) => _completePrivateCall(event, emit));
+    on<InitiatePrivateVideoCall>((event, emit) => _initiateCall(event, emit));
+    on<AnswerPrivateVideoCall>((event, emit) => _answerPrivateCall(event, emit));
+    on<RejectPrivateVideoCall>((event, emit) => _rejectPrivateCall(event, emit));
+    on<UpdatePrivateVideoCall>((event, emit) => _updatePrivateCall(event, emit));
+    on<CompletePrivateVideoCall>((event, emit) => _completePrivateCall(event, emit));
   }
 
-  _initiateCall(InitiatePrivateCall event, emit) async {
+  _initiateCall(InitiatePrivateVideoCall event, emit) async {
     emit(VideoCallLoading());
     await videoCallRepository.initiatePrivateCall(event);
     emit(VideoCallSuccess());
   }
 
-  _answerPrivateCall(AnswerPrivateCall event, emit) async {}
+  _answerPrivateCall(AnswerPrivateVideoCall event, emit) async {}
 
-  _rejectPrivateCall(RejectPrivateCall event, emit) async {}
+  _rejectPrivateCall(RejectPrivateVideoCall event, emit) async {}
 
-  _updatePrivateCall(UpdatePrivateCall event, emit) async {}
+  _updatePrivateCall(UpdatePrivateVideoCall event, emit) async {}
 
-  _completePrivateCall(CompletePrivateCall event, emit) async {}
+  _completePrivateCall(CompletePrivateVideoCall event, emit) async {}
 }

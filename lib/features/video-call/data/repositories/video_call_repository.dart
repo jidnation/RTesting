@@ -8,7 +8,7 @@ class VideoCallRepository {
 
   final VideoCallRemoteDataSource _videoCallRemoteDataSource;
 
-Future<dynamic>  initiatePrivateCall(InitiatePrivateCall privateCall)async {
+Future<dynamic>  initiatePrivateCall(InitiatePrivateVideoCall privateCall)async {
    await _videoCallRemoteDataSource.initiatePrivateCall(privateCall);
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/dialog_and_sheet_service.dart/dialog_and_sheet_service.dart';
 import 'package:reach_me/core/utils/loader.dart';
@@ -13,6 +12,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/video-call/presentation/bloc/video_call_bloc.dart';
+import 'package:reach_me/features/voice-call/presentation/bloc/voice_call_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -27,6 +27,7 @@ class AppGlobals {
   UserBloc? userBloc;
   ChatBloc? chatBloc;
   VideoCallBloc? videoCallBloc;
+  VoiceCallBloc? voiceCallBloc;
   SocialServiceBloc? socialServiceBloc;
   DictionaryBloc? dictionaryBloc;
   String? token;
@@ -58,6 +59,7 @@ class AppGlobals {
     userBloc = UserBloc();
     chatBloc = ChatBloc();
     videoCallBloc = VideoCallBloc();
+    voiceCallBloc = VoiceCallBloc();
     socialServiceBloc = SocialServiceBloc();
     dictionaryBloc = DictionaryBloc();
     token = '';
@@ -76,6 +78,7 @@ class AppGlobals {
     authBloc!.close();
     userBloc!.close();
     chatBloc!.close();
+    voiceCallBloc!.close();
     socialServiceBloc!.close();
     dictionaryBloc!.close();
     videoCallBloc!.close();
