@@ -24,9 +24,6 @@ import 'package:reach_me/features/onboarding/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
-import 'package:reach_me/features/voice-call/presentation/views/voice_calling_screen.dart';
-
-import '../../features/video-call/presentation/views/video_calling_screen.dart';
 
 class RMRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -97,14 +94,10 @@ class RMRouter {
       case VoiceCallScreen.id:
         return RMPageRoute(builder: (_) => const VoiceCallScreen());
 
-      case VoiceCallingScreen.id:
-        return RMPageRoute(builder: (_) => const VoiceCallingScreen());
 
       case VideoCallScreen.id:
         return RMPageRoute(builder: (_) => const VideoCallScreen());
 
-      case VideoCallingScreen.id:
-        return RMPageRoute(builder: (_) => const VideoCallingScreen());
 
       case SavedPostScreen.id:
         return RMPageRoute(builder: (_) => const SavedPostScreen());
