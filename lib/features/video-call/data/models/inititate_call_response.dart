@@ -9,7 +9,7 @@ class InitiateCallResponse {
 
   factory InitiateCallResponse.fromJson(Map<String, dynamic> json) =>
       InitiateCallResponse(
-        channel: json["channel"],
+        channel: json["channelName"],
         token: json["token"],
       );
 }

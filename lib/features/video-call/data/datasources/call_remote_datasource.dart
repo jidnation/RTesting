@@ -10,7 +10,7 @@ class VideoCallRemoteDataSource {
       : _client = client ?? GraphQLChatClient();
   final GraphQLChatClient _client;
 
-  Future<InitiateCallResponse?> initiatePrivateCall(
+  Future<InitiateCallResponse> initiatePrivateCall(
       InitiatePrivateVideoCall privateCall) async {
     String q = '''
             mutation{
@@ -32,8 +32,8 @@ class VideoCallRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('call result', result.data);
-      return null;
+      Console.log('call result', result.data['initiatePrivateCall']);
+      return InitiateCallResponse.fromJson(result.data['initiatePrivateCall']);
     } catch (e) {
       rethrow;
     }

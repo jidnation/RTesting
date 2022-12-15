@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:get/get_connect/http/src/exceptions/exceptions.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/features/video-call/data/models/inititate_call_response.dart';
 
 import '../../presentation/bloc/video_call_bloc.dart';
@@ -12,13 +13,16 @@ class VideoCallRepository {
 
   final VideoCallRemoteDataSource _videoCallRemoteDataSource;
 
-  Future<Either<String, InitiateCallResponse?>> initiatePrivateCall(
+  Future<Either<String, InitiateCallResponse>> initiatePrivateCall(
       InitiatePrivateVideoCall privateCall) async {
     try {
-      final InitiateCallResponse? response =
+      final InitiateCallResponse response =
           await _videoCallRemoteDataSource.initiatePrivateCall(privateCall);
-      return Right(response!);
+      Console.log('call response', response);
+      return Right(response);
     } on GraphQLError catch (e) {
+            Console.log('call response', e);
+
       return Left(e.message!);
     }
   }

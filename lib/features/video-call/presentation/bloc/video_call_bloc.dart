@@ -42,11 +42,11 @@ class VideoCallBloc extends Bloc<VideoCallEvent, VideoCallState> {
 
   _initiateCall(InitiatePrivateVideoCall event, emit) async {
     emit(VideoCallLoading());
-    final Either<String, InitiateCallResponse?> result = await videoCallRepository.initiatePrivateCall(event);
-    Console.log('call result', result);
+    final result = await videoCallRepository.initiatePrivateCall(event);
+    Console.log('call result bloc', result);
     result.fold(
-      (l) => emit(VideoCallError()),
-      (r) => emit(VideoCallSuccess()),
+      (l) => emit(VideoCallError(message: l)),
+      (r) => emit(VideoCallSuccess(response: r)),
     );
   }
 
