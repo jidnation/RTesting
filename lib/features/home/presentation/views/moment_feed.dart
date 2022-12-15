@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../momentControlRoom/control_room.dart';
@@ -21,7 +22,6 @@ final MomentFeedStore momentFeedStore = MomentFeedStore();
 class _MomentFeedState extends State<MomentFeed> {
   @override
   void initState() {
-    momentFeedStore.initialize();
     super.initState();
   }
 
@@ -39,25 +39,45 @@ class _MomentFeedState extends State<MomentFeed> {
               pageController: widget.pageController,
             ),
             Expanded(
-              child: ValueListenableBuilder(
-                  valueListenable: MomentFeedStore(),
-                  builder: (context, List<GetMomentFeed> value, child) {
-                    print('from the feed room.........??? $value }');
-                    final List<GetMomentFeed> momentFeeds = value;
-                    return momentFeedStore.gettingMoments
-                        ? const VideoLoader()
-                        : PageView.builder(
-                            itemCount: momentFeedStore.momentCount,
-                            controller: PageController(
-                                initialPage: 0, viewportFraction: 1),
-                            scrollDirection: Axis.vertical,
-                            itemBuilder: (context, index) {
-                              final GetMomentFeed getMomentFeed = value[index];
-                              return MomentViewer(momentFeed: getMomentFeed);
-                            },
-                          );
-                  }),
-            ),
+                child: ValueListenableBuilder(
+              valueListenable: MomentFeedStore(),
+              builder: (context, List<GetMomentFeed> value, child) {
+                print('from the feed room.........??? $value }');
+                final List<GetMomentFeed> momentFeeds = value;
+                return momentFeedStore.gettingMoments
+                    ? const VideoLoader()
+                    : CarouselSlider(
+                        options: CarouselOptions(
+                          viewportFraction: 1,
+                          height: size.height,
+                          scrollDirection: Axis.vertical,
+                        ),
+                        items: List<Widget>.generate(
+                            momentFeedStore.momentCount,
+                            (index) => Builder(builder: (context) {
+                                  final GetMomentFeed getMomentFeed =
+                                      value[index];
+                                  return MomentViewer(
+                                      momentFeed: getMomentFeed);
+                                }))
+
+                        // scrollDirection: Axis.vertical,
+                        // itemBuilder: (context, index) {
+                        //   final GetMomentFeed getMomentFeed = value[index];
+                        //   return ;
+                        );
+              },
+
+              // Swiper(
+              //     itemCount: momentFeedStore.momentCount,
+              //     scrollDirection: Axis.vertical,
+              //     itemBuilder: (context, index) {
+              //       final GetMomentFeed getMomentFeed = value[index];
+              //       return MomentViewer(momentFeed: getMomentFeed);
+              //     },
+            )
+                // }),
+                ),
           ]),
         ),
       ),

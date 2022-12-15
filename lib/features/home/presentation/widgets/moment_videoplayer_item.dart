@@ -1,6 +1,10 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
+
+import '../../../momentControlRoom/moment_cacher.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
@@ -15,17 +19,75 @@ class VideoPlayerItem extends StatefulWidget {
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
   late VideoPlayerController _videoPlayerController;
+  final VideoControllerService _videoControllerService =
+      CachedVideoControllerService(DefaultCacheManager());
+
+  ChewieController? _chewieController;
+  int? bufferDelay;
   bool isPlaying = false;
   bool isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _videoPlayerController = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) {
-        _videoPlayerController.play();
-        _videoPlayerController.setVolume(1);
-      });
+    initializePlayer();
+  }
+
+  Future<void> initializePlayer() async {
+    _videoPlayerController =
+        await _videoControllerService.getControllerForVideo(widget.videoUrl);
+    await Future.wait([_videoPlayerController.initialize()]);
+    _createChewieController();
+    setState(() {});
+  }
+
+  void _createChewieController() {
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: true,
+      looping: true,
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      overlay: Align(
+        alignment: Alignment.centerRight,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            height: 23.56,
+            width: 23.56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(40),
+              color: Colors.white,
+            ),
+          )
+        ]),
+      ),
+
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: toggleVideo,
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
+
+      hideControlsTimer: const Duration(seconds: 1),
+
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: Colors.red,
+        handleColor: Colors.blue,
+        backgroundColor: Colors.grey,
+        bufferedColor: Colors.lightGreen,
+      ),
+      placeholder: Container(
+        color: Colors.grey,
+      ),
+      autoInitialize: true,
+    );
   }
 
   @override
@@ -34,82 +96,36 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     _videoPlayerController.dispose();
   }
 
+  Future<void> toggleVideo() async {
+    await _videoPlayerController.pause();
+    await initializePlayer();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    _videoPlayerController.addListener(() {
-      if (_videoPlayerController.value.isPlaying) {
-        setState(() {
-          isPlaying = true;
-        });
-      } else {
-        setState(() {
-          isPlaying = false;
-        });
-      }
-    });
-    // _videoPlayerController.addListener(() {
-    // if (_videoPlayerController.value.isInitialized) {
-    //   setState(() {
-    //     isInitialized = true;
-    //   });
-    //   print(
-    //       ';;;;;;;from init::::: ${_videoPlayerController.value.isInitialized}');
-    // // }
-    // if (_videoPlayerController.value.isPlaying) {
-    //   setState(() {
-    //     isPlaying = true;
-    //   });
-    // } else {
-    //   setState(() {
-    //     isPlaying = false;
-    //   });
-    // }
-    // Center(
-    //   child: InkWell(
-    //     onTap: () async {
-    //       isPlaying
-    //           ? _videoPlayerController.pause()
-    //           : _videoPlayerController.play();
-    //     },
-    //     child: Icon(
-    //       isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-    //       color: Colors.white,
-    //       size: 50,
-    //     ),
-    //   ),
-    // )
-    // });
-    return Stack(children: [
-      Container(
-        width: size.width,
-        height: size.height,
-        decoration: const BoxDecoration(
-          color: AppColors.audioPlayerBg,
-        ),
-        child:
-            // isInitialized
-            //     ?
-            AspectRatio(
-          aspectRatio: _videoPlayerController.value.aspectRatio,
-          child: VideoPlayer(_videoPlayerController),
-        ),
-        // : const VideoLoader(),
+    return
+        // Stack(children: [
+        Container(
+      width: size.width,
+      height: size.height,
+      decoration: const BoxDecoration(
+        color: AppColors.audioPlayerBg,
       ),
-      Center(
-        child: InkWell(
-          onTap: () async {
-            isPlaying
-                ? _videoPlayerController.pause()
-                : _videoPlayerController.play();
-          },
-          child: Icon(
-            isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-            color: Colors.transparent,
-            size: 50,
-          ),
-        ),
-      )
-    ]);
+      child: _chewieController != null &&
+              _chewieController!.videoPlayerController.value.isInitialized
+          ? AspectRatio(
+              aspectRatio: _videoPlayerController.value.aspectRatio,
+              child: Chewie(
+                controller: _chewieController!,
+              ))
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text('Loading'),
+                ]),
+    );
   }
 }

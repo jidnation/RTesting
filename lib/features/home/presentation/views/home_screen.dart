@@ -24,6 +24,12 @@ class HomeScreen extends StatefulHookWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
+  void initState() {
+    momentFeedStore.initialize();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
