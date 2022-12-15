@@ -145,14 +145,14 @@ class _CommentReachState extends State<CommentReach> {
     int nVideos =
         _mediaList.value.where((e) => FileUtils.isVideo(e.file)).length;
     final AudioRecordingService _recordingService = AudioRecordingService();
-     final _isLoading = useState<bool>(true);
+    final _isLoading = useState<bool>(true);
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
     final _mentionList = useState<List<String>>([]);
-     GlobalKey<FlutterMentionsState> controllerKey =
-      GlobalKey<FlutterMentionsState>();
+    GlobalKey<FlutterMentionsState> controllerKey =
+        GlobalKey<FlutterMentionsState>();
 
-      useMemoized(() {
+    useMemoized(() {
       globals.dictionaryBloc!
           .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
     });
@@ -263,26 +263,26 @@ class _CommentReachState extends State<CommentReach> {
         },
         child: BlocConsumer<DictionaryBloc, DictionaryState>(
           bloc: globals.dictionaryBloc,
-           listener: (context, state) {
-                          if (state is GetWordToMentionsSuccess) {
-                            _recentWords.value = state.mentionsData
-                                .map((item) => {
-                                      "id": item["authId"],
-                                      "display": item["abbr"],
-                                      "meaning": item["meaning"],
-                                    })
-                                .toList();
+          listener: (context, state) {
+            if (state is GetWordToMentionsSuccess) {
+              _recentWords.value = state.mentionsData
+                  .map((item) => {
+                        "id": item["authId"],
+                        "display": item["abbr"],
+                        "meaning": item["meaning"],
+                      })
+                  .toList();
 
-                            _isLoading.value = false;
-                          }
+              _isLoading.value = false;
+            }
 
-                          if (state is LoadingWordsToMentions) {
-                            _isLoading.value = true;
-                          }
-                          if (state is GetWordToMentionsError) {
-                            Snackbars.error(context, message: state.error);
-                          }
-                        },
+            if (state is LoadingWordsToMentions) {
+              _isLoading.value = true;
+            }
+            if (state is GetWordToMentionsError) {
+              Snackbars.error(context, message: state.error);
+            }
+          },
           builder: (context, state) {
             return Scaffold(
                 body: SafeArea(
@@ -629,7 +629,7 @@ class _CommentReachState extends State<CommentReach> {
                           const Divider(
                               color: Color(0xFFEBEBEB), thickness: 0.5),
 
-                       FlutterMentions(
+                          FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
@@ -804,8 +804,7 @@ class _CommentReachState extends State<CommentReach> {
                             //   ),
                             // ).paddingSymmetric(h: 16),
                           ),
-                       
-                          
+
                           const SizedBox(height: 10),
                           if (_mediaList.value.isNotEmpty)
                             SizedBox(
@@ -900,7 +899,7 @@ class _CommentReachState extends State<CommentReach> {
                           else
                             const SizedBox.shrink(),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.2,
+                            height: MediaQuery.of(context).size.height * 0.5,
                           ),
                           // showEmoji.value
                           //     ? buildEmoji()
