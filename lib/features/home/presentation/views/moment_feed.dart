@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../momentControlRoom/control_room.dart';
 import '../../../momentControlRoom/models/get_moment_feed.dart';
 import '../widgets/moment_appbar.dart';
-import '../widgets/moment_viwer.dart';
+import '../widgets/moment_videoplayer_item.dart';
 import '../widgets/video_loader.dart';
 
 class MomentFeed extends StatefulWidget {
@@ -57,27 +57,11 @@ class _MomentFeedState extends State<MomentFeed> {
                             (index) => Builder(builder: (context) {
                                   final GetMomentFeed getMomentFeed =
                                       value[index];
-                                  return MomentViewer(
+                                  return VideoPlayerItem(
                                       momentFeed: getMomentFeed);
-                                }))
-
-                        // scrollDirection: Axis.vertical,
-                        // itemBuilder: (context, index) {
-                        //   final GetMomentFeed getMomentFeed = value[index];
-                        //   return ;
-                        );
+                                })));
               },
-
-              // Swiper(
-              //     itemCount: momentFeedStore.momentCount,
-              //     scrollDirection: Axis.vertical,
-              //     itemBuilder: (context, index) {
-              //       final GetMomentFeed getMomentFeed = value[index];
-              //       return MomentViewer(momentFeed: getMomentFeed);
-              //     },
-            )
-                // }),
-                ),
+            )),
           ]),
         ),
       ),
