@@ -711,502 +711,502 @@ class Helper {
     // }
   }
 
-   static Widget renderSavedPostImages(SavePostModel post, BuildContext context) {
-    int imageLength = post.imageMediaItems!.length;
-    if (post.imageMediaItems!.length > 4) {
-      int remImageLength = imageLength - 4;
-      return GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(0),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 178 / 164,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 20),
-          shrinkWrap: true,
-          itemCount: (post.imageMediaItems!.length - remImageLength),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+  //  static Widget renderSavedPostImages(SavePostModel post, BuildContext context) {
+  //   int imageLength = post.imageMediaItems!.length;
+  //   if (post.imageMediaItems!.length > 4) {
+  //     int remImageLength = imageLength - 4;
+  //     return GridView.builder(
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         padding: const EdgeInsets.all(0),
+  //         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+  //             maxCrossAxisExtent: 200,
+  //             childAspectRatio: 178 / 164,
+  //             crossAxisSpacing: 10,
+  //             mainAxisSpacing: 20),
+  //         shrinkWrap: true,
+  //         itemCount: (post.imageMediaItems!.length - remImageLength),
+  //         itemBuilder: (context, index) {
+  //           return GestureDetector(
+  //             onTap: () {
+  //               RouteNavigators.route(
+  //                 context,
+  //                 ListView.builder(
+  //                   scrollDirection: Axis.horizontal,
+  //                   shrinkWrap: true,
+  //                   itemCount: imageLength,
+  //                   itemBuilder: (context, index) => Container(                 
+  //                      decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //                   //clipBehavior: Clip.hardEdge,
+  //                     width: MediaQuery.of(context).size.width,
+  //                     //height:MediaQuery.of(context).size.height ,
+  //                     margin: const EdgeInsets.only(right: 50),
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-                );
-              },
-              child: Stack(
-                fit: StackFit.expand,
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: getScreenHeight(300),
-                    clipBehavior: Clip.hardEdge,
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![index],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  index == 3
-                      ? Container(
-                          alignment: Alignment.center,
-                          height: getScreenHeight(50),
-                          width: getScreenWidth(50),
-                          decoration:
-                             BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.black38),
-                          child: Text(
-                            "+ $remImageLength",
-                            style: TextStyle(
-                                fontSize: getScreenHeight(28),
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white),
-                          ),
-                        )
-                      : const SizedBox(),
-                ],
-              ),
-            );
-          });
-    } else if(post.imageMediaItems!.length == 1){
-         return GestureDetector(
-          onTap: (() =>    RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+  //                     child: PhotoView(
+  //                         imageProvider:
+  //                             NetworkImage(post.imageMediaItems![index],),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                               child: CupertinoActivityIndicator(
+  //                                 color: Colors.white,
+  //                               ),
+  //                             )),
+  //                   ),
+  //                 ),
+  //               );
+  //             },
+  //             child: Stack(
+  //               fit: StackFit.expand,
+  //               alignment: Alignment.center,
+  //               children: [
+  //                 Container(
+  //                   height: getScreenHeight(300),
+  //                   clipBehavior: Clip.hardEdge,
+  //                   decoration:
+  //                       BoxDecoration(borderRadius: BorderRadius.circular(8)),
+  //                   child: CachedNetworkImage(
+  //                     imageUrl: post.imageMediaItems![index],
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 ),
+  //                 index == 3
+  //                     ? Container(
+  //                         alignment: Alignment.center,
+  //                         height: getScreenHeight(50),
+  //                         width: getScreenWidth(50),
+  //                         decoration:
+  //                            BoxDecoration(
+  //                               borderRadius: BorderRadius.circular(8),
+  //                               color: Colors.black38),
+  //                         child: Text(
+  //                           "+ $remImageLength",
+  //                           style: TextStyle(
+  //                               fontSize: getScreenHeight(28),
+  //                               fontWeight: FontWeight.w400,
+  //                               color: Colors.white),
+  //                         ),
+  //                       )
+  //                     : const SizedBox(),
+  //               ],
+  //             ),
+  //           );
+  //         });
+  //   } else if(post.imageMediaItems!.length == 1){
+  //        return GestureDetector(
+  //         onTap: (() =>    RouteNavigators.route(
+  //                 context,
+  //                 ListView.builder(
+  //                   scrollDirection: Axis.horizontal,
+  //                   shrinkWrap: true,
+  //                   itemCount: imageLength,
+  //                   itemBuilder: (context, index) => Container(                 
+  //                      decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //                   //clipBehavior: Clip.hardEdge,
+  //                     width: MediaQuery.of(context).size.width,
+  //                     //height:MediaQuery.of(context).size.height ,
+  //                     margin: const EdgeInsets.only(right: 50),
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-                )
-              ),
-          child: Container(
-            height: getScreenHeight(300),
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: CachedNetworkImage(
-              imageUrl: post.imageMediaItems![0],
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-    }    
-    else if (post.imageMediaItems!.length == 3) {
-      int remImageLength =
-          1; // length of extra image not seen in the grid at first
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: GestureDetector(
-                onTap: (() =>   RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+  //                     child: PhotoView(
+  //                         imageProvider:
+  //                             NetworkImage(post.imageMediaItems![index],),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                               child: CupertinoActivityIndicator(
+  //                                 color: Colors.white,
+  //                               ),
+  //                             )),
+  //                   ),
+  //                 ),
+  //               )
+  //             ),
+  //         child: Container(
+  //           height: getScreenHeight(300),
+  //           clipBehavior: Clip.hardEdge,
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //           child: CachedNetworkImage(
+  //             imageUrl: post.imageMediaItems![0],
+  //             fit: BoxFit.cover,
+  //           ),
+  //         ),
+  //       );
+  //   }    
+  //   else if (post.imageMediaItems!.length == 3) {
+  //     int remImageLength =
+  //         1; // length of extra image not seen in the grid at first
+  //     return Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Flexible(
+  //             child: GestureDetector(
+  //               onTap: (() =>   RouteNavigators.route(
+  //                 context,
+  //                 ListView.builder(
+  //                   scrollDirection: Axis.horizontal,
+  //                   shrinkWrap: true,
+  //                   itemCount: imageLength,
+  //                   itemBuilder: (context, index) => Container(                 
+  //                      decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //                   //clipBehavior: Clip.hardEdge,
+  //                     width: MediaQuery.of(context).size.width,
+  //                     //height:MediaQuery.of(context).size.height ,
+  //                     margin: const EdgeInsets.only(right: 50),
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-                )
-                    ),
-                child: Container(
-                  height: getScreenHeight(300),
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: post.imageMediaItems![0],
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: getScreenWidth(5)),
-            Column(
-              mainAxisSize: MainAxisSize.min,
+  //                     child: PhotoView(
+  //                         imageProvider:
+  //                             NetworkImage(post.imageMediaItems![index],),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                               child: CupertinoActivityIndicator(
+  //                                 color: Colors.white,
+  //                               ),
+  //                             )),
+  //                   ),
+  //                 ),
+  //               )
+  //                   ),
+  //               child: Container(
+  //                 height: getScreenHeight(300),
+  //                 clipBehavior: Clip.hardEdge,
+  //                 decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.circular(8),
+  //                 ),
+  //                 child: CachedNetworkImage(
+  //                   imageUrl: post.imageMediaItems![0],
+  //                   fit: BoxFit.cover,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           SizedBox(width: getScreenWidth(5)),
+  //           Column(
+  //             mainAxisSize: MainAxisSize.min,
 
-              ///crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                GestureDetector(
-                  onTap: (() => RouteNavigators.route(
-                        context,
-                        PhotoView(
-                          imageProvider: NetworkImage(post.imageMediaItems![1]),
-                          loadingBuilder: (context, event) => const Center(
-                            child:
-                                CupertinoActivityIndicator(color: Colors.white),
-                          ),
-                        ),
-                      )),
-                  child: Container(
-                    height: getScreenHeight(150),
-                    width: getScreenWidth(180),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![1],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                SizedBox(height: getScreenHeight(5)),
-                GestureDetector(
-                  onTap: (() => RouteNavigators.route(
-                        context,
-                        PhotoView(
-                          imageProvider: NetworkImage(post.imageMediaItems![2]),
-                          loadingBuilder: (context, event) => const Center(
-                            child:
-                                CupertinoActivityIndicator(color: Colors.white),
-                          ),
-                        ),
-                      )),
-                  child: Container(
-                    height: getScreenHeight(150),
-                    width: getScreenWidth(180),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![2],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        );
-    } else {
-      return GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(0),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 178 / 164,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 20),
-          shrinkWrap: true,
-          itemCount: post.imageMediaItems!.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: (() => RouteNavigators.route(
-                    context,
-                     ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+  //             ///crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: [
+  //               GestureDetector(
+  //                 onTap: (() => RouteNavigators.route(
+  //                       context,
+  //                       PhotoView(
+  //                         imageProvider: NetworkImage(post.imageMediaItems![1]),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                           child:
+  //                               CupertinoActivityIndicator(color: Colors.white),
+  //                         ),
+  //                       ),
+  //                     )),
+  //                 child: Container(
+  //                   height: getScreenHeight(150),
+  //                   width: getScreenWidth(180),
+  //                   clipBehavior: Clip.hardEdge,
+  //                   decoration: BoxDecoration(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                   child: CachedNetworkImage(
+  //                     imageUrl: post.imageMediaItems![1],
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 ),
+  //               ),
+  //               SizedBox(height: getScreenHeight(5)),
+  //               GestureDetector(
+  //                 onTap: (() => RouteNavigators.route(
+  //                       context,
+  //                       PhotoView(
+  //                         imageProvider: NetworkImage(post.imageMediaItems![2]),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                           child:
+  //                               CupertinoActivityIndicator(color: Colors.white),
+  //                         ),
+  //                       ),
+  //                     )),
+  //                 child: Container(
+  //                   height: getScreenHeight(150),
+  //                   width: getScreenWidth(180),
+  //                   clipBehavior: Clip.hardEdge,
+  //                   decoration: BoxDecoration(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                   child: CachedNetworkImage(
+  //                     imageUrl: post.imageMediaItems![2],
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           )
+  //         ],
+  //       );
+  //   } else {
+  //     return GridView.builder(
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         padding: const EdgeInsets.all(0),
+  //         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+  //             maxCrossAxisExtent: 200,
+  //             childAspectRatio: 178 / 164,
+  //             crossAxisSpacing: 10,
+  //             mainAxisSpacing: 20),
+  //         shrinkWrap: true,
+  //         itemCount: post.imageMediaItems!.length,
+  //         itemBuilder: (context, index) {
+  //           return GestureDetector(
+  //             onTap: (() => RouteNavigators.route(
+  //                   context,
+  //                    ListView.builder(
+  //                   scrollDirection: Axis.horizontal,
+  //                   shrinkWrap: true,
+  //                   itemCount: imageLength,
+  //                   itemBuilder: (context, index) => Container(                 
+  //                      decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(8),
+  //           ),
+  //                   //clipBehavior: Clip.hardEdge,
+  //                     width: MediaQuery.of(context).size.width,
+  //                     //height:MediaQuery.of(context).size.height ,
+  //                     margin: const EdgeInsets.only(right: 50),
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-              )),
-              child: Container(
-                height: getScreenHeight(300),
-                clipBehavior: Clip.hardEdge,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(15)),
-                child: CachedNetworkImage(
-                  imageUrl: post.imageMediaItems![index],
-                  fit: BoxFit.cover,
-                ),
-              ),
-            );
-          });
-    }
+  //                     child: PhotoView(
+  //                         imageProvider:
+  //                             NetworkImage(post.imageMediaItems![index],),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                               child: CupertinoActivityIndicator(
+  //                                 color: Colors.white,
+  //                               ),
+  //                             )),
+  //                   ),
+  //                 ),
+  //             )),
+  //             child: Container(
+  //               height: getScreenHeight(300),
+  //               clipBehavior: Clip.hardEdge,
+  //               decoration:
+  //                   BoxDecoration(borderRadius: BorderRadius.circular(15)),
+  //               child: CachedNetworkImage(
+  //                 imageUrl: post.imageMediaItems![index],
+  //                 fit: BoxFit.cover,
+  //               ),
+  //             ),
+  //           );
+  //         });
+  //   }
 
     
-    /*
-       return GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(0),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              childAspectRatio: 178 / 164,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 20),
-          shrinkWrap: true,
-          itemCount: (post.imageMediaItems!.length - remImageLength),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(
-                      height: getScreenHeight(300),
-                      margin: const EdgeInsets.only(top: 50),
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index]),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-                );
-              },
-              child: Stack(
-                fit: StackFit.expand,
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: getScreenHeight(300),
-                    clipBehavior: Clip.hardEdge,
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(4)),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![index],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  index == 1
-                      ? Container(
-                          alignment: Alignment.center,
-                          height: getScreenHeight(50),
-                          width: getScreenWidth(50),
-                          decoration:
-                              const BoxDecoration(color: Colors.black38),
-                          child: Text(
-                            "+ $remImageLength",
-                            style: TextStyle(
-                                fontSize: getScreenHeight(28),
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white),
-                          ),
-                        )
-                      : const SizedBox(),
-                ],
-              ),
-            );
-          });
+  //   /*
+  //      return GridView.builder(
+  //         physics: const NeverScrollableScrollPhysics(),
+  //         padding: const EdgeInsets.all(0),
+  //         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+  //             maxCrossAxisExtent: 200,
+  //             childAspectRatio: 178 / 164,
+  //             crossAxisSpacing: 10,
+  //             mainAxisSpacing: 20),
+  //         shrinkWrap: true,
+  //         itemCount: (post.imageMediaItems!.length - remImageLength),
+  //         itemBuilder: (context, index) {
+  //           return GestureDetector(
+  //             onTap: () {
+  //               RouteNavigators.route(
+  //                 context,
+  //                 ListView.builder(
+  //                   shrinkWrap: true,
+  //                   itemCount: imageLength,
+  //                   itemBuilder: (context, index) => Container(
+  //                     height: getScreenHeight(300),
+  //                     margin: const EdgeInsets.only(top: 50),
+  //                     child: PhotoView(
+  //                         imageProvider:
+  //                             NetworkImage(post.imageMediaItems![index]),
+  //                         loadingBuilder: (context, event) => const Center(
+  //                               child: CupertinoActivityIndicator(
+  //                                 color: Colors.white,
+  //                               ),
+  //                             )),
+  //                   ),
+  //                 ),
+  //               );
+  //             },
+  //             child: Stack(
+  //               fit: StackFit.expand,
+  //               alignment: Alignment.center,
+  //               children: [
+  //                 Container(
+  //                   height: getScreenHeight(300),
+  //                   clipBehavior: Clip.hardEdge,
+  //                   decoration:
+  //                       BoxDecoration(borderRadius: BorderRadius.circular(4)),
+  //                   child: CachedNetworkImage(
+  //                     imageUrl: post.imageMediaItems![index],
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 ),
+  //                 index == 1
+  //                     ? Container(
+  //                         alignment: Alignment.center,
+  //                         height: getScreenHeight(50),
+  //                         width: getScreenWidth(50),
+  //                         decoration:
+  //                             const BoxDecoration(color: Colors.black38),
+  //                         child: Text(
+  //                           "+ $remImageLength",
+  //                           style: TextStyle(
+  //                               fontSize: getScreenHeight(28),
+  //                               fontWeight: FontWeight.w400,
+  //                               color: Colors.white),
+  //                         ),
+  //                       )
+  //                     : const SizedBox(),
+  //               ],
+  //             ),
+  //           );
+  //         });
     
-    */
-    // switch (post.imageMediaItems!.length) {
-    //   case 1:
-    //     return GestureDetector(
-    //       onTap: (() => RouteNavigators.route(
-    //             context,
-    //             PhotoView(
-    //               imageProvider: NetworkImage(post.imageMediaItems![0]),
-    //               loadingBuilder: (context, event) => const Center(
-    //                 child: CupertinoActivityIndicator(color: Colors.white),
-    //               ),
-    //             ),
-    //           )),
-    //       child: Container(
-    //         height: getScreenHeight(300),
-    //         clipBehavior: Clip.hardEdge,
-    //         decoration: BoxDecoration(
-    //           borderRadius: BorderRadius.circular(15),
-    //         ),
-    //         child: CachedNetworkImage(
-    //           imageUrl: post.imageMediaItems![0],
-    //           fit: BoxFit.cover,
-    //         ),
-    //       ),
-    //     );
+  //   */
+  //   // switch (post.imageMediaItems!.length) {
+  //   //   case 1:
+  //   //     return GestureDetector(
+  //   //       onTap: (() => RouteNavigators.route(
+  //   //             context,
+  //   //             PhotoView(
+  //   //               imageProvider: NetworkImage(post.imageMediaItems![0]),
+  //   //               loadingBuilder: (context, event) => const Center(
+  //   //                 child: CupertinoActivityIndicator(color: Colors.white),
+  //   //               ),
+  //   //             ),
+  //   //           )),
+  //   //       child: Container(
+  //   //         height: getScreenHeight(300),
+  //   //         clipBehavior: Clip.hardEdge,
+  //   //         decoration: BoxDecoration(
+  //   //           borderRadius: BorderRadius.circular(15),
+  //   //         ),
+  //   //         child: CachedNetworkImage(
+  //   //           imageUrl: post.imageMediaItems![0],
+  //   //           fit: BoxFit.cover,
+  //   //         ),
+  //   //       ),
+  //   //     );
 
-    //   case 3:
-    //     return Row(
-    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //       children: [
-    //         Flexible(
-    //           child: GestureDetector(
-    //             onTap: (() => RouteNavigators.route(
-    //                   context,
-    //                   PhotoView(
-    //                     imageProvider: NetworkImage(post.imageMediaItems![0]),
-    //                     loadingBuilder: (context, event) => const Center(
-    //                       child:
-    //                           CupertinoActivityIndicator(color: Colors.white),
-    //                     ),
-    //                   ),
-    //                 )),
-    //             child: Container(
-    //               height: getScreenHeight(300),
-    //               clipBehavior: Clip.hardEdge,
-    //               decoration: BoxDecoration(
-    //                 borderRadius: BorderRadius.circular(15),
-    //               ),
-    //               child: CachedNetworkImage(
-    //                 imageUrl: post.imageMediaItems![0],
-    //                 fit: BoxFit.cover,
-    //               ),
-    //             ),
-    //           ),
-    //         ),
-    //         SizedBox(width: getScreenWidth(5)),
-    //         Column(
-    //           mainAxisSize: MainAxisSize.min,
+  //   //   case 3:
+  //   //     return Row(
+  //   //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //   //       children: [
+  //   //         Flexible(
+  //   //           child: GestureDetector(
+  //   //             onTap: (() => RouteNavigators.route(
+  //   //                   context,
+  //   //                   PhotoView(
+  //   //                     imageProvider: NetworkImage(post.imageMediaItems![0]),
+  //   //                     loadingBuilder: (context, event) => const Center(
+  //   //                       child:
+  //   //                           CupertinoActivityIndicator(color: Colors.white),
+  //   //                     ),
+  //   //                   ),
+  //   //                 )),
+  //   //             child: Container(
+  //   //               height: getScreenHeight(300),
+  //   //               clipBehavior: Clip.hardEdge,
+  //   //               decoration: BoxDecoration(
+  //   //                 borderRadius: BorderRadius.circular(15),
+  //   //               ),
+  //   //               child: CachedNetworkImage(
+  //   //                 imageUrl: post.imageMediaItems![0],
+  //   //                 fit: BoxFit.cover,
+  //   //               ),
+  //   //             ),
+  //   //           ),
+  //   //         ),
+  //   //         SizedBox(width: getScreenWidth(5)),
+  //   //         Column(
+  //   //           mainAxisSize: MainAxisSize.min,
 
-    //           ///crossAxisAlignment: CrossAxisAlignment.stretch,
-    //           children: [
-    //             GestureDetector(
-    //               onTap: (() => RouteNavigators.route(
-    //                     context,
-    //                     PhotoView(
-    //                       imageProvider: NetworkImage(post.imageMediaItems![1]),
-    //                       loadingBuilder: (context, event) => const Center(
-    //                         child:
-    //                             CupertinoActivityIndicator(color: Colors.white),
-    //                       ),
-    //                     ),
-    //                   )),
-    //               child: Container(
-    //                 height: getScreenHeight(150),
-    //                 width: getScreenWidth(180),
-    //                 clipBehavior: Clip.hardEdge,
-    //                 decoration: BoxDecoration(
-    //                   borderRadius: BorderRadius.circular(15),
-    //                 ),
-    //                 child: CachedNetworkImage(
-    //                   imageUrl: post.imageMediaItems![1],
-    //                   fit: BoxFit.cover,
-    //                 ),
-    //               ),
-    //             ),
-    //             SizedBox(height: getScreenHeight(5)),
-    //             GestureDetector(
-    //               onTap: (() => RouteNavigators.route(
-    //                     context,
-    //                     PhotoView(
-    //                       imageProvider: NetworkImage(post.imageMediaItems![2]),
-    //                       loadingBuilder: (context, event) => const Center(
-    //                         child:
-    //                             CupertinoActivityIndicator(color: Colors.white),
-    //                       ),
-    //                     ),
-    //                   )),
-    //               child: Container(
-    //                 height: getScreenHeight(150),
-    //                 width: getScreenWidth(180),
-    //                 clipBehavior: Clip.hardEdge,
-    //                 decoration: BoxDecoration(
-    //                   borderRadius: BorderRadius.circular(15),
-    //                 ),
-    //                 child: CachedNetworkImage(
-    //                   imageUrl: post.imageMediaItems![2],
-    //                   fit: BoxFit.cover,
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         )
-    //       ],
-    //     );
-    //   default:
-    //     return Wrap(
-    //       runSpacing: getScreenHeight(5),
-    //       spacing: getScreenHeight(5),
-    //       alignment: WrapAlignment.spaceBetween,
-    //       children: [
-    //         for (var i = 0; i < post.imageMediaItems!.length; i++)
-    //           GestureDetector(
-    //             onTap: () => RouteNavigators.route(
-    //                 context,
-    //                 PhotoView(
-    //                   imageProvider: NetworkImage(
-    //                     post.imageMediaItems![i],
-    //                   ),
-    //                 )),
-    //             child: SizedBox(
-    //               width: getScreenWidth(170),
-    //               height: getScreenHeight(152),
-    //               child: ClipRRect(
-    //                 borderRadius: BorderRadius.circular(10),
-    //                 child: Image.network(
-    //                   post.imageMediaItems![i],
-    //                   fit: BoxFit.cover,
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //       ],
-    //     );
-    // }
-  }
+  //   //           ///crossAxisAlignment: CrossAxisAlignment.stretch,
+  //   //           children: [
+  //   //             GestureDetector(
+  //   //               onTap: (() => RouteNavigators.route(
+  //   //                     context,
+  //   //                     PhotoView(
+  //   //                       imageProvider: NetworkImage(post.imageMediaItems![1]),
+  //   //                       loadingBuilder: (context, event) => const Center(
+  //   //                         child:
+  //   //                             CupertinoActivityIndicator(color: Colors.white),
+  //   //                       ),
+  //   //                     ),
+  //   //                   )),
+  //   //               child: Container(
+  //   //                 height: getScreenHeight(150),
+  //   //                 width: getScreenWidth(180),
+  //   //                 clipBehavior: Clip.hardEdge,
+  //   //                 decoration: BoxDecoration(
+  //   //                   borderRadius: BorderRadius.circular(15),
+  //   //                 ),
+  //   //                 child: CachedNetworkImage(
+  //   //                   imageUrl: post.imageMediaItems![1],
+  //   //                   fit: BoxFit.cover,
+  //   //                 ),
+  //   //               ),
+  //   //             ),
+  //   //             SizedBox(height: getScreenHeight(5)),
+  //   //             GestureDetector(
+  //   //               onTap: (() => RouteNavigators.route(
+  //   //                     context,
+  //   //                     PhotoView(
+  //   //                       imageProvider: NetworkImage(post.imageMediaItems![2]),
+  //   //                       loadingBuilder: (context, event) => const Center(
+  //   //                         child:
+  //   //                             CupertinoActivityIndicator(color: Colors.white),
+  //   //                       ),
+  //   //                     ),
+  //   //                   )),
+  //   //               child: Container(
+  //   //                 height: getScreenHeight(150),
+  //   //                 width: getScreenWidth(180),
+  //   //                 clipBehavior: Clip.hardEdge,
+  //   //                 decoration: BoxDecoration(
+  //   //                   borderRadius: BorderRadius.circular(15),
+  //   //                 ),
+  //   //                 child: CachedNetworkImage(
+  //   //                   imageUrl: post.imageMediaItems![2],
+  //   //                   fit: BoxFit.cover,
+  //   //                 ),
+  //   //               ),
+  //   //             ),
+  //   //           ],
+  //   //         )
+  //   //       ],
+  //   //     );
+  //   //   default:
+  //   //     return Wrap(
+  //   //       runSpacing: getScreenHeight(5),
+  //   //       spacing: getScreenHeight(5),
+  //   //       alignment: WrapAlignment.spaceBetween,
+  //   //       children: [
+  //   //         for (var i = 0; i < post.imageMediaItems!.length; i++)
+  //   //           GestureDetector(
+  //   //             onTap: () => RouteNavigators.route(
+  //   //                 context,
+  //   //                 PhotoView(
+  //   //                   imageProvider: NetworkImage(
+  //   //                     post.imageMediaItems![i],
+  //   //                   ),
+  //   //                 )),
+  //   //             child: SizedBox(
+  //   //               width: getScreenWidth(170),
+  //   //               height: getScreenHeight(152),
+  //   //               child: ClipRRect(
+  //   //                 borderRadius: BorderRadius.circular(10),
+  //   //                 child: Image.network(
+  //   //                   post.imageMediaItems![i],
+  //   //                   fit: BoxFit.cover,
+  //   //                 ),
+  //   //               ),
+  //   //             ),
+  //   //           ),
+  //   //       ],
+  //   //     );
+  //   // }
+  // }
 
 }

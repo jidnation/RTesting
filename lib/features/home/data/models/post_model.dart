@@ -165,82 +165,33 @@ class PostModel {
 }
 
 class SavePostModel {
-  String? audioMediaItem;
-  String? authId;
-  String? content;
-  List<String>? imageMediaItems;
-  String? postId;
-  String? savedPostId;
-  String? videoMediaItem;
-  // DateTime? createdAt;
-  PostProfileModel? profile;
-  List<PostLikeModel>? like;
-  List<PostVoteModel>? vote;
+  DateTime createdAt;
+  PostModel post;
+  String? savePostId;
+  DateTime updatedAt;
 
   SavePostModel({
-    this.audioMediaItem,
-    this.authId,
-    this.content,
-    this.imageMediaItems,
-    this.postId,
-    this.savedPostId,
-    this.videoMediaItem,
-    //this.createdAt,
-    this.profile,
-    this.like,
-    this.vote,
+   required this.createdAt,
+   required this.post,
+   this.savePostId,
+   required this.updatedAt
   });
 
   factory SavePostModel.fromJson(Map<String, dynamic> json) => SavePostModel(
-        audioMediaItem: json["audioMediaItem"],
-        authId: json["authId"],
-        content: json["content"],
-        imageMediaItems: json["imageMediaItems"] == null
-            ? null
-            : List<String>.from(json["imageMediaItems"].map((x) => x)),
-        postId: json["postId"],
-        savedPostId: json["savedPostId"],
-        videoMediaItem: json["videoMediaItem"],
-        // createdAt: json["createdAt"] == null
-        //     ? null
-        //     : DateTime.parse(json["createdAt"]),
-        profile: json["profile"] != null
-            ? PostProfileModel.fromJson(json["profile"])
-            : null,
-        like: json["like"] == null
-            ? null
-            : List<PostLikeModel>.from(
-                json["like"].map((x) => PostLikeModel.fromJson(x))),
-        vote: json["vote"] == null
-            ? null
-            : List<PostVoteModel>.from(
-                json["vote"].map((x) => PostVoteModel.fromJson(x))),
+        createdAt: DateTime.parse(json["created_at"]),
+        post: PostModel.fromJson(json["post"]),
+        savePostId: json["savePostId"],
+        updatedAt:  DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "audioMediaItem": audioMediaItem,
-        "authId": authId,
-        "content": content,
-        "imageMediaItems": imageMediaItems == null
-            ? null
-            : List<dynamic>.from(imageMediaItems!.map((x) => x)),
-        "postId": postId,
-        "savedPostId": savedPostId,
-        "videoMediaItem": videoMediaItem,
-        //"createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
-        "profile": profile == null ? null : profile!.toJson(),
-        "like": like == null
-            ? null
-            : List<PostLikeModel>.from(like!.map((x) => x.toJson())),
-        "vote": vote == null
-            ? null
-            : List<PostVoteModel>.from(vote!.map((x) => x.toJson())),
+       "created_at": createdAt,
+       "post": post,
+       "savePostId": savePostId,
+       "updated_at": updatedAt
       };
 
-  PostModel toPostModel() => PostModel(
-      imageMediaItems: imageMediaItems,
-      videoMediaItem: videoMediaItem,
-      audioMediaItem: audioMediaItem);
+ 
 }
 
 class PostLikeModel {

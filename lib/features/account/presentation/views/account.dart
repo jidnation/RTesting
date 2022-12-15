@@ -319,10 +319,14 @@ class _AccountScreenState extends State<AccountScreen>
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
     final _savedPosts = useState<List<SavePostModel>>([]);
+    final _currentPost = useState<SavePostModel?>(null);
     final _likedPosts = useState<List<PostFeedModel>>([]);
     final _shoutDowns = useState<List<PostFeedModel>>([]);
     final _shoutOuts = useState<List<PostFeedModel>>([]);
     final _sharedPosts = useState<List<PostFeedModel>>([]);
+     final shoutingDown = useState(false);
+
+     final viewProfile = useState(false);
     useEffect(() {
       globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
       globals.socialServiceBloc!
@@ -351,13 +355,40 @@ class _AccountScreenState extends State<AccountScreen>
         body: BlocConsumer<UserBloc, UserState>(
           bloc: globals.userBloc,
           listener: (context, state) {
-            if (state is RecipientUserData) {
-              if (reachDM.value) {
-                reachDM.value = false;
-                RouteNavigators.route(
-                    context, MsgChatInterface(recipientUser: state.user));
+                 if (state is RecipientUserData) {
+                if (reachDM.value) {
+                  reachDM.value = false;
+                  RouteNavigators.route(
+                      context, MsgChatInterface(recipientUser: state.user));
+                } else if (viewProfile.value) {
+                  viewProfile.value = false;
+                  ProgressHUD.of(context)?.dismiss();
+                  globals.recipientUser = state.user;
+                  state.user!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: 'email',
+                            recipientImageUrl: state.user!.profilePicture,
+                            recipientId: state.user!.id,
+                          ));
+                }
               }
-            }
+                   if (state is GetReachRelationshipSuccess) {
+                if (shoutingDown.value) {
+                  shoutingDown.value = false;
+                  if ((state.isReaching ?? false)) {
+                    globals.socialServiceBloc!.add(VotePostEvent(
+                      voteType: 'Downvote',
+                      postId: _currentPost.value!.post.postId,
+                    ));
+                  } else {
+                    Snackbars.error(context,
+                        message: 'You cannot shout down on this user\'s posts');
+                  }
+                }
+              }
             if (state is DeleteAccountSuccess) {
               if (state.deleted ?? false) {
                 RouteNavigators.pop(context);
@@ -396,26 +427,37 @@ class _AccountScreenState extends State<AccountScreen>
                   Snackbars.error(context, message: state.error);
                   _reachoutsRefreshController.refreshFailed();
                 }
-                if (state is GetLikedPostsSuccess) {
-                  _likedPosts.value = state.posts!;
-                  _likesRefreshController.refreshCompleted();
-                }
-                if (state is GetLikedPostsError) {
-                  Snackbars.error(context, message: state.error);
-                  _likesRefreshController.refreshCompleted();
-                }
-                if (state is GetVotedPostsSuccess) {
-                  if (state.voteType == 'Upvote') {
-                    _shoutOuts.value = state.posts!;
-                    _shoutoutRefreshController.refreshCompleted();
-                  } else if (state.voteType == 'Downvote') {
-                    _shoutDowns.value = state.posts!;
-                    _shoutdownRefreshController.refreshCompleted();
+
+                
+                 if (state is UnlikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _savedPosts.value[pos].post.isLiked = true;
+                    _savedPosts.value[pos].post.nLikes =
+                        (_savedPosts.value[pos].post.nLikes ?? 0) + 1;
                   }
-                }
+
+                  if (state is LikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _savedPosts.value[pos].post.isLiked = false;
+                    _savedPosts.value[pos].post.nLikes =
+                        (_savedPosts.value[pos].post.nLikes ?? 1) - 1;
+                  }
                 if (state is GetVotedPostsError) {
                   Snackbars.error(context, message: state.error);
                 }
+
+                    if (state is DeletePostVoteSuccess) {
+                    globals.socialServiceBloc!
+                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteError) {
+                    Snackbars.error(context, message: state.error);
+                  }
                 if (state is GetPersonalCommentsSuccess) {
                   _comments.value = state.data!;
                   _commentsRefreshController.refreshCompleted();
@@ -1427,7 +1469,177 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _savedPosts.value.length,
                                       itemBuilder: (context, index) {
-                                        return SavedPostReacherCard(
+                                        return
+                                          SavedPostReacherCard(
+                                            likingPost: false,
+                                                    
+                                                      isLiked: (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isLiked ??
+                                                              false)
+                                                          ? true
+                                                          : false,
+                                                      isVoted: (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isVoted ??
+                                                              '')
+                                                          .isNotEmpty,
+                                                      voteType: _savedPosts
+                                                          .value[index]
+                                                          .post
+                                                          .isVoted,
+                                                      onViewProfile: () {
+                                                        viewProfile.value =
+                                                            true;
+                                                        ProgressHUD.of(context)
+                                                            ?.showWithText(
+                                                                'Viewing Profile');
+                                                        globals.userBloc!.add(
+                                                            GetRecipientProfileEvent(
+                                                                email: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId));
+                                                      },
+                                                      onMessage: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if ((_savedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .post.vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: _savedPosts
+                                                                  .value[index]
+                                                                  .post.postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: _savedPosts.value
+                                                                  [index]
+                                                                  .post.postId,
+                                                            ));
+                                                          }
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        _currentPost.value =
+                                                            _savedPosts.value[index];
+                                                        if (active
+                                                            .contains(index)) {
+                                                          shoutingDown.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                        }
+                                                      },
+                                                    onLike: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isLiked ??
+                                                              false) {
+                                                            _savedPosts
+                                                                    .value[index]
+                                                                    .post
+                                                                    .isLiked =
+                                                                false;
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .nLikes = (_savedPosts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        .nLikes ??
+                                                                    1) -
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: _savedPosts
+                                                                  .value[index]
+                                                                  .post.postId,
+                                                            ));
+                                                          } else {
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .isLiked = true;
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .nLikes = (_savedPosts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        .nLikes ??
+                                                                    0) +
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _savedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .post.postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                   
                                           savedPostModel:
                                               _savedPosts.value[index],
                                           onDelete: () {
@@ -1437,12 +1649,14 @@ class _AccountScreenState extends State<AccountScreen>
                                                   DeleteSavedPostEvent(
                                                       postId: _savedPosts
                                                           .value[index]
-                                                          .postId));
+                                                          .post.postId));
                                             }
                                           },
                                         );
+                               
                                       },
                                     ),
+                          
                             )
                         ],
                       ),

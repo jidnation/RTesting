@@ -332,6 +332,7 @@ class _PostReachState extends State<PostReach> {
                           _isLoading.value = false;
                         }
                       },
+                   
                       child: BlocConsumer<DictionaryBloc, DictionaryState>(
                         bloc: globals.dictionaryBloc,
                         listener: (context, state) {
@@ -355,7 +356,8 @@ class _PostReachState extends State<PostReach> {
                           }
                         },
                         builder: (context, state) {
-                          return FlutterMentions(
+                          return
+                           FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
@@ -530,8 +532,10 @@ class _PostReachState extends State<PostReach> {
                             //   ),
                             // ).paddingSymmetric(h: 16),
                           );
+                       
                         },
                       ),
+                  
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)
@@ -981,6 +985,7 @@ class _PostReachState extends State<PostReach> {
                   ],
                 ),
               ),
+            
               ValueListenableBuilder(
                   valueListenable: _recordingService.recording,
                   builder: (BuildContext context, bool value, Widget? child) {
