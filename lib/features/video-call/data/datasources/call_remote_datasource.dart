@@ -1,3 +1,7 @@
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/helper/logger.dart';
+import 'package:reach_me/features/video-call/data/models/inititate_call_response.dart';
+
 import '../../../../core/services/graphql/gql_client.dart';
 import '../../presentation/bloc/video_call_bloc.dart';
 
@@ -6,8 +10,34 @@ class VideoCallRemoteDataSource {
       : _client = client ?? GraphQLChatClient();
   final GraphQLChatClient _client;
 
-  Future<dynamic> initiatePrivateCall(
-    InitiatePrivateVideoCall privateCall) async {}
+  Future<InitiateCallResponse?> initiatePrivateCall(
+      InitiatePrivateVideoCall privateCall) async {
+    String q = '''
+            mutation{
+  initiatePrivateCall(
+    data:{
+      receiverId:"${privateCall.receiverId}"
+      callMode:"${privateCall.callMode.type}"
+      callType:"${privateCall.callType.type}"
+      initiatedAt:"${privateCall.dateTime}"
+    }
+  ){
+    token
+    channelName
+  }
+}
+                ''';
+    try {
+      var result = await _client.mutate(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('call result', result.data);
+      return null;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<dynamic> answerPrivateCall() async {}
 

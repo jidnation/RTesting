@@ -237,7 +237,7 @@ class GraphQLNotificationClient {
     DocumentNode query, {
     required Map<String, dynamic> variables,
   }) async {
-    final QueryResult result = await chatClientFor().value.query(
+    final QueryResult result = await notificationClientFor().value.query(
           QueryOptions(
             document: query,
             variables: variables,
@@ -275,7 +275,7 @@ class GraphQLNotificationClient {
     required Map<String, dynamic> variables,
   }) async {
     final QueryResult result =
-        await chatClientFor().value.mutate(MutationOptions(
+        await notificationClientFor().value.mutate(MutationOptions(
               document: documentNode,
               variables: variables,
             ));
@@ -313,7 +313,7 @@ class GraphQLNotificationClient {
       document: document,
       variables: variables,
     );
-    final Stream<QueryResult> result = chatClientFor().value.subscribe(options);
+    final Stream<QueryResult> result = notificationClientFor().value.subscribe(options);
     return result;
   }
 }

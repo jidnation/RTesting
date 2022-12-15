@@ -21,3 +21,4 @@ class NotifcationService {
         (OSEmailSubscriptionStateChanges emailChanges) {});
   }
 }
+  

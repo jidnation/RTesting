@@ -6,7 +6,7 @@ abstract class VideoCallEvent {}
 class InitiatePrivateVideoCall extends VideoCallEvent {
   final CallMode callMode;
   final CallType callType;
-  final DateTime? dateTime = DateTime.now();
+  final String dateTime = DateTime.now().toIso8601String();
   final String receiverId;
 
   InitiatePrivateVideoCall({required this.callMode, required this.callType,required this.receiverId,});

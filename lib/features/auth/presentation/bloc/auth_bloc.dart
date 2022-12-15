@@ -11,6 +11,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository? _authRepository = AuthRepository();
+
   AuthBloc() : super(AuthInitial()) {
     on<RegisterUserEvent>(((event, emit) async {
       emit(AuthLoading());
@@ -61,6 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             SecureStorage.writeSecureData('fname', user.firstName!);
             SecureStorage.writeSecureData('userId', user.id!);
             emit(Authenticated(message: 'User logged in successfully'));
+            _authRepository!.registerDeviceForNotifications();
           },
         );
       } on GraphQLError catch (e) {

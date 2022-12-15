@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -33,50 +35,56 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SizedBox(
-        height: size.height,
-        width: size.width,
-        child: Stack(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/video-call.png'),
-                  fit: BoxFit.cover,
+      body: BlocBuilder<VideoCallBloc, VideoCallState>(
+        bloc: globals.videoCallBloc,
+        builder: (context, state) {
+          Console.log('video call state', state);
+          return SizedBox(
+            height: size.height,
+            width: size.width,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/video-call.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: 100,
+                  right: size.width * 0.36,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      globals.user!.profilePicture == null
+                          ? ImagePlaceholder(
+                              width: getScreenWidth(100),
+                              height: getScreenHeight(100),
+                            )
+                          : ProfilePicture(
+                              width: getScreenWidth(100),
+                              height: getScreenHeight(100),
+                            ),
+                      Text(widget.recipient!.firstName!,
+                          style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.white)),
+                      const SizedBox(height: 8),
+                      const Text('Calling...',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.white)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Positioned(
-              top: 100,
-              right: size.width * 0.36,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  globals.user!.profilePicture == null
-                      ? ImagePlaceholder(
-                          width: getScreenWidth(100),
-                          height: getScreenHeight(100),
-                        )
-                      : ProfilePicture(
-                          width: getScreenWidth(100),
-                          height: getScreenHeight(100),
-                        ),
-                  Text(widget.recipient!.firstName!,
-                      style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.white)),
-                  const SizedBox(height: 8),
-                  const Text('Calling...',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.white)),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
       bottomNavigationBar: BottomAppBar(
         elevation: 12,

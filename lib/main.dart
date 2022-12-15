@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/routes/routes.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/notification_service.dart';

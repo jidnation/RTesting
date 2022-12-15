@@ -51,7 +51,6 @@ class AuthRepository {
     required String firstName,
     required String lastName,
     required String password,
-   
   }) async {
     try {
       final user = await _authRemoteDataSource.createAccount(
@@ -59,7 +58,6 @@ class AuthRepository {
         firstName: firstName,
         lastName: lastName,
         password: password,
-      
       );
       return Right(user);
     } on GraphQLError catch (e) {
@@ -124,6 +122,10 @@ class AuthRepository {
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
+  }
+
+  Future<void> registerDeviceForNotifications() async {
+    await _authRemoteDataSource.registerDeviceForNotification();
   }
 
   // @override
