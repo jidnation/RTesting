@@ -33,7 +33,6 @@ import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 
-
 import '../../../../core/models/file_result.dart';
 import '../../../chat/presentation/widgets/audio_player.dart';
 import '../widgets/post_media.dart';
@@ -422,8 +421,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                       },
                                     ),
                             ),
-                          
-                          
                           Container(
                             color: AppColors.white,
                             padding: const EdgeInsets.symmetric(
@@ -569,25 +566,33 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                     ],
                                                   )
                                                 : Row(
-                                                  children: [
-                                                     GestureDetector(
-                                                    onTap: () {
-                                                  recorderController.stop();
-                                                                },
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          recorderController
+                                                              .stop();
+
+                                                          setState(() {
+                                                            isRecording =
+                                                                !isRecording;
+                                                          });
+                                                        },
                                                         child: Icon(
                                                           Icons.delete,
-                                                                size: 32,
-                                   color: AppColors.primaryColor.withOpacity(0.5),
-                                                                    ),
-                                                              ),
-                                                   const SizedBox(
-                                                          width: 12,
-                                                                ),
-
-                                                    Expanded(
-                                                      child: AudioWaveforms(
+                                                          size: 32,
+                                                          color: AppColors
+                                                              .primaryColor
+                                                              .withOpacity(0.5),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 12,
+                                                      ),
+                                                      Expanded(
+                                                        child: AudioWaveforms(
                                                           size: Size(
-                                                              MediaQuery.of(context)
+                                                              MediaQuery.of(
+                                                                          context)
                                                                       .size
                                                                       .width /
                                                                   2,
@@ -595,30 +600,39 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                           recorderController:
                                                               recorderController,
                                                           enableGesture: true,
-                                                          waveStyle: const WaveStyle(
-                                                            waveColor: Colors.blueAccent,
-                                                            extendWaveform: true,
-                                                            showMiddleLine: false,
+                                                          waveStyle:
+                                                              const WaveStyle(
+                                                            waveColor: Colors
+                                                                .blueAccent,
+                                                            extendWaveform:
+                                                                true,
+                                                            showMiddleLine:
+                                                                false,
                                                           ),
-                                                          decoration: BoxDecoration(
+                                                          decoration:
+                                                              BoxDecoration(
                                                             borderRadius:
-                                                                BorderRadius.circular(
-                                                                    12.0),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12.0),
                                                             color: Colors.white,
                                                           ),
                                                           padding:
-                                                              const EdgeInsets.only(
+                                                              const EdgeInsets
+                                                                      .only(
                                                                   left: 18,
                                                                   right: 20,
                                                                   top: 15,
                                                                   bottom: 15),
-                                                          margin: const EdgeInsets
-                                                                  .symmetric(
-                                                              horizontal: 15),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      15),
                                                         ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                      ),
+                                                    ],
+                                                  ),
                                             enabledBorder:
                                                 const OutlineInputBorder(
                                               borderSide: BorderSide.none,
@@ -679,7 +693,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       await recorderController
                                                           .stop();
                                                   File audio = File(path!);
-                                                 globals.socialServiceBloc!
+                                                  globals.socialServiceBloc!
                                                       .add(MediaUploadEvent(
                                                           media: audio));
 
@@ -721,9 +735,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                       config: Config(
                                           columns: 7,
                                           emojiSizeMax: 28 *
-                                              (Platform.isIOS
-                                                  ? 1.30
-                                                  : 1.0), 
+                                              (Platform.isIOS ? 1.30 : 1.0),
                                           verticalSpacing: 0,
                                           horizontalSpacing: 0,
                                           gridPadding: EdgeInsets.zero,
@@ -1185,20 +1197,6 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            //  comment.content!.isNotEmpty ?
-            //   Text(comment.content!,
-            //    style: TextStyle(
-            //     fontSize: getScreenHeight(14),
-            //     color: AppColors.textColor2
-            //    ),)
-            //    : comment.audioMediaItem!.isNotEmpty ?
-            //      PostAudioMedia(path: comment.audioMediaItem!)
-            //      .paddingOnly(r: 16, l: 16, b: 10, t: 0)
-            //     : comment.imageMediaItems!.isNotEmpty ?
-            //       CommentMedia(comment: comment)
-            //      .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-            //      :  const SizedBox.shrink(),
-
             if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
               Text(
                 comment.content!,

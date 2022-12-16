@@ -188,7 +188,7 @@ class StatusFeedModel {
             ? DateTime.parse(json["created_at"])
             : null,
         feedOwnerProfile: json["feedOwnerProfile"] != null
-            ? StatusProfileModel.fromJson(json["feedOnwerProfile"])
+            ? StatusProfileModel.fromJson(json["feedOwnerProfile"])
             : null,
         reachingRelationship: json["reachingRelationship"],
         status: json["status"] != null

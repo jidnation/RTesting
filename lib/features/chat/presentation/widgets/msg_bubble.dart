@@ -53,7 +53,7 @@ class MsgBubble extends StatelessWidget {
         ),
       );
     } else if (label.contains('aac')) {
-      print('This is the lable link $label');
+      //print('This is the lable link $label');
       return Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(

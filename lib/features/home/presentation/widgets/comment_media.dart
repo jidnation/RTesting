@@ -228,9 +228,12 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   PlayerController? playerController;
   bool isInitialised = false;
   bool isPlaying = false;
-  final currentDurationStream = StreamController<int>();
+  bool isReadingCompleted = false;
+  //final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
+  int maxduration = 0;
   final MediaService _mediaService = MediaService();
+  Map<String, PlayerController> playerControllers = {};
 
   @override
   void initState() {
@@ -264,12 +267,29 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
     });
 
     await playerController!.preparePlayer(res.path);
-    // await playerController.startPlayer();
-    if (mounted) setState(() {});
+     // await playerController.startPlayer();
+     if (mounted) setState(() {});
+  }
+
+  Future<PlayerController> getPlayerController(String path, String playerkey) async {
+    if ( playerkey != null && playerControllers.containsKey(playerkey)) {
+      return playerControllers[playerkey]!;
+    }
+
+    final anotherPlayerController = PlayerController();
+    await anotherPlayerController.preparePlayer(path);
+    playerControllers[anotherPlayerController.playerKey] = anotherPlayerController;
+    return anotherPlayerController;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (maxduration - currentDuration < 15) {
+      print("STOP THE PLAYER PLAYING");
+    }
+    print("current duration $currentDuration");
+    print("max_duration $maxduration");
+
     return Container(
       margin: widget.margin,
       height: getScreenHeight(36),
@@ -279,7 +299,13 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+
+            // playerController?.pausePlayer();
+
+            //   playerController = await getPlayerController(widget.path,playerController!.playerKey);
+            //   playerController!.startPlayer(finishMode: FinishMode.pause);
+
               if (playerController == null) return;
               if (isPlaying) {
                 playerController!.pausePlayer();
