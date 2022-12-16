@@ -1,4 +1,3 @@
-
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -1432,6 +1431,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'statusBody': createStatusDto.toJson(),
       });
+      Console.log("Status Created", result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
