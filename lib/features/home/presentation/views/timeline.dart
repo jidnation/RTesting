@@ -307,6 +307,9 @@ class _TimelineScreenState extends State<TimelineScreen>
                       Snackbars.success(context,
                           message:
                               'The post you shouted down has been removed!');
+                    } else {
+                      Snackbars.success(context,
+                          message: 'You shouted at this post');
                     }
                     globals.socialServiceBloc!
                         .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
@@ -469,7 +472,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                       ));
                                                               return;
                                                             },
-                                                           
                                                           ),
 
                                                           if (_myStatus
@@ -557,180 +559,198 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       _posts.value.length,
                                                   itemBuilder:
                                                       (context, index) {
-                                                    return PostFeedReacherCard(
-                                                      likingPost: false,
-                                                      postFeedModel:
-                                                          _posts.value[index],
-                                                      voterProfile: _posts
-                                                          .value[index]
-                                                          .voterProfile,
-                                                      isLiked: (_posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.isLiked ??
-                                                              false)
-                                                          ? true
-                                                          : false,
-                                                      isVoted: (_posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.isVoted ??
-                                                              '')
-                                                          .isNotEmpty,
-                                                      voteType: _posts
-                                                          .value[index]
-                                                          .post
-                                                          ?.isVoted,
-                                                      onViewProfile: () {
-                                                        viewProfile.value =
-                                                            true;
-                                                        ProgressHUD.of(context)
-                                                            ?.showWithText(
-                                                                'Viewing Profile');
-                                                        globals.userBloc!.add(
-                                                            GetRecipientProfileEvent(
-                                                                email: _posts
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        () => Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (builder) =>
+                                                                        FullPostScreen(
+                                                                          postFeedModel:
+                                                                              _posts.value[index],
+                                                                        )));
+                                                      },
+                                                      child:
+                                                          PostFeedReacherCard(
+                                                        likingPost: false,
+                                                        postFeedModel:
+                                                            _posts.value[index],
+                                                        voterProfile: _posts
+                                                            .value[index]
+                                                            .voterProfile,
+                                                        isLiked: (_posts
                                                                     .value[
                                                                         index]
-                                                                    .postOwnerId));
-                                                      },
-                                                      onMessage: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        reachDM.value = true;
-
-                                                        handleTap(index);
-                                                        if (active
-                                                            .contains(index)) {
+                                                                    .post
+                                                                    ?.isLiked ??
+                                                                false)
+                                                            ? true
+                                                            : false,
+                                                        isVoted: (_posts
+                                                                    .value[
+                                                                        index]
+                                                                    .post
+                                                                    ?.isVoted ??
+                                                                '')
+                                                            .isNotEmpty,
+                                                        voteType: _posts
+                                                            .value[index]
+                                                            .post
+                                                            ?.isVoted,
+                                                        onViewProfile: () {
+                                                          viewProfile.value =
+                                                              true;
+                                                          ProgressHUD.of(
+                                                                  context)
+                                                              ?.showWithText(
+                                                                  'Viewing Profile');
                                                           globals.userBloc!.add(
                                                               GetRecipientProfileEvent(
                                                                   email: _posts
                                                                       .value[
                                                                           index]
-                                                                      .postOwnerId!));
-                                                        }
-                                                      },
-                                                      onUpvote: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(index);
+                                                                      .postOwnerId));
+                                                        },
+                                                        onMessage: () {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          reachDM.value = true;
 
-                                                        if (active
-                                                            .contains(index)) {
-                                                          if ((_posts
-                                                                      .value[
-                                                                          index]
-                                                                      .vote ??
-                                                                  [])
-                                                              .isEmpty) {
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    VotePostEvent(
-                                                              voteType:
-                                                                  'Upvote',
-                                                              postId: _posts
-                                                                  .value[index]
-                                                                  .postId,
-                                                            ));
-                                                          } else {
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    DeletePostVoteEvent(
-                                                              voteId: _posts
-                                                                  .value[index]
-                                                                  .postId,
-                                                            ));
+                                                          handleTap(index);
+                                                          if (active.contains(
+                                                              index)) {
+                                                            globals.userBloc!.add(
+                                                                GetRecipientProfileEvent(
+                                                                    email: _posts
+                                                                        .value[
+                                                                            index]
+                                                                        .postOwnerId!));
                                                           }
-                                                        }
-                                                      },
-                                                      onDownvote: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(index);
-                                                        _currentPost.value =
-                                                            _posts.value[index];
-                                                        if (active
-                                                            .contains(index)) {
-                                                          shoutingDown.value =
-                                                              true;
-                                                          globals.userBloc!.add(
-                                                              GetReachRelationshipEvent(
-                                                                  userIdToReach: _posts
-                                                                      .value[
-                                                                          index]
-                                                                      .postOwnerId,
-                                                                  type: ReachRelationshipType
-                                                                      .reacher));
-                                                        }
-                                                      },
-                                                      onLike: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(index);
-                                                        // Console.log(
-                                                        //     'Like Data',
-                                                        //     _posts.value[index]
-                                                        //         .toJson());
-                                                        if (active
-                                                            .contains(index)) {
-                                                          if (_posts
+                                                        },
+                                                        onUpvote: () {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          handleTap(index);
+
+                                                          if (active.contains(
+                                                              index)) {
+                                                            if ((_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .vote ??
+                                                                    [])
+                                                                .isEmpty) {
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                      VotePostEvent(
+                                                                voteType:
+                                                                    'Upvote',
+                                                                postId: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postId,
+                                                              ));
+                                                            } else {
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                      DeletePostVoteEvent(
+                                                                voteId: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postId,
+                                                              ));
+                                                            }
+                                                          }
+                                                        },
+                                                        onDownvote: () {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          handleTap(index);
+                                                          _currentPost.value =
+                                                              _posts
+                                                                  .value[index];
+                                                          if (active.contains(
+                                                              index)) {
+                                                            shoutingDown.value =
+                                                                true;
+                                                            globals.userBloc!.add(GetReachRelationshipEvent(
+                                                                userIdToReach: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postOwnerId,
+                                                                type: ReachRelationshipType
+                                                                    .reacher));
+                                                          }
+                                                        },
+                                                        onLike: () {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          handleTap(index);
+                                                          // Console.log(
+                                                          //     'Like Data',
+                                                          //     _posts.value[index]
+                                                          //         .toJson());
+                                                          if (active.contains(
+                                                              index)) {
+                                                            if (_posts
+                                                                    .value[
+                                                                        index]
+                                                                    .post
+                                                                    ?.isLiked ??
+                                                                false) {
+                                                              _posts
                                                                   .value[index]
                                                                   .post
-                                                                  ?.isLiked ??
-                                                              false) {
-                                                            _posts
-                                                                    .value[index]
-                                                                    .post
-                                                                    ?.isLiked =
-                                                                false;
-                                                            _posts
-                                                                .value[index]
-                                                                .post
-                                                                ?.nLikes = (_posts
-                                                                        .value[
-                                                                            index]
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    1) -
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    UnlikePostEvent(
-                                                              postId: _posts
+                                                                  ?.isLiked = false;
+                                                              _posts
                                                                   .value[index]
-                                                                  .postId,
-                                                            ));
-                                                          } else {
-                                                            _posts
-                                                                .value[index]
-                                                                .post
-                                                                ?.isLiked = true;
-                                                            _posts
-                                                                .value[index]
-                                                                .post
-                                                                ?.nLikes = (_posts
+                                                                  .post
+                                                                  ?.nLikes = (_posts
+                                                                          .value[
+                                                                              index]
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      1) -
+                                                                  1;
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                      UnlikePostEvent(
+                                                                postId: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postId,
+                                                              ));
+                                                            } else {
+                                                              _posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isLiked = true;
+                                                              _posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.nLikes = (_posts
+                                                                          .value[
+                                                                              index]
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      0) +
+                                                                  1;
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                LikePostEvent(
+                                                                    postId: _posts
                                                                         .value[
                                                                             index]
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    0) +
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                              LikePostEvent(
-                                                                  postId: _posts
-                                                                      .value[
-                                                                          index]
-                                                                      .postId),
-                                                            );
+                                                                        .postId),
+                                                              );
+                                                            }
                                                           }
-                                                        }
-                                                      },
-                                                   
+                                                        },
+                                                      ),
                                                     );
                                                   },
                                                 ),
@@ -1261,7 +1281,6 @@ class PostFeedReacherCard extends HookWidget {
       ),
     );
   }
-
 }
 
 // class PostFeedReacherCard extends HookWidget {
