@@ -1,6 +1,5 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
@@ -8,7 +7,7 @@ import 'package:video_player/video_player.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../momentControlRoom/models/get_moment_feed.dart';
-import '../../../momentControlRoom/moment_cacher.dart';
+import '../views/moment_feed.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final GetMomentFeed momentFeed;
@@ -23,8 +22,6 @@ class VideoPlayerItem extends StatefulWidget {
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
   late VideoPlayerController _videoPlayerController;
-  final VideoControllerService _videoControllerService =
-      CachedVideoControllerService(DefaultCacheManager());
 
   ChewieController? _chewieController;
   int? bufferDelay;
@@ -38,7 +35,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController = await _videoControllerService
+    _videoPlayerController = await momentFeedStore.videoControllerService
         .getControllerForVideo(widget.momentFeed.moment!.videoMediaItem!);
     await Future.wait([_videoPlayerController.initialize()]);
     _createChewieController();
@@ -47,8 +44,11 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
+      aspectRatio: _videoPlayerController.value.aspectRatio,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
+      allowFullScreen: true,
+      // fullScreenByDefault: true,
       looping: true,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,

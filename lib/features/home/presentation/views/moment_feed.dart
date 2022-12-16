@@ -39,32 +39,60 @@ class _MomentFeedState extends State<MomentFeed> {
               pageController: widget.pageController,
             ),
             Expanded(
-                child: ValueListenableBuilder(
-              valueListenable: MomentFeedStore(),
-              builder: (context, List<GetMomentFeed> value, child) {
-                print('from the feed room.........??? $value }');
-                final List<GetMomentFeed> momentFeeds = value;
-                return momentFeedStore.gettingMoments
-                    ? const VideoLoader()
-                    : CarouselSlider(
-                        options: CarouselOptions(
-                          viewportFraction: 1,
-                          height: size.height,
-                          scrollDirection: Axis.vertical,
-                        ),
-                        items: List<Widget>.generate(
-                            momentFeedStore.momentCount,
-                            (index) => Builder(builder: (context) {
-                                  final GetMomentFeed getMomentFeed =
-                                      value[index];
-                                  return VideoPlayerItem(
-                                      momentFeed: getMomentFeed);
-                                })));
-              },
-            )),
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    // top: 0,
+                    bottom: 0,
+                    child: ValueListenableBuilder(
+                      valueListenable: MomentFeedStore(),
+                      builder: (context, List<GetMomentFeed> value, child) {
+                        print('from the feed room.........??? $value }');
+                        final List<GetMomentFeed> momentFeeds = value;
+                        return momentFeedStore.gettingMoments
+                            ? const VideoLoader()
+                            : CarouselSlider(
+                                options: CarouselOptions(
+                                  viewportFraction: 1,
+                                  aspectRatio: 9 / 16,
+                                  enableInfiniteScroll: false,
+                                  // height: size.height,
+                                  scrollDirection: Axis.vertical,
+                                ),
+                                items: List<Widget>.generate(
+                                    momentFeedStore.momentCount,
+                                    (index) => Builder(builder: (context) {
+                                          checkMeOut(index);
+                                          final GetMomentFeed getMomentFeed =
+                                              value[index];
+                                          return SizedBox(
+                                            width: size.width,
+                                            height: size.height,
+                                            child: Expanded(
+                                              child: VideoPlayerItem(
+                                                  momentFeed: getMomentFeed),
+                                            ),
+                                          );
+                                        })));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ]),
         ),
       ),
     );
+  }
+
+  void checkMeOut(int index) {
+    print('....check Me out is running>>>>>>>>>>>>>>>>');
+    int currentSaved = momentFeedStore.currentSaveIndex;
+    if (index == (currentSaved - 2)) {
+      momentFeedStore.cacheNextFive(currentSaved);
+    }
   }
 }

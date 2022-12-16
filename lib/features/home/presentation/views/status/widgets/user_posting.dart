@@ -358,7 +358,12 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                         Icons.stop,
                                         color: Colors.red,
                                       )
-                                    : Image.asset(
+                                    :
+                            // SvgPicture.asset(
+                            //             'assets/svgs/camera_button.svg',
+                            //             fit: BoxFit.contain,
+                            //           ),
+                            Image.asset(
                                         'assets/images/play-btn.png',
                                         fit: BoxFit.contain,
                                       ),
