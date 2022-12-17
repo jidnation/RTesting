@@ -1,27 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:reach_me/core/routes/page_route.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
+import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
+import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
 import 'package:reach_me/features/account/presentation/views/qr_code.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
 import 'package:reach_me/features/account/presentation/views/starred_profile.dart';
-import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
-import 'package:reach_me/features/account/presentation/views/account.dart';
-import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
-import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
-import 'package:reach_me/features/account/presentation/views/edit_profile_screen.dart';
-import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
-import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
-import 'package:reach_me/features/home/presentation/views/home_screen.dart';
-import 'package:reach_me/features/home/presentation/views/search.dart';
-import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/auth/presentation/views/forgot_password.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
-import 'package:reach_me/features/home/presentation/views/notification.dart';
-import 'package:reach_me/features/home/presentation/views/video_moment.dart';
-import 'package:reach_me/features/onboarding/onboarding.dart';
+import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/reset_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
+import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
+import 'package:reach_me/features/chat/presentation/views/chats_list_screen.dart';
+import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
+import 'package:reach_me/features/home/presentation/views/home_screen.dart';
+import 'package:reach_me/features/home/presentation/views/notification.dart';
+import 'package:reach_me/features/home/presentation/views/search.dart';
+import 'package:reach_me/features/home/presentation/views/timeline.dart';
+import 'package:reach_me/features/home/presentation/views/video_moment.dart';
+import 'package:reach_me/features/onboarding/onboarding.dart';
 import 'package:reach_me/features/onboarding/welcome_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
 
@@ -94,10 +94,8 @@ class RMRouter {
       case VoiceCallScreen.id:
         return RMPageRoute(builder: (_) => const VoiceCallScreen());
 
-
       case VideoCallScreen.id:
         return RMPageRoute(builder: (_) => const VideoCallScreen());
-
 
       case SavedPostScreen.id:
         return RMPageRoute(builder: (_) => const SavedPostScreen());
@@ -116,9 +114,10 @@ class RMRouter {
 
       default:
         return RMPageRoute(
-            builder: (_) => const Scaffold(
-                  body: Center(child: Text('Something went wrong')),
-                ));
+          builder: (_) => const Scaffold(
+            body: Center(child: Text('Something went wrong')),
+          ),
+        );
     }
   }
 }
