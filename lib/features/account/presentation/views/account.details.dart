@@ -126,7 +126,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
               }),
               child: FittedBox(
                 child: Text(
-                  '${globals.user!.nBlocked} Blocked',
+                  '${globals.user!.nBlocked} EX',
                   style: TextStyle(
                     fontSize: getScreenHeight(15),
                     fontWeight: FontWeight.w400,
@@ -396,10 +396,7 @@ class SeeMyReachersList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (data!.reacher!.firstName! +
-                              ' ' +
-                              data!.reacher!.lastName!)
-                          .toTitleCase(),
+                      '${data!.reacher!.username}',
                       style: TextStyle(
                         fontSize: getScreenHeight(16),
                         color: AppColors.textColor2,
@@ -514,10 +511,7 @@ class SeeMyReachingsList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (data!.reaching!.firstName! +
-                            ' ' +
-                            data!.reaching!.lastName!)
-                        .toTitleCase(),
+                    '${data!.reaching!.username}',
                     style: TextStyle(
                       fontSize: getScreenHeight(16),
                       color: AppColors.textColor2,
@@ -615,8 +609,7 @@ class SeeMyStarsList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (data!.starred!.firstName! + ' ' + data!.starred!.lastName!)
-                        .toTitleCase(),
+                    '${data!.starred!.username}',
                     style: TextStyle(
                       fontSize: getScreenHeight(16),
                       color: AppColors.textColor2,
@@ -694,10 +687,7 @@ class SeeMyBlockList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (data!.blockedProfile!.firstName! +
-                              ' ' +
-                              data!.blockedProfile!.lastName!)
-                          .toTitleCase(),
+                      '${data!.blockedProfile!.username}',
                       style: TextStyle(
                         fontSize: getScreenHeight(16),
                         color: AppColors.textColor2,
