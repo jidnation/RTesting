@@ -11,9 +11,18 @@ import '../../../../core/utils/dimensions.dart';
 import '../../../account/presentation/widgets/image_placeholder.dart';
 
 class IncomingVideoCall extends StatelessWidget {
-  const IncomingVideoCall({super.key});
+  const IncomingVideoCall({
+    super.key,
+    this.channelName,
+    this.user,
+    this.token,
+  });
+
+  final String? token, channelName, user;
 
   stopRingtone() async {
+    FlutterRingtonePlayer.playRingtone();
+
     await Future.delayed(const Duration(seconds: 30));
     FlutterRingtonePlayer.stop();
     Get.back();
@@ -54,9 +63,9 @@ class IncomingVideoCall extends StatelessWidget {
                           width: getScreenWidth(100),
                           height: getScreenHeight(100),
                         ),
-                  const Text(
-                    'Name',
-                    style: TextStyle(
+                  Text(
+                    user!,
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w400,
                       color: AppColors.white,

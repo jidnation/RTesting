@@ -21,6 +21,6 @@ class CallNotificationResponse {
         callType: json['callType'],
         callerFirstName: json['callerFirstName'],
         channelName: json['channelName'],
-        token: json['token'],
+        token: json['receiverToken'],
       );
 }

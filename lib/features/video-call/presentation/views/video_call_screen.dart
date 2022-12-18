@@ -85,7 +85,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
-  join(String token, channel) async {
+  join(String token,String channel) async {
     Console.log('call joined status', 'joining');
     await _engine.joinChannel(
       token: token,
