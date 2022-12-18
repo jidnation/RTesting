@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../video-call/presentation/bloc/video_call_bloc.dart';
-import '../../data/repositories/video_call_repository.dart';
+import '../../data/repositories/voice_call_repository.dart';
 
 part 'voice_call_event.dart';
 part 'voice_call_state.dart';
