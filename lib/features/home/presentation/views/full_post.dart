@@ -23,6 +23,7 @@ import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -80,6 +81,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final likePost = useState(false);
     final shoutoutPost = useState(false);
     final shoutdownPost = useState(false);
+    final _currentPost = useState<PostFeedModel?>(null);
     final commentOption = widget.postFeedModel!.post!.commentOption;
     final likeId = useState<String?>(null);
     final reachingList = useState<List<VirtualReach>?>([]);
@@ -192,6 +194,19 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
         if (state is GetReachRelationshipSuccess) {
           isReaching.value = state.isReaching!;
+          if (shoutdownPost.value) {
+            shoutdownPost.value = false;
+            if ((state.isReaching ?? false)) {
+              globals.socialServiceBloc!.add(VotePostEvent(
+                voteType: 'Downvote',
+                postId: _currentPost.value!.postId,
+              ));
+              RouteNavigators.pop(context);
+            } else {
+              Snackbars.error(context,
+                  message: 'You cannot shout down on this user\'s posts');
+            }
+          }
           debugPrint("State isReahing ${state.isReaching}");
         }
       },
@@ -199,8 +214,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
           bloc: globals.socialServiceBloc,
           listener: ((context, state) {
-            if (state is VotePostSuccess) {}
-
+            if (state is VotePostSuccess) {
+              if (!(state.isVoted!)) {
+                Snackbars.success(context,
+                    message: 'The post you shouted down has been removed!');
+              } else {
+                Snackbars.success(context, message: 'You shouted at this post');
+              }
+              globals.socialServiceBloc!
+                  .add(GetPostEvent(postId: widget.postFeedModel!.postId));
+            }
             if (state is LikePostSuccess || state is UnlikePostSuccess) {
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
@@ -823,6 +846,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                     .vote ??
                                                                 [])
                                                             .isEmpty) {
+                                                          setState(() {
+                                                            shoutoutPost.value =
+                                                                true;
+                                                          });
                                                           globals
                                                               .socialServiceBloc!
                                                               .add(
@@ -845,7 +872,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       }
                                                     },
                                                     padding: EdgeInsets.zero,
-                                                    child: shoutoutPost.value
+                                                    child: shoutoutPost.value ==
+                                                            true
                                                         ? SvgPicture.asset(
                                                             'assets/svgs/shoutup-active.svg',
                                                             height:
@@ -1146,7 +1174,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                             ],
                           ),
                           Positioned(
-                              top: 700,
+                              //top: 670,
+                              bottom:
+                                  ((MediaQuery.of(context).size.height) * 0.01),
                               child: commentField(controller, showEmoji,
                                   postFeedModel: widget.postFeedModel!,
                                   isReaching: isReaching.value))
@@ -1268,9 +1298,11 @@ class CommentsTile extends StatelessWidget {
           top: 10,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          color: AppColors.white,
-        ),
+            borderRadius: BorderRadius.circular(25),
+            color: AppColors.white,
+            border: Border.all(
+              color: const Color(0xFFF5F5F5),
+            )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -1323,13 +1355,23 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            Text(
-              comment.content!,
-              style: TextStyle(
-                fontSize: getScreenHeight(14),
-                color: AppColors.textColor2,
-              ),
-            ),
+            if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
+              Text(
+                comment.content!,
+                style: TextStyle(
+                  fontSize: getScreenHeight(14),
+                  color: AppColors.textColor2,
+                ),
+              )
+            else if (comment.audioMediaItem!.isNotEmpty)
+              CommentAudioMedia(path: comment.audioMediaItem!)
+                  .paddingOnly(r: 0, l: 0, b: 10, t: 0)
+            else
+              const SizedBox.shrink(),
+            comment.imageMediaItems!.isNotEmpty
+                ? CommentMedia(comment: comment)
+                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

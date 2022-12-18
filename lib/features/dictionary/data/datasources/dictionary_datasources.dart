@@ -40,8 +40,7 @@ deleteWord(wordId:$wordId)
     String q = r'''mutation deleteSingleWordHistory($historyId:String!) {
   deleteSingleWordHistory(
     historyId: $historyId
-  )
-  
+  ) 
 }''';
     try {
       Map<String, dynamic> historyInput = {
@@ -164,7 +163,7 @@ deleteWord(wordId:$wordId)
   Future<List<GetRecentlyAddedWord>> getWordsLibrary(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
-        r'''query getRecentlyAddedWords($page_limit: Float!, $page_number:Float!){
+        r'''query getRecentlyAddedWords($page_limit: Int!, $page_number:Int!){
   getRecentlyAddedWords(page_limit: $page_limit, page_number:$page_number){
     abbr
     authId
@@ -173,6 +172,17 @@ deleteWord(wordId:$wordId)
     language
     word
     wordId
+     wordOwnerProfile{
+       verified
+      lastName
+      authId
+      firstName
+      location
+      profileSlug
+      profilePicture
+      username
+      bio
+  }
   }
 }''';
 
@@ -196,7 +206,7 @@ deleteWord(wordId:$wordId)
   Future<List<GetRecentlyAddedWord>> getRecentWord(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
-        r'''query getPersonalWords($page_limit: Float!, $page_number:Float!){
+        r'''query getPersonalWords($page_limit: Int!, $page_number:Int!){
  getPersonalWords(page_limit: $page_limit, page_number:$page_number){
     abbr
     authId
@@ -205,6 +215,17 @@ deleteWord(wordId:$wordId)
     language
     word
     wordId
+     wordOwnerProfile{
+       verified
+      lastName
+      authId
+      firstName
+      location
+      profileSlug
+      profilePicture
+      username
+      bio
+  }
   }
 }''';
 
@@ -228,7 +249,7 @@ deleteWord(wordId:$wordId)
   Future<List<Map<String, dynamic>>> getWords(
       {required num pageLimit, required num pageNumber}) async {
     const String q =
-        r'''query getRecentlyAddedWords($page_limit: Float!, $page_number:Float!){
+        r'''query getRecentlyAddedWords($page_limit: Int!, $page_number:Int!){
   getRecentlyAddedWords(page_limit: $page_limit, page_number:$page_number){
     abbr
     authId
@@ -237,6 +258,17 @@ deleteWord(wordId:$wordId)
     language
     word
     wordId
+     wordOwnerProfile{
+      verified
+      lastName
+      authId
+      firstName
+      location
+      profileSlug
+      profilePicture
+      username
+      bio
+  }
   }
 }''';
 

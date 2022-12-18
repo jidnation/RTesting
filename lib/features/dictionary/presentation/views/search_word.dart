@@ -53,7 +53,10 @@ class _SearchWordState extends State<SearchWord> {
                       children: [
                         InkWell(
                           child: const Icon(Icons.arrow_back),
-                          onTap: () => RouteNavigators.pop(context),
+                          onTap: () {
+                            setState(() {});
+                            RouteNavigators.pop(context);
+                          },
                         ),
                         const SizedBox(
                           width: 20,
@@ -77,7 +80,9 @@ class _SearchWordState extends State<SearchWord> {
                               ? Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24.5),
-                                    color: Colors.white,
+                                    color: _showWords.value.word == null
+                                        ? Colors.transparent
+                                        : Colors.white,
                                   ),
                                   width: 410,
                                   child: Padding(
@@ -90,26 +95,43 @@ class _SearchWordState extends State<SearchWord> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        RichText(
-                                          text: TextSpan(
-                                            style: const TextStyle(
-                                                color: Colors.black),
-                                            children: [
-                                              TextSpan(
-                                                  text:
-                                                      '${_showWords.value.abbr} : ',
+                                        _showWords.value.word == null
+                                            ? Center(
+                                                child: TextButton(
+                                                  child: const Text(
+                                                    'Add Word to Dictionary',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xff001824)),
+                                                  ),
+                                                  onPressed: () =>
+                                                      RouteNavigators.route(
+                                                          context,
+                                                          const AddToGlossary()),
+                                                ),
+                                              )
+                                            : RichText(
+                                                text: TextSpan(
                                                   style: const TextStyle(
-                                                      color: Colors.blue)),
-                                              TextSpan(
-                                                  text:
-                                                      '${_showWords.value.word} ; '),
-                                              TextSpan(
-                                                  text:
-                                                      _showWords.value.meaning,
-                                                  style: const TextStyle())
-                                            ],
-                                          ),
-                                        ),
+                                                      color: Colors.black),
+                                                  children: [
+                                                    TextSpan(
+                                                        text:
+                                                            '${_showWords.value.abbr}  ',
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.blue)),
+                                                    TextSpan(
+                                                        text:
+                                                            '${_showWords.value.word}  '),
+                                                    TextSpan(
+                                                        text: _showWords
+                                                            .value.meaning,
+                                                        style:
+                                                            const TextStyle())
+                                                  ],
+                                                ),
+                                              ),
                                         const SizedBox(
                                           height: 5,
                                         ),

@@ -58,10 +58,36 @@ class ContentContainer extends StatelessWidget {
                     const SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      dateFormatter(getRecentlyAddedWord.createdAt!),
-                      style: const TextStyle(
-                          fontFamily: 'poppins', fontWeight: FontWeight.w600),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          dateFormatter(getRecentlyAddedWord.createdAt!),
+                          style: const TextStyle(
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w600),
+                        ),
+                        showButtons
+                            ? const SizedBox()
+                            : RichText(
+                                softWrap: true,
+                                text: TextSpan(
+                                  style: const TextStyle(color: Colors.black),
+                                  children: [
+                                    const TextSpan(
+                                        text: 'creator: ',
+                                        style: TextStyle(color: Colors.blue)),
+                                    TextSpan(
+                                      text:
+                                          '@${getRecentlyAddedWord.wordOwnerProfile!.username!}',
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ],
                     ),
                   ],
                 ),
@@ -70,36 +96,60 @@ class ContentContainer extends StatelessWidget {
                 height: 5,
               ),
               showButtons
-                  ? Padding(
-                      padding: const EdgeInsets.only(left: 240.0, bottom: 10),
-                      child: Container(
-                        height: 40.0,
-                        decoration: const BoxDecoration(
-                            color: AppColors.greyShade10,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            IconButton(
-                              onPressed: onEdit,
-                              icon: const Icon(
-                                Icons.edit_outlined,
-                                color: AppColors.primaryColor,
-                                size: 20,
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RichText(
+                          softWrap: true,
+                          text: TextSpan(
+                            style: const TextStyle(color: Colors.black),
+                            children: [
+                              const TextSpan(
+                                  text: 'creator: ',
+                                  style: TextStyle(color: Colors.blue)),
+                              TextSpan(
+                                text:
+                                    '@${getRecentlyAddedWord.wordOwnerProfile!.username!}',
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w800),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: onDelete,
-                              icon: const Icon(
-                                Icons.delete_outlined,
-                                color: Colors.red,
-                                size: 20,
-                              ),
-                            )
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 40.0, bottom: 10),
+                          child: Container(
+                            height: 40.0,
+                            decoration: const BoxDecoration(
+                                color: AppColors.greyShade10,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                IconButton(
+                                  onPressed: onEdit,
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    color: AppColors.primaryColor,
+                                    size: 20,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: onDelete,
+                                  icon: const Icon(
+                                    Icons.delete_outlined,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   : const SizedBox()
             ],

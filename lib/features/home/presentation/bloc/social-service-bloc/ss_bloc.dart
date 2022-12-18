@@ -651,7 +651,6 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         });
 
         Console.log('temp arr length', newlist.length);
-
         Console.log('newlist first', newlist.first);
         Console.log('newlist ', newlist);
 
