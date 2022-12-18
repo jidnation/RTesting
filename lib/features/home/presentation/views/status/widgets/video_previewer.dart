@@ -296,11 +296,39 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 milliseconds: 1400,
                               );
                             }
-                            setState(() {
-                              isUploading = false;
-                            });
+                            // setState(() {
+                            //   isUploading = false;
+                            // });
+                          }
+                        } else {
+                          FileResult vFile = await MediaService().compressVideo(
+                            file: FileResult(path: widget.videoFile.path),
+                          );
+                          String? videoUrl = await FileConverter()
+                              .convertMe(filePath: vFile.path);
+                          if (videoUrl != null) {
+                            var res = await MomentQuery.postMoment(
+                                videoMediaItem: videoUrl);
+                            if (res) {
+                              Snackbars.success(
+                                context,
+                                message: 'Moment successfully created',
+                                milliseconds: 1300,
+                              );
+                              momentCtrl.clearPostingData();
+                              RouteNavigators.pop(context);
+                            } else {
+                              Snackbars.error(
+                                context,
+                                message: 'Operation Failed, Try again.',
+                                milliseconds: 1400,
+                              );
+                            }
                           }
                         }
+                        setState(() {
+                          isUploading = false;
+                        });
                       },
                       child: Container(
                         height: 40,
