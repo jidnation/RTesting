@@ -1128,13 +1128,13 @@ class PostFeedReacherCard extends HookWidget {
                             child: isLiked
                                 ? SvgPicture.asset(
                                     'assets/svgs/like-active.svg',
-                                    height: getScreenHeight(20),
-                                    width: getScreenWidth(20),
+                                    height: getScreenHeight(30),
+                                    width: getScreenWidth(30),
                                   )
                                 : SvgPicture.asset(
                                     'assets/svgs/like.svg',
-                                    height: getScreenHeight(20),
-                                    width: getScreenWidth(20),
+                                    height: getScreenHeight(30),
+                                    width: getScreenWidth(30),
                                   ),
                           ),
                           SizedBox(width: getScreenWidth(4)),
@@ -1142,7 +1142,7 @@ class PostFeedReacherCard extends HookWidget {
                             child: Text(
                               '${postFeedModel!.post!.nLikes}',
                               style: TextStyle(
-                                fontSize: getScreenHeight(12),
+                                fontSize: getScreenHeight(15),
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textColor3,
                               ),
@@ -1158,8 +1158,8 @@ class PostFeedReacherCard extends HookWidget {
                             padding: EdgeInsets.zero,
                             child: SvgPicture.asset(
                               'assets/svgs/comment.svg',
-                              height: getScreenHeight(20),
-                              width: getScreenWidth(20),
+                              height: getScreenHeight(30),
+                              width: getScreenWidth(30),
                             ),
                           ),
                           SizedBox(width: getScreenWidth(4)),
@@ -1167,7 +1167,7 @@ class PostFeedReacherCard extends HookWidget {
                             child: Text(
                               '${postFeedModel!.post!.nComments}',
                               style: TextStyle(
-                                fontSize: getScreenHeight(12),
+                                fontSize: getScreenHeight(15),
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textColor3,
                               ),
@@ -1182,8 +1182,8 @@ class PostFeedReacherCard extends HookWidget {
                               padding: const EdgeInsets.all(0),
                               child: SvgPicture.asset(
                                 'assets/svgs/message.svg',
-                                height: getScreenHeight(20),
-                                width: getScreenWidth(20),
+                                height: getScreenHeight(30),
+                                width: getScreenWidth(30),
                               ),
                             ),
                         ],
@@ -1216,20 +1216,20 @@ class PostFeedReacherCard extends HookWidget {
                                 child: isVoted && voteType == 'Upvote'
                                     ? SvgPicture.asset(
                                         'assets/svgs/shoutup-active.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
+                                        height: getScreenHeight(30),
+                                        width: getScreenWidth(30),
                                       )
                                     : SvgPicture.asset(
                                         'assets/svgs/shoutup.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
+                                        height: getScreenHeight(30),
+                                        width: getScreenWidth(30),
                                       ),
                               ),
                               FittedBox(
                                 child: Text(
                                   '${postFeedModel!.post!.nUpvotes ?? 0}',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(12),
+                                    fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textColor3,
                                   ),
@@ -1246,20 +1246,20 @@ class PostFeedReacherCard extends HookWidget {
                                 child: isVoted && voteType == 'Downvote'
                                     ? SvgPicture.asset(
                                         'assets/svgs/shoutdown-active.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
+                                        height: getScreenHeight(30),
+                                        width: getScreenWidth(30),
                                       )
                                     : SvgPicture.asset(
                                         'assets/svgs/shoutdown.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
+                                        height: getScreenHeight(30),
+                                        width: getScreenWidth(30),
                                       ),
                               ),
                               FittedBox(
                                 child: Text(
                                   '${postFeedModel!.post!.nDownvotes ?? 0}',
                                   style: TextStyle(
-                                    fontSize: getScreenHeight(12),
+                                    fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.textColor3,
                                   ),
