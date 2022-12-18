@@ -17,7 +17,7 @@ class MomentsAppBar extends StatelessWidget {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         color: Colors.black,
-        height: 78,
+        height: 58,
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(

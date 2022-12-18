@@ -16,14 +16,14 @@ class MomentFeed extends StatefulWidget {
 }
 
 final MomentFeedStore momentFeedStore = MomentFeedStore();
-
+CarouselController carouselController = CarouselController();
 // const colors = [Colors.green, Colors.blue, Colors.red, Colors.yellow];
 
 class _MomentFeedState extends State<MomentFeed> {
-  @override
-  void initState() {
-    super.initState();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -38,48 +38,34 @@ class _MomentFeedState extends State<MomentFeed> {
             MomentsAppBar(
               pageController: widget.pageController,
             ),
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    // top: 0,
-                    bottom: 0,
-                    child: ValueListenableBuilder(
-                      valueListenable: MomentFeedStore(),
-                      builder: (context, List<GetMomentFeed> value, child) {
-                        print('from the feed room.........??? $value }');
-                        final List<GetMomentFeed> momentFeeds = value;
-                        return momentFeedStore.gettingMoments
-                            ? const VideoLoader()
-                            : CarouselSlider(
-                                options: CarouselOptions(
-                                  viewportFraction: 1,
-                                  aspectRatio: 9 / 16,
-                                  enableInfiniteScroll: false,
-                                  // height: size.height,
-                                  scrollDirection: Axis.vertical,
-                                ),
-                                items: List<Widget>.generate(
-                                    momentFeedStore.momentCount,
-                                    (index) => Builder(builder: (context) {
-                                          checkMeOut(index);
-                                          final GetMomentFeed getMomentFeed =
-                                              value[index];
-                                          return SizedBox(
-                                            width: size.width,
-                                            height: size.height,
-                                            child: Expanded(
-                                              child: VideoPlayerItem(
-                                                  momentFeed: getMomentFeed),
-                                            ),
-                                          );
-                                        })));
-                      },
-                    ),
-                  ),
-                ],
+            SizedBox(
+              child: ValueListenableBuilder(
+                valueListenable: MomentFeedStore(),
+                builder: (context, List<GetMomentFeed> value, child) {
+                  print('from the feed room.........??? $value }');
+                  final List<GetMomentFeed> momentFeeds = value;
+                  return momentFeedStore.gettingMoments
+                      ? const VideoLoader()
+                      : CarouselSlider(
+                          options: CarouselOptions(
+                            viewportFraction: 1,
+                            aspectRatio: 9 / 16,
+                            onPageChanged: (index, _) {
+                              checkMeOut(index);
+                            },
+                            enableInfiniteScroll: false,
+                            scrollDirection: Axis.vertical,
+                          ),
+                          items: List<Widget>.generate(
+                              momentFeedStore.momentCount,
+                              (index) => Builder(builder: (context) {
+                                    final GetMomentFeed getMomentFeed =
+                                        value[index];
+                                    return VideoPlayerItem(
+                                      momentFeed: getMomentFeed,
+                                    );
+                                  })));
+                },
               ),
             ),
           ]),

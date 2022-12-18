@@ -47,7 +47,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       aspectRatio: _videoPlayerController.value.aspectRatio,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
-      allowFullScreen: true,
+      // allowFullScreen: true,
       // fullScreenByDefault: true,
       looping: true,
       progressIndicatorDelay:
@@ -213,7 +213,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       placeholder: Container(
         color: Colors.grey,
       ),
-      autoInitialize: true,
+      // autoInitialize: true,
     );
   }
 
@@ -221,6 +221,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   void dispose() {
     super.dispose();
     _videoPlayerController.dispose();
+    // _chewieController?.dispose();
   }
 
   Future<void> toggleVideo() async {

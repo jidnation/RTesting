@@ -38,6 +38,7 @@ class UserPosting extends StatefulHookWidget {
 
 final MomentController momentCtrl = Get.find();
 CarouselController sliderController = CarouselController();
+
 final CountDownController timeController = CountDownController();
 final MomentVideoControl momentVideoControl = MomentVideoControl();
 int index = 0;
@@ -359,11 +360,11 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                         color: Colors.red,
                                       )
                                     :
-                            // SvgPicture.asset(
-                            //             'assets/svgs/camera_button.svg',
-                            //             fit: BoxFit.contain,
-                            //           ),
-                            Image.asset(
+                                    // SvgPicture.asset(
+                                    //             'assets/svgs/camera_button.svg',
+                                    //             fit: BoxFit.contain,
+                                    //           ),
+                                    Image.asset(
                                         'assets/images/play-btn.png',
                                         fit: BoxFit.contain,
                                       ),

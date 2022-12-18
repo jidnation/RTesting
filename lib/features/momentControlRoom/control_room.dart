@@ -24,15 +24,21 @@ class MomentFeedStore extends ValueNotifier<List<GetMomentFeed>> {
 
   final VideoControllerService _videoControllerService =
       CachedVideoControllerService(DefaultCacheManager());
-
   VideoControllerService get videoControllerService => _videoControllerService;
+
+  //the combined Moment List
+  List<GetMomentFeed> _combinedMomentList = <GetMomentFeed>[];
+  List<GetMomentFeed> get combinedMomentList => _combinedMomentList;
 
   initialize() async {
     _gettingMoments = true;
     MomentFeedModel? response =
         await momentQuery.getAllFeeds(pageLimit: 30, pageNumber: 1);
     response != null ? value = response.getMomentFeed! : null;
-    print('................. IT IS DONE..................... $value....');
+    _combinedMomentList = value;
+    print('................. IT IS DONE..................... $value..   ..');
+    print(
+        '................. IT IS DONE2........n ${value.first.moment!.momentId}........');
     _gettingMoments = false;
     cacheValues();
     notifyListeners();
@@ -43,7 +49,7 @@ class MomentFeedStore extends ValueNotifier<List<GetMomentFeed>> {
     if (momentCount != 0) {
       if (momentCount > 5) {
         count = 0;
-        for (GetMomentFeed momentFeed in value) {
+        for (GetMomentFeed momentFeed in combinedMomentList) {
           print('....caching started......>>>>>>>>>>>:::::::::::::::::::>>>>>');
           await videoControllerService
               .getControllerForVideo(momentFeed.moment!.videoMediaItem!);
@@ -54,7 +60,7 @@ class MomentFeedStore extends ValueNotifier<List<GetMomentFeed>> {
           }
         }
       } else {
-        for (GetMomentFeed momentFeed in value) {
+        for (GetMomentFeed momentFeed in combinedMomentList) {
           await videoControllerService
               .getControllerForVideo(momentFeed.moment!.videoMediaItem!);
           _currentSaveIndex = momentCount;
@@ -69,18 +75,46 @@ class MomentFeedStore extends ValueNotifier<List<GetMomentFeed>> {
     int to = currentCount + 5;
     if (momentCount > currentCount) {
       counter = 0;
-      for (GetMomentFeed momentFeed in value) {
-        await videoControllerService
-            .getControllerForVideo(momentFeed.moment!.videoMediaItem!);
+      for (GetMomentFeed momentFeed in combinedMomentList) {
         ++counter;
-        if (counter == to) {
-          _currentSaveIndex = to;
-          return;
-        } else if (momentCount < to &&
-            (counter + currentCount == momentCount)) {
-          _currentSaveIndex = counter + currentCount;
-          return;
+        if (counter > currentCount) {
+          await videoControllerService
+              .getControllerForVideo(momentFeed.moment!.videoMediaItem!);
+          if (counter == to) {
+            _currentSaveIndex = to;
+            return;
+          } else if (momentCount < to &&
+              (counter + currentCount == momentCount)) {
+            _currentSaveIndex = counter + currentCount;
+            return;
+          }
         }
+      }
+    }
+    notifyListeners();
+  }
+
+  likeMoment({required String momentId}) async {
+    var response = await MomentQuery.likeMoment(momentId: momentId);
+    if (response) {
+      getMoment(momentId: momentId);
+    }
+  }
+
+  unLikeMoment({required String momentId}) async {
+    var response = await MomentQuery.unlikeMoment(momentId: momentId);
+    if (response) {
+      getMoment(momentId: momentId);
+    }
+  }
+
+  //updating only the consider moment
+  getMoment({required String momentId}) async {
+    List<GetMomentFeed> currentList = combinedMomentList;
+    GetMomentFeed? response = await MomentQuery.getMoment(momentId: momentId);
+    for (GetMomentFeed momentFeed in currentList) {
+      if (momentFeed.moment!.momentId == momentId) {
+        momentFeed = response!;
       }
     }
     notifyListeners();
