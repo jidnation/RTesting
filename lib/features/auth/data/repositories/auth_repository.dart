@@ -128,6 +128,11 @@ class AuthRepository {
     await _authRemoteDataSource.registerDeviceForNotification();
   }
 
+  Future<void> deregisterDeviceForNotifications()async{
+        await _authRemoteDataSource.deregisterDeviceForNotification();
+
+  }
+
   // @override
   // Future<Either<String, User>> signInWithEmailAndPassword({
   //   required String email,

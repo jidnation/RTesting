@@ -11,8 +11,8 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_blo
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:reach_me/features/video-call/presentation/bloc/video_call_bloc.dart';
-import 'package:reach_me/features/voice-call/presentation/bloc/voice_call_bloc.dart';
+
+import '../../features/call/presentation/bloc/call_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -26,8 +26,8 @@ class AppGlobals {
   AuthBloc? authBloc;
   UserBloc? userBloc;
   ChatBloc? chatBloc;
-  VideoCallBloc? videoCallBloc;
-  VoiceCallBloc? voiceCallBloc;
+  CallBloc? callBloc;
+
   SocialServiceBloc? socialServiceBloc;
   DictionaryBloc? dictionaryBloc;
   String? token;
@@ -58,8 +58,7 @@ class AppGlobals {
     authBloc = AuthBloc();
     userBloc = UserBloc();
     chatBloc = ChatBloc();
-    videoCallBloc = VideoCallBloc();
-    voiceCallBloc = VoiceCallBloc();
+    callBloc = CallBloc();
     socialServiceBloc = SocialServiceBloc();
     dictionaryBloc = DictionaryBloc();
     token = '';
@@ -78,10 +77,9 @@ class AppGlobals {
     authBloc!.close();
     userBloc!.close();
     chatBloc!.close();
-    voiceCallBloc!.close();
+    callBloc!.close();
     socialServiceBloc!.close();
     dictionaryBloc!.close();
-    videoCallBloc!.close();
   }
 
   void showLoader(BuildContext context) {

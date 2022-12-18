@@ -1,6 +1,6 @@
 import 'package:get/route_manager.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:reach_me/features/video-call/presentation/views/incoming_video_call.dart';
+import 'package:reach_me/features/call/presentation/views/incoming_call.dart';
 
 import '../helper/logger.dart';
 
@@ -9,27 +9,11 @@ class NotifcationService {
     OneSignal.shared.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent event) {
       Console.log('additional data', event.notification.additionalData);
-      if (event.notification.additionalData!['type'] == 'call.initiated') {
-        Console.log(
-            'additional data',
-            event.notification.additionalData!['body']['callerProfile']
-                ['firstName']);
-        Console.log(
-            'additional data',
-            event.notification.additionalData!['body']
-                ['receiverToken']);
-        Console.log(
-            'additional data',
-            event.notification.additionalData!['body']
-                ['channelName']);
-        Get.to(() => IncomingVideoCall(
-              user: event.notification.additionalData!['body']['callerProfile']
-                  ['firstName'],
-              token: event.notification.additionalData!
-                  ['receiverToken'],
-              channelName: event.notification.additionalData!['body']
-                  ['callerProfile']['channelName'],
-            ));
+      switch (event.notification.additionalData!['type']) {
+        case 'call.initiated':
+          handleCallNotification(event);
+          break;
+        default:
       }
       event.complete(event.notification);
     });
@@ -42,4 +26,14 @@ class NotifcationService {
     OneSignal.shared.setEmailSubscriptionObserver(
         (OSEmailSubscriptionStateChanges emailChanges) {});
   }
+}
+
+handleCallNotification(OSNotificationReceivedEvent event) {
+  Get.to(() => IncomingCall(
+        user: event.notification.additionalData!['body']['callerProfile']
+            ['firstName'],
+        token: event.notification.additionalData!['body']['receiverToken'],
+        channelName: event.notification.additionalData!['body']['channelName'],
+        callType: event.notification.additionalData!['body']['callMode'],
+      ));
 }

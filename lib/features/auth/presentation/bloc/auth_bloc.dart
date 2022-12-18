@@ -13,6 +13,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository? _authRepository = AuthRepository();
 
   AuthBloc() : super(AuthInitial()) {
+    on<LogoutEvent>((event, emit) {
+      _authRepository!.deregisterDeviceForNotifications();
+    });
+
     on<RegisterUserEvent>(((event, emit) async {
       emit(AuthLoading());
       try {
@@ -61,8 +65,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             SecureStorage.writeSecureData('email', globals.email!);
             SecureStorage.writeSecureData('fname', user.firstName!);
             SecureStorage.writeSecureData('userId', user.id!);
-            emit(Authenticated(message: 'User logged in successfully'));
             _authRepository!.registerDeviceForNotifications();
+            emit(Authenticated(message: 'User logged in successfully'));
           },
         );
       } on GraphQLError catch (e) {

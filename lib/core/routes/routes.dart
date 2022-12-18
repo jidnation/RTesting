@@ -22,8 +22,9 @@ import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/views/video_moment.dart';
 import 'package:reach_me/features/onboarding/onboarding.dart';
 import 'package:reach_me/features/onboarding/welcome_screen.dart';
-import 'package:reach_me/features/video-call/presentation/views/video_call_screen.dart';
-import 'package:reach_me/features/voice-call/presentation/views/voice_call_screen.dart';
+
+import '../../features/call/presentation/views/initiate_call.dart';
+
 
 class RMRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -91,11 +92,9 @@ class RMRouter {
       case MsgChatInterface.id:
         return RMPageRoute(builder: (_) => const MsgChatInterface());
 
-      case VoiceCallScreen.id:
-        return RMPageRoute(builder: (_) => const VoiceCallScreen());
+      case CallScreen.id:
+        return RMPageRoute(builder: (_) => const CallScreen());
 
-      case VideoCallScreen.id:
-        return RMPageRoute(builder: (_) => const VideoCallScreen());
 
       case SavedPostScreen.id:
         return RMPageRoute(builder: (_) => const SavedPostScreen());

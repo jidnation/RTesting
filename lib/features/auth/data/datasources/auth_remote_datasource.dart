@@ -198,19 +198,35 @@ class AuthRemoteDataSource {
 
   Future<void> registerDeviceForNotification() async {
     var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
     String q = r'''
-  mutation{
-      registerDeviceForNotification(
-      playerId: $playerId
+    mutation registerDeviceForNotification(
+    $playerId: String!
+    ) {
+    registerDeviceForNotification(
+        playerId: $playerId
     )
-  }
-    ''';
-    final result = await _client.mutate(
+}''';
+     await _client.mutate(
       gql(q),
-      variables: {
-        "playerId":token!.userId!
-      },
+      variables: {'playerId': token.userId},
     );
-    Console.log('fcmtokenresult', result);
+  }
+
+  Future<void> deregisterDeviceForNotification() async {
+    var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
+    String q = r'''
+    mutation deregisterDeviceForNotification(
+    $playerId: String!
+    ) {
+    deregisterDeviceForNotification(
+        playerId: $playerId
+    )
+}''';
+     await _client.mutate(
+      gql(q),
+      variables: {'playerId': token.userId},
+    );
   }
 }
