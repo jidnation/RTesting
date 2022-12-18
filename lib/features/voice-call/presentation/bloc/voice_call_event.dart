@@ -4,12 +4,12 @@ part of 'voice_call_bloc.dart';
 abstract class VoiceCallEvent {}
 
 class InitiatePrivateAudioCall extends VoiceCallEvent {
-  final CallMode callMode;
+  final CallMode callMode = CallMode.audio ;
   final CallType callType;
   final DateTime? dateTime = DateTime.now();
   final String receiverId;
 
-  InitiatePrivateAudioCall({required this.callMode, required this.callType,required this.receiverId,});
+  InitiatePrivateAudioCall({ required this.callType,required this.receiverId,});
 }
 
 class AnswerPrivateAudioCall extends VoiceCallEvent {}

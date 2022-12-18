@@ -30,7 +30,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
     initAgora();
-    super.initState();
+    super.initState();    
   }
 
   Future<void> initAgora() async {
@@ -79,7 +79,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     await _engine.startPreview();
     globals.videoCallBloc!.add(
       InitiatePrivateVideoCall(
-        callMode: CallMode.video,
         callType: CallType.private,
         receiverId: widget.recipient!.id!,
       ),

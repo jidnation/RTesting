@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../video-call/presentation/bloc/video_call_bloc.dart';
 import '../../data/repositories/video_call_repository.dart';
 
 part 'voice_call_event.dart';
 part 'voice_call_state.dart';
 
-enum CallMode { video, audio }
-
-enum CallType { private, livestream }
 
 class VoiceCallBloc extends Bloc<VoiceCallEvent, VoiceCallState> {
-  final VoiceCallRepository videoCallRepository = VoiceCallRepository();
+  final VoiceCallRepository voiceCallRepository = VoiceCallRepository();
   VoiceCallBloc() : super(VoiceCallInitial()) {
     on<InitiatePrivateAudioCall>((event, emit) => _initiateCall(event, emit));
     on<AnswerPrivateAudioCall>((event, emit) => _answerPrivateCall(event, emit));
@@ -22,7 +20,7 @@ class VoiceCallBloc extends Bloc<VoiceCallEvent, VoiceCallState> {
 
   _initiateCall(InitiatePrivateAudioCall event, emit) async {
     emit(VoiceCallLoading());
-    await videoCallRepository.initiatePrivateCall();
+    await voiceCallRepository.initiatePrivateCall(event);
     emit(VoiceCallSuccess());
   }
 

@@ -9,17 +9,19 @@ class NotifcationService {
   static handleNotifications() {
     OneSignal.shared.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent event) {
-      event.complete(event.notification);
       Console.log('additional data', event.notification.additionalData);
       if (event.notification.additionalData!['notificationType'] == 'call') {
         Console.log('additional data', 'call');
         FlutterRingtonePlayer.playRingtone();
         Get.to(() => const IncomingVideoCall());
       }
+      event.complete(event.notification);
+      
     });
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       Console.log('additional data', result.notification.additionalData);
+      Get.to(() => const IncomingVideoCall());
     });
     OneSignal.shared
         .setPermissionObserver((OSPermissionStateChanges changes) {});

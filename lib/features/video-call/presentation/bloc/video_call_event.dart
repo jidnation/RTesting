@@ -4,12 +4,12 @@ part of 'video_call_bloc.dart';
 abstract class VideoCallEvent {}
 
 class InitiatePrivateVideoCall extends VideoCallEvent {
-  final CallMode callMode;
+  final CallMode callMode = CallMode.video;
   final CallType callType;
   final String dateTime = DateTime.now().toIso8601String();
   final String receiverId;
 
-  InitiatePrivateVideoCall({required this.callMode, required this.callType,required this.receiverId,});
+  InitiatePrivateVideoCall({ required this.callType,required this.receiverId,});
 }
 
 class AnswerPrivateVideoCall extends VideoCallEvent {}

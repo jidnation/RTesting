@@ -8,6 +8,7 @@ import 'package:reach_me/features/account/presentation/widgets/image_placeholder
 import 'package:reach_me/features/voice-call/presentation/bloc/voice_call_bloc.dart';
 
 import '../../../../core/models/user.dart';
+import '../../../video-call/presentation/bloc/video_call_bloc.dart';
 
 class VoiceCallScreen extends StatefulWidget {
   static const String id = 'voice_call';
@@ -23,7 +24,6 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
   @override
   void initState() {
     globals.voiceCallBloc!.add(InitiatePrivateAudioCall(
-      callMode: CallMode.audio,
       callType: CallType.private,
       receiverId: widget.recipient!.id!,
     ));

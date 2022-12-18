@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/routes/routes.dart';
 import 'package:reach_me/core/services/graphql/gql_provider.dart';
 import 'package:reach_me/core/services/notification_service.dart';
@@ -27,10 +26,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initSingletons();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await OneSignal.shared.promptUserForPushNotificationPermission();
   await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
   await OneSignal.shared.setAppId("4f584eee-135c-46bc-8986-8dfd980f4d3c");
-  await OneSignal.shared.promptUserForPushNotificationPermission();
-  NotifcationService.handleNotifications();
+  await NotifcationService.handleNotifications();
   Bloc.observer = AppBlocObserver();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -60,30 +59,27 @@ class MyApp extends StatelessWidget {
       client: clientFor(),
       child: GraphQLProvider(
         client: chatClientFor(),
-        child: GraphQLProvider(
-          client: notificationClientFor(),
-          child: LifeCycleManager(
-            child: OverlaySupport.global(
-              child: Portal(
-                child: GetMaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  title: 'ReachMe',
-                  theme: ThemeData(
-                    fontFamily: 'Poppins',
-                    primarySwatch: Colors.blue,
-                    sliderTheme: const SliderThemeData(
-                      trackHeight: 4.0,
-                      activeTickMarkColor: AppColors.textColor2,
-                      inactiveTickMarkColor: AppColors.white,
-                      thumbColor: AppColors.white,
-                      thumbShape:
-                          RoundSliderThumbShape(enabledThumbRadius: 6.0),
-                      overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
-                    ),
+        child: LifeCycleManager(
+          child: OverlaySupport.global(
+            child: Portal(
+              child: GetMaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'ReachMe',
+                theme: ThemeData(
+                  fontFamily: 'Poppins',
+                  primarySwatch: Colors.blue,
+                  sliderTheme: const SliderThemeData(
+                    trackHeight: 4.0,
+                    activeTickMarkColor: AppColors.textColor2,
+                    inactiveTickMarkColor: AppColors.white,
+                    thumbColor: AppColors.white,
+                    thumbShape:
+                        RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 8.0),
                   ),
-                  initialRoute: SplashScreenAnimator.id,
-                  onGenerateRoute: RMRouter.generateRoute,
                 ),
+                initialRoute: SplashScreenAnimator.id,
+                onGenerateRoute: RMRouter.generateRoute,
               ),
             ),
           ),
