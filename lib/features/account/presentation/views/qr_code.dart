@@ -45,11 +45,11 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                       ShareFilesAndScreenshotWidgets().shareScreenshot(
                           reachMeID,
                           800,
-                          "Share your ReachMe ID using:",
+                          "Share your reach ID using:",
                           "${globals.user!.username ?? 'username'}-ReachMeID.png",
                           "image/png",
                           text:
-                              "Hi, this is my ReachMe ID\nScan with ReachMe app to Reach Me");
+                              "Hi, this is my reach ID\nScan with Reachme to reach me");
                     }),
               ],
             ),

@@ -126,19 +126,20 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                 handleTap(index);
                                 if (active.contains(index)) {
                                   reachingUser.value = true;
-                                  if (suggestedUsers
-                                          .value[index].reaching!.reacherId ==
-                                      null) {
+                                  // if (suggestedUsers
+                                  //         .value[index].reaching!.reacherId ==
+                                  //     null) {
                                     globals.userBloc!.add(ReachUserEvent(
                                         userIdToReach:
                                             suggestedUsers.value[index].id!));
-                                  } else {
+                                  }
+                                   else {
                                     globals.userBloc!.add(
                                         DelReachRelationshipEvent(
                                             userIdToDelete: suggestedUsers
                                                 .value[index].id!));
                                   }
-                                }
+                                //}
                               },
                               onDelete: () {
                                 handleTap(index);
@@ -161,7 +162,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                   ? reachingUser.value
                                   : false,
                               label:
-                                  active.contains(index) ? "Reaching" : 'Reach',
+                                  active.contains(index) ? reachLabel.value : 'Reach',
                             );
                           },
                           itemCount: suggestedUsers.value.length,

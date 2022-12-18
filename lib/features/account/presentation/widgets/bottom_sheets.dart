@@ -179,7 +179,7 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   onPressed: () {
                     RouteNavigators.pop(context);
                     Share.share(
-                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                        'Hi, this is my reach ID: https://${globals.user!.profileSlug}\n Open with Reachme to reach me');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),

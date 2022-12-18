@@ -783,7 +783,7 @@ class _AccountScreenState extends State<AccountScreen>
                                         ),
                                         SizedBox(width: getScreenWidth(5)),
                                         Text(
-                                          'Block',
+                                          'EX',
                                           style: TextStyle(
                                               fontSize: getScreenHeight(15),
                                               color: AppColors.greyShade2,
