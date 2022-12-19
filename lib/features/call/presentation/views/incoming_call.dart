@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
+import 'package:reach_me/features/call/presentation/views/receive_audio_call.dart';
+import 'package:reach_me/features/call/presentation/views/receive_video_call.dart';
 
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
@@ -30,10 +32,16 @@ class IncomingCall extends StatelessWidget {
 
   acceptCall() {
     globals.callBloc!.add(AnswerPrivateCall(channelName: channelName));
+    Get.to(
+      () => callType == 'audio'
+          ? ReceiveAudioCall(channelName: channelName, token: token, user: user)
+          : ReceiveVideoCall(channelName: channelName, token: token),
+    );
   }
 
   rejectCall() {
     globals.callBloc!.add(RejectPrivateCall(channelName: channelName));
+    Get.back();
   }
 
   @override
@@ -106,7 +114,7 @@ class IncomingCall extends StatelessWidget {
             left: 1,
             right: 1,
             bottom: 40,
-          )
+          ),
         ],
       ),
     );

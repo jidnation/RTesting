@@ -207,10 +207,11 @@ class AuthRemoteDataSource {
         playerId: $playerId
     )
 }''';
-     await _client.mutate(
+    final result = await _client.mutate(
       gql(q),
       variables: {'playerId': token.userId},
     );
+    Console.log('fcmtoken', result);
   }
 
   Future<void> deregisterDeviceForNotification() async {
@@ -224,9 +225,10 @@ class AuthRemoteDataSource {
         playerId: $playerId
     )
 }''';
-     await _client.mutate(
+    final result = await _client.mutate(
       gql(q),
       variables: {'playerId': token.userId},
     );
+    Console.log('fcmtoken', result);
   }
 }

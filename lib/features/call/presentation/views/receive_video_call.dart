@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
 
 class ReceiveVideoCall extends StatelessWidget {
-  const ReceiveVideoCall({super.key, });
+  const ReceiveVideoCall({
+    super.key,
+    required this.channelName,
+    required this.token,
+  });
 
+  final String channelName;
+  final String token;
 
   @override
   Widget build(BuildContext context) {

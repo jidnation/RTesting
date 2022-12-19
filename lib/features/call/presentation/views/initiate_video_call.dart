@@ -12,17 +12,16 @@ import '../bloc/call_bloc.dart';
 
 const appId = "5741afe670ba4684aec914fb19eeb82a";
 
-class CallScreen extends StatefulWidget {
+class InitiateVideoCall extends StatefulWidget {
   static const String id = 'call';
-  const CallScreen({Key? key, this.recipient,this.callMode}) : super(key: key);
+  const InitiateVideoCall({Key? key, this.recipient}) : super(key: key);
   final User? recipient;
-  final CallMode? callMode;
 
   @override
-  State<CallScreen> createState() => _CallScreenState();
+  State<InitiateVideoCall> createState() => _CallScreenState();
 }
 
-class _CallScreenState extends State<CallScreen> {
+class _CallScreenState extends State<InitiateVideoCall> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool muteMic = false;
@@ -81,7 +80,7 @@ class _CallScreenState extends State<CallScreen> {
     globals.callBloc!.add(
       InitiatePrivateCall(
         callType: CallType.private,
-        callMode: widget.callMode!,
+        callMode: CallMode.video,
         receiverId: widget.recipient!.id!,
       ),
     );
@@ -145,7 +144,12 @@ class _CallScreenState extends State<CallScreen> {
                             canvas: const VideoCanvas(uid: 0),
                           ),
                         )
-                      : const CircularProgressIndicator(),
+                      : Image.asset(
+                          'assets/images/incoming_call.png',
+                          fit: BoxFit.fill,
+                          height: size.height,
+                          width: size.width,
+                        ),
                 ),
               ),
               Positioned(
