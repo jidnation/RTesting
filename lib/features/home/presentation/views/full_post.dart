@@ -23,6 +23,7 @@ import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -1446,9 +1447,11 @@ class CommentsTile extends StatelessWidget {
           top: 10,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          color: AppColors.white,
-        ),
+            borderRadius: BorderRadius.circular(25),
+            color: AppColors.white,
+            border: Border.all(
+              color: const Color(0xFFF5F5F5),
+            )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -1501,13 +1504,23 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            Text(
-              comment.content!,
-              style: TextStyle(
-                fontSize: getScreenHeight(14),
-                color: AppColors.textColor2,
-              ),
-            ),
+            if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
+              Text(
+                comment.content!,
+                style: TextStyle(
+                  fontSize: getScreenHeight(14),
+                  color: AppColors.textColor2,
+                ),
+              )
+            else if (comment.audioMediaItem!.isNotEmpty)
+              CommentAudioMedia(path: comment.audioMediaItem!)
+                  .paddingOnly(r: 0, l: 0, b: 10, t: 0)
+            else
+              const SizedBox.shrink(),
+            comment.imageMediaItems!.isNotEmpty
+                ? CommentMedia(comment: comment)
+                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
