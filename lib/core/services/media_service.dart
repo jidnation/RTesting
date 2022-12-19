@@ -201,15 +201,13 @@ class MediaService {
   Future<FileResult> compressVideo({required FileResult file}) async {
     final res = await VideoCompress.compressVideo(
       file.path,
-      quality: VideoQuality.MediumQuality,
+      quality: VideoQuality.DefaultQuality,
     );
 
     print('size1:::::::::::::::${res!.filesize! / 1024}');
-    print('size1:::::::::::::::${res.filesize! / 2048}');
     return FileResult(
         path: res.path!,
-        size: res.filesize! / 2048,
-        // size: res.filesize! / 1024,
+        size: res.filesize! / 1024,
         duration: file.duration,
         height: file.height,
         width: file.width,

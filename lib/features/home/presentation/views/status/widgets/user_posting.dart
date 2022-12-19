@@ -55,7 +55,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
     // Instantiating the camera controller
     final CameraController cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
 

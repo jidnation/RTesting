@@ -32,6 +32,7 @@ mutation($momentId: String!) {
     likeMoment (momentId: $momentId){
     authId
   }
+  }
 ''';
 
 const likeMomentReply = r'''
@@ -61,6 +62,7 @@ mutation($replyId: String!, $likeId: String!) {
 const unlikeMoment = r'''
 mutation($momentId: String!) {
     unlikeMoment (momentId: $momentId)
+    }
 ''';
 
 const editMomentContent = r'''

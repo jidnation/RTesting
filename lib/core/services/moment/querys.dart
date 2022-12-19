@@ -100,7 +100,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my moment-Liking-query::::: $queryResult');
-    // return queryResult.data?['createMoment']['authId'] != null;
+    return queryResult.data?['likeMoment']['authId'] != null;
   }
 
   static unlikeMoment({required String momentId}) async {
@@ -125,7 +125,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my moment-unLiking-query::::: $queryResult');
-    // return queryResult.data?['createMoment']['authId'] != null;
+    return queryResult.data?['unlikeMoment'] ?? false;
   }
 
   Future<MomentFeedModel?>? getAllFeeds(
@@ -170,7 +170,7 @@ class MomentQuery {
     }
   }
 
-  static Future<GetMomentFeed?>? getMoment({required String momentId}) async {
+  static Future<Moment?>? getMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -194,7 +194,7 @@ class MomentQuery {
     );
     log('from my moment-query::::: $queryResult');
     if (queryResult.data != null) {
-      return GetMomentFeed.fromJson(queryResult.data!['getMoment']);
+      return Moment.fromJson(queryResult.data!['getMoment']);
     } else {
       return null;
     }
