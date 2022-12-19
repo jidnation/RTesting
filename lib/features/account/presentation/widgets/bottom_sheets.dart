@@ -20,6 +20,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:share_plus/share_plus.dart';
 
 Future showProfileMenuBottomSheet(BuildContext context,
@@ -304,7 +305,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 RouteNavigators.route(context,
-                                    CommentReach(postFeedModel: postFeedModel));
+                                    RepostReach(postFeedModel: postFeedModel));
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',
@@ -315,12 +316,12 @@ Future showReacherCardBottomSheet(BuildContext context,
                           KebabBottomTextButton(
                               label: 'Download Reach Card',
                               onPressed: downloadPost),
-                          KebabBottomTextButton(
-                            label: 'Report',
-                            onPressed: () {
-                              RouteNavigators.pop(context);
-                            },
-                          ),
+                          // KebabBottomTextButton(
+                          //   label: 'Report',
+                          //   onPressed: () {
+                          //     RouteNavigators.pop(context);
+                          //   },
+                          // ),
                           KebabBottomTextButton(
                             label: 'Reach user',
                             onPressed: () {

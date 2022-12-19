@@ -101,7 +101,7 @@ class _PostReachState extends State<PostReach> {
     final _isLoading = useState<bool>(true);
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
-    final _mentionList = useState<List<String>>([]);
+    final _mentionList = useState<List<String>?>([]);
     useMemoized(() {
       globals.dictionaryBloc!
           .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
@@ -179,18 +179,9 @@ class _PostReachState extends State<PostReach> {
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
 
-                                for (int i = 0;
-                                    i <
-                                        controllerKey.currentState!.controller!
-                                            .text.length;
-                                    i++) {
-                                  if (controllerKey
-                                      .currentState!.controller!.text
-                                      .contains("@")) {}
-                                }
                                 setState(() {
-                                  _mentionList.value.add(controllerKey
-                                      .currentState!.controller!.text);
+                                  _mentionList.value = controllerKey
+                                      .currentState!.controller!.text.mentions;
                                 });
                                 globals.postContent = controllerKey
                                     .currentState!.controller!.text;
@@ -207,8 +198,10 @@ class _PostReachState extends State<PostReach> {
                                 setState(() {});
                               } else {
                                 setState(() {
-                                  _mentionList.value.add(controllerKey
-                                      .currentState!.controller!.text);
+                                  _mentionList.value = controllerKey
+                                      .currentState!.controller!.text.mentions;
+
+                                  
                                 });
                                 debugPrint(
                                     "Mentions Value List: ${_mentionList.value}");
@@ -332,7 +325,6 @@ class _PostReachState extends State<PostReach> {
                           _isLoading.value = false;
                         }
                       },
-                   
                       child: BlocConsumer<DictionaryBloc, DictionaryState>(
                         bloc: globals.dictionaryBloc,
                         listener: (context, state) {
@@ -356,8 +348,7 @@ class _PostReachState extends State<PostReach> {
                           }
                         },
                         builder: (context, state) {
-                          return
-                           FlutterMentions(
+                          return FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
@@ -532,10 +523,8 @@ class _PostReachState extends State<PostReach> {
                             //   ),
                             // ).paddingSymmetric(h: 16),
                           );
-                       
                         },
                       ),
-                  
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)
@@ -985,7 +974,7 @@ class _PostReachState extends State<PostReach> {
                   ],
                 ),
               ),
-            
+
               ValueListenableBuilder(
                   valueListenable: _recordingService.recording,
                   builder: (BuildContext context, bool value, Widget? child) {

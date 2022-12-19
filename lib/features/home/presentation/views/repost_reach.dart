@@ -48,15 +48,15 @@ import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 import '../widgets/post_media.dart';
 
-class CommentReach extends StatefulHookWidget {
+class RepostReach extends StatefulHookWidget {
   final PostFeedModel? postFeedModel;
-  const CommentReach({required this.postFeedModel, Key? key}) : super(key: key);
+  const RepostReach({required this.postFeedModel, Key? key}) : super(key: key);
 
   @override
-  State<CommentReach> createState() => _CommentReachState();
+  State<RepostReach> createState() => _CommentReachState();
 }
 
-class _CommentReachState extends State<CommentReach> {
+class _CommentReachState extends State<RepostReach> {
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
@@ -304,29 +304,24 @@ class _CommentReachState extends State<CommentReach> {
                     onPressed: () {
                       if (controllerKey
                           .currentState!.controller!.text.isNotEmpty) {
-                        globals.socialServiceBloc!.add(CommentOnPostEvent(
-                            postId: widget.postFeedModel!.post!.postId,
-                            content: controller.text,
+                        // globals.socialServiceBloc!.add(CommentOnPostEvent(
+                        //     postId: widget.postFeedModel.postId,
+                        //     content: controller.text,
+                        //     userId: globals.user!.id));
 
-                            //audioMediaItem: ' ',
-
-                            userId: globals.user!.id,
-                            postOwnerId: widget.postFeedModel!.post!
-                                .postOwnerProfile!.authId));
-
-                        // globals.socialServiceBloc!.add(CreateRepostEvent(
-                        //     input: CreateRepostInput(
-                        //         repostedPostId: widget.postFeedModel.postId,
-                        //         repostedPostOwnerId:
-                        //             widget.postFeedModel.postOwnerId,
-                        //         content: controller.text,
-                        //         location: globals.user!.showLocation!
-                        //             ? globals.location!
-                        //             : 'nil',
-                        //         postRating: 'normal',
-                        //         commentOption: 'everyone')));
+                        globals.socialServiceBloc!.add(CreateRepostEvent(
+                            input: CreateRepostInput(
+                                repostedPostId: widget.postFeedModel!.postId,
+                                repostedPostOwnerId:
+                                    widget.postFeedModel!.postOwnerId,
+                                content: controller.text,
+                                location: globals.user!.showLocation!
+                                    ? globals.location!
+                                    : 'nil',
+                                postRating: 'normal',
+                                commentOption: 'everyone')));
                       }
-                      controller.clear();
+                      // controller.clear();
                     },
                   ),
                 ],
@@ -505,7 +500,7 @@ class _CommentReachState extends State<CommentReach> {
                                           Row(
                                             children: [
                                               Text(
-                                              widget.postFeedModel!.post!.location! ==
+                                               widget.postFeedModel!.post!.location! ==
                                                       'nil' ||
                                                   widget.postFeedModel!
                                                           .post!.location! ==
@@ -643,6 +638,7 @@ class _CommentReachState extends State<CommentReach> {
                         builder: (context, state) {
                           return FlutterMentions(
                             key: controllerKey,
+
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
                             // minLines: null,

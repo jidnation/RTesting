@@ -85,11 +85,11 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final likeId = useState<String?>(null);
     final reachingList = useState<List<VirtualReach>?>([]);
     final isReaching = useState(false);
-    useMemoized(() {
-      globals.userBloc!.add(GetReachRelationshipEvent(
-          userIdToReach: widget.postFeedModel!.postOwnerId,
-          type: ReachRelationshipType.reacher));
-    });
+    // useMemoized(() {
+    //   globals.userBloc!.add(GetReachRelationshipEvent(
+    //       userIdToReach: widget.postFeedModel!.postOwnerId,
+    //       type: ReachRelationshipType.reacher));
+    // });
 
     useMemoized(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
@@ -193,17 +193,24 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
         if (state is GetReachRelationshipSuccess) {
           isReaching.value = state.isReaching!;
-          if (shoutdownPost.value) {
+          if (shoutdownPost.value == true) {
             shoutdownPost.value = false;
+            debugPrint("Shoutdown post");
             if ((state.isReaching ?? false)) {
+              debugPrint("PostId: ${widget.postFeedModel!.postId} ");
+              // _currentPost.value!.postId = widget.postFeedModel!.postId;
               globals.socialServiceBloc!.add(VotePostEvent(
                 voteType: 'Downvote',
-                postId: _currentPost.value!.postId,
+                postId: widget.postFeedModel!.postId,
               ));
+              print("Shoutdown success");
+              Snackbars.success(context,
+                  message: 'You shouted down on this user\'s posts');
               RouteNavigators.pop(context);
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
+              RouteNavigators.pop(context);
             }
           }
           debugPrint("State isReahing ${state.isReaching}");
@@ -227,6 +234,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
+            }
+
+            if (state is SavePostSuccess) {
+              RouteNavigators.pop(context);
+              Snackbars.success(context, message: 'Post saved successfully');
+            }
+            if (state is SavePostError) {
+              RouteNavigators.pop(context);
+              Snackbars.error(context, message: state.error);
             }
             if (state is GetPostSuccess) {
               debugPrint("Get Post Success");
@@ -286,898 +302,946 @@ class _FullPostScreenState extends State<FullPostScreen> {
                       height: MediaQuery.of(context).size.height,
                       child: Stack(
                         children: [
-                          Column(
-                            children: [
-                              RepaintBoundary(
-                                key: scr,
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    right: getScreenWidth(16),
-                                    left: getScreenWidth(16),
-                                    //bottom: getScreenHeight(2),
-                                  ),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.white,
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height,
+                            child: ListView(
+                              children: [
+                                RepaintBoundary(
+                                  key: scr,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      right: getScreenWidth(16),
+                                      left: getScreenWidth(16),
+                                      //bottom: getScreenHeight(2),
                                     ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            CupertinoButton(
-                                              minSize: 0,
-                                              padding: EdgeInsets.zero,
-                                              onPressed: () {
-                                                globals.userBloc!.add(
-                                                    GetRecipientProfileEvent(
-                                                        email: widget
-                                                            .postFeedModel!
-                                                            .postOwnerId));
-                                                widget.postFeedModel!
-                                                            .postOwnerId ==
-                                                        globals.user!.id
-                                                    ? RouteNavigators.route(
-                                                        context,
-                                                        const AccountScreen())
-                                                    : RouteNavigators.route(
-                                                        context,
-                                                        RecipientAccountProfile(
-                                                          recipientEmail:
-                                                              'email',
-                                                          recipientImageUrl: widget
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.white,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              CupertinoButton(
+                                                minSize: 0,
+                                                padding: EdgeInsets.zero,
+                                                onPressed: () {
+                                                  globals.userBloc!.add(
+                                                      GetRecipientProfileEvent(
+                                                          email: widget
                                                               .postFeedModel!
-                                                              .profilePicture,
-                                                          recipientId: widget
-                                                              .postFeedModel!
-                                                              .postOwnerId,
-                                                        ));
-                                              },
-                                              child: Row(
+                                                              .postOwnerId));
+                                                  widget.postFeedModel!
+                                                              .postOwnerId ==
+                                                          globals.user!.id
+                                                      ? RouteNavigators.route(
+                                                          context,
+                                                          const AccountScreen())
+                                                      : RouteNavigators.route(
+                                                          context,
+                                                          RecipientAccountProfile(
+                                                            recipientEmail:
+                                                                'email',
+                                                            recipientImageUrl: widget
+                                                                .postFeedModel!
+                                                                .profilePicture,
+                                                            recipientId: widget
+                                                                .postFeedModel!
+                                                                .postOwnerId,
+                                                          ));
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Helper.renderProfilePicture(
+                                                      widget.postFeedModel!
+                                                          .profilePicture,
+                                                      size: 33,
+                                                    ).paddingOnly(l: 13, t: 10),
+                                                    SizedBox(
+                                                        width:
+                                                            getScreenWidth(9)),
+                                                    Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              '@${widget.postFeedModel!.username!}',
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    getScreenHeight(
+                                                                        14),
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: AppColors
+                                                                    .textColor2,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 3),
+                                                            widget.postFeedModel!
+                                                                    .verified!
+                                                                ? SvgPicture.asset(
+                                                                    'assets/svgs/verified.svg')
+                                                                : const SizedBox
+                                                                    .shrink()
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              widget
+                                                                              .postFeedModel!
+                                                                              .post!
+                                                                              .location! ==
+                                                                          'nil' ||
+                                                                      widget.postFeedModel!.post!.location! ==
+                                                                          'NIL' ||
+                                                                      widget.postFeedModel!.post!
+                                                                              .location ==
+                                                                          null
+                                                                  ? ''
+                                                                  : widget.postFeedModel!.post!.location!
+                                                                              .length >
+                                                                          23
+                                                                      ? widget
+                                                                          .postFeedModel!
+                                                                          .post!
+                                                                          .location!
+                                                                          .substring(
+                                                                              0,
+                                                                              23)
+                                                                      : widget
+                                                                          .postFeedModel!
+                                                                          .post!
+                                                                          .location!,
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    getScreenHeight(
+                                                                        10),
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                letterSpacing:
+                                                                    0.4,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: AppColors
+                                                                    .textColor2,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              postDuration,
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    getScreenHeight(
+                                                                        10),
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                letterSpacing:
+                                                                    0.4,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: AppColors
+                                                                    .textColor2,
+                                                              ),
+                                                            ).paddingOnly(l: 6),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ).paddingOnly(t: 10),
+                                                  ],
+                                                ),
+                                              ),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Helper.renderProfilePicture(
-                                                    widget.postFeedModel!
-                                                        .profilePicture,
-                                                    size: 33,
-                                                  ).paddingOnly(l: 13, t: 10),
+                                                  //  SvgPicture.asset('assets/svgs/starred.svg'),
                                                   SizedBox(
                                                       width: getScreenWidth(9)),
-                                                  Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            '@${widget.postFeedModel!.username!}',
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                                  getScreenHeight(
-                                                                      14),
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: AppColors
-                                                                  .textColor2,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 3),
-                                                          widget.postFeedModel!
-                                                                  .verified!
-                                                              ? SvgPicture.asset(
-                                                                  'assets/svgs/verified.svg')
-                                                              : const SizedBox
-                                                                  .shrink()
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            widget.postFeedModel!.post!.location! == 'nil' ||
-                                                                    widget.postFeedModel!.post!
-                                                                            .location! ==
-                                                                        'NIL' ||
-                                                                    widget
-                                                                            .postFeedModel!
-                                                                            .post!
-                                                                            .location ==
-                                                                        null
-                                                                ? ''
-                                                                : widget
-                                                                            .postFeedModel!
-                                                                            .post!
-                                                                            .location!
-                                                                            .length >
-                                                                        23
-                                                                    ? widget
-                                                                        .postFeedModel!
-                                                                        .post!
-                                                                        .location!
-                                                                        .substring(
-                                                                            0,
-                                                                            23)
-                                                                    : widget
-                                                                        .postFeedModel!
-                                                                        .post!
-                                                                        .location!,
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                                  getScreenHeight(
-                                                                      10),
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              letterSpacing:
-                                                                  0.4,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: AppColors
-                                                                  .textColor2,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            postDuration,
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                                  getScreenHeight(
-                                                                      10),
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              letterSpacing:
-                                                                  0.4,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: AppColors
-                                                                  .textColor2,
-                                                            ),
-                                                          ).paddingOnly(l: 6),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ).paddingOnly(t: 10),
+                                                  IconButton(
+                                                    onPressed: () async {
+                                                      await showReacherCardBottomSheet(
+                                                        context,
+                                                        downloadPost:
+                                                            takeScreenShot,
+                                                        postFeedModel: widget
+                                                            .postFeedModel!,
+                                                      );
+                                                    },
+                                                    iconSize:
+                                                        getScreenHeight(19),
+                                                    padding:
+                                                        const EdgeInsets.all(0),
+                                                    icon: SvgPicture.asset(
+                                                        'assets/svgs/kebab card.svg'),
+                                                  ),
                                                 ],
-                                              ),
-                                            ),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                //  SvgPicture.asset('assets/svgs/starred.svg'),
-                                                SizedBox(
-                                                    width: getScreenWidth(9)),
-                                                IconButton(
-                                                  onPressed: () async {
-                                                    await showReacherCardBottomSheet(
-                                                      context,
-                                                      downloadPost:
-                                                          takeScreenShot,
-                                                      postFeedModel:
-                                                          widget.postFeedModel!,
-                                                    );
-                                                  },
-                                                  iconSize: getScreenHeight(19),
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  icon: SvgPicture.asset(
-                                                      'assets/svgs/kebab card.svg'),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                        widget.postFeedModel!.post!.content ==
-                                                null
-                                            ? const SizedBox.shrink()
-                                            : ExpandableText(
-                                                "${widget.postFeedModel!.post!.content}",
-                                                prefixText: widget
-                                                        .postFeedModel!
-                                                        .post!
-                                                        .edited!
-                                                    ? "(Reach Edited)"
-                                                    : null,
-                                                prefixStyle: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(12),
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        AppColors.primaryColor),
-                                                onPrefixTap: () {
-                                                  tooltipkey.currentState
-                                                      ?.ensureTooltipVisible();
-                                                },
-                                                expandText: 'see more',
-                                                maxLines: 2,
-                                                linkColor: Colors.blue,
-                                                animation: true,
-                                                expanded: false,
-                                                collapseText: 'see less',
-                                                onHashtagTap: (value) {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return DictionaryDialog(
-                                                          abbr: value,
-                                                          meaning: '',
-                                                          word: '',
-                                                        );
-                                                      });
-                                                  print('Tapped Url');
-                                                },
-                                                onMentionTap: (value) {
-                                                  print('Tapped Url');
-                                                },
-                                                mentionStyle: const TextStyle(
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                    color: Colors.blue),
-                                                hashtagStyle: const TextStyle(
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                    color: Colors.blue),
-                                              ).paddingSymmetric(h: 16, v: 10),
-                                        Tooltip(
-                                          key: tooltipkey,
-                                          triggerMode:
-                                              TooltipTriggerMode.manual,
-                                          showDuration:
-                                              const Duration(seconds: 1),
-                                          message: 'This reach has been edited',
-                                        ),
-                                        if ((widget.postFeedModel?.post
-                                                        ?.imageMediaItems ??
-                                                    [])
-                                                .isNotEmpty ||
-                                            (widget.postFeedModel?.post
-                                                        ?.videoMediaItem ??
-                                                    '')
-                                                .isNotEmpty)
-                                          PostMedia(
-                                                  post: widget
-                                                      .postFeedModel!.post!)
-                                              .paddingOnly(
-                                                  r: 16, l: 16, b: 16, t: 10)
-                                        else
-                                          const SizedBox.shrink(),
-                                        (widget.postFeedModel?.post
-                                                        ?.audioMediaItem ??
-                                                    '')
-                                                .isNotEmpty
-                                            ? PostAudioMedia(
-                                                    path: widget.postFeedModel!
-                                                        .post!.audioMediaItem!)
-                                                .paddingOnly(
-                                                    l: 16, r: 16, b: 10, t: 0)
-                                            : const SizedBox.shrink(),
-
-                                        // likes and message
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: size.width -
-                                                  (size.width - 124),
-                                              height: size.width -
-                                                  (size.width - 50),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 11,
-                                                vertical: 7,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: const Color(0xFFF5F5F5),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CupertinoButton(
-                                                    minSize: 0,
-                                                    onPressed: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      handleTap(widget
-                                                          .postFeedModel!.post);
-                                                      // Console.log(
-                                                      //     'Like Data',
-                                                      //     _posts.value[index]
-                                                      //         .toJson());
-                                                      if (active.contains(widget
+                                              )
+                                            ],
+                                          ),
+                                          widget.postFeedModel!.post!.content ==
+                                                  null
+                                              ? const SizedBox.shrink()
+                                              : ExpandableText(
+                                                  "${widget.postFeedModel!.post!.content}",
+                                                  prefixText: widget
                                                           .postFeedModel!
-                                                          .post)) {
-                                                        if (widget
+                                                          .post!
+                                                          .edited!
+                                                      ? "(Reach Edited)"
+                                                      : null,
+                                                  prefixStyle: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(12),
+                                                      fontFamily: 'Poppins',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: AppColors
+                                                          .primaryColor),
+                                                  onPrefixTap: () {
+                                                    tooltipkey.currentState
+                                                        ?.ensureTooltipVisible();
+                                                  },
+                                                  expandText: 'see more',
+                                                  maxLines: 2,
+                                                  linkColor: Colors.blue,
+                                                  animation: true,
+                                                  expanded: false,
+                                                  collapseText: 'see less',
+                                                  onHashtagTap: (value) {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return DictionaryDialog(
+                                                            abbr: value,
+                                                            meaning: '',
+                                                            word: '',
+                                                          );
+                                                        });
+                                                    print('Tapped Url');
+                                                  },
+                                                  onMentionTap: (value) {
+                                                    print('Tapped Url');
+                                                  },
+                                                  mentionStyle: const TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.blue),
+                                                  hashtagStyle: const TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.blue),
+                                                ).paddingSymmetric(
+                                                  h: 16, v: 10),
+                                          Tooltip(
+                                            key: tooltipkey,
+                                            triggerMode:
+                                                TooltipTriggerMode.manual,
+                                            showDuration:
+                                                const Duration(seconds: 1),
+                                            message:
+                                                'This reach has been edited',
+                                          ),
+                                          if ((widget.postFeedModel?.post
+                                                          ?.imageMediaItems ??
+                                                      [])
+                                                  .isNotEmpty ||
+                                              (widget.postFeedModel?.post
+                                                          ?.videoMediaItem ??
+                                                      '')
+                                                  .isNotEmpty)
+                                            PostMedia(
+                                                    post: widget
+                                                        .postFeedModel!.post!)
+                                                .paddingOnly(
+                                                    r: 16, l: 16, b: 16, t: 10)
+                                          else
+                                            const SizedBox.shrink(),
+                                          (widget.postFeedModel?.post
+                                                          ?.audioMediaItem ??
+                                                      '')
+                                                  .isNotEmpty
+                                              ? PostAudioMedia(
+                                                      path: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .audioMediaItem!)
+                                                  .paddingOnly(
+                                                      l: 16, r: 16, b: 10, t: 0)
+                                              : const SizedBox.shrink(),
+
+                                          // likes and message
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: size.width -
+                                                    (size.width - 124),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color:
+                                                      const Color(0xFFF5F5F5),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(widget
+                                                            .postFeedModel!
+                                                            .post);
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
+                                                        if (active.contains(
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post)) {
+                                                          if (widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false) {
+                                                            widget
                                                                 .postFeedModel!
                                                                 .post
-                                                                ?.isLiked ??
-                                                            false) {
-                                                          widget
-                                                              .postFeedModel!
-                                                              .post
-                                                              ?.isLiked = false;
-                                                          widget
-                                                              .postFeedModel!
-                                                              .post
-                                                              ?.nLikes = (widget
+                                                                ?.isLiked = false;
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes = (widget
+                                                                        .postFeedModel!
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    1) -
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: widget
+                                                                  .postFeedModel!
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.isLiked = true;
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes = (widget
+                                                                        .postFeedModel!
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    0) +
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: widget
                                                                       .postFeedModel!
-                                                                      .post
-                                                                      ?.nLikes ??
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                      padding: EdgeInsets.zero,
+                                                      child: likePost.value ||
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post!
+                                                                  .isLiked!
+                                                          ? SvgPicture.asset(
+                                                              'assets/svgs/like-active.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            )
+                                                          : SvgPicture.asset(
+                                                              'assets/svgs/like.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            ),
+                                                    ),
+                                                    SizedBox(
+                                                        width:
+                                                            getScreenWidth(8)),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        '${post.value.post!.nLikes}',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ).paddingOnly(r: 8),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        'Likes',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: getScreenWidth(15)),
+                                              Container(
+                                                width: size.width -
+                                                    (size.width - 163),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    color: widget.postFeedModel!
+                                                                .postOwnerId !=
+                                                            globals.userId
+                                                        ? const Color(
+                                                            0xFFF5F5F5)
+                                                        : AppColors.disabled),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        if (widget
+                                                                .postFeedModel!
+                                                                .postOwnerId !=
+                                                            widget
+                                                                .postFeedModel!
+                                                                .feedOwnerId) {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          reachDM.value = true;
+
+                                                          handleTap(widget
+                                                              .postFeedModel!
+                                                              .post);
+                                                          if (active.contains(
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post)) {
+                                                            globals.userBloc!.add(
+                                                                GetRecipientProfileEvent(
+                                                                    email: widget
+                                                                        .postFeedModel!
+                                                                        .postOwnerId!));
+                                                          }
+                                                        }
+                                                      },
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0),
+                                                      child: SvgPicture.asset(
+                                                        'assets/svgs/message.svg',
+                                                        height:
+                                                            getScreenHeight(20),
+                                                        width:
+                                                            getScreenWidth(20),
+                                                      ),
+                                                    ).paddingOnly(r: 8),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        widget.postFeedModel!
+                                                                    .postOwnerId ==
+                                                                globals.userId
+                                                            ? "Message"
+                                                            : 'Message user',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ).paddingOnly(l: 16, b: 16),
+
+                                          // shoutout and shoutdown
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: size.width -
+                                                    (size.width - 124),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color:
+                                                      const Color(0xFFF5F5F5),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(widget
+                                                            .postFeedModel!
+                                                            .post);
+
+                                                        if (active.contains(
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post)) {
+                                                          if ((widget.postFeedModel!
+                                                                      .vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            setState(() {
+                                                              shoutoutPost
+                                                                  .value = true;
+                                                            });
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: widget
+                                                                  .postFeedModel!
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: widget
+                                                                  .postFeedModel!
+                                                                  .postId,
+                                                            ));
+                                                          }
+                                                        }
+                                                      },
+                                                      padding: EdgeInsets.zero,
+                                                      child: shoutoutPost
+                                                                      .value ==
+                                                                  true ||
+                                                              widget
+                                                                      .postFeedModel!
+                                                                      .post!
+                                                                      .isVoted ==
+                                                                  'Upvote'
+                                                          ? SvgPicture.asset(
+                                                              'assets/svgs/shoutup-active.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            )
+                                                          : SvgPicture.asset(
+                                                              'assets/svgs/shoutup.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            ),
+                                                    ),
+                                                    SizedBox(
+                                                        width:
+                                                            getScreenWidth(8)),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        '${post.value.post!.nUpvotes}',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ).paddingOnly(r: 6),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        'Shoutout',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: getScreenWidth(15)),
+                                              Container(
+                                                width: size.width -
+                                                    (size.width - 163),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color:
+                                                      const Color(0xFFF5F5F5),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(widget
+                                                            .postFeedModel!
+                                                            .post);
+
+                                                        if (active.contains(
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post)) {
+                                                          shoutdownPost.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: widget
+                                                                      .postFeedModel!
+                                                                      .postOwnerId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                        }
+                                                      },
+                                                      padding: EdgeInsets.zero,
+                                                      child: shoutdownPost.value
+                                                          ? SvgPicture.asset(
+                                                              'assets/svgs/shoutdown-active.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            )
+                                                          : SvgPicture.asset(
+                                                              'assets/svgs/shoutdown.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            ),
+                                                    ),
+                                                    SizedBox(
+                                                        width:
+                                                            getScreenWidth(8)),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        '${widget.postFeedModel!.post!.nDownvotes}',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ).paddingOnly(r: 8),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        'Shoutdown',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ).paddingOnly(l: 16)
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                const Divider(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 21.0),
+                                  child: Row(
+                                    children: [
+                                      const Text("Comments"),
+                                      IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              showCommentField.value =
+                                                  !showCommentField.value;
+                                            });
+                                          },
+                                          icon: const Icon(
+                                              Icons.keyboard_arrow_down))
+                                    ],
+                                  ),
+                                ),
+                                const Divider(),
+                                showCommentField.value
+                                    ? Expanded(
+                                        child: comments.value.isEmpty
+                                            ? const Center(
+                                                child: Text('No comments yet'))
+                                            : ListView.builder(
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                controller: scrollController,
+                                                shrinkWrap: true,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15),
+                                                itemCount:
+                                                    comments.value.length,
+                                                itemBuilder: (context, index) {
+                                                  // if (comments
+                                                  //         .value[index].audioMediaItem ==
+                                                  //     null) {
+                                                  //   comments.value[index].audioMediaItem =
+                                                  //       ' ';
+                                                  // }
+                                                  return CommentsTile(
+                                                    comment:
+                                                        comments.value[index],
+                                                    isLiked: comments
+                                                                .value[index]
+                                                                .isLiked ??
+                                                            false
+                                                        ? true
+                                                        : false,
+                                                    onLike: () {
+                                                      print(
+                                                          "${comments.value[index].isLiked}");
+                                                      HapticFeedback
+                                                          .mediumImpact();
+                                                      handleTap(index);
+                                                      if (active
+                                                          .contains(index)) {
+                                                        if (comments
+                                                            .value[index]
+                                                            .isLiked!) {
+                                                          comments.value[index]
+                                                              .isLiked = false;
+
+                                                          comments.value[index]
+                                                              .nLikes = (comments
+                                                                      .value[
+                                                                          index]
+                                                                      .nLikes ??
                                                                   1) -
                                                               1;
                                                           globals
                                                               .socialServiceBloc!
-                                                              .add(
-                                                                  UnlikePostEvent(
-                                                            postId: widget
-                                                                .postFeedModel!
-                                                                .postId,
-                                                          ));
+                                                              .add(GetAllCommentLikesEvent(
+                                                                  commentId: comments
+                                                                      .value[
+                                                                          index]
+                                                                      .commentId));
+
+                                                          if (likeId.value !=
+                                                              null) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              UnlikeCommentOnPostEvent(
+                                                                  commentId: comments
+                                                                      .value[
+                                                                          index]
+                                                                      .commentId!,
+                                                                  likeId: likeId
+                                                                      .value
+
+                                                                  //commentLike
+                                                                  //  .value!.likeId!,
+                                                                  ),
+                                                            );
+                                                          }
                                                         } else {
-                                                          widget
-                                                              .postFeedModel!
-                                                              .post
-                                                              ?.isLiked = true;
-                                                          widget
-                                                              .postFeedModel!
-                                                              .post
-                                                              ?.nLikes = (widget
-                                                                      .postFeedModel!
-                                                                      .post
-                                                                      ?.nLikes ??
+                                                          comments.value[index]
+                                                              .isLiked = true;
+                                                          comments.value[index]
+                                                              .nLikes = (comments
+                                                                      .value[
+                                                                          index]
+                                                                      .nLikes ??
                                                                   0) +
                                                               1;
                                                           globals
                                                               .socialServiceBloc!
                                                               .add(
-                                                            LikePostEvent(
-                                                                postId: widget
-                                                                    .postFeedModel!
-                                                                    .postId),
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                    padding: EdgeInsets.zero,
-                                                    child: likePost.value ||
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post!
-                                                                .isLiked!
-                                                        ? SvgPicture.asset(
-                                                            'assets/svgs/like-active.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          )
-                                                        : SvgPicture.asset(
-                                                            'assets/svgs/like.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          ),
-                                                  ),
-                                                  SizedBox(
-                                                      width: getScreenWidth(8)),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      '${post.value.post!.nLikes}',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ).paddingOnly(r: 8),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      'Likes',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: getScreenWidth(15)),
-                                            Container(
-                                              width: size.width -
-                                                  (size.width - 163),
-                                              height: size.width -
-                                                  (size.width - 50),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 11,
-                                                vertical: 7,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  color: widget.postFeedModel!
-                                                              .postOwnerId !=
-                                                          widget.postFeedModel!
-                                                              .feedOwnerId
-                                                      ? const Color(0xFFF5F5F5)
-                                                      : AppColors.disabled),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CupertinoButton(
-                                                    minSize: 0,
-                                                    onPressed: () {
-                                                      if (widget.postFeedModel!
-                                                              .postOwnerId !=
-                                                          widget.postFeedModel!
-                                                              .feedOwnerId) {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        reachDM.value = true;
-
-                                                        handleTap(widget
-                                                            .postFeedModel!
-                                                            .post);
-                                                        if (active.contains(
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post)) {
-                                                          globals.userBloc!.add(
-                                                              GetRecipientProfileEvent(
-                                                                  email: widget
-                                                                      .postFeedModel!
-                                                                      .postOwnerId!));
-                                                        }
-                                                      }
-                                                    },
-                                                    padding:
-                                                        const EdgeInsets.all(0),
-                                                    child: SvgPicture.asset(
-                                                      'assets/svgs/message.svg',
-                                                      height:
-                                                          getScreenHeight(20),
-                                                      width: getScreenWidth(20),
-                                                    ),
-                                                  ).paddingOnly(r: 8),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      widget.postFeedModel!
-                                                                  .postOwnerId !=
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .feedOwnerId
-                                                          ? "Message"
-                                                          : 'Message user',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ).paddingOnly(l: 16, b: 16),
-
-                                        // shoutout and shoutdown
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: size.width -
-                                                  (size.width - 124),
-                                              height: size.width -
-                                                  (size.width - 50),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 11,
-                                                vertical: 7,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: const Color(0xFFF5F5F5),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  CupertinoButton(
-                                                    minSize: 0,
-                                                    onPressed: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      handleTap(widget
-                                                          .postFeedModel!.post);
-
-                                                      if (active.contains(widget
-                                                          .postFeedModel!
-                                                          .post)) {
-                                                        if ((widget.postFeedModel!
-                                                                    .vote ??
-                                                                [])
-                                                            .isEmpty) {
-                                                          setState(() {
-                                                            shoutoutPost.value =
-                                                                true;
-                                                          });
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  VotePostEvent(
-                                                            voteType: 'Upvote',
-                                                            postId: widget
-                                                                .postFeedModel!
+                                                                  LikeCommentOnPostEvent(
+                                                            postId: comments
+                                                                .value[index]
                                                                 .postId,
-                                                          ));
-                                                        } else {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  DeletePostVoteEvent(
-                                                            voteId: widget
-                                                                .postFeedModel!
-                                                                .postId,
+                                                            commentId: comments
+                                                                .value[index]
+                                                                .commentId,
                                                           ));
                                                         }
                                                       }
                                                     },
-                                                    padding: EdgeInsets.zero,
-                                                    child: shoutoutPost.value ==
-                                                            true
-                                                        ? SvgPicture.asset(
-                                                            'assets/svgs/shoutup-active.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          )
-                                                        : SvgPicture.asset(
-                                                            'assets/svgs/shoutup.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          ),
-                                                  ),
-                                                  SizedBox(
-                                                      width: getScreenWidth(8)),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      '${post.value.post!.nUpvotes}',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ).paddingOnly(r: 6),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      'Shoutout',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(width: getScreenWidth(15)),
-                                            Container(
-                                              width: size.width -
-                                                  (size.width - 163),
-                                              height: size.width -
-                                                  (size.width - 50),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 11,
-                                                vertical: 7,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: const Color(0xFFF5F5F5),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  CupertinoButton(
-                                                    minSize: 0,
-                                                    onPressed: () {
+                                                    onMessage: () {
                                                       HapticFeedback
                                                           .mediumImpact();
-                                                      handleTap(widget
-                                                          .postFeedModel!.post);
-
-                                                      if (active.contains(widget
-                                                          .postFeedModel!
-                                                          .post)) {
-                                                        shoutdownPost.value =
-                                                            true;
+                                                      reachDM.value = true;
+                                                      handleTap(index);
+                                                      if (active
+                                                          .contains(index)) {
                                                         globals.userBloc!.add(
-                                                            GetReachRelationshipEvent(
-                                                                userIdToReach: widget
-                                                                    .postFeedModel!
-                                                                    .postOwnerId,
-                                                                type: ReachRelationshipType
-                                                                    .reacher));
+                                                            GetRecipientProfileEvent(
+                                                                email: comments
+                                                                    .value[
+                                                                        index]
+                                                                    .authId!));
                                                       }
                                                     },
-                                                    padding: EdgeInsets.zero,
-                                                    child: shoutdownPost.value
-                                                        ? SvgPicture.asset(
-                                                            'assets/svgs/shoutdown-active.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          )
-                                                        : SvgPicture.asset(
-                                                            'assets/svgs/shoutdown.svg',
-                                                            height:
-                                                                getScreenHeight(
-                                                                    20),
-                                                            width:
-                                                                getScreenWidth(
-                                                                    20),
-                                                          ),
-                                                  ),
-                                                  SizedBox(
-                                                      width: getScreenWidth(8)),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      '${widget.postFeedModel!.post!.nDownvotes}',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ).paddingOnly(r: 8),
-                                                  FittedBox(
-                                                    child: Text(
-                                                      'Shoutdown',
-                                                      style: TextStyle(
-                                                        fontSize:
-                                                            getScreenHeight(12),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: AppColors
-                                                            .textColor3,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
+                                                  );
+                                                },
                                               ),
-                                            ),
-                                          ],
-                                        ).paddingOnly(l: 16)
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01,
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 21.0),
-                                child: Row(
-                                  children: [
-                                    const Text("Comments"),
-                                    IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            showCommentField.value =
-                                                !showCommentField.value;
-                                          });
-                                        },
-                                        icon: const Icon(
-                                            Icons.keyboard_arrow_down))
-                                  ],
-                                ),
-                              ),
-                              const Divider(),
-                              showCommentField.value
-                                  ? Expanded(
-                                      child: comments.value.isEmpty
-                                          ? const Center(
-                                              child: Text('No comments yet'))
-                                          : ListView.builder(
-                                              physics:
-                                                  const BouncingScrollPhysics(),
-                                              controller: scrollController,
-                                              shrinkWrap: true,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 15),
-                                              itemCount: comments.value.length,
-                                              itemBuilder: (context, index) {
-                                                // if (comments
-                                                //         .value[index].audioMediaItem ==
-                                                //     null) {
-                                                //   comments.value[index].audioMediaItem =
-                                                //       ' ';
-                                                // }
-                                                return CommentsTile(
-                                                  comment:
-                                                      comments.value[index],
-                                                  isLiked: comments.value[index]
-                                                              .isLiked ??
-                                                          false
-                                                      ? true
-                                                      : false,
-                                                  onLike: () {
-                                                    print(
-                                                        "${comments.value[index].isLiked}");
-                                                    HapticFeedback
-                                                        .mediumImpact();
-                                                    handleTap(index);
-                                                    if (active
-                                                        .contains(index)) {
-                                                      if (comments.value[index]
-                                                          .isLiked!) {
-                                                        comments.value[index]
-                                                            .isLiked = false;
-
-                                                        comments.value[index]
-                                                            .nLikes = (comments
-                                                                    .value[
-                                                                        index]
-                                                                    .nLikes ??
-                                                                1) -
-                                                            1;
-                                                        globals
-                                                            .socialServiceBloc!
-                                                            .add(GetAllCommentLikesEvent(
-                                                                commentId: comments
-                                                                    .value[
-                                                                        index]
-                                                                    .commentId));
-
-                                                        if (likeId.value !=
-                                                            null) {
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                            UnlikeCommentOnPostEvent(
-                                                                commentId: comments
-                                                                    .value[
-                                                                        index]
-                                                                    .commentId!,
-                                                                likeId:
-                                                                    likeId.value
-
-                                                                //commentLike
-                                                                //  .value!.likeId!,
-                                                                ),
-                                                          );
-                                                        }
-                                                      } else {
-                                                        comments.value[index]
-                                                            .isLiked = true;
-                                                        comments.value[index]
-                                                            .nLikes = (comments
-                                                                    .value[
-                                                                        index]
-                                                                    .nLikes ??
-                                                                0) +
-                                                            1;
-                                                        globals
-                                                            .socialServiceBloc!
-                                                            .add(
-                                                                LikeCommentOnPostEvent(
-                                                          postId: comments
-                                                              .value[index]
-                                                              .postId,
-                                                          commentId: comments
-                                                              .value[index]
-                                                              .commentId,
-                                                        ));
-                                                      }
-                                                    }
-                                                  },
-                                                  onMessage: () {
-                                                    HapticFeedback
-                                                        .mediumImpact();
-                                                    reachDM.value = true;
-                                                    handleTap(index);
-                                                    if (active
-                                                        .contains(index)) {
-                                                      globals.userBloc!.add(
-                                                          GetRecipientProfileEvent(
-                                                              email: comments
-                                                                  .value[index]
-                                                                  .authId!));
-                                                    }
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                    )
-                                  : const SizedBox.shrink()
-                            ],
+                                      )
+                                    : const SizedBox.shrink()
+                              ],
+                            ),
                           ),
                           Positioned(
                               //top: 670,
                               bottom:
                                   ((MediaQuery.of(context).size.height) * 0.01),
                               child: commentField(controller, showEmoji,
-                                  postFeedModel: widget.postFeedModel!,
+                                  postFeedModel: widget.postFeedModel,
                                   isReaching: isReaching.value))
                         ],
                       ),
@@ -1190,53 +1254,14 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
   Widget commentField(TextEditingController controller,
       foundation.ValueNotifier<bool> showEmoji,
-      {required PostFeedModel postFeedModel, bool isReaching = false}) {
+      {required PostFeedModel? postFeedModel, bool isReaching = false}) {
+    // debugPrint("Comment option: ${widget.postFeedModel!.post!.commentOption}");
+    debugPrint("PostFeedModel: ${widget.postFeedModel!.post!.content}");
+    debugPrint("PostFeedModel: ${widget.postFeedModel!.profilePicture}");
+    debugPrint(
+        "PostModel: ${widget.postFeedModel!.post!.postOwnerProfile!.username}");
     switch (widget.postFeedModel!.post!.commentOption) {
-      case "people_you_follow":
-        debugPrint("ïsReaching $isReaching");
-        if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: CustomRoundTextField(
-                      onTap: () {
-                        RouteNavigators.route(
-                            context,
-                            CommentReach(
-                              postFeedModel: postFeedModel,
-                            ));
-                      },
-                      verticalHeight: 0,
-                      controller: controller,
-                      hintText: 'Comment on this post...',
-                      suffixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined),
-                          onPressed: () {
-                            showEmoji.value = !showEmoji.value;
-                          }),
-                    ),
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.camera_alt_outlined,
-                      ))
-                ],
-              ),
-            ),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      case "none":
-        return const SizedBox.shrink();
-
-      default:
+      case "everyone":
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 21.0),
           child: SizedBox(
@@ -1272,6 +1297,130 @@ class _FullPostScreenState extends State<FullPostScreen> {
             ),
           ),
         );
+      case "people_you_follow":
+        debugPrint("ïsReaching $isReaching");
+        if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 21.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: CustomRoundTextField(
+                      onTap: () {
+                        RouteNavigators.route(
+                            context,
+                            CommentReach(
+                              postFeedModel: postFeedModel!,
+                            ));
+                      },
+                      verticalHeight: 0,
+                      controller: controller,
+                      hintText: 'Comment on this post...',
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.emoji_emotions_outlined),
+                          onPressed: () {
+                            showEmoji.value = !showEmoji.value;
+                          }),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                      ))
+                ],
+              ),
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+
+      case "only_people_you_mention":
+        if (widget.postFeedModel!.post!.mentionList!
+            .contains(globals.user!.username)) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 21.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: CustomRoundTextField(
+                      onTap: () {
+                        RouteNavigators.route(
+                            context,
+                            CommentReach(
+                              postFeedModel: postFeedModel!,
+                            ));
+                      },
+                      verticalHeight: 0,
+                      controller: controller,
+                      hintText: 'Comment on this post...',
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.emoji_emotions_outlined),
+                          onPressed: () {
+                            showEmoji.value = !showEmoji.value;
+                          }),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                      ))
+                ],
+              ),
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+
+      case "none":
+        return const SizedBox.shrink();
+
+      default:
+        return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 21.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: CustomRoundTextField(
+                      onTap: () {
+                        RouteNavigators.route(
+                            context,
+                            CommentReach(
+                              postFeedModel: postFeedModel!,
+                            ));
+                      },
+                      verticalHeight: 0,
+                      controller: controller,
+                      hintText: 'Comment on this post...',
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.emoji_emotions_outlined),
+                          onPressed: () {
+                            showEmoji.value = !showEmoji.value;
+                          }),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.camera_alt_outlined,
+                      ))
+                ],
+              ),
+            ),
+          );
+       
     }
   }
 }

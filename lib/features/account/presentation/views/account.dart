@@ -1097,7 +1097,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'upvote',
+                                                voteType: 'Upvote',
                                                 postId: _likedPosts
                                                     .value[index].postId,
                                               ));
@@ -1108,7 +1108,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'downvote',
+                                                voteType: 'Downvote',
                                                 postId: _likedPosts
                                                     .value[index].postId,
                                               ));
@@ -1267,7 +1267,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'upvote',
+                                                voteType: 'Upvote',
                                                 postId: _shoutOuts
                                                     .value[index].postId,
                                               ));
@@ -1278,7 +1278,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'downvote',
+                                                voteType: 'Downvote',
                                                 postId: _shoutOuts
                                                     .value[index].postId,
                                               ));
