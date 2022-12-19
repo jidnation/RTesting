@@ -89,6 +89,13 @@ mutation($momentId: String!, $content: String,$momentOwnerId: String, $sound: St
   }
 ''';
 
+const reachUser = r'''
+  mutation($userIdToReach: String!){
+    reachUser(userIdToReach: $userIdToReach){
+    isReaching
+  }  
+''';
+
 //used
 const String getMomentFeed = r''' 
 query ($pageLimit: Int!, $pageNumber: Int!, $authIdToGet: String) {

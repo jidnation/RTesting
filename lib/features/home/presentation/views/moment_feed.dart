@@ -77,28 +77,39 @@ class _MomentFeedState extends State<MomentFeed> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Stack(children: [
-                                                  SizedBox(
-                                                    height: 70,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          height: 49.44,
-                                                          width: 49.44,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        40),
-                                                            color: Colors.red,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                  InkWell(
+                                                    onTap: () {
+                                                      momentFeedStore.reachUser(
+                                                        toReachId: momentFeed
+                                                            .momentOwnerId,
+                                                        id: momentFeed.id,
+                                                      );
+                                                    },
+                                                    child: SizedBox(
+                                                      height: 70,
+                                                      child: CircleAvatar(
+                                                        radius: 25.5,
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .primaryColor,
+                                                        backgroundImage: (momentFeed
+                                                                        .profilePicture !=
+                                                                    null ||
+                                                                momentFeed
+                                                                        .profilePicture !=
+                                                                    '')
+                                                            ? NetworkImage(
+                                                                    momentFeed
+                                                                        .profilePicture!)
+                                                                as ImageProvider
+                                                            : const AssetImage(
+                                                                "assets/images/app-logo.png"),
+                                                      ),
                                                     ),
                                                   ),
                                                   Positioned(
-                                                      bottom: 12,
-                                                      right: 12,
+                                                      bottom: 2,
+                                                      right: 14,
                                                       child: Container(
                                                         height: 20,
                                                         width: 20,
@@ -106,8 +117,11 @@ class _MomentFeedState extends State<MomentFeed> {
                                                             Alignment.center,
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: AppColors
-                                                              .primaryColor,
+                                                          color: momentFeed
+                                                                  .reachingUser
+                                                              ? Colors.green
+                                                              : AppColors
+                                                                  .primaryColor,
                                                           border: Border.all(
                                                             color: Colors.white,
                                                             width: 1.2,
@@ -116,9 +130,12 @@ class _MomentFeedState extends State<MomentFeed> {
                                                               BorderRadius
                                                                   .circular(30),
                                                         ),
-                                                        child: const Center(
+                                                        child: Center(
                                                             child: Icon(
-                                                          Icons.add,
+                                                          momentFeed
+                                                                  .reachingUser
+                                                              ? Icons.check
+                                                              : Icons.add,
                                                           size: 13,
                                                           color: Colors.white,
                                                         )),
@@ -184,18 +201,23 @@ class _MomentFeedState extends State<MomentFeed> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              const CustomText(
-                                                text: '@jasonstatham',
-                                                color: Colors.white,
-                                                weight: FontWeight.w600,
-                                                size: 16.28,
+                                              FittedBox(
+                                                child: CustomText(
+                                                  text:
+                                                      '@${momentFeed.momentOwnerUserName}',
+                                                  color: Colors.white,
+                                                  weight: FontWeight.w600,
+                                                  size: 16.28,
+                                                ),
                                               ),
                                               const SizedBox(height: 5),
                                               SizedBox(
                                                 width: getScreenWidth(300),
-                                                child: const CustomText(
-                                                  text:
-                                                      'The normal ride through the street...\ni sure miss my home #moviestudio...\nMore',
+                                                child: CustomText(
+                                                  text: momentFeed.caption !=
+                                                          'No Caption'
+                                                      ? momentFeed.caption
+                                                      : '',
                                                   color: Colors.white,
                                                   weight: FontWeight.w600,
                                                   // overflow: TextOverflow.ellipsis,

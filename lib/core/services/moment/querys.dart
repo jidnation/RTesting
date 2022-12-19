@@ -53,7 +53,7 @@ class MomentQuery {
     return queryResult.data?['createMoment']['authId'] != null;
   }
 
-  static deleteMoment({required String momentId}) async {
+   deleteMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -78,7 +78,7 @@ class MomentQuery {
     // return queryResult.data?['createMoment']['authId'] != null;
   }
 
-  static likeMoment({required String momentId}) async {
+  likeMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -103,7 +103,32 @@ class MomentQuery {
     return queryResult.data?['likeMoment']['authId'] != null;
   }
 
-  static unlikeMoment({required String momentId}) async {
+  reachUser({required String reachingId}) async {
+    HttpLink link = HttpLink(
+      "https://api.myreach.me/",
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {'userIdToReach': reachingId};
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.likeMoment,
+      ),
+      variables: momentVariables,
+    ));
+    log('from the reaching user end::::: $queryResult');
+    // return queryResult.data?['likeMoment']['authId'] != null;
+  }
+
+   unlikeMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -170,7 +195,7 @@ class MomentQuery {
     }
   }
 
-  static Future<Moment?>? getMoment({required String momentId}) async {
+   Future<Moment?>? getMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{

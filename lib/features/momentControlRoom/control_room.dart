@@ -42,6 +42,12 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
             videoUrl: momentFeed.moment!.videoMediaItem!,
             isLiked: momentFeed.moment!.isLiked!,
             nLikes: momentFeed.moment!.nLikes!,
+            momentOwnerId: momentFeed.moment!.momentOwnerProfile!.authId!,
+            momentOwnerUserName:
+                momentFeed.moment!.momentOwnerProfile!.username!,
+            reachingUser: momentFeed.reachingRelationship!,
+            profilePicture:
+                momentFeed.moment!.momentOwnerProfile!.profilePicture,
             nComment: momentFeed.moment!.nComments!,
             momentId: momentFeed.moment!.momentId!,
             caption: momentFeed.moment!.caption!));
@@ -125,11 +131,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         if (momentModel.isLiked) {
           momentModel.isLiked = false;
           momentModel.nLikes -= 1;
-          response = await MomentQuery.unlikeMoment(momentId: momentId);
+          response = await momentQuery.unlikeMoment(momentId: momentId);
         } else {
           momentModel.isLiked = true;
           momentModel.nLikes += 1;
-          response = await MomentQuery.likeMoment(momentId: momentId);
+          response = await momentQuery.likeMoment(momentId: momentId);
         }
       }
     }
@@ -153,7 +159,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   getMoment({required String momentId, required String id}) async {
     print('getting moment called::::::: $value');
     List<MomentModel> currentList = value;
-    Moment? response = await MomentQuery.getMoment(momentId: momentId);
+    Moment? response = await momentQuery.getMoment(momentId: momentId);
 
     if (response != null) {
       for (MomentModel momentFeed in currentList) {
@@ -167,27 +173,38 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
     notifyListeners();
   }
+
+  reachUser({required String toReachId, required String id}) async {
+    var response = await momentQuery.reachUser(reachingId: '');
+    print('from the reaching end this is us>>>>>>>>>>>>> $response');
+  }
 }
 
 class MomentModel {
   final String id;
   final String videoUrl;
   final String? soundUrl;
+  bool reachingUser;
   int nLikes;
   int nComment;
   bool isLiked;
   final String momentId;
   final String? profilePicture;
+  final String momentOwnerId;
+  final String momentOwnerUserName;
   final String caption;
 
   MomentModel(
       {required this.videoUrl,
       this.soundUrl,
+      required this.reachingUser,
       required this.isLiked,
+      required this.momentOwnerId,
+      required this.momentOwnerUserName,
       required this.nLikes,
       required this.nComment,
       required this.momentId,
       this.profilePicture,
       required this.caption})
-      : id = Uuid().v4();
+      : id = const Uuid().v4();
 }
