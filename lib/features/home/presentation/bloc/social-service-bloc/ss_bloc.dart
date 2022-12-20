@@ -163,7 +163,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(VotePostLoading());
       try {
         final response = await socialServiceRepository.votePost(
-          postId: event.postId!,
+          postId: event.postId ?? '',
           voteType: event.voteType!,
         );
         response.fold(
@@ -197,12 +197,14 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           commentId: event.commentId!,
         );
         response.fold(
-          (error) => emit(LikeCommentOnPostError(error: error, commentId: event.commentId!)),
+          (error) => emit(LikeCommentOnPostError(
+              error: error, commentId: event.commentId!)),
           (commentLikeModel) => emit(
               LikeCommentOnPostSuccess(commentLikeModel: commentLikeModel)),
         );
       } on GraphQLError catch (e) {
-        emit(LikeCommentOnPostError(error: e.message,commentId: event.commentId!));
+        emit(LikeCommentOnPostError(
+            error: e.message, commentId: event.commentId!));
       }
     });
     on<UnlikeCommentOnPostEvent>((event, emit) async {
@@ -213,12 +215,14 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
           likeId: event.likeId!,
         );
         response.fold(
-          (error) => emit(UnlikeCommentOnPostError(error: error, commentId: event.commentId!)),
+          (error) => emit(UnlikeCommentOnPostError(
+              error: error, commentId: event.commentId!)),
           (unlikeComment) =>
               emit(UnlikeCommentOnPostSuccess(unlikeComment: unlikeComment)),
         );
       } on GraphQLError catch (e) {
-        emit(UnlikeCommentOnPostError(error: e.message, commentId: event.commentId!));
+        emit(UnlikeCommentOnPostError(
+            error: e.message, commentId: event.commentId!));
       }
     });
     on<CheckCommentLikeEvent>((event, emit) async {

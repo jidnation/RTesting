@@ -559,198 +559,179 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       _posts.value.length,
                                                   itemBuilder:
                                                       (context, index) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        () => Navigator.of(context).push(
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (builder) =>
-                                                                        FullPostScreen(
-                                                                          postFeedModel:
-                                                                              _posts.value[index],
-                                                                        )));
+                                                    return PostFeedReacherCard(
+                                                      likingPost: false,
+                                                      postFeedModel:
+                                                          _posts.value[index],
+                                                      voterProfile: _posts
+                                                          .value[index]
+                                                          .voterProfile,
+                                                      isLiked: (_posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false)
+                                                          ? true
+                                                          : false,
+                                                      isVoted: (_posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isVoted ??
+                                                              '')
+                                                          .isNotEmpty,
+                                                      voteType: _posts
+                                                          .value[index]
+                                                          .post
+                                                          ?.isVoted,
+                                                      onViewProfile: () {
+                                                        viewProfile.value =
+                                                            true;
+                                                        ProgressHUD.of(context)
+                                                            ?.showWithText(
+                                                                'Viewing Profile');
+                                                        globals.userBloc!.add(
+                                                            GetRecipientProfileEvent(
+                                                                email: _posts
+                                                                    .value[
+                                                                        index]
+                                                                    .postOwnerId));
                                                       },
-                                                      child:
-                                                          PostFeedReacherCard(
-                                                        likingPost: false,
-                                                        postFeedModel:
-                                                            _posts.value[index],
-                                                        voterProfile: _posts
-                                                            .value[index]
-                                                            .voterProfile,
-                                                        isLiked: (_posts
-                                                                    .value[
-                                                                        index]
-                                                                    .post
-                                                                    ?.isLiked ??
-                                                                false)
-                                                            ? true
-                                                            : false,
-                                                        isVoted: (_posts
-                                                                    .value[
-                                                                        index]
-                                                                    .post
-                                                                    ?.isVoted ??
-                                                                '')
-                                                            .isNotEmpty,
-                                                        voteType: _posts
-                                                            .value[index]
-                                                            .post
-                                                            ?.isVoted,
-                                                        onViewProfile: () {
-                                                          viewProfile.value =
-                                                              true;
-                                                          ProgressHUD.of(
-                                                                  context)
-                                                              ?.showWithText(
-                                                                  'Viewing Profile');
+                                                      onMessage: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
                                                           globals.userBloc!.add(
                                                               GetRecipientProfileEvent(
                                                                   email: _posts
                                                                       .value[
                                                                           index]
-                                                                      .postOwnerId));
-                                                        },
-                                                        onMessage: () {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          reachDM.value = true;
+                                                                      .postOwnerId!));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
 
-                                                          handleTap(index);
-                                                          if (active.contains(
-                                                              index)) {
-                                                            globals.userBloc!.add(
-                                                                GetRecipientProfileEvent(
-                                                                    email: _posts
-                                                                        .value[
-                                                                            index]
-                                                                        .postOwnerId!));
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if ((_posts
+                                                                      .value[
+                                                                          index]
+                                                                      .vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
                                                           }
-                                                        },
-                                                        onUpvote: () {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          handleTap(index);
-
-                                                          if (active.contains(
-                                                              index)) {
-                                                            if ((_posts
-                                                                        .value[
-                                                                            index]
-                                                                        .vote ??
-                                                                    [])
-                                                                .isEmpty) {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      VotePostEvent(
-                                                                voteType:
-                                                                    'Upvote',
-                                                                postId: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postId,
-                                                              ));
-                                                            } else {
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      DeletePostVoteEvent(
-                                                                voteId: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postId,
-                                                              ));
-                                                            }
-                                                          }
-                                                        },
-                                                        onDownvote: () {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          handleTap(index);
-                                                          _currentPost.value =
-                                                              _posts
-                                                                  .value[index];
-                                                          if (active.contains(
-                                                              index)) {
-                                                            shoutingDown.value =
-                                                                true;
-                                                            globals.userBloc!.add(GetReachRelationshipEvent(
-                                                                userIdToReach: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postOwnerId,
-                                                                type: ReachRelationshipType
-                                                                    .reacher));
-                                                          }
-                                                        },
-                                                        onLike: () {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          handleTap(index);
-                                                          // Console.log(
-                                                          //     'Like Data',
-                                                          //     _posts.value[index]
-                                                          //         .toJson());
-                                                          if (active.contains(
-                                                              index)) {
-                                                            if (_posts
-                                                                    .value[
-                                                                        index]
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        _currentPost.value =
+                                                            _posts.value[index];
+                                                        if (active
+                                                            .contains(index)) {
+                                                          shoutingDown.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: _posts
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                        }
+                                                      },
+                                                      onLike: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_posts
+                                                                  .value[index]
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false) {
+                                                            _posts
+                                                                    .value[index]
                                                                     .post
-                                                                    ?.isLiked ??
-                                                                false) {
-                                                              _posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.isLiked = false;
-                                                              _posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.nLikes = (_posts
-                                                                          .value[
-                                                                              index]
-                                                                          .post
-                                                                          ?.nLikes ??
-                                                                      1) -
-                                                                  1;
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      UnlikePostEvent(
-                                                                postId: _posts
-                                                                    .value[
-                                                                        index]
-                                                                    .postId,
-                                                              ));
-                                                            } else {
-                                                              _posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.isLiked = true;
-                                                              _posts
-                                                                  .value[index]
-                                                                  .post
-                                                                  ?.nLikes = (_posts
-                                                                          .value[
-                                                                              index]
-                                                                          .post
-                                                                          ?.nLikes ??
-                                                                      0) +
-                                                                  1;
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                LikePostEvent(
-                                                                    postId: _posts
+                                                                    ?.isLiked =
+                                                                false;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
                                                                         .value[
                                                                             index]
-                                                                        .postId),
-                                                              );
-                                                            }
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    1) -
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: _posts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.isLiked = true;
+                                                            _posts
+                                                                .value[index]
+                                                                .post
+                                                                ?.nLikes = (_posts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    0) +
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _posts
+                                                                      .value[
+                                                                          index]
+                                                                      .postId),
+                                                            );
                                                           }
-                                                        },
-                                                      ),
+                                                        }
+                                                      },
                                                     );
                                                   },
                                                 ),
@@ -864,166 +845,74 @@ class PostFeedReacherCard extends HookWidget {
       ),
       child: RepaintBoundary(
         key: scr,
-        child: Container(
-          width: size.width,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Visibility(
-                visible: voterProfile != null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: RichText(
-                        text: TextSpan(
-                            text:
-                                '@${voterProfile?.authId != globals.userId ? voterProfile?.username?.appendOverflow(15) : 'You'}',
-                            style: const TextStyle(
-                                color: AppColors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                            children: const [
-                              TextSpan(
-                                  text: ' shouted out this reach',
-                                  style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: AppColors.grey,
-                                      fontWeight: FontWeight.w500))
-                            ]),
-                      ),
-                    ),
-                    SizedBox(
-                      height: getScreenHeight(8),
-                    ),
-                    const Divider(
-                      height: 1,
-                      thickness: 1,
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (builder) => FullPostScreen(
+                      postFeedModel: postFeedModel,
+                    )));
+            debugPrint("Full post clicked 1");
+          },
+          child: Container(
+            width: size.width,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                 Navigator.of(context).push(MaterialPageRoute(
+                    builder: (builder) => FullPostScreen(
+                          postFeedModel: postFeedModel,
+                        )));
+                debugPrint("Full post clicked");
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: CupertinoButton(
-                      minSize: 0,
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        if (onViewProfile != null) {
-                          onViewProfile!();
-                        } else {
-                          final progress = ProgressHUD.of(context);
-                          progress?.showWithText('Viewing Reacher...');
-                          Future.delayed(const Duration(seconds: 3), () {
-                            globals.userBloc!.add(GetRecipientProfileEvent(
-                                email: postFeedModel!.postOwnerId));
-                            postFeedModel!.postOwnerId == globals.user!.id
-                                ? RouteNavigators.route(
-                                    context, const AccountScreen())
-                                : RouteNavigators.route(
-                                    context,
-                                    RecipientAccountProfile(
-                                      recipientEmail: 'email',
-                                      recipientImageUrl:
-                                          postFeedModel!.profilePicture,
-                                      recipientId: postFeedModel!.postOwnerId,
-                                    ));
-                            progress?.dismiss();
-                          });
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Helper.renderProfilePicture(
-                            postFeedModel!.profilePicture,
-                            size: 33,
-                          ).paddingOnly(l: 13, t: 10),
-                          SizedBox(width: getScreenWidth(9)),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '@${postFeedModel!.username ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(14),
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textColor2,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  postFeedModel!.verified ?? false
-                                      ? SvgPicture.asset(
-                                          'assets/svgs/verified.svg')
-                                      : const SizedBox.shrink()
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                        builder: (builder) => FullPostScreen(
-                                              postFeedModel: postFeedModel,
-                                            ))),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      postFeedModel!.post!.location! == 'nil' ||
-                                              postFeedModel!.post!.location! ==
-                                                  'NIL' ||
-                                              postFeedModel!.post!.location ==
-                                                  null
-                                          ? ''
-                                          : postFeedModel!
-                                                      .post!.location!.length >
-                                                  23
-                                              ? postFeedModel!.post!.location!
-                                                  .substring(0, 23)
-                                              : postFeedModel!.post!.location!,
+                  Visibility(
+                    visible: voterProfile != null,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                          child: RichText(
+                            text: TextSpan(
+                                text:
+                                    '@${voterProfile?.authId != globals.userId ? voterProfile?.username?.appendOverflow(15) : 'You'}',
+                                style: const TextStyle(
+                                    color: AppColors.black,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500),
+                                children: const [
+                                  TextSpan(
+                                      text: ' shouted out this reach',
                                       style: TextStyle(
-                                        fontSize: getScreenHeight(10),
-                                        fontFamily: 'Poppins',
-                                        letterSpacing: 0.4,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    ),
-                                    Text(
-                                      postDuration,
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(10),
-                                        fontFamily: 'Poppins',
-                                        letterSpacing: 0.4,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.textColor2,
-                                      ),
-                                    ).paddingOnly(l: 6),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ).paddingOnly(t: 10),
-                        ],
-                      ),
+                                          fontFamily: 'Poppins',
+                                          color: AppColors.grey,
+                                          fontWeight: FontWeight.w500))
+                                ]),
+                          ),
+                        ),
+                        SizedBox(
+                          height: getScreenHeight(8),
+                        ),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                        ),
+                      ],
                     ),
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+
                       //  SvgPicture.asset('assets/svgs/starred.svg'),
                       SizedBox(width: getScreenWidth(9)),
                       IconButton(
@@ -1136,7 +1025,58 @@ class PostFeedReacherCard extends HookWidget {
                                     height: getScreenHeight(30),
                                     width: getScreenWidth(30),
                                   ),
+                                  GestureDetector(
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                FullPostScreen(
+                                                  postFeedModel: postFeedModel,
+                                                ))),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          postFeedModel!.post!.location! ==
+                                                      'nil' ||
+                                                  postFeedModel!
+                                                          .post!.location! ==
+                                                      'NIL' ||
+                                                  postFeedModel!.post!.location ==
+                                                      null
+                                              ? ''
+                                              : postFeedModel!.post!.location!
+                                                          .length >
+                                                      23
+                                                  ? postFeedModel!
+                                                      .post!.location!
+                                                      .substring(0, 23)
+                                                  : postFeedModel!
+                                                      .post!.location!,
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(10),
+                                            fontFamily: 'Poppins',
+                                            letterSpacing: 0.4,
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.textColor2,
+                                          ),
+                                        ),
+                                        Text(
+                                          postDuration,
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(10),
+                                            fontFamily: 'Poppins',
+                                            letterSpacing: 0.4,
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.textColor2,
+                                          ),
+                                        ).paddingOnly(l: 6),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ).paddingOnly(t: 10),
+                            ],
                           ),
+
                           SizedBox(width: getScreenWidth(4)),
                           FittedBox(
                             child: Text(
@@ -1186,14 +1126,76 @@ class PostFeedReacherCard extends HookWidget {
                                 width: getScreenWidth(30),
                               ),
                             ),
+
                         ],
-                      ),
-                    ),
+                      )
+                    ],
                   ),
-                  SizedBox(width: getScreenWidth(20)),
+                  postFeedModel!.post!.content == null
+                      ? const SizedBox.shrink()
+                      : ExpandableText(
+                          "${postFeedModel!.post!.content}",
+                          prefixText: postFeedModel!.post!.edited!
+                              ? "(Reach Edited)"
+                              : null,
+                          prefixStyle: TextStyle(
+                              fontSize: getScreenHeight(12),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryColor),
+                          onPrefixTap: () {
+                            tooltipkey.currentState?.ensureTooltipVisible();
+                          },
+                          expandText: 'see more',
+                          maxLines: 2,
+                          linkColor: Colors.blue,
+                          animation: true,
+                          expanded: false,
+                          collapseText: 'see less',
+                          onHashtagTap: (value) {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return DictionaryDialog(
+                                    abbr: value,
+                                    meaning: '',
+                                    word: '',
+                                  );
+                                });
+                          },
+                          onMentionTap: (value) {},
+                          mentionStyle: const TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Colors.blue),
+                          hashtagStyle: const TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Colors.blue),
+                        ).paddingSymmetric(h: 16, v: 10),
+                  Tooltip(
+                    key: tooltipkey,
+                    triggerMode: TooltipTriggerMode.manual,
+                    showDuration: const Duration(seconds: 1),
+                    message: 'This reach has been edited',
+                  ),
+                  if ((postFeedModel?.post?.imageMediaItems ?? []).isNotEmpty ||
+                      (postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
+                    PostMedia(post: postFeedModel!.post!)
+                        .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                  else
+                    const SizedBox.shrink(),
+                  (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
+                      ? PostAudioMedia(
+                              path: postFeedModel!.post!.audioMediaItem!)
+                          .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      : const SizedBox.shrink(),
+                  (postFeedModel?.post?.repostedPost != null)
+                      ? RepostedPost(
+                          post: postFeedModel!.post!,
+                        ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
+                      : const SizedBox.shrink(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Flexible(
                         child: Container(
@@ -1211,10 +1213,11 @@ class PostFeedReacherCard extends HookWidget {
                             children: [
                               CupertinoButton(
                                 minSize: 0,
-                                onPressed: onUpvote,
+                                onPressed: onLike,
                                 padding: EdgeInsets.zero,
-                                child: isVoted && voteType == 'Upvote'
+                                child: isLiked
                                     ? SvgPicture.asset(
+
                                         'assets/svgs/shoutup-active.svg',
                                         height: getScreenHeight(30),
                                         width: getScreenWidth(30),
@@ -1223,11 +1226,13 @@ class PostFeedReacherCard extends HookWidget {
                                         'assets/svgs/shoutup.svg',
                                         height: getScreenHeight(30),
                                         width: getScreenWidth(30),
+
                                       ),
                               ),
+                              SizedBox(width: getScreenWidth(4)),
                               FittedBox(
                                 child: Text(
-                                  '${postFeedModel!.post!.nUpvotes ?? 0}',
+                                  '${postFeedModel!.post!.nLikes}',
                                   style: TextStyle(
                                     fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w500,
@@ -1235,14 +1240,15 @@ class PostFeedReacherCard extends HookWidget {
                                   ),
                                 ),
                               ),
-                              Flexible(
-                                  child: SizedBox(width: getScreenWidth(4))),
-                              Flexible(
-                                  child: SizedBox(width: getScreenWidth(4))),
+                              SizedBox(width: getScreenWidth(15)),
                               CupertinoButton(
                                 minSize: 0,
-                                onPressed: onDownvote,
+                                onPressed: () {
+                                  RouteNavigators.route(context,
+                                      ViewCommentsScreen(post: postFeedModel!));
+                                },
                                 padding: EdgeInsets.zero,
+
                                 child: isVoted && voteType == 'Downvote'
                                     ? SvgPicture.asset(
                                         'assets/svgs/shoutdown-active.svg',
@@ -1254,10 +1260,12 @@ class PostFeedReacherCard extends HookWidget {
                                         height: getScreenHeight(30),
                                         width: getScreenWidth(30),
                                       ),
+
                               ),
+                              SizedBox(width: getScreenWidth(4)),
                               FittedBox(
                                 child: Text(
-                                  '${postFeedModel!.post!.nDownvotes ?? 0}',
+                                  '${postFeedModel!.post!.nComments}',
                                   style: TextStyle(
                                     fontSize: getScreenHeight(15),
                                     fontWeight: FontWeight.w500,
@@ -1265,17 +1273,114 @@ class PostFeedReacherCard extends HookWidget {
                                   ),
                                 ),
                               ),
-                              Flexible(
-                                  child: SizedBox(width: getScreenWidth(4))),
+                              if (postFeedModel!.postOwnerId != globals.userId)
+                                SizedBox(width: getScreenWidth(15)),
+                              if (postFeedModel!.postOwnerId != globals.userId)
+                                CupertinoButton(
+                                  minSize: 0,
+                                  onPressed: onMessage,
+                                  padding: const EdgeInsets.all(0),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/message.svg',
+                                    height: getScreenHeight(20),
+                                    width: getScreenWidth(20),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
                       ),
+                      SizedBox(width: getScreenWidth(20)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 11,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0xFFF5F5F5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CupertinoButton(
+                                    minSize: 0,
+                                    onPressed: onUpvote,
+                                    padding: EdgeInsets.zero,
+                                    child: isVoted && voteType == 'Upvote'
+                                        ? SvgPicture.asset(
+                                            'assets/svgs/shoutup-active.svg',
+                                            height: getScreenHeight(20),
+                                            width: getScreenWidth(20),
+                                          )
+                                        : SvgPicture.asset(
+                                            'assets/svgs/shoutup.svg',
+                                            height: getScreenHeight(20),
+                                            width: getScreenWidth(20),
+                                          ),
+                                  ),
+                                  FittedBox(
+                                    child: Text(
+                                      '${postFeedModel!.post!.nUpvotes ?? 0}',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(12),
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textColor3,
+                                      ),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                  CupertinoButton(
+                                    minSize: 0,
+                                    onPressed: onDownvote,
+                                    padding: EdgeInsets.zero,
+                                    child: isVoted && voteType == 'Downvote'
+                                        ? SvgPicture.asset(
+                                            'assets/svgs/shoutdown-active.svg',
+                                            height: getScreenHeight(20),
+                                            width: getScreenWidth(20),
+                                          )
+                                        : SvgPicture.asset(
+                                            'assets/svgs/shoutdown.svg',
+                                            height: getScreenHeight(20),
+                                            width: getScreenWidth(20),
+                                          ),
+                                  ),
+                                  FittedBox(
+                                    child: Text(
+                                      '${postFeedModel!.post!.nDownvotes ?? 0}',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(12),
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textColor3,
+                                      ),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child:
+                                          SizedBox(width: getScreenWidth(4))),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
-                  ),
+                  ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
                 ],
-              ).paddingOnly(b: 15, r: 16, l: 16, t: 5),
-            ],
+              ),
+            ),
           ),
         ),
       ),

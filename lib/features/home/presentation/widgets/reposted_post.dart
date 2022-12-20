@@ -1,6 +1,7 @@
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -8,7 +9,12 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../../core/services/navigation/navigation_service.dart';
+import '../../../../core/utils/app_globals.dart';
+import '../../../account/presentation/views/account.dart';
 
 class RepostedPost extends StatelessWidget {
   final PostModel post;
@@ -37,16 +43,16 @@ class RepostedPost extends StatelessWidget {
                 minSize: 0,
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  // final progress = ProgressHUD.of(context);
-                  // progress
-                  //     ?.showWithText('Viewing Reacher...');
+                 
+                  final progress = ProgressHUD.of(context);
+                  progress
+                      ?.showWithText('Viewing Reacher...');
                   // Future.delayed(const Duration(seconds: 3),
                   //         () {
                   //       globals.userBloc!.add(
                   //           GetRecipientProfileEvent(
-                  //               email: widget
-                  //                   .postFeedModel.postOwnerId));
-                  //       widget.postFeedModel.postOwnerId ==
+                  //               email: post.postOwnerProfile!.authId));
+                  //        post.postOwnerProfile!.authId ==
                   //           globals.user!.id
                   //           ? RouteNavigators.route(
                   //           context, const AccountScreen())
@@ -54,14 +60,30 @@ class RepostedPost extends StatelessWidget {
                   //           context,
                   //           RecipientAccountProfile(
                   //             recipientEmail: 'email',
-                  //             recipientImageUrl: widget
-                  //                 .postFeedModel
-                  //                 .profilePicture,
-                  //             recipientId: widget
-                  //                 .postFeedModel.postOwnerId,
+                  //             recipientImageUrl:  post.postOwnerProfile!.profilePicture,
+                  //             recipientId:  post.postOwnerProfile!.authId,
                   //           ));
                   //       progress?.dismiss();
                   //     });
+
+                   Future.delayed(const Duration(seconds: 3),
+                          () {
+                        globals.userBloc!.add(
+                            GetRecipientProfileEvent(
+                                email: post.repostedPostOwnerProfile!.authId));
+                         post.repostedPostOwnerProfile!.authId ==
+                            globals.user!.id
+                            ? RouteNavigators.route(
+                            context, const AccountScreen())
+                            : RouteNavigators.route(
+                            context,
+                            RecipientAccountProfile(
+                              recipientEmail: 'email',
+                              recipientImageUrl:  post.repostedPostOwnerProfile!.profilePicture,
+                              recipientId:  post.repostedPostOwnerProfile!.authId,
+                            ));
+                        progress?.dismiss();
+                      });
                 },
                 child: Row(
                   children: [
