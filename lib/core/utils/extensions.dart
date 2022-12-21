@@ -51,3 +51,13 @@ extension StringExtention on String {
     }
   }
 }
+
+extension Mentions on String {
+  List<String>? get mentions {
+    final regExp = RegExp('(@\\w+)');
+
+    final matches = regExp.allMatches(this).map((e) => e[0]);
+
+    return matches.map((e) => e!.replaceAll('@', '')).toList();
+  }
+}
