@@ -41,10 +41,10 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: _videoPlayerController.value.aspectRatio,
+      // aspectRatio: _videoPlayerController.value.aspectRatio,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
-      // allowFullScreen: true,
+      allowFullScreen: true,
       // fullScreenByDefault: true,
       looping: true,
       progressIndicatorDelay:
