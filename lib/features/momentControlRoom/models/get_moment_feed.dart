@@ -10,7 +10,7 @@ class MomentFeedModel {
   });
 
   final String? typename;
-  final List<GetMomentFeed>? getMomentFeed;
+  List<GetMomentFeed>? getMomentFeed;
 
   factory MomentFeedModel.fromJson(Map<String, dynamic> json) =>
       MomentFeedModel(
@@ -32,7 +32,7 @@ class GetMomentFeed {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final OwnerProfile? feedOwnerProfile;
-  final Moment? moment;
+  Moment? moment;
   final bool? reachingRelationship;
 
   factory GetMomentFeed.fromJson(Map<String, dynamic> json) => GetMomentFeed(
@@ -100,18 +100,18 @@ class Moment {
     this.momentOwnerProfile,
   });
 
-  final String? momentId;
-  final String? caption;
-  final String? authId;
-  final List<String>? mentionList;
-  final List<String>? hashTags;
-  final DateTime? createdAt;
-  final bool? isLiked;
-  final int? nLikes;
-  final int? nComments;
-  final String? momentSlug;
-  final String? sound;
-  final String? videoMediaItem;
+  String? momentId;
+  String? caption;
+  String? authId;
+  List<String>? mentionList;
+  List<String>? hashTags;
+  DateTime? createdAt;
+  bool? isLiked;
+  int? nLikes;
+  int? nComments;
+  String? momentSlug;
+  String? sound;
+  String? videoMediaItem;
   final OwnerProfile? momentOwnerProfile;
 
   factory Moment.fromJson(Map<String, dynamic> json) => Moment(

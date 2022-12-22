@@ -8,8 +8,10 @@ import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
+import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_compress/video_compress.dart';
+import 'package:video_compress/video_compress.dart' as vc;
+// import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -199,28 +201,48 @@ class MediaService {
   }
 
   Future<FileResult> compressVideo({required FileResult file}) async {
-    final res = await VideoCompress.compressVideo(
+    final res = await vc.VideoCompress.compressVideo(
       file.path,
-      quality: VideoQuality.MediumQuality,
+      quality: vc.VideoQuality.MediumQuality,
     );
 
     print('size1:::::::::::::::${res!.filesize! / 1024}');
-    print('size1:::::::::::::::${res.filesize! / 2048}');
     return FileResult(
         path: res.path!,
-        size: res.filesize! / 2048,
-        // size: res.filesize! / 1024,
+        size: res.filesize! / 1024,
         duration: file.duration,
         height: file.height,
         width: file.width,
         fileName: res.path!.split('/').last);
   }
 
+  Future<String> compressMomentVideo({required String filePath}) async {
+    final String videoName =
+        'ReachMe-${DateTime.now().millisecondsSinceEpoch}.mp4';
+    final LightCompressor _lightCompressor = LightCompressor();
+    final dynamic response = await _lightCompressor.compressVideo(
+      path: filePath,
+      // destinationPath: _destinationPath,
+      videoQuality: VideoQuality.low,
+      isMinBitrateCheckEnabled: false,
+      video: Video(videoName: videoName),
+      android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
+      ios: IOSConfig(saveInGallery: true),
+    );
+    // final res = await VideoCompress.compressVideo(
+    //   filePath,
+    //   quality: VideoQuality.DefaultQuality,
+    // );
+
+    // print('size1:::::::::::::::${res!.filesize! / 1024}');
+    return response.destinationPath;
+  }
+
   Future<String> removeAudio({required String filePath}) async {
-    final MediaInfo? res = await VideoCompress.compressVideo(
+    final vc.MediaInfo? res = await vc.VideoCompress.compressVideo(
       filePath,
       includeAudio: false,
-      quality: VideoQuality.MediumQuality,
+      quality: vc.VideoQuality.MediumQuality,
     );
     return res!.path!;
   }

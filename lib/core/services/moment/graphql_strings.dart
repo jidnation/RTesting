@@ -32,6 +32,7 @@ mutation($momentId: String!) {
     likeMoment (momentId: $momentId){
     authId
   }
+  }
 ''';
 
 const likeMomentReply = r'''
@@ -61,6 +62,7 @@ mutation($replyId: String!, $likeId: String!) {
 const unlikeMoment = r'''
 mutation($momentId: String!) {
     unlikeMoment (momentId: $momentId)
+    }
 ''';
 
 const editMomentContent = r'''
@@ -78,13 +80,21 @@ mutation($momentId: String!, $commentId: String!, $content: String!) {
     }
   }
 ''';
-
+// {content : $content, audioMediaItem: $sound, momentOwnerId: $momentOwnerId, imageMediaItems: $imageList, videoMediaItem: $videoUrl}
+// mutation($momentId: String!, $content: String,$momentOwnerId: String, $sound: String, $videoUrl: String, $imageList: [String]) {
 const createMomentComment = r'''
-mutation($momentId: String!, $content: String,$momentOwnerId: String, $sound: String, $videoUrl: String, $imageList: [String]) {
-    createMomentComment(commentBody: {content : $content, audioMediaItem: $sound, momentOwnerId: $momentOwnerId, imageMediaItems: $imageList, videoMediaItem: $videoUrl}){
+mutation($commentBody: MomentCommentInputDto!) {
+    createMomentComment(commentBody: $commentBody){
     authId
     }
   }
+''';
+
+const reachUser = r'''
+  mutation($userIdToReach: String!){
+    reachUser(userIdToReach: $userIdToReach){
+    isReaching
+  }  
 ''';
 
 //used
@@ -231,11 +241,12 @@ query ($momentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
       username,
       firstName,
       lastName,
+      location,
       profilePicture
     },
     postOwnerProfile{
       authId,
-      firstName,lastName,username,profilePicture
+      firstName,lastName,username,profilePicture, location
     }
     }
   }
@@ -347,5 +358,5 @@ query ($replyId: String!) {
 
 ///
 /// 23 in total
-/// 2 used
+/// 4 used
 ///
