@@ -209,7 +209,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   message: 'You shouted down on this user\'s posts');
               RouteNavigators.pop(context);
               globals.socialServiceBloc!
-        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
@@ -1236,7 +1236,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               ),
                                       )
                                     : const SizedBox.shrink(),
-                                    const SizedBox(height:40),
+                                const SizedBox(height: 40),
                               ],
                             ),
                           ),
@@ -1303,7 +1303,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
         );
       case "people_you_follow":
         debugPrint("ïsReaching $isReaching");
-        if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching ) {
+        if (widget.postFeedModel!.postOwnerId == globals.userId || isReaching) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0),
             child: SizedBox(
@@ -1390,41 +1390,40 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
       default:
         return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: CustomRoundTextField(
-                      onTap: () {
-                        RouteNavigators.route(
-                            context,
-                            CommentReach(
-                              postFeedModel: postFeedModel!,
-                            ));
-                      },
-                      verticalHeight: 0,
-                      controller: controller,
-                      hintText: 'Comment on this post...',
-                      suffixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined),
-                          onPressed: () {
-                            showEmoji.value = !showEmoji.value;
-                          }),
-                    ),
+          padding: const EdgeInsets.symmetric(horizontal: 21.0),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.85,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: CustomRoundTextField(
+                    onTap: () {
+                      RouteNavigators.route(
+                          context,
+                          CommentReach(
+                            postFeedModel: postFeedModel!,
+                          ));
+                    },
+                    verticalHeight: 0,
+                    controller: controller,
+                    hintText: 'Comment on this post...',
+                    suffixIcon: IconButton(
+                        icon: const Icon(Icons.emoji_emotions_outlined),
+                        onPressed: () {
+                          showEmoji.value = !showEmoji.value;
+                        }),
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.camera_alt_outlined,
-                      ))
-                ],
-              ),
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                    ))
+              ],
             ),
-          );
-       
+          ),
+        );
     }
   }
 }
