@@ -47,6 +47,7 @@ mutation($momentId: String!, $commentId: String!) {
     likeMomentComment (momentId: $momentId, commentId: $commentId){
     authId
   }
+  }
 ''';
 
 const unlikeMomentComment = r'''

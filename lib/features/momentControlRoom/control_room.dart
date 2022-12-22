@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../home/presentation/views/status/widgets/user_posting.dart';
 import 'models/get_comments_model.dart';
 import 'models/get_moment_feed.dart';
 import 'moment_cacher.dart';
@@ -27,6 +29,9 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
 
   bool _gettingUserComment = false;
   bool get gettingUserComment => _gettingUserComment;
+
+  bool _postingMoment = false;
+  bool get postingMoment => _postingMoment;
 
   int _currentSaveIndex = 0;
   int get currentSaveIndex => _currentSaveIndex;
@@ -224,6 +229,31 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       //     return;
       //   }
     }
+    notifyListeners();
+  }
+
+  postMoment(BuildContext context, {required String? videoUrl}) async {
+    _postingMoment = true;
+    if (videoUrl != null) {
+      print(":::::::::::::::::::::::::::n printing starrted :::::");
+      var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+      if (res) {
+        Snackbars.success(
+          context,
+          message: 'Moment successfully created',
+          milliseconds: 1300,
+        );
+        momentCtrl.clearPostingData();
+        RouteNavigators.pop(context);
+      } else {
+        Snackbars.error(
+          context,
+          message: 'Operation Failed, Try again.',
+          milliseconds: 1400,
+        );
+      }
+    }
+    _postingMoment = false;
     notifyListeners();
   }
 
