@@ -86,11 +86,11 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final likeId = useState<String?>(null);
     final reachingList = useState<List<VirtualReach>?>([]);
     final isReaching = useState(false);
-    // useMemoized(() {
-    //   globals.userBloc!.add(GetReachRelationshipEvent(
-    //       userIdToReach: widget.postFeedModel!.postOwnerId,
-    //       type: ReachRelationshipType.reacher));
-    // });
+    useMemoized(() {
+      globals.userBloc!.add(GetReachRelationshipEvent(
+          userIdToReach: widget.postFeedModel!.postOwnerId,
+          type: ReachRelationshipType.reacher));
+    });
 
     useMemoized(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
@@ -204,10 +204,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 voteType: 'Downvote',
                 postId: widget.postFeedModel!.postId,
               ));
-              print("Shoutdown success");
+              debugPrint("Shoutdown success");
               Snackbars.success(context,
                   message: 'You shouted down on this user\'s posts');
               RouteNavigators.pop(context);
+              globals.socialServiceBloc!
+                  .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
@@ -1233,7 +1235,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 },
                                               ),
                                       )
-                                    : const SizedBox.shrink()
+                                    : const SizedBox.shrink(),
+                                const SizedBox(height: 40),
                               ],
                             ),
                           ),
@@ -1387,41 +1390,40 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
       default:
         return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: CustomRoundTextField(
-                      onTap: () {
-                        RouteNavigators.route(
-                            context,
-                            CommentReach(
-                              postFeedModel: postFeedModel!,
-                            ));
-                      },
-                      verticalHeight: 0,
-                      controller: controller,
-                      hintText: 'Comment on this post...',
-                      suffixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined),
-                          onPressed: () {
-                            showEmoji.value = !showEmoji.value;
-                          }),
-                    ),
+          padding: const EdgeInsets.symmetric(horizontal: 21.0),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.85,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: CustomRoundTextField(
+                    onTap: () {
+                      RouteNavigators.route(
+                          context,
+                          CommentReach(
+                            postFeedModel: postFeedModel!,
+                          ));
+                    },
+                    verticalHeight: 0,
+                    controller: controller,
+                    hintText: 'Comment on this post...',
+                    suffixIcon: IconButton(
+                        icon: const Icon(Icons.emoji_emotions_outlined),
+                        onPressed: () {
+                          showEmoji.value = !showEmoji.value;
+                        }),
                   ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.camera_alt_outlined,
-                      ))
-                ],
-              ),
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.camera_alt_outlined,
+                    ))
+              ],
             ),
-          );
-       
+          ),
+        );
     }
   }
 }
