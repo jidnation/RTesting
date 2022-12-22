@@ -186,11 +186,21 @@ class _MomentFeedState extends State<MomentFeed> {
                                                   MomentFeedComment(
                                                       momentFeed: momentFeed),
                                                   const SizedBox(height: 15),
-                                                  SvgPicture.asset(
-                                                    'assets/svgs/message.svg',
-                                                    color: Colors.white,
-                                                    width: 24.44,
-                                                    height: 22,
+                                                  InkWell(
+                                                    onTap: () {
+                                                      // RouteNavigators.route(
+                                                      //     context,
+                                                      //     MsgChatInterface(
+                                                      //       recipientUser:
+                                                      //           User(gf),
+                                                      //     ));
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/message.svg',
+                                                      color: Colors.white,
+                                                      width: 24.44,
+                                                      height: 22,
+                                                    ),
                                                   ),
                                                 ]),
                                           ),
