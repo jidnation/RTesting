@@ -31,8 +31,6 @@ import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 import 'package:reach_me/features/video-call/video_call_screen.dart';
 import 'package:reach_me/features/voice-call/voice_call_screen.dart';
 
-import '../../../../core/utils/string_util.dart';
-
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
   const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);

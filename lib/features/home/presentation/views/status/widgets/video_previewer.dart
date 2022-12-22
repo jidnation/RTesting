@@ -9,7 +9,6 @@ import 'package:reach_me/features/home/presentation/views/status/widgets/user_po
 import 'package:video_player/video_player.dart';
 
 import '../../../../../../core/components/snackbar.dart';
-import '../../../../../../core/models/file_result.dart';
 import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
@@ -57,83 +56,87 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     });
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.4),
-      body: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: AspectRatio(
-              aspectRatio: widget.videoController.value.aspectRatio,
-              child: Stack(children: [
-                VideoPlayer(widget.videoController),
-                Positioned(
-                    top: size.height * 0.42,
-                    right: size.width * 0.42,
-                    child: InkWell(
-                      onTap: () async {
-                        isPlaying
-                            ? widget.videoController.pause()
-                            : widget.videoController.play();
-                      },
-                      child: Icon(
-                        isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    )),
-                Positioned(
-                    top: 20,
-                    left: 20,
-                    right: 20,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              RouteNavigators.pop(context);
-                            },
-                            child: Container(
-                              height: 46,
-                              width: 46,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                              child: SvgPicture.asset(
-                                'assets/svgs/back.svg',
-                                color: Colors.white,
+      body: SizedBox(
+        height: SizeConfig.screenHeight,
+        width: SizeConfig.screenWidth,
+        child: Column(children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: AspectRatio(
+                aspectRatio: widget.videoController.value.aspectRatio,
+                child: Stack(children: [
+                  VideoPlayer(widget.videoController),
+                  Positioned(
+                      top: size.height * 0.42,
+                      right: size.width * 0.42,
+                      child: InkWell(
+                        onTap: () async {
+                          isPlaying
+                              ? widget.videoController.pause()
+                              : widget.videoController.play();
+                        },
+                        child: Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 50,
+                        ),
+                      )),
+                  Positioned(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                RouteNavigators.pop(context);
+                              },
+                              child: Container(
+                                height: 46,
+                                width: 46,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25),
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                                child: SvgPicture.asset(
+                                  'assets/svgs/back.svg',
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                          CustomText(
-                            text: 'Video Preview',
-                            color: Colors.black.withOpacity(0.4),
-                            size: 15,
-                          ),
-                          const SizedBox(),
-                        ])),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          MomentActions(
-                            label: 'Filters',
-                            svgUrl: 'assets/svgs/filter-n.svg',
-                          ),
-                          SizedBox(height: 20),
-                          MomentActions(
-                            label: 'Voice over',
-                            svgUrl: 'assets/svgs/mic.svg',
-                          ),
-                        ]),
+                            CustomText(
+                              text: 'Video Preview',
+                              color: Colors.black.withOpacity(0.4),
+                              size: 15,
+                            ),
+                            const SizedBox(),
+                          ])),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            MomentActions(
+                              label: 'Filters',
+                              svgUrl: 'assets/svgs/filter-n.svg',
+                            ),
+                            SizedBox(height: 20),
+                            MomentActions(
+                              label: 'Voice over',
+                              svgUrl: 'assets/svgs/mic.svg',
+                            ),
+                          ]),
+                    ),
                   ),
-                ),
-              ]),
+                ]),
+              ),
             ),
           ),
           SizedBox(height: getScreenHeight(10)),
@@ -273,11 +276,12 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
                           var noAudioFile = await MediaService()
                               .removeAudio(filePath: widget.videoFile.path);
-                          FileResult fileResult = FileResult(path: noAudioFile);
-                          FileResult vFile = await MediaService()
-                              .compressVideo(file: fileResult);
-                          String? videoUrl = await FileConverter()
-                              .convertMe(filePath: vFile.path);
+                          // FileResult fileResult = FileResult(path: noAudioFile);
+                          String vFile = await MediaService()
+                              .compressMomentVideo(
+                                  filePath: noAudioFile); //removing the braces
+                          String? videoUrl =
+                              await FileConverter().convertMe(filePath: vFile);
                           if (videoUrl != null) {
                             var res = await MomentQuery.postMoment(
                                 videoMediaItem: videoUrl);
@@ -296,11 +300,43 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 milliseconds: 1400,
                               );
                             }
-                            setState(() {
-                              isUploading = false;
-                            });
+                            // setState(() {
+                            //   isUploading = false;
+                            // });
+                          }
+                        } else {
+                          print(
+                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
+
+                          String vFile =
+                              await MediaService().compressMomentVideo(
+                            filePath: widget.videoFile.path,
+                          );
+                          String? videoUrl =
+                              await FileConverter().convertMe(filePath: vFile);
+                          if (videoUrl != null) {
+                            var res = await MomentQuery.postMoment(
+                                videoMediaItem: videoUrl);
+                            if (res) {
+                              Snackbars.success(
+                                context,
+                                message: 'Moment successfully created',
+                                milliseconds: 1300,
+                              );
+                              momentCtrl.clearPostingData();
+                              RouteNavigators.pop(context);
+                            } else {
+                              Snackbars.error(
+                                context,
+                                message: 'Operation Failed, Try again.',
+                                milliseconds: 1400,
+                              );
+                            }
                           }
                         }
+                        setState(() {
+                          isUploading = false;
+                        });
                       },
                       child: Container(
                         height: 40,
@@ -328,6 +364,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     )
                 ]),
           ),
+          SizedBox(height: getScreenHeight(90)),
         ]),
       ),
     );

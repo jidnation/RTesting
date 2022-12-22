@@ -65,7 +65,11 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           RouteNavigators.pop(context);
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Profile', onPressed: () {}),
+                        label: 'Share Profile', onPressed: () {
+                          RouteNavigators.pop(context);
+                    Share.share(
+                        'Hi, this is ${globals.user!.username} reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach ${globals.user!.gender == null ? "this person." : globals.user!.gender == "male" ? "him." : "her."}');
+                        }),
                     //KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 )
@@ -100,9 +104,9 @@ Future showProfileMenuBottomSheet(BuildContext context,
                     KebabBottomTextButton(
                         label: 'Share Profile',
                         onPressed: () {
-                          RouteNavigators.pop(context);
+                        RouteNavigators.pop(context);
                           Share.share(
-                              'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                              'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -180,7 +184,7 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   onPressed: () {
                     RouteNavigators.pop(context);
                     Share.share(
-                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                        'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),

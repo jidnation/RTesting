@@ -1,3 +1,20 @@
+class StatusDataSchema {
+  StatusDataSchema._();
+
+  static String get schema {
+    return r'''
+        audioMedia
+        background
+        imageMedia
+        content
+        alignment
+        font
+        caption
+        videoMedia
+        ''';
+  }
+}
+
 class StatusSchema {
   StatusSchema._();
 
@@ -6,14 +23,9 @@ class StatusSchema {
             authId
             created_at
             data {
-                audioMedia
-                background
-                imageMedia
-                content
-                alignment
-                font
-                caption
-                videoMedia
+               ''' + 
+               StatusDataSchema.schema +
+               '''
             }
             isMuted
             statusSlug
@@ -69,8 +81,8 @@ class StatusFeedSchema {
             created_at
              feedOwnerProfile {
               ''' +
-              StatusProfileSchema.schema +
-              '''
+        StatusProfileSchema.schema +
+        '''
              }
              reachingRelationship
             status {

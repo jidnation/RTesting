@@ -438,6 +438,7 @@ class _TextStatus2State extends State<TextStatus2> {
                                   CreateStatusEvent(
                                     createStatusDto: CreateStatusDto(
                                       caption: controller.text,
+                                      content: controller.text,
                                       alignment: currentAlignment.value,
                                       font: currentFont.value,
                                       background: selectedColour.value != null
