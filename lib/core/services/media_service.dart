@@ -381,7 +381,7 @@ class MediaService {
       required int time}) async {
     String timeLimit = '00:00:';
     String outputPath = '/storage/emulated/0/Download/output.mp4';
-    late String? fileUrl;
+    String? fileUrl;
     if (await Permission.storage.request().isGranted) {
       if (time.toInt() < 10) {
         timeLimit = timeLimit + '0' + time.toString();
@@ -417,7 +417,6 @@ class MediaService {
           // ERROR
         }
       });
-      print("Done::::::::::::::::::::::::::::::::::::::::::::");
       return fileUrl;
     } else if (await Permission.storage.isPermanentlyDenied) {
       openAppSettings();

@@ -172,10 +172,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     CustomMomentCommentModel commentModel =
         currentCommentList.firstWhere((element) => element.id == id);
     late bool response;
-    if (commentModel.getMomentComment.isLiked!) {
+    if (commentModel.getMomentComment.isLiked != 'false') {
       // momentModel.isLiked = false;
       // momentModel.nLikes -= 1;
-      // response = await momentQuery.unlikeMomentComment(momentId: momentId, likeId: commentModel.getMomentComment);
+      response = await momentQuery.unlikeMomentComment(
+          momentId: momentId, likeId: commentModel.getMomentComment.isLiked!);
     } else {
       // momentModel.isLiked = true;
       // momentModel.nLikes += 1;
@@ -217,17 +218,18 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     CustomMomentCommentModel commentModel =
         currentCommentList.firstWhere((element) => element.id == id);
 
-    var response = await momentQuery.getMomentComment(
+    GetMomentComment? response = await momentQuery.getMomentComment(
         commentId: commentModel.getMomentComment.commentId!);
 
     if (response != null) {
-      // for (MomentModel momentFeed in currentList) {
-      //   if (momentFeed.id == id) {
-      //     momentFeed.nLikes = response.nLikes!;
-      //     momentFeed.nComment = response.nComments!;
-      //     momentFeed.isLiked = response.isLiked!;
-      //     return;
-      //   }
+      for (CustomMomentCommentModel momentComment in currentCommentList) {
+        if (momentComment.id == id) {
+          momentComment.getMomentComment.isLiked = response.isLiked!;
+          momentComment.getMomentComment.nComments = response.nComments!;
+          momentComment.getMomentComment.nLikes = response.nLikes;
+          return;
+        }
+      }
     }
     notifyListeners();
   }

@@ -89,7 +89,7 @@ class MomentCommentBox extends HookWidget {
                   child: MomentAudioPlayer(
                 audioPath: commentInfo.getMomentComment.audioMediaItem!,
                 // audioPath:
-                // 'https://res.cloudinary.com/dwj7naozp/video/upload/v1671552267/2-03_Thursday_zrklln.mp3',
+                //     'https://res.cloudinary.com/dwj7naozp/video/upload/v1671552267/2-03_Thursday_zrklln.mp3',
               )),
             ]),
           ),
@@ -126,7 +126,7 @@ class MomentCommentBox extends HookWidget {
                         );
                       },
                       child: SvgPicture.asset(
-                        commentInfo.getMomentComment.isLiked!
+                        commentInfo.getMomentComment.isLiked != "false"
                             ? 'assets/svgs/like-active.svg'
                             : 'assets/svgs/like.svg',
                       ),
