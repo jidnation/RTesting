@@ -1,3 +1,20 @@
+class StatusDataSchema {
+  StatusDataSchema._();
+
+  static String get schema {
+    return r'''
+        audioMedia
+        background
+        imageMedia
+        content
+        alignment
+        font
+        caption
+        videoMedia
+        ''';
+  }
+}
+
 class StatusSchema {
   StatusSchema._();
 
@@ -6,16 +23,13 @@ class StatusSchema {
             authId
             created_at
             data {
-                audioMedia
-                background
-                imageMedia
-                content
-                alignment
-                font
-                caption
-                videoMedia
+               ''' + 
+               StatusDataSchema.schema +
+               '''
             }
-            profile {
+            isMuted
+            statusSlug
+            statusOwnerProfile {
               ''' +
         StatusProfileSchema.schema +
         '''
@@ -37,6 +51,24 @@ class StatusProfileSchema {
             profilePicture
             profileSlug
             username
+            authId
+            bio
+            verified
+        ''';
+  }
+}
+
+class StatusFeedResponseSchema {
+  StatusFeedResponseSchema._();
+
+  static String get schema {
+    return r'''
+            _id
+            status {
+              ''' +
+        StatusFeedSchema.schema +
+        '''
+            }
         ''';
   }
 }
@@ -46,41 +78,24 @@ class StatusFeedSchema {
 
   static String get schema {
     return r'''
-            _id
-            status {
-              ''' +
-        StatusFeedResponse.schema +
-        '''
-            }
-        ''';
-  }
-}
-
-class StatusFeedResponse {
-  StatusFeedResponse._();
-
-  static String get schema {
-    return r'''
-            authId
             created_at
-            firstName
-            lastName
-            location
-            profilePicture
-            profileSlug
-            username
-            reacherId
+             feedOwnerProfile {
+              ''' +
+        StatusProfileSchema.schema +
+        '''
+             }
+             reachingRelationship
             status {
               ''' +
         StatusSchema.schema +
         '''
             }
-            statusId
-            status_creator_profile {
+            statusOwnerProfile {
                ''' +
         StatusProfileSchema.schema +
         '''
             }
+          username
         ''';
   }
 }

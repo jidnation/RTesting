@@ -26,7 +26,9 @@ class SocialServiceRepository {
       List<String>? imageMediaItems,
       String? videoMediaItem,
       String? location,
-      String? postRating}) async {
+      String? postRating,
+     List<String>? mentionList,
+      }) async {
     try {
       final post = await _homeRemoteDataSource.createPost(
           audioMediaItem: audioMediaItem,
@@ -35,7 +37,8 @@ class SocialServiceRepository {
           imageMediaItems: imageMediaItems,
           videoMediaItem: videoMediaItem,
           location: location,
-          postRating: postRating);
+          postRating: postRating,
+          mentionList: mentionList);
       return Right(post);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -455,7 +458,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, List<StatusFeedModel>>> getStatusFeed({
+  Future<Either<String, List<StatusFeedResponseModel>>> getStatusFeed({
     required int pageLimit,
     required int pageNumber,
   }) async {

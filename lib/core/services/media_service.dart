@@ -3,16 +3,21 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
+// import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_compress/video_compress.dart';
+import 'package:video_compress/video_compress.dart' as vc;
+// import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../models/file_result.dart';
+import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
 
 class MediaService {
@@ -179,18 +184,92 @@ class MediaService {
     return file.copyWith(path: res.path);
   }
 
+  //cutting the audio file based on the time frame
+  Future<File> audioCutter(
+      {required String audioPath, required int endTime}) async {
+    File outputFile = File('');
+    var result = await AudioCutter.cutAudio(audioPath, 0.0, endTime.toDouble());
+    outputFile = File(result);
+
+    return outputFile;
+  }
+
+  //converting the file to url
+  Future<String?>? urlConverter({required String filePath}) async {
+    String? fileUrl = await FileConverter().convertMe(filePath: filePath);
+    return fileUrl;
+  }
+
   Future<FileResult> compressVideo({required FileResult file}) async {
-    final res = await VideoCompress.compressVideo(
+    final res = await vc.VideoCompress.compressVideo(
       file.path,
-      quality: VideoQuality.MediumQuality,
+      quality: vc.VideoQuality.MediumQuality,
     );
+
+    print('size1:::::::::::::::${res!.filesize! / 1024}');
     return FileResult(
-        path: res!.path!,
+        path: res.path!,
         size: res.filesize! / 1024,
         duration: file.duration,
         height: file.height,
         width: file.width,
         fileName: res.path!.split('/').last);
+  }
+
+  Future<String> compressMomentVideo({required String filePath}) async {
+    final String videoName =
+        'ReachMe-${DateTime.now().millisecondsSinceEpoch}.mp4';
+    // final LightCompressor _lightCompressor = LightCompressor();
+    // final dynamic response = await _lightCompressor.compressVideo(
+    //   path: filePath,
+    //   // destinationPath: _destinationPath,
+    //   videoQuality: VideoQuality.low,
+    //   isMinBitrateCheckEnabled: false,
+    //   video: Video(videoName: videoName),
+    //   android: AndroidConfig(saveAt: SaveAt.Movies),
+    //   // android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
+    //   ios: IOSConfig(saveInGallery: true),
+    // );
+    // final res = await VideoCompress.compressVideo(
+    //   filePath,
+    //   quality: VideoQuality.DefaultQuality,
+    // );
+
+    // print('size1:::::::::::::::${res!.filesize! / 1024}');
+    // return response.destinationPath;
+    return '';
+  }
+
+  Future<String> removeAudio({required String filePath}) async {
+    final vc.MediaInfo? res = await vc.VideoCompress.compressVideo(
+      filePath,
+      includeAudio: false,
+      quality: vc.VideoQuality.MediumQuality,
+    );
+    return res!.path!;
+  }
+
+  Future<PlatformFile?> getAudioFiles() async {
+    print('....function called....');
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: false,
+        onFileLoading: (FilePickerStatus status) => print(status),
+      );
+      PlatformFile file = result!.files.first;
+      int fileSize = file.size;
+      print('....file size:::: $fileSize');
+      // String? audioUrl =
+      //     await FileConverter().convertMe(filePath: file.path!);
+      // return audioUrl;
+      return file;
+    } on PlatformException catch (e) {
+      print('Unsupported operation' + e.toString());
+    } catch (e) {
+      print(e.toString());
+    }
+    return null;
   }
 
   Future<FileResult?> pickFromCamera(

@@ -20,6 +20,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:share_plus/share_plus.dart';
 
 Future showProfileMenuBottomSheet(BuildContext context,
@@ -64,7 +65,11 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           RouteNavigators.pop(context);
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Profile', onPressed: () {}),
+                        label: 'Share Profile', onPressed: () {
+                          RouteNavigators.pop(context);
+                    Share.share(
+                        'Hi, this is ${globals.user!.username} reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach ${globals.user!.gender == null ? "this person." : globals.user!.gender == "male" ? "him." : "her."}');
+                        }),
                     //KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 )
@@ -99,9 +104,9 @@ Future showProfileMenuBottomSheet(BuildContext context,
                     KebabBottomTextButton(
                         label: 'Share Profile',
                         onPressed: () {
-                          RouteNavigators.pop(context);
+                        RouteNavigators.pop(context);
                           Share.share(
-                              'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                              'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -179,7 +184,7 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   onPressed: () {
                     RouteNavigators.pop(context);
                     Share.share(
-                        'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                        'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),
@@ -304,7 +309,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 RouteNavigators.route(context,
-                                    CommentReach(postFeedModel: postFeedModel));
+                                    RepostReach(postFeedModel: postFeedModel));
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',
@@ -315,12 +320,12 @@ Future showReacherCardBottomSheet(BuildContext context,
                           KebabBottomTextButton(
                               label: 'Download Reach Card',
                               onPressed: downloadPost),
-                          KebabBottomTextButton(
-                            label: 'Report',
-                            onPressed: () {
-                              RouteNavigators.pop(context);
-                            },
-                          ),
+                          // KebabBottomTextButton(
+                          //   label: 'Report',
+                          //   onPressed: () {
+                          //     RouteNavigators.pop(context);
+                          //   },
+                          // ),
                           KebabBottomTextButton(
                             label: 'Reach user',
                             onPressed: () {
@@ -458,7 +463,7 @@ Future showStoryBottomSheet(BuildContext context,
 }
 
 Future showUserStoryBottomSheet(BuildContext context,
-    {required StatusFeedResponseModel status}) async {
+    {required StatusFeedModel status}) async {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
@@ -514,14 +519,14 @@ Future showUserStoryBottomSheet(BuildContext context,
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(ReachUserEvent(
-                                    userIdToReach: status.authId));
+                                    userIdToReach: status.statusOwnerProfile!.authId));
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(
-                                    StarUserEvent(userIdToStar: status.authId));
+                                    StarUserEvent(userIdToStar: status.statusOwnerProfile!.authId));
                               }),
                           // KebabBottomTextButton(
                           //     label: 'Copy link',

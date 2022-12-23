@@ -126,7 +126,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
               }),
               child: FittedBox(
                 child: Text(
-                  '${globals.user!.nBlocked} Blocked',
+                  '${globals.user!.nBlocked} EX',
                   style: TextStyle(
                     fontSize: getScreenHeight(15),
                     fontWeight: FontWeight.w400,
@@ -185,7 +185,8 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                   _blockedList.value = state.blockedList!;
                 }
                 if (state is DelStarRelationshipSuccess) {
-                  Snackbars.success(context, message: 'User unstar Successful');
+                  Snackbars.success(context,
+                      message: 'User unstarred Successfully');
                   globals.userBloc!
                       .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
                   globals.userBloc!
@@ -200,13 +201,14 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is UnBlockUserSuccess) {
                   Snackbars.success(context,
-                      message: 'User Unblock Successful');
+                      message: 'User Unblocked Successfully');
                   globals.userBloc!.add(GetBlockedListEvent());
                   globals.userBloc!
                       .add(GetUserProfileEvent(email: globals.user!.email!));
                 }
                 if (state is BlockUserSuccess) {
-                  Snackbars.success(context, message: 'User Block Successful');
+                  Snackbars.success(context,
+                      message: 'User Blocked Successfully');
                   globals.userBloc!.add(GetBlockedListEvent());
                   globals.userBloc!
                       .add(GetUserProfileEvent(email: globals.user!.email!));
@@ -215,7 +217,7 @@ class _AccountStatsInfoState extends State<AccountStatsInfo>
                 }
                 if (state is DelReachRelationshipSuccess) {
                   Snackbars.success(context,
-                      message: 'User Unreach Successful');
+                      message: 'User Unreached Successfully');
                   globals.userBloc!.add(
                       FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
                   globals.userBloc!.add(
@@ -377,23 +379,24 @@ class SeeMyReachersList extends StatelessWidget {
               minLeadingWidth: getScreenWidth(20),
               title: InkWell(
                 onTap: () {
-                  RouteNavigators.route(
-                      context,
-                      RecipientAccountProfile(
-                        recipientEmail: data!.reacher!.email,
-                        recipientImageUrl: data!.reacher!.profilePicture,
-                        recipientId: data!.reacher!.id,
-                      ));
+                  globals.userBloc!
+                      .add(GetRecipientProfileEvent(email: data!.reacher!.id));
+                  data!.reacher!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: data!.reacher!.email,
+                            recipientImageUrl: data!.reacher!.profilePicture,
+                            recipientId: data!.reacher!.id,
+                          ));
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (data!.reacher!.firstName! +
-                              ' ' +
-                              data!.reacher!.lastName!)
-                          .toTitleCase(),
+                      '${data!.reacher!.username}',
                       style: TextStyle(
                         fontSize: getScreenHeight(16),
                         color: AppColors.textColor2,
@@ -490,22 +493,25 @@ class SeeMyReachingsList extends StatelessWidget {
             ),
             minLeadingWidth: getScreenWidth(20),
             title: InkWell(
-              onTap: () => RouteNavigators.route(
-                  context,
-                  RecipientAccountProfile(
-                    recipientEmail: data!.reaching!.email,
-                    recipientImageUrl: data!.reaching!.profilePicture,
-                    recipientId: data!.reaching!.id,
-                  )),
+              onTap: () {
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: data!.reaching!.id));
+                data!.reaching!.id == globals.user!.id
+                    ? RouteNavigators.route(context, const AccountScreen())
+                    : RouteNavigators.route(
+                        context,
+                        RecipientAccountProfile(
+                          recipientEmail: data!.reaching!.email,
+                          recipientImageUrl: data!.reaching!.profilePicture,
+                          recipientId: data!.reaching!.id,
+                        ));
+              },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (data!.reaching!.firstName! +
-                            ' ' +
-                            data!.reaching!.lastName!)
-                        .toTitleCase(),
+                    '${data!.reaching!.username}',
                     style: TextStyle(
                       fontSize: getScreenHeight(16),
                       color: AppColors.textColor2,
@@ -531,7 +537,7 @@ class SeeMyReachingsList extends StatelessWidget {
                 label: isRecipientAccount!
                     ? isReaching!
                         ? 'Unreach'
-                        : 'reach'
+                        : 'Reach'
                     : 'Unreach',
                 labelFontSize: getScreenHeight(13),
                 color: !isRecipientAccount!
@@ -541,11 +547,20 @@ class SeeMyReachingsList extends StatelessWidget {
                         : AppColors.primaryColor,
                 onPressed: () {
                   // Remove User from Reaching UI //
-
-                  globals.userBloc!.add(DelReachRelationshipEvent(
-                      userIdToDelete: data!.reaching!.id));
-                  globals.userBloc!.add(DelStarRelationshipEvent(
-                      starIdToDelete: data!.reaching!.id));
+                  if (isRecipientAccount!) {
+                    if (isReaching!) {
+                      globals.userBloc!.add(DelReachRelationshipEvent(
+                          userIdToDelete: data!.reaching!.id));
+                      globals.userBloc!.add(DelStarRelationshipEvent(
+                          starIdToDelete: data!.reaching!.id));
+                    } else {
+                      globals.userBloc!.add(
+                          ReachUserEvent(userIdToReach: data!.reaching!.id));
+                    }
+                  } else {
+                    globals.userBloc!.add(DelReachRelationshipEvent(
+                        userIdToDelete: data!.reaching!.id));
+                  }
                 },
                 textColor: !isRecipientAccount!
                     ? AppColors.black
@@ -594,8 +609,7 @@ class SeeMyStarsList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (data!.starred!.firstName! + ' ' + data!.starred!.lastName!)
-                        .toTitleCase(),
+                    '${data!.starred!.username}',
                     style: TextStyle(
                       fontSize: getScreenHeight(16),
                       color: AppColors.textColor2,
@@ -650,7 +664,7 @@ class SeeMyBlockList extends StatelessWidget {
           bloc: globals.userBloc,
           listener: (context, state) {
             if (state is UnBlockUserSuccess) {
-              print('User Unblock Successful');
+              print('User Unblocked Successfully');
             }
           },
           builder: (context, state) {
@@ -673,10 +687,7 @@ class SeeMyBlockList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (data!.blockedProfile!.firstName! +
-                              ' ' +
-                              data!.blockedProfile!.lastName!)
-                          .toTitleCase(),
+                      '${data!.blockedProfile!.username}',
                       style: TextStyle(
                         fontSize: getScreenHeight(16),
                         color: AppColors.textColor2,
@@ -842,12 +853,12 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
     final _starsList = useState<List<VirtualStar>>([]);
 
     useEffect(() {
-      globals.userBloc!
-          .add(FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-      globals.userBloc!
-          .add(FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
-      globals.userBloc!
-          .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1));
+      globals.userBloc!.add(FetchUserReachersEvent(
+          pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+      globals.userBloc!.add(FetchUserReachingsEvent(
+          pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
+      //globals.userBloc!
+      // .add(FetchUserStarredEvent(pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
       globals.userBloc!.add(GetBlockedListEvent());
       return null;
     }, []);
@@ -862,6 +873,18 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
           child: BlocConsumer<UserBloc, UserState>(
               bloc: globals.userBloc,
               listener: (context, state) {
+                if (state is DelReachRelationshipSuccess ||
+                    state is UserLoaded) {
+                  globals.userBloc!.add(FetchUserReachersEvent(
+                      pageLimit: 50,
+                      pageNumber: 1,
+                      authId: widget.recipientId));
+                  globals.userBloc!.add(FetchUserReachingsEvent(
+                      pageLimit: 50,
+                      pageNumber: 1,
+                      authId: widget.recipientId));
+                }
+
                 if (state is FetchUserReachersSuccess) {
                   _reachersList.value = state.reachers!;
                 }
@@ -874,13 +897,6 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                 if (state is UserError) {
                   Snackbars.error(context, message: state.error);
                 }
-                /*if (state is DelReachRelationshipSuccess ||
-                    state is UserLoaded) {
-                  globals.userBloc!.add(
-                      FetchUserReachersEvent(pageLimit: 50, pageNumber: 1));
-                   globals.userBloc!.add(
-                    FetchUserReachingsEvent(pageLimit: 50, pageNumber: 1));
-                }*/
               },
               builder: (context, state) {
                 bool _isLoading = state is UserLoading;
@@ -976,15 +992,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                                     );
                                   },
                                 ),
-                                /*ListView.builder(
-                                  itemCount: _starsList.value.length,
-                                  itemBuilder: (context, index) {
-                                    return SeeMyStarsList(
-                                      data: _starsList.value[index],
-                                    );
-                                  },
-                                ),*/
-                              ],
+                                ],
                             ).paddingSymmetric(h: 13),
                     ),
                   ],

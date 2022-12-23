@@ -20,6 +20,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
@@ -27,9 +28,14 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+
+import '../../../../core/models/file_result.dart';
+import '../../../chat/presentation/widgets/audio_player.dart';
+import '../widgets/post_media.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -45,7 +51,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   bool emojiShowing = false;
   FocusNode focusNode = FocusNode();
   late final RecorderController recorderController;
-//FlutterSoundRecorder? _soundRecorder;
   bool isRecordingInit = false;
   bool isRecording = false;
   Set active = {};
@@ -61,8 +66,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   void initState() {
     super.initState();
     _initialiseController();
-    //_soundRecorder = FlutterSoundRecorder();
-    //openAudio();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -75,19 +78,10 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
   @override
   void dispose() {
     super.dispose();
-    // _soundRecorder!.closeRecorder();
     isRecordingInit = false;
+    focusNode.dispose();
     recorderController.dispose();
   }
-
-/*void openAudio() async {
-  final status = await permit.Permission.microphone.request();
-  if (status != PermissionStatus.granted) {
-    throw RecordingPermissionException('Mic permission not allowed');
-  }
-  await _soundRecorder!.openRecorder();
-  isRecordingInit = true;
-}*/
 
   void _initialiseController() {
     recorderController = RecorderController()
@@ -103,9 +97,11 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
     final controller = useTextEditingController();
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
+    final commentLike = useState<CommentLikeModel?>(null);
     final scrollController = useScrollController();
     final isTyping = useState<bool>(false);
-    final mediaList = useState<List<UploadFileDto>>([]);
+    final likeId = useState<String?>(null);
+    final imageList = useState<List<UploadFileDto>>([]);
 
     useEffect(() {
       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
@@ -141,6 +137,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                         curve: Curves.easeOut,
                       );
                     });
+
                     Snackbars.success(context,
                         message: "Your commment has been posted");
                     triggerProgressIndicator.value = false;
@@ -163,26 +160,72 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                   if (state is GetAllCommentsOnPostError) {
                     Snackbars.error(context, message: state.error);
                   }
-                  if (state is UnlikeCommentOnPostSuccess ||
-                      state is LikeCommentOnPostSuccess) {
-                    globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-                        postId: widget.post.postId,
-                        pageLimit: 50,
-                        pageNumber: 1));
+
+                  //if (state is UnlikeCommentOnPostSuccess ||
+                  // state is LikeCommentOnPostSuccess) {
+                  //globals.socialServiceBloc!.add(GetAllCommentLikesEvent(
+                  //  commentId: comments.value[index].commentId));
+
+                  //}
+
+                  if (state is GetAllCommentLikesSuccess) {
+                    commentLike.value = state.data!.firstWhere(
+                        (element) => element.authId == globals.user!.id);
+                    likeId.value = state.data!
+                        .firstWhere((e) => e.authId == globals.user!.id)
+                        .likeId;
+                    print(likeId);
                   }
+
+                  if (state is LikeCommentOnPostSuccess) {}
+
+                  if (state is UnlikeCommentOnPostSuccess) {
+                    // commentUnlike.value = state.unlikeComment;
+                    //isLiked.value = false;
+                  }
+                  if (state is UnlikeCommentOnPostError) {
+                    int pos = comments.value
+                        .indexWhere((e) => e.commentId == state.commentId);
+                    comments.value[pos].isLiked = true;
+                    comments.value[pos].nLikes =
+                        (comments.value[pos].nLikes ?? 0) + 1;
+                  }
+
+                  if (state is LikeCommentOnPostError) {
+                    int pos = comments.value
+                        .indexWhere((e) => e.commentId == state.commentId);
+                    comments.value[pos].isLiked = true;
+                    comments.value[pos].nLikes =
+                        (comments.value[pos].nLikes ?? 1) - 1;
+                  }
+
                   if (state is MediaUploadSuccess) {
                     String? audioUrl = state.image!;
                     globals.socialServiceBloc!.add(CommentOnPostEvent(
-                        content: " ",
+                        content: ' ',
                         postId: widget.post.postId,
                         userId: globals.user!.id,
-                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
+                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : ' ',
+                        postOwnerId: widget.post.postOwnerId));
+                  }
+                  if (state is UploadMediaSuccess) {
+                    List<String> commentsUrls = state.data as List<String>;
+                    List<String> commentmediaUrls = commentsUrls
+                        .where((e) => FileUtils.fileType(e) == 'image')
+                        .toList();
+                    globals.socialServiceBloc!.add(CommentOnPostEvent(
+                        content: ' ',
+                        postId: widget.post.postId,
+                        userId: globals.user!.id,
+                        imageMediaItems: commentmediaUrls.isNotEmpty
+                            ? commentmediaUrls
+                            : null,
                         postOwnerId: widget.post.postOwnerId));
                   }
                 },
                 builder: (context, state) {
                   bool isLoading = state is GetAllCommentsOnPostLoading;
-
+                  print('like users here: ${commentLike.value}');
                   return WillPopScope(
                     child: ProgressHUD(
                       child: Column(
@@ -276,8 +319,8 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                           color: AppColors.textColor2,
                                         ),
                                       ),
-                                if ((widget
-                                    .post.post!.imageMediaItems??[]).isNotEmpty)
+                                if ((widget.post.post!.imageMediaItems ?? [])
+                                    .isNotEmpty)
                                   Helper.renderPostImages(
                                           widget.post.post!, context)
                                       .paddingOnly(r: 16, l: 16, b: 16, t: 10)
@@ -303,39 +346,62 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                       itemBuilder: (context, index) {
                                         return CommentsTile(
                                           comment: comments.value[index],
-                                          isLiked: comments
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
+                                          isLiked:
+                                              comments.value[index].isLiked ??
+                                                      false
+                                                  ? true
+                                                  : false,
                                           onLike: () {
+                                            print(
+                                                "${comments.value[index].isLiked}");
                                             HapticFeedback.mediumImpact();
                                             handleTap(index);
                                             if (active.contains(index)) {
-                                              String like =
-                                                  (comments.value[index].like!)
-                                                      .firstWhere((e) =>
-                                                          e.authId ==
-                                                          globals.userId)
-                                                      .likeId!;
-                                              if (comments.value[index].like!
-                                                  .isNotEmpty) {
+                                              if (comments
+                                                  .value[index].isLiked!) {
+                                                comments.value[index].isLiked =
+                                                    false;
+
+                                                comments.value[index].nLikes =
+                                                    (comments.value[index]
+                                                                .nLikes ??
+                                                            1) -
+                                                        1;
                                                 globals.socialServiceBloc!.add(
+                                                    GetAllCommentLikesEvent(
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId));
+
+                                                if (likeId.value != null) {
+                                                  globals.socialServiceBloc!
+                                                      .add(
                                                     UnlikeCommentOnPostEvent(
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId!,
+                                                        likeId: likeId.value
+
+                                                        //commentLike
+                                                        //  .value!.likeId!,
+                                                        ),
+                                                  );
+                                                }
+                                              } else {
+                                                comments.value[index].isLiked =
+                                                    true;
+                                                comments.value[index].nLikes =
+                                                    (comments.value[index]
+                                                                .nLikes ??
+                                                            0) +
+                                                        1;
+                                                globals.socialServiceBloc!
+                                                    .add(LikeCommentOnPostEvent(
+                                                  postId: comments
+                                                      .value[index].postId,
                                                   commentId: comments
                                                       .value[index].commentId,
-                                                  likeId: like,
-                                                  // comments
-                                                  //  .value[index].like.,
                                                 ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikeCommentOnPostEvent(
-                                                    postId: comments
-                                                        .value[index].postId,
-                                                    commentId: comments
-                                                        .value[index].commentId,
-                                                  ),
-                                                );
                                               }
                                             }
                                           },
@@ -433,14 +499,13 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                           context,
                                                                       maxAssets:
                                                                           5);
-                                                              if (image == null)
-                                                                return;
-
-                                                              if (image !=
+                                                              if (image ==
                                                                   null) {
+                                                                return;
+                                                              } else {
                                                                 for (var e
                                                                     in image) {
-                                                                  mediaList.value.add(UploadFileDto(
+                                                                  imageList.value.add(UploadFileDto(
                                                                       file: e
                                                                           .file,
                                                                       fileResult:
@@ -451,6 +516,11 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                           .toString()));
                                                                 }
                                                               }
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(UploadPostMediaEvent(
+                                                                      media: imageList
+                                                                          .value));
                                                             },
                                                           ),
                                                         ]).paddingSymmetric(
@@ -495,37 +565,73 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       ),
                                                     ],
                                                   )
-                                                : AudioWaveforms(
-                                                    size: Size(
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            2,
-                                                        20),
-                                                    recorderController:
-                                                        recorderController,
-                                                    enableGesture: true,
-                                                    waveStyle: const WaveStyle(
-                                                      waveColor: Colors.white,
-                                                      extendWaveform: true,
-                                                      showMiddleLine: false,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12.0),
-                                                      color: const Color(
-                                                          0xFF1E1B26),
-                                                    ),
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 18,
-                                                            right: 20,
-                                                            top: 15,
-                                                            bottom: 15),
-                                                    margin: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 15),
+                                                : Row(
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          recorderController
+                                                              .stop();
+
+                                                          setState(() {
+                                                            isRecording =
+                                                                !isRecording;
+                                                          });
+                                                        },
+                                                        child: Icon(
+                                                          Icons.delete,
+                                                          size: 32,
+                                                          color: AppColors
+                                                              .primaryColor
+                                                              .withOpacity(0.5),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 12,
+                                                      ),
+                                                      Expanded(
+                                                        child: AudioWaveforms(
+                                                          size: Size(
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width /
+                                                                  2,
+                                                              20),
+                                                          recorderController:
+                                                              recorderController,
+                                                          enableGesture: true,
+                                                          waveStyle:
+                                                              const WaveStyle(
+                                                            waveColor: Colors
+                                                                .blueAccent,
+                                                            extendWaveform:
+                                                                true,
+                                                            showMiddleLine:
+                                                                false,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12.0),
+                                                            color: Colors.white,
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  left: 18,
+                                                                  right: 20,
+                                                                  top: 15,
+                                                                  bottom: 15),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      15),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                             enabledBorder:
                                                 const OutlineInputBorder(
@@ -560,6 +666,9 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                               .post.postId,
                                                           content:
                                                               controller.text,
+
+                                                          //audioMediaItem: ' ',
+
                                                           userId:
                                                               globals.user!.id,
                                                           postOwnerId: widget
@@ -574,33 +683,6 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                               // maxHeight: 25, maxWidth: 25),
                                               onPressed: () async {
                                                 print('BUTTON WORKING');
-                                                /* var tempDir =
-                                                          await getTemporaryDirectory();
-                                                      var path =
-                                                          '${tempDir.path}/flutter_sound.aac';
-
-                                                      if (!isRecordingInit) {
-                                                        return;
-                                                      }
-                                                      if (isRecording) {
-                                                        await _soundRecorder!
-                                                            .stopRecorder();
-                                                        print(path);
-                                                        File audioMessage = File(path);
-
-                                                        /*globals.chatBloc!.add(
-                                                            UploadImageFileEvent(
-                                                                file: audioMessage));*/
-                                                      } else {
-                                                        await _soundRecorder!
-                                                            .startRecorder(
-                                                          toFile: path,
-                                                        );
-                                                      }
-                                                      setState(() {
-                                                        isRecording = !isRecording;
-
-                                                      });*/
                                                 var tempDir =
                                                     await getTemporaryDirectory();
                                                 String? path =
@@ -612,20 +694,9 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                           .stop();
                                                   File audio = File(path!);
                                                   globals.socialServiceBloc!
-                                                      .add(CommentOnPostEvent(
-                                                          content: " ",
-                                                          audioMediaItem:
-                                                              audio.path,
-                                                          postId: widget
-                                                              .post.postId,
-                                                          userId:
-                                                              globals.user!.id!,
-                                                          postOwnerId: widget
-                                                              .post
-                                                              .postOwnerId));
-                                                  globals.socialServiceBloc!
                                                       .add(MediaUploadEvent(
                                                           media: audio));
+
                                                   print(path);
                                                 } else {
                                                   await recorderController
@@ -645,25 +716,58 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       height: 26,
                                                     )
                                                   : SvgPicture.asset(
-                                                      'assets/svgs/dc-cancel.svg',
+                                                      'assets/svgs/send.svg',
                                                       color:
                                                           AppColors.blackShade3,
                                                       height: 20,
                                                       width: 20,
-                                                    )),
+                                                    ),
+                                            ),
                                     ],
                                   ),
                                 ),
                                 Offstage(
                                   offstage: !emojiShowing,
                                   child: SizedBox(
-                                    height: 250,
+                                    height: 227,
                                     child: EmojiPicker(
                                       textEditingController: controller,
-                                      config: const Config(
-                                        columns: 7,
-                                      ),
+                                      config: Config(
+                                          columns: 7,
+                                          emojiSizeMax: 28 *
+                                              (Platform.isIOS ? 1.30 : 1.0),
+                                          verticalSpacing: 0,
+                                          horizontalSpacing: 0,
+                                          gridPadding: EdgeInsets.zero,
+                                          initCategory: Category.RECENT,
+                                          bgColor: Colors.white,
+                                          indicatorColor:
+                                              Theme.of(context).primaryColor,
+                                          iconColor: Colors.grey,
+                                          iconColorSelected:
+                                              Theme.of(context).primaryColor,
+                                          backspaceColor:
+                                              Theme.of(context).primaryColor,
+                                          skinToneDialogBgColor: Colors.white,
+                                          skinToneIndicatorColor: Colors.grey,
+                                          enableSkinTones: true,
+                                          showRecentsTab: true,
+                                          recentsLimit: 32,
+                                          noRecents: const Text(
+                                            'Pas d\'émojis récents',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black26),
+                                            textAlign: TextAlign.center,
+                                          )),
                                       onEmojiSelected: (category, emoji) {
+                                        controller
+                                          ..text += emoji.emoji
+                                          ..selection =
+                                              TextSelection.fromPosition(
+                                                  TextPosition(
+                                                      offset: controller
+                                                          .text.length));
                                         setState(() {
                                           controller.text = controller.text;
                                         });
@@ -924,9 +1028,9 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                               globals.socialServiceBloc!
                                                   .add(UnlikeCommentOnPostEvent(
                                                 commentId: comments
-                                                    .value[index].commentId,
+                                                    .value[index].commentId!,
                                                 likeId: comments
-                                                    .value[index].postId,
+                                                    .value[index].postId!,
                                               ));
                                             } else {
                                               globals.socialServiceBloc!.add(
@@ -1061,7 +1165,7 @@ class CommentsTile extends StatelessWidget {
                           RecipientAccountProfile(
                             recipientEmail: 'email',
                             recipientImageUrl:
-                                comment.commentProfile!.profilePicture,
+                                comment.commentOwnerProfile!.profilePicture,
                             recipientId: comment.authId,
                           ));
                   progress?.dismiss();
@@ -1070,7 +1174,7 @@ class CommentsTile extends StatelessWidget {
               child: Row(
                 children: [
                   Helper.renderProfilePicture(
-                    comment.commentProfile!.profilePicture,
+                    comment.commentOwnerProfile!.profilePicture,
                     size: 30,
                   ),
                   const SizedBox(width: 10),
@@ -1079,7 +1183,7 @@ class CommentsTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '@${comment.commentProfile!.username!}',
+                        '@${comment.commentOwnerProfile!.username!}',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontFamily: 'Poppins',
@@ -1093,22 +1197,26 @@ class CommentsTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: getScreenHeight(12)),
-            comment.content!.isNotEmpty
-                ? Text(
-                    comment.content!,
-                    style: TextStyle(
-                      fontSize: getScreenHeight(14),
-                      color: AppColors.textColor2,
-                    ),
-                  )
-                : comment.audioMediaItem!.isNotEmpty
-                    //? PostAudioMedia(path: comment.audioMediaItem!)
-                    ? PostAudioMedia(path: comment.audioMediaItem!)
-                        .paddingOnly(r: 16, l: 16, b: 10, t: 0)
-                    : comment.imageMediaItems!.isNotEmpty
-                        ? CommentMedia(comment: comment)
-                            .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                        : const SizedBox.shrink(),
+            if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
+              Text(
+                comment.content!,
+                style: TextStyle(
+                  fontSize: getScreenHeight(14),
+                  color: AppColors.textColor2,
+                ),
+              )
+            else if (comment.audioMediaItem!.isNotEmpty)
+              CommentAudioMedia(path: comment.audioMediaItem!)
+                  .paddingOnly(r: 0, l: 0, b: 10, t: 0)
+            else
+              const SizedBox.shrink(),
+
+            comment.imageMediaItems!.isNotEmpty
+                ? CommentMedia(comment: comment)
+                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                // const Text('This is it'),
+
+                : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

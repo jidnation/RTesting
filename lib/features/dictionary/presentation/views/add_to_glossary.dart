@@ -83,26 +83,26 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                           height: 80,
                           hintText: 'Abbreviaton',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: wordController,
                           hintText: 'word',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: languageController,
                           hintText: 'Language',
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         AddToGlossaryTextBox(
                           controller: meaningController,
                           hintText: 'Meaning',
                           maxLines: 5,
                           validator: (value) =>
-                              Validator.validateText(value ?? ''),
+                              Validator.emptyField(value ?? ''),
                         ),
                         const SizedBox(
                           height: 40,
@@ -124,7 +124,7 @@ class _AddToGlossaryState extends State<AddToGlossary> {
                                   } else {
                                     return;
                                   }
-                                 }
+                                }
                               : () {},
                         )
                       ],

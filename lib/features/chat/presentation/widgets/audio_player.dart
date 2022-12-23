@@ -8,8 +8,10 @@ import 'dart:io';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:reach_me/core/services/media_service.dart';
+import 'package:reach_me/core/utils/constants.dart';
 
 import '../../../../core/helper/logger.dart';
+import '../../../../core/utils/string_util.dart';
 
 class MyAudioPlayer extends StatefulHookWidget {
   const MyAudioPlayer({Key? key, this.sourceFile}) : super(key: key);
@@ -142,10 +144,12 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
 }
 
 class PlayAudio extends StatefulWidget {
-  const PlayAudio({Key? key, this.audioFile, required this.isMe})
+  const PlayAudio(
+      {Key? key, this.audioFile, required this.isMe, required this.timeStamp})
       : super(key: key);
   final String? audioFile;
   final bool isMe;
+  final String timeStamp;
   @override
   State<PlayAudio> createState() => _PlayAudioState();
 }
@@ -153,7 +157,8 @@ class PlayAudio extends StatefulWidget {
 class _PlayAudioState extends State<PlayAudio> {
   late final PlayerController playerController;
   bool isPlaying = false;
-  //bool isInitialised = false;
+  bool isInitialised = false;
+  bool isReadingComplete = false;
   final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
   final MediaService _mediaService = MediaService();
@@ -180,7 +185,7 @@ class _PlayAudioState extends State<PlayAudio> {
       Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
 
       if (playerController.playerState == PlayerState.initialized) {
-        //isInitialised = true;
+        isInitialised = true;
         setState(() {});
       } else if (playerController.playerState == PlayerState.playing) {
         isPlaying = true;
@@ -203,58 +208,108 @@ class _PlayAudioState extends State<PlayAudio> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Align(
-          child: IconButton(
-            onPressed: () {
-              if (isPlaying) {
-                playerController.pausePlayer();
-              } else {
-                playerController.startPlayer(finishMode: FinishMode.pause);
-              }
-              setState(() {
-                isPlaying = !isPlaying;
-              });
-            },
-            icon: isPlaying
-                ? Icon(
-                    Icons.play_arrow,
-                    size: 30,
-                    color: widget.isMe ? Colors.white : Colors.blue,
-                  )
-                : Icon(
-                    Icons.pause_circle,
-                    size: 30,
-                    color: widget.isMe ? Colors.white : Colors.blue,
-                  ),
+        Expanded(
+          child: Row(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  onPressed: () {
+                    if (isPlaying) {
+                      playerController.pausePlayer();
+                    } else {
+                      playerController.startPlayer(
+                          finishMode: FinishMode.pause);
+                    }
+                    setState(() {
+                      isPlaying = !isPlaying;
+                    });
+                  },
+                  icon: !isPlaying
+                      ? Icon(
+                          Icons.play_arrow,
+                          size: 30,
+                          color: widget.isMe ? Colors.white : Colors.blue,
+                        )
+                      : Icon(
+                          Icons.pause_circle,
+                          size: 30,
+                          color: widget.isMe ? Colors.white : Colors.blue,
+                        ),
+                ),
+              ),
+              //Expanded(
+              // child:
+              //Container(
+              // padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              //child:
+              isInitialised
+                  ? AudioFileWaveforms(
+                      margin:
+                          const EdgeInsets.only(top: 7, bottom: 3, right: 7),
+                      size: Size(MediaQuery.of(context).size.width / 2.5, 28),
+                      playerController: playerController,
+                      density: 1.5,
+                      enableSeekGesture: true,
+                      playerWaveStyle: PlayerWaveStyle(
+                        scaleFactor: 0.2,
+                        fixedWaveColor:
+                            widget.isMe ? Colors.grey : Colors.lightBlueAccent,
+                        liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
+                        waveCap: StrokeCap.butt,
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      animationDuration: const Duration(milliseconds: 1000),
+                    )
+                  : SizedBox(
+                      width: MediaQuery.of(context).size.width / 2.5,
+                      child: widget.isMe
+                          ? const LinearProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              color: AppColors.greyShade1,
+                              backgroundColor: AppColors.greyShade1,
+                            )
+                          : const LinearProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.blueAccent),
+                              color: AppColors.greyShade1,
+                              backgroundColor: AppColors.greyShade1,
+                            ))
+              // ),
+              //),
+            ],
           ),
         ),
-        //Expanded(
-        // child:
-        //Container(
-        // padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        //child:
-        AudioFileWaveforms(
-          margin: const EdgeInsets.only(top: 7, bottom: 7, right: 7),
-          size: Size(MediaQuery.of(context).size.width / 2.0, 24),
-          playerController: playerController,
-          density: 1.5,
-          enableSeekGesture: true,
-          playerWaveStyle: PlayerWaveStyle(
-            scaleFactor: 0.8,
-            fixedWaveColor: widget.isMe ? Colors.grey : Colors.lightBlueAccent,
-            liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
-            waveCap: StrokeCap.round,
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                StringUtil.formatDuration(
+                    Duration(milliseconds: currentDuration)),
+                style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    color: widget.isMe ? AppColors.white : AppColors.textColor2,
+                    fontSize: 10),
+              ),
+              Text(
+                widget.timeStamp,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: widget.isMe ? AppColors.white : AppColors.textColor2,
+                ),
+              ),
+            ],
           ),
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          animationDuration: const Duration(milliseconds: 1000),
         ),
-        // ),
-        //),
       ],
     );
   }

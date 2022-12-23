@@ -53,7 +53,10 @@ class _SearchWordState extends State<SearchWord> {
                       children: [
                         InkWell(
                           child: const Icon(Icons.arrow_back),
-                          onTap: () => RouteNavigators.pop(context),
+                          onTap: () {
+                            setState(() {});
+                            RouteNavigators.pop(context);
+                          },
                         ),
                         const SizedBox(
                           width: 20,
@@ -71,46 +74,56 @@ class _SearchWordState extends State<SearchWord> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 18.0),
-                      child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                              maxWidth: 419, maxHeight: 190),
-                          child: _isLoading
-                              ? const CircularLoader()
-                              : _isSuccess
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(24.5),
-                                        color: Colors.white,
-                                      ),
-                                      height: 121,
-                                      width: 410,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 18.0,
-                                          right: 25,
-                                          top: 16,
-                                        ),
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.vertical,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              RichText(
+                      child: _isLoading
+                          ? const CircularLoader()
+                          : _isSuccess
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24.5),
+                                    color: _showWords.value.word == null
+                                        ? Colors.transparent
+                                        : Colors.white,
+                                  ),
+                                  width: 410,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 18.0,
+                                      right: 25,
+                                      top: 16,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _showWords.value.word == null
+                                            ? Center(
+                                                child: TextButton(
+                                                  child: const Text(
+                                                    'Add Word to Dictionary',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xff001824)),
+                                                  ),
+                                                  onPressed: () =>
+                                                      RouteNavigators.route(
+                                                          context,
+                                                          const AddToGlossary()),
+                                                ),
+                                              )
+                                            : RichText(
                                                 text: TextSpan(
                                                   style: const TextStyle(
                                                       color: Colors.black),
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            '${_showWords.value.abbr} : ',
+                                                            '${_showWords.value.abbr}  ',
                                                         style: const TextStyle(
                                                             color:
                                                                 Colors.blue)),
                                                     TextSpan(
                                                         text:
-                                                            '${_showWords.value.word} ; '),
+                                                            '${_showWords.value.word}  '),
                                                     TextSpan(
                                                         text: _showWords
                                                             .value.meaning,
@@ -119,26 +132,24 @@ class _SearchWordState extends State<SearchWord> {
                                                   ],
                                                 ),
                                               ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                            ],
-                                          ),
+                                        const SizedBox(
+                                          height: 5,
                                         ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : _isFailure
+                                  ? TextButton(
+                                      child: const Text(
+                                        'Add Word to Dictionary',
+                                        style:
+                                            TextStyle(color: Color(0xff001824)),
                                       ),
+                                      onPressed: () => RouteNavigators.route(
+                                          context, const AddToGlossary()),
                                     )
-                                  : _isFailure
-                                      ? TextButton(
-                                          child: const Text(
-                                            'Add Word to Dictionary',
-                                            style: TextStyle(
-                                                color: Color(0xff001824)),
-                                          ),
-                                          onPressed: () =>
-                                              RouteNavigators.route(context,
-                                                  const AddToGlossary()),
-                                        )
-                                      : const Text('Search Word')),
+                                  : const Text('Search Word'),
                     ),
                     const Spacer(),
                     CustomButton(

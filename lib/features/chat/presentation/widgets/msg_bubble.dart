@@ -4,7 +4,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
-import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble({
@@ -54,20 +53,25 @@ class MsgBubble extends StatelessWidget {
         ),
       );
     } else if (label.contains('aac')) {
-      print('This is the lable link $label');
+      //print('This is the lable link $label');
       return Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-              height: 50,
-              width: 200,
+              height: 55,
+              width: 220,
               clipBehavior: Clip.hardEdge,
               //padding:
               //const EdgeInsets.only(top: 7, left: 2, right: 4, bottom: 13),
               margin: const EdgeInsets.all(4),
+              padding: const EdgeInsets.only(top: 5, bottom: 3),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: isMe ? AppColors.primaryColor : AppColors.grey),
-              child: PlayAudio(audioFile: label, isMe: isMe)));
+              child: PlayAudio(
+                audioFile: label,
+                isMe: isMe,
+                timeStamp: timeStamp,
+              )));
     }
     return Column(
       children: [
@@ -119,16 +123,17 @@ class MsgBubble extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Align(
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                      timeStamp,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w400,
-                        color: isMe ? AppColors.white : AppColors.textColor2,
-                      ),
-                    )),
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    timeStamp,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: isMe ? AppColors.white : AppColors.textColor2,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

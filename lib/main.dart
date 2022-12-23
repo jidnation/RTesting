@@ -1,21 +1,24 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:bloc/bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_mentions/flutter_mentions.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
-import 'package:reach_me/core/routes/routes.dart';
-import 'package:reach_me/core/services/graphql/gql_provider.dart';
-import 'package:flutter/services.dart';
-import 'package:reach_me/core/utils/bloc_observer.dart';
-import 'package:reach_me/core/utils/constants.dart';
 import 'dart:io';
 
+import 'package:bloc/bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:get/get.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:reach_me/core/routes/routes.dart';
+import 'package:reach_me/core/services/graphql/gql_provider.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
+import 'package:reach_me/core/utils/bloc_observer.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
 import 'package:reach_me/firebase_options.dart';
+
+import 'core/services/moment/controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +46,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Get.lazyPut(() => MomentController(), fenix: true);
     return GraphQLProvider(
       client: clientFor(),
       child: GraphQLProvider(
@@ -50,7 +54,7 @@ class MyApp extends StatelessWidget {
         child: LifeCycleManager(
           child: OverlaySupport.global(
             child: Portal(
-              child: MaterialApp(
+              child: GetMaterialApp(
                 debugShowCheckedModeBanner: false,
                 title: 'ReachMe',
                 theme: ThemeData(

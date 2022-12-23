@@ -39,6 +39,7 @@ import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -98,11 +99,15 @@ class _AccountScreenState extends State<AccountScreen>
         isScrollable: true,
         controller: _tabController,
         indicatorWeight: 1.5,
-        unselectedLabelColor: AppColors.greyShade4,
+        unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
-        labelColor: AppColors.primaryColor,
+        labelColor: AppColors.white,
         labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        indicator: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          color: AppColors.textColor2,
+        ),
         labelStyle: TextStyle(
           fontSize: getScreenHeight(15),
           fontFamily: 'Poppins',
@@ -123,21 +128,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 0
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Reaches',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 0
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -156,21 +152,12 @@ class _AccountScreenState extends State<AccountScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: _tabController!.index == 1
-                          ? AppColors.textColor2
-                          : Colors.transparent,
-                    ),
                     child: FittedBox(
                       child: Text(
                         'Likes',
                         style: TextStyle(
                           fontSize: getScreenHeight(15),
                           fontWeight: FontWeight.w400,
-                          color: _tabController!.index == 1
-                              ? AppColors.white
-                              : AppColors.textColor2,
                         ),
                       ),
                     ),
@@ -188,21 +175,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 2
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Comments',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 2
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -218,21 +196,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 3
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Shoutout',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 3
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -248,21 +217,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 4
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Shoutdown',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 4
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -278,21 +238,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 5
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Share',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 5
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -308,21 +259,12 @@ class _AccountScreenState extends State<AccountScreen>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 6
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Save',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 6
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -377,10 +319,14 @@ class _AccountScreenState extends State<AccountScreen>
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
     final _savedPosts = useState<List<SavePostModel>>([]);
+    final _currentPost = useState<SavePostModel?>(null);
     final _likedPosts = useState<List<PostFeedModel>>([]);
     final _shoutDowns = useState<List<PostFeedModel>>([]);
     final _shoutOuts = useState<List<PostFeedModel>>([]);
     final _sharedPosts = useState<List<PostFeedModel>>([]);
+     final shoutingDown = useState(false);
+
+     final viewProfile = useState(false);
     useEffect(() {
       globals.userBloc!.add(GetUserProfileEvent(email: globals.user!.email!));
       globals.socialServiceBloc!
@@ -409,13 +355,40 @@ class _AccountScreenState extends State<AccountScreen>
         body: BlocConsumer<UserBloc, UserState>(
           bloc: globals.userBloc,
           listener: (context, state) {
-            if (state is RecipientUserData) {
-              if (reachDM.value) {
-                reachDM.value = false;
-                RouteNavigators.route(
-                    context, MsgChatInterface(recipientUser: state.user));
+                 if (state is RecipientUserData) {
+                if (reachDM.value) {
+                  reachDM.value = false;
+                  RouteNavigators.route(
+                      context, MsgChatInterface(recipientUser: state.user));
+                } else if (viewProfile.value) {
+                  viewProfile.value = false;
+                  ProgressHUD.of(context)?.dismiss();
+                  globals.recipientUser = state.user;
+                  state.user!.id == globals.user!.id
+                      ? RouteNavigators.route(context, const AccountScreen())
+                      : RouteNavigators.route(
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: 'email',
+                            recipientImageUrl: state.user!.profilePicture,
+                            recipientId: state.user!.id,
+                          ));
+                }
               }
-            }
+                   if (state is GetReachRelationshipSuccess) {
+                if (shoutingDown.value) {
+                  shoutingDown.value = false;
+                  if ((state.isReaching ?? false)) {
+                    globals.socialServiceBloc!.add(VotePostEvent(
+                      voteType: 'Downvote',
+                      postId: _currentPost.value!.post.postId,
+                    ));
+                  } else {
+                    Snackbars.error(context,
+                        message: 'You cannot shout down on this user\'s posts');
+                  }
+                }
+              }
             if (state is DeleteAccountSuccess) {
               if (state.deleted ?? false) {
                 RouteNavigators.pop(context);
@@ -454,26 +427,37 @@ class _AccountScreenState extends State<AccountScreen>
                   Snackbars.error(context, message: state.error);
                   _reachoutsRefreshController.refreshFailed();
                 }
-                if (state is GetLikedPostsSuccess) {
-                  _likedPosts.value = state.posts!;
-                  _likesRefreshController.refreshCompleted();
-                }
-                if (state is GetLikedPostsError) {
-                  Snackbars.error(context, message: state.error);
-                  _likesRefreshController.refreshCompleted();
-                }
-                if (state is GetVotedPostsSuccess) {
-                  if (state.voteType == 'Upvote') {
-                    _shoutOuts.value = state.posts!;
-                    _shoutoutRefreshController.refreshCompleted();
-                  } else if (state.voteType == 'Downvote') {
-                    _shoutDowns.value = state.posts!;
-                    _shoutdownRefreshController.refreshCompleted();
+
+                
+                 if (state is UnlikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _savedPosts.value[pos].post.isLiked = true;
+                    _savedPosts.value[pos].post.nLikes =
+                        (_savedPosts.value[pos].post.nLikes ?? 0) + 1;
                   }
-                }
+
+                  if (state is LikePostError) {
+                    Snackbars.error(context, message: state.error);
+                    int pos = _posts.value
+                        .indexWhere((e) => e.postId == state.postId);
+                    _savedPosts.value[pos].post.isLiked = false;
+                    _savedPosts.value[pos].post.nLikes =
+                        (_savedPosts.value[pos].post.nLikes ?? 1) - 1;
+                  }
                 if (state is GetVotedPostsError) {
                   Snackbars.error(context, message: state.error);
                 }
+
+                    if (state is DeletePostVoteSuccess) {
+                    globals.socialServiceBloc!
+                        .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                  }
+
+                  if (state is DeletePostVoteError) {
+                    Snackbars.error(context, message: state.error);
+                  }
                 if (state is GetPersonalCommentsSuccess) {
                   _comments.value = state.data!;
                   _commentsRefreshController.refreshCompleted();
@@ -799,7 +783,7 @@ class _AccountScreenState extends State<AccountScreen>
                                         ),
                                         SizedBox(width: getScreenWidth(5)),
                                         Text(
-                                          'Block',
+                                          'EX',
                                           style: TextStyle(
                                               fontSize: getScreenHeight(15),
                                               color: AppColors.greyShade2,
@@ -862,69 +846,158 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     Visibility(
                       visible: isCollapsed ? false : true,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: Container(
-                                    width: getScreenWidth(40),
-                                    height: getScreenHeight(40),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color:
-                                          AppColors.textColor2.withOpacity(0.5),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/back.svg',
-                                      color: AppColors.white,
-                                      width: getScreenWidth(50),
-                                      height: getScreenHeight(50),
-                                    ),
-                                  ),
-                                  onPressed: () =>
-                                      setState(() => isCollapsed = true),
-                                ),
-                                Text(
-                                  globals.user!.username.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
+                      child: GestureDetector(
+                        child: Stack(
+                          alignment: Alignment.topCenter,
+                          fit: StackFit.passthrough,
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            /// Banner image
+                            SizedBox(
+                              height: getScreenHeight(200),
+                              width: size.width,
+                              child: SvgPicture.asset(
+                                "assets/svgs/cover-banner.svg",
+                                fit: BoxFit.cover,
                               ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.user!);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]).paddingOnly(t: 40),
+                            ),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: Container(
+                                      width: getScreenWidth(40),
+                                      height: getScreenHeight(40),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.textColor2
+                                            .withOpacity(0.5),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        'assets/svgs/back.svg',
+                                        color: AppColors.white,
+                                        width: getScreenWidth(50),
+                                        height: getScreenHeight(50),
+                                      ),
+                                    ),
+                                    onPressed: () => setState(() {
+                                      isCollapsed = !isCollapsed;
+                                    }),
+                                  ),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: Container(
+                                      width: getScreenWidth(40),
+                                      height: getScreenHeight(40),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.textColor2
+                                            .withOpacity(0.5),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        'assets/svgs/pop-vertical.svg',
+                                        color: AppColors.white,
+                                        width: getScreenWidth(50),
+                                        height: getScreenHeight(50),
+                                      ),
+                                    ),
+                                   onPressed: () => RouteNavigators.route(
+                                      context, const HomeScreen()),
+                                    splashRadius: 20,
+                                  )
+                                ]).paddingOnly(t: 40),
+                            Positioned(
+                              top: size.height * 0.2 - 100,
+                              child: GestureDetector(
+                                child: Column(
+                                  children: [
+                                    const ProfilePicture(
+                                      height: 60,
+                                      width: 60,
+                                    ),
+                                    SizedBox(height: getScreenHeight(10)),
+                                    Column(
+                                      children: [
+                                        Text(
+                                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                                .toTitleCase(),
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(19),
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.white,
+                                            )),
+                                        Text(
+                                            '@${globals.user!.username ?? 'username'}',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              fontWeight: FontWeight.w400,
+                                              color: AppColors.white,
+                                            )),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                onTap: () {
+                                  RouteNavigators.route(
+                                      context,
+                                      FullScreenWidget(
+                                        child: Stack(children: <Widget>[
+                                          Container(
+                                            color: AppColors
+                                                .black, // Your screen background color
+                                          ),
+                                          Column(children: <Widget>[
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            Image.network(
+                                              globals.user!.profilePicture!,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ]),
+                                          Positioned(
+                                            top: 0.0,
+                                            left: 0.0,
+                                            right: 0.0,
+                                            child: AppBar(
+                                              title: const Text(
+                                                  'Profile Picture'), // You can add title here
+                                              leading: IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_back,
+                                                    color: AppColors.white),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                              ),
+                                              backgroundColor: AppColors
+                                                  .black, //You can make this transparent
+                                              elevation: 0.0, //No shadow
+                                            ),
+                                          ),
+                                        ]),
+                                      ));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        onVerticalDragEnd: (dragEndDetails) {
+                          if (dragEndDetails.primaryVelocity! > 0) {
+                            setState(() {
+                              isCollapsed = !isCollapsed;
+                            });
+                          }
+                        },
+                      ),
                     ),
+                    SizedBox(height: getScreenHeight(10)),
                     Center(child: _tabBar),
                     Expanded(
                       child: TabBarView(
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         controller: _tabController,
                         children: [
                           //REACHES TAB
@@ -1024,7 +1097,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'upvote',
+                                                voteType: 'Upvote',
                                                 postId: _likedPosts
                                                     .value[index].postId,
                                               ));
@@ -1035,7 +1108,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'downvote',
+                                                voteType: 'Downvote',
                                                 postId: _likedPosts
                                                     .value[index].postId,
                                               ));
@@ -1194,7 +1267,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'upvote',
+                                                voteType: 'Upvote',
                                                 postId: _shoutOuts
                                                     .value[index].postId,
                                               ));
@@ -1205,7 +1278,7 @@ class _AccountScreenState extends State<AccountScreen>
                                             if (active.contains(index)) {
                                               globals.socialServiceBloc!
                                                   .add(VotePostEvent(
-                                                voteType: 'downvote',
+                                                voteType: 'Downvote',
                                                 postId: _shoutOuts
                                                     .value[index].postId,
                                               ));
@@ -1396,7 +1469,177 @@ class _AccountScreenState extends State<AccountScreen>
                                   : ListView.builder(
                                       itemCount: _savedPosts.value.length,
                                       itemBuilder: (context, index) {
-                                        return SavedPostReacherCard(
+                                        return
+                                          SavedPostReacherCard(
+                                            likingPost: false,
+                                                    
+                                                      isLiked: (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isLiked ??
+                                                              false)
+                                                          ? true
+                                                          : false,
+                                                      isVoted: (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isVoted ??
+                                                              '')
+                                                          .isNotEmpty,
+                                                      voteType: _savedPosts
+                                                          .value[index]
+                                                          .post
+                                                          .isVoted,
+                                                      onViewProfile: () {
+                                                        viewProfile.value =
+                                                            true;
+                                                        ProgressHUD.of(context)
+                                                            ?.showWithText(
+                                                                'Viewing Profile');
+                                                        globals.userBloc!.add(
+                                                            GetRecipientProfileEvent(
+                                                                email: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId));
+                                                      },
+                                                      onMessage: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if ((_savedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .post.vote ??
+                                                                  [])
+                                                              .isEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    VotePostEvent(
+                                                              voteType:
+                                                                  'Upvote',
+                                                              postId: _savedPosts
+                                                                  .value[index]
+                                                                  .post.postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    DeletePostVoteEvent(
+                                                              voteId: _savedPosts.value
+                                                                  [index]
+                                                                  .post.postId,
+                                                            ));
+                                                          }
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        _currentPost.value =
+                                                            _savedPosts.value[index];
+                                                        if (active
+                                                            .contains(index)) {
+                                                          shoutingDown.value =
+                                                              true;
+                                                          globals.userBloc!.add(
+                                                              GetReachRelationshipEvent(
+                                                                  userIdToReach: _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post.postOwnerProfile!.authId,
+                                                                  type: ReachRelationshipType
+                                                                      .reacher));
+                                                        }
+                                                      },
+                                                    onLike: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(index);
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .isLiked ??
+                                                              false) {
+                                                            _savedPosts
+                                                                    .value[index]
+                                                                    .post
+                                                                    .isLiked =
+                                                                false;
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .nLikes = (_savedPosts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        .nLikes ??
+                                                                    1) -
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: _savedPosts
+                                                                  .value[index]
+                                                                  .post.postId,
+                                                            ));
+                                                          } else {
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .isLiked = true;
+                                                            _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .nLikes = (_savedPosts
+                                                                        .value[
+                                                                            index]
+                                                                        .post
+                                                                        .nLikes ??
+                                                                    0) +
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _savedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .post.postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                   
                                           savedPostModel:
                                               _savedPosts.value[index],
                                           onDelete: () {
@@ -1406,12 +1649,14 @@ class _AccountScreenState extends State<AccountScreen>
                                                   DeleteSavedPostEvent(
                                                       postId: _savedPosts
                                                           .value[index]
-                                                          .postId));
+                                                          .post.postId));
                                             }
                                           },
                                         );
+                               
                                       },
                                     ),
+                          
                             )
                         ],
                       ),
@@ -1446,6 +1691,7 @@ class _ReacherCard extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+     final postDuration = timeago.format(postModel!.createdAt!);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 13,
@@ -1496,14 +1742,42 @@ class _ReacherCard extends HookWidget {
                                   // SvgPicture.asset('assets/svgs/verified.svg')
                                 ],
                               ),
-                              Text(
-                                postModel!.location!,
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
+                               Row(
+                                  children: [
+                                    Text(
+                                      postModel!.location! == 'nil' ||
+                                              postModel!.location! ==
+                                                  'NIL' ||
+                                              postModel!.location ==
+                                                  null
+                                          ? ''
+                                          : postModel!
+                                                      .location!.length >
+                                                  23
+                                              ? postModel!.location!
+                                                  .substring(0, 23)
+                                              : postModel!.location!,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ),
+                                    Text(
+                                      postDuration,
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(10),
+                                        fontFamily: 'Poppins',
+                                        letterSpacing: 0.4,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.textColor2,
+                                      ),
+                                    ).paddingOnly(l: 6),
+                                  ],
                                 ),
-                              )
+                             
                             ],
                           ).paddingOnly(t: 10),
                         ],
@@ -1770,7 +2044,7 @@ class _CommentReachCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '@${commentModel!.commentProfile!.username}',
+                                    '@${commentModel!.commentOwnerProfile!.username}',
                                     style: TextStyle(
                                       fontSize: getScreenHeight(15),
                                       fontWeight: FontWeight.w500,
@@ -1782,7 +2056,7 @@ class _CommentReachCard extends HookWidget {
                                 ],
                               ),
                               Text(
-                                'Comment on @${commentModel!.commentProfile!.username}',
+                                'Comment on @${commentModel!.commentOwnerProfile!.username}',
                                 style: TextStyle(
                                   fontSize: getScreenHeight(11),
                                   fontWeight: FontWeight.w400,
@@ -2020,7 +2294,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
-    // globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
+    globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.userBloc!.add(GetReachRelationshipEvent(
         userIdToReach: widget.recipientId,
         type: ReachRelationshipType.reaching));
@@ -2044,9 +2318,13 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         isScrollable: true,
         controller: _tabController,
         indicatorWeight: 1.5,
-        unselectedLabelColor: AppColors.greyShade4,
+        unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
-        labelColor: AppColors.primaryColor,
+        labelColor: AppColors.white,
+        indicator: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          color: AppColors.textColor2,
+        ),
         labelStyle: TextStyle(
           fontSize: getScreenHeight(15),
           fontFamily: 'Poppins',
@@ -2067,21 +2345,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 0
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
                 child: FittedBox(
                   child: Text(
                     'Reaches',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 0
-                          ? AppColors.white
-                          : AppColors.textColor2,
                     ),
                   ),
                 ),
@@ -2094,25 +2363,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 _tabController?.animateTo(1);
                 collapseUserProfile();
               }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 1
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    'Comment',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 1
-                          ? AppColors.white
-                          : AppColors.textColor2,
-                    ),
+              child: FittedBox(
+                child: Text(
+                  'Comment',
+                  style: TextStyle(
+                    fontSize: getScreenHeight(15),
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -2124,25 +2380,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 _tabController?.animateTo(2);
                 collapseUserProfile();
               }),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: _tabController!.index == 2
-                      ? AppColors.textColor2
-                      : Colors.transparent,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    'Likes',
-                    style: TextStyle(
-                      fontSize: getScreenHeight(15),
-                      fontWeight: FontWeight.w400,
-                      color: _tabController!.index == 2
-                          ? AppColors.white
-                          : AppColors.textColor2,
-                    ),
+              child: FittedBox(
+                child: Text(
+                  'Likes',
+                  style: TextStyle(
+                    fontSize: getScreenHeight(15),
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -2192,10 +2435,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              // if (state is RecipientUserData) {
-              //   globals.recipientUser = state.user;
-              //   setState(() {});
-              // }
+              if (state is RecipientUserData) {
+                globals.recipientUser = state.user;
+                setState(() {});
+              }
 
               if (state is UserError) {
                 Snackbars.error(context, message: state.error);
@@ -2231,14 +2474,16 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
 
               if (state is DelReachRelationshipSuccess) {
                 _isReaching = false;
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: widget.recipientId));
                 setState(() {});
               }
 
               if (state is UserLoaded) {
                 Snackbars.success(context,
                     message: "Reached User Successfully");
-                // globals.userBloc!.add(
-                //     GetRecipientProfileEvent(email: widget.recipientEmail));
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: widget.recipientId));
                 _isReaching = true;
 
                 setState(() {});
@@ -2436,211 +2681,256 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                       ],
                     ),
                   ),
-                  Visibility(
-                    visible: isUserCollapsed,
-                    child: Column(
-                      children: [
-                        SizedBox(height: getScreenHeight(15)),
-                        Text(
-                            ('@${globals.recipientUser!.username}')
-                                .toLowerCase(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(15),
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor2,
-                            )),
-                        // Text('@${globals.recipientUser!.username ?? 'username'}',
-                        //     style: TextStyle(
-                        //       fontSize: getScreenHeight(13),
-                        //       fontWeight: FontWeight.w400,
-                        //       color: AppColors.textColor2,
-                        //     )),
-                        SizedBox(height: getScreenHeight(15)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  Stack(
+                    children: [
+                      Visibility(
+                        visible: isUserCollapsed,
+                        child: Column(
                           children: [
+                            SizedBox(height: getScreenHeight(15)),
+                            Text(
+                                ('@${globals.recipientUser!.username}')
+                                    .toLowerCase(),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(15),
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColor2,
+                                )),
+                            // Text('@${globals.recipientUser!.username ?? 'username'}',
+                            //     style: TextStyle(
+                            //       fontSize: getScreenHeight(13),
+                            //       fontWeight: FontWeight.w400,
+                            //       color: AppColors.textColor2,
+                            //     )),
+                            SizedBox(height: getScreenHeight(15)),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context,
-                                      RecipientAccountStatsInfo(
-                                        index: 0,
-                                        recipientId: widget.recipientId,
-                                        // recipientId: widget.recipientId,
-                                      )),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nReachers
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
+                                Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context,
+                                          RecipientAccountStatsInfo(
+                                            index: 0,
+                                            recipientId: widget.recipientId,
+                                            // recipientId: widget.recipientId,
+                                          )),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nReachers
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Reachers',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        'Reachers',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
+                                    ),
+                                    SizedBox(width: getScreenWidth(20)),
+                                    InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context,
+                                          RecipientAccountStatsInfo(
+                                            index: 1,
+                                            recipientId: widget.recipientId,
+                                          )),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nReaching
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Reaching',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    //SizedBox(width: getScreenWidth(20)),
+                                    /*InkWell(
+                                      onTap: () => RouteNavigators.route(
+                                          context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            globals.recipientUser!.nStaring
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(15),
+                                                color: AppColors.textColor2,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            'Starring',
+                                            style: TextStyle(
+                                                fontSize: getScreenHeight(13),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    )*/
+                                  ],
                                 ),
-                                SizedBox(width: getScreenWidth(20)),
-                                InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context,
-                                      RecipientAccountStatsInfo(
-                                        index: 1,
-                                        recipientId: widget.recipientId,
-                                      )),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nReaching
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                        'Reaching',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                //SizedBox(width: getScreenWidth(20)),
-                                /*InkWell(
-                                  onTap: () => RouteNavigators.route(
-                                      context, RecipientAccountStatsInfo(index: 2, recipientId: widget.recipientId)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        globals.recipientUser!.nStaring
-                                            .toString(),
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(15),
-                                            color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      Text(
-                                        'Starring',
-                                        style: TextStyle(
-                                            fontSize: getScreenHeight(13),
-                                            color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
-                                  ),
-                                )*/
                               ],
                             ),
-                          ],
-                        ),
-                        globals.recipientUser!.bio != null &&
-                                globals.recipientUser!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        SizedBox(
-                            width: getScreenWidth(290),
-                            child: Text(
-                              globals.recipientUser!.bio ?? '',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: getScreenHeight(13),
-                                color: AppColors.greyShade2,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            )),
-                        globals.recipientUser!.bio != null &&
-                                globals.recipientUser!.bio != ''
-                            ? SizedBox(height: getScreenHeight(20))
-                            : const SizedBox.shrink(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                            globals.recipientUser!.bio != null &&
+                                    globals.recipientUser!.bio != ''
+                                ? SizedBox(height: getScreenHeight(20))
+                                : const SizedBox.shrink(),
                             SizedBox(
-                              width: getScreenWidth(130),
-                              height: getScreenHeight(41),
-                              child: CustomButton(
-                                isLoading: _isLoading,
-                                loaderColor: _isReaching
-                                    ? AppColors.primaryColor
-                                    : AppColors.white,
-                                label: _isReaching ? 'Reaching' : 'Reach',
-                                color: _isReaching
-                                    ? AppColors.white
-                                    : AppColors.primaryColor,
-                                onPressed: () {
-                                  if (!_isReaching) {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            globals.recipientUser!.id));
-                                  } else {
-                                    globals.userBloc!.add(
-                                        DelReachRelationshipEvent(
-                                            userIdToDelete:
-                                                globals.recipientUser!.id));
-                                  }
-                                },
-                                size: size,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 9,
-                                  horizontal: 21,
-                                ),
-                                textColor: _isReaching
-                                    ? AppColors.black
-                                    : AppColors.white,
-                                borderSide: _isReaching
-                                    ? const BorderSide(
-                                        color: AppColors.greyShade5)
-                                    : BorderSide.none,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                                width: getScreenWidth(130),
-                                height: getScreenHeight(41),
-                                child: CustomButton(
-                                  label: 'Message',
-                                  color: AppColors.white,
-                                  onPressed: () {
-                                    RouteNavigators.route(
-                                        context,
-                                        MsgChatInterface(
-                                          recipientUser: globals.recipientUser,
-                                        ));
-                                  },
-                                  size: size,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 9,
-                                    horizontal: 21,
+                                width: getScreenWidth(290),
+                                child: Text(
+                                  globals.recipientUser!.bio ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(13),
+                                    color: AppColors.greyShade2,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  textColor: AppColors.textColor2,
-                                  borderSide: const BorderSide(
-                                      color: AppColors.greyShade5),
                                 )),
+                            globals.recipientUser!.bio != null &&
+                                    globals.recipientUser!.bio != ''
+                                ? SizedBox(height: getScreenHeight(20))
+                                : const SizedBox.shrink(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: getScreenWidth(130),
+                                  height: getScreenHeight(41),
+                                  child: CustomButton(
+                                    isLoading: _isLoading,
+                                    loaderColor: _isReaching
+                                        ? AppColors.primaryColor
+                                        : AppColors.white,
+                                    label: _isReaching ? 'Reaching' : 'Reach',
+                                    color: _isReaching
+                                        ? AppColors.white
+                                        : AppColors.primaryColor,
+                                    onPressed: () {
+                                      if (!_isReaching) {
+                                        globals.userBloc!.add(ReachUserEvent(
+                                            userIdToReach:
+                                                globals.recipientUser!.id));
+                                      } else {
+                                        globals.userBloc!.add(
+                                            DelReachRelationshipEvent(
+                                                userIdToDelete:
+                                                    globals.recipientUser!.id));
+                                      }
+                                    },
+                                    size: size,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 9,
+                                      horizontal: 21,
+                                    ),
+                                    textColor: _isReaching
+                                        ? AppColors.black
+                                        : AppColors.white,
+                                    borderSide: _isReaching
+                                        ? const BorderSide(
+                                            color: AppColors.greyShade5)
+                                        : BorderSide.none,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                    width: getScreenWidth(130),
+                                    height: getScreenHeight(41),
+                                    child: CustomButton(
+                                      label: 'Message',
+                                      color: AppColors.white,
+                                      onPressed: () {
+                                        RouteNavigators.route(
+                                            context,
+                                            MsgChatInterface(
+                                              recipientUser:
+                                                  globals.recipientUser,
+                                            ));
+                                      },
+                                      size: size,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 9,
+                                        horizontal: 21,
+                                      ),
+                                      textColor: AppColors.textColor2,
+                                      borderSide: const BorderSide(
+                                          color: AppColors.greyShade5),
+                                    )),
+                              ],
+                            ),
+                            SizedBox(height: getScreenHeight(15)),
                           ],
-                        ),
-                        SizedBox(height: getScreenHeight(15)),
-                      ],
-                    ).paddingOnly(t: 50),
+                        ).paddingOnly(t: 50),
+                      ),
+                      Visibility(
+                        visible: _isReaching,
+                        child: Positioned(
+                            top: size.height * 0.1 - 55,
+                            right: size.width * 0.4,
+                            //child: FractionalTranslation(
+                            //translation: const Offset(0.1, 0.1),
+                            child: InkWell(
+                              onTap: () {
+                                print("User Tap for starring");
+                                if (!_isStarring) {
+                                  globals.userBloc!.add(StarUserEvent(
+                                      userIdToStar: widget.recipientId));
+                                } else {
+                                  globals.userBloc!.add(
+                                      DelStarRelationshipEvent(
+                                          starIdToDelete: widget.recipientId));
+                                }
+                              },
+                              child: Container(
+                                width: getScreenHeight(30),
+                                height: getScreenHeight(30),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: !_isStarring
+                                          ? Colors.grey
+                                          : Colors.yellowAccent),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.star,
+                                    size: 19,
+                                    color: !_isStarring
+                                        ? Colors.grey
+                                        : Colors.yellowAccent),
+                              ),
+                            )
+                            //),
+                            ),
+                      ),
+                    ],
                   ),
                   Visibility(
                     visible: isUserCollapsed ? true : false,
@@ -2651,65 +2941,172 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                   ),
                   Visibility(
                     visible: isUserCollapsed ? false : true,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Container(
-                                  width: getScreenWidth(40),
-                                  height: getScreenHeight(40),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors.textColor2.withOpacity(0.5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/svgs/back.svg',
-                                    color: AppColors.white,
-                                    width: getScreenWidth(50),
-                                    height: getScreenHeight(50),
-                                  ),
+                    child: GestureDetector(
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        fit: StackFit.passthrough,
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          /// Banner image
+                          SizedBox(
+                            height: getScreenHeight(200),
+                            width: size.width,
+                            child: SvgPicture.asset(
+                                  "assets/svgs/cover-banner.svg",
+                                  fit: BoxFit.cover,
                                 ),
-                                onPressed: () =>
-                                    setState(() => isUserCollapsed = true),
-                              ),
-                              Text(
-                                globals.recipientUser!.username.toString(),
-                                style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w500),
-                              )
-                            ],
                           ),
-                          IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: Container(
-                              width: getScreenWidth(40),
-                              height: getScreenHeight(40),
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.textColor2.withOpacity(0.5),
-                              ),
-                              child: SvgPicture.asset(
-                                'assets/svgs/pop-vertical.svg',
-                                color: AppColors.white,
-                                width: getScreenWidth(50),
-                                height: getScreenHeight(50),
-                              ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/back.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
+                                  ),
+                                  onPressed: () => RouteNavigators.route(
+                                        context, const HomeScreen()),
+                                ),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/pop-vertical.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    await showProfileMenuBottomSheet(context,
+                                        user: globals.recipientUser!,
+                                        isStarring: _isStarring);
+                                  },
+                                  splashRadius: 20,
+                                )
+                              ]).paddingOnly(t: 40),
+                          Positioned(
+                            top: size.height * 0.2 - 100,
+                            child: Column(
+                              children: [
+                                globals.recipientUser!.profilePicture == null
+                                    ? ImagePlaceholder(
+                                        width: 60,
+                                        height: 60,
+                                        border: Border.all(
+                                            color: Colors.grey.shade50,
+                                            width: 3.0),
+                                      )
+                                    : GestureDetector(
+                                        child: RecipientProfilePicture(
+                                          imageUrl: globals
+                                              .recipientUser!.profilePicture,
+                                          width: 60,
+                                          height: 60,
+                                          border: Border.all(
+                                              color: Colors.grey.shade50,
+                                              width: 3.0),
+                                        ),
+                                        onTap: () {
+                                          RouteNavigators.route(
+                                              context,
+                                              Stack(children: <Widget>[
+                                                Container(
+                                                  color: AppColors
+                                                      .black, // Your screen background color
+                                                ),
+                                                Column(children: <Widget>[
+                                                  Container(
+                                                      height:
+                                                          getScreenHeight(100)),
+                                                  Container(
+                                                    height: size.height - 100,
+                                                    width: size.width,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.rectangle,
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(widget
+                                                            .recipientImageUrl!),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ]),
+                                                AppBar(
+                                                  title: const Text(
+                                                      'Profile Picture'), // You can add title here
+                                                  leading: IconButton(
+                                                    icon: const Icon(
+                                                        Icons.arrow_back,
+                                                        color: AppColors.white),
+                                                    onPressed: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                  ),
+                                                  backgroundColor: AppColors
+                                                      .black, //You can make this transparent
+                                                  elevation: 0.0, //No shadow
+                                                ),
+                                              ]));
+                                        },
+                                      ),
+                                SizedBox(height: getScreenHeight(20)),
+                                Column(
+                                  children: [
+                                    Text(
+                                        ('${globals.recipientUser!.firstName} ${globals.recipientUser!.lastName}')
+                                            .toTitleCase(),
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(19),
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.white,
+                                        )),
+                                    Text(
+                                        '@${globals.recipientUser!.username ?? 'username'}',
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(13),
+                                          fontWeight: FontWeight.w400,
+                                          color: AppColors.white,
+                                        )),
+                                    SizedBox(height: getScreenHeight(15)),
+                                  ],
+                                ),
+                              ],
                             ),
-                            onPressed: () async {
-                              await showProfileMenuBottomSheet(context,
-                                  user: globals.recipientUser!,
-                                  isStarring: _isStarring);
-                            },
-                            splashRadius: 20,
-                          )
-                        ]).paddingOnly(t: 40),
+                          ),
+                        ],
+                      ),
+                      onVerticalDragEnd: (dragEndDetails) {
+                          if (dragEndDetails.primaryVelocity! > 0) {
+                            setState(() {
+                              isUserCollapsed = !isUserCollapsed;
+                            });
+                          }
+                        },
+                    ),
                   ),
+                  SizedBox(height: getScreenHeight(10)),
                   Visibility(
                     visible: _isReaching,
                     child: Expanded(

@@ -536,6 +536,7 @@ class HomeRemoteDataSource {
     List<String>? imageMediaItems,
     String? videoMediaItem,
     String? postRating,
+    List<String>? mentionList,
   }) async {
     String q = r'''
         mutation createPost(
@@ -546,6 +547,7 @@ class HomeRemoteDataSource {
           $videoMediaItem: String
           $location: String!
           $postRating: String!
+          $mentionList: [String]
           ) {
           createPost(
             postBody: {
@@ -556,6 +558,7 @@ class HomeRemoteDataSource {
               videoMediaItem: $videoMediaItem
               location: $location
               postRating: $postRating
+              mentionList: $mentionList
           }) {
             ''' +
         PostSchema.schema +
@@ -580,6 +583,9 @@ class HomeRemoteDataSource {
       if (videoMediaItem != null) {
         variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
       }
+      if (mentionList != null) {
+        variables.putIfAbsent('mentionList', () => mentionList);
+      }
 
       final result = await _client.mutate(
         gql(q),
@@ -590,7 +596,8 @@ class HomeRemoteDataSource {
       }
 
       var post = PostModel.fromJson(result.data!['createPost']);
-      print("Postrating: ${post.postRating}");
+
+      print("MentionListValue: ${post.mentionList}");
 
       return PostModel.fromJson(result.data!['createPost']);
     } catch (e) {
@@ -601,7 +608,7 @@ class HomeRemoteDataSource {
   Future<PostModel> createRepost({required CreateRepostInput input}) async {
     String q = r'''
         mutation createRepost(
-          $repostBody: CreateRepostInput!
+          $repostBody: PostRepostInputDto!
           ) {
           createRepost(
             repostBody: $repostBody
@@ -1096,6 +1103,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'commentId': commentId,
       });
+      Console.log("alllikes", result);
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -1409,7 +1417,7 @@ class HomeRemoteDataSource {
   }) async {
     String q = r'''
         mutation createStatus(
-          $statusBody: CreateStatus!
+          $statusBody: StatusInputDto!
           ) {
           createStatus(
             statusBody: $statusBody
@@ -1423,6 +1431,7 @@ class HomeRemoteDataSource {
       final result = await _client.query(gql(q), variables: {
         'statusBody': createStatusDto.toJson(),
       });
+      Console.log("Status Created", result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -1589,7 +1598,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<StatusFeedModel>> getStatusFeed({
+  Future<List<StatusFeedResponseModel>> getStatusFeed({
     required int? pageLimit,
     required int? pageNumber,
   }) async {
@@ -1603,7 +1612,7 @@ class HomeRemoteDataSource {
             page_number: $page_number
           ){   
                ''' +
-        StatusFeedSchema.schema +
+        StatusFeedResponseSchema.schema +
         '''
           }
         }''';
@@ -1617,14 +1626,14 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       final tempList = (result.data!['getStatusFeed'] as List)
-          .map((e) => StatusFeedModel.fromJson(e))
+          .map((e) => StatusFeedResponseModel.fromJson(e))
           .toList();
-      List<StatusFeedModel> list = [];
+      List<StatusFeedResponseModel> list = [];
       if (tempList.isNotEmpty) {
         final groupedList =
             tempList.first.status!.groupBy((item) => item.status!.authId!);
         groupedList.forEach((key, value) {
-          list.add(StatusFeedModel(id: key, status: value.toList()));
+          list.add(StatusFeedResponseModel(id: key, status: value.toList()));
         });
       }
       return list;

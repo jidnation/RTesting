@@ -8,8 +8,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-//import 'package:reach_me/features/chat/presentation/widgets/audio.waveforms.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -50,10 +48,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   FlutterSoundRecorder? _soundRecorder;
   bool isRecordingInit = false;
   bool isRecording = false;
-  bool isTyping = false;
-  final TextEditingController controller = TextEditingController();
-  bool isKeyboardVisible = false;
-  var keyboardVisibilityController = KeyboardVisibilityController();
 
   //AUDIO_WAVEFORM RECORDER
   RecorderController? recorderController;
@@ -65,16 +59,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
 
-   // if (mounted)_initialiseController();
-
     openAudio();
-    /*focusNode.addListener(() {
+
+    focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
           emojiShowing = false;
         });
       }
-    });*/
+    });
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _controller.animateTo(
         _controller.position.maxScrollExtent,
@@ -86,17 +79,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
     });
-
-    keyboardVisibilityController.onChange.listen((value) {
-      setState(() {
-        isKeyboardVisible = value;
-      });
-      /* if (isKeyboardVisible && emojiShowing) {
-        setState(() {
-          emojiShowing = false;
-        });
-      }*/
-    });
   }
 
   @override
@@ -106,7 +88,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     _soundRecorder?.closeRecorder();
     isRecordingInit = false;
     focusNode.dispose();
-    recorderController?.dispose();
   }
 
   void openAudio() async {
@@ -115,6 +96,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       throw RecordingPermissionException('Mic permission not allowed');
     }
     await _soundRecorder!.openRecorder();
+    await _soundRecorder!
+        .setSubscriptionDuration(const Duration(milliseconds: 500));
     isRecordingInit = true;
   }
 
@@ -141,10 +124,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    //final isTyping = useState<bool>(false);
+    final isTyping = useState<bool>(false);
     final isSending = useState<bool>(false);
     final showIsSending = useState<bool>(false);
-    // final controller = useTextEditingController();
+    final controller = useTextEditingController();
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           id: '${globals.user!.id}--${widget.recipientUser!.id}'));
@@ -297,493 +280,538 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             }
           },
           builder: (context, state) {
-            return Container(
-              width: size.width,
-              height: size.height,
-              child: WillPopScope(
-                  child: Stack(
-                    children: [
-                      Column(
-                        children: [
-                          Flexible(
-                            child: ListView(
-                              controller: _controller,
-                              shrinkWrap: false,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(height: getScreenHeight(20)),
-                                    widget.recipientUser!.profilePicture == null
-                                        ? ImagePlaceholder(
-                                            width: getScreenWidth(80),
-                                            height: getScreenHeight(80),
-                                          )
-                                        : RecipientProfilePicture(
-                                            width: getScreenWidth(80),
-                                            height: getScreenHeight(80),
-                                            imageUrl: widget
-                                                .recipientUser!.profilePicture,
-                                          ),
-                                    SizedBox(height: getScreenHeight(5)),
-                                    Text('@${widget.recipientUser!.username}',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(14),
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.textColor2,
-                                        )),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              widget.recipientUser!.nReachers
-                                                  .toString(),
-                                              style: TextStyle(
-                                                fontSize: getScreenHeight(15),
-                                                color: AppColors.greyShade2,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Reachers',
-                                              style: TextStyle(
-                                                fontSize: getScreenHeight(14),
-                                                color: AppColors.greyShade2,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(width: getScreenWidth(20)),
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              widget.recipientUser!.nReaching
-                                                  .toString(),
-                                              style: TextStyle(
-                                                fontSize: getScreenHeight(15),
-                                                color: AppColors.greyShade2,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Reaching',
-                                              style: TextStyle(
-                                                fontSize: getScreenHeight(14),
-                                                color: AppColors.greyShade2,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: getScreenHeight(11)),
-                                    if (widget.recipientUser!.bio == null)
-                                      const SizedBox.shrink()
-                                    else
-                                      SizedBox(
-                                          width: getScreenWidth(290),
-                                          child: Text(
-                                            widget.recipientUser!.bio ?? '',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(14),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          )),
-                                    SizedBox(height: getScreenHeight(15)),
-                                    SizedBox(
-                                        width: getScreenWidth(130),
-                                        height: getScreenHeight(41),
-                                        child: CustomButton(
-                                          label: 'View Profile',
-                                          color: AppColors.white,
-                                          onPressed: () {
-                                            RouteNavigators.route(
-                                                context,
-                                                RecipientAccountProfile(
-                                                  recipientEmail: widget
-                                                      .recipientUser!.email,
-                                                  recipientImageUrl: widget
-                                                      .recipientUser!
-                                                      .profilePicture,
-                                                  recipientId:
-                                                      widget.recipientUser!.id,
-                                                ));
-                                          },
-                                          size: size,
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 9,
-                                            horizontal: 21,
-                                          ),
-                                          textColor: const Color(0xFF767474),
-                                          borderSide: BorderSide.none,
-                                        )),
-                                    const SizedBox(height: 15),
-                                  ],
-                                ),
-                                if (globals.userChat!.isEmpty)
-                                  const SizedBox.shrink()
-                                else
+            return
+                // Container(
+                //   width: size.width,
+                //   height: size.height,
+                // child:
+                WillPopScope(
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            Flexible(
+                              child: ListView(
+                                controller: _controller,
+                                shrinkWrap: false,
+                                children: [
                                   Column(
-                                    children: List.generate(
-                                      globals.userChat!.length,
-                                      (index) => MsgBubble(
-                                        msgDate: '',
-                                        isMe: globals.user!.id ==
-                                            globals.userChat![index].senderId,
-                                        label: globals.userChat![index].value!,
-                                        size: size,
-                                        timeStamp: Helper.parseChatTime(
-                                            globals.userChat![index].sentAt ??
-                                                ''),
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(height: getScreenHeight(20)),
+                                      widget.recipientUser!.profilePicture ==
+                                              null
+                                          ? ImagePlaceholder(
+                                              width: getScreenWidth(80),
+                                              height: getScreenHeight(80),
+                                            )
+                                          : RecipientProfilePicture(
+                                              width: getScreenWidth(80),
+                                              height: getScreenHeight(80),
+                                              imageUrl: widget.recipientUser!
+                                                  .profilePicture,
+                                            ),
+                                      SizedBox(height: getScreenHeight(5)),
+                                      Text('@${widget.recipientUser!.username}',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(14),
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.textColor2,
+                                          )),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                widget.recipientUser!.nReachers
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: getScreenHeight(15),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Reachers',
+                                                style: TextStyle(
+                                                  fontSize: getScreenHeight(14),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(width: getScreenWidth(20)),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                widget.recipientUser!.nReaching
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: getScreenHeight(15),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Reaching',
+                                                style: TextStyle(
+                                                  fontSize: getScreenHeight(14),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
                                       ),
-                                    ),
-                                  )
-                              ],
-                            ).paddingOnly(r: 15, l: 15),
-                          ),
-                          Visibility(
-                            visible: showIsSending.value,
-                            child: Row(
-                              mainAxisAlignment:
-                                  globals.user!.id != widget.recipientUser!.id
-                                      ? MainAxisAlignment.end
-                                      : MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Sending',
-                                  style: TextStyle(
-                                    fontSize: getScreenHeight(11),
-                                    color: AppColors.grey,
+                                      SizedBox(height: getScreenHeight(11)),
+                                      if (widget.recipientUser!.bio == null)
+                                        const SizedBox.shrink()
+                                      else
+                                        SizedBox(
+                                            width: getScreenWidth(290),
+                                            child: Text(
+                                              widget.recipientUser!.bio ?? '',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: getScreenHeight(14),
+                                                color: AppColors.greyShade2,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            )),
+                                      SizedBox(height: getScreenHeight(15)),
+                                      SizedBox(
+                                          width: getScreenWidth(130),
+                                          height: getScreenHeight(41),
+                                          child: CustomButton(
+                                            label: 'View Profile',
+                                            color: AppColors.white,
+                                            onPressed: () {
+                                              RouteNavigators.route(
+                                                  context,
+                                                  RecipientAccountProfile(
+                                                    recipientEmail: widget
+                                                        .recipientUser!.email,
+                                                    recipientImageUrl: widget
+                                                        .recipientUser!
+                                                        .profilePicture,
+                                                    recipientId: widget
+                                                        .recipientUser!.id,
+                                                  ));
+                                            },
+                                            size: size,
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 9,
+                                              horizontal: 21,
+                                            ),
+                                            textColor: const Color(0xFF767474),
+                                            borderSide: BorderSide.none,
+                                          )),
+                                      const SizedBox(height: 15),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ).paddingSymmetric(h: 30),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            /*child: Transform.translate(
+                                  if (globals.userChat!.isEmpty)
+                                    const SizedBox.shrink()
+                                  else
+                                    Column(
+                                      children: List.generate(
+                                        globals.userChat!.length,
+                                        (index) => MsgBubble(
+                                          msgDate: '',
+                                          isMe: globals.user!.id ==
+                                              globals.userChat![index].senderId,
+                                          label:
+                                              globals.userChat![index].value!,
+                                          size: size,
+                                          timeStamp: Helper.parseChatTime(
+                                              globals.userChat![index].sentAt ??
+                                                  ''),
+                                        ),
+                                      ),
+                                    )
+                                ],
+                              ).paddingOnly(r: 15, l: 15),
+                            ),
+                            Visibility(
+                              visible: showIsSending.value,
+                              child: Row(
+                                mainAxisAlignment:
+                                    globals.user!.id != widget.recipientUser!.id
+                                        ? MainAxisAlignment.end
+                                        : MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Sending',
+                                    style: TextStyle(
+                                      fontSize: getScreenHeight(11),
+                                      color: AppColors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ).paddingSymmetric(h: 30),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              /*child: Transform.translate(
                               offset: Offset(
                                   0.0,
                                   -1 *
                                       MediaQuery.of(context).viewInsets.bottom),*/
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Row(children: [
-                                  Flexible(
-                                    child: CustomRoundTextField(
-                                      focusNode: focusNode,
-                                      //focusScope: focusScope,
-                                      controller: controller,
-                                      fillColor: AppColors.white,
-                                      textCapitalization:
-                                          TextCapitalization.sentences,
-                                      hintText: 'Type Message...',
-                                      hintStyle: const TextStyle(
-                                          color: Color(0xFF666666),
-                                          fontSize: 12),
-                                      onChanged: (val) {
-                                        if (val.isNotEmpty) {
-                                          setState(() {
-                                            isTyping = true;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            isTyping = false;
-                                          });
-                                        }
-                                      },
-                                      prefixIcon: GestureDetector(
-                                        onTap: () async {
-                                          if (emojiShowing &&
-                                              !isKeyboardVisible) {
-                                            //keyboardVisibilityController.
-                                            //focusNode.requestFocus();
-                                            //FocusScope.of(context).unfocus();
-                                            setState(() {
-                                              emojiShowing = false;
-                                            });
-                                            focusNode.requestFocus();
-                                            FocusScope.of(context)
-                                                .requestFocus(focusNode);
-                                          } else if (isKeyboardVisible &&
-                                              !emojiShowing) {
-                                            setState(() {
-                                              emojiShowing = true;
-                                            });
-                                            await Future.delayed(const Duration(
-                                                milliseconds: 100));
-                                            focusNode.unfocus();
-                                            FocusScope.of(context).unfocus();
-                                            FocusManager.instance.primaryFocus
-                                                ?.unfocus();
-                                            await SystemChannels.textInput
-                                                .invokeMethod('TextInput.hide');
-                                          }
-                                          /*if (isKeyboardVisible) {
-                                            FocusScope.of(context).unfocus();
-                                          }
-                                          setState(() {
-                                            emojiShowing = !emojiShowing;
-                                          });*/
-                                        },
-                                        child: SvgPicture.asset(
-                                          'assets/svgs/emoji.svg',
-                                        ).paddingAll(10),
-                                      ),
-                                      suffixIcon: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {},
-                                            child: SvgPicture.asset(
-                                              'assets/svgs/attach.svg',
-                                              // width: 24,
-                                              // height: 18,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          GestureDetector(
-                                            onTap: () {
-                                              showModalBottomSheet(
-                                                context: context,
-                                                builder: (context) {
-                                                  return ListView(
-                                                    shrinkWrap: true,
-                                                    children: [
-                                                      Column(children: [
-                                                        ListTile(
-                                                          leading:
-                                                              SvgPicture.asset(
-                                                            'assets/svgs/Camera.svg',
-                                                            color:
-                                                                AppColors.black,
-                                                          ),
-                                                          title: const Text(
-                                                              'Camera'),
-                                                          onTap: () async {
-                                                            Navigator.pop(
-                                                                context);
-                                                            final image =
-                                                                await getImage(
-                                                                    ImageSource
-                                                                        .camera);
-                                                            if (image != null) {
-                                                              globals.chatBloc!.add(
-                                                                  UploadImageFileEvent(
-                                                                      file:
-                                                                          image));
-                                                            }
-                                                          },
-                                                        ),
-                                                        ListTile(
-                                                          leading: SvgPicture.asset(
-                                                              'assets/svgs/gallery.svg'),
-                                                          title: const Text(
-                                                              'Gallery'),
-                                                          onTap: () async {
-                                                            Navigator.pop(
-                                                                context);
-                                                            final image =
-                                                                await getImage(
-                                                                    ImageSource
-                                                                        .gallery);
-                                                            if (image != null) {
-                                                              globals.chatBloc!.add(
-                                                                  UploadImageFileEvent(
-                                                                      file:
-                                                                          image));
-                                                            }
-                                                          },
-                                                        ),
-                                                      ]).paddingSymmetric(v: 5),
-                                                    ],
-                                                  );
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Row(children: [
+                                    Flexible(
+                                        child: !isRecording
+                                            ? CustomRoundTextField(
+                                                focusNode: focusNode,
+                                                controller: controller,
+                                                fillColor: AppColors.white,
+                                                textCapitalization:
+                                                    TextCapitalization
+                                                        .sentences,
+                                                hintText: 'Type Message...',
+                                                hintStyle: const TextStyle(
+                                                    color: Color(0xFF666666),
+                                                    fontSize: 12),
+                                                onChanged: (val) {
+                                                  if (val.isNotEmpty) {
+                                                    setState(() {
+                                                      isTyping.value = true;
+                                                    });
+                                                  } else {
+                                                    setState(() {
+                                                      isTyping.value = false;
+                                                    });
+                                                  }
                                                 },
-                                              );
-                                            },
-                                            child: SvgPicture.asset(
-                                              'assets/svgs/gallery.svg',
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 7),
-                                  isTyping
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            if (controller.text.isNotEmpty) {
-                                              final value =
-                                                  controller.text.trim();
-
-                                              Chat temp = Chat(
-                                                  senderId: globals.user!.id,
-                                                  type: 'text',
-                                                  value:
-                                                      controller.text.trim());
-                                              globals.userChat!.add(temp);
-                                              controller.clear();
-
-                                              SchedulerBinding.instance
-                                                  .addPostFrameCallback(
-                                                (_) {
-                                                  _controller.animateTo(
-                                                    _controller.position
-                                                        .maxScrollExtent,
-                                                    duration: const Duration(
-                                                        milliseconds: 10),
-                                                    curve: Curves.easeOut,
-                                                  );
-                                                },
-                                              );
-
-                                              globals.chatBloc!.add(
-                                                SendChatMessageEvent(
-                                                  senderId: globals.user!.id,
-                                                  receiverId:
-                                                      widget.recipientUser!.id,
-                                                  threadId:
-                                                      '${globals.user!.id}--${widget.recipientUser!.id}',
-                                                  value: value,
-                                                  type: 'text',
+                                                prefixIcon: GestureDetector(
+                                                  onTap: () async {
+                                                    focusNode.unfocus();
+                                                    focusNode.canRequestFocus =
+                                                        false;
+                                                    setState(() {
+                                                      emojiShowing =
+                                                          !emojiShowing;
+                                                    });
+                                                  },
+                                                  child: SvgPicture.asset(
+                                                    'assets/svgs/emoji.svg',
+                                                  ).paddingAll(10),
                                                 ),
-                                              );
-                                              isSending.value = true;
-                                              showIsSending.value = true;
-                                            } else {
-                                              controller.clear();
-                                            }
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(7),
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.primaryColor,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: SvgPicture.asset(
-                                              'assets/svgs/send.svg',
-                                              width: 25,
-                                              height: 25,
-                                              color: AppColors.white,
-                                            ),
-                                          ),
-                                        )
-                                      : GestureDetector(
-                                          onTap: () async {
-                                            var tempDir =
-                                                await getTemporaryDirectory();
-                                            var path =
-                                                '${tempDir.path}/flutter_sound.aac';
-                                            if (!isRecordingInit) {
-                                              return;
-                                            }
-                                            if (isRecording) {
-                                              await _soundRecorder!
-                                                  .stopRecorder();
-                                              print(path);
-                                              File audioMessage = File(path);
+                                                suffixIcon: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {},
+                                                      child: SvgPicture.asset(
+                                                        'assets/svgs/attach.svg',
+                                                        // width: 24,
+                                                        // height: 18,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 15),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        showModalBottomSheet(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return ListView(
+                                                              shrinkWrap: true,
+                                                              children: [
+                                                                Column(
+                                                                    children: [
+                                                                      ListTile(
+                                                                        leading:
+                                                                            SvgPicture.asset(
+                                                                          'assets/svgs/Camera.svg',
+                                                                          color:
+                                                                              AppColors.black,
+                                                                        ),
+                                                                        title: const Text(
+                                                                            'Camera'),
+                                                                        onTap:
+                                                                            () async {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          final image =
+                                                                              await getImage(ImageSource.camera);
+                                                                          if (image !=
+                                                                              null) {
+                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
+                                                                          }
+                                                                        },
+                                                                      ),
+                                                                      ListTile(
+                                                                        leading:
+                                                                            SvgPicture.asset('assets/svgs/gallery.svg'),
+                                                                        title: const Text(
+                                                                            'Gallery'),
+                                                                        onTap:
+                                                                            () async {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          final image =
+                                                                              await getImage(ImageSource.gallery);
+                                                                          if (image !=
+                                                                              null) {
+                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
+                                                                          }
+                                                                        },
+                                                                      ),
+                                                                    ]).paddingSymmetric(
+                                                                    v: 5),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child: SvgPicture.asset(
+                                                        'assets/svgs/gallery.svg',
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 15),
+                                                  ],
+                                                ),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      _soundRecorder!
+                                                          .closeRecorder();
+                                                      setState(() {
+                                                        isRecording = false;
+                                                      });
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.delete,
+                                                      size: 30,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    child: StreamBuilder<
+                                                        RecordingDisposition>(
+                                                      stream: _soundRecorder!
+                                                          .onProgress,
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        final duration =
+                                                            snapshot.hasData
+                                                                ? snapshot.data!
+                                                                    .duration
+                                                                : Duration.zero;
 
-                                              globals.chatBloc!.add(
-                                                  UploadImageFileEvent(
-                                                      file: audioMessage));
-                                            } else {
-                                              await _soundRecorder!
-                                                  .startRecorder(
-                                                toFile: path,
-                                              );
+                                                        String twoDigits(
+                                                                int n) =>
+                                                            n
+                                                                .toString()
+                                                                .padLeft(
+                                                                    2, '0');
+                                                        final twoDigitMinutes =
+                                                            twoDigits(duration
+                                                                .inMinutes
+                                                                .remainder(60));
+                                                        final twoDigitSeconds =
+                                                            twoDigits(duration
+                                                                .inSeconds
+                                                                .remainder(60));
+                                                        return Text(
+                                                          '$twoDigitMinutes: $twoDigitSeconds',
+                                                          style: const TextStyle(
+                                                              fontSize: 20,
+                                                              color: AppColors
+                                                                  .primaryColor),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                    const SizedBox(width: 7),
+                                    isTyping.value
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              if (controller.text.isNotEmpty) {
+                                                final value =
+                                                    controller.text.trim();
+
+                                                Chat temp = Chat(
+                                                    senderId: globals.user!.id,
+                                                    type: 'text',
+                                                    value:
+                                                        controller.text.trim());
+                                                globals.userChat!.add(temp);
+                                                controller.clear();
+
+                                                SchedulerBinding.instance
+                                                    .addPostFrameCallback(
+                                                  (_) {
+                                                    _controller.animateTo(
+                                                      _controller.position
+                                                          .maxScrollExtent,
+                                                      duration: const Duration(
+                                                          milliseconds: 10),
+                                                      curve: Curves.easeOut,
+                                                    );
+                                                  },
+                                                );
+
+                                                globals.chatBloc!.add(
+                                                  SendChatMessageEvent(
+                                                    senderId: globals.user!.id,
+                                                    receiverId: widget
+                                                        .recipientUser!.id,
+                                                    threadId:
+                                                        '${globals.user!.id}--${widget.recipientUser!.id}',
+                                                    value: value,
+                                                    type: 'text',
+                                                  ),
+                                                );
+                                                isSending.value = true;
+                                                showIsSending.value = true;
+                                              } else {
+                                                controller.clear();
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.primaryColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: SvgPicture.asset(
+                                                'assets/svgs/send.svg',
+                                                width: 25,
+                                                height: 25,
+                                                color: AppColors.white,
+                                              ),
+                                            ),
+                                          )
+                                        : GestureDetector(
+                                            onTap: () async {
+                                              var tempDir =
+                                                  await getTemporaryDirectory();
+                                              var path =
+                                                  '${tempDir.path}/flutter_sound.aac';
+                                              if (!isRecordingInit) {
+                                                return;
+                                              }
+                                              if (isRecording) {
+                                                await _soundRecorder!
+                                                    .stopRecorder();
+                                                print(path);
+                                                File audioMessage = File(path);
+
+                                                globals.chatBloc!.add(
+                                                    UploadImageFileEvent(
+                                                        file: audioMessage));
+                                              } else {
+                                                await _soundRecorder!
+                                                    .startRecorder(
+                                                  toFile: path,
+                                                );
+                                              }
+                                              setState(() {
+                                                isRecording = !isRecording;
+                                              });
+                                            },
+                                            child: !isRecording
+                                                ? Container(
+                                                    padding:
+                                                        const EdgeInsets.all(7),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/mic.svg',
+                                                      width: 25,
+                                                      height: 25,
+                                                      color: AppColors.white,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    padding:
+                                                        const EdgeInsets.all(7),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/send.svg',
+                                                      width: 25,
+                                                      height: 25,
+                                                      color: AppColors.white,
+                                                    ))),
+                                  ]).paddingOnly(r: 15, l: 15, b: 15, t: 10),
+                                  Offstage(
+                                    offstage: !emojiShowing,
+                                    child: SizedBox(
+                                        height: 230,
+                                        child: EmojiPicker(
+                                          textEditingController: controller,
+                                          config: const Config(
+                                            columns: 7,
+                                          ),
+                                          onEmojiSelected: (category, emoji) {
+                                            controller
+                                              ..text += emoji.emoji
+                                              ..selection =
+                                                  TextSelection.fromPosition(
+                                                      TextPosition(
+                                                          offset: controller
+                                                              .text.length));
+                                            if (!isTyping.value) {
+                                              setState(() {
+                                                isTyping.value =
+                                                    !isTyping.value;
+                                              });
                                             }
                                             setState(() {
-                                              isRecording = !isRecording;
+                                              controller.text = controller.text;
                                             });
                                           },
-                                          child: !isRecording
-                                              ? Container(
-                                                  padding:
-                                                      const EdgeInsets.all(7),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: SvgPicture.asset(
-                                                    'assets/svgs/mic.svg',
-                                                    width: 25,
-                                                    height: 25,
-                                                    color: AppColors.white,
-                                                  ),
-                                                )
-                                              : Container(
-                                                  padding:
-                                                      const EdgeInsets.all(7),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: SvgPicture.asset(
-                                                    'assets/svgs/dc-cancel.svg',
-                                                    width: 25,
-                                                    height: 25,
-                                                    color: AppColors.white,
-                                                  ))),
-                                ]).paddingOnly(r: 15, l: 15, b: 15, t: 10),
-                                // emojiShowing
-                                //  ? showemoji()
-                                //: const SizedBox.shrink(),
-
-                                Offstage(
-                                  offstage: !emojiShowing,
-                                  child: SizedBox(
-                                      height: 250,
-                                      child: EmojiPicker(
-                                        config: const Config(
-                                          columns: 7,
-                                        ),
-                                        onEmojiSelected: (category, emoji) {
-                                          setState(() {
-                                            isTyping = !isTyping;
-                                          });
-
-                                        },
-                                      )),
-                                )
-                                //const Spacer(),
-                              ],
+                                        )),
+                                  )
+                                  //const Spacer(),
+                                ],
+                              ),
+                              //  ),
                             ),
-                            //  ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  onWillPop: () {
-                    if (emojiShowing) {
-                      setState(() {
-                        emojiShowing = false;
-                      });
-                    } else {
-                      RouteNavigators.pop(context);
-                    }
-                    return Future.value(false);
-                  }),
-            );
+                          ],
+                        ),
+                      ],
+                    ),
+                    onWillPop: () {
+                      if (emojiShowing) {
+                        setState(() {
+                          emojiShowing = false;
+                        });
+                      } else {
+                        RouteNavigators.pop(context);
+                      }
+                      return Future.value(false);
+                    });
+            //);
           }),
     );
   }
