@@ -910,6 +910,242 @@ class _CommentReachState extends State<CommentReach> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.5,
                       ),
+
+                       Container(
+                width: MediaQuery.of(context).size.width,
+                // margin: const EdgeInsets.only(top: 210),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
+                color: const Color(0xFFF5F5F5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10)),
+                            ),
+                            builder: (context) {
+                              return ListView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 27,
+                                    vertical: 10,
+                                  ),
+                                  children: [
+                                    Container(
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.greyShade5
+                                            .withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ).paddingSymmetric(h: size.width / 2.7),
+                                    SizedBox(height: getScreenHeight(21)),
+                                    Center(
+                                      child: Text(
+                                        'Who can reply',
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(16),
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(5)),
+                                    Center(
+                                      child: Text(
+                                        'Identify who can reply to this reach.',
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(14),
+                                          color: AppColors.greyShade3,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(20)),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'everyone';
+                                          RouteNavigators.pop(context);
+                                        });
+                                      },
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        minLeadingWidth: 14,
+                                        leading: SvgPicture.asset(
+                                            'assets/svgs/world.svg'),
+                                        title: Text(
+                                          'Everyone can reply',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(10)),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'people_you_follow';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        minLeadingWidth: 14,
+                                        leading: SvgPicture.asset(
+                                            'assets/svgs/people-you-follow.svg'),
+                                        title: Text(
+                                          'People you follow',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(10)),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value =
+                                              'only_people_you_mention';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        minLeadingWidth: 14,
+                                        leading: SvgPicture.asset(
+                                            'assets/svgs/people-you-mention.svg'),
+                                        title: Text(
+                                          'Only people you mention',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: getScreenHeight(10)),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          replyFeature.value = 'none';
+                                        });
+                                        RouteNavigators.pop(context);
+                                      },
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        minLeadingWidth: 14,
+                                        leading: SvgPicture.asset(
+                                            'assets/svgs/none.svg'),
+                                        title: Text(
+                                          'None',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]);
+                            });
+                      },
+                      child: replyWidget(replyFeature.value),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              //  showEmoji.value = !showEmoji.value;
+                            });
+                          },
+                          padding: EdgeInsets.zero,
+                          icon: SvgPicture.asset('assets/svgs/emoji.svg'),
+                          splashColor: Colors.transparent,
+                          splashRadius: 20,
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 20),
+                        IconButton(
+                          onPressed: () async {
+                            // final media = await MediaService()
+                            //     .loadMediaFromGallery(context: context);
+                            final media = await getImage(ImageSource.gallery);
+                            if (media != null) {
+                              _mediaList.value.add(UploadFileDto(
+                                  file: media,
+                                  id: Random().nextInt(100).toString()));
+                              setState(() {});
+                            }
+                          },
+                          splashColor: Colors.transparent,
+                          splashRadius: 20,
+                          padding: EdgeInsets.zero,
+                          icon: SvgPicture.asset('assets/svgs/gallery.svg'),
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 20),
+                        IconButton(
+                          //constraints: const BoxConstraints(
+                          // maxHeight: 25, maxWidth: 25),
+                          onPressed: () async {
+                            setState(() {
+                              isRecording = !isRecording;
+                            });
+                            var tempDir = await getTemporaryDirectory();
+                            var path = '${tempDir.path}/flutter_sound.aac';
+
+                            if (!isRecordingInit) {
+                              return;
+                            }
+                            if (isRecording) {
+                              await _soundRecorder!.stopRecorder();
+                              print(path);
+                              File audioMessage = File(path);
+
+                              /*globals.chatBloc!.add(
+                                                        UploadImageFileEvent(
+                                                            file: audioMessage));*/
+                            } else {
+                              await _soundRecorder!.startRecorder(
+                                toFile: path,
+                              );
+                            }
+                          },
+                          icon: !isRecording
+                              ? SvgPicture.asset(
+                                  'assets/svgs/mic.svg',
+                                  color: AppColors.blackShade3,
+                                  width: 20,
+                                  height: 26,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/svgs/dc-cancel.svg',
+                                  color: AppColors.blackShade3,
+                                  height: 20,
+                                  width: 20,
+                                ),
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+           
                       // showEmoji.value
                       //     ? buildEmoji()
                       //     : SizedBox(
@@ -1340,243 +1576,246 @@ class _CommentReachState extends State<CommentReach> {
                 ),
               ]),
             ),
-            Positioned(
-              top: 750,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                // margin: const EdgeInsets.only(top: 210),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                color: const Color(0xFFF5F5F5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
-                            ),
-                            builder: (context) {
-                              return ListView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 27,
-                                    vertical: 10,
-                                  ),
-                                  children: [
-                                    Container(
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.greyShade5
-                                            .withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ).paddingSymmetric(h: size.width / 2.7),
-                                    SizedBox(height: getScreenHeight(21)),
-                                    Center(
-                                      child: Text(
-                                        'Who can reply',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(5)),
-                                    Center(
-                                      child: Text(
-                                        'Identify who can reply to this reach.',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(14),
-                                          color: AppColors.greyShade3,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(20)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value = 'everyone';
-                                          RouteNavigators.pop(context);
-                                        });
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/world.svg'),
-                                        title: Text(
-                                          'Everyone can reply',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value =
-                                              'people_you_follow';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-follow.svg'),
-                                        title: Text(
-                                          'People you follow',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value =
-                                              'only_people_you_mention';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-mention.svg'),
-                                        title: Text(
-                                          'Only people you mention',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value = 'none';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/none.svg'),
-                                        title: Text(
-                                          'None',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ]);
-                            });
-                      },
-                      child: replyWidget(replyFeature.value),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              //  showEmoji.value = !showEmoji.value;
-                            });
-                          },
-                          padding: EdgeInsets.zero,
-                          icon: SvgPicture.asset('assets/svgs/emoji.svg'),
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          constraints: const BoxConstraints(),
-                        ),
-                        const SizedBox(width: 20),
-                        IconButton(
-                          onPressed: () async {
-                            // final media = await MediaService()
-                            //     .loadMediaFromGallery(context: context);
-                            final media = await getImage(ImageSource.gallery);
-                            if (media != null) {
-                              _mediaList.value.add(UploadFileDto(
-                                  file: media,
-                                  id: Random().nextInt(100).toString()));
-                              setState(() {});
-                            }
-                          },
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          padding: EdgeInsets.zero,
-                          icon: SvgPicture.asset('assets/svgs/gallery.svg'),
-                          constraints: const BoxConstraints(),
-                        ),
-                        const SizedBox(width: 20),
-                        IconButton(
-                          //constraints: const BoxConstraints(
-                          // maxHeight: 25, maxWidth: 25),
-                          onPressed: () async {
-                            setState(() {
-                              isRecording = !isRecording;
-                            });
-                            var tempDir = await getTemporaryDirectory();
-                            var path = '${tempDir.path}/flutter_sound.aac';
+            // Positioned(
+            //   top: 750,
+            //   child:
+              
+            //    Container(
+            //     width: MediaQuery.of(context).size.width,
+            //     // margin: const EdgeInsets.only(top: 210),
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 20,
+            //       vertical: 15,
+            //     ),
+            //     color: const Color(0xFFF5F5F5),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         InkWell(
+            //           onTap: () {
+            //             showModalBottomSheet(
+            //                 context: context,
+            //                 shape: const RoundedRectangleBorder(
+            //                   borderRadius: BorderRadius.only(
+            //                       topLeft: Radius.circular(10),
+            //                       topRight: Radius.circular(10)),
+            //                 ),
+            //                 builder: (context) {
+            //                   return ListView(
+            //                       physics: const NeverScrollableScrollPhysics(),
+            //                       shrinkWrap: true,
+            //                       padding: const EdgeInsets.symmetric(
+            //                         horizontal: 27,
+            //                         vertical: 10,
+            //                       ),
+            //                       children: [
+            //                         Container(
+            //                           height: 4,
+            //                           decoration: BoxDecoration(
+            //                             color: AppColors.greyShade5
+            //                                 .withOpacity(0.5),
+            //                             borderRadius: BorderRadius.circular(20),
+            //                           ),
+            //                         ).paddingSymmetric(h: size.width / 2.7),
+            //                         SizedBox(height: getScreenHeight(21)),
+            //                         Center(
+            //                           child: Text(
+            //                             'Who can reply',
+            //                             style: TextStyle(
+            //                               fontSize: getScreenHeight(16),
+            //                               color: AppColors.black,
+            //                               fontWeight: FontWeight.w600,
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(5)),
+            //                         Center(
+            //                           child: Text(
+            //                             'Identify who can reply to this reach.',
+            //                             style: TextStyle(
+            //                               fontSize: getScreenHeight(14),
+            //                               color: AppColors.greyShade3,
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(20)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value = 'everyone';
+            //                               RouteNavigators.pop(context);
+            //                             });
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/world.svg'),
+            //                             title: Text(
+            //                               'Everyone can reply',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value =
+            //                                   'people_you_follow';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/people-you-follow.svg'),
+            //                             title: Text(
+            //                               'People you follow',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value =
+            //                                   'only_people_you_mention';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/people-you-mention.svg'),
+            //                             title: Text(
+            //                               'Only people you mention',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value = 'none';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/none.svg'),
+            //                             title: Text(
+            //                               'None',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                       ]);
+            //                 });
+            //           },
+            //           child: replyWidget(replyFeature.value),
+            //         ),
+            //         Row(
+            //           children: [
+            //             IconButton(
+            //               onPressed: () {
+            //                 setState(() {
+            //                   //  showEmoji.value = !showEmoji.value;
+            //                 });
+            //               },
+            //               padding: EdgeInsets.zero,
+            //               icon: SvgPicture.asset('assets/svgs/emoji.svg'),
+            //               splashColor: Colors.transparent,
+            //               splashRadius: 20,
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //             const SizedBox(width: 20),
+            //             IconButton(
+            //               onPressed: () async {
+            //                 // final media = await MediaService()
+            //                 //     .loadMediaFromGallery(context: context);
+            //                 final media = await getImage(ImageSource.gallery);
+            //                 if (media != null) {
+            //                   _mediaList.value.add(UploadFileDto(
+            //                       file: media,
+            //                       id: Random().nextInt(100).toString()));
+            //                   setState(() {});
+            //                 }
+            //               },
+            //               splashColor: Colors.transparent,
+            //               splashRadius: 20,
+            //               padding: EdgeInsets.zero,
+            //               icon: SvgPicture.asset('assets/svgs/gallery.svg'),
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //             const SizedBox(width: 20),
+            //             IconButton(
+            //               //constraints: const BoxConstraints(
+            //               // maxHeight: 25, maxWidth: 25),
+            //               onPressed: () async {
+            //                 setState(() {
+            //                   isRecording = !isRecording;
+            //                 });
+            //                 var tempDir = await getTemporaryDirectory();
+            //                 var path = '${tempDir.path}/flutter_sound.aac';
 
-                            if (!isRecordingInit) {
-                              return;
-                            }
-                            if (isRecording) {
-                              await _soundRecorder!.stopRecorder();
-                              print(path);
-                              File audioMessage = File(path);
+            //                 if (!isRecordingInit) {
+            //                   return;
+            //                 }
+            //                 if (isRecording) {
+            //                   await _soundRecorder!.stopRecorder();
+            //                   print(path);
+            //                   File audioMessage = File(path);
 
-                              /*globals.chatBloc!.add(
-                                                        UploadImageFileEvent(
-                                                            file: audioMessage));*/
-                            } else {
-                              await _soundRecorder!.startRecorder(
-                                toFile: path,
-                              );
-                            }
-                          },
-                          icon: !isRecording
-                              ? SvgPicture.asset(
-                                  'assets/svgs/mic.svg',
-                                  color: AppColors.blackShade3,
-                                  width: 20,
-                                  height: 26,
-                                )
-                              : SvgPicture.asset(
-                                  'assets/svgs/dc-cancel.svg',
-                                  color: AppColors.blackShade3,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            //                   /*globals.chatBloc!.add(
+            //                                             UploadImageFileEvent(
+            //                                                 file: audioMessage));*/
+            //                 } else {
+            //                   await _soundRecorder!.startRecorder(
+            //                     toFile: path,
+            //                   );
+            //                 }
+            //               },
+            //               icon: !isRecording
+            //                   ? SvgPicture.asset(
+            //                       'assets/svgs/mic.svg',
+            //                       color: AppColors.blackShade3,
+            //                       width: 20,
+            //                       height: 26,
+            //                     )
+            //                   : SvgPicture.asset(
+            //                       'assets/svgs/dc-cancel.svg',
+            //                       color: AppColors.blackShade3,
+            //                       height: 20,
+            //                       width: 20,
+            //                     ),
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+           
+            // )
           ],
         ))));
   }
