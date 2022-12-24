@@ -26,22 +26,29 @@ class ChatRemoteDataSource {
     required String? threadId,
     required String? value,
     required String? type,
+    required String? sentAt,
+    required String? messageMode,
   }) async {
     String q = r'''
         mutation sendChatMessage(
           $senderId: String!
           $receiverId: String!
-          $type: MessageType!
-          $threadId: String
-          $value: String
+          $messageMode: String!
+          $contentType: String!
+          $content: String!
+          $sentAt: String!
+          $threadId: String!
+          
         ) {
           sendChatMessage(
             data: {
               senderId: $senderId
               receiverId: $receiverId
-              type: $type
+              messageMode: $messageMode
+              contentType: $contentType
+              content: $content
+              sentAt: $sentAt
               threadId: $threadId
-              value: $value
             }
           ) {
           ''' +
@@ -53,9 +60,11 @@ class ChatRemoteDataSource {
       final result = await _client.mutate(gql(q), variables: {
         'senderId': senderId,
         'receiverId': receiverId,
-        'type': type,
+        'contentType': type,
         'threadId': threadId,
-        'value': value,
+        'content': value,
+        'sentAt': sentAt,
+        'messageMode': messageMode,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);

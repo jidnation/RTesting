@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,12 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/presentation/widgets/gallery_view.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+import 'package:reach_me/features/momentControlRoom/moment_cacher.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/services/media_service.dart';
@@ -231,9 +235,10 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   bool isReadingCompleted = false;
   //final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
-  int maxduration = 0;
+ 
   final MediaService _mediaService = MediaService();
   Map<String, PlayerController> playerControllers = {};
+  late VideoAudioCommentCacheService videoAudioservices = CachedVideoAudioService(DefaultCacheManager());
 
   @override
   void initState() {
@@ -242,9 +247,16 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   }
 
   Future<void> initPlayer() async {
-    final res = await _mediaService.downloadFile(url: widget.path);
-    if (res == null) return;
+    late String filePath;
     playerController = PlayerController();
+    File? audioFile = await videoAudioservices.getAudioFile(widget.path);
+
+    if (audioFile == null) {
+      final res = await _mediaService.downloadFile(url: widget.path);
+      filePath = res!.path;
+    } else {
+      filePath = audioFile.path;
+    }
     // if(playerController == null) return;
     playerController!.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
@@ -266,29 +278,28 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       }
     });
 
-    await playerController!.preparePlayer(res.path);
-     // await playerController.startPlayer();
-     if (mounted) setState(() {});
+    await playerController!.preparePlayer(filePath);
+    // await playerController.startPlayer();
+    if (mounted) setState(() {});
   }
 
-  Future<PlayerController> getPlayerController(String path, String playerkey) async {
-    if ( playerkey != null && playerControllers.containsKey(playerkey)) {
+  Future<PlayerController> getPlayerController(
+      String path, String playerkey) async {
+    if (playerkey != null && playerControllers.containsKey(playerkey)) {
       return playerControllers[playerkey]!;
     }
 
     final anotherPlayerController = PlayerController();
     await anotherPlayerController.preparePlayer(path);
-    playerControllers[anotherPlayerController.playerKey] = anotherPlayerController;
+    playerControllers[anotherPlayerController.playerKey] =
+        anotherPlayerController;
     return anotherPlayerController;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (maxduration - currentDuration < 15) {
-      print("STOP THE PLAYER PLAYING");
-    }
+    
     print("current duration $currentDuration");
-    print("max_duration $maxduration");
 
     return Container(
       margin: widget.margin,
@@ -300,11 +311,10 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
         children: [
           GestureDetector(
             onTap: () async {
+              // playerController?.pausePlayer();
 
-            // playerController?.pausePlayer();
-
-            //   playerController = await getPlayerController(widget.path,playerController!.playerKey);
-            //   playerController!.startPlayer(finishMode: FinishMode.pause);
+              //   playerController = await getPlayerController(widget.path,playerController!.playerKey);
+              //   playerController!.startPlayer(finishMode: FinishMode.pause);
 
               if (playerController == null) return;
               if (isPlaying) {
@@ -324,17 +334,19 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
             width: getScreenWidth(8),
           ),
           isInitialised
-              ? AudioFileWaveforms(
-                  size: Size(MediaQuery.of(context).size.width / 2.0, 24),
-                  playerController: playerController!,
-                  density: 2,
-                  enableSeekGesture: true,
-                  playerWaveStyle: const PlayerWaveStyle(
-                    scaleFactor: 0.2,
-                    waveThickness: 3,
-                    fixedWaveColor: AppColors.white,
-                    liveWaveColor: Colors.blueAccent,
-                    waveCap: StrokeCap.round,
+              ? Expanded(
+                  child: AudioFileWaveforms(
+                    size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+                    playerController: playerController!,
+                    density: 2,
+                    enableSeekGesture: true,
+                    playerWaveStyle: const PlayerWaveStyle(
+                      scaleFactor: 0.2,
+                      waveThickness: 3,
+                      fixedWaveColor: AppColors.white,
+                      liveWaveColor: Colors.blueAccent,
+                      waveCap: StrokeCap.round,
+                    ),
                   ),
                 )
               : SizedBox(
@@ -366,5 +378,47 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   void dispose() {
     super.dispose();
     playerController?.dispose();
+  }
+}
+
+abstract class VideoAudioCommentCacheService {
+  Future<VideoPlayerController> getVideoFile(String videoUrl);
+  Future<File?> getAudioFile(String audioUrl);
+}
+
+class CachedVideoAudioService extends VideoAudioCommentCacheService {
+  final BaseCacheManager _cacheManager;
+
+  CachedVideoAudioService(this._cacheManager);
+
+  @override
+  Future<File?> getAudioFile(String audioUrl) async {
+    final fileInfo = await _cacheManager.getFileFromCache(audioUrl);
+
+    if (fileInfo == null) {
+      print('[VideoAudioCommentCacheService]: No audio in cache');
+
+      unawaited(_cacheManager.downloadFile(audioUrl));
+      return null;
+    } else {
+      print('[VideoAudioCommentCacheService]: Loading audio from cache');
+
+      return fileInfo.file;
+    }
+  }
+
+  @override
+  Future<VideoPlayerController> getVideoFile(String videoUrl) async {
+    final fileInfo = await _cacheManager.getFileFromCache(videoUrl);
+
+    if (fileInfo == null) {
+      print('[VideoAudioCommentCacheService]: No video in cache');
+      unawaited(_cacheManager.downloadFile(videoUrl));
+
+      return VideoPlayerController.network(videoUrl);
+    } else {
+      print('[VideoAudioCommentCacheService]: Loading video from cache');
+      return VideoPlayerController.file(fileInfo.file);
+    }
   }
 }

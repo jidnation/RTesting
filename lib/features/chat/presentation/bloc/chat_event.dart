@@ -32,12 +32,16 @@ class SendChatMessageEvent extends ChatEvent {
     required this.threadId,
     required this.value,
     required this.type,
+    required this.sentAt,
+    required this.messageMode,
   });
   final String? senderId;
   final String? receiverId;
   final String? threadId;
   final String? value;
   final String? type;
+  final String? sentAt;
+  final String? messageMode;
 }
 
 class SendImageMessageEvent extends ChatEvent {

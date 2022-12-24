@@ -74,6 +74,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           value: event.value,
           type: event.type,
           threadId: event.threadId,
+          sentAt: event.sentAt,
+          messageMode: event.messageMode,
         );
         response.fold(
           (error) => emit(ChatSendError(error: error)),

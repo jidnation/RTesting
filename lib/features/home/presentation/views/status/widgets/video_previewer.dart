@@ -274,65 +274,65 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           isUploading = true;
                         });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
-                          var noAudioFile = await MediaService()
-                              .removeAudio(filePath: widget.videoFile.path);
-                          // FileResult fileResult = FileResult(path: noAudioFile);
-                          String vFile = await MediaService()
-                              .compressMomentVideo(
-                                  filePath: noAudioFile); //removing the braces
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
-                          if (videoUrl != null) {
-                            var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
-                            if (res) {
-                              Snackbars.success(
-                                context,
-                                message: 'Moment successfully created',
-                                milliseconds: 1300,
-                              );
-                              momentCtrl.clearPostingData();
-                              RouteNavigators.pop(context);
-                            } else {
-                              Snackbars.error(
-                                context,
-                                message: 'Operation Failed, Try again.',
-                                milliseconds: 1400,
-                              );
-                            }
+                          // var noAudioFile = await MediaService()
+                          //     .removeAudio(filePath: widget.videoFile.path);
+                          // // FileResult fileResult = FileResult(path: noAudioFile);
+                          // String vFile = await MediaService()
+                          //     .compressMomentVideo(
+                          //         filePath: noAudioFile); //removing the braces
+                          // String? videoUrl =
+                          //     await FileConverter().convertMe(filePath: vFile);
+                          // if (videoUrl != null) {
+                          //   var res = await MomentQuery.postMoment(
+                          //       videoMediaItem: videoUrl);
+                          //   if (res) {
+                          //     Snackbars.success(
+                          //       context,
+                          //       message: 'Moment successfully created',
+                          //       milliseconds: 1300,
+                          //     );
+                          //     momentCtrl.clearPostingData();
+                          //     RouteNavigators.pop(context);
+                          //   } else {
+                          //     Snackbars.error(
+                          //       context,
+                          //       message: 'Operation Failed, Try again.',
+                          //       milliseconds: 1400,
+                          //     );
+                          //   }
                             // setState(() {
                             //   isUploading = false;
                             // });
-                          }
+                          //}
                         } else {
                           print(
                               ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
 
-                          String vFile =
-                              await MediaService().compressMomentVideo(
-                            filePath: widget.videoFile.path,
-                          );
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
-                          if (videoUrl != null) {
-                            var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
-                            if (res) {
-                              Snackbars.success(
-                                context,
-                                message: 'Moment successfully created',
-                                milliseconds: 1300,
-                              );
-                              momentCtrl.clearPostingData();
-                              RouteNavigators.pop(context);
-                            } else {
-                              Snackbars.error(
-                                context,
-                                message: 'Operation Failed, Try again.',
-                                milliseconds: 1400,
-                              );
-                            }
-                          }
+                          // String vFile =
+                          //     await MediaService().compressMomentVideo(
+                          //   filePath: widget.videoFile.path,
+                          // );
+                          // String? videoUrl =
+                          //     await FileConverter().convertMe(filePath: vFile);
+                          // if (videoUrl != null) {
+                          //   var res = await MomentQuery.postMoment(
+                          //       videoMediaItem: videoUrl);
+                          //   if (res) {
+                          //     Snackbars.success(
+                          //       context,
+                          //       message: 'Moment successfully created',
+                          //       milliseconds: 1300,
+                          //     );
+                          //     momentCtrl.clearPostingData();
+                          //     RouteNavigators.pop(context);
+                          //   } else {
+                          //     Snackbars.error(
+                          //       context,
+                          //       message: 'Operation Failed, Try again.',
+                          //       milliseconds: 1400,
+                          //     );
+                          //   }
+                          // }
                         }
                         setState(() {
                           isUploading = false;

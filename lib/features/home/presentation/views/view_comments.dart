@@ -460,30 +460,30 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                       shrinkWrap: true,
                                                       children: [
                                                         Column(children: [
-                                                          ListTile(
-                                                              leading:
-                                                                  SvgPicture
-                                                                      .asset(
-                                                                'assets/svgs/Camera.svg',
-                                                                color: AppColors
-                                                                    .black,
-                                                              ),
-                                                              title: const Text(
-                                                                  'Camera'),
-                                                              onTap: () async {
-                                                                Navigator.pop(
-                                                                    context);
-                                                                /* final image =
-                                                                await getImage(
-                                                                    ImageSource
-                                                                        .camera);
-                                                            if (image != null) {
-                                                              globals.chatBloc!.add(
-                                                                  UploadImageFileEvent(
-                                                                      file:
-                                                                          image));
-                                                            }*/
-                                                              }),
+                                                          // ListTile(
+                                                          //     leading:
+                                                          //         SvgPicture
+                                                          //             .asset(
+                                                          //       'assets/svgs/Camera.svg',
+                                                          //       color: AppColors
+                                                          //           .black,
+                                                          //     ),
+                                                          //     title: const Text(
+                                                          //         'Camera'),
+                                                          //     onTap: () async {
+                                                          //       Navigator.pop(
+                                                          //           context);
+                                                          //       /* final image =
+                                                          //       await getImage(
+                                                          //           ImageSource
+                                                          //               .camera);
+                                                          //   if (image != null) {
+                                                          //     globals.chatBloc!.add(
+                                                          //         UploadImageFileEvent(
+                                                          //             file:
+                                                          //                 image));
+                                                          //   }*/
+                                                          //     }),
                                                           ListTile(
                                                             leading: SvgPicture
                                                                 .asset(
@@ -498,7 +498,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                                                       context:
                                                                           context,
                                                                       maxAssets:
-                                                                          5);
+                                                                          1);
                                                               if (image ==
                                                                   null) {
                                                                 return;
@@ -1206,14 +1206,25 @@ class CommentsTile extends StatelessWidget {
                 ),
               )
             else if (comment.audioMediaItem!.isNotEmpty)
-              CommentAudioMedia(path: comment.audioMediaItem!)
-                  .paddingOnly(r: 0, l: 0, b: 10, t: 0)
+              Row(
+                children: [
+                  Expanded(
+                    child: CommentAudioMedia(path: comment.audioMediaItem!)
+                        .paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                  ),
+                ],
+              )
             else
               const SizedBox.shrink(),
-
             comment.imageMediaItems!.isNotEmpty
-                ? CommentMedia(comment: comment)
-                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: CommentMedia(comment: comment)
+                            .paddingOnly(l: 16, r: 16, b: 10, t: 0),
+                      ),
+                    ],
+                  )
                 // const Text('This is it'),
 
                 : const SizedBox.shrink(),

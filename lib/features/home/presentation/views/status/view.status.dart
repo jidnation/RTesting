@@ -17,6 +17,7 @@ import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 import 'package:story_time/story_page_view/story_page_view.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ViewMyStatus extends HookWidget {
   const ViewMyStatus({Key? key, required this.status}) : super(key: key);
@@ -84,6 +85,14 @@ class ViewMyStatus extends HookWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+
+                              Text(timeago.format(story.createdAt!),
+                              style: TextStyle(
+                                 fontSize: getScreenHeight(16),
+                                 color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                              ),
+                              )
                             ],
                           ),
                         ],
@@ -291,13 +300,27 @@ class ViewUserStatus extends HookWidget {
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    Text(
-                                      '@${story.statusOwnerProfile!.username!}',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(13),
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '@${story.statusOwnerProfile!.username!}',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          timeago.format(story.status!.createdAt!),
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+
+                                        )
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -383,13 +406,31 @@ class ViewUserStatus extends HookWidget {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  Text(
-                                    '@${story.statusOwnerProfile!.username!}',
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(13),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '@${story.statusOwnerProfile!.username!}',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            timeago.format(story.status!.createdAt!),
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                        
+                                          ),
+                                        )
+                                    ],
                                   ),
                                 ],
                               ),
@@ -552,6 +593,9 @@ class ViewUserStatus extends HookWidget {
                                     '${globals.user!.id}--${story.statusOwnerProfile!.authId}',
                                 value: controller.text.trim(),
                                 type: 'text',
+                                messageMode: '',
+                                sentAt: Helper.parseChatTime(''
+                                                  ),
                               ),
                             );
                             toast('Sending message...',

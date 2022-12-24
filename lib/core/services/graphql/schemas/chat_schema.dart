@@ -3,17 +3,16 @@ class ChatSchema {
 
   static String get schema {
     return r'''
-      _id 
       id 
       senderId 
       receiverId
-      receivers 
-      type 
-      value 
+      content 
+      contentType 
       threadId 
       sentAt 
-      createdAt 
-      updatedAt 
+      messageMode
+      created_at
+      updated_at 
           ''';
   }
 }
