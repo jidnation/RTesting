@@ -8,14 +8,11 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../../../core/components/snackbar.dart';
 import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
-import '../../../../../../core/utils/file_url_converter.dart';
 import '../../moment_feed.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
@@ -290,36 +287,38 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
-                        } else {
-                          print(
-                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-
-                          String vFile =
-                              await MediaService().compressMomentVideo(
-                            filePath: widget.videoFile.path,
-                          );
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
-                          if (videoUrl != null) {
-                            var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
-                            if (res) {
-                              Snackbars.success(
-                                context,
-                                message: 'Moment successfully created',
-                                milliseconds: 1300,
-                              );
-                              momentCtrl.clearPostingData();
-                              RouteNavigators.pop(context);
-                            } else {
-                              Snackbars.error(
-                                context,
-                                message: 'Operation Failed, Try again.',
-                                milliseconds: 1400,
-                              );
-                            }
-                          }
                         }
+                        // else
+                        // {
+                        //   print(
+                        //       ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
+                        //
+                        //   String vFile =
+                        //       await MediaService().compressMomentVideo(
+                        //     filePath: widget.videoFile.path,
+                        //   );
+                        //   String? videoUrl =
+                        //       await FileConverter().convertMe(filePath: vFile);
+                        //   if (videoUrl != null) {
+                        //     var res = await MomentQuery.postMoment(
+                        //         videoMediaItem: videoUrl);
+                        //     if (res) {
+                        //       Snackbars.success(
+                        //         context,
+                        //         message: 'Moment successfully created',
+                        //         milliseconds: 1300,
+                        //       );
+                        //       momentCtrl.clearPostingData();
+                        //       RouteNavigators.pop(context);
+                        //     } else {
+                        //       Snackbars.error(
+                        //         context,
+                        //         message: 'Operation Failed, Try again.',
+                        //         milliseconds: 1400,
+                        //       );
+                        //     }
+                        //   }
+                        // }
                         setState(() {
                           isUploading = false;
                         });

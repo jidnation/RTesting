@@ -128,7 +128,7 @@ dependencies:
   better_player: ^0.0.83
   uuid: ^3.0.7
   //////
-  light_compressor: ^2.0.1
+#  light_compressor: ^2.0.1
   ffmpeg_kit_flutter: ^4.5.1
 
 
