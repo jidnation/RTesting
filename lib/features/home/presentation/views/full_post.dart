@@ -308,6 +308,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height,
                             child: ListView(
+                              shrinkWrap: true,
                               children: [
                                 RepaintBoundary(
                                   key: scr,
@@ -1115,128 +1116,126 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                 ),
                                 const Divider(),
                                 showCommentField.value
-                                    ? Expanded(
-                                        child: comments.value.isEmpty
-                                            ? const Center(
-                                                child: Text('No comments yet'))
-                                            : ListView.builder(
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                controller: scrollController,
-                                                shrinkWrap: true,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15),
-                                                itemCount:
-                                                    comments.value.length,
-                                                itemBuilder: (context, index) {
-                                                  // if (comments
-                                                  //         .value[index].audioMediaItem ==
-                                                  //     null) {
-                                                  //   comments.value[index].audioMediaItem =
-                                                  //       ' ';
-                                                  // }
-                                                  return CommentsTile(
-                                                    comment:
-                                                        comments.value[index],
-                                                    isLiked: comments
-                                                                .value[index]
-                                                                .isLiked ??
-                                                            false
-                                                        ? true
-                                                        : false,
-                                                    onLike: () {
-                                                      print(
-                                                          "${comments.value[index].isLiked}");
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        if (comments
+                                    ? comments.value.isEmpty
+                                        ? const Center(
+                                            child: Text('No comments yet'))
+                                        : ListView.builder(
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            controller: scrollController,
+                                            shrinkWrap: true,
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 15),
+                                            itemCount:
+                                                comments.value.length,
+                                            itemBuilder: (context, index) {
+                                              // if (comments
+                                              //         .value[index].audioMediaItem ==
+                                              //     null) {
+                                              //   comments.value[index].audioMediaItem =
+                                              //       ' ';
+                                              // }
+                                              return CommentsTile(
+                                                comment:
+                                                    comments.value[index],
+                                                isLiked: comments
                                                             .value[index]
-                                                            .isLiked!) {
-                                                          comments.value[index]
-                                                              .isLiked = false;
+                                                            .isLiked ??
+                                                        false
+                                                    ? true
+                                                    : false,
+                                                onLike: () {
+                                                  print(
+                                                      "${comments.value[index].isLiked}");
+                                                  HapticFeedback
+                                                      .mediumImpact();
+                                                  handleTap(index);
+                                                  if (active
+                                                      .contains(index)) {
+                                                    if (comments
+                                                        .value[index]
+                                                        .isLiked!) {
+                                                      comments.value[index]
+                                                          .isLiked = false;
 
-                                                          comments.value[index]
-                                                              .nLikes = (comments
-                                                                      .value[
-                                                                          index]
-                                                                      .nLikes ??
-                                                                  1) -
-                                                              1;
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(GetAllCommentLikesEvent(
-                                                                  commentId: comments
-                                                                      .value[
-                                                                          index]
-                                                                      .commentId));
+                                                      comments.value[index]
+                                                          .nLikes = (comments
+                                                                  .value[
+                                                                      index]
+                                                                  .nLikes ??
+                                                              1) -
+                                                          1;
+                                                      globals
+                                                          .socialServiceBloc!
+                                                          .add(GetAllCommentLikesEvent(
+                                                              commentId: comments
+                                                                  .value[
+                                                                      index]
+                                                                  .commentId));
 
-                                                          if (likeId.value !=
-                                                              null) {
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                              UnlikeCommentOnPostEvent(
-                                                                  commentId: comments
-                                                                      .value[
-                                                                          index]
-                                                                      .commentId!,
-                                                                  likeId: likeId
-                                                                      .value
+                                                      if (likeId.value !=
+                                                          null) {
+                                                        globals
+                                                            .socialServiceBloc!
+                                                            .add(
+                                                          UnlikeCommentOnPostEvent(
+                                                              commentId: comments
+                                                                  .value[
+                                                                      index]
+                                                                  .commentId!,
+                                                              likeId: likeId
+                                                                  .value
 
-                                                                  //commentLike
-                                                                  //  .value!.likeId!,
-                                                                  ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          comments.value[index]
-                                                              .isLiked = true;
-                                                          comments.value[index]
-                                                              .nLikes = (comments
-                                                                      .value[
-                                                                          index]
-                                                                      .nLikes ??
-                                                                  0) +
-                                                              1;
-                                                          globals
-                                                              .socialServiceBloc!
-                                                              .add(
-                                                                  LikeCommentOnPostEvent(
-                                                            postId: comments
-                                                                .value[index]
-                                                                .postId,
-                                                            commentId: comments
-                                                                .value[index]
-                                                                .commentId,
-                                                          ));
-                                                        }
+                                                              //commentLike
+                                                              //  .value!.likeId!,
+                                                              ),
+                                                        );
                                                       }
-                                                    },
-                                                    onMessage: () {
-                                                      HapticFeedback
-                                                          .mediumImpact();
-                                                      reachDM.value = true;
-                                                      handleTap(index);
-                                                      if (active
-                                                          .contains(index)) {
-                                                        globals.userBloc!.add(
-                                                            GetRecipientProfileEvent(
-                                                                email: comments
-                                                                    .value[
-                                                                        index]
-                                                                    .authId!));
-                                                      }
-                                                    },
-                                                  );
+                                                    } else {
+                                                      comments.value[index]
+                                                          .isLiked = true;
+                                                      comments.value[index]
+                                                          .nLikes = (comments
+                                                                  .value[
+                                                                      index]
+                                                                  .nLikes ??
+                                                              0) +
+                                                          1;
+                                                      globals
+                                                          .socialServiceBloc!
+                                                          .add(
+                                                              LikeCommentOnPostEvent(
+                                                        postId: comments
+                                                            .value[index]
+                                                            .postId,
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId,
+                                                      ));
+                                                    }
+                                                  }
                                                 },
-                                              ),
-                                      )
+                                                onMessage: () {
+                                                  HapticFeedback
+                                                      .mediumImpact();
+                                                  reachDM.value = true;
+                                                  handleTap(index);
+                                                  if (active
+                                                      .contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: comments
+                                                                .value[
+                                                                    index]
+                                                                .authId!));
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          )
                                     : const SizedBox.shrink(),
-                                const SizedBox(height: 40),
+                                const SizedBox(height: 80),
                               ],
                             ),
                           ),

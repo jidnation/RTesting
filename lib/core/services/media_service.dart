@@ -5,11 +5,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_cutter/audio_cutter.dart';
+// import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
-import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;
@@ -196,7 +197,9 @@ class MediaService {
 
   //converting the file to url
   Future<String?>? urlConverter({required String filePath}) async {
+    File file = File(filePath);
     String? fileUrl = await FileConverter().convertMe(filePath: filePath);
+    unawaited(file.delete());
     return fileUrl;
   }
 
@@ -216,27 +219,27 @@ class MediaService {
         fileName: res.path!.split('/').last);
   }
 
-  Future<String> compressMomentVideo({required String filePath}) async {
-    final String videoName =
-        'ReachMe-${DateTime.now().millisecondsSinceEpoch}.mp4';
-    final LightCompressor _lightCompressor = LightCompressor();
-    final dynamic response = await _lightCompressor.compressVideo(
-      path: filePath,
-      // destinationPath: _destinationPath,
-      videoQuality: VideoQuality.low,
-      isMinBitrateCheckEnabled: false,
-      video: Video(videoName: videoName),
-      android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
-      ios: IOSConfig(saveInGallery: true),
-    );
-    // final res = await VideoCompress.compressVideo(
-    //   filePath,
-    //   quality: VideoQuality.DefaultQuality,
-    // );
-
-    // print('size1:::::::::::::::${res!.filesize! / 1024}');
-    return response.destinationPath;
-  }
+  // Future<String> compressMomentVideo({required String filePath}) async {
+  //   final String videoName =
+  //       'ReachMe-${DateTime.now().millisecondsSinceEpoch}.mp4';
+  //   final LightCompressor _lightCompressor = LightCompressor();
+  //   final dynamic response = await _lightCompressor.compressVideo(
+  //     path: filePath,
+  //     // destinationPath: _destinationPath,
+  //     videoQuality: VideoQuality.low,
+  //     isMinBitrateCheckEnabled: false,
+  //     video: Video(videoName: videoName),
+  //     android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
+  //     ios: IOSConfig(saveInGallery: true),
+  //   );
+  //   // final res = await VideoCompress.compressVideo(
+  //   //   filePath,
+  //   //   quality: VideoQuality.DefaultQuality,
+  //   // );
+  //
+  //   // print('size1:::::::::::::::${res!.filesize! / 1024}');
+  //   return response.destinationPath;
+  // }
 
   Future<String> removeAudio({required String filePath}) async {
     final vc.MediaInfo? res = await vc.VideoCompress.compressVideo(
@@ -366,6 +369,57 @@ class MediaService {
         height: height == null ? null : height / 1.0,
         width: width == null ? null : width / 1.0,
         fileName: thumbnailPath.split('/').last);
+  }
+
+  Future<String?> videoAudioMerger(BuildContext context,
+      {required String videoPath,
+      required String audioPath,
+      required int time}) async {
+    String timeLimit = '00:00:';
+    String outputPath = '/storage/emulated/0/Download/output.mp4';
+    String? fileUrl;
+    if (await Permission.storage.request().isGranted) {
+      if (time.toInt() < 10) {
+        timeLimit = timeLimit + '0' + time.toString();
+      } else {
+        timeLimit = timeLimit + time.toString();
+      }
+
+      /// To combine audio with video
+      ///
+      /// Merging video and audio, with audio re-encoding
+      /// -c:v copy -c:a aac
+      ///
+      /// Copying the audio without re-encoding
+      /// -c copy
+      ///
+      /// Replacing audio stream
+      /// -c:v copy -c:a aac -map 0:v:0 -map 1:a:0
+      String commandToExecute =
+          '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
+
+      // FFmpegKit.executeAsync(commandToExecute, (session) async {
+      //   final ReturnCode? returnCode = await session.getReturnCode();
+      //   if (ReturnCode.isSuccess(returnCode)) {
+      //     String file = await compressMomentVideo(filePath: outputPath);
+      //     fileUrl = await urlConverter(filePath: file);
+      //     momentFeedStore.postMoment(context, videoUrl: fileUrl);
+      //     // SUCCESS
+      //   } else if (ReturnCode.isCancel(returnCode)) {
+      //     fileUrl = null;
+      //     // CANCEL
+      //   } else {
+      //     fileUrl = null;
+      //     // ERROR
+      //   }
+      // });
+      return fileUrl;
+    } else if (await Permission.storage.isPermanentlyDenied) {
+      openAppSettings();
+    } else {
+      return null;
+    }
+    return null;
   }
 
   Future<FileResult?> downloadFile({required String url}) async {
