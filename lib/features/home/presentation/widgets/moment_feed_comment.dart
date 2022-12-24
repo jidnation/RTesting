@@ -30,7 +30,7 @@ class _MomentFeedCommentState extends State<MomentFeedComment> {
     return InkWell(
       onTap: () {
         Get.to(
-          () => MomentCommentStation2(momentFeed: widget.momentFeed),
+          () => MomentCommentStation2(momentFeedId: widget.momentFeed.id),
           transition: Transition.downToUp,
         );
         // Get.bottomSheet(

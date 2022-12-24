@@ -249,7 +249,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   }
 
   postMoment(BuildContext context, {required String? videoUrl}) async {
-    _postingMoment = true;
     if (videoUrl != null) {
       print(":::::::::::::::::::::::::::n printing starrted :::::");
       var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
@@ -286,8 +285,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       String? audioUrl,
       String? videoUrl}) async {
     _postingUserComment = true;
+    notifyListeners();
     MomentModel momentModel = value.firstWhere((element) => element.id == id);
-
     bool response = await momentQuery.createMomentComment(
         momentId: momentModel.momentId,
         momentOwnerId: momentModel.momentOwnerId,
@@ -346,6 +345,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       for (GetMomentComment element in response) {
         updateCommentList.add(CustomMomentCommentModel(element));
       }
+      updateCommentList = updateCommentList.reversed.toList();
       actualMomentModel.momentComments = updateCommentList;
       print(
           "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
@@ -364,10 +364,16 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       for (GetMomentComment element in response) {
         data.add(CustomMomentCommentModel(element));
       }
+      data.reversed;
       return data;
     } else {
       return [];
     }
+  }
+
+  void startReading() {
+    _postingMoment = true;
+    notifyListeners();
   }
 }
 
