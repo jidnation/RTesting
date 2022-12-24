@@ -121,8 +121,8 @@ class MomentCommentBox extends HookWidget {
                     InkWell(
                       onTap: () {
                         momentFeedStore.likingMomentComment(
-                          momentId: momentFeed.momentId,
-                          id: commentInfo.id,
+                          commentId: commentInfo.id,
+                          id: momentFeed.id,
                         );
                       },
                       child: SvgPicture.asset(
@@ -169,7 +169,7 @@ class MomentCommentBox extends HookWidget {
                                       ),
                                       child: TextFormField(
                                         controller: userCommentTextCtrl,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                         ),
                                       ),

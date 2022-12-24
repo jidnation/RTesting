@@ -226,7 +226,7 @@ class MomentQuery {
   }
 
   unlikeMomentComment(
-      {required String momentId, required String likeId}) async {
+      {required String commentId, required String likeId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -239,7 +239,7 @@ class MomentQuery {
       cache: GraphQLCache(),
     );
     Map<String, dynamic> momentVariables = {
-      'momentId': momentId,
+      'commentId': commentId,
       'likeId': likeId
     };
 
@@ -251,7 +251,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my moment-unLiking-query::::: $queryResult');
-    // return queryResult.data?['unlikeMoment'] ?? false;
+    return queryResult.data?['unlikeMomentComment'] ?? false;
   }
 
   Future<MomentFeedModel?>? getAllFeeds(

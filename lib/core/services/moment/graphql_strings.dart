@@ -51,8 +51,8 @@ mutation($momentId: String!, $commentId: String!) {
 ''';
 
 const unlikeMomentComment = r'''
-mutation($momentId: String!, $likeId: String!) {
-    unlikeMomentComment (momentId: $momentId, likeId: $likeId)
+mutation($commentId: String!, $likeId: String!) {
+    unlikeMomentComment (commentId: $commentId, likeId: $likeId)
     }
 ''';
 
