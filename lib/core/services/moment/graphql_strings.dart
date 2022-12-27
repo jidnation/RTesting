@@ -47,11 +47,13 @@ mutation($momentId: String!, $commentId: String!) {
     likeMomentComment (momentId: $momentId, commentId: $commentId){
     authId
   }
+  }
 ''';
 
 const unlikeMomentComment = r'''
-mutation($momentId: String!, $likeId: String!) {
-    unlikeMomentComment (momentId: $momentId, likeId: $likeId)
+mutation($commentId: String!, $likeId: String!) {
+    unlikeMomentComment (commentId: $commentId, likeId: $likeId)
+    }
 ''';
 
 const unlikeMomentReply = r'''

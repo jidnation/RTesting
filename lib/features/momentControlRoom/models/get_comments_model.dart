@@ -47,9 +47,9 @@ class GetMomentComment {
   final List<String>? imageMediaItems;
   final String? videoMediaItem;
   final String? audioMediaItem;
-  final int? nLikes;
-  final int? nComments;
-  final bool? isLiked;
+  int? nLikes;
+  int? nComments;
+  String? isLiked;
   final CommentOwnerProfile? commentOwnerProfile;
   final String? postOwnerProfile;
 
@@ -67,7 +67,7 @@ class GetMomentComment {
         audioMediaItem: json["audioMediaItem"] ?? "",
         nLikes: json["nLikes"] ?? 0,
         nComments: json["nComments"] ?? 0,
-        isLiked: json["isLiked"] ?? false,
+        isLiked: json["isLiked"],
         commentOwnerProfile: json["commentOwnerProfile"] == null
             ? null
             : CommentOwnerProfile.fromJson(json["commentOwnerProfile"]),
