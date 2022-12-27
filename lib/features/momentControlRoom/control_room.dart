@@ -54,8 +54,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   VideoControllerService get videoControllerService => _videoControllerService;
 
   //the combined Moment List
-  // List<GetMomentFeed> _combinedMomentList = <GetMomentFeed>[];
-  // List<GetMomentFeed> get combinedMomentList => _combinedMomentList;
+  List<String> _momentIdList = <String>[];
+  List<String> get momentIdList => _momentIdList;
 
   initialize() async {
     _gettingMoments = true;
@@ -64,6 +64,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response != null) {
       List<GetMomentFeed> data = response.getMomentFeed!;
       for (GetMomentFeed momentFeed in data) {
+        _momentIdList.add(momentFeed.moment!.momentId!);
         value.add(MomentModel(
           videoUrl: momentFeed.moment!.videoMediaItem!,
           isLiked: momentFeed.moment!.isLiked!,
@@ -90,6 +91,40 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     //     '................. IT IS DONE2........n ${value.first.momentId}........');
     _gettingMoments = false;
     cacheValues();
+    notifyListeners();
+  }
+
+  fetchMoment() async {
+    //TODO: to make pageLimit dynamic based on the current available moments
+    MomentFeedModel? response =
+        await momentQuery.getAllFeeds(pageLimit: 30, pageNumber: 1);
+    if (response != null) {
+      List<GetMomentFeed> data = response.getMomentFeed!;
+      for (GetMomentFeed momentFeed in data) {
+        if (!(_momentIdList.contains(momentFeed.moment!.momentId))) {
+          _momentIdList.add(momentFeed.moment!.momentId!);
+          value.add(MomentModel(
+            videoUrl: momentFeed.moment!.videoMediaItem!,
+            isLiked: momentFeed.moment!.isLiked!,
+            nLikes: momentFeed.moment!.nLikes!,
+            soundUrl: momentFeed.moment!.sound,
+            momentOwnerId: momentFeed.moment!.momentOwnerProfile!.authId!,
+            momentOwnerUserName:
+                momentFeed.moment!.momentOwnerProfile!.username!,
+            feedOwnerUserName: momentFeed.feedOwnerProfile!.username!,
+            reachingUser: momentFeed.reachingRelationship!,
+            profilePicture:
+                momentFeed.moment!.momentOwnerProfile!.profilePicture ?? "",
+            nComment: momentFeed.moment!.nComments!,
+            momentId: momentFeed.moment!.momentId!,
+            caption: momentFeed.moment!.caption!,
+            momentCreatedTime: momentFeed.createdAt.toString(),
+            momentComments: await momentFeedStore.getMyMomentComments(
+                momentId: momentFeed.moment!.momentId!),
+          ));
+        }
+      }
+    }
     notifyListeners();
   }
 

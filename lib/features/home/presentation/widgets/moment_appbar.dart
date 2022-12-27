@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
+import '../views/moment_feed.dart';
 import '../views/status/widgets/user_posting.dart';
 
 class MomentsAppBar extends StatelessWidget {
@@ -82,6 +83,7 @@ class MomentsAppBar extends StatelessWidget {
                     ),
                     transition: Transition.fadeIn,
                   );
+                  momentFeedStore.currentVideoController.pause();
                 },
               ),
             ),
@@ -112,6 +114,7 @@ class MomentsAppBar extends StatelessWidget {
                   ),
                   transition: Transition.fadeIn,
                 );
+                momentFeedStore.currentVideoController.pause();
               },
             ),
           ]),

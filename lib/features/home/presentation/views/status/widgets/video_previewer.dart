@@ -39,7 +39,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
   }
 
   bool isPlaying = false;
-  // bool isUploading = false;
+  bool isUploading = false;
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -67,6 +67,9 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
               child: AspectRatio(
                 aspectRatio: widget.videoController.value.aspectRatio,
                 child: Stack(children: [
+                  // BetterPlayer.file(
+                  //   widget.videoFile.path,
+                  // ),
                   VideoPlayer(widget.videoController),
                   Positioned(
                       top: size.height * 0.42,
@@ -268,13 +271,13 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     )
                   ]),
                   Visibility(
-                    visible: !momentFeedStore.postingMoment,
+                    visible: !isUploading,
                     child: InkWell(
                       onTap: () async {
-                        momentFeedStore.startReading();
-                        // setState(() {
-                        //   isUploading = true;
-                        // });
+                        // momentFeedStore.startReading();
+                        setState(() {
+                          isUploading = true;
+                        });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
                           // String noAudioFile = await MediaService()
                           //     .removeAudio(filePath: widget.videoFile.path);
@@ -283,14 +286,39 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           //     .compressMomentVideo(
                           //         filePath: noAudioFile); //removing the braces
                           print(
-                              ":::::::::::::::::::::::::::n audio find boss:::::: starrted :::::");
-
-                          await MediaService().videoAudioMerger(
-                            context,
-                            videoPath: widget.videoFile.path,
-                            audioPath: momentCtrl.audioFilePath.value,
-                            time: momentCtrl.endTime.value,
-                          );
+                              ":::::::::::::::::::::::::::n audio find boss:::::: started :::::");
+                          String? videoUrl = await MediaService().urlConverter(
+                              filePath: momentCtrl.mergedVideoPath.value);
+                          if (videoUrl != null) {
+                            var res = await MomentQuery.postMoment(
+                                videoMediaItem: videoUrl);
+                            if (res) {
+                              Snackbars.success(
+                                context,
+                                message: 'Moment successfully created',
+                                milliseconds: 1300,
+                              );
+                              momentFeedStore.fetchMoment();
+                              momentCtrl.clearPostingData();
+                              RouteNavigators.pop(context);
+                            } else {
+                              Snackbars.error(
+                                context,
+                                message: 'Operation Failed, Try again.',
+                                milliseconds: 1400,
+                              );
+                            }
+                          }
+                          // if (fileUrl != null) {
+                          //   momentFeedStore.postMoment(context,
+                          //       videoUrl: fileUrl);
+                          // }
+                          // await MediaService().videoAudioMerger(
+                          //   context,
+                          //   videoPath: widget.videoFile.path,
+                          //   audioPath: momentCtrl.audioFilePath.value,
+                          //   time: momentCtrl.endTime.value,
+                          // );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
                         } else {
@@ -311,6 +339,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 message: 'Moment successfully created',
                                 milliseconds: 1300,
                               );
+                              momentFeedStore.fetchMoment();
                               momentCtrl.clearPostingData();
                               RouteNavigators.pop(context);
                             } else {
@@ -322,6 +351,9 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                             }
                           }
                         }
+                        setState(() {
+                          isUploading = false;
+                        });
                       },
                       child: Container(
                         height: 40,
@@ -338,7 +370,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                       ),
                     ),
                   ),
-                  if (momentFeedStore.postingMoment)
+                  if (isUploading)
                     const SizedBox(
                       height: 20,
                       width: 20,

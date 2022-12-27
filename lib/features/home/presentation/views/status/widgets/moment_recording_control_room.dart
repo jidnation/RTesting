@@ -5,11 +5,17 @@ import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/video_previewer.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
+import '../../../../../../core/utils/constants.dart';
+import '../../../../../../core/utils/custom_text.dart';
+import '../../../../../../core/utils/dimensions.dart';
+import '../../../../../../core/utils/loader.dart';
 
 class MomentVideoControl {
   VideoPlayerController? videoController;
@@ -84,6 +90,27 @@ class MomentVideoControl {
       {required File? videoFile}) async {
     if (videoFile != null) {
       if (momentCtrl.audioFilePath.value.isNotEmpty) {
+        CustomDialog.openDialogBox(
+            height: SizeConfig.screenHeight * 0.9,
+            width: SizeConfig.screenWidth,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  RLoader(
+                    'Processing Video',
+                    textStyle: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15),
+                  ),
+                  CustomText(
+                    text: 'Please wait....',
+                    color: AppColors.primaryColor,
+                    weight: FontWeight.w500,
+                    size: 13,
+                  )
+                ]));
+
         String timeLimit = '00:00:';
         int time = momentCtrl.endTime.value;
         String videoPath = videoFile.path;
@@ -103,18 +130,22 @@ class MomentVideoControl {
               timeLimit = '00:' '0$min:' + sec.toString();
             }
           }
-
+          print(
+              "::::::::::::::::::::::::::::::::::::::::::::::: the time:  $timeLimit");
           String commandToExecute =
               '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
           print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
+          File(outputPath).delete();
           await FFmpegKit.executeAsync(commandToExecute, (session) async {
             final ReturnCode? returnCode = await session.getReturnCode();
             if (ReturnCode.isSuccess(returnCode)) {
               print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
-              momentCtrl.mergedVideoPath(outputPath);
-              videoController = VideoPlayerController.file(File(outputPath));
+              String file = await MediaService()
+                  .compressMomentVideo(filePath: outputPath);
+              momentCtrl.mergedVideoPath(file);
+              videoController = VideoPlayerController.file(File(file));
               await videoController!.initialize().then((_) {
-                RouteNavigators.route(
+                RouteNavigators.routeReplace(
                   context,
                   VideoPreviewer(
                     videoFile: File(outputPath),
@@ -134,24 +165,6 @@ class MomentVideoControl {
         } else if (await Permission.storage.isPermanentlyDenied) {
           openAppSettings();
         }
-
-        // await MediaService().videoAudioViewerMerger(context,
-        //     videoPath: videoFile.path,
-        //     audioPath: momentCtrl.audioFilePath.value,
-        //     time: momentCtrl.endTime.value);
-        // if (!momentFeedStore.stillMerging && momentFeedStore.mergingDone) {
-        //   videoController = VideoPlayerController.file(
-        //       File(momentCtrl.mergedVideoPath.value));
-        //   await videoController!.initialize().then((_) {
-        //     RouteNavigators.route(
-        //       context,
-        //       VideoPreviewer(
-        //         videoFile: File(momentCtrl.mergedVideoPath.value),
-        //         videoController: videoController!,
-        //       ),
-        //     );
-        //   });
-        // }
       } else {
         videoController = VideoPlayerController.file(videoFile);
         await videoController!.initialize().then((_) {
@@ -167,16 +180,6 @@ class MomentVideoControl {
           );
         });
       }
-
-      // await videoController!.setLooping(true);
-      // await videoController!.play();
-      // ClipRRect(
-      //   borderRadius: BorderRadius.circular(8.0),
-      //   child: AspectRatio(
-      //     aspectRatio: videoController!.value.aspectRatio,
-      //     child: VideoPlayer(videoController!),
-      //   ),
-      // )
     }
   }
 }
