@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -23,6 +24,7 @@ import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
+import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
@@ -30,6 +32,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/components/bottom_sheet_list_tile.dart';
 import '../../../../core/components/snackbar.dart';
+import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/app_globals.dart';
 import '../../../../core/utils/constants.dart';
@@ -204,12 +207,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 voteType: 'Downvote',
                 postId: widget.postFeedModel!.postId,
               ));
-              debugPrint("Shoutdown success");
-              Snackbars.success(context,
-                  message: 'You shouted down on this user\'s posts');
-              RouteNavigators.pop(context);
-              globals.socialServiceBloc!.add(
-                                    GetPostEvent(postId: widget.postFeedModel!.postId));
+              // debugPrint("Shoutdown success");
+              // Snackbars.success(context,
+              //     message: 'You shouted down on this user\'s posts');
+
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
@@ -227,6 +228,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
               if (!(state.isVoted!)) {
                 Snackbars.success(context,
                     message: 'The post you shouted down has been removed!');
+                globals.socialServiceBloc!
+                    .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+                RouteNavigators.pop(context);
               } else {
                 Snackbars.success(context, message: 'You shouted at this post');
               }
@@ -602,84 +606,67 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             children: [
                                               GestureDetector(
                                                 onTap: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(widget
-                                                            .postFeedModel!
-                                                            .post);
-                                                        // Console.log(
-                                                        //     'Like Data',
-                                                        //     _posts.value[index]
-                                                        //         .toJson());
-                                                        if (active.contains(
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post)) {
-                                                          if (widget
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(widget
+                                                      .postFeedModel!.post);
+                                                  // Console.log(
+                                                  //     'Like Data',
+                                                  //     _posts.value[index]
+                                                  //         .toJson());
+                                                  if (active.contains(widget
+                                                      .postFeedModel!.post)) {
+                                                    if (widget.postFeedModel!
+                                                            .post?.isLiked ??
+                                                        false) {
+                                                      widget.postFeedModel!.post
+                                                          ?.isLiked = false;
+                                                      widget.postFeedModel!.post
+                                                          ?.nLikes = (widget
                                                                   .postFeedModel!
                                                                   .post
-                                                                  ?.isLiked ??
-                                                              false) {
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.isLiked = false;
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.nLikes = (widget
-                                                                        .postFeedModel!
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    1) -
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    UnlikePostEvent(
-                                                              postId: widget
+                                                                  ?.nLikes ??
+                                                              1) -
+                                                          1;
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: widget
+                                                            .postFeedModel!
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      widget.postFeedModel!.post
+                                                          ?.isLiked = true;
+                                                      widget.postFeedModel!.post
+                                                          ?.nLikes = (widget
                                                                   .postFeedModel!
-                                                                  .postId,
-                                                            ));
-                                                          } else {
-                                                            widget
+                                                                  .post
+                                                                  ?.nLikes ??
+                                                              0) +
+                                                          1;
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: widget
                                                                 .postFeedModel!
-                                                                .post
-                                                                ?.isLiked = true;
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.nLikes = (widget
-                                                                        .postFeedModel!
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    0) +
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                              LikePostEvent(
-                                                                  postId: widget
-                                                                      .postFeedModel!
-                                                                      .postId),
-                                                            );
-                                                          }
-                                                        }
-                                                      },
-                                                    
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
                                                 child: Container(
                                                   width: size.width -
                                                       (size.width - 124),
                                                   height: size.width -
                                                       (size.width - 50),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 11,
                                                     vertical: 7,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(12),
+                                                        BorderRadius.circular(
+                                                            12),
                                                     color:
                                                         const Color(0xFFF5F5F5),
                                                   ),
@@ -688,7 +675,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         MainAxisAlignment
                                                             .spaceEvenly,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
@@ -759,8 +747,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             }
                                                           }
                                                         },
-                                                      
-                                                        padding: EdgeInsets.zero,
+                                                        padding:
+                                                            EdgeInsets.zero,
                                                         child: likePost.value ||
                                                                 widget
                                                                     .postFeedModel!
@@ -786,8 +774,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               ),
                                                       ),
                                                       SizedBox(
-                                                          width:
-                                                              getScreenWidth(8)),
+                                                          width: getScreenWidth(
+                                                              8)),
                                                       FittedBox(
                                                         child: Text(
                                                           '${post.value.post!.nLikes}',
@@ -824,39 +812,33 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   width: getScreenWidth(15)),
                                               GestureDetector(
                                                 onTap: () {
-                                                        if (widget
-                                                                .postFeedModel!
-                                                                .postOwnerId !=
-                                                            widget
-                                                                .postFeedModel!
-                                                                .feedOwnerId) {
-                                                          HapticFeedback
-                                                              .mediumImpact();
-                                                          reachDM.value = true;
+                                                  if (widget.postFeedModel!
+                                                          .postOwnerId !=
+                                                      widget.postFeedModel!
+                                                          .feedOwnerId) {
+                                                    HapticFeedback
+                                                        .mediumImpact();
+                                                    reachDM.value = true;
 
-                                                          handleTap(widget
-                                                              .postFeedModel!
-                                                              .post);
-                                                          if (active.contains(
-                                                              widget
+                                                    handleTap(widget
+                                                        .postFeedModel!.post);
+                                                    if (active.contains(widget
+                                                        .postFeedModel!.post)) {
+                                                      globals.userBloc!.add(
+                                                          GetRecipientProfileEvent(
+                                                              email: widget
                                                                   .postFeedModel!
-                                                                  .post)) {
-                                                            globals.userBloc!.add(
-                                                                GetRecipientProfileEvent(
-                                                                    email: widget
-                                                                        .postFeedModel!
-                                                                        .postOwnerId!));
-                                                          }
-                                                        }
-                                                      },
-                                                      
+                                                                  .postOwnerId!));
+                                                    }
+                                                  }
+                                                },
                                                 child: Container(
                                                   width: size.width -
                                                       (size.width - 163),
                                                   height: size.width -
                                                       (size.width - 50),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 11,
                                                     vertical: 7,
                                                   ),
@@ -864,7 +846,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
-                                                      color: widget.postFeedModel!
+                                                      color: widget
+                                                                  .postFeedModel!
                                                                   .postOwnerId !=
                                                               globals.userId
                                                           ? const Color(
@@ -875,7 +858,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         MainAxisAlignment
                                                             .spaceEvenly,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
@@ -890,8 +874,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .feedOwnerId) {
                                                             HapticFeedback
                                                                 .mediumImpact();
-                                                            reachDM.value = true;
-                                              
+                                                            reachDM.value =
+                                                                true;
+
                                                             handleTap(widget
                                                                 .postFeedModel!
                                                                 .post);
@@ -907,16 +892,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             }
                                                           }
                                                         },
-                                                        
                                                         padding:
-                                                            const EdgeInsets.all(
-                                                                0),
+                                                            const EdgeInsets
+                                                                .all(0),
                                                         child: SvgPicture.asset(
                                                           'assets/svgs/message.svg',
                                                           height:
-                                                              getScreenHeight(20),
-                                                          width:
-                                                              getScreenWidth(20),
+                                                              getScreenHeight(
+                                                                  20),
+                                                          width: getScreenWidth(
+                                                              20),
                                                         ),
                                                       ).paddingOnly(r: 8),
                                                       FittedBox(
@@ -949,60 +934,52 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             children: [
                                               GestureDetector(
                                                 onTap: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(widget
-                                                            .postFeedModel!
-                                                            .post);
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(widget
+                                                      .postFeedModel!.post);
 
-                                                        if (active.contains(
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post)) {
-                                                          if ((widget.postFeedModel!
-                                                                      .vote ??
-                                                                  [])
-                                                              .isEmpty) {
-                                                            setState(() {
-                                                              shoutoutPost
-                                                                  .value = true;
-                                                            });
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    VotePostEvent(
-                                                              voteType:
-                                                                  'Upvote',
-                                                              postId: widget
-                                                                  .postFeedModel!
-                                                                  .postId,
-                                                            ));
-                                                          } else {
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    DeletePostVoteEvent(
-                                                              voteId: widget
-                                                                  .postFeedModel!
-                                                                  .postId,
-                                                            ));
-                                                          }
-                                                        }
-                                                      },
-                                                      
+                                                  if (active.contains(widget
+                                                      .postFeedModel!.post)) {
+                                                    if ((widget.postFeedModel!
+                                                                .vote ??
+                                                            [])
+                                                        .isEmpty) {
+                                                      setState(() {
+                                                        shoutoutPost.value =
+                                                            true;
+                                                      });
+                                                      globals.socialServiceBloc!
+                                                          .add(VotePostEvent(
+                                                        voteType: 'Upvote',
+                                                        postId: widget
+                                                            .postFeedModel!
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                              DeletePostVoteEvent(
+                                                        voteId: widget
+                                                            .postFeedModel!
+                                                            .postId,
+                                                      ));
+                                                    }
+                                                  }
+                                                },
                                                 child: Container(
                                                   width: size.width -
                                                       (size.width - 124),
                                                   height: size.width -
                                                       (size.width - 50),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 11,
                                                     vertical: 7,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(12),
+                                                        BorderRadius.circular(
+                                                            12),
                                                     color:
                                                         const Color(0xFFF5F5F5),
                                                   ),
@@ -1013,7 +990,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
@@ -1023,7 +1001,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           handleTap(widget
                                                               .postFeedModel!
                                                               .post);
-                                              
+
                                                           if (active.contains(
                                                               widget
                                                                   .postFeedModel!
@@ -1034,7 +1012,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .isEmpty) {
                                                               setState(() {
                                                                 shoutoutPost
-                                                                    .value = true;
+                                                                        .value =
+                                                                    true;
                                                               });
                                                               globals
                                                                   .socialServiceBloc!
@@ -1058,8 +1037,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             }
                                                           }
                                                         },
-                                                        
-                                                        padding: EdgeInsets.zero,
+                                                        padding:
+                                                            EdgeInsets.zero,
                                                         child: shoutoutPost
                                                                         .value ==
                                                                     true ||
@@ -1088,8 +1067,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               ),
                                                       ),
                                                       SizedBox(
-                                                          width:
-                                                              getScreenWidth(8)),
+                                                          width: getScreenWidth(
+                                                              8)),
                                                       FittedBox(
                                                         child: Text(
                                                           '${post.value.post!.nUpvotes}',
@@ -1125,42 +1104,38 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               SizedBox(
                                                   width: getScreenWidth(15)),
                                               GestureDetector(
-                                                 onTap: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(widget
-                                                            .postFeedModel!
-                                                            .post);
+                                                onTap: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(widget
+                                                      .postFeedModel!.post);
 
-                                                        if (active.contains(
-                                                            widget
+                                                  if (active.contains(widget
+                                                      .postFeedModel!.post)) {
+                                                    shoutdownPost.value = true;
+                                                    globals.userBloc!.add(
+                                                        GetReachRelationshipEvent(
+                                                            userIdToReach: widget
                                                                 .postFeedModel!
-                                                                .post)) {
-                                                          shoutdownPost.value =
-                                                              true;
-                                                          globals.userBloc!.add(
-                                                              GetReachRelationshipEvent(
-                                                                  userIdToReach: widget
-                                                                      .postFeedModel!
-                                                                      .postOwnerId,
-                                                                  type: ReachRelationshipType
-                                                                      .reacher));
-                                                        }
-                                                      },
-                                                   
+                                                                .postOwnerId,
+                                                            type:
+                                                                ReachRelationshipType
+                                                                    .reacher));
+                                                  }
+                                                },
                                                 child: Container(
                                                   width: size.width -
                                                       (size.width - 163),
                                                   height: size.width -
                                                       (size.width - 50),
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                     horizontal: 11,
                                                     vertical: 7,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(8),
+                                                        BorderRadius.circular(
+                                                            8),
                                                     color:
                                                         const Color(0xFFF5F5F5),
                                                   ),
@@ -1171,7 +1146,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
@@ -1181,25 +1157,25 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           handleTap(widget
                                                               .postFeedModel!
                                                               .post);
-                                              
+
                                                           if (active.contains(
                                                               widget
                                                                   .postFeedModel!
                                                                   .post)) {
-                                                            shoutdownPost.value =
-                                                                true;
-                                                            globals.userBloc!.add(
-                                                                GetReachRelationshipEvent(
-                                                                    userIdToReach: widget
-                                                                        .postFeedModel!
-                                                                        .postOwnerId,
-                                                                    type: ReachRelationshipType
-                                                                        .reacher));
+                                                            shoutdownPost
+                                                                .value = true;
+                                                            globals.userBloc!.add(GetReachRelationshipEvent(
+                                                                userIdToReach: widget
+                                                                    .postFeedModel!
+                                                                    .postOwnerId,
+                                                                type: ReachRelationshipType
+                                                                    .reacher));
                                                           }
                                                         },
-                                                     
-                                                        padding: EdgeInsets.zero,
-                                                        child: shoutdownPost.value
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        child: shoutdownPost
+                                                                .value
                                                             ? SvgPicture.asset(
                                                                 'assets/svgs/shoutdown-active.svg',
                                                                 height:
@@ -1220,8 +1196,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               ),
                                                       ),
                                                       SizedBox(
-                                                          width:
-                                                              getScreenWidth(8)),
+                                                          width: getScreenWidth(
+                                                              8)),
                                                       FittedBox(
                                                         child: Text(
                                                           '${widget.postFeedModel!.post!.nDownvotes}',
@@ -1294,11 +1270,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 const BouncingScrollPhysics(),
                                             controller: scrollController,
                                             shrinkWrap: true,
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 15),
-                                            itemCount:
-                                                comments.value.length,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            itemCount: comments.value.length,
                                             itemBuilder: (context, index) {
                                               // if (comments
                                               //         .value[index].audioMediaItem ==
@@ -1307,10 +1281,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               //       ' ';
                                               // }
                                               return CommentsTile(
-                                                comment:
-                                                    comments.value[index],
-                                                isLiked: comments
-                                                            .value[index]
+                                                comment: comments.value[index],
+                                                isLiked: comments.value[index]
                                                             .isLiked ??
                                                         false
                                                     ? true
@@ -1318,30 +1290,24 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 onLike: () {
                                                   print(
                                                       "${comments.value[index].isLiked}");
-                                                  HapticFeedback
-                                                      .mediumImpact();
+                                                  HapticFeedback.mediumImpact();
                                                   handleTap(index);
-                                                  if (active
-                                                      .contains(index)) {
-                                                    if (comments
-                                                        .value[index]
+                                                  if (active.contains(index)) {
+                                                    if (comments.value[index]
                                                         .isLiked!) {
                                                       comments.value[index]
                                                           .isLiked = false;
 
                                                       comments.value[index]
                                                           .nLikes = (comments
-                                                                  .value[
-                                                                      index]
+                                                                  .value[index]
                                                                   .nLikes ??
                                                               1) -
                                                           1;
-                                                      globals
-                                                          .socialServiceBloc!
-                                                          .add(GetAllCommentLikesEvent(
+                                                      globals.socialServiceBloc!.add(
+                                                          GetAllCommentLikesEvent(
                                                               commentId: comments
-                                                                  .value[
-                                                                      index]
+                                                                  .value[index]
                                                                   .commentId));
 
                                                       if (likeId.value !=
@@ -1351,11 +1317,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             .add(
                                                           UnlikeCommentOnPostEvent(
                                                               commentId: comments
-                                                                  .value[
-                                                                      index]
+                                                                  .value[index]
                                                                   .commentId!,
-                                                              likeId: likeId
-                                                                  .value
+                                                              likeId:
+                                                                  likeId.value
 
                                                               //commentLike
                                                               //  .value!.likeId!,
@@ -1367,13 +1332,11 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           .isLiked = true;
                                                       comments.value[index]
                                                           .nLikes = (comments
-                                                                  .value[
-                                                                      index]
+                                                                  .value[index]
                                                                   .nLikes ??
                                                               0) +
                                                           1;
-                                                      globals
-                                                          .socialServiceBloc!
+                                                      globals.socialServiceBloc!
                                                           .add(
                                                               LikeCommentOnPostEvent(
                                                         postId: comments
@@ -1387,17 +1350,14 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   }
                                                 },
                                                 onMessage: () {
-                                                  HapticFeedback
-                                                      .mediumImpact();
+                                                  HapticFeedback.mediumImpact();
                                                   reachDM.value = true;
                                                   handleTap(index);
-                                                  if (active
-                                                      .contains(index)) {
+                                                  if (active.contains(index)) {
                                                     globals.userBloc!.add(
                                                         GetRecipientProfileEvent(
                                                             email: comments
-                                                                .value[
-                                                                    index]
+                                                                .value[index]
                                                                 .authId!));
                                                   }
                                                 },
@@ -1457,12 +1417,41 @@ class _FullPostScreenState extends State<FullPostScreen> {
                     suffixIcon: IconButton(
                         icon: const Icon(Icons.emoji_emotions_outlined),
                         onPressed: () {
-                          showEmoji.value = !showEmoji.value;
+                          RouteNavigators.route(context,
+                              CommentReach(postFeedModel: widget.postFeedModel));
                         }),
                   ),
                 ),
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                     // Navigator.pop(context);
+                      final image = await MediaService()
+                          .pickFromGallery(context: context, maxAssets: 1);
+                      if (image == null) {
+                        return;
+                      } else {
+                        for (var e in image) {
+                          RouteNavigators.route(
+                              context,
+                              CommentReach(
+                                postFeedModel: postFeedModel,
+                                mediaList: [
+                                  UploadFileDto(
+                                      file: e.file,
+                                      fileResult: e,
+                                      id: Random().nextInt(100).toString())
+                                ],
+                              ));
+                          // _mediaList.value.add(
+                          //     UploadFileDto(
+                          //         file: e.file,
+                          //         fileResult: e,
+                          //         id: Random()
+                          //             .nextInt(100)
+                          //             .toString()));
+                        }
+                      }
+                    },
                     icon: const Icon(
                       Icons.camera_alt_outlined,
                     ))

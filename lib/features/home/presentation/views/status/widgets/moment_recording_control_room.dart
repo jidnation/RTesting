@@ -86,10 +86,10 @@ class MomentVideoControl {
         // setState(() {});
         RouteNavigators.route(
           context,
-          VideoPreviewer(
-            videoFile: videoFile,
-            videoController: videoController!,
-          ),
+          // VideoPreviewer(
+          //   videoFile: videoFile,
+          //   videoController: videoController!,
+          // ),
         );
       });
 
