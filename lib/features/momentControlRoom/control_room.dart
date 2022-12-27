@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:uuid/uuid.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
@@ -27,6 +28,14 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
 
   bool _postingUserComment = false;
   bool get postingUserComment => _postingUserComment;
+
+  bool _stillMerging = false;
+  bool get stillMerging => _stillMerging;
+
+  bool _mergingDone = false;
+  bool get mergingDone => _mergingDone;
+
+  late VideoPlayerController currentVideoController;
 
   bool _gettingUserComment = false;
   bool get gettingUserComment => _gettingUserComment;
@@ -77,8 +86,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
     // _combinedMomentList = value;
     print('................. IT IS DONE..................... $value..   ..');
-    print(
-        '................. IT IS DONE2........n ${value.first.momentId}........');
+    // print(
+    //     '................. IT IS DONE2........n ${value.first.momentId}........');
     _gettingMoments = false;
     cacheValues();
     notifyListeners();
@@ -114,12 +123,28 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         }
       } else {
         for (MomentModel momentFeed in value) {
+          print(
+              ":::::::::::::::::::::::::::::::::::::::::::::the else is running");
           await videoControllerService
               .getControllerForVideo(momentFeed.videoUrl);
           _currentSaveIndex = momentCount;
         }
       }
     }
+    notifyListeners();
+  }
+
+  videoCtrl(bool isInit, {VideoPlayerController? vController}) {
+    if (isInit) {
+      currentVideoController = vController!;
+    } else {
+      currentVideoController.pause();
+    }
+  }
+
+  updateMerger(bool value, {bool? isDone}) {
+    _stillMerging = value;
+    _mergingDone = isDone ?? false;
     notifyListeners();
   }
 
@@ -267,13 +292,13 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           milliseconds: 1400,
         );
       }
+      _postingMoment = false;
+      notifyListeners();
     }
-    _postingMoment = false;
-    notifyListeners();
   }
 
   reachUser({required String toReachId, required String id}) async {
-    var response = await momentQuery.reachUser(reachingId: '');
+    var response = await momentQuery.reachUser(reachingId: toReachId);
     print('from the reaching end this is us>>>>>>>>>>>>> $response');
   }
 
@@ -294,6 +319,39 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         images: images,
         audioUrl: audioUrl,
         videoUrl: videoUrl);
+    if (response) {
+      Snackbars.success(
+        context,
+        message: 'Moment successfully created',
+        milliseconds: 1300,
+      );
+      updateMomentComments(id: momentModel.id);
+      getMoment(momentId: momentModel.momentId, id: momentModel.id);
+    } else {
+      Snackbars.error(
+        context,
+        message: 'Unable to post your comment, Try again Later.',
+        milliseconds: 1300,
+      );
+    }
+    _postingUserComment = false;
+    notifyListeners();
+    return response;
+  }
+
+  // ($momentId: String!, $commentId: String!, $content: String!)
+  Future<bool> replyCommentOnMoment(BuildContext context,
+      {required String id,
+      required String commentId,
+      required String userInput}) async {
+    _postingUserComment = true;
+    notifyListeners();
+    MomentModel momentModel = value.firstWhere((element) => element.id == id);
+    bool response = await momentQuery.replyMomentComment(
+      momentId: momentModel.momentId,
+      commentId: commentId,
+      comment: userInput,
+    );
     if (response) {
       Snackbars.success(
         context,

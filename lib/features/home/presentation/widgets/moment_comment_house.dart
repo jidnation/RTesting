@@ -10,6 +10,7 @@ import '../../../../core/utils/helpers.dart';
 import '../../../momentControlRoom/control_room.dart';
 import '../views/moment_feed.dart';
 import 'moment_comment_box.dart';
+import 'moment_videoplayer_item.dart';
 
 class MomentCommentStation extends StatelessWidget {
   final String momentFeedId;
@@ -203,6 +204,10 @@ class MomentCommentStation2 extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: const Color(0xff001824),
+                              ),
+                              child: VideoPlayerItem2(
+                                videoUrl: momentFeed.videoUrl,
+                                // ),
                               ),
                             ),
                             const SizedBox(height: 10),

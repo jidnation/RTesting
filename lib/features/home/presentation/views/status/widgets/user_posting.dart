@@ -93,6 +93,9 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     onNewCameraSelected(widget.phoneCameras[0]);
+    setState(() {
+      index = widget.initialIndex;
+    });
   }
 
   @override
@@ -359,12 +362,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                         Icons.stop,
                                         color: Colors.red,
                                       )
-                                    :
-                                    // SvgPicture.asset(
-                                    //             'assets/svgs/camera_button.svg',
-                                    //             fit: BoxFit.contain,
-                                    //           ),
-                                    Image.asset(
+                                    : Image.asset(
                                         'assets/images/play-btn.png',
                                         fit: BoxFit.contain,
                                       ),

@@ -21,6 +21,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../../features/home/presentation/views/moment_feed.dart';
+import '../../features/home/presentation/views/status/widgets/user_posting.dart';
 import '../models/file_result.dart';
 import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
@@ -406,8 +407,6 @@ class MediaService {
       await FFmpegKit.executeAsync(commandToExecute, (session) async {
         final ReturnCode? returnCode = await session.getReturnCode();
         if (ReturnCode.isSuccess(returnCode)) {
-          momentFeedStore.startReading();
-
           String file = await compressMomentVideo(filePath: outputPath);
           fileUrl = await urlConverter(filePath: file);
           momentFeedStore.postMoment(context, videoUrl: fileUrl);
@@ -416,6 +415,61 @@ class MediaService {
           fileUrl = null;
           // CANCEL
         } else {
+          fileUrl = null;
+          // ERROR
+        }
+      });
+      return fileUrl;
+    } else if (await Permission.storage.isPermanentlyDenied) {
+      openAppSettings();
+    } else {
+      return null;
+    }
+    return null;
+  }
+
+  Future<String?> videoAudioViewerMerger(BuildContext context,
+      {required String videoPath,
+      required String audioPath,
+      required int time}) async {
+    String timeLimit = '00:00:';
+    String outputPath = '/storage/emulated/0/Download/viewer.mp4';
+    String? fileUrl;
+
+    momentFeedStore.updateMerger(true);
+    if (await Permission.storage.request().isGranted) {
+      if (time.toInt() < 10) {
+        timeLimit = timeLimit + '0' + time.toString();
+      } else {
+        timeLimit = timeLimit + time.toString();
+      }
+
+      /// To combine audio with video
+      ///
+      /// Merging video and audio, with audio re-encoding
+      /// -c:v copy -c:a aac
+      ///
+      /// Copying the audio without re-encoding
+      /// -c copy
+      ///
+      /// Replacing audio stream
+      /// -c:v copy -c:a aac -map 0:v:0 -map 1:a:0
+      String commandToExecute =
+          '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
+      print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
+      await FFmpegKit.executeAsync(commandToExecute, (session) async {
+        final ReturnCode? returnCode = await session.getReturnCode();
+        if (ReturnCode.isSuccess(returnCode)) {
+          print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
+          momentFeedStore.updateMerger(false, isDone: true);
+          momentCtrl.mergedVideoPath(outputPath);
+          // SUCCESS
+        } else if (ReturnCode.isCancel(returnCode)) {
+          fileUrl = null;
+          // CANCEL
+        } else {
+          print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
+
           fileUrl = null;
           // ERROR
         }

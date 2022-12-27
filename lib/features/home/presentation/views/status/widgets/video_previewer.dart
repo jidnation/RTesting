@@ -39,7 +39,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
   }
 
   bool isPlaying = false;
-  bool isUploading = false;
+  // bool isUploading = false;
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -271,9 +271,10 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     visible: !momentFeedStore.postingMoment,
                     child: InkWell(
                       onTap: () async {
-                        setState(() {
-                          isUploading = true;
-                        });
+                        momentFeedStore.startReading();
+                        // setState(() {
+                        //   isUploading = true;
+                        // });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
                           // String noAudioFile = await MediaService()
                           //     .removeAudio(filePath: widget.videoFile.path);
@@ -321,9 +322,6 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                             }
                           }
                         }
-                        setState(() {
-                          isUploading = false;
-                        });
                       },
                       child: Container(
                         height: 40,
@@ -340,7 +338,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                       ),
                     ),
                   ),
-                  if (isUploading || momentFeedStore.postingMoment)
+                  if (momentFeedStore.postingMoment)
                     const SizedBox(
                       height: 20,
                       width: 20,

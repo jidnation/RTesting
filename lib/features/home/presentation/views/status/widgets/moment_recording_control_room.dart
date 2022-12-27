@@ -1,7 +1,11 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/video_previewer.dart';
 import 'package:video_player/video_player.dart';
 
@@ -79,19 +83,90 @@ class MomentVideoControl {
   Future<void> startVideoPlayer(BuildContext context,
       {required File? videoFile}) async {
     if (videoFile != null) {
-      videoController = VideoPlayerController.file(videoFile);
-      await videoController!.initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized,
-        // even before the play button has been pressed.
-        // setState(() {});
-        RouteNavigators.route(
-          context,
-          VideoPreviewer(
-            videoFile: videoFile,
-            videoController: videoController!,
-          ),
-        );
-      });
+      if (momentCtrl.audioFilePath.value.isNotEmpty) {
+        String timeLimit = '00:00:';
+        int time = momentCtrl.endTime.value;
+        String videoPath = videoFile.path;
+        String audioPath = momentCtrl.audioFilePath.value;
+        String outputPath = '/storage/emulated/0/Download/viewer.mp4';
+        if (await Permission.storage.request().isGranted) {
+          if (time.toInt() < 10) {
+            timeLimit = timeLimit + '0' + time.toString();
+          } else if (time.toInt() >= 10 && time.toInt() < 60) {
+            timeLimit = timeLimit + time.toString();
+          } else if (time.toInt() >= 60) {
+            int min = time.toInt() ~/ 60;
+            int sec = time - (min * 60);
+            if (sec.toInt() < 10) {
+              timeLimit = '00:' '0$min:' '0' + sec.toString();
+            } else {
+              timeLimit = '00:' '0$min:' + sec.toString();
+            }
+          }
+
+          String commandToExecute =
+              '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
+          print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
+          await FFmpegKit.executeAsync(commandToExecute, (session) async {
+            final ReturnCode? returnCode = await session.getReturnCode();
+            if (ReturnCode.isSuccess(returnCode)) {
+              print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
+              momentCtrl.mergedVideoPath(outputPath);
+              videoController = VideoPlayerController.file(File(outputPath));
+              await videoController!.initialize().then((_) {
+                RouteNavigators.route(
+                  context,
+                  VideoPreviewer(
+                    videoFile: File(outputPath),
+                    videoController: videoController!,
+                  ),
+                );
+              });
+              // SUCCESS
+            } else if (ReturnCode.isCancel(returnCode)) {
+              // CANCEL
+            } else {
+              print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
+
+              // ERROR
+            }
+          });
+        } else if (await Permission.storage.isPermanentlyDenied) {
+          openAppSettings();
+        }
+
+        // await MediaService().videoAudioViewerMerger(context,
+        //     videoPath: videoFile.path,
+        //     audioPath: momentCtrl.audioFilePath.value,
+        //     time: momentCtrl.endTime.value);
+        // if (!momentFeedStore.stillMerging && momentFeedStore.mergingDone) {
+        //   videoController = VideoPlayerController.file(
+        //       File(momentCtrl.mergedVideoPath.value));
+        //   await videoController!.initialize().then((_) {
+        //     RouteNavigators.route(
+        //       context,
+        //       VideoPreviewer(
+        //         videoFile: File(momentCtrl.mergedVideoPath.value),
+        //         videoController: videoController!,
+        //       ),
+        //     );
+        //   });
+        // }
+      } else {
+        videoController = VideoPlayerController.file(videoFile);
+        await videoController!.initialize().then((_) {
+          // Ensure the first frame is shown after the video is initialized,
+          // even before the play button has been pressed.
+          // setState(() {});
+          RouteNavigators.route(
+            context,
+            VideoPreviewer(
+              videoFile: videoFile,
+              videoController: videoController!,
+            ),
+          );
+        });
+      }
 
       // await videoController!.setLooping(true);
       // await videoController!.play();

@@ -9,7 +9,7 @@ class MomentController extends GetxController {
   final RxString audioFilePath = ''.obs;
   final RxString caption = ''.obs;
   // final RxString noAudioVideoFilePath = ''.obs;
-  // final RxString videoUrl = ''.obs;
+  final RxString mergedVideoPath = ''.obs;
   final RxInt endTime = 0.obs;
 
   getAudioUrl() async {
