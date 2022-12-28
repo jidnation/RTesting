@@ -1468,7 +1468,7 @@ class HomeRemoteDataSource {
         mutation muteStatus(
           $idToMute: String!
           ) {
-          createStatus(
+          muteStatus(
             idToMute: $idToMute
           ){   
                authId
@@ -1495,8 +1495,8 @@ class HomeRemoteDataSource {
         mutation unmuteStatus(
           $idToUnmute: String!
           ) {
-          createStatus(
-            $idToUnmute: $idToUnmute
+          unmuteStatus(
+            idToUnmute: $idToUnmute
           )
         }''';
     try {
@@ -1517,11 +1517,11 @@ class HomeRemoteDataSource {
     required String statusId,
   }) async {
     String q = r'''
-        mutation unmuteStatus(
+        mutation reportStatus(
           $reportReason: String!
           $statusId: String!
           ) {
-          createStatus(
+          reportStatus(
             reportReason: $reportReason
             statusId: $statusId
           ){

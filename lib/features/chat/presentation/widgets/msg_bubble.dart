@@ -23,6 +23,82 @@ class MsgBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final type = 'image';
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Align(
+        //   alignment: Alignment.centerRight,
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Icon(
+        //         Icons.view_timeline_outlined,
+        //         color: AppColors.primaryColor,
+        //         size: 20,
+        //       ),
+        //       // Icon(
+        //       //   Icons.feed_rounded,
+        //       //   color: AppColors.primaryColor,
+        //       //   size: 20,
+        //       // ),
+        //       Container(
+        //         // clipBehavior: Clip.hardEdge,
+        //         padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+        //         margin: const EdgeInsets.only(right: 12, left: 4),
+        //         constraints: BoxConstraints(
+        //           maxWidth: size.width * .7,
+        //           maxHeight: size.height * .4,
+        //         ),
+        //         decoration: BoxDecoration(
+        //             border: Border.all(color: AppColors.primaryColor),
+        //             borderRadius: BorderRadius.circular(15),
+        //             color: isMe ? AppColors.white : AppColors.grey),
+        //         // child: Row(
+        //         //   mainAxisSize: MainAxisSize.min,
+        //         //   children: [
+        //         //     Icon(
+        //         //       Icons.photo,
+        //         //       color: AppColors.primaryColor.withOpacity(0.5),
+        //         //       size: 20,
+        //         //     ),
+        //         //     Text(' Image Media',
+        //         //         style: TextStyle(
+        //         //             color: AppColors.primaryColor.withOpacity(0.5),
+        //         //             fontStyle: FontStyle.normal)),
+        //         //   ],
+        //         // ),
+        //         child: Row(
+        //           children: [
+        //             // Text('Status ',
+        //             //     maxLines: 1,
+        //             //     overflow: TextOverflow.ellipsis,
+        //             //     style: TextStyle(
+        //             //         color: AppColors.primaryColor.withOpacity(0.5),
+        //             //         fontWeight: FontWeight.w600,
+        //             //         fontStyle: FontStyle.italic)),
+        //             Expanded(
+        //               child: Text(
+        //                   'On getting to the side of the road, all I could imagine running in my brain was the ministry of Charles and Frances Hunter. There and then I held the boy\'s feeble legs, the feet and the legs felt very light and lifeless in my hands.',
+        //                   maxLines: 1,
+        //                   overflow: TextOverflow.ellipsis,
+        //                   style: TextStyle(
+        //                       color: AppColors.primaryColor.withOpacity(0.5),
+        //                       fontStyle: FontStyle.italic)),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        Container(margin: EdgeInsets.only(top: 0), child: mainMessage(context))
+        // Positioned(top: 32, right: 16, child: mainMessage(context))
+      ],
+    );
+  }
+
+  Widget mainMessage(BuildContext context) {
     if (label.contains('jpg')) {
       return GestureDetector(
         onTap: () {
