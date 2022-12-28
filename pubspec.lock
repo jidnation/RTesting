@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "38.0.0"
+  agora_rtc_engine:
+    dependency: "direct main"
+    description:
+      name: agora_rtc_engine
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.1.0"
   analyzer:
     dependency: transitive
     description:
@@ -417,7 +424,7 @@ packages:
     source: hosted
     version: "2.0.1"
   ffmpeg_kit_flutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: ffmpeg_kit_flutter
       url: "https://pub.dartlang.org"
@@ -972,6 +979,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.17.0"
+  iris_event:
+    dependency: transitive
+    description:
+      name: iris_event
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   js:
     dependency: transitive
     description:

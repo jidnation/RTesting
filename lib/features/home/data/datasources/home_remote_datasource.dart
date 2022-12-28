@@ -13,6 +13,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -1815,6 +1816,55 @@ class HomeRemoteDataSource {
       return (result.data['getBlockList'] as List)
           .map((e) => Block.fromJson(e))
           .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> joinLiveStream({
+    required String? channelName,
+  }) async {
+    String q = r'''
+             mutation joinLiveStream(
+              $channelName:String!
+             ){
+               joinLiveStream(
+                channelName: $channelName
+               )
+             }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'channelName': channelName,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('joinLiveStream', result.data);
+      return result.data!['joinLiveStream'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<StreamResponse> initiateLiveStreaming({
+    required String? startedAt,
+  }) async {
+    String q = r'''
+             mutation initiateLiveStream(
+              $startedAt:String!
+             ){
+               token,
+               channelName
+             }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'startedAt': startedAt,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('Initiate LiveStreaming', result.data);
+      return StreamResponse.fromJson(result.data!['initiateLiveStream']);
     } catch (e) {
       rethrow;
     }

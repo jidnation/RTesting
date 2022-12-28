@@ -49,152 +49,6 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       looping: true,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      // overlay: Stack(children: [
-      //   Positioned(
-      //     top: getScreenHeight(300),
-      //     right: 20,
-      //     child: Align(
-      //       alignment: Alignment.centerRight,
-      //       child:
-      //           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      //         Stack(children: [
-      //           SizedBox(
-      //             height: 70,
-      //             child: Column(
-      //               children: [
-      //                 Container(
-      //                   height: 49.44,
-      //                   width: 49.44,
-      //                   decoration: BoxDecoration(
-      //                     borderRadius: BorderRadius.circular(40),
-      //                     color: Colors.red,
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //           Positioned(
-      //               bottom: 12,
-      //               right: 12,
-      //               child: Container(
-      //                 height: 20,
-      //                 width: 20,
-      //                 alignment: Alignment.center,
-      //                 decoration: BoxDecoration(
-      //                   color: AppColors.primaryColor,
-      //                   border: Border.all(
-      //                     color: Colors.white,
-      //                     width: 1.2,
-      //                   ),
-      //                   borderRadius: BorderRadius.circular(30),
-      //                 ),
-      //                 child: const Center(
-      //                     child: Icon(
-      //                   Icons.add,
-      //                   size: 13,
-      //                   color: Colors.white,
-      //                 )),
-      //               ))
-      //         ]),
-      //         const SizedBox(height: 20),
-      //         MomentTabs(
-      //           icon: widget.momentFeed.moment!.isLiked!
-      //               ? Icons.favorite
-      //               : Icons.favorite_outline_outlined,
-      //           color: widget.momentFeed.moment!.isLiked! ? Colors.red : null,
-      //           value: momentFeedStore.getCountValue(
-      //               value: widget.momentFeed.moment!.nLikes ?? 0),
-      //           onClick: () {
-      //             momentFeedStore.likeMoment(
-      //                 momentId: widget.momentFeed.moment!.momentId!);
-      //           },
-      //         ),
-      //         const SizedBox(height: 20),
-      //         Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-      //           SvgPicture.asset('assets/svgs/comment.svg',
-      //               color: Colors.white),
-      //           const SizedBox(height: 5),
-      //           CustomText(
-      //             text: momentFeedStore.getCountValue(
-      //                 value: widget.momentFeed.moment!.nComments ?? 0),
-      //             weight: FontWeight.w500,
-      //             color: Colors.white,
-      //             size: 13.28,
-      //           )
-      //         ]),
-      //         const SizedBox(height: 20),
-      //         SvgPicture.asset(
-      //           'assets/svgs/message.svg',
-      //           color: Colors.white,
-      //           width: 24.44,
-      //           height: 22,
-      //         ),
-      //       ]),
-      //     ),
-      //   ),
-      //   Positioned(
-      //     bottom: getScreenHeight(30),
-      //     left: 20,
-      //     right: 20,
-      //     child:
-      //         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      //       const CustomText(
-      //         text: '@jasonstatham',
-      //         color: Colors.white,
-      //         weight: FontWeight.w600,
-      //         size: 16.28,
-      //       ),
-      //       const SizedBox(height: 5),
-      //       SizedBox(
-      //         width: getScreenWidth(300),
-      //         child: const CustomText(
-      //           text:
-      //               'The normal ride through the street...\ni sure miss my home #moviestudio...\nMore',
-      //           color: Colors.white,
-      //           weight: FontWeight.w600,
-      //           // overflow: TextOverflow.ellipsis,
-      //           size: 16.28,
-      //         ),
-      //       ),
-      //       const SizedBox(height: 15),
-      //       Row(
-      //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //           crossAxisAlignment: CrossAxisAlignment.end,
-      //           children: [
-      //             Row(children: [
-      //               SvgPicture.asset('assets/svgs/music.svg'),
-      //               const SizedBox(width: 10),
-      //               const CustomText(
-      //                 text: 'Original Audio',
-      //                 color: Colors.white,
-      //                 weight: FontWeight.w600,
-      //                 size: 15.28,
-      //               )
-      //             ]),
-      //             Container(
-      //               height: 50,
-      //               width: 50,
-      //               alignment: Alignment.center,
-      //               decoration: BoxDecoration(
-      //                 borderRadius: BorderRadius.circular(30),
-      //                 color: Colors.red,
-      //               ),
-      //               child: Column(
-      //                   mainAxisAlignment: MainAxisAlignment.center,
-      //                   children: [
-      //                     Container(
-      //                       height: 10,
-      //                       width: 10,
-      //                       decoration: BoxDecoration(
-      //                           color: Colors.white,
-      //                           borderRadius: BorderRadius.circular(10)),
-      //                     )
-      //                   ]),
-      //             )
-      //           ])
-      //     ]),
-      //   ),
-      // ]),
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
@@ -217,7 +71,120 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
         bufferedColor: Colors.lightGreen,
       ),
       placeholder: Container(
-        color: Colors.grey,
+        color: const Color(0xff001824),
+      ),
+      // autoInitialize: true,
+    );
+    momentFeedStore.videoCtrl(true, vController: _videoPlayerController);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _videoPlayerController.dispose();
+    // _chewieController?.dispose();
+  }
+
+  Future<void> toggleVideo() async {
+    await _videoPlayerController.pause();
+    await initializePlayer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return
+        // Stack(children: [
+        Container(
+      width: size.width,
+      height: size.height,
+      decoration: const BoxDecoration(
+        color: AppColors.audioPlayerBg,
+      ),
+      child: _chewieController != null &&
+              _chewieController!.videoPlayerController.value.isInitialized
+          ? AspectRatio(
+              aspectRatio: _videoPlayerController.value.aspectRatio,
+              child: Chewie(
+                controller: _chewieController!,
+              ))
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text('Loading'),
+                ]),
+    );
+  }
+}
+
+class VideoPlayerItem2 extends StatefulWidget {
+  final String videoUrl;
+  const VideoPlayerItem2({
+    Key? key,
+    required this.videoUrl,
+  }) : super(key: key);
+
+  @override
+  _VideoPlayerItem2State createState() => _VideoPlayerItem2State();
+}
+
+class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
+  late VideoPlayerController _videoPlayerController;
+
+  ChewieController? _chewieController;
+  int? bufferDelay;
+  bool isPlaying = false;
+  bool isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initializePlayer();
+  }
+
+  Future<void> initializePlayer() async {
+    _videoPlayerController = await momentFeedStore.videoControllerService
+        .getControllerForVideo(widget.videoUrl);
+    await Future.wait([_videoPlayerController.initialize()]);
+    _createChewieController();
+    setState(() {});
+  }
+
+  void _createChewieController() {
+    _chewieController = ChewieController(
+      aspectRatio: 3.8 / 3.3,
+      videoPlayerController: _videoPlayerController,
+      autoPlay: true,
+      allowFullScreen: true,
+      // fullScreenByDefault: true,
+      looping: true,
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: toggleVideo,
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
+
+      hideControlsTimer: const Duration(seconds: 1),
+
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: Colors.red,
+        handleColor: Colors.blue,
+        backgroundColor: Colors.grey,
+        bufferedColor: Colors.lightGreen,
+      ),
+      placeholder: Container(
+        color: const Color(0xff001824),
       ),
       // autoInitialize: true,
     );

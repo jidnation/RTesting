@@ -262,8 +262,9 @@ Future showReacherCardBottomSheet(BuildContext context,
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is UserLoading) {
-                // globals.showLoader(context);
+              if (state is UserLoaded) {
+                Snackbars.success(context, message: "Reached user successfully" );
+                RouteNavigators.pop(context);
               }
               if (state is UserError) {
                 RouteNavigators.pop(context);

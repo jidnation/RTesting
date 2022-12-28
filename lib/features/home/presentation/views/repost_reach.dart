@@ -47,6 +47,7 @@ import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 import '../widgets/post_media.dart';
+import '../widgets/post_reach_media.dart';
 
 class RepostReach extends StatefulHookWidget {
   final PostFeedModel? postFeedModel;
@@ -155,7 +156,7 @@ class _CommentReachState extends State<RepostReach> {
     final _isLoading = useState<bool>(true);
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
-    final _mentionList = useState<List<String>>([]);
+    final _mentionList = useState<List<String>?>([]);
 
     useMemoized(() {
       globals.dictionaryBloc!
@@ -228,43 +229,34 @@ class _CommentReachState extends State<RepostReach> {
                 duration: const Duration(milliseconds: 100));
           }
 
-          //
-          // if (state is CommentOnPostSuccess) {
-          //   SchedulerBinding.instance.addPostFrameCallback((_) {
-          //     scrollController.animateTo(
-          //       scrollController.position.minScrollExtent,
-          //       duration: const Duration(milliseconds: 10),
-          //       curve: Curves.easeOut,
-          //     );
-          //   });
-          //   Snackbars.success(context, message: "Your commment has been posted");
-          //   triggerProgressIndicator.value = false;
-          //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-          //       postId: widget.postFeedModel.postId,
-          //       pageLimit: 50,
-          //       pageNumber: 1));
-          // }
-          // if (state is CommentOnPostError) {
-          //   Snackbars.error(context, message: state.error);
-          // }
-          // if (state is CommentOnPostLoading) {
-          //   toast('Posting comment...',
-          //       duration: const Duration(milliseconds: 100));
-          // }
-          // if (state is GetAllCommentsOnPostSuccess) {
-          //   comments.value = state.data!.reversed.toList();
-          // }
-          //
-          // if (state is GetAllCommentsOnPostError) {
-          //   Snackbars.error(context, message: state.error);
-          // }
-          // if (state is UnlikeCommentOnPostSuccess ||
-          //     state is LikeCommentOnPostSuccess) {
-          //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-          //       postId: widget.postFeedModel.postId,
-          //       pageLimit: 50,
-          //       pageNumber: 1));
-          // }
+          if (state is UploadMediaSuccess) {
+              List<String> mediaUrls = state.data as List<String>;
+                    List<String> imageUrls = mediaUrls
+                        .where((e) => FileUtils.fileType(e) == 'image')
+                        .toList();
+                    String videoUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'video',
+                        orElse: () => '');
+                    String audioUrl = mediaUrls.firstWhere(
+                        (e) => FileUtils.fileType(e) == 'audio',
+                        orElse: () => '');
+            globals.socialServiceBloc!.add(CreateRepostEvent(
+                input: CreateRepostInput(
+                    repostedPostId: widget.postFeedModel!.postId,
+                    repostedPostOwnerId: widget.postFeedModel!.postOwnerId,
+                    content: controllerKey.currentState!.controller!.text,
+                      imageMediaItems: imageUrls.isNotEmpty ? imageUrls : null,
+                        videoMediaItem: videoUrl.isNotEmpty ? videoUrl : null,
+                        audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
+                    location:
+                        globals.user!.showLocation! ? globals.location! : 'nil',
+                    postRating: postRating,
+                    mentionList: _mentionList.value,
+                    commentOption: replyFeature.value)));
+          }
+          if (state is UploadMediaError) {
+             Snackbars.error(context, message: state.error);
+          }
         },
         child: Scaffold(
             body: SafeArea(
@@ -303,25 +295,50 @@ class _CommentReachState extends State<RepostReach> {
                     icon: SvgPicture.asset('assets/svgs/send.svg'),
                     onPressed: () {
                       if (controllerKey
-                          .currentState!.controller!.text.isNotEmpty) {
-                        // globals.socialServiceBloc!.add(CommentOnPostEvent(
-                        //     postId: widget.postFeedModel.postId,
-                        //     content: controller.text,
-                        //     userId: globals.user!.id));
+                              .currentState!.controller!.text.isNotEmpty ||
+                          _mediaList.value.isNotEmpty) {
+                        if (_mediaList.value.isNotEmpty) {
+                          globals.socialServiceBloc!.add(
+                              UploadPostMediaEvent(media: _mediaList.value));
 
-                        globals.socialServiceBloc!.add(CreateRepostEvent(
-                            input: CreateRepostInput(
-                                repostedPostId: widget.postFeedModel!.postId,
-                                repostedPostOwnerId:
-                                    widget.postFeedModel!.postOwnerId,
-                                content: controller.text,
-                                location: globals.user!.showLocation!
-                                    ? globals.location!
-                                    : 'nil',
-                                postRating: 'normal',
-                                commentOption: 'everyone')));
+                          setState(() {
+                            _mentionList.value = controllerKey
+                                .currentState!.controller!.text.mentions;
+                          });
+                          globals.postContent =
+                              controllerKey.currentState!.controller!.text;
+                          globals.postCommentOption = replyFeature.value;
+                          globals.postRating = postRating;
+                          globals.mentionList = _mentionList.value;
+
+                          // globals.mentionList!.add(controllerKey
+                          //     .currentState!.controller!.markupText);
+
+                          debugPrint(
+                              "Mention: ${controllerKey.currentState!.controller!.markupText}");
+
+                          setState(() {});
+                        } else {
+                          setState(() {
+                            _mentionList.value = controllerKey
+                                .currentState!.controller!.text.mentions;
+                          });
+                          globals.socialServiceBloc!.add(CreateRepostEvent(
+                              input: CreateRepostInput(
+                                  repostedPostId: widget.postFeedModel!.postId,
+                                  repostedPostOwnerId:
+                                      widget.postFeedModel!.postOwnerId,
+                                  content: controllerKey
+                                      .currentState!.controller!.text,
+                                  location: globals.user!.showLocation!
+                                      ? globals.location!
+                                      : 'nil',
+                                  postRating: postRating,
+                                  mentionList: _mentionList.value,
+                                  commentOption: replyFeature.value)));
+                        }
                       }
-                      // controller.clear();
+                      controller.clear();
                     },
                   ),
                 ],
@@ -500,22 +517,31 @@ class _CommentReachState extends State<RepostReach> {
                                           Row(
                                             children: [
                                               Text(
-                                               widget.postFeedModel!.post!.location! ==
-                                                      'nil' ||
-                                                  widget.postFeedModel!
-                                                          .post!.location! ==
-                                                      'NIL' ||
-                                                  widget.postFeedModel!.post!.location ==
-                                                      null
-                                              ? ''
-                                              : widget.postFeedModel!.post!.location!
-                                                          .length >
-                                                      23
-                                                  ? widget.postFeedModel!
-                                                      .post!.location!
-                                                      .substring(0, 23)
-                                                  : widget.postFeedModel!
-                                                      .post!.location!,
+                                                widget.postFeedModel!.post!
+                                                                .location! ==
+                                                            'nil' ||
+                                                        widget
+                                                                .postFeedModel!
+                                                                .post!
+                                                                .location! ==
+                                                            'NIL' ||
+                                                        widget
+                                                                .postFeedModel!
+                                                                .post!
+                                                                .location ==
+                                                            null
+                                                    ? ''
+                                                    : widget
+                                                                .postFeedModel!
+                                                                .post!
+                                                                .location!
+                                                                .length >
+                                                            23
+                                                        ? widget.postFeedModel!
+                                                            .post!.location!
+                                                            .substring(0, 23)
+                                                        : widget.postFeedModel!
+                                                            .post!.location!,
                                                 style: TextStyle(
                                                   fontSize: getScreenHeight(10),
                                                   fontFamily: 'Poppins',
@@ -636,943 +662,911 @@ class _CommentReachState extends State<RepostReach> {
                           }
                         },
                         builder: (context, state) {
-                          return FlutterMentions(
-                            key: controllerKey,
+                          return Flexible(
+                            child: FlutterMentions(
+                              key: controllerKey,
+                              maxLengthEnforcement:
+                                  MaxLengthEnforcement.enforced,
+                              maxLength: 1100,
+                              // minLines: null,
 
-                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            maxLength: 1100,
-                            // minLines: null,
-
-                            suggestionPosition: SuggestionPosition.Bottom,
-                            onChanged: (val) {
-                              counter.value = val
-                                  .trim()
-                                  .split(RegexUtil.spaceOrNewLine)
-                                  .length;
-                              if (counter.value >= 200) {
-                                Snackbars.error(context,
-                                    message: '200 words limit reached!');
-                                // setState(() {
-                                //   showCursor = false;
-                                //   enabled = false;
-                                // });
-                              }
-                            },
-                            decoration: const InputDecoration(
-                              counterText: '',
-                              hintText: "Comment to this reach",
-                              hintStyle: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.greyShade1,
+                              suggestionPosition: SuggestionPosition.Bottom,
+                              onChanged: (val) {
+                                counter.value = val
+                                    .trim()
+                                    .split(RegexUtil.spaceOrNewLine)
+                                    .length;
+                                if (counter.value >= 200) {
+                                  Snackbars.error(context,
+                                      message: '200 words limit reached!');
+                                  // setState(() {
+                                  //   showCursor = false;
+                                  //   enabled = false;
+                                  // });
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                counterText: '',
+                                hintText: "Comment to this reach",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.greyShade1,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
                               ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
+                              mentions: [
+                                Mention(
+                                    trigger: "#",
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                    data: _recentWords.value,
+                                    matchAll: false,
+                                    suggestionBuilder: (data) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: _isLoading.value
+                                            ? const CircularProgressIndicator()
+                                            : _recentWords.value.isEmpty
+                                                ? TextButton(
+                                                    onPressed: () {
+                                                      RouteNavigators.route(
+                                                          context,
+                                                          const AddToGlossary());
+                                                    },
+                                                    child: const Text(
+                                                        'Add to glossary'))
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 20.0,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '#${data['display']}',
+                                                            style: const TextStyle(
+                                                                fontSize: 10,
+                                                                color: Colors
+                                                                    .blueAccent),
+                                                          ),
+                                                          Text(
+                                                            data['meaning'],
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        10,
+                                                                    color: Colors
+                                                                        .black),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // IconButton(
+                                                      //   onPressed: () {},
+                                                      //   icon: const Icon(Icons.add),
+                                                      // ),
+                                                    ],
+                                                  ),
+                                      );
+                                    }),
+                                Mention(
+                                    trigger: "@",
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                    data: _mentionUsers.value,
+                                    matchAll: false,
+                                    suggestionBuilder: (data) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: _isLoading.value
+                                            ? const CircularProgressIndicator()
+                                            : _mentionUsers.value.isEmpty
+                                                ? const SizedBox.shrink()
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 20.0,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${data['display']}',
+                                                            style: const TextStyle(
+                                                                fontSize: 10,
+                                                                color: Colors
+                                                                    .blueAccent),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // IconButton(
+                                                      //   onPressed: () {},
+                                                      //   icon: const Icon(Icons.add),
+                                                      // ),
+                                                    ],
+                                                  ),
+                                      );
+                                    }),
+                              ],
+                              // child: TextField(
+                              //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                              //   minLines: 1,
+                              //   maxLines: null,
+                              //   controller: controller,
+                              //   inputFormatters: [
+                              //     MaxWordTextInputFormater(maxWords: 200)
+                              //   ],
+                              //   // maxLength: 200,
+                              //   onChanged: (val) {
+                              //     counter.value =
+                              //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                              //     if (counter.value >= 200) {
+                              //       Snackbars.error(context,
+                              //           message: '200 words limit reached!');
+                              //     }
+                              //   },
+                              //   decoration: const InputDecoration(
+                              //     counterText: '',
+                              //     hintText: "What's on your mind?",
+                              //     hintStyle: TextStyle(
+                              //       fontSize: 14,
+                              //       fontWeight: FontWeight.w400,
+                              //       color: AppColors.greyShade1,
+                              //     ),
+                              //     border: InputBorder.none,
+                              //     contentPadding: EdgeInsets.symmetric(
+                              //       horizontal: 16,
+                              //       vertical: 10,
+                              //     ),
+                              //   ),
+                              // ).paddingSymmetric(h: 16),
                             ),
-                            mentions: [
-                              Mention(
-                                  trigger: "#",
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                  data: _recentWords.value,
-                                  matchAll: false,
-                                  suggestionBuilder: (data) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: _isLoading.value
-                                          ? const CircularProgressIndicator()
-                                          : _recentWords.value.isEmpty
-                                              ? TextButton(
-                                                  onPressed: () {
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        const AddToGlossary());
-                                                  },
-                                                  child: const Text(
-                                                      'Add to glossary'))
-                                              : Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(
-                                                      width: 20.0,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '#${data['display']}',
-                                                          style: const TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors
-                                                                  .blueAccent),
-                                                        ),
-                                                        Text(
-                                                          data['meaning'],
-                                                          textAlign:
-                                                              TextAlign.left,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 10,
-                                                                  color: Colors
-                                                                      .black),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    // IconButton(
-                                                    //   onPressed: () {},
-                                                    //   icon: const Icon(Icons.add),
-                                                    // ),
-                                                  ],
-                                                ),
-                                    );
-                                  }),
-                              Mention(
-                                  trigger: "@",
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                  data: _mentionUsers.value,
-                                  matchAll: false,
-                                  suggestionBuilder: (data) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: _isLoading.value
-                                          ? const CircularProgressIndicator()
-                                          : _mentionUsers.value.isEmpty
-                                              ? const SizedBox.shrink()
-                                              : Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(
-                                                      width: 20.0,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '${data['display']}',
-                                                          style: const TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors
-                                                                  .blueAccent),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    // IconButton(
-                                                    //   onPressed: () {},
-                                                    //   icon: const Icon(Icons.add),
-                                                    // ),
-                                                  ],
-                                                ),
-                                    );
-                                  }),
-                            ],
-                            // child: TextField(
-                            //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            //   minLines: 1,
-                            //   maxLines: null,
-                            //   controller: controller,
-                            //   inputFormatters: [
-                            //     MaxWordTextInputFormater(maxWords: 200)
-                            //   ],
-                            //   // maxLength: 200,
-                            //   onChanged: (val) {
-                            //     counter.value =
-                            //         val.trim().split(RegexUtil.spaceOrNewLine).length;
-                            //     if (counter.value >= 200) {
-                            //       Snackbars.error(context,
-                            //           message: '200 words limit reached!');
-                            //     }
-                            //   },
-                            //   decoration: const InputDecoration(
-                            //     counterText: '',
-                            //     hintText: "What's on your mind?",
-                            //     hintStyle: TextStyle(
-                            //       fontSize: 14,
-                            //       fontWeight: FontWeight.w400,
-                            //       color: AppColors.greyShade1,
-                            //     ),
-                            //     border: InputBorder.none,
-                            //     contentPadding: EdgeInsets.symmetric(
-                            //       horizontal: 16,
-                            //       vertical: 10,
-                            //     ),
-                            //   ),
-                            // ).paddingSymmetric(h: 16),
                           );
                         },
                       ),
 
                       const SizedBox(height: 10),
                       if (_mediaList.value.isNotEmpty)
-                        SizedBox(
-                            height: getScreenHeight(200),
-                            width: MediaQuery.of(context).size.width,
-                            child: Center(
-                              child: ListView.builder(
-                                  itemCount: _mediaList.value.length,
-                                  shrinkWrap: false,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    if (_mediaList.value.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    UploadFileDto mediaDto =
-                                        _mediaList.value[index];
-                                    return Stack(
-                                      alignment: Alignment.topRight,
-                                      children: [
-                                        Container(
-                                          width: getScreenWidth(200),
-                                          height: getScreenHeight(200),
-                                          clipBehavior: Clip.hardEdge,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: Image.file(
-                                            mediaDto.file,
-                                            fit: BoxFit.cover,
+                        PostReachMediaGrid(
+                          mediaList: _mediaList.value
+                              .where((e) =>
+                                  FileUtils.isImage(e.file) ||
+                                  FileUtils.isVideo(e.file))
+                              .toList(),
+                          onUpdateList: (val) {
+                            if (val.length != _mediaList.value.length) {
+                              _mediaList.value = val;
+                            }
+                          },
+                          onRemove: (index) {
+                            _mediaList.value = [..._mediaList.value]
+                              ..removeAt(index);
+                          },
+                        ).paddingSymmetric(h: 16)
+                      else
+                        const SizedBox.shrink(),
+                      if (_mediaList.value
+                              .indexWhere((e) => FileUtils.isAudio(e.file)) >=
+                          0)
+                        PostReachAudioMedia(
+                          margin: const EdgeInsets.all(16),
+                          path: _mediaList
+                              .value[_mediaList.value
+                                  .indexWhere((e) => FileUtils.isAudio(e.file))]
+                              .file
+                              .path,
+                          onCancel: () {
+                            int pos = _mediaList.value
+                                .indexWhere((e) => FileUtils.isAudio(e.file));
+                            _mediaList.value = [..._mediaList.value]
+                              ..removeAt(pos);
+                          },
+                        )
+                      else
+                        const SizedBox.shrink(),
+                      // SizedBox(
+                      //   height: MediaQuery.of(context).size.height * 0.4,
+                      // ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  // margin: const EdgeInsets.only(top: 210),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  color: const Color(0xFFF5F5F5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10)),
+                              ),
+                              builder: (context) {
+                                return ListView(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 27,
+                                      vertical: 10,
+                                    ),
+                                    children: [
+                                      Container(
+                                        height: 4,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.greyShade5
+                                              .withOpacity(0.5),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                      ).paddingSymmetric(h: size.width / 2.7),
+                                      SizedBox(height: getScreenHeight(21)),
+                                      Center(
+                                        child: Text(
+                                          'Who can reply',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: AppColors.black,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        Positioned.fill(
-                                            child: GestureDetector(onTap: () {
-                                          RouteNavigators.route(
-                                              context,
-                                              PhotoView(
-                                                imageProvider: FileImage(
-                                                  mediaDto.file,
-                                                ),
-                                              ));
-                                        })),
-                                        Positioned(
-                                          right: getScreenWidth(4),
-                                          top: getScreenWidth(5),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              _mediaList.value.removeAt(index);
-                                              setState(() {});
-                                            },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Container(
-                                                height: getScreenHeight(26),
-                                                width: getScreenWidth(26),
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    color: AppColors.grey,
-                                                    size: getScreenHeight(14),
-                                                  ),
-                                                ),
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: AppColors.white),
-                                              ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(5)),
+                                      Center(
+                                        child: Text(
+                                          'Identify who can reply to this reach.',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(14),
+                                            color: AppColors.greyShade3,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(20)),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            replyFeature.value = 'everyone';
+                                            RouteNavigators.pop(context);
+                                          });
+                                        },
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/world.svg'),
+                                          title: Text(
+                                            'Everyone can reply',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
                                             ),
                                           ),
                                         ),
-                                      ],
-                                    ).paddingOnly(r: 10);
-                                    // if (FileUtils.isImage(mediaDto.file) ||
-                                    //     FileUtils.isVideo(mediaDto.file)) {
-                                    //   return PostReachMedia(
-                                    //       fileResult: mediaDto.fileResult!,
-                                    //       onClose: () {
-                                    //         _mediaList.value.removeAt(index);
-                                    //         setState(() {});
-                                    //       });
-                                    // } else {
-                                    //   return const SizedBox.shrink();
-                                    // }
-                                  }),
-                            )).paddingSymmetric(h: 16)
-                      else
-                        const SizedBox.shrink(),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.5,
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            replyFeature.value =
+                                                'people_you_follow';
+                                          });
+                                          RouteNavigators.pop(context);
+                                        },
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-follow.svg'),
+                                          title: Text(
+                                            'People you follow',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            replyFeature.value =
+                                                'only_people_you_mention';
+                                          });
+                                          RouteNavigators.pop(context);
+                                        },
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/people-you-mention.svg'),
+                                          title: Text(
+                                            'Only people you mention',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(10)),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            replyFeature.value = 'none';
+                                          });
+                                          RouteNavigators.pop(context);
+                                        },
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          minLeadingWidth: 14,
+                                          leading: SvgPicture.asset(
+                                              'assets/svgs/none.svg'),
+                                          title: Text(
+                                            'None',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]);
+                              });
+                        },
+                        child: replyWidget(replyFeature.value),
                       ),
-                      // showEmoji.value
-                      //     ? buildEmoji()
-                      //     : SizedBox(
-                      //         height: MediaQuery.of(context).size.height * 0.3,
-                      //       ),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                //  showEmoji.value = !showEmoji.value;
+                              });
+                            },
+                            padding: EdgeInsets.zero,
+                            icon: SvgPicture.asset('assets/svgs/emoji.svg'),
+                            splashColor: Colors.transparent,
+                            splashRadius: 20,
+                            constraints: const BoxConstraints(),
+                          ),
 
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(
-                      //     horizontal: 20,
-                      //     vertical: 15,
-                      //   ),
-                      //   color: const Color(0xFFF5F5F5),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //     children: [
-                      //       InkWell(
-                      //         onTap: () {
-                      //           showModalBottomSheet(
-                      //               context: context,
-                      //               shape: const RoundedRectangleBorder(
-                      //                 borderRadius: BorderRadius.only(
-                      //                     topLeft: Radius.circular(10),
-                      //                     topRight: Radius.circular(10)),
-                      //               ),
-                      //               builder: (context) {
-                      //                 return ListView(
-                      //                     physics:
-                      //                         const NeverScrollableScrollPhysics(),
-                      //                     shrinkWrap: true,
-                      //                     padding: const EdgeInsets.symmetric(
-                      //                       horizontal: 27,
-                      //                       vertical: 10,
-                      //                     ),
-                      //                     children: [
-                      //                       Container(
-                      //                         height: 4,
-                      //                         decoration: BoxDecoration(
-                      //                           color: AppColors.greyShade5
-                      //                               .withOpacity(0.5),
-                      //                           borderRadius:
-                      //                               BorderRadius.circular(20),
-                      //                         ),
-                      //                       ).paddingSymmetric(
-                      //                           h: size.width / 2.7),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(21)),
-                      //                       Center(
-                      //                         child: Text(
-                      //                           'Who can reply',
-                      //                           style: TextStyle(
-                      //                             fontSize: getScreenHeight(16),
-                      //                             color: AppColors.black,
-                      //                             fontWeight: FontWeight.w600,
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(5)),
-                      //                       Center(
-                      //                         child: Text(
-                      //                           'Identify who can reply to this reach.',
-                      //                           style: TextStyle(
-                      //                             fontSize: getScreenHeight(14),
-                      //                             color: AppColors.greyShade3,
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(20)),
-                      //                       InkWell(
-                      //                         onTap: () {
-                      //                           setState(() {
-                      //                             replyFeature.value =
-                      //                                 'everyone';
-                      //                             RouteNavigators.pop(context);
-                      //                           });
-                      //                         },
-                      //                         child: ListTile(
-                      //                           contentPadding: EdgeInsets.zero,
-                      //                           minLeadingWidth: 14,
-                      //                           leading: SvgPicture.asset(
-                      //                               'assets/svgs/world.svg'),
-                      //                           title: Text(
-                      //                             'Everyone can reply',
-                      //                             style: TextStyle(
-                      //                               fontSize:
-                      //                                   getScreenHeight(16),
-                      //                               color: AppColors.black,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(10)),
-                      //                       InkWell(
-                      //                         onTap: () {
-                      //                           setState(() {
-                      //                             replyFeature.value =
-                      //                                 'people_you_follow';
-                      //                           });
-                      //                           RouteNavigators.pop(context);
-                      //                         },
-                      //                         child: ListTile(
-                      //                           contentPadding: EdgeInsets.zero,
-                      //                           minLeadingWidth: 14,
-                      //                           leading: SvgPicture.asset(
-                      //                               'assets/svgs/people-you-follow.svg'),
-                      //                           title: Text(
-                      //                             'People you follow',
-                      //                             style: TextStyle(
-                      //                               fontSize:
-                      //                                   getScreenHeight(16),
-                      //                               color: AppColors.black,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(10)),
-                      //                       InkWell(
-                      //                         onTap: () {
-                      //                           setState(() {
-                      //                             replyFeature.value =
-                      //                                 'only_people_you_mention';
-                      //                           });
-                      //                           RouteNavigators.pop(context);
-                      //                         },
-                      //                         child: ListTile(
-                      //                           contentPadding: EdgeInsets.zero,
-                      //                           minLeadingWidth: 14,
-                      //                           leading: SvgPicture.asset(
-                      //                               'assets/svgs/people-you-mention.svg'),
-                      //                           title: Text(
-                      //                             'Only people you mention',
-                      //                             style: TextStyle(
-                      //                               fontSize:
-                      //                                   getScreenHeight(16),
-                      //                               color: AppColors.black,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       SizedBox(
-                      //                           height: getScreenHeight(10)),
-                      //                       InkWell(
-                      //                         onTap: () {
-                      //                           setState(() {
-                      //                             replyFeature.value = 'none';
-                      //                           });
-                      //                           RouteNavigators.pop(context);
-                      //                         },
-                      //                         child: ListTile(
-                      //                           contentPadding: EdgeInsets.zero,
-                      //                           minLeadingWidth: 14,
-                      //                           leading: SvgPicture.asset(
-                      //                               'assets/svgs/none.svg'),
-                      //                           title: Text(
-                      //                             'None',
-                      //                             style: TextStyle(
-                      //                               fontSize:
-                      //                                   getScreenHeight(16),
-                      //                               color: AppColors.black,
-                      //                             ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ]);
-                      //               });
-                      //         },
-                      //         child: replyWidget(replyFeature.value),
-                      //       ),
-                      //       Row(
-                      //         children: [
-                      //           // IconButton(
-                      //           //   onPressed: () {},
-                      //           //   padding: EdgeInsets.zero,
-                      //           //   icon: SvgPicture.asset('assets/svgs/emoji.svg'),
-                      //           //   splashColor: Colors.transparent,
-                      //           //   splashRadius: 20,
-                      //           //   constraints: const BoxConstraints(),
-                      //           // ),
-                      //           // const SizedBox(width: 20),
-                      //           IconButton(
-                      //               onPressed: () {
-                      //                 showModalBottomSheet(
-                      //                     context: context,
-                      //                     shape: const RoundedRectangleBorder(
-                      //                       borderRadius: BorderRadius.only(
-                      //                           topLeft: Radius.circular(10),
-                      //                           topRight: Radius.circular(10)),
-                      //                     ),
-                      //                     builder: (context) {
-                      //                       return StatefulBuilder(
-                      //                         builder: ((context, setState) {
-                      //                           return ListView(
-                      //                               physics:
-                      //                                   const NeverScrollableScrollPhysics(),
-                      //                               shrinkWrap: true,
-                      //                               padding: const EdgeInsets
-                      //                                   .symmetric(
-                      //                                 horizontal: 27,
-                      //                                 vertical: 10,
-                      //                               ),
-                      //                               children: [
-                      //                                 Container(
-                      //                                   height: 4,
-                      //                                   decoration:
-                      //                                       BoxDecoration(
-                      //                                     color: AppColors
-                      //                                         .greyShade5
-                      //                                         .withOpacity(0.5),
-                      //                                     borderRadius:
-                      //                                         BorderRadius
-                      //                                             .circular(20),
-                      //                                   ),
-                      //                                 ).paddingSymmetric(
-                      //                                     h: size.width / 2.7),
-                      //                                 SizedBox(
-                      //                                     height:
-                      //                                         getScreenHeight(
-                      //                                             21)),
-                      //                                 Center(
-                      //                                   child: Text(
-                      //                                     'Content warning',
-                      //                                     style: TextStyle(
-                      //                                       fontSize:
-                      //                                           getScreenHeight(
-                      //                                               16),
-                      //                                       color:
-                      //                                           AppColors.black,
-                      //                                       fontWeight:
-                      //                                           FontWeight.w600,
-                      //                                     ),
-                      //                                   ),
-                      //                                 ),
-                      //                                 SizedBox(
-                      //                                     height:
-                      //                                         getScreenHeight(
-                      //                                             5)),
-                      //                                 Center(
-                      //                                   child: Text(
-                      //                                     "Select a category and we'll put a content warning. This helps people avoid content they don't want to see",
-                      //                                     style: TextStyle(
-                      //                                       fontSize:
-                      //                                           getScreenHeight(
-                      //                                               14),
-                      //                                       color: AppColors
-                      //                                           .greyShade3,
-                      //                                     ),
-                      //                                   ),
-                      //                                 ),
-                      //                                 RadioListTile(
-                      //                                   title: const Text(
-                      //                                       'Nudity'),
-                      //                                   value: 'Nudity',
-                      //                                   groupValue: postRating,
-                      //                                   activeColor: AppColors
-                      //                                       .primaryColor,
-                      //                                   onChanged:
-                      //                                       (String? value) {
-                      //                                     setState(() {
-                      //                                       postRating = value!;
-                      //                                     });
-                      //                                   },
-                      //                                 ),
-                      //                                 RadioListTile(
-                      //                                   title: const Text(
-                      //                                       'Graphic Violence'),
-                      //                                   value:
-                      //                                       'Graphic Violence',
-                      //                                   activeColor: AppColors
-                      //                                       .primaryColor,
-                      //                                   groupValue: postRating,
-                      //                                   onChanged:
-                      //                                       (String? value) {
-                      //                                     setState(() {
-                      //                                       postRating = value!;
-                      //                                     });
-                      //                                   },
-                      //                                 ),
-                      //                                 RadioListTile(
-                      //                                   title: const Text(
-                      //                                       'Sensitive'),
-                      //                                   value: 'Sensitive',
-                      //                                   activeColor: AppColors
-                      //                                       .primaryColor,
-                      //                                   groupValue: postRating,
-                      //                                   onChanged:
-                      //                                       (String? value) {
-                      //                                     setState(() {
-                      //                                       postRating = value!;
-                      //                                     });
-                      //                                   },
-                      //                                 ),
-                      //                               ]);
-                      //                         }),
-                      //                       );
-                      //                     });
-                      //               },
-                      //               icon: const Icon(Icons.flag)),
-                      //           IconButton(
-                      //             onPressed: () async {
-                      //               final res = await showMediaUploadOption(
-                      //                   context: context,
-                      //                   iconPath1: 'assets/svgs/Camera.svg',
-                      //                   iconPath2: 'assets/svgs/gallery.svg',
-                      //                   title1: 'Camera',
-                      //                   title2: 'Gallery');
-                      //               if (res == null) return;
-                      //               List<FileResult>? media;
-                      //               if (res == 1) {
-                      //                 final cMedia = await MediaService()
-                      //                     .pickFromCamera(
-                      //                         enableRecording: true,
-                      //                         context: context);
-                      //                 media = cMedia != null ? [cMedia] : null;
-                      //               } else {
-                      //                 media = await MediaService()
-                      //                     .pickFromGallery(
-                      //                         context: context, maxAssets: 15);
-                      //               }
+                          IconButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10)),
+                                    ),
+                                    builder: (context) {
+                                      return StatefulBuilder(
+                                        builder: ((context, setState) {
+                                          return ListView(
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              shrinkWrap: true,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 27,
+                                                vertical: 10,
+                                              ),
+                                              children: [
+                                                Container(
+                                                  height: 4,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.greyShade5
+                                                        .withOpacity(0.5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                ).paddingSymmetric(
+                                                    h: size.width / 2.7),
+                                                SizedBox(
+                                                    height:
+                                                        getScreenHeight(21)),
+                                                Center(
+                                                  child: Text(
+                                                    'Content warning',
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(16),
+                                                      color: AppColors.black,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                    height: getScreenHeight(5)),
+                                                Center(
+                                                  child: Text(
+                                                    "Select a category and we'll put a content warning. This helps people avoid content they don't want to see",
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(14),
+                                                      color:
+                                                          AppColors.greyShade3,
+                                                    ),
+                                                  ),
+                                                ),
+                                                RadioListTile(
+                                                  title: const Text('Nudity'),
+                                                  value: 'Nudity',
+                                                  groupValue: postRating,
+                                                  activeColor:
+                                                      AppColors.primaryColor,
+                                                  onChanged: (String? value) {
+                                                    setState(() {
+                                                      postRating = value!;
+                                                    });
+                                                  },
+                                                ),
+                                                RadioListTile(
+                                                  title: const Text(
+                                                      'Graphic Violence'),
+                                                  value: 'Graphic Violence',
+                                                  activeColor:
+                                                      AppColors.primaryColor,
+                                                  groupValue: postRating,
+                                                  onChanged: (String? value) {
+                                                    setState(() {
+                                                      postRating = value!;
+                                                    });
+                                                  },
+                                                ),
+                                                RadioListTile(
+                                                  title:
+                                                      const Text('Sensitive'),
+                                                  value: 'Sensitive',
+                                                  activeColor:
+                                                      AppColors.primaryColor,
+                                                  groupValue: postRating,
+                                                  onChanged: (String? value) {
+                                                    setState(() {
+                                                      postRating = value!;
+                                                    });
+                                                  },
+                                                ),
+                                              ]);
+                                        }),
+                                      );
+                                    });
+                              },
+                              icon: const Icon(Icons.flag)),
 
-                      //               if (media == null) return;
-                      //               int total = media.length;
-                      //               // int noOfVideos = media
-                      //               //     .where((e) => FileUtils.isVideo(e.file))
-                      //               //     .length;
-                      //               // int noOfImages = media
-                      //               //     .where((e) => FileUtils.isImage(e.file))
-                      //               //     .length;
+                          IconButton(
+                            onPressed: () async {
+                              final res = await showMediaUploadOption(
+                                  context: context,
+                                  iconPath1: 'assets/svgs/Camera.svg',
+                                  iconPath2: 'assets/svgs/gallery.svg',
+                                  title1: 'Camera',
+                                  title2: 'Gallery');
+                              if (res == null) return;
+                              List<FileResult>? media;
+                              if (res == 1) {
+                                final cMedia = await MediaService()
+                                    .pickFromCamera(
+                                        enableRecording: true,
+                                        context: context);
+                                media = cMedia != null ? [cMedia] : null;
+                              } else {
+                                media = await MediaService().pickFromGallery(
+                                    context: context, maxAssets: 15);
+                              }
 
-                      //               if ((_mediaList.value.length + total) >
-                      //                   15) {
-                      //                 Snackbars.error(context,
-                      //                     message:
-                      //                         'Sorry, you cannot add more than 15 media');
-                      //                 return;
-                      //               }
+                              if (media == null) return;
+                              int total = media.length;
+                              // int noOfVideos = media
+                              //     .where((e) => FileUtils.isVideo(e.file))
+                              //     .length;
+                              // int noOfImages = media
+                              //     .where((e) => FileUtils.isImage(e.file))
+                              //     .length;
 
-                      //               if (nVideos > 0) {
-                      //                 Snackbars.error(context,
-                      //                     message:
-                      //                         'Sorry, you cannot add more than one video media');
-                      //                 return;
-                      //               }
-                      //               for (var e in media) {
-                      //                 _mediaList.value.add(UploadFileDto(
-                      //                     file: e.file,
-                      //                     fileResult: e,
-                      //                     id: Random()
-                      //                         .nextInt(100)
-                      //                         .toString()));
-                      //               }
-                      //               setState(() {});
-                      //             },
-                      //             splashColor: Colors.transparent,
-                      //             splashRadius: 20,
-                      //             padding: EdgeInsets.zero,
-                      //             icon: SvgPicture.asset(
-                      //                 'assets/svgs/gallery.svg'),
-                      //             constraints: const BoxConstraints(),
-                      //           ),
-                      //           const SizedBox(width: 20),
-                      //           PopupMenuButton(
-                      //             onSelected: (value) async {
-                      //               if ((_mediaList.value.length + 1) > 15) {
-                      //                 Snackbars.error(context,
-                      //                     message:
-                      //                         'Sorry, you cannot add more than 15 media');
-                      //                 return;
-                      //               }
-                      //               if (nAudios > 0) {
-                      //                 Snackbars.error(context,
-                      //                     message:
-                      //                         'Sorry, you cannot add more than one audio media');
-                      //                 return;
-                      //               }
-                      //               if (value == null) return;
-                      //               if (value == 1) {
-                      //                 final media = await MediaService()
-                      //                     .getAudio(context: context);
-                      //                 if (media == null) return;
-                      //                 if (!FileUtils.isAudio(media.file)) {
-                      //                   Snackbars.error(context,
-                      //                       message:
-                      //                           'Audio format not supported!');
-                      //                   return;
-                      //                 }
-                      //                 //   Console.log('<<<PATH>>', media.path);
-                      //                 _mediaList.value.add(UploadFileDto(
-                      //                     file: media.file,
-                      //                     fileResult: media,
-                      //                     id: Random()
-                      //                         .nextInt(100)
-                      //                         .toString()));
-                      //                 setState(() {});
-                      //               } else if (value == 2) {
-                      //                 _recordingService.record(
-                      //                     fileName: 'post_reach_aud.aac');
-                      //               }
-                      //             },
-                      //             itemBuilder: (context) => [
-                      //               const PopupMenuItem(
-                      //                   value: 1,
-                      //                   child: Text(
-                      //                     'Upload',
-                      //                     style:
-                      //                         TextStyle(color: AppColors.black),
-                      //                   )),
-                      //               const PopupMenuItem(
-                      //                   value: 2,
-                      //                   child: Text(
-                      //                     'Record',
-                      //                     style:
-                      //                         TextStyle(color: AppColors.black),
-                      //                   )),
-                      //             ],
-                      //             child:
-                      //                 SvgPicture.asset('assets/svgs/mic.svg'),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                              if ((_mediaList.value.length + total) > 15) {
+                                Snackbars.error(context,
+                                    message:
+                                        'Sorry, you cannot add more than 15 media');
+                                return;
+                              }
+
+                              if (nVideos > 0) {
+                                Snackbars.error(context,
+                                    message:
+                                        'Sorry, you cannot add more than one video media');
+                                return;
+                              }
+                              for (var e in media) {
+                                _mediaList.value.add(UploadFileDto(
+                                    file: e.file,
+                                    fileResult: e,
+                                    id: Random().nextInt(100).toString()));
+                              }
+                              setState(() {});
+                            },
+                            splashColor: Colors.transparent,
+                            splashRadius: 20,
+                            padding: EdgeInsets.zero,
+                            icon: SvgPicture.asset('assets/svgs/gallery.svg'),
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 20),
+                          // IconButton(
+                          //   //constraints: const BoxConstraints(
+                          //   // maxHeight: 25, maxWidth: 25),
+                          //   onPressed: () async {
+                          //     setState(() {
+                          //       isRecording = !isRecording;
+                          //     });
+                          //     var tempDir = await getTemporaryDirectory();
+                          //     var path = '${tempDir.path}/flutter_sound.aac';
+
+                          //     if (!isRecordingInit) {
+                          //       return;
+                          //     }
+                          //     if (isRecording) {
+                          //       await _soundRecorder!.stopRecorder();
+                          //       print(path);
+                          //       File audioMessage = File(path);
+
+                          //       /*globals.chatBloc!.add(
+                          //                                 UploadImageFileEvent(
+                          //                                     file: audioMessage));*/
+                          //     } else {
+                          //       await _soundRecorder!.startRecorder(
+                          //         toFile: path,
+                          //       );
+                          //     }
+                          //   },
+                          //   icon: !isRecording
+                          //       ? SvgPicture.asset(
+                          //           'assets/svgs/mic.svg',
+                          //           color: AppColors.blackShade3,
+                          //           width: 20,
+                          //           height: 26,
+                          //         )
+                          //       : SvgPicture.asset(
+                          //           'assets/svgs/dc-cancel.svg',
+                          //           color: AppColors.blackShade3,
+                          //           height: 20,
+                          //           width: 20,
+                          //         ),
+                          //   constraints: const BoxConstraints(),
+                          // ),
+
+                          PopupMenuButton(
+                            onSelected: (value) async {
+                              if ((_mediaList.value.length + 1) > 15) {
+                                Snackbars.error(context,
+                                    message:
+                                        'Sorry, you cannot add more than 15 media');
+                                return;
+                              }
+                              if (nAudios > 0) {
+                                Snackbars.error(context,
+                                    message:
+                                        'Sorry, you cannot add more than one audio media');
+                                return;
+                              }
+                              if (value == null) return;
+                              if (value == 1) {
+                                final media = await MediaService()
+                                    .getAudio(context: context);
+                                if (media == null) return;
+                                if (!FileUtils.isAudio(media.file)) {
+                                  Snackbars.error(context,
+                                      message: 'Audio format not supported!');
+                                  return;
+                                }
+                                //  Console.log('<<<PATH>>', media.path);
+                                _mediaList.value.add(UploadFileDto(
+                                    file: media.file,
+                                    fileResult: media,
+                                    id: Random().nextInt(100).toString()));
+                                setState(() {});
+                              } else if (value == 2) {
+                                _recordingService.record(
+                                    fileName: 'post_reach_aud.aac');
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                  value: 1,
+                                  child: Text(
+                                    'Upload',
+                                    style: TextStyle(color: AppColors.black),
+                                  )),
+                              const PopupMenuItem(
+                                  value: 2,
+                                  child: Text(
+                                    'Record',
+                                    style: TextStyle(color: AppColors.black),
+                                  )),
+                            ],
+                            child: SvgPicture.asset('assets/svgs/mic.svg'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ]),
             ),
-            Positioned(
-              top: 750,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                // margin: const EdgeInsets.only(top: 210),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                color: const Color(0xFFF5F5F5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
-                            ),
-                            builder: (context) {
-                              return ListView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 27,
-                                    vertical: 10,
-                                  ),
-                                  children: [
-                                    Container(
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.greyShade5
-                                            .withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ).paddingSymmetric(h: size.width / 2.7),
-                                    SizedBox(height: getScreenHeight(21)),
-                                    Center(
-                                      child: Text(
-                                        'Who can reply',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(5)),
-                                    Center(
-                                      child: Text(
-                                        'Identify who can reply to this reach.',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(14),
-                                          color: AppColors.greyShade3,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(20)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value = 'everyone';
-                                          RouteNavigators.pop(context);
-                                        });
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/world.svg'),
-                                        title: Text(
-                                          'Everyone can reply',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value =
-                                              'people_you_follow';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-follow.svg'),
-                                        title: Text(
-                                          'People you follow',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value =
-                                              'only_people_you_mention';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/people-you-mention.svg'),
-                                        title: Text(
-                                          'Only people you mention',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: getScreenHeight(10)),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          replyFeature.value = 'none';
-                                        });
-                                        RouteNavigators.pop(context);
-                                      },
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        minLeadingWidth: 14,
-                                        leading: SvgPicture.asset(
-                                            'assets/svgs/none.svg'),
-                                        title: Text(
-                                          'None',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ]);
-                            });
-                      },
-                      child: replyWidget(replyFeature.value),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              //  showEmoji.value = !showEmoji.value;
-                            });
-                          },
-                          padding: EdgeInsets.zero,
-                          icon: SvgPicture.asset('assets/svgs/emoji.svg'),
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          constraints: const BoxConstraints(),
-                        ),
-                        const SizedBox(width: 20),
-                        IconButton(
-                          onPressed: () async {
-                            // final media = await MediaService()
-                            //     .loadMediaFromGallery(context: context);
-                            final media = await getImage(ImageSource.gallery);
-                            if (media != null) {
-                              _mediaList.value.add(UploadFileDto(
-                                  file: media,
-                                  id: Random().nextInt(100).toString()));
-                              setState(() {});
-                            }
-                          },
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          padding: EdgeInsets.zero,
-                          icon: SvgPicture.asset('assets/svgs/gallery.svg'),
-                          constraints: const BoxConstraints(),
-                        ),
-                        const SizedBox(width: 20),
-                        IconButton(
-                          //constraints: const BoxConstraints(
-                          // maxHeight: 25, maxWidth: 25),
-                          onPressed: () async {
-                            setState(() {
-                              isRecording = !isRecording;
-                            });
-                            var tempDir = await getTemporaryDirectory();
-                            var path = '${tempDir.path}/flutter_sound.aac';
+            // Positioned(
+            //   top: 750,
+            //   child:
 
-                            if (!isRecordingInit) {
-                              return;
-                            }
-                            if (isRecording) {
-                              await _soundRecorder!.stopRecorder();
-                              print(path);
-                              File audioMessage = File(path);
+            //    Container(
+            //     width: MediaQuery.of(context).size.width,
+            //     // margin: const EdgeInsets.only(top: 210),
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 20,
+            //       vertical: 15,
+            //     ),
+            //     color: const Color(0xFFF5F5F5),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //       children: [
+            //         InkWell(
+            //           onTap: () {
+            //             showModalBottomSheet(
+            //                 context: context,
+            //                 shape: const RoundedRectangleBorder(
+            //                   borderRadius: BorderRadius.only(
+            //                       topLeft: Radius.circular(10),
+            //                       topRight: Radius.circular(10)),
+            //                 ),
+            //                 builder: (context) {
+            //                   return ListView(
+            //                       physics: const NeverScrollableScrollPhysics(),
+            //                       shrinkWrap: true,
+            //                       padding: const EdgeInsets.symmetric(
+            //                         horizontal: 27,
+            //                         vertical: 10,
+            //                       ),
+            //                       children: [
+            //                         Container(
+            //                           height: 4,
+            //                           decoration: BoxDecoration(
+            //                             color: AppColors.greyShade5
+            //                                 .withOpacity(0.5),
+            //                             borderRadius: BorderRadius.circular(20),
+            //                           ),
+            //                         ).paddingSymmetric(h: size.width / 2.7),
+            //                         SizedBox(height: getScreenHeight(21)),
+            //                         Center(
+            //                           child: Text(
+            //                             'Who can reply',
+            //                             style: TextStyle(
+            //                               fontSize: getScreenHeight(16),
+            //                               color: AppColors.black,
+            //                               fontWeight: FontWeight.w600,
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(5)),
+            //                         Center(
+            //                           child: Text(
+            //                             'Identify who can reply to this reach.',
+            //                             style: TextStyle(
+            //                               fontSize: getScreenHeight(14),
+            //                               color: AppColors.greyShade3,
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(20)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value = 'everyone';
+            //                               RouteNavigators.pop(context);
+            //                             });
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/world.svg'),
+            //                             title: Text(
+            //                               'Everyone can reply',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value =
+            //                                   'people_you_follow';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/people-you-follow.svg'),
+            //                             title: Text(
+            //                               'People you follow',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value =
+            //                                   'only_people_you_mention';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/people-you-mention.svg'),
+            //                             title: Text(
+            //                               'Only people you mention',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                         SizedBox(height: getScreenHeight(10)),
+            //                         InkWell(
+            //                           onTap: () {
+            //                             setState(() {
+            //                               replyFeature.value = 'none';
+            //                             });
+            //                             RouteNavigators.pop(context);
+            //                           },
+            //                           child: ListTile(
+            //                             contentPadding: EdgeInsets.zero,
+            //                             minLeadingWidth: 14,
+            //                             leading: SvgPicture.asset(
+            //                                 'assets/svgs/none.svg'),
+            //                             title: Text(
+            //                               'None',
+            //                               style: TextStyle(
+            //                                 fontSize: getScreenHeight(16),
+            //                                 color: AppColors.black,
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                       ]);
+            //                 });
+            //           },
+            //           child: replyWidget(replyFeature.value),
+            //         ),
+            //         Row(
+            //           children: [
+            //             IconButton(
+            //               onPressed: () {
+            //                 setState(() {
+            //                   //  showEmoji.value = !showEmoji.value;
+            //                 });
+            //               },
+            //               padding: EdgeInsets.zero,
+            //               icon: SvgPicture.asset('assets/svgs/emoji.svg'),
+            //               splashColor: Colors.transparent,
+            //               splashRadius: 20,
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //             const SizedBox(width: 20),
+            //             IconButton(
+            //               onPressed: () async {
+            //                 // final media = await MediaService()
+            //                 //     .loadMediaFromGallery(context: context);
+            //                 final media = await getImage(ImageSource.gallery);
+            //                 if (media != null) {
+            //                   _mediaList.value.add(UploadFileDto(
+            //                       file: media,
+            //                       id: Random().nextInt(100).toString()));
+            //                   setState(() {});
+            //                 }
+            //               },
+            //               splashColor: Colors.transparent,
+            //               splashRadius: 20,
+            //               padding: EdgeInsets.zero,
+            //               icon: SvgPicture.asset('assets/svgs/gallery.svg'),
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //             const SizedBox(width: 20),
+            //             IconButton(
+            //               //constraints: const BoxConstraints(
+            //               // maxHeight: 25, maxWidth: 25),
+            //               onPressed: () async {
+            //                 setState(() {
+            //                   isRecording = !isRecording;
+            //                 });
+            //                 var tempDir = await getTemporaryDirectory();
+            //                 var path = '${tempDir.path}/flutter_sound.aac';
 
-                              /*globals.chatBloc!.add(
-                                                        UploadImageFileEvent(
-                                                            file: audioMessage));*/
-                            } else {
-                              await _soundRecorder!.startRecorder(
-                                toFile: path,
-                              );
-                            }
-                          },
-                          icon: !isRecording
-                              ? SvgPicture.asset(
-                                  'assets/svgs/mic.svg',
-                                  color: AppColors.blackShade3,
-                                  width: 20,
-                                  height: 26,
-                                )
-                              : SvgPicture.asset(
-                                  'assets/svgs/dc-cancel.svg',
-                                  color: AppColors.blackShade3,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            //                 if (!isRecordingInit) {
+            //                   return;
+            //                 }
+            //                 if (isRecording) {
+            //                   await _soundRecorder!.stopRecorder();
+            //                   print(path);
+            //                   File audioMessage = File(path);
+
+            //                   /*globals.chatBloc!.add(
+            //                                             UploadImageFileEvent(
+            //                                                 file: audioMessage));*/
+            //                 } else {
+            //                   await _soundRecorder!.startRecorder(
+            //                     toFile: path,
+            //                   );
+            //                 }
+            //               },
+            //               icon: !isRecording
+            //                   ? SvgPicture.asset(
+            //                       'assets/svgs/mic.svg',
+            //                       color: AppColors.blackShade3,
+            //                       width: 20,
+            //                       height: 26,
+            //                     )
+            //                   : SvgPicture.asset(
+            //                       'assets/svgs/dc-cancel.svg',
+            //                       color: AppColors.blackShade3,
+            //                       height: 20,
+            //                       width: 20,
+            //                     ),
+            //               constraints: const BoxConstraints(),
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+
+            // )
           ],
         ))));
   }

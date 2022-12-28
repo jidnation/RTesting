@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:uuid/uuid.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../home/presentation/views/moment_feed.dart';
+import '../home/presentation/views/status/widgets/user_posting.dart';
 import 'models/get_comments_model.dart';
 import 'models/get_moment_feed.dart';
 import 'moment_cacher.dart';
@@ -25,22 +29,33 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   bool _postingUserComment = false;
   bool get postingUserComment => _postingUserComment;
 
+  bool _stillMerging = false;
+  bool get stillMerging => _stillMerging;
+
+  bool _mergingDone = false;
+  bool get mergingDone => _mergingDone;
+
+  late VideoPlayerController currentVideoController;
+
   bool _gettingUserComment = false;
   bool get gettingUserComment => _gettingUserComment;
+
+  bool _postingMoment = false;
+  bool get postingMoment => _postingMoment;
 
   int _currentSaveIndex = 0;
   int get currentSaveIndex => _currentSaveIndex;
 
-  List<CustomMomentCommentModel> _momentComments = <CustomMomentCommentModel>[];
-  List<CustomMomentCommentModel> get momentComments => _momentComments;
+  // List<CustomMomentCommentModel> _momentComments = <CustomMomentCommentModel>[];
+  // List<CustomMomentCommentModel> get momentComments => _momentComments;
 
   final VideoControllerService _videoControllerService =
       CachedVideoControllerService(DefaultCacheManager());
   VideoControllerService get videoControllerService => _videoControllerService;
 
   //the combined Moment List
-  // List<GetMomentFeed> _combinedMomentList = <GetMomentFeed>[];
-  // List<GetMomentFeed> get combinedMomentList => _combinedMomentList;
+  List<String> _momentIdList = <String>[];
+  List<String> get momentIdList => _momentIdList;
 
   initialize() async {
     _gettingMoments = true;
@@ -49,6 +64,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response != null) {
       List<GetMomentFeed> data = response.getMomentFeed!;
       for (GetMomentFeed momentFeed in data) {
+        _momentIdList.add(momentFeed.moment!.momentId!);
         value.add(MomentModel(
           videoUrl: momentFeed.moment!.videoMediaItem!,
           isLiked: momentFeed.moment!.isLiked!,
@@ -64,15 +80,51 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           momentId: momentFeed.moment!.momentId!,
           caption: momentFeed.moment!.caption!,
           momentCreatedTime: momentFeed.createdAt.toString(),
+          momentComments: await momentFeedStore.getMyMomentComments(
+              momentId: momentFeed.moment!.momentId!),
         ));
       }
     }
     // _combinedMomentList = value;
     print('................. IT IS DONE..................... $value..   ..');
-    print(
-        '................. IT IS DONE2........n ${value.first.momentId}........');
+    // print(
+    //     '................. IT IS DONE2........n ${value.first.momentId}........');
     _gettingMoments = false;
     cacheValues();
+    notifyListeners();
+  }
+
+  fetchMoment() async {
+    //TODO: to make pageLimit dynamic based on the current available moments
+    MomentFeedModel? response =
+        await momentQuery.getAllFeeds(pageLimit: 30, pageNumber: 1);
+    if (response != null) {
+      List<GetMomentFeed> data = response.getMomentFeed!;
+      for (GetMomentFeed momentFeed in data) {
+        if (!(_momentIdList.contains(momentFeed.moment!.momentId))) {
+          _momentIdList.add(momentFeed.moment!.momentId!);
+          value.add(MomentModel(
+            videoUrl: momentFeed.moment!.videoMediaItem!,
+            isLiked: momentFeed.moment!.isLiked!,
+            nLikes: momentFeed.moment!.nLikes!,
+            soundUrl: momentFeed.moment!.sound,
+            momentOwnerId: momentFeed.moment!.momentOwnerProfile!.authId!,
+            momentOwnerUserName:
+                momentFeed.moment!.momentOwnerProfile!.username!,
+            feedOwnerUserName: momentFeed.feedOwnerProfile!.username!,
+            reachingUser: momentFeed.reachingRelationship!,
+            profilePicture:
+                momentFeed.moment!.momentOwnerProfile!.profilePicture ?? "",
+            nComment: momentFeed.moment!.nComments!,
+            momentId: momentFeed.moment!.momentId!,
+            caption: momentFeed.moment!.caption!,
+            momentCreatedTime: momentFeed.createdAt.toString(),
+            momentComments: await momentFeedStore.getMyMomentComments(
+                momentId: momentFeed.moment!.momentId!),
+          ));
+        }
+      }
+    }
     notifyListeners();
   }
 
@@ -90,26 +142,44 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   cacheValues() async {
     late int count;
     if (momentCount != 0) {
-      if (momentCount > 5) {
+      if (momentCount > 3) {
+        // if (momentCount > 5) {
         count = 0;
         for (MomentModel momentFeed in value) {
           print('....caching started......>>>>>>>>>>>:::::::::::::::::::>>>>>');
           await videoControllerService
               .getControllerForVideo(momentFeed.videoUrl);
           ++count;
-          if (count > 5) {
+          if (count > 3) {
+            // if (count > 5) {
             _currentSaveIndex = 5;
             return;
           }
         }
       } else {
         for (MomentModel momentFeed in value) {
+          print(
+              ":::::::::::::::::::::::::::::::::::::::::::::the else is running");
           await videoControllerService
               .getControllerForVideo(momentFeed.videoUrl);
           _currentSaveIndex = momentCount;
         }
       }
     }
+    notifyListeners();
+  }
+
+  videoCtrl(bool isInit, {VideoPlayerController? vController}) {
+    if (isInit) {
+      currentVideoController = vController!;
+    } else {
+      currentVideoController.pause();
+    }
+  }
+
+  updateMerger(bool value, {bool? isDone}) {
+    _stillMerging = value;
+    _mergingDone = isDone ?? false;
     notifyListeners();
   }
 
@@ -162,27 +232,32 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
   }
 
-  likingMomentComment({required String momentId, required String id}) async {
-    List<CustomMomentCommentModel> currentCommentList = momentComments;
-    CustomMomentCommentModel commentModel =
-        currentCommentList.firstWhere((element) => element.id == id);
+  likingMomentComment({required String commentId, required String id}) async {
+    List<MomentModel> currentList = value;
+    MomentModel actualMomentModel =
+        currentList.firstWhere((element) => element.id == id);
     late bool response;
-    if (commentModel.getMomentComment.isLiked!) {
+    CustomMomentCommentModel commentModel = actualMomentModel.momentComments
+        .firstWhere((element) => commentId == element.id);
+    if (commentModel.getMomentComment.isLiked != 'false') {
       // momentModel.isLiked = false;
       // momentModel.nLikes -= 1;
-      // response = await momentQuery.unlikeMomentComment(momentId: momentId, likeId: commentModel.getMomentComment);
+      response = await momentQuery.unlikeMomentComment(
+          commentId: commentModel.getMomentComment.commentId!,
+          likeId: commentModel.getMomentComment.isLiked!);
     } else {
       // momentModel.isLiked = true;
       // momentModel.nLikes += 1;
       response = await momentQuery.likeMomentComment(
-          momentId: momentId,
+          momentId: actualMomentModel.momentId,
           commentId: commentModel.getMomentComment.commentId!);
     }
-    print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called :::::: $momentId');
+    print(
+        'isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called :::::: ${actualMomentModel.momentId}');
 
     print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called2 :::::: $response');
     if (response) {
-      getMomentComment(id: id);
+      getMomentComment(id: id, commentId: commentId);
     }
     notifyListeners();
   }
@@ -206,29 +281,59 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
   }
 
-  getMomentComment({required String id}) async {
-    // print('getting moment called::::::: $value');
-    List<CustomMomentCommentModel> currentCommentList = momentComments;
-    CustomMomentCommentModel commentModel =
-        currentCommentList.firstWhere((element) => element.id == id);
+  getMomentComment({required String id, required String commentId}) async {
+    print('getting moment comment called::::::: $id');
+    // List<MomentModel> currentCommentList = value;
+    // CustomMomentCommentModel commentModel =
+    //     currentCommentList.firstWhere((element) => element.id == id);
+    List<MomentModel> currentList = value;
+    MomentModel actualMomentModel =
+        currentList.firstWhere((element) => element.id == id);
+    CustomMomentCommentModel commentModel = actualMomentModel.momentComments
+        .firstWhere((element) => commentId == element.id);
 
-    var response = await momentQuery.getMomentComment(
+    GetMomentComment? response = await momentQuery.getMomentComment(
         commentId: commentModel.getMomentComment.commentId!);
 
     if (response != null) {
-      // for (MomentModel momentFeed in currentList) {
-      //   if (momentFeed.id == id) {
-      //     momentFeed.nLikes = response.nLikes!;
-      //     momentFeed.nComment = response.nComments!;
-      //     momentFeed.isLiked = response.isLiked!;
-      //     return;
+      // for (CustomMomentCommentModel momentComment in currentCommentList) {
+      //   if (momentComment.id == id) {
+      commentModel.getMomentComment.isLiked = response.isLiked!;
+      commentModel.getMomentComment.nComments = response.nComments!;
+      commentModel.getMomentComment.nLikes = response.nLikes;
+      notifyListeners();
+      return;
       //   }
+      // }
     }
-    notifyListeners();
+  }
+
+  postMoment(BuildContext context, {required String? videoUrl}) async {
+    if (videoUrl != null) {
+      print(":::::::::::::::::::::::::::n printing starrted :::::");
+      var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+      if (res) {
+        Snackbars.success(
+          context,
+          message: 'Moment successfully created',
+          milliseconds: 1300,
+        );
+        momentCtrl.clearPostingData();
+        RouteNavigators.pop(context);
+      } else {
+        Snackbars.error(
+          context,
+          message: 'Operation Failed, Try again.',
+          milliseconds: 1400,
+        );
+      }
+      _postingMoment = false;
+      notifyListeners();
+    }
   }
 
   reachUser({required String toReachId, required String id}) async {
-    var response = await momentQuery.reachUser(reachingId: '');
+    var response = await momentQuery.reachUser(reachingId: toReachId);
     print('from the reaching end this is us>>>>>>>>>>>>> $response');
   }
 
@@ -240,8 +345,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       String? audioUrl,
       String? videoUrl}) async {
     _postingUserComment = true;
+    notifyListeners();
     MomentModel momentModel = value.firstWhere((element) => element.id == id);
-
     bool response = await momentQuery.createMomentComment(
         momentId: momentModel.momentId,
         momentOwnerId: momentModel.momentOwnerId,
@@ -255,6 +360,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         message: 'Moment successfully created',
         milliseconds: 1300,
       );
+      updateMomentComments(id: momentModel.id);
+      getMoment(momentId: momentModel.momentId, id: momentModel.id);
     } else {
       Snackbars.error(
         context,
@@ -267,18 +374,98 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     return response;
   }
 
-  getMomentComments(
-      {required String momentId, int? pageLimit, int? pageNumber}) async {
+  // ($momentId: String!, $commentId: String!, $content: String!)
+  Future<bool> replyCommentOnMoment(BuildContext context,
+      {required String id,
+      required String commentId,
+      required String userInput}) async {
+    _postingUserComment = true;
+    notifyListeners();
+    MomentModel momentModel = value.firstWhere((element) => element.id == id);
+    bool response = await momentQuery.replyMomentComment(
+      momentId: momentModel.momentId,
+      commentId: commentId,
+      comment: userInput,
+    );
+    if (response) {
+      Snackbars.success(
+        context,
+        message: 'Moment successfully created',
+        milliseconds: 1300,
+      );
+      updateMomentComments(id: momentModel.id);
+      getMoment(momentId: momentModel.momentId, id: momentModel.id);
+    } else {
+      Snackbars.error(
+        context,
+        message: 'Unable to post your comment, Try again Later.',
+        milliseconds: 1300,
+      );
+    }
+    _postingUserComment = false;
+    notifyListeners();
+    return response;
+  }
+  //
+  // getMomentComments(
+  //     {required String momentId, int? pageLimit, int? pageNumber}) async {
+  //   _gettingUserComment = true;
+  //   List<GetMomentComment>? response =
+  //       await momentQuery.getMomentComments(momentId: momentId);
+  //   if (response != null) {
+  //     print(
+  //         "::::::::::::::::::::::::::::;; getting momment Comments done::::::::::::::::");
+  //     // _momentComments.clear();
+  //     for (GetMomentComment element in response) {
+  //       // _momentComments.add(CustomMomentCommentModel(element));
+  //     }
+  //   }
+  //   _gettingUserComment = false;
+  //   notifyListeners();
+  // }
+
+  //TODO: making it flexible with the previous comment length
+  updateMomentComments({required String id}) async {
     _gettingUserComment = true;
+    List<MomentModel> currentList = value;
+    MomentModel actualMomentModel =
+        currentList.firstWhere((element) => element.id == id);
+
+    List<GetMomentComment>? response = await momentQuery.getMomentComments(
+        momentId: actualMomentModel.momentId);
+    if (response != null) {
+      List<CustomMomentCommentModel> updateCommentList = [];
+      for (GetMomentComment element in response) {
+        updateCommentList.add(CustomMomentCommentModel(element));
+      }
+      updateCommentList = updateCommentList.reversed.toList();
+      actualMomentModel.momentComments = updateCommentList;
+      print(
+          "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
+      notifyListeners();
+    }
+    _gettingUserComment = false;
+    notifyListeners();
+  }
+
+  Future<List<CustomMomentCommentModel>> getMyMomentComments(
+      {required String momentId, int? pageLimit, int? pageNumber}) async {
+    List<CustomMomentCommentModel> data = [];
     List<GetMomentComment>? response =
         await momentQuery.getMomentComments(momentId: momentId);
     if (response != null) {
-      _momentComments.clear();
       for (GetMomentComment element in response) {
-        _momentComments.add(CustomMomentCommentModel(element));
+        data.add(CustomMomentCommentModel(element));
       }
+      data.reversed;
+      return data;
+    } else {
+      return [];
     }
-    _gettingUserComment = false;
+  }
+
+  void startReading() {
+    _postingMoment = true;
     notifyListeners();
   }
 }
@@ -295,12 +482,14 @@ class MomentModel {
   final String momentId;
   final String profilePicture;
   final String momentOwnerId;
+  List<CustomMomentCommentModel> momentComments;
   final String momentOwnerUserName;
   final String feedOwnerUserName;
   final String caption;
 
   MomentModel(
       {required this.videoUrl,
+      required this.momentComments,
       this.soundUrl,
       required this.reachingUser,
       required this.momentCreatedTime,

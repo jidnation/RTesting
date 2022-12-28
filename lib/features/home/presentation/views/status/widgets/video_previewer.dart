@@ -16,6 +16,7 @@ import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
 import '../../../../../../core/utils/file_url_converter.dart';
+import '../../moment_feed.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
 
@@ -66,6 +67,9 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
               child: AspectRatio(
                 aspectRatio: widget.videoController.value.aspectRatio,
                 child: Stack(children: [
+                  // BetterPlayer.file(
+                  //   widget.videoFile.path,
+                  // ),
                   VideoPlayer(widget.videoController),
                   Positioned(
                       top: size.height * 0.42,
@@ -270,18 +274,21 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     visible: !isUploading,
                     child: InkWell(
                       onTap: () async {
+                        // momentFeedStore.startReading();
                         setState(() {
                           isUploading = true;
                         });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
-                          var noAudioFile = await MediaService()
-                              .removeAudio(filePath: widget.videoFile.path);
+                          // String noAudioFile = await MediaService()
+                          //     .removeAudio(filePath: widget.videoFile.path);
                           // FileResult fileResult = FileResult(path: noAudioFile);
-                          String vFile = await MediaService()
-                              .compressMomentVideo(
-                                  filePath: noAudioFile); //removing the braces
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
+                          // String vFile = await MediaService()
+                          //     .compressMomentVideo(
+                          //         filePath: noAudioFile); //removing the braces
+                          print(
+                              ":::::::::::::::::::::::::::n audio find boss:::::: started :::::");
+                          String? videoUrl = await MediaService().urlConverter(
+                              filePath: momentCtrl.mergedVideoPath.value);
                           if (videoUrl != null) {
                             var res = await MomentQuery.postMoment(
                                 videoMediaItem: videoUrl);
@@ -291,6 +298,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 message: 'Moment successfully created',
                                 milliseconds: 1300,
                               );
+                              momentFeedStore.fetchMoment();
                               momentCtrl.clearPostingData();
                               RouteNavigators.pop(context);
                             } else {
@@ -300,20 +308,28 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 milliseconds: 1400,
                               );
                             }
-                            // setState(() {
-                            //   isUploading = false;
-                            // });
                           }
+                          // if (fileUrl != null) {
+                          //   momentFeedStore.postMoment(context,
+                          //       videoUrl: fileUrl);
+                          // }
+                          // await MediaService().videoAudioMerger(
+                          //   context,
+                          //   videoPath: widget.videoFile.path,
+                          //   audioPath: momentCtrl.audioFilePath.value,
+                          //   time: momentCtrl.endTime.value,
+                          // );
+                          // String? videoUrl =
+                          //     await FileConverter().convertMe(filePath: vFile);
                         } else {
                           print(
                               ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-
-                          String vFile =
-                              await MediaService().compressMomentVideo(
-                            filePath: widget.videoFile.path,
-                          );
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
+                          // String vFile =
+                          //     await MediaService().compressMomentVideo(
+                          //   filePath: widget.videoFile.path,
+                          // );
+                          String? videoUrl = await FileConverter()
+                              .convertMe(filePath: 'vFile');
                           if (videoUrl != null) {
                             var res = await MomentQuery.postMoment(
                                 videoMediaItem: videoUrl);
@@ -323,6 +339,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                                 message: 'Moment successfully created',
                                 milliseconds: 1300,
                               );
+                              momentFeedStore.fetchMoment();
                               momentCtrl.clearPostingData();
                               RouteNavigators.pop(context);
                             } else {
