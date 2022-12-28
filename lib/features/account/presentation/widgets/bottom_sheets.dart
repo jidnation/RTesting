@@ -591,12 +591,12 @@ Future showUserStoryBottomSheet(BuildContext context,
                           // KebabBottomTextButton(
                           //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
-                              label: (status.status?.isMuted ?? false) ||
+                              label: (status.status?.isMuted ?? false) &&
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',
                               onPressed: () {
-                                if ((status.status?.isMuted ?? false) ||
+                                if ((status.status?.isMuted ?? false) &&
                                     (isMuted ?? false)) {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(

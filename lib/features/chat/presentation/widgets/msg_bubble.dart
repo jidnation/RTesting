@@ -23,7 +23,6 @@ class MsgBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final type = 'image';
     return Stack(
       clipBehavior: Clip.none,
       children: [
