@@ -150,3 +150,14 @@ class UnBlockUserEvent extends UserEvent {
 class GetBlockedListEvent extends UserEvent { 
   GetBlockedListEvent();
 }
+
+class InitiateLiveStreamEvent extends UserEvent {
+  final String startedAt;
+
+  InitiateLiveStreamEvent({required this.startedAt});
+}
+
+class JoinStreamEvent extends UserEvent {
+  final String channelName;
+  JoinStreamEvent({required this.channelName});
+}

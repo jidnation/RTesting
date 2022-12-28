@@ -11,6 +11,7 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_blo
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -42,11 +43,13 @@ class AppGlobals {
   List<ProfileIndexModel>? userList;
   List<ChatsThread>? userThreads;
   LoginResponse? loginResponse;
+  StreamResponse? streamLive;
   DialogAndSheetService? dialogAndSheetService;
 
   void init() {
     user = User();
     recipientUser = User();
+    streamLive = StreamResponse();
     userChat = [];
     mentionList = [];
     userThreads = [];

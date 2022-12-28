@@ -226,7 +226,7 @@ class MomentQuery {
   }
 
   unlikeMomentComment(
-      {required String momentId, required String likeId}) async {
+      {required String commentId, required String likeId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -238,7 +238,10 @@ class MomentQuery {
       link: link,
       cache: GraphQLCache(),
     );
-    Map<String, dynamic> momentVariables = {'momentId': momentId};
+    Map<String, dynamic> momentVariables = {
+      'commentId': commentId,
+      'likeId': likeId
+    };
 
     QueryResult queryResult = await qlClient.mutate(MutationOptions(
       fetchPolicy: FetchPolicy.networkOnly,
@@ -248,7 +251,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my moment-unLiking-query::::: $queryResult');
-    // return queryResult.data?['unlikeMoment'] ?? false;
+    return queryResult.data?['unlikeMomentComment'] ?? false;
   }
 
   Future<MomentFeedModel?>? getAllFeeds(
@@ -323,7 +326,8 @@ class MomentQuery {
     }
   }
 
-  getMomentComment({required String commentId}) async {
+  Future<GetMomentComment?>? getMomentComment(
+      {required String commentId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -347,7 +351,7 @@ class MomentQuery {
     );
     log('from getting commentInfo-query::::: $queryResult');
     if (queryResult.data != null) {
-      // return Moment.fromJson(queryResult.data!['getMoment']);
+      return GetMomentComment.fromJson(queryResult.data!['getMomentComment']);
     } else {
       return null;
     }

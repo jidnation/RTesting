@@ -299,7 +299,6 @@ class _MomentFeedState extends State<MomentFeed> {
                                           top: 2,
                                           right: 0,
                                           left: 0,
-                                          // right: SizeConfig.screenWidth * 0.42,
                                           child: Align(
                                             alignment: Alignment.center,
                                             child: Visibility(
@@ -307,7 +306,7 @@ class _MomentFeedState extends State<MomentFeed> {
                                                   .postingUserComment,
                                               child: const CustomText(
                                                 text: 'Posting Comment...',
-                                                color: Colors.white,
+                                                color: Colors.green,
                                                 size: 18,
                                                 weight: FontWeight.w600,
                                               ),
