@@ -1,42 +1,42 @@
-// import 'dart:io';
+import 'dart:io';
 
-// import 'package:flutter/material.dart';
-// import 'package:flutter_hooks/flutter_hooks.dart';
-// import 'package:flutter_svg/svg.dart';
-// import 'package:get/get.dart';
-// import 'package:reach_me/core/components/custom_textfield.dart';
-// import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
-// import 'package:video_player/video_player.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
+import 'package:video_player/video_player.dart';
 
-
+import '../../../../../../core/components/snackbar.dart';
 import '../../../../../../core/services/media_service.dart';
+import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
+import '../../../../../../core/utils/file_url_converter.dart';
 import '../../moment_feed.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
 
+class VideoPreviewer extends StatefulHookWidget {
+  final VideoPlayerController videoController;
+  final File videoFile;
+  const VideoPreviewer(
+      {Key? key, required this.videoController, required this.videoFile})
+      : super(key: key);
 
-// class VideoPreviewer extends StatefulHookWidget {
-//   final VideoPlayerController videoController;
-//   final File videoFile;
-//   const VideoPreviewer(
-//       {Key? key, required this.videoController, required this.videoFile})
-//       : super(key: key);
+  @override
+  State<VideoPreviewer> createState() => _VideoPreviewerState();
+}
 
-//   @override
-//   State<VideoPreviewer> createState() => _VideoPreviewerState();
-// }
-
-// class _VideoPreviewerState extends State<VideoPreviewer> {
-//   @override
-//   void dispose() {
-//     widget.videoController.dispose();
-//     super.dispose();
-//   }
-
+class _VideoPreviewerState extends State<VideoPreviewer> {
+  @override
+  void dispose() {
+    widget.videoController.dispose();
+    super.dispose();
+  }
 
   bool isPlaying = false;
   bool isUploading = false;
@@ -67,6 +67,9 @@ import 'moment_preview_editor.dart';
               child: AspectRatio(
                 aspectRatio: widget.videoController.value.aspectRatio,
                 child: Stack(children: [
+                  // BetterPlayer.file(
+                  //   widget.videoFile.path,
+                  // ),
                   VideoPlayer(widget.videoController),
                   Positioned(
                       top: size.height * 0.42,
@@ -268,9 +271,10 @@ import 'moment_preview_editor.dart';
                     )
                   ]),
                   Visibility(
-                    visible: !isUploading || !momentFeedStore.postingMoment,
+                    visible: !isUploading,
                     child: InkWell(
                       onTap: () async {
+                        // momentFeedStore.startReading();
                         setState(() {
                           isUploading = true;
                         });
@@ -281,47 +285,72 @@ import 'moment_preview_editor.dart';
                           // String vFile = await MediaService()
                           //     .compressMomentVideo(
                           //         filePath: noAudioFile); //removing the braces
-                          String? videoUrl =
-                              await MediaService().videoAudioMerger(
-                            context,
-                            videoPath: widget.videoFile.path,
-                            audioPath: momentCtrl.audioFilePath.value,
-                            time: momentCtrl.endTime.value,
-                          );
+                          print(
+                              ":::::::::::::::::::::::::::n audio find boss:::::: started :::::");
+                          String? videoUrl = await MediaService().urlConverter(
+                              filePath: momentCtrl.mergedVideoPath.value);
+                          if (videoUrl != null) {
+                            var res = await MomentQuery.postMoment(
+                                videoMediaItem: videoUrl);
+                            if (res) {
+                              Snackbars.success(
+                                context,
+                                message: 'Moment successfully created',
+                                milliseconds: 1300,
+                              );
+                              momentFeedStore.fetchMoment();
+                              momentCtrl.clearPostingData();
+                              RouteNavigators.pop(context);
+                            } else {
+                              Snackbars.error(
+                                context,
+                                message: 'Operation Failed, Try again.',
+                                milliseconds: 1400,
+                              );
+                            }
+                          }
+                          // if (fileUrl != null) {
+                          //   momentFeedStore.postMoment(context,
+                          //       videoUrl: fileUrl);
+                          // }
+                          // await MediaService().videoAudioMerger(
+                          //   context,
+                          //   videoPath: widget.videoFile.path,
+                          //   audioPath: momentCtrl.audioFilePath.value,
+                          //   time: momentCtrl.endTime.value,
+                          // );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
+                        } else {
+                          print(
+                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
+                          // String vFile =
+                          //     await MediaService().compressMomentVideo(
+                          //   filePath: widget.videoFile.path,
+                          // );
+                          String? videoUrl = await FileConverter()
+                              .convertMe(filePath: 'vFile');
+                          if (videoUrl != null) {
+                            var res = await MomentQuery.postMoment(
+                                videoMediaItem: videoUrl);
+                            if (res) {
+                              Snackbars.success(
+                                context,
+                                message: 'Moment successfully created',
+                                milliseconds: 1300,
+                              );
+                              momentFeedStore.fetchMoment();
+                              momentCtrl.clearPostingData();
+                              RouteNavigators.pop(context);
+                            } else {
+                              Snackbars.error(
+                                context,
+                                message: 'Operation Failed, Try again.',
+                                milliseconds: 1400,
+                              );
+                            }
+                          }
                         }
-                        // else
-                        // {
-                        //   print(
-                        //       ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-                        //
-                        //   String vFile =
-                        //       await MediaService().compressMomentVideo(
-                        //     filePath: widget.videoFile.path,
-                        //   );
-                        //   String? videoUrl =
-                        //       await FileConverter().convertMe(filePath: vFile);
-                        //   if (videoUrl != null) {
-                        //     var res = await MomentQuery.postMoment(
-                        //         videoMediaItem: videoUrl);
-                        //     if (res) {
-                        //       Snackbars.success(
-                        //         context,
-                        //         message: 'Moment successfully created',
-                        //         milliseconds: 1300,
-                        //       );
-                        //       momentCtrl.clearPostingData();
-                        //       RouteNavigators.pop(context);
-                        //     } else {
-                        //       Snackbars.error(
-                        //         context,
-                        //         message: 'Operation Failed, Try again.',
-                        //         milliseconds: 1400,
-                        //       );
-                        //     }
-                        //   }
-                        // }
                         setState(() {
                           isUploading = false;
                         });
@@ -341,7 +370,7 @@ import 'moment_preview_editor.dart';
                       ),
                     ),
                   ),
-                  if (isUploading || momentFeedStore.postingMoment)
+                  if (isUploading)
                     const SizedBox(
                       height: 20,
                       width: 20,
@@ -358,4 +387,3 @@ import 'moment_preview_editor.dart';
     );
   }
 }
-

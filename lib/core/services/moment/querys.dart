@@ -175,6 +175,42 @@ class MomentQuery {
     return queryResult.data?['createMomentComment']['authId'] != null;
   }
 
+  // ($momentId: String!, $commentId: String!, $content: String!)
+  replyMomentComment(
+      {required String momentId,
+      required String commentId,
+      required String comment}) async {
+    HttpLink link = HttpLink(
+      "https://api.myreach.me/",
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+
+    Map<String, dynamic> commentBody = {
+      'momentId': momentId,
+      'commentId': commentId,
+      'comment': comment,
+    };
+
+    Map<String, dynamic> momentVariables = {'commentBody': commentBody};
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.replyMomentComment,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my reply comment-query::::: $queryResult');
+    return queryResult.data?['createMomentComment']['authId'] != null;
+  }
+
   reachUser({required String reachingId}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
@@ -192,7 +228,7 @@ class MomentQuery {
     QueryResult queryResult = await qlClient.mutate(MutationOptions(
       fetchPolicy: FetchPolicy.networkOnly,
       document: gql(
-        gql_string.likeMoment,
+        gql_string.reachUser,
       ),
       variables: momentVariables,
     ));
