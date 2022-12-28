@@ -65,10 +65,11 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           RouteNavigators.pop(context);
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Profile', onPressed: () {
+                        label: 'Share Profile',
+                        onPressed: () {
                           RouteNavigators.pop(context);
-                    Share.share(
-                        'Hi, this is ${globals.user!.username} reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach ${globals.user!.gender == null ? "this person." : globals.user!.gender == "male" ? "him." : "her."}');
+                          Share.share(
+                              'Hi, this is ${globals.user!.username} reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach ${globals.user!.gender == null ? "this person." : globals.user!.gender == "male" ? "him." : "her."}');
                         }),
                     //KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
@@ -104,7 +105,7 @@ Future showProfileMenuBottomSheet(BuildContext context,
                     KebabBottomTextButton(
                         label: 'Share Profile',
                         onPressed: () {
-                        RouteNavigators.pop(context);
+                          RouteNavigators.pop(context);
                           Share.share(
                               'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                         }),
@@ -261,8 +262,9 @@ Future showReacherCardBottomSheet(BuildContext context,
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is UserLoading) {
-                // globals.showLoader(context);
+              if (state is UserLoaded) {
+                Snackbars.success(context, message: "Reached user successfully" );
+                RouteNavigators.pop(context);
               }
               if (state is UserError) {
                 RouteNavigators.pop(context);
@@ -519,14 +521,16 @@ Future showUserStoryBottomSheet(BuildContext context,
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(ReachUserEvent(
-                                    userIdToReach: status.statusOwnerProfile!.authId));
+                                    userIdToReach:
+                                        status.statusOwnerProfile!.authId));
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
                               onPressed: () {
                                 globals.showLoader(context);
-                                globals.userBloc!.add(
-                                    StarUserEvent(userIdToStar: status.statusOwnerProfile!.authId));
+                                globals.userBloc!.add(StarUserEvent(
+                                    userIdToStar:
+                                        status.statusOwnerProfile!.authId));
                               }),
                           // KebabBottomTextButton(
                           //     label: 'Copy link',

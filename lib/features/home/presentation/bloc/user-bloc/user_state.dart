@@ -148,3 +148,13 @@ class GetBlockedListSuccess extends UserState {
   GetBlockedListSuccess({this.blockedList});
   final List<Block>? blockedList;
 }
+
+class JoinLiveStreamSuccess extends UserState {
+  JoinLiveStreamSuccess({this.joinLiveStream});
+  final bool? joinLiveStream;
+}
+
+class InitiateLiveStreamingSuccess extends UserState {
+  InitiateLiveStreamingSuccess({this.live});
+  final StreamResponse? live;
+}

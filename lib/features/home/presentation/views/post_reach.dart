@@ -544,38 +544,7 @@ class _PostReachState extends State<PostReach> {
                             ..removeAt(index);
                         },
                       ).paddingSymmetric(h: 16)
-                    // Center(
-                    // child: ListView.builder(
-                    //     itemCount: _mediaList.value.length,
-                    //     shrinkWrap: false,
-                    //     controller: _controller,
-                    //     scrollDirection: Axis.horizontal,
-                    //     physics: const BouncingScrollPhysics(),
-                    //     itemBuilder: (context, index) {
-                    //       if (_mediaList.value.isEmpty) {
-                    //         return const SizedBox.shrink();
-                    //       }
-                    //       UploadFileDto mediaDto =
-                    //           _mediaList.value[index];
-                    //       if (FileUtils.isImage(mediaDto.file) ||
-                    //           FileUtils.isVideo(mediaDto.file)) {
-                    //         return PostReachMedia(
-                    //             fileResult: mediaDto.fileResult!,
-                    //             onClose: () {
-                    //               if (FileUtils.isImage(mediaDto.file)) {
-                    //                 nImages.value = nImages.value - 1;
-                    //               } else {
-                    //                 nVideos.value = nVideos.value - 1;
-                    //               }
-                    //               _mediaList.value = [..._mediaList.value]
-                    //                 ..removeAt(index);
-                    //               setState(() {});
-                    //             });
-                    //       } else {
-                    //         return const SizedBox.shrink();
-                    //       }
-                    //     }),
-                    // ).paddingSymmetric(h: 16)
+                 
                     else
                       const SizedBox.shrink(),
                     if (_mediaList.value
@@ -861,6 +830,7 @@ class _PostReachState extends State<PostReach> {
                                   });
                             },
                             icon: const Icon(Icons.flag)),
+                       
                         IconButton(
                           onPressed: () async {
                             final res = await showMediaUploadOption(
@@ -911,6 +881,7 @@ class _PostReachState extends State<PostReach> {
                             }
                             setState(() {});
                           },
+                      
                           splashColor: Colors.transparent,
                           splashRadius: 20,
                           padding: EdgeInsets.zero,
@@ -969,6 +940,7 @@ class _PostReachState extends State<PostReach> {
                           ],
                           child: SvgPicture.asset('assets/svgs/mic.svg'),
                         ),
+                    
                       ],
                     ),
                   ],
