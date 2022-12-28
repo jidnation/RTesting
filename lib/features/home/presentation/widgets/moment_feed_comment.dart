@@ -29,8 +29,9 @@ class _MomentFeedCommentState extends State<MomentFeedComment> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        momentFeedStore.videoCtrl(false);
         Get.to(
-          () => MomentCommentStation2(momentFeed: widget.momentFeed),
+          () => MomentCommentStation2(momentFeedId: widget.momentFeed.id),
           transition: Transition.downToUp,
         );
         // Get.bottomSheet(
