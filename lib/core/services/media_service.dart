@@ -9,6 +9,8 @@ import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
+
+
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
@@ -236,7 +238,7 @@ class MediaService {
   //   //   filePath,
   //   //   quality: VideoQuality.DefaultQuality,
   //   // );
-  //
+
   //   // print('size1:::::::::::::::${res!.filesize! / 1024}');
   //   return response.destinationPath;
   // }
