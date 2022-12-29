@@ -17,6 +17,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -40,6 +41,7 @@ class _SearchScreenState extends State<SearchScreen>
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
+    final _userList = useState<List<ProfileIndexModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -99,6 +101,7 @@ class _SearchScreenState extends State<SearchScreen>
                 listener: (context, state) {
                   if (state is SearchProfileSuccess) {
                     globals.userList = state.users!;
+                    _userList.value = state.users!;
                   } else if (state is SearchProfileError) {
                     Snackbars.error(context, message: state.error);
                   }
@@ -107,14 +110,14 @@ class _SearchScreenState extends State<SearchScreen>
                   if (state is UserLoading) {
                     return const Center(child: CupertinoActivityIndicator());
                   }
-                  if (globals.userList!.isEmpty) {
+                  if (_userList.value.isEmpty) {
                     return SearchNoResultFound(size: size)
                         .paddingSymmetric(h: 16);
                   }
                   return ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: globals.userList!.length,
+                    itemCount: _userList.value.length,
                     itemBuilder: (context, index) {
                       return SearchResultCard(
                         displayName: (globals.userList![index].firstName! +
@@ -122,9 +125,9 @@ class _SearchScreenState extends State<SearchScreen>
                                 globals.userList![index].lastName!)
                             .toTitleCase(),
                         //: globals.userList![index].,
-                        username: globals.userList![index].username,
-                        imageUrl: globals.userList![index].profilePicture,
-                        id: globals.userList![index].authId,
+                        username: _userList.value[index].username,
+                        imageUrl: _userList.value[index].profilePicture,
+                        id: _userList.value[index].authId,
                       );
                     },
                   );
