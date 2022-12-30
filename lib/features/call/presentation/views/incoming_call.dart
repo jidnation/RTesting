@@ -13,26 +13,33 @@ import '../../../../core/utils/dimensions.dart';
 import '../../../account/presentation/widgets/image_placeholder.dart';
 
 class IncomingCall extends StatelessWidget {
-  const IncomingCall(
-      {super.key,
-      required this.channelName,
-      required this.user,
-      required this.token,
-      required this.callType});
+  IncomingCall({
+    super.key,
+    required this.channelName,
+    required this.user,
+    required this.token,
+    required this.callType,
+  });
 
   final String token, channelName, user, callType;
+
+  bool isRinging = true;
 
   stopRingtone() async {
     FlutterRingtonePlayer.playRingtone();
     await Future.delayed(const Duration(seconds: 30));
     FlutterRingtonePlayer.stop();
     OneSignal.shared.clearOneSignalNotifications();
-    Get.back();
+    if (isRinging) {
+      globals.callBloc!.add(RejectPrivateCall(channelName: channelName));
+      Get.back();
+    }
   }
 
   acceptCall() {
+    isRinging = false;
     globals.callBloc!.add(AnswerPrivateCall(channelName: channelName));
-    Get.to(
+    Get.off(
       () => callType == 'audio'
           ? ReceiveAudioCall(channelName: channelName, token: token, user: user)
           : ReceiveVideoCall(channelName: channelName, token: token),
@@ -40,6 +47,7 @@ class IncomingCall extends StatelessWidget {
   }
 
   rejectCall() {
+    isRinging = false;
     globals.callBloc!.add(RejectPrivateCall(channelName: channelName));
     Get.back();
   }

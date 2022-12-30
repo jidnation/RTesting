@@ -32,7 +32,7 @@ class CallRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('call result', result.data['initiatePrivateCall']);
+      Console.log('call result', result.data);
       return InitiateCallResponse.fromJson(result.data['initiatePrivateCall']);
     } catch (e) {
       rethrow;
@@ -49,26 +49,4 @@ class CallRemoteDataSource {
 
   Future<dynamic> updatePrivateCall() async {}
 
-  // Future<dynamic> testNotifications() async {
-  //   String q = '''
-  //         mutation {
-  //           testNotification(
-  //             payload:{
-  //               title: "title"
-  //               message: "message"
-  //             }
-  //           )
-  //         }
-  //     ''';
-  //   try {
-  //     final result = await _client.mutate(gql(q), variables: {});
-  //     if (result is GraphQLError) {
-  //       Console.log('error message', result);
-  //       throw GraphQLError(message: result.message);
-  //     }
-  //     Console.log('notification response', result.data);
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
 }

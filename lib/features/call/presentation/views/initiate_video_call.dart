@@ -1,7 +1,10 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/route_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -25,6 +28,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool muteMic = false;
+  String? channelName;
   late RtcEngine _engine;
 
   @override
@@ -41,13 +45,34 @@ class _CallScreenState extends State<InitiateVideoCall> {
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
       const RtcEngineContext(
-        appId: appId,
+        appId: '5741afe670ba4684aec914fb19eeb82a',
         channelProfile: ChannelProfileType.channelProfileCommunication,
       ),
     );
     _engine.registerEventHandler(
       RtcEngineEventHandler(
+        onConnectionStateChanged: (connection, state, reason) {
+          Console.log('reachme calllog connection ', connection);
+          Console.log('reachme calllog state', state);
+          Console.log('reachme calllog reason', reason);
+          showCallAlerts(reason);
+        },
+        onPermissionError: (permissionType) {
+          Console.log('reachme calllog permission error', permissionType);
+        },
+        onApiCallExecuted: (err, api, result) {
+          Console.log('reachme calllog api err', err);
+          Console.log('reachme calllog apicall', api);
+          Console.log('reachme calllog apiresult', result);
+        },
+        onError: (err, msg) {
+          Console.log('reachme calllog error message', msg);
+          Console.log('reachme calllog error', err);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(msg)));
+        },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+          Console.log('reachme calllog channel join', 'join channel success');
           debugPrint("local user ${connection.localUid} joined");
           setState(() {
             _localUserJoined = true;
@@ -87,6 +112,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
   }
 
   join(String token, String channel) async {
+    channelName = channel;
     Console.log('call joined status', 'joining');
     await _engine.joinChannel(
       token: token,
@@ -138,11 +164,26 @@ class _CallScreenState extends State<InitiateVideoCall> {
                 height: size.height,
                 child: Center(
                   child: _localUserJoined
-                      ? AgoraVideoView(
-                          controller: VideoViewController(
-                            rtcEngine: _engine,
-                            canvas: const VideoCanvas(uid: 0),
-                          ),
+                      ? Stack(
+                          children: [
+                            SizedBox(
+                              width: size.width,
+                              height: size.height,
+                              child: _remoteVideo(channelName!),
+                            ),
+                            Positioned(
+                              bottom: 110,
+                              right: 20,
+                              child: SizedBox(
+                                width: size.width * 0.4,
+                                height: size.height * 0.3,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: _localPreview(_localUserJoined, 0),
+                                ),
+                              ),
+                            ),
+                          ],
                         )
                       : Image.asset(
                           'assets/images/incoming_call.png',
@@ -239,6 +280,26 @@ class _CallScreenState extends State<InitiateVideoCall> {
     );
   }
 
+  Widget _remoteVideo(String channel) {
+    if (_remoteUid != null) {
+      return AgoraVideoView(
+        controller: VideoViewController.remote(
+          rtcEngine: _engine,
+          canvas: VideoCanvas(uid: _remoteUid),
+          connection: RtcConnection(channelId: channel),
+        ),
+      );
+    } else {
+      String msg = '';
+      if (_localUserJoined) msg = 'Waiting for a remote user to join';
+      return Image.asset(
+        'assets/images/voice-call.png',
+        width: double.infinity,
+        height: double.infinity,
+      ).blurred();
+    }
+  }
+
   Widget _localPreview(bool _isJoined, int uid) {
     if (_isJoined) {
       return AgoraVideoView(
@@ -254,24 +315,24 @@ class _CallScreenState extends State<InitiateVideoCall> {
       );
     }
   }
+}
 
-// Display remote user's video
-  Widget _remoteVideo() {
-    if (_remoteUid != null) {
-      return AgoraVideoView(
-        controller: VideoViewController.remote(
-          rtcEngine: _engine,
-          canvas: VideoCanvas(uid: _remoteUid),
-          connection: const RtcConnection(channelId: 'channelName'),
-        ),
-      );
-    } else {
-      String msg = '';
-      if (_localUserJoined) msg = 'Waiting for a remote user to join';
-      return Text(
-        msg,
-        textAlign: TextAlign.center,
-      );
-    }
+showCallAlerts(ConnectionChangedReasonType reasonType) {
+  switch (reasonType) {
+    case ConnectionChangedReasonType.connectionChangedConnecting:
+      Fluttertoast.showToast(msg: 'connecting');
+      break;
+    case ConnectionChangedReasonType.connectionChangedJoinSuccess:
+      Fluttertoast.showToast(msg: 'call joined');
+      break;
+    case ConnectionChangedReasonType.connectionChangedLost:
+      Fluttertoast.showToast(msg: 'connection lost');
+     
+      break;
+    case ConnectionChangedReasonType.connectionChangedLeaveChannel:
+      Fluttertoast.showToast(msg: 'call ended');
+      break;
+    default:
+      break;
   }
 }
