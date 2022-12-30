@@ -12,6 +12,8 @@ class NotifcationService {
       switch (event.notification.additionalData!['type']) {
         case 'call.initiated':
           handleCallNotification(event);
+          break; case 'stream.initiated':
+          handleStreamNotification(event);
           break;
         default:
       }
@@ -36,4 +38,9 @@ handleCallNotification(OSNotificationReceivedEvent event) {
         channelName: event.notification.additionalData!['body']['channelName'],
         callType: event.notification.additionalData!['body']['callMode'],
       ));
+}
+
+
+handleStreamNotification(OSNotificationReceivedEvent event){
+  
 }
