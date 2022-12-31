@@ -12,9 +12,7 @@ class NotifcationService {
       switch (event.notification.additionalData!['type']) {
         case 'call.initiated':
           handleCallNotification(event);
-          break; case 'stream.initiated':
-          handleStreamNotification(event);
-          break;
+          break; 
         default:
       }
       event.complete(event.notification);
@@ -40,7 +38,3 @@ handleCallNotification(OSNotificationReceivedEvent event) {
       ));
 }
 
-
-handleStreamNotification(OSNotificationReceivedEvent event){
-  
-}
