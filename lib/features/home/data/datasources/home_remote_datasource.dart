@@ -743,7 +743,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<CommentModel> commentOnPost({
+Future<CommentModel> commentOnPost({
     required String postId,
     String? content,
     required String userId,
@@ -754,7 +754,7 @@ class HomeRemoteDataSource {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
-          $content: String!
+          $content: String
           $postOwnerId: String!
           $imageMediaItems:[String]
           $audioMediaItem:String
@@ -786,9 +786,7 @@ class HomeRemoteDataSource {
       if (imageMediaItems != null) {
         variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
       }
-
       final result = await _client.mutate(gql(q), variables: variables);
-
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -797,7 +795,6 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
-
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
         mutation deletePostComment($commentId: String!) {
