@@ -109,15 +109,14 @@ class SavePostSchema {
 
 class CommentSchema {
   CommentSchema._();
-
   static String get schema {
     return r'''
-            commentId 
+            commentId
             authId
             commentSlug
             content
             created_at
-            nComments
+            nReplies
             nLikes
             postId
             imageMediaItems
