@@ -230,6 +230,7 @@ class ViewUserStatus extends HookWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
+    final indicatorController = useState(IndicatorAnimationCommand());
     return Scaffold(
       body: BlocConsumer<ChatBloc, ChatState>(
           bloc: globals.chatBloc,
@@ -243,9 +244,17 @@ class ViewUserStatus extends HookWidget {
           },
           builder: (context, state) {
             return StoryPageView(
-              indicatorDuration: const Duration(seconds: 7),
+              indicatorAnimationController: indicatorController,
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = status[storyIndex];
+
+                if (story.status?.statusData?.videoMedia != null) {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 30));
+                } else {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 5));
+                }
 
                 if (story.status!.statusData!.imageMedia != null ||
                     (story.status!.statusData!.imageMedia ?? '').isNotEmpty) {
@@ -318,7 +327,8 @@ class ViewUserStatus extends HookWidget {
                     ),
                     //check typename from model and display widgets accordingly
 
-                    if (story.status!.statusData!.background!.contains('0x'))
+                    if ((story.status?.statusData?.background ?? '')
+                        .contains('0x'))
                       Positioned.fill(
                         child: Container(
                           height: size.height,
@@ -340,26 +350,40 @@ class ViewUserStatus extends HookWidget {
                       )
                     else
                       Positioned.fill(
-                        child: Container(
-                          height: size.height,
-                          width: size.width,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  story.status!.statusData!.background!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              story.status!.statusData!.caption!,
-                              textAlign: Helper.getAlignment(story
-                                  .status!.statusData!.alignment!)['align'],
-                              style: Helper.getFont(
-                                  story.status!.statusData!.font!),
-                            ),
-                          ),
-                        ),
+                        child: story.status?.type == 'video'
+                            ? Container(
+                                height: size.height,
+                                width: size.width,
+                                color: AppColors.black,
+                                child: VideoPreview(
+                                  isLocalVideo: false,
+                                  loop: true,
+                                  showControls: false,
+                                  path: story.status!.statusData!.videoMedia!,
+                                ),
+                              )
+                            : Container(
+                                height: size.height,
+                                width: size.width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        story.status?.statusData?.background ??
+                                            ''),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    story.status!.statusData!.caption!,
+                                    textAlign: Helper.getAlignment(
+                                        story.status?.statusData?.alignment ??
+                                            '')['align'],
+                                    style: Helper.getFont(
+                                        story.status?.statusData?.font ?? ''),
+                                  ),
+                                ),
+                              ),
                       ),
                     Padding(
                       padding: const EdgeInsets.only(top: 44, left: 8),
