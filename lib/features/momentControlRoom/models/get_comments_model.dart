@@ -33,7 +33,7 @@ class GetMomentComment {
     this.videoMediaItem,
     this.audioMediaItem,
     this.nLikes,
-    this.nComments,
+    this.nReplies,
     this.isLiked,
     this.commentOwnerProfile,
     this.postOwnerProfile,
@@ -48,7 +48,7 @@ class GetMomentComment {
   final String? videoMediaItem;
   final String? audioMediaItem;
   int? nLikes;
-  int? nComments;
+  int? nReplies;
   String? isLiked;
   final CommentOwnerProfile? commentOwnerProfile;
   final String? postOwnerProfile;
@@ -66,7 +66,7 @@ class GetMomentComment {
         videoMediaItem: json["videoMediaItem"] ?? "",
         audioMediaItem: json["audioMediaItem"] ?? "",
         nLikes: json["nLikes"] ?? 0,
-        nComments: json["nComments"] ?? 0,
+        nReplies: json["nReplies"] ?? 0,
         isLiked: json["isLiked"],
         commentOwnerProfile: json["commentOwnerProfile"] == null
             ? null

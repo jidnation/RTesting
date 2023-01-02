@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/momentControlRoom/models/get_comments_model.dart';
 
@@ -13,8 +14,6 @@ import '../../../../core/utils/helpers.dart';
 import '../../../momentControlRoom/control_room.dart';
 import '../views/moment_feed.dart';
 import 'moment_audio_player.dart';
-
-FocusNode replyCommentFocus = FocusNode();
 
 class MomentCommentBox extends HookWidget {
   final MomentModel momentFeed;
@@ -174,7 +173,7 @@ class MomentCommentBox extends HookWidget {
                           const SizedBox(width: 3),
                           CustomText(
                             text: momentFeedStore.getCountValue(
-                              value: commentInfo.getMomentComment.nComments!,
+                              value: commentInfo.getMomentComment.nReplies!,
                             ),
                             size: 15,
                             isCenter: true,
@@ -219,7 +218,6 @@ class MomentCommentBox extends HookWidget {
 
   void replyMomentComment(
       BuildContext context, TextEditingController userCommentTextCtrl) {
-    FocusScope.of(context).autofocus(replyCommentFocus);
     CustomDialog.openDialogBox(
         height: 200,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -243,7 +241,6 @@ class MomentCommentBox extends HookWidget {
                 ),
                 child: TextFormField(
                   controller: userCommentTextCtrl,
-                  focusNode: replyCommentFocus,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                   ),
@@ -253,14 +250,15 @@ class MomentCommentBox extends HookWidget {
             const SizedBox(width: 10),
             InkWell(
                 onTap: () async {
-                  FocusScope.of(context).unfocus();
                   if (userCommentTextCtrl.text.isNotEmpty) {
+                    FocusScope.of(context).unfocus();
                     bool isDone = await momentFeedStore.replyCommentOnMoment(
                         context,
                         id: momentFeed.id,
                         commentId: commentInfo.getMomentComment.commentId!,
                         userInput: userCommentTextCtrl.text);
                     isDone ? userCommentTextCtrl.clear() : null;
+                    Get.back();
                   } else {
                     Snackbars.error(
                       context,

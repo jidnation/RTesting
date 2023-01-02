@@ -77,7 +77,7 @@ mutation($momentId: String!, $caption: String!, $sound: String, $hashTags: [Stri
 
 const replyMomentComment = r'''
 mutation($momentId: String!, $commentId: String!, $content: String!) {
-    replyMomentComment(momentId: $momentId, content: $content, content: $commentId){
+    replyMomentComment(replyInput: {momentId: $momentId, content: $content, commentId: $commentId}){
     authId
     }
   }
@@ -238,7 +238,7 @@ query ($momentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
     videoMediaItem,
     audioMediaItem,
     nLikes,
-    nComments,
+    nReplies,
     isLiked,
     commentOwnerProfile{
       username,
@@ -304,7 +304,8 @@ query ($commentId: String!) {
     videoMediaItem,
     audioMediaItem,
     nLikes,
-    nComments,
+    authId,
+    nReplies,
     isLiked,
     commentOwnerProfile{
       username,
