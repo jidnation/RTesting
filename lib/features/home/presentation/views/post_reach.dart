@@ -101,7 +101,7 @@ class _PostReachState extends State<PostReach> {
     final _isLoading = useState<bool>(true);
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
-    final _mentionList = useState<List<String>>([]);
+    final _mentionList = useState<List<String>?>([]);
     useMemoized(() {
       globals.dictionaryBloc!
           .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
@@ -179,18 +179,9 @@ class _PostReachState extends State<PostReach> {
                                     UploadPostMediaEvent(
                                         media: _mediaList.value));
 
-                                for (int i = 0;
-                                    i <
-                                        controllerKey.currentState!.controller!
-                                            .text.length;
-                                    i++) {
-                                  if (controllerKey
-                                      .currentState!.controller!.text
-                                      .contains("@")) {}
-                                }
                                 setState(() {
-                                  _mentionList.value.add(controllerKey
-                                      .currentState!.controller!.text);
+                                  _mentionList.value = controllerKey
+                                      .currentState!.controller!.text.mentions;
                                 });
                                 globals.postContent = controllerKey
                                     .currentState!.controller!.text;
@@ -207,8 +198,10 @@ class _PostReachState extends State<PostReach> {
                                 setState(() {});
                               } else {
                                 setState(() {
-                                  _mentionList.value.add(controllerKey
-                                      .currentState!.controller!.text);
+                                  _mentionList.value = controllerKey
+                                      .currentState!.controller!.text.mentions;
+
+                                  
                                 });
                                 debugPrint(
                                     "Mentions Value List: ${_mentionList.value}");
@@ -332,7 +325,6 @@ class _PostReachState extends State<PostReach> {
                           _isLoading.value = false;
                         }
                       },
-                   
                       child: BlocConsumer<DictionaryBloc, DictionaryState>(
                         bloc: globals.dictionaryBloc,
                         listener: (context, state) {
@@ -356,8 +348,7 @@ class _PostReachState extends State<PostReach> {
                           }
                         },
                         builder: (context, state) {
-                          return
-                           FlutterMentions(
+                          return FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
@@ -532,10 +523,8 @@ class _PostReachState extends State<PostReach> {
                             //   ),
                             // ).paddingSymmetric(h: 16),
                           );
-                       
                         },
                       ),
-                  
                     ),
                     const SizedBox(height: 10),
                     if (_mediaList.value.isNotEmpty)
@@ -555,38 +544,7 @@ class _PostReachState extends State<PostReach> {
                             ..removeAt(index);
                         },
                       ).paddingSymmetric(h: 16)
-                    // Center(
-                    // child: ListView.builder(
-                    //     itemCount: _mediaList.value.length,
-                    //     shrinkWrap: false,
-                    //     controller: _controller,
-                    //     scrollDirection: Axis.horizontal,
-                    //     physics: const BouncingScrollPhysics(),
-                    //     itemBuilder: (context, index) {
-                    //       if (_mediaList.value.isEmpty) {
-                    //         return const SizedBox.shrink();
-                    //       }
-                    //       UploadFileDto mediaDto =
-                    //           _mediaList.value[index];
-                    //       if (FileUtils.isImage(mediaDto.file) ||
-                    //           FileUtils.isVideo(mediaDto.file)) {
-                    //         return PostReachMedia(
-                    //             fileResult: mediaDto.fileResult!,
-                    //             onClose: () {
-                    //               if (FileUtils.isImage(mediaDto.file)) {
-                    //                 nImages.value = nImages.value - 1;
-                    //               } else {
-                    //                 nVideos.value = nVideos.value - 1;
-                    //               }
-                    //               _mediaList.value = [..._mediaList.value]
-                    //                 ..removeAt(index);
-                    //               setState(() {});
-                    //             });
-                    //       } else {
-                    //         return const SizedBox.shrink();
-                    //       }
-                    //     }),
-                    // ).paddingSymmetric(h: 16)
+                 
                     else
                       const SizedBox.shrink(),
                     if (_mediaList.value
@@ -872,6 +830,7 @@ class _PostReachState extends State<PostReach> {
                                   });
                             },
                             icon: const Icon(Icons.flag)),
+                       
                         IconButton(
                           onPressed: () async {
                             final res = await showMediaUploadOption(
@@ -922,6 +881,7 @@ class _PostReachState extends State<PostReach> {
                             }
                             setState(() {});
                           },
+                      
                           splashColor: Colors.transparent,
                           splashRadius: 20,
                           padding: EdgeInsets.zero,
@@ -980,12 +940,13 @@ class _PostReachState extends State<PostReach> {
                           ],
                           child: SvgPicture.asset('assets/svgs/mic.svg'),
                         ),
+                    
                       ],
                     ),
                   ],
                 ),
               ),
-            
+
               ValueListenableBuilder(
                   valueListenable: _recordingService.recording,
                   builder: (BuildContext context, bool value, Widget? child) {

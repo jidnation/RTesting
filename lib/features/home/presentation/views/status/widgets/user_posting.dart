@@ -38,6 +38,7 @@ class UserPosting extends StatefulHookWidget {
 
 final MomentController momentCtrl = Get.find();
 CarouselController sliderController = CarouselController();
+
 final CountDownController timeController = CountDownController();
 final MomentVideoControl momentVideoControl = MomentVideoControl();
 int index = 0;
@@ -92,6 +93,9 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     onNewCameraSelected(widget.phoneCameras[0]);
+    setState(() {
+      index = widget.initialIndex;
+    });
   }
 
   @override

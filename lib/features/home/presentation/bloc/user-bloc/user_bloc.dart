@@ -8,6 +8,7 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -468,6 +469,39 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           (blockedList) =>
               emit(GetBlockedListSuccess(blockedList: blockedList)),
         );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+
+    on<InitiateLiveStreamEvent>((event, emit) async{
+      emit(UserLoading());
+      try {
+        final response = await userRepository.initiateLiveStream(startedAt: event.startedAt);
+        response.fold(
+              (error) => emit(UserError(error: error)),
+              (live) {
+            globals.streamLive = live;
+            print("the ${live.channelName}");
+            print("the ${live.token}");
+            emit(InitiateLiveStreamingSuccess(live: live));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
+
+    on<JoinStreamEvent>((event, emit) async {
+      emit(UserLoading());
+
+      try {
+        final response =
+        await userRepository.joinStream(channelName: event.channelName);
+        response.fold(
+                (error) => emit(UserError(error: error)),
+                (joinLiveStream) =>
+                emit(JoinLiveStreamSuccess(joinLiveStream: joinLiveStream)));
       } on GraphQLError catch (e) {
         emit(UserError(error: e.message));
       }

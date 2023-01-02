@@ -333,7 +333,8 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
                     waveCap: StrokeCap.round,
                   ),
                 )
-              : SizedBox(
+              :
+          SizedBox(
                   width: MediaQuery.of(context).size.width / 2.0,
                   child: const LinearProgressIndicator(
                     valueColor:
@@ -353,7 +354,7 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
           SizedBox(
             width: getScreenWidth(12),
           ),
-        ],
+        ]
       ),
     );
   }

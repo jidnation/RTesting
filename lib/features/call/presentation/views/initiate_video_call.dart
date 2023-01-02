@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/route_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
+import '../../../../core/utils/dimensions.dart';
+import '../../../account/presentation/widgets/image_placeholder.dart';
 import '../bloc/call_bloc.dart';
 
 const appId = "5741afe670ba4684aec914fb19eeb82a";
@@ -38,10 +39,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
   }
 
   Future<void> initAgora() async {
-    // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
     Console.log('PERMISSIONS', 'permissions request');
-    //create the engine
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
       const RtcEngineContext(
@@ -185,11 +184,47 @@ class _CallScreenState extends State<InitiateVideoCall> {
                             ),
                           ],
                         )
-                      : Image.asset(
-                          'assets/images/incoming_call.png',
-                          fit: BoxFit.fill,
-                          height: size.height,
-                          width: size.width,
+                      : Stack(
+                          children: [
+                            Image.asset(
+                              'assets/images/incoming_call.png',
+                              fit: BoxFit.fill,
+                              height: size.height,
+                              width: size.width,
+                            ),
+                            Positioned(
+                              top: 100,
+                              left: 1,
+                              right: 1,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  ImagePlaceholder(
+                                    width: getScreenWidth(100),
+                                    height: getScreenHeight(100),
+                                  ),
+                                  Text(
+                                    widget.recipient!.firstName!,
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Calling',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                 ),
               ),
@@ -290,13 +325,27 @@ class _CallScreenState extends State<InitiateVideoCall> {
         ),
       );
     } else {
-      String msg = '';
-      if (_localUserJoined) msg = 'Waiting for a remote user to join';
-      return Image.asset(
-        'assets/images/voice-call.png',
-        width: double.infinity,
-        height: double.infinity,
-      ).blurred();
+      return Stack(
+        children: [
+          Image.asset(
+            'assets/images/incoming_call.png',
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.fill,
+          ).blurred(),
+           Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Text('waiting for recipient'),
+                SizedBox(height: 10,),
+                CircularProgressIndicator(color: Colors.white,)
+              ],
+            ),
+          )
+        ],
+      );
     }
   }
 
@@ -327,7 +376,6 @@ showCallAlerts(ConnectionChangedReasonType reasonType) {
       break;
     case ConnectionChangedReasonType.connectionChangedLost:
       Fluttertoast.showToast(msg: 'connection lost');
-     
       break;
     case ConnectionChangedReasonType.connectionChangedLeaveChannel:
       Fluttertoast.showToast(msg: 'call ended');

@@ -220,9 +220,11 @@ class ViewMyStatus extends HookWidget {
 }
 
 class ViewUserStatus extends HookWidget {
-  const ViewUserStatus({Key? key, required this.status}) : super(key: key);
+  const ViewUserStatus({Key? key, required this.status, this.isMuted})
+      : super(key: key);
   //final List<StatusFeedResponseModel> status;
   final List<StatusFeedModel> status;
+  final bool? isMuted;
 
   @override
   Widget build(BuildContext context) {
@@ -511,9 +513,15 @@ class ViewUserStatus extends HookWidget {
                             padding: EdgeInsets.zero,
                             color: Colors.white,
                             icon: const Icon(Icons.more_horiz_rounded),
-                            onPressed: () {
-                              showUserStoryBottomSheet(context,
+                            onPressed: () async {
+                              final res = await showUserStoryBottomSheet(
+                                  context,
+                                  isMuted: isMuted,
                                   status: status[storyIndex]);
+                              if (res == null) return;
+                              if (res is MuteResult) {
+                                Navigator.pop(context, res);
+                              }
                             },
                           ),
                         ),
@@ -587,4 +595,10 @@ class ViewUserStatus extends HookWidget {
           }),
     );
   }
+}
+
+class MuteResult {
+  final bool isMute;
+  final String userId;
+  MuteResult({required this.isMute, required this.userId});
 }

@@ -18,8 +18,9 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
+import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:share_plus/share_plus.dart';
 
 Future showProfileMenuBottomSheet(BuildContext context,
@@ -64,7 +65,12 @@ Future showProfileMenuBottomSheet(BuildContext context,
                           RouteNavigators.pop(context);
                         }),
                     KebabBottomTextButton(
-                        label: 'Share Profile', onPressed: () {}),
+                        label: 'Share Profile',
+                        onPressed: () {
+                          RouteNavigators.pop(context);
+                          Share.share(
+                              'Hi, this is ${globals.user!.username} reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach ${globals.user!.gender == null ? "this person." : globals.user!.gender == "male" ? "him." : "her."}');
+                        }),
                     //KebabBottomTextButton(label: 'More', onPressed: () {}),
                   ],
                 )
@@ -101,7 +107,7 @@ Future showProfileMenuBottomSheet(BuildContext context,
                         onPressed: () {
                           RouteNavigators.pop(context);
                           Share.share(
-                              'Hi\nThis is my ReachMe Profile: https://${globals.user!.profileSlug}');
+                              'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                         }),
                     KebabBottomTextButton(
                         label: 'Delete Account',
@@ -179,7 +185,7 @@ Future showEditProfileBottomSheet(BuildContext context) {
                   onPressed: () {
                     RouteNavigators.pop(context);
                     Share.share(
-                        'Hi, this is my reach ID: https://${globals.user!.profileSlug}\n Open with Reachme to reach me');
+                        'Hi, this is my reach ID: https://${globals.user!.profileSlug}\nOpen with Reachme to reach me.');
                   }),
               //KebabBottomTextButton(label: 'More', onPressed: () {}),
               const SizedBox(height: 20),
@@ -256,8 +262,9 @@ Future showReacherCardBottomSheet(BuildContext context,
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
             listener: (context, state) {
-              if (state is UserLoading) {
-                // globals.showLoader(context);
+              if (state is UserLoaded) {
+                Snackbars.success(context, message: "Reached user successfully" );
+                RouteNavigators.pop(context);
               }
               if (state is UserError) {
                 RouteNavigators.pop(context);
@@ -304,7 +311,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 RouteNavigators.route(context,
-                                    CommentReach(postFeedModel: postFeedModel));
+                                    RepostReach(postFeedModel: postFeedModel));
                               }),
                           KebabBottomTextButton(
                               label: 'Save post',
@@ -315,12 +322,12 @@ Future showReacherCardBottomSheet(BuildContext context,
                           KebabBottomTextButton(
                               label: 'Download Reach Card',
                               onPressed: downloadPost),
-                          KebabBottomTextButton(
-                            label: 'Report',
-                            onPressed: () {
-                              RouteNavigators.pop(context);
-                            },
-                          ),
+                          // KebabBottomTextButton(
+                          //   label: 'Report',
+                          //   onPressed: () {
+                          //     RouteNavigators.pop(context);
+                          //   },
+                          // ),
                           KebabBottomTextButton(
                             label: 'Reach user',
                             onPressed: () {
@@ -458,14 +465,54 @@ Future showStoryBottomSheet(BuildContext context,
 }
 
 Future showUserStoryBottomSheet(BuildContext context,
-    {required StatusFeedModel status}) async {
+    {required StatusFeedModel status, bool? isMuted}) async {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
     builder: (context) {
       return BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is MuteStatusError) {
+            RouteNavigators.pop(context);
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+          if (state is UnmuteStatusError) {
+            RouteNavigators.pop(context);
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+          if (state is ReportStatusError) {
+            RouteNavigators.pop(context);
+            RouteNavigators.pop(context);
+            Snackbars.error(context, message: state.error);
+          }
+          if (state is MuteStatusSuccess) {
+            RouteNavigators.pop(context);
+            Navigator.pop(
+                context,
+                MuteResult(
+                    isMute: true,
+                    userId: status.statusOwnerProfile!.authId ?? ''));
+            Snackbars.success(context, message: 'Status muted successfully!');
+          }
+          if (state is UnmuteStatusSuccess) {
+            RouteNavigators.pop(context);
+            Navigator.pop(
+                context,
+                MuteResult(
+                    isMute: false,
+                    userId: status.statusOwnerProfile!.authId ?? ''));
+            Snackbars.success(context, message: 'Status unmuted successfully!');
+          }
+          if (state is ReportStatusSuccess) {
+            RouteNavigators.pop(context);
+            RouteNavigators.pop(context);
+            Snackbars.success(context,
+                message: 'Status reported successfully!');
+          }
+        },
         builder: (context, state) {
           return BlocConsumer<UserBloc, UserState>(
               bloc: globals.userBloc,
@@ -506,7 +553,15 @@ Future showUserStoryBottomSheet(BuildContext context,
                         children: [
                           KebabBottomTextButton(
                             label: 'Report',
-                            onPressed: () {},
+                            onPressed: () async {
+                              final res =
+                                  await showReportReasonBottomSheet(context);
+                              if (res == null) return;
+                              globals.showLoader(context);
+                              globals.socialServiceBloc!.add(ReportStatusEvent(
+                                  reportReason: res as String,
+                                  statusId: status.status?.statusId ?? ''));
+                            },
                             color: const Color(0xFFE50101),
                           ),
                           KebabBottomTextButton(
@@ -514,14 +569,16 @@ Future showUserStoryBottomSheet(BuildContext context,
                               onPressed: () {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(ReachUserEvent(
-                                    userIdToReach: status.statusOwnerProfile!.authId));
+                                    userIdToReach:
+                                        status.statusOwnerProfile!.authId));
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
                               onPressed: () {
                                 globals.showLoader(context);
-                                globals.userBloc!.add(
-                                    StarUserEvent(userIdToStar: status.statusOwnerProfile!.authId));
+                                globals.userBloc!.add(StarUserEvent(
+                                    userIdToStar:
+                                        status.statusOwnerProfile!.authId));
                               }),
                           // KebabBottomTextButton(
                           //     label: 'Copy link',
@@ -535,7 +592,28 @@ Future showUserStoryBottomSheet(BuildContext context,
                           // KebabBottomTextButton(
                           //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
-                              label: 'Mute', onPressed: () {}),
+                              label: (status.status?.isMuted ?? false) &&
+                                      (isMuted ?? false)
+                                  ? 'Unmute'
+                                  : 'Mute',
+                              onPressed: () {
+                                if ((status.status?.isMuted ?? false) &&
+                                    (isMuted ?? false)) {
+                                  globals.showLoader(context);
+                                  globals.socialServiceBloc!.add(
+                                      UnmuteStatusEvent(
+                                          idToUnmute: status
+                                                  .statusOwnerProfile?.authId ??
+                                              ''));
+                                } else {
+                                  globals.showLoader(context);
+                                  globals.socialServiceBloc!.add(
+                                      MuteStatusEvent(
+                                          idToMute: status
+                                                  .statusOwnerProfile?.authId ??
+                                              ''));
+                                }
+                              }),
                         ],
                       ),
                       SizedBox(height: getScreenHeight(20)),
@@ -543,6 +621,62 @@ Future showUserStoryBottomSheet(BuildContext context,
               });
         },
       );
+    },
+  );
+}
+
+Future showReportReasonBottomSheet(BuildContext context) async {
+  return showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) {
+      return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.greyShade7,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: ListView(shrinkWrap: true, children: [
+            Center(
+              child: Container(
+                  height: getScreenHeight(4),
+                  width: getScreenWidth(58),
+                  decoration: BoxDecoration(
+                      color: AppColors.greyShade4,
+                      borderRadius: BorderRadius.circular(40))),
+            ).paddingOnly(t: 23),
+            SizedBox(height: getScreenHeight(20)),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Text(
+                ('Report Reason').toTitleCase(),
+                style: TextStyle(
+                  fontSize: getScreenHeight(20),
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                KebabBottomTextButton(
+                    label: 'Offensive',
+                    onPressed: () => Navigator.pop(context, 'offensive')),
+                KebabBottomTextButton(
+                    label: 'Deceitful',
+                    onPressed: () => Navigator.pop(context, 'deceitful')),
+                KebabBottomTextButton(
+                    label: 'Sensitive',
+                    onPressed: () => Navigator.pop(context, 'sensitive')),
+                KebabBottomTextButton(
+                    label: 'Others',
+                    onPressed: () => Navigator.pop(context, 'others')),
+              ],
+            ),
+            SizedBox(height: getScreenHeight(20)),
+          ]));
     },
   );
 }

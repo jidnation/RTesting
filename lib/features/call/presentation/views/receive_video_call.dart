@@ -1,4 +1,5 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -55,6 +56,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
           Console.log('reachme calllog connection ', connection);
           Console.log('reachme calllog state', state);
           Console.log('reachme calllog reason', reason);
+          showCallAlerts(reason);
         },
         onPermissionError: (permissionType) {
           Console.log('reachme calllog permission error', permissionType);
@@ -106,9 +108,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   join() async {
     Console.log('call joined status', 'joining');
     await _engine.joinChannel(
-      token:
-          '0065741afe670ba4684aec914fb19eeb82aIACW2H6u9qeJ123K50JfLZC6SW7Mx/O0J8YcRTesAsoYqc4RKP8AAAAAEACLGro3FhWvYwEAAQBWbK5j',
-      channelId: 'tLKZfLVKxAYEbiOVIuzBfCFSBhdXSpducGHo',
+      token: widget.token,
+      channelId: widget.channelName,
       options: const ChannelMediaOptions(),
       uid: 1,
     );
@@ -158,7 +159,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                               width: size.width,
                               height: size.height,
                               child: _remoteVideo(
-                                  widget.channelName),
+                                widget.channelName,
+                              ),
                             ),
                             Positioned(
                               bottom: 110,
@@ -167,9 +169,12 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                                 width: size.width * 0.4,
                                 height: size.height * 0.3,
                                 child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: _localPreview(
-                                        _localUserJoined, 0)),
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: _localPreview(
+                                    _localUserJoined,
+                                    0,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -296,11 +301,30 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         ),
       );
     } else {
-      String msg = '';
-      if (_localUserJoined) msg = 'Waiting for a remote user to join';
-      return Text(
-        msg,
-        textAlign: TextAlign.center,
+      return Stack(
+        children: [
+          Image.asset(
+            'assets/images/incoming_call.png',
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.fill,
+          ).blurred(),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Text('waiting for caller'),
+                SizedBox(
+                  height: 10,
+                ),
+                CircularProgressIndicator(
+                  color: Colors.white,
+                )
+              ],
+            ),
+          )
+        ],
       );
     }
   }

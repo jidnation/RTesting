@@ -66,44 +66,12 @@ class MomentsAppBar extends StatelessWidget {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         color: Colors.transparent,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          offset: const Offset(0.0, 0.2),
-                          blurRadius: 20,
-                          color: AppColors.black.withOpacity(0.1),
-                        ),
-                      ],
-                    ),
-                    child: SvgPicture.asset('assets/svgs/back.svg',
-                        color: Colors.white),
-                  ),
-                  padding: const EdgeInsets.all(0),
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    RouteNavigators.pop(context);
-                  },
-                ),
-                SizedBox(width: getScreenWidth(24)),
-                Text(
-                  'Moments',
-                  style: TextStyle(
-                      fontSize: getScreenHeight(18),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.white),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Row(
+            children: [
+              IconButton(
+                icon: Container(
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
@@ -113,43 +81,71 @@ class MomentsAppBar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/svgs/fluent_live-24-regular.svg',
-                    ),
-                    padding: const EdgeInsets.all(0),
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      //Navigator.pop(context);
-                    },
-                  ),
+                  child: SvgPicture.asset('assets/svgs/back.svg',
+                      color: Colors.white),
                 ),
-                SizedBox(width: getScreenWidth(40)),
-                IconButton(
-                  icon: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          offset: const Offset(0.0, 0.2),
-                          blurRadius: 20,
-                          color: AppColors.black.withOpacity(0.1),
-                        ),
-                      ],
-                    ),
-                    child: SvgPicture.asset(
-                      'assets/svgs/Camera.svg',
-                    ),
+                padding: const EdgeInsets.all(0),
+                constraints: const BoxConstraints(),
+                onPressed: () {
+                  RouteNavigators.pop(context);
+                },
+              ),
+              SizedBox(width: getScreenWidth(24)),
+              Text(
+                'Moments',
+                style: TextStyle(
+                    fontSize: getScreenHeight(18),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white),
+              ),
+            ],
+          ),
+          Row(children: [
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(0.0, 0.2),
+                    blurRadius: 20,
+                    color: AppColors.black.withOpacity(0.1),
                   ),
-                  padding: const EdgeInsets.all(0),
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    //Navigator.pop(context);
-                  },
+                ],
+              ),
+              child: IconButton(
+                icon: SvgPicture.asset(
+                  'assets/svgs/fluent_live-24-regular.svg',
                 ),
-              ],
+                padding: const EdgeInsets.all(0),
+                constraints: const BoxConstraints(),
+                onPressed: () {
+                  //Navigator.pop(context);
+                },
+              ),
             ),
-          ],
-        ),
+            SizedBox(width: getScreenWidth(40)),
+            IconButton(
+              icon: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0.0, 0.2),
+                      blurRadius: 20,
+                      color: AppColors.black.withOpacity(0.1),
+                    ),
+                  ],
+                ),
+                child: SvgPicture.asset(
+                  'assets/svgs/Camera.svg',
+                ),
+              ),
+              padding: const EdgeInsets.all(0),
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                //Navigator.pop(context);
+              },
+            ),
+          ]),
+        ]),
       ),
     ]);
   }
@@ -177,46 +173,89 @@ class OptionsWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          clipBehavior: Clip.none,
-                          children: [
-                            ImagePlaceholder(
-                              width: getScreenWidth(50),
-                              height: getScreenHeight(50),
-                            ),
-                            Positioned(
-                              top: getScreenHeight(37),
-                              child: Container(
-                                width: getScreenWidth(20),
-                                height: getScreenHeight(20),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.white,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.add,
-                                    color: AppColors.white,
-                                    size: getScreenHeight(15),
-                                  ),
-                                ),
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
+                            clipBehavior: Clip.none,
+                            children: [
+                              ImagePlaceholder(
+                                width: getScreenWidth(50),
+                                height: getScreenHeight(50),
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: getScreenHeight(25)),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Container(
+                              Positioned(
+                                top: getScreenHeight(37),
+                                child: Container(
+                                  width: getScreenWidth(20),
+                                  height: getScreenHeight(20),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.white,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.add,
+                                      color: AppColors.white,
+                                      size: getScreenHeight(15),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: getScreenHeight(25)),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Container(
+                                  decoration: BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        offset: const Offset(0.0, 0.2),
+                                        blurRadius: 20,
+                                        color: AppColors.black.withOpacity(0.1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/like for tv.svg',
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(0),
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  //Navigator.pop(context);
+                                },
+                              ),
+                              SizedBox(height: getScreenHeight(5)),
+                              Text(
+                                '24k',
+                                style: TextStyle(
+                                    fontSize: getScreenHeight(14),
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w500,
+                                    shadows: [
+                                      Shadow(
+                                          offset: const Offset(0.0, 0.2),
+                                          blurRadius: 20,
+                                          color:
+                                              AppColors.black.withOpacity(0.4)
+                                          //color: AppColors.black,
+                                          ),
+                                    ]),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: getScreenHeight(25)),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
                                 decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
@@ -226,20 +265,21 @@ class OptionsWidget extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/like for tv.svg',
+                                child: IconButton(
+                                  icon: SvgPicture.asset(
+                                    'assets/svgs/Vector(1).svg',
+                                  ),
+                                  padding: const EdgeInsets.all(0),
+                                  constraints: const BoxConstraints(),
+                                  onPressed: () {
+                                    //Navigator.pop(context);
+                                  },
                                 ),
                               ),
-                              padding: const EdgeInsets.all(0),
-                              constraints: const BoxConstraints(),
-                              onPressed: () {
-                                //Navigator.pop(context);
-                              },
-                            ),
-                            SizedBox(height: getScreenHeight(5)),
-                            Text(
-                              '24k',
-                              style: TextStyle(
+                              SizedBox(height: getScreenHeight(5)),
+                              Text(
+                                '3k',
+                                style: TextStyle(
                                   fontSize: getScreenHeight(14),
                                   color: AppColors.white,
                                   fontWeight: FontWeight.w500,
@@ -250,69 +290,22 @@ class OptionsWidget extends StatelessWidget {
                                         color: AppColors.black.withOpacity(0.4)
                                         //color: AppColors.black,
                                         ),
-                                  ]),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: getScreenHeight(25)),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: getScreenHeight(25)),
+                          Column(mainAxisSize: MainAxisSize.min, children: [
+                            IconButton(
+                              icon: Container(
+                                decoration: BoxDecoration(boxShadow: [
                                   BoxShadow(
                                     offset: const Offset(0.0, 0.2),
                                     blurRadius: 20,
                                     color: AppColors.black.withOpacity(0.1),
                                   ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  'assets/svgs/Vector(1).svg',
-                                ),
-                                padding: const EdgeInsets.all(0),
-                                constraints: const BoxConstraints(),
-                                onPressed: () {
-                                  //Navigator.pop(context);
-                                },
-                              ),
-                            ),
-                            SizedBox(height: getScreenHeight(5)),
-                            Text(
-                              '3k',
-                              style: TextStyle(
-                                fontSize: getScreenHeight(14),
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w500,
-                                shadows: [
-                                  Shadow(
-                                      offset: const Offset(0.0, 0.2),
-                                      blurRadius: 20,
-                                      color: AppColors.black.withOpacity(0.4)
-                                      //color: AppColors.black,
-                                      ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: getScreenHeight(25)),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      offset: const Offset(0.0, 0.2),
-                                      blurRadius: 20,
-                                      color: AppColors.black.withOpacity(0.1),
-                                    ),
-                                  ],
-                                ),
+                                ]),
                                 child: SvgPicture.asset(
                                   'assets/svgs/message.svg',
                                   color: AppColors.white,
@@ -324,10 +317,8 @@ class OptionsWidget extends StatelessWidget {
                                 //Navigator.pop(context);
                               },
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ]),
+                        ]),
                   ],
                 ),
                 SizedBox(height: getScreenHeight(10)),
@@ -547,13 +538,12 @@ class _ContentScreenState extends State<ContentScreen> {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: const Alignment(0.0, 4),
-                end: const Alignment(0.0, -1.2),
-                colors: <Color>[
-                  AppColors.black.withOpacity(0.5),
-                  Colors.black12.withOpacity(0.0)
-                ],
-              ),
+                  begin: const Alignment(0.0, 4),
+                  end: const Alignment(0.0, -1.2),
+                  colors: <Color>[
+                    AppColors.black.withOpacity(0.5),
+                    Colors.black12.withOpacity(0.0)
+                  ]),
             ),
             // decoration: BoxDecoration(
             //   color: AppColors.grey.withOpacity(0.14),

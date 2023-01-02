@@ -25,12 +25,11 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/call/presentation/views/initiate_audio_call.dart';
+import 'package:reach_me/features/call/presentation/views/initiate_video_call.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
-
-import '../../../call/presentation/views/initiate_audio_call.dart';
-import '../../../call/presentation/views/initiate_video_call.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -422,22 +421,40 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   if (globals.userChat!.isEmpty)
                                     const SizedBox.shrink()
                                   else
-                                    Column(
-                                      children: List.generate(
-                                        globals.userChat!.length,
-                                        (index) => MsgBubble(
-                                          msgDate: '',
-                                          isMe: globals.user!.id ==
-                                              globals.userChat![index].senderId,
-                                          label:
-                                              globals.userChat![index].value!,
-                                          size: size,
-                                          timeStamp: Helper.parseChatTime(
-                                              globals.userChat![index].sentAt ??
-                                                  ''),
-                                        ),
-                                      ),
-                                    )
+                                    ListView.separated(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemBuilder: (c, i) => MsgBubble(
+                                              msgDate: '',
+                                              isMe: globals.user!.id ==
+                                                  globals.userChat![i].senderId,
+                                              label:
+                                                  globals.userChat![i].value!,
+                                              size: size,
+                                              timeStamp: Helper.parseChatTime(
+                                                  globals.userChat![i].sentAt ??
+                                                      ''),
+                                            ),
+                                        separatorBuilder: (c, i) => SizedBox(
+                                              height: 0,
+                                            ),
+                                        itemCount: globals.userChat!.length)
+                                  // Column(
+                                  //   children: List.generate(
+                                  //     globals.userChat!.length,
+                                  //     (index) => MsgBubble(
+                                  //       msgDate: '',
+                                  //       isMe: globals.user!.id ==
+                                  //           globals.userChat![index].senderId,
+                                  //       label:
+                                  //           globals.userChat![index].value!,
+                                  //       size: size,
+                                  //       timeStamp: Helper.parseChatTime(
+                                  //           globals.userChat![index].sentAt ??
+                                  //               ''),
+                                  //     ),
+                                  //   ),
+                                  // )
                                 ],
                               ).paddingOnly(r: 15, l: 15),
                             ),
