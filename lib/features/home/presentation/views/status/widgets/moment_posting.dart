@@ -4,9 +4,12 @@ import 'package:file_picker/src/platform_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/moment_count_down_timer.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 
 import '../../../../../../core/services/media_service.dart';
+import '../../../../../../core/services/moment/controller.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
@@ -15,6 +18,7 @@ import 'status_widgets.dart';
 class MomentPosting extends StatefulWidget {
   final CameraController? controller;
   final CarouselController slidingController;
+
   const MomentPosting({
     Key? key,
     required this.controller,
@@ -24,6 +28,9 @@ class MomentPosting extends StatefulWidget {
   @override
   State<MomentPosting> createState() => _MomentPostingState();
 }
+
+int countDownTime = 0;
+bool showTimer = false;
 
 class _MomentPostingState extends State<MomentPosting> {
   @override
@@ -144,34 +151,117 @@ class _MomentPostingState extends State<MomentPosting> {
                         ),
                       ]),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        MomentActions(
-                          label: 'Speed',
-                          svgUrl: 'assets/svgs/speeding.svg',
+                Center(
+                  child: Stack(children: [
+                    SizedBox(
+                      height: 250,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: SizedBox(
+                          width: 50,
+                          child: Column(
+                              // mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const MomentActions(
+                                  label: 'Speed',
+                                  svgUrl: 'assets/svgs/speeding.svg',
+                                ),
+                                const SizedBox(height: 20),
+                                const MomentActions(
+                                  label: 'Filters',
+                                  svgUrl: 'assets/svgs/filter-n.svg',
+                                ),
+                                const SizedBox(height: 20),
+                                const MomentActions(
+                                  label: 'Beautify',
+                                  svgUrl: 'assets/svgs/beautify-n.svg',
+                                ),
+                                const SizedBox(height: 20),
+                                MomentActions(
+                                  label: 'Timer',
+                                  svgUrl: 'assets/svgs/timer-n.svg',
+                                  onClick: () {
+                                    setState(() {
+                                      showTimer = !showTimer;
+                                    });
+                                  },
+                                ),
+                              ]),
                         ),
-                        SizedBox(height: 20),
-                        MomentActions(
-                          label: 'Filters',
-                          svgUrl: 'assets/svgs/filter-n.svg',
-                        ),
-                        SizedBox(height: 20),
-                        MomentActions(
-                          label: 'Beautify',
-                          svgUrl: 'assets/svgs/beautify-n.svg',
-                        ),
-                        SizedBox(height: 20),
-                        MomentActions(
-                          label: 'Timer',
-                          svgUrl: 'assets/svgs/timer-n.svg',
-                        ),
-                      ]),
+                      ),
+                    ),
+                    showTimer
+                        ? Positioned(
+                            bottom: 35,
+                            right: 38,
+                            child: Container(
+                              height: 25,
+                              width: 120,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            countDownTime = 5;
+                                          });
+                                          momentCtrl.momentCounter(1);
+                                        },
+                                        child: const CustomText(
+                                          text: '5s',
+                                          weight: FontWeight.w500,
+                                          size: 14,
+                                        )),
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            countDownTime = 10;
+                                          });
+                                          momentCtrl.momentCounter(1);
+                                        },
+                                        child: const CustomText(
+                                          text: '10s',
+                                          weight: FontWeight.w500,
+                                          size: 14,
+                                        )),
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            countDownTime = 20;
+                                          });
+                                          momentCtrl.momentCounter(1);
+                                        },
+                                        child: const CustomText(
+                                          text: '20s',
+                                          weight: FontWeight.w500,
+                                          size: 14,
+                                        )),
+                                  ]),
+                            ))
+                        : const SizedBox.shrink(),
+                  ]),
                 ),
+                GetX<MomentController>(
+                  builder: (mc) {
+                    return mc.momentCounter.value != 0
+                        ? Center(
+                            child: CountDownTimer(
+                            from: countDownTime,
+                            vController: widget.controller!,
+                          ))
+                        : const SizedBox.shrink();
+                  },
+                ),
+
                 // Positioned(
                 //     bottom: 70,
                 //     right: 0,

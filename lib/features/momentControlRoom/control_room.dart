@@ -5,9 +5,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
-import '../../core/services/navigation/navigation_service.dart';
 import '../home/presentation/views/moment_feed.dart';
-import '../home/presentation/views/status/widgets/user_posting.dart';
 import 'models/get_comments_model.dart';
 import 'models/get_moment_feed.dart';
 import 'moment_cacher.dart';
@@ -232,6 +230,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
   }
 
+  /////
   likingMomentComment({required String commentId, required String id}) async {
     List<MomentModel> currentList = value;
     MomentModel actualMomentModel =
@@ -308,29 +307,29 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
   }
 
-  postMoment(BuildContext context, {required String? videoUrl}) async {
-    if (videoUrl != null) {
-      print(":::::::::::::::::::::::::::n printing starrted :::::");
-      var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
-      if (res) {
-        Snackbars.success(
-          context,
-          message: 'Moment successfully created',
-          milliseconds: 1300,
-        );
-        momentCtrl.clearPostingData();
-        RouteNavigators.pop(context);
-      } else {
-        Snackbars.error(
-          context,
-          message: 'Operation Failed, Try again.',
-          milliseconds: 1400,
-        );
-      }
-      _postingMoment = false;
-      notifyListeners();
-    }
-  }
+  // postMoment(BuildContext context, {required String? videoUrl}) async {
+  //   if (videoUrl != null) {
+  //     print(":::::::::::::::::::::::::::n printing starrted :::::");
+  //     var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+  //     if (res) {
+  //       Snackbars.success(
+  //         context,
+  //         message: 'Moment successfully created',
+  //         milliseconds: 1300,
+  //       );
+  //       momentCtrl.clearPostingData();
+  //       RouteNavigators.pop(context);
+  //     } else {
+  //       Snackbars.error(
+  //         context,
+  //         message: 'Operation Failed, Try again.',
+  //         milliseconds: 1400,
+  //       );
+  //     }
+  //     _postingMoment = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   reachUser({required String toReachId, required String id}) async {
     var response = await momentQuery.reachUser(reachingId: toReachId);

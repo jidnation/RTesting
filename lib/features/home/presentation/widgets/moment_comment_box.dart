@@ -33,7 +33,7 @@ class MomentCommentBox extends HookWidget {
       width: SizeConfig.screenWidth,
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
-        vertical: 5,
+        vertical: 2.5,
       ),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -43,9 +43,9 @@ class MomentCommentBox extends HookWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(
-            height: 50,
-            width: 50,
-            padding: const EdgeInsets.all(12),
+            height: 30,
+            width: 30,
+            padding: EdgeInsets.all(cInfo.profilePicture!.isNotEmpty ? 0 : 5),
             decoration: BoxDecoration(
                 color: AppColors.primaryColor,
                 borderRadius: BorderRadius.circular(30),
@@ -65,7 +65,7 @@ class MomentCommentBox extends HookWidget {
               text:
                   '${cInfo.firstName.toString().toCapitalized()} ${cInfo.lastName.toString().toCapitalized()}',
               color: Colors.black,
-              size: 16.28,
+              size: 14.28,
               weight: FontWeight.w600,
             ),
             const SizedBox(height: 1.5),
@@ -76,7 +76,7 @@ class MomentCommentBox extends HookWidget {
                   CustomText(
                     text: cInfo.location.toString().toCapitalized(),
                     color: const Color(0xff252525).withOpacity(0.5),
-                    size: 11.44,
+                    size: 10.44,
                     weight: FontWeight.w600,
                   ),
                   const SizedBox(width: 5),
@@ -125,7 +125,7 @@ class MomentCommentBox extends HookWidget {
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Container(
-            height: 47,
+            height: 40,
             width: getScreenWidth(160),
             padding: const EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
@@ -191,25 +191,25 @@ class MomentCommentBox extends HookWidget {
                 ]),
           ),
           Row(children: [
-            Container(
-              height: 41,
-              width: 25.7,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: const Color(0xfff5f5f5),
-              ),
-              child: SvgPicture.asset('assets/svgs/upvote.svg'),
-            ),
-            const SizedBox(width: 12),
-            Container(
-              height: 41,
-              width: 25.7,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: const Color(0xfff5f5f5),
-              ),
-              child: SvgPicture.asset('assets/svgs/downvote.svg'),
-            ),
+            // Container(
+            //   height: 41,
+            //   width: 25.7,
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(10),
+            //     color: const Color(0xfff5f5f5),
+            //   ),
+            //   child: SvgPicture.asset('assets/svgs/upvote.svg'),
+            // ),
+            // const SizedBox(width: 12),
+            // Container(
+            //   height: 41,
+            //   width: 25.7,
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(10),
+            //     color: const Color(0xfff5f5f5),
+            //   ),
+            //   child: SvgPicture.asset('assets/svgs/downvote.svg'),
+            // ),
           ])
         ])
       ]),

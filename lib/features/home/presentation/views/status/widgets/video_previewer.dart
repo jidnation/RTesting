@@ -19,7 +19,6 @@ import '../../../../../../core/utils/file_url_converter.dart';
 import '../../moment_feed.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
-import 'moment_video_editor.dart';
 
 class VideoPreviewer extends StatefulHookWidget {
   final VideoPlayerController videoController;
@@ -132,12 +131,12 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                               label: 'Filters',
                               svgUrl: 'assets/svgs/filter-n.svg',
                               onClick: () {
-                                RouteNavigators.route(
-                                  context,
-                                  VideoEditor(
-                                    file: widget.videoFile,
-                                  ),
-                                );
+                                // RouteNavigators.route(
+                                //   context,
+                                //   VideoEditor(
+                                //     file: widget.videoFile,
+                                //   ),
+                                // );
                               },
                             ),
                             const SizedBox(height: 20),
@@ -331,8 +330,6 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
                         } else {
-                          print(
-                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
                           String vFile =
                               await MediaService().compressMomentVideo(
                             filePath: widget.videoFile.path,
@@ -341,7 +338,8 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                               await FileConverter().convertMe(filePath: vFile);
                           if (videoUrl != null) {
                             var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
+                              videoMediaItem: videoUrl,
+                            );
                             if (res) {
                               Snackbars.success(
                                 context,
