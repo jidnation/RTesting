@@ -132,9 +132,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       try {
         final response = await socialServiceRepository.commentOnPost(
             postId: event.postId!,
-            content: event.content!,
+            content: event.content,
             userId: event.userId!,
             imageMediaItems: event.imageMediaItems,
+            videoMediaItem: event.videoMediaItem,
             audioMediaItem: event.audioMediaItem,
             postOwnerId: event.postOwnerId!);
         response.fold(
@@ -590,11 +591,15 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
     on<GetVotedPostsEvent>((event, emit) async {
       emit(GetVotedPostsLoading());
       try {
+        print("pageLimit ${event.pageLimit}");
+         print("pageNumber ${event.pageNumber}");
+          print("vote tyoe ${event.voteType}");
         final response = await socialServiceRepository.getVotedPosts(
-            pageLimit: event.pageLimit!,
-            pageNumber: event.pageNumber!,
-            voteType: event.voteType!,
-            authId: event.authId!);
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+          voteType: event.voteType!,
+          authId: ""
+        );
         response.fold(
           (error) => emit(GetVotedPostsError(error: error)),
           (posts) => emit(

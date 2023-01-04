@@ -110,6 +110,7 @@ class SocialServiceRepository {
     required String postOwnerId,
     String? audioMediaItem,
     List<String>? imageMediaItems,
+    String? videoMediaItem,
   }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
@@ -119,6 +120,7 @@ class SocialServiceRepository {
         postOwnerId: postOwnerId,
         imageMediaItems: imageMediaItems,
         audioMediaItem: audioMediaItem,
+        videoMediaItem: videoMediaItem,
       );
       return Right(comment);
     } on GraphQLError catch (e) {

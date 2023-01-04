@@ -177,27 +177,31 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                     print(likeId);
                   }
 
-                  if (state is LikeCommentOnPostSuccess) {}
+                  if (state is LikeCommentOnPostSuccess) {
+                    likeId.value = state.commentLikeModel!.likeId;
+                    globals.socialServiceBloc!.add(GetAllCommentLikesEvent(
+                      commentId: state.commentLikeModel!.commentId,
+                    ));
+                  }
 
                   if (state is UnlikeCommentOnPostSuccess) {
-                    // commentUnlike.value = state.unlikeComment;
-                    //isLiked.value = false;
+                    likeId.value = "false";
                   }
-                  if (state is UnlikeCommentOnPostError) {
-                    int pos = comments.value
-                        .indexWhere((e) => e.commentId == state.commentId);
-                    comments.value[pos].isLiked = true;
-                    comments.value[pos].nLikes =
-                        (comments.value[pos].nLikes ?? 0) + 1;
-                  }
+                  // if (state is UnlikeCommentOnPostError) {
+                  //   int pos = comments.value
+                  //       .indexWhere((e) => e.commentId == state.commentId);
+                  //   comments.value[pos].isLiked = true;
+                  //   comments.value[pos].nLikes =
+                  //       (comments.value[pos].nLikes ?? 0) + 1;
+                  // }
 
-                  if (state is LikeCommentOnPostError) {
-                    int pos = comments.value
-                        .indexWhere((e) => e.commentId == state.commentId);
-                    comments.value[pos].isLiked = true;
-                    comments.value[pos].nLikes =
-                        (comments.value[pos].nLikes ?? 1) - 1;
-                  }
+                  // if (state is LikeCommentOnPostError) {
+                  //   int pos = comments.value
+                  //       .indexWhere((e) => e.commentId == state.commentId);
+                  //   comments.value[pos].isLiked = true;
+                  //   comments.value[pos].nLikes =
+                  //       (comments.value[pos].nLikes ?? 1) - 1;
+                  // }
 
                   if (state is MediaUploadSuccess) {
                     String? audioUrl = state.image!;
@@ -348,9 +352,7 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                           comment: comments.value[index],
                                           isLiked:
                                               comments.value[index].isLiked ??
-                                                      false
-                                                  ? true
-                                                  : false,
+                                                  "false",
                                           onLike: () {
                                             print(
                                                 "${comments.value[index].isLiked}");
@@ -358,47 +360,56 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                                             handleTap(index);
                                             if (active.contains(index)) {
                                               if (comments
-                                                  .value[index].isLiked!) {
-                                                comments.value[index].isLiked =
-                                                    false;
+                                                      .value[index].isLiked! ==
+                                                  "false") {
+                                                // comments.value[index].isLiked =
+                                                //     false
 
-                                                comments.value[index].nLikes =
-                                                    (comments.value[index]
-                                                                .nLikes ??
-                                                            1) -
-                                                        1;
                                                 globals.socialServiceBloc!.add(
-                                                    GetAllCommentLikesEvent(
+                                                    LikeCommentOnPostEvent(
+                                                        postId:
+                                                            widget.post.postId,
                                                         commentId: comments
                                                             .value[index]
-                                                            .commentId));
+                                                            .commentId!));
 
-                                                if (likeId.value != null) {
-                                                  globals.socialServiceBloc!
-                                                      .add(
-                                                    UnlikeCommentOnPostEvent(
-                                                        commentId: comments
-                                                            .value[index]
-                                                            .commentId!,
-                                                        likeId: likeId.value
+                                                // comments.value[index].nLikes =
+                                                //     (comments.value[index]
+                                                //                 .nLikes ??
+                                                //             1) -
+                                                //         1;
+                                                // globals.socialServiceBloc!.add(
+                                                //     GetAllCommentLikesEvent(
+                                                //         commentId: comments
+                                                //             .value[index]
+                                                //             .commentId));
 
-                                                        //commentLike
-                                                        //  .value!.likeId!,
-                                                        ),
-                                                  );
-                                                }
+                                                // if (likeId.value != null) {
+                                                //   globals.socialServiceBloc!
+                                                //       .add(
+                                                //     UnlikeCommentOnPostEvent(
+                                                //         commentId: comments
+                                                //             .value[index]
+                                                //             .commentId!,
+                                                //         likeId: likeId.value
+
+                                                //commentLike
+                                                //  .value!.likeId!,
+                                                //  ),
+                                                // );
+                                                // }
                                               } else {
-                                                comments.value[index].isLiked =
-                                                    true;
-                                                comments.value[index].nLikes =
-                                                    (comments.value[index]
-                                                                .nLikes ??
-                                                            0) +
-                                                        1;
-                                                globals.socialServiceBloc!
-                                                    .add(LikeCommentOnPostEvent(
-                                                  postId: comments
-                                                      .value[index].postId,
+                                                // comments.value[index].isLiked =
+                                                //     true;
+                                                // comments.value[index].nLikes =
+                                                //     (comments.value[index]
+                                                //                 .nLikes ??
+                                                //             0) +
+                                                //         1;
+                                                globals.socialServiceBloc!.add(
+                                                    UnlikeCommentOnPostEvent(
+                                                  likeId: comments
+                                                      .value[index].isLiked,
                                                   commentId: comments
                                                       .value[index].commentId,
                                                 ));
@@ -1015,10 +1026,9 @@ class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
                                     itemBuilder: (context, index) {
                                       return CommentsTile(
                                         comment: comments.value[index],
-                                        isLiked: comments
-                                                .value[index].like!.isNotEmpty
-                                            ? true
-                                            : false,
+                                        isLiked:
+                                            comments.value[index].isLiked ??
+                                                "false",
                                         onLike: () {
                                           HapticFeedback.mediumImpact();
                                           handleTap(index);
@@ -1131,7 +1141,7 @@ class CommentsTile extends StatelessWidget {
   }) : super(key: key);
   final Function()? onLike, onMessage;
   final CommentModel comment;
-  final bool isLiked;
+  final String isLiked;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1209,14 +1219,17 @@ class CommentsTile extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: CommentAudioMedia(path: comment.audioMediaItem!)
-                        .paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                    child: CommentAudioMedia(
+                      path: comment.audioMediaItem!,
+                      isPlaying: false,
+                    ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
                   ),
                 ],
               )
             else
               const SizedBox.shrink(),
             comment.imageMediaItems!.isNotEmpty
+                // if((comment.imageMediaItems.isNotEmpty || (comment.v)))
                 ? Row(
                     children: [
                       Expanded(
@@ -1251,7 +1264,7 @@ class CommentsTile extends StatelessWidget {
                           onPressed: onLike,
                           minSize: 0,
                           padding: EdgeInsets.zero,
-                          child: isLiked
+                          child: isLiked != "false"
                               ? SvgPicture.asset(
                                   'assets/svgs/like-active.svg',
                                   height: getScreenHeight(20),

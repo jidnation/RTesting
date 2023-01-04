@@ -8,16 +8,16 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../../../core/components/snackbar.dart';
+
 import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/querys.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
-import '../../../../../../core/utils/file_url_converter.dart';
+import '../../moment_feed.dart';
 import 'moment_actions.dart';
 import 'moment_preview_editor.dart';
+
 
 class VideoPreviewer extends StatefulHookWidget {
   final VideoPlayerController videoController;
@@ -36,6 +36,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     widget.videoController.dispose();
     super.dispose();
   }
+
 
   bool isPlaying = false;
   bool isUploading = false;
@@ -267,73 +268,60 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     )
                   ]),
                   Visibility(
-                    visible: !isUploading,
+                    visible: !isUploading || !momentFeedStore.postingMoment,
                     child: InkWell(
                       onTap: () async {
                         setState(() {
                           isUploading = true;
                         });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
-                          // var noAudioFile = await MediaService()
+                          // String noAudioFile = await MediaService()
                           //     .removeAudio(filePath: widget.videoFile.path);
-                          // // FileResult fileResult = FileResult(path: noAudioFile);
+                          // FileResult fileResult = FileResult(path: noAudioFile);
                           // String vFile = await MediaService()
                           //     .compressMomentVideo(
                           //         filePath: noAudioFile); //removing the braces
+                          String? videoUrl =
+                              await MediaService().videoAudioMerger(
+                            context,
+                            videoPath: widget.videoFile.path,
+                            audioPath: momentCtrl.audioFilePath.value,
+                            time: momentCtrl.endTime.value,
+                          );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
-                          // if (videoUrl != null) {
-                          //   var res = await MomentQuery.postMoment(
-                          //       videoMediaItem: videoUrl);
-                          //   if (res) {
-                          //     Snackbars.success(
-                          //       context,
-                          //       message: 'Moment successfully created',
-                          //       milliseconds: 1300,
-                          //     );
-                          //     momentCtrl.clearPostingData();
-                          //     RouteNavigators.pop(context);
-                          //   } else {
-                          //     Snackbars.error(
-                          //       context,
-                          //       message: 'Operation Failed, Try again.',
-                          //       milliseconds: 1400,
-                          //     );
-                          //   }
-                            // setState(() {
-                            //   isUploading = false;
-                            // });
-                          //}
-                        } else {
-                          print(
-                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-
-                          // String vFile =
-                          //     await MediaService().compressMomentVideo(
-                          //   filePath: widget.videoFile.path,
-                          // );
-                          // String? videoUrl =
-                          //     await FileConverter().convertMe(filePath: vFile);
-                          // if (videoUrl != null) {
-                          //   var res = await MomentQuery.postMoment(
-                          //       videoMediaItem: videoUrl);
-                          //   if (res) {
-                          //     Snackbars.success(
-                          //       context,
-                          //       message: 'Moment successfully created',
-                          //       milliseconds: 1300,
-                          //     );
-                          //     momentCtrl.clearPostingData();
-                          //     RouteNavigators.pop(context);
-                          //   } else {
-                          //     Snackbars.error(
-                          //       context,
-                          //       message: 'Operation Failed, Try again.',
-                          //       milliseconds: 1400,
-                          //     );
-                          //   }
-                          // }
                         }
+                        // else
+                        // {
+                        //   print(
+                        //       ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
+                        //
+                        //   String vFile =
+                        //       await MediaService().compressMomentVideo(
+                        //     filePath: widget.videoFile.path,
+                        //   );
+                        //   String? videoUrl =
+                        //       await FileConverter().convertMe(filePath: vFile);
+                        //   if (videoUrl != null) {
+                        //     var res = await MomentQuery.postMoment(
+                        //         videoMediaItem: videoUrl);
+                        //     if (res) {
+                        //       Snackbars.success(
+                        //         context,
+                        //         message: 'Moment successfully created',
+                        //         milliseconds: 1300,
+                        //       );
+                        //       momentCtrl.clearPostingData();
+                        //       RouteNavigators.pop(context);
+                        //     } else {
+                        //       Snackbars.error(
+                        //         context,
+                        //         message: 'Operation Failed, Try again.',
+                        //         milliseconds: 1400,
+                        //       );
+                        //     }
+                        //   }
+                        // }
                         setState(() {
                           isUploading = false;
                         });
@@ -353,7 +341,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                       ),
                     ),
                   ),
-                  if (isUploading)
+                  if (isUploading || momentFeedStore.postingMoment)
                     const SizedBox(
                       height: 20,
                       width: 20,
@@ -370,3 +358,4 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     );
   }
 }
+

@@ -9,6 +9,7 @@ import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IUserRepository {
 //   Future<Either<String, User>> createAccount({
@@ -342,6 +343,31 @@ class UserRepository {
     try {
       final getBlockedList = await _homeRemoteDataSource.getBlockList();
       return Right(getBlockedList);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, StreamResponse>> initiateLiveStream({
+    required String startedAt,
+  }) async {
+    print("initiate repo");
+    try {
+      final initiate = await _homeRemoteDataSource.initiateLiveStreaming(startedAt: startedAt);
+      return Right(initiate);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> joinStream({
+    required String? channelName,
+  }) async {
+    try {
+      final join =
+      await _homeRemoteDataSource.joinLiveStream(channelName: channelName);
+
+      return Right(join);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

@@ -117,11 +117,12 @@ class CommentSchema {
             commentSlug
             content
             created_at
-            nComments
+            nReplies
             nLikes
             postId
             imageMediaItems
             audioMediaItem
+            videoMediaItem
             isLiked
             postOwnerProfile {
               ''' +
@@ -160,6 +161,8 @@ class CommentProfileSchema {
   static String get schema {
     return r'''
             firstName
+            authId
+            bio
             lastName
             location
             profilePicture
@@ -270,3 +273,4 @@ class PostVoteSchema {
         ''';
   }
 }
+
