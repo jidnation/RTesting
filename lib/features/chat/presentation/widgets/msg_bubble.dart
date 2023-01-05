@@ -6,20 +6,22 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 
 class MsgBubble extends StatelessWidget {
-  const MsgBubble({
-    Key? key,
-    required this.msgDate,
-    required this.isMe,
-    required this.label,
-    required this.size,
-    required this.timeStamp,
-  }) : super(key: key);
+  const MsgBubble(
+      {Key? key,
+      required this.msgDate,
+      required this.isMe,
+      required this.label,
+      required this.size,
+      required this.timeStamp,
+      this.quotedData})
+      : super(key: key);
 
   final Size size;
   final String msgDate;
   final bool isMe;
   final String label;
   final String timeStamp;
+  final String? quotedData;
 
   @override
   Widget build(BuildContext context) {

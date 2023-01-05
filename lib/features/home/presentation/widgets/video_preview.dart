@@ -51,7 +51,16 @@ class _VideoPreviewState extends State<VideoPreview> {
         widget.isLocalVideo
             ? BetterPlayerDataSourceType.file
             : BetterPlayerDataSourceType.network,
-        widget.path);
+        widget.path,
+        cacheConfiguration: const BetterPlayerCacheConfiguration(
+          useCache: true,
+          // preCacheSize: 10 * 1024 * 1024,
+          // maxCacheSize: 10 * 1024 * 1024,
+          // maxCacheFileSize: 10 * 1024 * 1024,
+
+          ///Android only option to use cached video between app sessions
+          key: "testCacheKey",
+        ));
 
     _betterPlayerController = BetterPlayerController(
       betterPlayerConfiguration,
@@ -77,6 +86,7 @@ class _VideoPreviewState extends State<VideoPreview> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      key: Key(widget.path),
       child: Container(
         color: AppColors.black,
         child: BetterPlayer(

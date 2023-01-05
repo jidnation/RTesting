@@ -33,8 +33,12 @@ import 'package:reach_me/features/voice-call/voice_call_screen.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
-  const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);
+  const MsgChatInterface(
+      {Key? key, this.recipientUser, this.thread, this.quotedData})
+      : super(key: key);
   final User? recipientUser;
+  final ChatsThread? thread;
+  final String? quotedData;
 
   @override
   State<MsgChatInterface> createState() => _MsgChatInterfaceState();
@@ -76,8 +80,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       );
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
     });
   }
 
@@ -130,7 +136,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     final controller = useTextEditingController();
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
@@ -268,12 +276,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               });
 
               globals.chatBloc!.add(SendChatMessageEvent(
-                senderId: globals.user!.id,
-                receiverId: widget.recipientUser!.id,
-                threadId: '${globals.user!.id}--${widget.recipientUser!.id}',
-                value: state.imgUrl,
-                type: 'image',
-              ));
+                  senderId: globals.user!.id,
+                  receiverId: widget.recipientUser!.id,
+                  threadId: widget.thread?.id,
+                  value: state.imgUrl,
+                  type: 'image',
+                  quotedData: widget.quotedData,
+                  messageMode: widget.quotedData == null
+                      ? MessageMode.direct.name
+                      : MessageMode.quoted.name));
 
               isSending.value = true;
               showIsSending.value = true;
@@ -429,6 +440,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                               label:
                                                   globals.userChat![i].value!,
                                               size: size,
+                                              quotedData: globals
+                                                  .userChat![i].quotedData,
                                               timeStamp: Helper.parseChatTime(
                                                   globals.userChat![i].sentAt ??
                                                       ''),
@@ -691,14 +704,23 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                 globals.chatBloc!.add(
                                                   SendChatMessageEvent(
-                                                    senderId: globals.user!.id,
-                                                    receiverId: widget
-                                                        .recipientUser!.id,
-                                                    threadId:
-                                                        '${globals.user!.id}--${widget.recipientUser!.id}',
-                                                    value: value,
-                                                    type: 'text',
-                                                  ),
+                                                      senderId:
+                                                          globals.user!.id,
+                                                      receiverId: widget
+                                                          .recipientUser!.id,
+                                                      threadId:
+                                                          widget.thread?.id,
+                                                      value: value,
+                                                      type: 'text',
+                                                      quotedData:
+                                                          widget.quotedData,
+                                                      messageMode:
+                                                          widget.quotedData ==
+                                                                  null
+                                                              ? MessageMode
+                                                                  .direct.name
+                                                              : MessageMode
+                                                                  .quoted.name),
                                                 );
                                                 isSending.value = true;
                                                 showIsSending.value = true;

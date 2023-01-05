@@ -263,7 +263,8 @@ Future showReacherCardBottomSheet(BuildContext context,
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is UserLoaded) {
-                Snackbars.success(context, message: "Reached user successfully" );
+                Snackbars.success(context,
+                    message: "Reached user successfully");
                 RouteNavigators.pop(context);
               }
               if (state is UserError) {
@@ -592,7 +593,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                           // KebabBottomTextButton(
                           //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
-                              label: (status.status?.isMuted ?? false) &&
+                              label: (status.status?.isMuted ?? false) ||
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',

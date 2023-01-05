@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
@@ -578,13 +581,12 @@ class ViewUserStatus extends HookWidget {
                           if (controller.text.isNotEmpty) {
                             globals.chatBloc!.add(
                               SendChatMessageEvent(
-                                senderId: globals.user!.id,
-                                receiverId: story.statusOwnerProfile!.authId,
-                                threadId:
-                                    '${globals.user!.id}--${story.statusOwnerProfile!.authId}',
-                                value: controller.text.trim(),
-                                type: 'text',
-                              ),
+                                  senderId: globals.user!.id,
+                                  receiverId: story.statusOwnerProfile!.authId,
+                                  value: controller.text.trim(),
+                                  type: 'text',
+                                  quotedData: jsonEncode(story.toJson()),
+                                  messageMode: MessageMode.quoted.name),
                             );
                             toast('Sending message...',
                                 duration: Toast.LENGTH_LONG);

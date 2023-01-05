@@ -22,7 +22,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(ChatLoading());
       try {
         final response = await chatRepository.getThreadMessages(
-          id: event.id,
+          receiverId: event.receiverId,
+          threadId: event.threadId,
           fromMessageId: event.fromMessageId,
         );
         response.fold(
@@ -39,7 +40,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<GetUserThreadsEvent>((event, emit) async {
       emit(ChatLoading());
       try {
-        final response = await chatRepository.getUserThreads(id: event.id);
+        final response = await chatRepository.getUserThreads(
+            pageLimit: event.pageLimit, pageNumber: event.pageNumber);
         response.fold(
           (error) => emit(ChatError(error: error)),
           (userThreads) {
@@ -69,12 +71,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(ChatSending());
       try {
         final response = await chatRepository.sendTextMessage(
-          senderId: event.senderId,
-          receiverId: event.receiverId,
-          value: event.value,
-          type: event.type,
-          threadId: event.threadId,
-        );
+            senderId: event.senderId,
+            receiverId: event.receiverId,
+            value: event.value,
+            type: event.type,
+            threadId: event.threadId,
+            messageMode: event.messageMode,
+            quotedData: event.quotedData);
         response.fold(
           (error) => emit(ChatSendError(error: error)),
           (chat) {

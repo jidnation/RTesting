@@ -26,20 +26,27 @@ class Chat {
   DateTime? createdAt;
   DateTime? updatedAt;
 
+  String? messageMode;
+  String? quotedData;
+
   Chat.fromJson(Map<String, dynamic> json) {
     // _id = null;
     id = json['id'];
     senderId = json['senderId'];
     receiverId = json['receiverId'];
     // receivers = List.castFrom<dynamic, dynamic>(json['receivers']);
-    type = json['type'];
-    value = json['value'];
+    type = json['contentType'];
+    value = json['content'];
     threadId = json['threadId'];
     sentAt = json['sentAt'];
-    createdAt =
-        json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null;
-    updatedAt =
-        json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null;
+    messageMode = json['messageMode'];
+    quotedData = json['quotedData'];
+    createdAt = json['created_at'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(int.parse(json['created_at']))
+        : null;
+    updatedAt = json['updated_at'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(int.parse(json['updated_at']))
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -49,13 +56,15 @@ class Chat {
     _data['senderId'] = senderId;
     _data['receiverId'] = receiverId;
     //  _data['receivers'] = receivers;
-    _data['type'] = type;
-    _data['value'] = value;
+    _data['contentType'] = type;
+    _data['content'] = value;
     _data['threadId'] = threadId;
     _data['sentAt'] = sentAt;
-    _data['createdAt'] =
+    _data['messageMode'] = messageMode;
+    _data['quotedData'] = quotedData;
+    _data['created_at'] =
         createdAt != null ? createdAt!.toIso8601String() : null;
-    _data['updatedAt'] =
+    _data['updated_at'] =
         updatedAt != null ? updatedAt!.toIso8601String() : null;
     return _data;
   }
@@ -69,6 +78,7 @@ class ChatsThread {
     this.createdAt,
     this.updatedAt,
     this.participantsInfo,
+    this.private,
   });
   String? id;
   List<String>? participants;
@@ -76,6 +86,7 @@ class ChatsThread {
   Chat? tailMessage;
   String? createdAt;
   String? updatedAt;
+  bool? private;
 
   ChatsThread.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -83,8 +94,9 @@ class ChatsThread {
     tailMessage = Chat.fromJson(json['tailMessage']);
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    private = json['private'];
     participantsInfo = List<ChatUser>.from(
-        json['participantsInfo'].map((item) => ChatUser.fromJson(item)));
+        json['participantsProfile'].map((item) => ChatUser.fromJson(item)));
   }
 
   Map<String, dynamic> toJson() {
@@ -94,8 +106,11 @@ class ChatsThread {
     _data['tailMessage'] = tailMessage!.toJson();
     _data['createdAt'] = createdAt;
     _data['updatedAt'] = updatedAt;
-    _data['participantsInfo'] =
+    _data['private'] = private;
+    _data['participantsProfile'] =
         participantsInfo?.map((item) => item.toJson()).toList();
     return _data;
   }
 }
+
+enum MessageMode { quoted, direct }
