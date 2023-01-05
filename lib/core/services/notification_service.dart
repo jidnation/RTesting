@@ -12,13 +12,20 @@ class NotifcationService {
       switch (event.notification.additionalData!['type']) {
         case 'call.initiated':
           handleCallNotification(event);
-          break; 
+          break;
         default:
       }
       event.complete(event.notification);
     });
     OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      switch (result.notification.additionalData!['type']) {
+        case 'call.initiated':
+          openCallNotification(result);
+          break;
+        default:
+      }
+    });
     OneSignal.shared
         .setPermissionObserver((OSPermissionStateChanges changes) {});
     OneSignal.shared
@@ -38,3 +45,12 @@ handleCallNotification(OSNotificationReceivedEvent event) {
       ));
 }
 
+openCallNotification(OSNotificationOpenedResult result) {
+  Get.to(() => IncomingCall(
+        user: result.notification.additionalData!['body']['callerProfile']
+            ['firstName'],
+        token: result.notification.additionalData!['body']['receiverToken'],
+        channelName: result.notification.additionalData!['body']['channelName'],
+        callType: result.notification.additionalData!['body']['callMode'],
+      ));
+}

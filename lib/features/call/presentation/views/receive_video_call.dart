@@ -1,10 +1,11 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/app_globals.dart';
@@ -31,6 +32,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   int? _localuid;
   bool muteMic = false;
   late RtcEngine _engine;
+  final StopWatchTimer stopWatchTimer =
+      StopWatchTimer(mode: StopWatchMode.countUp);
 
   @override
   void initState() {
@@ -39,10 +42,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   }
 
   Future<void> initAgora() async {
-    // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
-    Console.log('PERMISSIONS', 'permissions request');
-    //create the engine
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
       const RtcEngineContext(
@@ -53,25 +53,11 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     _engine.registerEventHandler(
       RtcEngineEventHandler(
         onConnectionStateChanged: (connection, state, reason) {
-          Console.log('reachme calllog connection ', connection);
-          Console.log('reachme calllog state', state);
-          Console.log('reachme calllog reason', reason);
           showCallAlerts(reason);
-        },
-        onPermissionError: (permissionType) {
-          Console.log('reachme calllog permission error', permissionType);
-        },
-        onApiCallExecuted: (err, api, result) {
-          Console.log('reachme calllog api err', err);
-          Console.log('reachme calllog apicall', api);
-          Console.log('reachme calllog apiresult', result);
-        },
-        onError: (err, msg) {
-          Console.log('call error', msg);
-          Console.log('call error', err);
         },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           debugPrint("local user ${connection.localUid} joined");
+          stopWatchTimer.onStartTimer();
           setState(() {
             _localUserJoined = true;
             _localuid = connection.localUid;
@@ -89,6 +75,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
           setState(() {
             _remoteUid = null;
           });
+          endCall();
         },
         onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
           Console.log(
@@ -102,7 +89,9 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     await _engine.enableVideo();
     await _engine.startPreview();
     await join();
-    globals.callBloc!.add(AnswerPrivateCall(channelName: widget.channelName));
+    globals.callBloc!.add(
+      AnswerPrivateCall(channelName: widget.channelName),
+    );
   }
 
   join() async {
@@ -126,7 +115,15 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   muteMicrophone() async {
     muteMic = !muteMic;
     await _engine.muteLocalAudioStream(muteMic);
-    Console.log('MIC STATUS', muteMic);
+    Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
+  }
+
+  endCall() {
+    Navigator.pop(context);
+    Fluttertoast.showToast(msg: 'call ended');
+    setState(() {
+      
+    });
   }
 
   @override
@@ -134,6 +131,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     _engine.disableAudio();
     _engine.disableVideo();
     _engine.leaveChannel();
+    _engine.release();
+    stopWatchTimer.dispose();
     super.dispose();
   }
 
@@ -145,7 +144,6 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         bloc: globals.callBloc,
         listener: (context, state) {},
         builder: (context, state) {
-          Console.log('call state', state);
           return Stack(
             children: [
               SizedBox(
@@ -185,6 +183,23 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                           height: size.height,
                           width: size.width,
                         ),
+                ),
+              ),
+              Positioned(
+                top: 50,
+                right: 30,
+                child: StreamBuilder<int>(
+                  stream: stopWatchTimer.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(value!,
+                        milliSecond: false);
+                    return Text(
+                      displayTime,
+                      style: const TextStyle(color: Colors.white),
+                    );
+                  },
                 ),
               ),
               Positioned(
@@ -229,9 +244,11 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                               ],
                             ),
                           ),
-                          CircleAvatar(
+                          FloatingActionButton(
                             backgroundColor: const Color(0xffE91C43),
-                            radius: 29,
+                            onPressed: () {
+                              endCall();
+                            },
                             child: SvgPicture.asset(
                               'assets/svgs/call.svg',
                               color: AppColors.white,
@@ -254,7 +271,9 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                                   right: 10,
                                   bottom: 10,
                                   child: SvgPicture.asset(
-                                    'assets/svgs/mic.svg',
+                                    muteMic
+                                        ? 'assets/svgs/mic_slash.svg'
+                                        : 'assets/svgs/mic.svg',
                                     color: AppColors.white,
                                   ),
                                 ),
@@ -290,7 +309,6 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     }
   }
 
-// Display remote user's video
   Widget _remoteVideo(String channel) {
     if (_remoteUid != null) {
       return AgoraVideoView(
@@ -301,31 +319,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         ),
       );
     } else {
-      return Stack(
-        children: [
-          Image.asset(
-            'assets/images/incoming_call.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.fill,
-          ).blurred(),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                Text('waiting for caller'),
-                SizedBox(
-                  height: 10,
-                ),
-                CircularProgressIndicator(
-                  color: Colors.white,
-                )
-              ],
-            ),
-          )
-        ],
-      );
+      return const SizedBox();
     }
   }
 }

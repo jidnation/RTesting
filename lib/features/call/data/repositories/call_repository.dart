@@ -21,7 +21,6 @@ class CallRepository {
       return Right(response);
     } on GraphQLError catch (e) {
       Console.log('call response', e);
-
       return Left(e.message!);
     }
   }

@@ -12,6 +12,7 @@ class CallRemoteDataSource {
 
   Future<InitiateCallResponse> initiatePrivateCall(
       InitiatePrivateCall privateCall) async {
+        
     String q = '''
             mutation{
   initiatePrivateCall(
@@ -29,24 +30,22 @@ class CallRemoteDataSource {
                 ''';
     try {
       var result = await _client.mutate(gql(q), variables: {});
+      Console.log('call result', result);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      Console.log('call result', result.data);
       return InitiateCallResponse.fromJson(result.data['initiatePrivateCall']);
     } catch (e) {
+      Console.log('call result', e);
       rethrow;
     }
   }
 
-  Future<dynamic> answerPrivateCall(AnswerPrivateCall privateCall) async {
-
-  }
+  Future<dynamic> answerPrivateCall(AnswerPrivateCall privateCall) async {}
 
   Future<dynamic> completePrivateCall() async {}
 
   Future<dynamic> rejectPrivateCall(RejectPrivateCall privateCall) async {}
 
   Future<dynamic> updatePrivateCall() async {}
-
 }

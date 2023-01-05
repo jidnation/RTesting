@@ -1,4 +1,5 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,10 +10,19 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
-import '../../../../core/utils/dimensions.dart';
-import '../../../account/presentation/widgets/image_placeholder.dart';
 import '../bloc/call_bloc.dart';
+
+enum CallStatus {
+  calling,
+  ringing,
+  successful,
+  failed,
+  rejected,
+  ended,
+  timedout
+}
 
 const appId = "5741afe670ba4684aec914fb19eeb82a";
 
@@ -31,7 +41,13 @@ class _CallScreenState extends State<InitiateVideoCall> {
   bool muteMic = false;
   String? channelName;
   late RtcEngine _engine;
+  bool remoteUserJoined = false;
 
+  CallStatus status = CallStatus.calling;
+
+  final assetsAudioPlayer = AssetsAudioPlayer();
+  final StopWatchTimer stopWatchTimer =
+      StopWatchTimer(mode: StopWatchMode.countUp);
   @override
   void initState() {
     initAgora();
@@ -40,7 +56,6 @@ class _CallScreenState extends State<InitiateVideoCall> {
 
   Future<void> initAgora() async {
     await [Permission.microphone, Permission.camera].request();
-    Console.log('PERMISSIONS', 'permissions request');
     _engine = createAgoraRtcEngine();
     await _engine.initialize(
       const RtcEngineContext(
@@ -48,56 +63,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
         channelProfile: ChannelProfileType.channelProfileCommunication,
       ),
     );
-    _engine.registerEventHandler(
-      RtcEngineEventHandler(
-        onConnectionStateChanged: (connection, state, reason) {
-          Console.log('reachme calllog connection ', connection);
-          Console.log('reachme calllog state', state);
-          Console.log('reachme calllog reason', reason);
-          showCallAlerts(reason);
-        },
-        onPermissionError: (permissionType) {
-          Console.log('reachme calllog permission error', permissionType);
-        },
-        onApiCallExecuted: (err, api, result) {
-          Console.log('reachme calllog api err', err);
-          Console.log('reachme calllog apicall', api);
-          Console.log('reachme calllog apiresult', result);
-        },
-        onError: (err, msg) {
-          Console.log('reachme calllog error message', msg);
-          Console.log('reachme calllog error', err);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(msg)));
-        },
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          Console.log('reachme calllog channel join', 'join channel success');
-          debugPrint("local user ${connection.localUid} joined");
-          setState(() {
-            _localUserJoined = true;
-          });
-        },
-        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          debugPrint("remote user $remoteUid joined");
-          setState(() {
-            _remoteUid = remoteUid;
-          });
-        },
-        onUserOffline: (RtcConnection connection, int remoteUid,
-            UserOfflineReasonType reason) {
-          debugPrint("remote user $remoteUid left channel");
-          setState(() {
-            _remoteUid = null;
-          });
-        },
-        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
-          Console.log(
-            '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}',
-            ' token: $token',
-          );
-        },
-      ),
-    );
+    _engine.registerEventHandler(agoraEventHandler());
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     await _engine.enableVideo();
     await _engine.startPreview();
@@ -110,19 +76,86 @@ class _CallScreenState extends State<InitiateVideoCall> {
     );
   }
 
+  RtcEngineEventHandler agoraEventHandler() {
+    return RtcEngineEventHandler(
+      onConnectionStateChanged: (connection, state, reason) {
+        showCallAlerts(reason);
+      },
+      onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+        Console.log('reachme calllog channel join', 'join channel success');
+        debugPrint("local user ${connection.localUid} joined");
+        stopWatchTimer.onStartTimer();
+        setState(() {
+          _localUserJoined = true;
+        });
+      },
+      onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+        debugPrint("remote user $remoteUid joined");
+        stopRingingSound();
+        setState(() {
+          status = CallStatus.successful;
+          remoteUserJoined = !remoteUserJoined;
+          _remoteUid = remoteUid;
+          Console.log('status', status);
+        });
+      },
+      onUserOffline: (RtcConnection connection, int remoteUid,
+          UserOfflineReasonType reason) {
+        debugPrint("remote user $remoteUid left channel");
+        setState(() {
+          status = CallStatus.ended;
+          remoteUserJoined = !remoteUserJoined;
+          _remoteUid = null;
+        });
+        endCall();
+      },
+    );
+  }
+
+  endCall() {
+    Navigator.pop(context);
+    Fluttertoast.showToast(msg: 'call ended');
+  }
+
   join(String token, String channel) async {
     channelName = channel;
     Console.log('call joined status', 'joining');
+
     await _engine.joinChannel(
       token: token,
       channelId: channel,
       options: const ChannelMediaOptions(),
       uid: 0,
     );
+    await playRingingSound();
     setState(() {
       _localUserJoined = true;
     });
+    Console.log('timer started', DateTime.now().second);
+    await Future.delayed(const Duration(seconds: 30)).then((value) {
+      if (_remoteUid == null) {
+        setState(() {
+          status = CallStatus.timedout;
+        });
+        Fluttertoast.showToast(
+            msg: '${widget.recipient!.username} did not pick up');
+        Navigator.pop(context);
+        Console.log('timer started', DateTime.now().second);
+      }
+    });
     Console.log('call joined status', _localUserJoined);
+  }
+
+  playRingingSound() async {
+    assetsAudioPlayer.open(
+      Audio("assets/sounds/calling_sound.mp3"),
+      autoStart: true,
+      showNotification: false,
+    );
+  }
+
+  stopRingingSound() {
+    assetsAudioPlayer.stop();
   }
 
   toggleCamera() async {
@@ -132,7 +165,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
   muteMicrophone() async {
     muteMic = !muteMic;
     await _engine.muteLocalAudioStream(muteMic);
-    Console.log('MIC STATUS', muteMic);
+    Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
+    setState(() {});
   }
 
   @override
@@ -140,6 +174,10 @@ class _CallScreenState extends State<InitiateVideoCall> {
     _engine.disableAudio();
     _engine.disableVideo();
     _engine.leaveChannel();
+    _engine.unregisterEventHandler(agoraEventHandler());
+    _engine.release();
+    stopRingingSound();
+    stopWatchTimer.dispose();
     super.dispose();
   }
 
@@ -155,79 +193,19 @@ class _CallScreenState extends State<InitiateVideoCall> {
           }
         },
         builder: (context, state) {
-          Console.log('call state', state);
           return Stack(
             children: [
-              SizedBox(
-                width: size.width,
-                height: size.height,
-                child: Center(
-                  child: _localUserJoined
-                      ? Stack(
-                          children: [
-                            SizedBox(
-                              width: size.width,
-                              height: size.height,
-                              child: _remoteVideo(channelName!),
-                            ),
-                            Positioned(
-                              bottom: 110,
-                              right: 20,
-                              child: SizedBox(
-                                width: size.width * 0.4,
-                                height: size.height * 0.3,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: _localPreview(_localUserJoined, 0),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Stack(
-                          children: [
-                            Image.asset(
-                              'assets/images/incoming_call.png',
-                              fit: BoxFit.fill,
-                              height: size.height,
-                              width: size.width,
-                            ),
-                            Positioned(
-                              top: 100,
-                              left: 1,
-                              right: 1,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  ImagePlaceholder(
-                                    width: getScreenWidth(100),
-                                    height: getScreenHeight(100),
-                                  ),
-                                  Text(
-                                    widget.recipient!.firstName!,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Calling',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ),
+              _remoteUid == null
+                  ? SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: _localPreview(_localUserJoined, 0),
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: _remoteVideo(channelName!),
+                    ),
               Positioned(
                 bottom: 0,
                 child: Stack(
@@ -270,9 +248,12 @@ class _CallScreenState extends State<InitiateVideoCall> {
                               ],
                             ),
                           ),
-                          CircleAvatar(
+                          FloatingActionButton(
                             backgroundColor: const Color(0xffE91C43),
-                            radius: 29,
+                            onPressed: () {
+                              Fluttertoast.showToast(msg: 'call ended');
+                              Navigator.pop(context);
+                            },
                             child: SvgPicture.asset(
                               'assets/svgs/call.svg',
                               color: AppColors.white,
@@ -295,7 +276,9 @@ class _CallScreenState extends State<InitiateVideoCall> {
                                   right: 10,
                                   bottom: 10,
                                   child: SvgPicture.asset(
-                                    'assets/svgs/mic.svg',
+                                    muteMic
+                                        ? 'assets/svgs/mic_slash.svg'
+                                        : 'assets/svgs/mic.svg',
                                     color: AppColors.white,
                                   ),
                                 ),
@@ -333,14 +316,14 @@ class _CallScreenState extends State<InitiateVideoCall> {
             height: double.infinity,
             fit: BoxFit.fill,
           ).blurred(),
-           Center(
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: const [
-                Text('waiting for recipient'),
-                SizedBox(height: 10,),
-                CircularProgressIndicator(color: Colors.white,)
+                CircularProgressIndicator(
+                  color: Colors.white,
+                )
               ],
             ),
           )
@@ -358,10 +341,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
         ),
       );
     } else {
-      return const Text(
-        'Join a channel',
-        textAlign: TextAlign.center,
-      );
+      return const SizedBox();
     }
   }
 }
