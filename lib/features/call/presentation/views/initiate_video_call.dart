@@ -1,6 +1,5 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +10,7 @@ import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:wakelock/wakelock.dart';
 
 import '../bloc/call_bloc.dart';
 
@@ -51,6 +51,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
   @override
   void initState() {
     initAgora();
+    Wakelock.enable();
+
     super.initState();
   }
 
@@ -84,7 +86,6 @@ class _CallScreenState extends State<InitiateVideoCall> {
       onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
         Console.log('reachme calllog channel join', 'join channel success');
         debugPrint("local user ${connection.localUid} joined");
-        stopWatchTimer.onStartTimer();
         setState(() {
           _localUserJoined = true;
         });
@@ -96,6 +97,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
           status = CallStatus.successful;
           remoteUserJoined = !remoteUserJoined;
           _remoteUid = remoteUid;
+          stopWatchTimer.onStartTimer();
           Console.log('status', status);
         });
       },
@@ -177,6 +179,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
     _engine.unregisterEventHandler(agoraEventHandler());
     _engine.release();
     stopRingingSound();
+    Wakelock.disable();
+
     stopWatchTimer.dispose();
     super.dispose();
   }
@@ -195,17 +199,63 @@ class _CallScreenState extends State<InitiateVideoCall> {
         builder: (context, state) {
           return Stack(
             children: [
-              _remoteUid == null
-                  ? SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: _localPreview(_localUserJoined, 0),
-                    )
-                  : SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: _remoteVideo(channelName!),
-                    ),
+              SizedBox(
+                width: size.width,
+                height: size.height,
+                child: Center(
+                  child: _localUserJoined
+                      ? !remoteUserJoined
+                          ? _localPreview(
+                              _localUserJoined,
+                              0,
+                            )
+                          : Stack(
+                              children: [
+                                SizedBox(
+                                  width: size.width,
+                                  height: size.height,
+                                  child: _remoteVideo(channelName!),
+                                ),
+                                Visibility(
+                                  visible: remoteUserJoined,
+                                  child: Positioned(
+                                    bottom: 110,
+                                    right: 20,
+                                    child: SizedBox(
+                                      width: size.width * 0.4,
+                                      height: size.height * 0.3,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: _localPreview(
+                                          _localUserJoined,
+                                          0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                      : const SizedBox(),
+                ),
+              ),
+              Positioned(
+                top: 50,
+                right: 30,
+                child: StreamBuilder<int>(
+                  stream: stopWatchTimer.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(value!,
+                        milliSecond: false);
+                    return Text(
+                      displayTime,
+                      style: const TextStyle(color: Colors.white),
+                    );
+                  },
+                ),
+              ),
               Positioned(
                 bottom: 0,
                 child: Stack(
@@ -308,26 +358,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
         ),
       );
     } else {
-      return Stack(
-        children: [
-          Image.asset(
-            'assets/images/incoming_call.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.fill,
-          ).blurred(),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                CircularProgressIndicator(
-                  color: Colors.white,
-                )
-              ],
-            ),
-          )
-        ],
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.black),
       );
     }
   }

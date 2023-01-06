@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:wakelock/wakelock.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/app_globals.dart';
@@ -38,6 +39,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   @override
   void initState() {
     initAgora();
+    Wakelock.enable();
+
     super.initState();
   }
 
@@ -65,6 +68,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           debugPrint("remote user $remoteUid joined");
+
           setState(() {
             _remoteUid = remoteUid;
           });
@@ -121,9 +125,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   endCall() {
     Navigator.pop(context);
     Fluttertoast.showToast(msg: 'call ended');
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   @override
@@ -133,6 +135,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     _engine.leaveChannel();
     _engine.release();
     stopWatchTimer.dispose();
+    Wakelock.disable();
     super.dispose();
   }
 
@@ -319,7 +322,13 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         ),
       );
     } else {
-      return const SizedBox();
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: const [
+           CircularProgressIndicator(color: Colors.black),
+        ],
+      );
     }
   }
 }
