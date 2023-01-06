@@ -1,4 +1,5 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/features/auth/data/models/login_response.dart';
@@ -193,5 +194,41 @@ class AuthRemoteDataSource {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> registerDeviceForNotification() async {
+    var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
+    String q = r'''
+    mutation registerDeviceForNotification(
+    $playerId: String!
+    ) {
+    registerDeviceForNotification(
+        playerId: $playerId
+    )
+}''';
+    final result = await _client.mutate(
+      gql(q),
+      variables: {'playerId': token.userId},
+    );
+    Console.log('fcmtoken', result);
+  }
+
+  Future<void> deregisterDeviceForNotification() async {
+    var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
+    String q = r'''
+    mutation deregisterDeviceForNotification(
+    $playerId: String!
+    ) {
+    deregisterDeviceForNotification(
+        playerId: $playerId
+    )
+}''';
+    final result = await _client.mutate(
+      gql(q),
+      variables: {'playerId': token.userId},
+    );
+    Console.log('fcmtoken', result);
   }
 }

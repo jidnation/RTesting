@@ -115,7 +115,7 @@ class Moment {
   final OwnerProfile? momentOwnerProfile;
 
   factory Moment.fromJson(Map<String, dynamic> json) => Moment(
-        momentId: json["momentId"].toString() ?? '',
+        momentId: json["momentId"].toString() ,
         caption: json["caption"] ?? '',
         authId: json["authId"] ?? '',
         mentionList: json["mentionList"] != null
