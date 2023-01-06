@@ -215,3 +215,105 @@ class GraphQLChatClient {
     return result;
   }
 }
+
+class GraphQLNotificationClient {
+  GraphQLNotificationClient()
+      : graphQLClient = ValueNotifier<GraphQLClient>(
+          GraphQLClient(
+            cache: GraphQLCache(store: InMemoryStore()),
+            link: HttpLink(
+              Endpoints.graphQLNotificationUrl,
+              httpClient: LoggerHttpClient(http.Client()),
+              defaultHeaders: <String, String>{
+                'Authorization': 'Bearer ${globals.token}',
+              },
+            ),
+          ),
+        );
+
+  final ValueNotifier<GraphQLClient> graphQLClient;
+
+  Future<dynamic> query(
+    DocumentNode query, {
+    required Map<String, dynamic> variables,
+  }) async {
+    final QueryResult result = await notificationClientFor().value.query(
+          QueryOptions(
+            document: query,
+            variables: variables,
+          ),
+        );
+
+    if (result.exception != null) {
+      Console.log('query exception', result.exception);
+      if (result.exception!.linkException != null) {
+        return const GraphQLError(message: "Something went wrong. Try again.");
+      } else {
+        if (result.exception != null) {
+          dynamic myException =
+              result.exception!.graphqlErrors.first.extensions!['exception'];
+          bool isUnauthorized = myException['message']
+                  .toString()
+                  .contains('This endpoint requires authorization!')
+              ? true
+              : false;
+
+          if (isUnauthorized) {
+            //if user token has expired, redirect them to login & remove all stacked routes
+            return const GraphQLError(
+                message: "Your session has expired, please login again");
+          }
+          return result.exception!.graphqlErrors.first;
+        }
+      }
+    }
+    return result;
+  }
+
+  Future<dynamic> mutate(
+    DocumentNode documentNode, {
+    required Map<String, dynamic> variables,
+  }) async {
+    final QueryResult result =
+        await notificationClientFor().value.mutate(MutationOptions(
+              document: documentNode,
+              variables: variables,
+            ));
+
+    if (result.exception != null) {
+      Console.log('mutate exception', result.exception);
+      if (result.exception!.linkException != null) {
+        return const GraphQLError(message: "Something went wrong. Try again.");
+      } else {
+        dynamic myException =
+            result.exception!.graphqlErrors.first.extensions!['exception'];
+        bool isUnauthorized = myException['message']
+                .toString()
+                .contains('This endpoint requires authorization!')
+            ? true
+            : false;
+
+        if (isUnauthorized) {
+          //if user token has expired, redirect them to login & remove all stacked routes
+          return const GraphQLError(
+              message: "Your session has expired, please login again");
+        }
+        return result.exception!.graphqlErrors.first;
+      }
+    }
+    return result;
+  }
+
+  //subscriptions
+  Stream<QueryResult> subscribe(
+    DocumentNode document, {
+    required Map<String, dynamic> variables,
+  }) {
+    final SubscriptionOptions options = SubscriptionOptions(
+      document: document,
+      variables: variables,
+    );
+    final Stream<QueryResult> result = notificationClientFor().value.subscribe(options);
+    return result;
+  }
+}

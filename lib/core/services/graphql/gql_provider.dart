@@ -1,5 +1,5 @@
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/endpoints.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 
@@ -74,6 +74,29 @@ ValueNotifier<GraphQLClient> chatClientFor() {
   );
 
   link = link.concat(websocketLink);
+
+  return ValueNotifier<GraphQLClient>(
+    GraphQLClient(
+      cache: GraphQLCache(store: InMemoryStore()),
+      link: link,
+    ),
+  );
+}
+
+///notification gql client
+
+ValueNotifier<GraphQLClient> notificationClientFor() {
+  final HttpLink httpLink = HttpLink(
+    Endpoints.graphQLNotificationUrl,
+    defaultHeaders: <String, String>{
+      'Authorization': 'Bearer ${globals.token}',
+    },
+  );
+  final AuthLink authLink = AuthLink(
+    getToken: () => 'Bearer ${globals.token}',
+  );
+
+  Link link = authLink.concat(httpLink);
 
   return ValueNotifier<GraphQLClient>(
     GraphQLClient(

@@ -1273,10 +1273,10 @@ class PostFeedReacherCard extends HookWidget {
                                 CupertinoButton(
                                   minSize: 0,
                                   onPressed: () {
-                                    RouteNavigators.route(
-                                        context,
-                                        ViewCommentsScreen(
-                                            post: postFeedModel!));
+                                    // RouteNavigators.route(
+                                    //     context,
+                                    //     ViewCommentsScreen(
+                                    //         post: postFeedModel!));
                                   },
                                   padding: EdgeInsets.zero,
                                   child: SvgPicture.asset(

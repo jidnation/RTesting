@@ -4,7 +4,7 @@ class CommentModel {
   String? commentId;
   String? commentSlug;
   String? content;
-  int? nComments;
+  int? nReplies;
   int? nLikes;
   List<String>? imageMediaItems;
   String? audioMediaItem;
@@ -12,15 +12,15 @@ class CommentModel {
   CommentProfileModel? commentOwnerProfile;
   CommentProfileModel? postOwnerProfile;
   List<CommentLikeModel>? like;
-  bool? isLiked;
-
+  String? isLiked;
+  int? nreply;
   CommentModel({
     this.postId,
     this.authId,
     this.commentId,
     this.commentSlug,
     this.content,
-    this.nComments,
+    this.nReplies,
     this.nLikes,
     this.imageMediaItems,
     this.audioMediaItem,
@@ -30,14 +30,13 @@ class CommentModel {
     this.like,
     this.isLiked,
   });
-
   factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
         postId: json["postId"],
         authId: json["authId"],
         commentId: json["commentId"],
         commentSlug: json["commentSlug"],
         content: json["content"],
-        nComments: json["nComments"],
+        nReplies: json["nReplies"],
         nLikes: json["nLikes"],
         isLiked: json["isLiked"],
         imageMediaItems: json["imageMediaItems"] == null
@@ -56,14 +55,13 @@ class CommentModel {
         //   : List<CommentLikeModel>.from(
         //       json["like"].map((x) => CommentLikeModel.fromJson(x))),
       );
-
   Map<String, dynamic> toJson() => {
         "postId": postId,
         "authId": authId,
         "commentId": commentId,
         "commentSlug": commentSlug,
         "content": content,
-        "nComments": nComments,
+        "nRepliess": nReplies,
         "audioMediaItem": audioMediaItem,
         "isLiked": isLiked,
         "imageMediaItem": imageMediaItems == null
