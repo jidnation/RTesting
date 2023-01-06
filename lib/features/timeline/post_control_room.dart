@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import 'package:reach_me/features/timeline/models/post_feed.dart';
+import 'package:reach_me/features/timeline/query.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
+
+class PostStore extends ValueNotifier<List<CustomPostModel>> {
+  //creating a singleton class
+  PostStore._sharedInstance() : super(<CustomPostModel>[]);
+  static final PostStore _shared = PostStore._sharedInstance();
+
+  factory PostStore() => _shared;
+
+  final TimeLineQuery timeLineQuery = TimeLineQuery();
+
+  initialize(List<TimeLineModel> timelinePosts) {
+    for (TimeLineModel postFeed in timelinePosts) {
+      Post post = postFeed.getPostFeed.post!;
+      value.add(CustomPostModel(postFeed.id, post: post));
+    }
+    notifyListeners();
+  }
+
+  likePost(String id) async {
+    List<CustomPostModel> currentData = value;
+    CustomPostModel actualModel =
+        currentData.firstWhere((element) => element.id == id);
+    String postID = actualModel.post.postId!;
+    if (!actualModel.post.isLiked!) {
+      bool response = await timeLineQuery.likePost(postId: postID);
+      if (response) {
+        updateTimeLine(id);
+      }
+    } else {
+      bool response =
+          await timeLineQuery.unlikePost(postId: actualModel.post.postId!);
+      if (response) {
+        updateTimeLine(id);
+      }
+    }
+  }
+
+  votePost({required String id, required String voteType}) async {
+    List<CustomPostModel> currentData = value;
+    CustomPostModel actualModel =
+        currentData.firstWhere((element) => element.id == id);
+    String postID = actualModel.post.postId!;
+    bool response = await timeLineQuery.votePost(
+      postId: postID,
+      voteType: voteType,
+    );
+    if (response) {
+      updateTimeLine(id);
+    }
+  }
+
+  updateTimeLine(String id) async {
+    List<CustomPostModel> currentData = value;
+    CustomPostModel actualModel =
+        currentData.firstWhere((element) => element.id == id);
+    String postID = actualModel.post.postId!;
+    Post? response = await timeLineQuery.getPost(postId: postID);
+    if (response != null) {
+      actualModel.post.isLiked = response.isLiked!;
+      actualModel.post.nLikes = response.nLikes!;
+      actualModel.post.nUpvotes = response.nUpvotes!;
+      actualModel.post.nDownvotes = response.nDownvotes!;
+      actualModel.post.isVoted = response.isVoted!;
+      actualModel.post.nComments = response.nComments!;
+    }
+    notifyListeners();
+  }
+}
+
+class CustomPostModel {
+  final Post post;
+  final String id;
+
+  CustomPostModel(this.id, {required this.post});
+}

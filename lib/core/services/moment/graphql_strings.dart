@@ -360,6 +360,168 @@ query ($replyId: String!) {
   }
 ''';
 
+////////////
+///TimeLine String
+////////////
+const String getPostFeeds = r''' 
+query ($pageNumber: Int!, $pageLimit: Int! ) {
+  getPostFeed(page_limit: $pageLimit, page_number: $pageNumber){
+    reachingRelationship,
+    created_at,
+    updated_at,
+    feedOwnerProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        verified,
+        profileSlug,
+        location,
+        profilePicture,
+        location
+    },
+    voterProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+    },
+    post{
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+    }
+  }
+  }
+''';
+
+const String getPost = r''' 
+query ($postId: String!) {
+  getPost(postId: $postId){
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+  }
+  }
+''';
+
+const likePost = r'''
+mutation($postId: String!) {
+    likePost (postId: $postId){
+    authId
+  }
+  }
+''';
+
+const votePost = r'''
+mutation($postId: String!, $voteType: String!) {
+    votePost(postId: $postId, voteType: $voteType)
+  }
+''';
+
+const unlikePost = r'''
+mutation($postId: String!) {
+    unlikePost (postId: $postId)
+  }
+''';
+
 ///
 /// 23 in total
 /// 4 used

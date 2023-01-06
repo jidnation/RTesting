@@ -23,6 +23,7 @@ class MomentFeed extends StatefulWidget {
 }
 
 final MomentFeedStore momentFeedStore = MomentFeedStore();
+
 CarouselController carouselController = CarouselController();
 // const colors = [Colors.green, Colors.blue, Colors.red, Colors.yellow];
 
