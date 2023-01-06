@@ -1,4 +1,5 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/features/auth/data/models/login_response.dart';
@@ -61,7 +62,8 @@ class AuthRemoteDataSource {
     }
   }
 
-  Future<LoginResponse> verifyAccount({required String? email, required int pin}) async {
+  Future<LoginResponse> verifyAccount(
+      {required String? email, required int pin}) async {
     const String q = r'''
       query activateAccount($email: String!, $pin: Int!) {
         activateAccount(email: $email, pin: $pin) {
@@ -113,7 +115,9 @@ class AuthRemoteDataSource {
       {required String? email, required int? pin}) async {
     const String q = r'''
         query verifyResetPin($email: String!, $pin: Int!) {
-          verifyResetPin(email: $email, pin: $pin) 
+          verifyResetPin(email: $email, pin: $pin) {
+            token
+          }
         }''';
     try {
       final result = await _client.query(
@@ -160,9 +164,10 @@ class AuthRemoteDataSource {
     }
   }
 
-  Future<LoginResponse> login({required String? email, required String password}) async {
+  Future<LoginResponse> login(
+      {required String? email, required String password}) async {
     const String q = r'''
-      query login($email: String!, $password: String) {
+      query login($email: String!, $password: String!) {
       login(email: $email, password: $password) {
         id
         email
@@ -189,5 +194,41 @@ class AuthRemoteDataSource {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> registerDeviceForNotification() async {
+    var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
+    String q = r'''
+    mutation registerDeviceForNotification(
+    $playerId: String!
+    ) {
+    registerDeviceForNotification(
+        playerId: $playerId
+    )
+}''';
+    final result = await _client.mutate(
+      gql(q),
+      variables: {'playerId': token.userId},
+    );
+    Console.log('fcmtoken', result);
+  }
+
+  Future<void> deregisterDeviceForNotification() async {
+    var token = await OneSignal.shared.getDeviceState();
+    Console.log('fcmtoken', token!.userId);
+    String q = r'''
+    mutation deregisterDeviceForNotification(
+    $playerId: String!
+    ) {
+    deregisterDeviceForNotification(
+        playerId: $playerId
+    )
+}''';
+    final result = await _client.mutate(
+      gql(q),
+      variables: {'playerId': token.userId},
+    );
+    Console.log('fcmtoken', result);
   }
 }

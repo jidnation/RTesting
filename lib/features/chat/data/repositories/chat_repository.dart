@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/chat/data/datasources/chat_remote_datasource.dart';
@@ -45,7 +48,7 @@ class ChatRepository {
     }
   }
 
-  Future<Either<String, Chat>> getThreadMessages({
+  Future<Either<String, List<Chat>>> getThreadMessages({
     required String? id,
     String? fromMessageId,
   }) async {
@@ -75,6 +78,22 @@ class ChatRepository {
       final isDeleted = await _chatRemoteDataSource.deleteThread(id: id);
       return Right(isDeleted);
     } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Stream<QueryResult> subcribeToChats({required String? id}) {
+    final stream = _chatRemoteDataSource.subscribeToChats(id: id);
+    return stream;
+  }
+
+  Future<Either<String, String>> uploadPhoto({File? file}) async {
+    try {
+      //TODO: WORK ON THIS
+      final user = await _apiClient.uploadImage(url: '', file: file!);
+      final String imgUrl = user['data'];
+      return Right(imgUrl);
+    } on DioError catch (e) {
       return Left(e.message);
     }
   }

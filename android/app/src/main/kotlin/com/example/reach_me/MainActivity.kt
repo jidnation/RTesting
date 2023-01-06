@@ -1,4 +1,4 @@
-package com.example.reach_me
+package com.myreach.me
 
 import io.flutter.embedding.android.FlutterActivity
 

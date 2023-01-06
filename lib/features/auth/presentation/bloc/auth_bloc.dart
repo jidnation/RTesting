@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/services/database/secure_storage.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/auth/data/repositories/auth_repository.dart';
 
@@ -10,7 +11,12 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository? _authRepository = AuthRepository();
+
   AuthBloc() : super(AuthInitial()) {
+    on<LogoutEvent>((event, emit) {
+      _authRepository!.deregisterDeviceForNotifications();
+    });
+
     on<RegisterUserEvent>(((event, emit) async {
       emit(AuthLoading());
       try {
@@ -52,6 +58,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (user) {
             globals.loginResponse = user;
             globals.token = user.token;
+            globals.email = user.email;
+            globals.fname = user.firstName;
+            globals.userId = user.id;
+            SecureStorage.writeSecureData('token', globals.token!);
+            SecureStorage.writeSecureData('email', globals.email!);
+            SecureStorage.writeSecureData('fname', user.firstName!);
+            SecureStorage.writeSecureData('userId', user.id!);
+            _authRepository!.registerDeviceForNotifications();
             emit(Authenticated(message: 'User logged in successfully'));
           },
         );

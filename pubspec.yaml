@@ -1,125 +1,132 @@
 name: reach_me
 description: A new Flutter project.
 
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: "none"
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  shared_preferences: ^2.0.5
-  lottie: ^1.2.1
-  dio: ^4.0.4
-  http: ^0.13.4
-  flutter_overlay_loader: ^1.0.3
-  freezed: ^1.1.0
-  pinput: ^1.2.0
-  freezed_annotation: ^1.1.0
-  json_serializable: ^6.1.3
-  json_annotation: ^4.4.0
-  equatable: ^2.0.3
-  flutter_svg: ^1.0.3
-  readmore: ^2.1.0
+  agora_rtc_engine: ^6.0.0
+  assets_audio_player: ^3.0.6
+  audio_waveforms:
+    git: https://github.com/gideonoyekale/audio_waveforms.git
+  audioplayers: ^1.1.1
+  better_player: ^0.0.83
+  blur: ^3.1.0
   bubble: ^1.2.1
-  graphql_flutter: ^5.0.1
-  flutter_secure_storage: ^5.0.2
-  gap: ^2.0.0
-  dartz: ^0.10.1
-  get_it: ^7.2.0
-  flutter_bloc: 7.3.1
-  sprintf: ^6.0.0
-  flutter_hooks: ^0.18.2+1
-  image_picker: ^0.8.5
-  photo_gallery: ^1.1.1
-  permission_handler: ^9.2.0
+  bubble_tab_indicator: ^0.1.6
+  cached_network_image: ^3.2.0
+  camera: ^0.10.0+1
   card_swiper: ^2.0.3
   carousel_slider: ^4.0.0
   chewie: ^1.3.1
-  video_player: 
-  cached_network_image: ^3.2.0
-
+  cloudinary: ^1.0.3
+  cupertino_icons: ^1.0.2
+  dartz: ^0.10.1
+  dio: ^4.0.4
+  double_back_to_close_app: ^2.1.0
+  emoji_picker_flutter: ^1.5.0
+  equatable: ^2.0.3
+  expandable_text: ^2.3.0
+  file_picker: ^5.0.0
+  firebase_core: ^2.1.1
+  firebase_messaging: ^14.1.4
+  flutter:
+    sdk: flutter
+  flutter_audio_cutter: ^1.0.3+1
+  flutter_bloc: ^8.1.1
+  flutter_hooks: ^0.18.2+1
+  flutter_keyboard_visibility: ^5.4.0
+  flutter_linkify: ^5.0.2
+  flutter_mentions:
+    git: https://github.com/gideonoyekale/flutter_mentions.git
+  flutter_native_image: ^0.0.6+1
+  flutter_overlay_loader: ^1.0.3
+  flutter_progress_hud: ^2.0.2
+  flutter_ringtone_player: ^3.2.0
+  flutter_secure_storage: ^5.0.2
+  flutter_sound: ^9.2.13
+  flutter_staggered_grid_view: ^0.6.2
+  flutter_svg: ^1.0.3
+  fluttertoast: ^8.0.9
+  focused_menu: ^1.0.5
+  freezed: ^1.1.0
+  freezed_annotation: ^1.1.0
+  full_screen_image_null_safe: ^2.0.0
+  fwfh_text_style: 2.22.8+1
+  gap: ^2.0.0
+  get: ^4.6.5
+  get_it: ^7.2.0
+  google_fonts: ^3.0.1
+  graphql_flutter: ^5.0.1
+  grouped_list: ^5.1.2
+  http: ^0.13.4
+  image_cropper: ^3.0.0
+  image_gallery_saver: ^1.7.1
+  image_picker: ^0.8.5
+  image_viewer: ^1.5.0
+  intl: ^0.17.0
+  json_annotation: ^4.4.0
+  json_serializable: ^6.1.3
+  just_waveform: ^0.0.3
+  location: ^4.4.0
+  lottie: ^1.2.1
+  mime: ^1.0.2
+  neon_circular_timer: ^0.0.7
+  onesignal_flutter: ^3.5.0
+  overlay_support: ^2.0.1
+  path: ^1.8.2
+  path_provider: ^2.0.11
+  permission_handler: ^10.2.0
+  photo_gallery: ^1.1.1
+  photo_view: ^0.14.0
+  pinput: ^1.2.0
+  pull_to_refresh: ^2.0.0
+  qr_code_scanner: ^1.0.1
+  qr_flutter: ^4.0.0
+  readmore: ^2.1.0
+  scan: ^1.6.0
+  share_files_and_screenshot_widgets: ^1.0.6
+  share_plus: ^5.0.0
+  shared_preferences: ^2.0.5
+  skeletons: ^0.0.3
+  sprintf: ^6.0.0
+  stop_watch_timer: ^2.0.0
+  story_time: ^1.0.6
+  tab_indicator_styler: ^2.0.0
+  timeago: ^3.3.0
+  video_compress: ^3.1.1
+  video_player: 2.4.4
+  video_thumbnail: ^0.5.3
+  visibility_detector: ^0.3.3
+  wakelock: ^0.6.2
+  wechat_assets_picker: ^8.1.3
+  wechat_camera_picker: ^3.6.3
+  workmanager: ^0.5.1
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.9.0
+
+  flutter_lints: ^1.0.4
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^1.0.4
-  flutter_launcher_icons: ^0.9.0
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# handle Futter icons
 flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/app-icon.png"
 
-# The following section is specific to Flutter.
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/icons/
     - assets/svgs/
-    - assets/videos/
+    - assets/sounds/
 
-  # fonts:
-  #   - family: Karla
-  #     fonts:
-  #       - asset: assets/fonts/Karla-Light.ttf
-  #         weight: 300
-  #       - asset: assets/fonts/Karla-LightItalic.ttf
-  #         weight: 300
-  #         style: italic
-  #       - asset: assets/fonts/Karla-Regular.ttf
-  #         weight: 400
-  #       - asset: assets/fonts/Karla-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/Karla-MediumItalic.ttf
-  #         weight: 500
-  #         style: italic
-  #       - asset: assets/fonts/Karla-Bold.ttf
-  #         weight: 700
-  #       - asset: assets/fonts/Karla-BoldItalic.ttf
-  #         weight: 700
-  #         style: italic
   fonts:
     - family: Poppins
       fonts:
@@ -140,6 +147,3 @@ flutter:
         - asset: assets/fonts/Poppins-BoldItalic.ttf
           weight: 700
           style: italic
-  
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages

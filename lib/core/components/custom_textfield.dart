@@ -84,7 +84,13 @@ class CustomRoundTextField extends StatelessWidget {
   final int? minLines;
   final Color? fillColor;
   final bool? isDense;
+  final bool? autoFocus;
+  final void Function()? onTap;
+  final FocusNode? focusNode;
+  final double? verticalHeight;
   final Function(String)? onChanged;
+  final FocusScope? focusScope;
+  final FocusManager? focusManager;
 
   const CustomRoundTextField(
       {Key? key,
@@ -93,27 +99,35 @@ class CustomRoundTextField extends StatelessWidget {
       this.obscureText = false,
       this.validator,
       this.controller,
+        this.autoFocus,
       this.prefixIcon,
       this.enabledBorderSide = BorderSide.none,
       this.focusedBorderSide = BorderSide.none,
       this.suffixIcon,
       this.isFilled = true,
       this.borderRadius = 54,
+      this.verticalHeight,
       this.minLines = 1,
       this.maxLines = 5,
       this.isDense = false,
+      this.onTap,
       this.onChanged,
       this.fillColor = const Color(0xFFF5F5F5),
       this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
       this.textStyle =
           const TextStyle(color: AppColors.textColor2, fontSize: 15),
-      this.textCapitalization = TextCapitalization.none})
+      this.textCapitalization = TextCapitalization.none,
+      this.focusNode,
+      this.focusScope,
+      this.focusManager,})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onTap: onTap,
       minLines: minLines,
+      autofocus: autoFocus ?? false,
       maxLines: maxLines,
       style: textStyle,
       keyboardType: keyboardType,
@@ -123,14 +137,15 @@ class CustomRoundTextField extends StatelessWidget {
       textCapitalization: textCapitalization,
       onChanged: onChanged,
       validator: validator,
+      focusNode: focusNode,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: hintStyle,
         filled: isFilled,
         isDense: isDense,
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: 24,
-          vertical: 19,
+          vertical: verticalHeight ?? 12,
         ),
         fillColor: fillColor,
         suffixIcon: suffixIcon,
@@ -139,6 +154,12 @@ class CustomRoundTextField extends StatelessWidget {
             borderSide: enabledBorderSide,
             borderRadius: BorderRadius.circular(borderRadius)),
         focusedBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
+        errorBorder: OutlineInputBorder(
+            borderSide: focusedBorderSide,
+            borderRadius: BorderRadius.circular(borderRadius)),
+        focusedErrorBorder: OutlineInputBorder(
             borderSide: focusedBorderSide,
             borderRadius: BorderRadius.circular(borderRadius)),
       ),

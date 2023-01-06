@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reach_me/core/utils/constants.dart';
 
 class ImagePlaceholder extends StatelessWidget {
   const ImagePlaceholder({
@@ -16,17 +15,42 @@ class ImagePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.hardEdge,
+      padding: const EdgeInsets.all(3),
       height: height,
       width: width,
-      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
+        //  border: border,
         shape: BoxShape.circle,
-        border: border
+        color: Colors.grey.shade50,
       ),
-      child: FittedBox(
-        child: Image.asset('assets/images/blank-dp.png', fit: BoxFit.cover,)
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: FittedBox(
+            child: Image.asset(
+          'assets/images/blank-dp.png',
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+        )),
       ),
+    );
+  }
+}
+
+class CoverImagePlaceholder extends StatelessWidget {
+  const CoverImagePlaceholder({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/images/cover.png',
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
     );
   }
 }

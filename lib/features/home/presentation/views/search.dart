@@ -1,42 +1,55 @@
+import 'dart:io';
+
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/home/presentation/bloc/user_bloc.dart';
-import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/extensions.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
-class SearchScreen extends HookWidget {
+class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
-  const SearchScreen({Key? key}) : super(key: key);
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+  const SearchScreen({Key? key, this.scaffoldKey}) : super(key: key);
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin<SearchScreen> {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    final _scaffoldKey = useState(GlobalKey<ScaffoldState>());
+    super.build(context);
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
+    final _userList = useState<List<ProfileIndexModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      key: _scaffoldKey.value,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.grey.shade50,
         elevation: 0,
         leading: IconButton(
           padding: const EdgeInsets.all(0),
-          onPressed: () => _scaffoldKey.value.currentState!.openDrawer(),
+          onPressed: () => widget.scaffoldKey!.currentState!.openDrawer(),
           icon: globals.user!.profilePicture == null
               ? ImagePlaceholder(
                   width: getScreenWidth(40),
@@ -51,14 +64,15 @@ class SearchScreen extends HookWidget {
           hintText: 'Search ReachMe',
           fillColor: AppColors.white,
           controller: _searchController,
+          maxLines: 1,
           onChanged: (val) {
             if (val.isNotEmpty) {
               _hasText.value = true;
               _searchString.value = val;
-              globals.userBloc!.add(FetchAllUsersByNameEvent(
-                limit: 20,
+              globals.socialServiceBloc!.add(SearchProfileEvent(
+                pageLimit: 20,
                 pageNumber: 1,
-                query: val,
+                name: val,
               ));
             } else {
               _hasText.value = false;
@@ -78,40 +92,42 @@ class SearchScreen extends HookWidget {
         ],
       ),
       body: SizedBox(
-        width: size.width,
-        height: size.height,
+        // width: size.width,
+        // height: size.height,
         child: !_hasText.value
             ? const SearchStories()
-            : BlocConsumer<UserBloc, UserState>(
-                bloc: globals.userBloc,
+            : BlocConsumer<SocialServiceBloc, SocialServiceState>(
+                bloc: globals.socialServiceBloc,
                 listener: (context, state) {
-                  if (state is FetchUsersSuccess) {
-                    globals.userList = state.user;
-                  } else if (state is UserError) {
-                    RMSnackBar.showErrorSnackBar(context, message: state.error);
+                  if (state is SearchProfileSuccess) {
+                    globals.userList = state.users!;
+                    _userList.value = state.users!;
+                  } else if (state is SearchProfileError) {
+                    Snackbars.error(context, message: state.error);
                   }
                 },
                 builder: (context, state) {
                   if (state is UserLoading) {
                     return const Center(child: CupertinoActivityIndicator());
                   }
-                  if (globals.userList!.isEmpty) {
+                  if (_userList.value.isEmpty) {
                     return SearchNoResultFound(size: size)
                         .paddingSymmetric(h: 16);
                   }
                   return ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: globals.userList!.length,
+                    itemCount: _userList.value.length,
                     itemBuilder: (context, index) {
                       return SearchResultCard(
                         displayName: (globals.userList![index].firstName! +
                                 ' ' +
                                 globals.userList![index].lastName!)
                             .toTitleCase(),
-                        email: globals.userList![index].email,
-                        username: globals.userList![index].username,
-                        imageUrl: globals.userList![index].profilePicture,
+                        //: globals.userList![index].,
+                        username: _userList.value[index].username,
+                        imageUrl: _userList.value[index].profilePicture,
+                        id: _userList.value[index].authId,
                       );
                     },
                   );
@@ -166,61 +182,82 @@ class SearchResultCard extends StatelessWidget {
     required this.username,
     required this.displayName,
     required this.imageUrl,
-    required this.email,
+    // required this.email,
+    required this.id,
   }) : super(key: key);
 
   final String? imageUrl;
   final String? username;
   final String? displayName;
-  final String? email;
+  // final String? email;
+  final String? id;
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserBloc, UserState>(
-        bloc: globals.userBloc,
-        listener: (context, state) {
-          if (state is RecipientUserData) {
-            globals.recipientUser = state.user;
-            //RouteNavigators.route(context, const RecipientAccountProfile());
-          } else if (state is UserError){
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
-          }
-        },
-        builder: (context, state) {
-          return InkWell(
-            onTap: () {
-              RouteNavigators.route(context, const RecipientAccountProfile());
-              globals.userBloc!.add(GetRecipientProfileEvent(email: email));
-            },
-            child: ListTile(
-              leading: imageUrl == null
-                  ? ImagePlaceholder(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                    )
-                  : ProfilePicture(
-                      height: getScreenHeight(50),
-                      width: getScreenWidth(50),
-                    ),
-              title: Text(
-                username ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: Text(
-                displayName ?? '',
-                style: TextStyle(
-                  fontSize: getScreenHeight(15),
-                  color: AppColors.textColor2.withOpacity(0.7),
-                  fontWeight: FontWeight.w400,
-                ),
+      bloc: globals.userBloc,
+      listener: (context, state) {
+        if (state is RecipientUserData) {
+          globals.recipientUser = state.user;
+          //  email == globals.user!.email
+          //       ? RouteNavigators.route(context, const AccountScreen())
+          //       : RouteNavigators.route(
+          //           context, RecipientAccountProfile(email: email));
+        } else if (state is UserError) {
+          Snackbars.error(context, message: state.error);
+        }
+      },
+      builder: (context, state) {
+        if (state is UserLoading) {
+          return Center(
+              child: Platform.isIOS
+                  ? const CupertinoActivityIndicator()
+                  : const CircularProgressIndicator());
+        }
+        return InkWell(
+          onTap: () {
+            globals.userBloc!.add(GetRecipientProfileEvent(email: id));
+            id == globals.user!.id
+                ? RouteNavigators.route(context, const AccountScreen())
+                : RouteNavigators.route(
+                    context,
+                    RecipientAccountProfile(
+                      recipientEmail: 'email',
+                      recipientImageUrl: imageUrl,
+                      recipientId: id,
+                    ));
+          },
+          child: ListTile(
+            leading: imageUrl == null
+                ? ImagePlaceholder(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                  )
+                : RecipientProfilePicture(
+                    height: getScreenHeight(40),
+                    width: getScreenWidth(40),
+                    imageUrl: imageUrl,
+                  ),
+            title: Text(
+              username ?? '',
+              style: TextStyle(
+                fontSize: getScreenHeight(15),
+                color: AppColors.textColor2,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          );
-        });
+            // subtitle: Text(
+            //   displayName ?? '',
+            //   style: TextStyle(
+            //     fontSize: getScreenHeight(15),
+            //     color: AppColors.textColor2.withOpacity(0.7),
+            //     fontWeight: FontWeight.w400,
+            //   ),
+            // ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -230,14 +267,23 @@ class SearchStories extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final imgList = [
-      'assets/images/frame.png',
-      'assets/images/frame.png',
-      'assets/images/frame.png',
+      'assets/images/billboard.png',
+      'assets/images/billboard.png',
+      'assets/images/billboard.png',
     ];
+    // final imgList = [
+    //   'assets/images/frame.png',
+    //   'assets/images/frame.png',
+    //   'assets/images/frame.png',
+    // ];
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
               margin: const EdgeInsets.all(5.0),
-              child: Image.asset(item),
+              child: Image.asset(
+                item,
+                fit: BoxFit.fill,
+                // gaplessPlayback: true,
+              ),
             ))
         .toList();
     final _currentIndex = useState<int>(0);
@@ -254,12 +300,13 @@ class SearchStories extends HookWidget {
             children: [
               SizedBox(
                 width: size.width,
-                height: getScreenHeight(200),
+                // height: getScreenHeight(315),
                 child: CarouselSlider.builder(
                   itemCount: imgList.length,
                   options: CarouselOptions(
-                    height: getScreenHeight(200),
+                    // height: getScreenHeight(200),
                     viewportFraction: 1,
+                    aspectRatio: 2.0,
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,
@@ -268,7 +315,7 @@ class SearchStories extends HookWidget {
                     autoPlayAnimationDuration:
                         const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
+                    enlargeCenterPage: false,
                     scrollDirection: Axis.horizontal,
                     disableCenter: true,
                     onPageChanged: (index, reason) {
@@ -283,26 +330,27 @@ class SearchStories extends HookWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: imgList.map((url) {
-                  int index = imgList.indexOf(url);
+                children: imgList.mapIndexed((i, url) {
+                  // int index = imgList.indexOf(url);
+                  bool selected = true;
                   return Container(
-                    width: 7.0,
-                    height: 7.0,
+                    width: _currentIndex.value == i ? 8 : 5.0,
+                    height: _currentIndex.value == i ? 8 : 5.0,
                     margin: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                      horizontal: 3.0,
+                      vertical: 12.0,
+                      horizontal: 1.0,
                     ),
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _currentIndex.value == index
+                        color: _currentIndex.value == i
                             ? AppColors.primaryColor
-                            : AppColors.greyShade4),
+                            : AppColors.white),
                   );
                 }).toList(),
               ),
             ],
           ),
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(9)),
           GestureDetector(
             onTap: () => _showLeadingContent.value = !_showLeadingContent.value,
             child: Container(
@@ -333,7 +381,7 @@ class SearchStories extends HookWidget {
               ),
             ),
           ),
-          SizedBox(height: getScreenHeight(10)),
+          SizedBox(height: getScreenHeight(9)),
           Visibility(
             visible: _showLeadingContent.value,
             child: Container(
@@ -362,7 +410,7 @@ class SearchStories extends HookWidget {
               ]),
             ).paddingSymmetric(h: 16),
           ),
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(9)),
           GestureDetector(
             onTap: () =>
                 _showHappeningContent.value = !_showHappeningContent.value,

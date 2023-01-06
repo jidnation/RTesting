@@ -60,7 +60,7 @@ class _RLoaderState extends State<RLoader> with TickerProviderStateMixin {
                       decoration: const ShapeDecoration(
                         shape: CircleBorder(),
                       ),
-                      child: SvgPicture.asset('assets/svgs/logo-white.svg')
+                      child: SvgPicture.asset('assets/svgs/logo-blue.svg')
                       // )
                       ),
                 ),
@@ -69,7 +69,7 @@ class _RLoaderState extends State<RLoader> with TickerProviderStateMixin {
               Text(
                 widget.text,
                 style:
-                    widget.textStyle ?? Theme.of(context).textTheme.bodyText1!,
+                    widget.textStyle ?? Theme.of(context).textTheme.bodyLarge!,
               ),
             ],
           )

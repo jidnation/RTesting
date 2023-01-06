@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,21 +23,24 @@ class ResetPasswordScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _obscureText = useState(true);
+    final _obscureConfirmText = useState(true);
     final _formKey = useState<GlobalKey<FormState>>(GlobalKey());
     final _passwordController = useTextEditingController();
     final _confirmPasswordController = useTextEditingController();
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: BlocConsumer<AuthBloc, AuthState>(
         bloc: globals.authBloc,
         listener: (context, state) {
           if (state is AuthLoaded) {
-            SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
-              RMSnackBar.showSuccessSnackBar(context, message: state.message!);
+            SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+              Snackbars.success(context, message: state.message!);
             });
-            RouteNavigators.routeNoWayHome(context, LoginScreen());
+            RouteNavigators.routeNoWayHome(context, const LoginScreen());
           } else if (state is AuthError) {
-            RMSnackBar.showErrorSnackBar(context, message: state.error);
+            Snackbars.error(context, message: state.error);
           }
         },
         builder: (context, state) {
@@ -73,22 +77,52 @@ class ResetPasswordScreen extends HookWidget {
                     const SizedBox(height: 40),
                     CustomTextField(
                       hintText: 'Enter new password',
-                      obscureText: true,
+                      obscureText: _obscureText.value,
                       keyboardType: TextInputType.text,
                       controller: _passwordController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>
                           Validator.validatePassword(value ?? ""),
+                      suffixIcon: CupertinoButton(
+                        minSize: 0,
+                        padding: EdgeInsets.zero,
+                        onPressed: () =>
+                            _obscureText.value = !_obscureText.value,
+                        child: _obscureText.value
+                            ? const Icon(
+                                Icons.visibility_off_outlined,
+                                color: AppColors.textFieldLabelColor,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: AppColors.primaryColor,
+                              ),
+                      ),
                     ).paddingSymmetric(h: 45.0),
                     const SizedBox(height: 30),
                     CustomTextField(
                       hintText: 'Confirm new password',
-                      obscureText: true,
+                      obscureText: _obscureConfirmText.value,
                       keyboardType: TextInputType.text,
                       controller: _confirmPasswordController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>
                           Validator.validatePassword(value ?? ""),
+                      suffixIcon: CupertinoButton(
+                        minSize: 0,
+                        padding: EdgeInsets.zero,
+                        onPressed: () => _obscureConfirmText.value =
+                            !_obscureConfirmText.value,
+                        child: _obscureText.value
+                            ? const Icon(
+                                Icons.visibility_off_outlined,
+                                color: AppColors.textFieldLabelColor,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: AppColors.primaryColor,
+                              ),
+                      ),
                     ).paddingSymmetric(h: 45.0),
                     const SizedBox(height: 40),
                     CustomButton(
@@ -105,7 +139,7 @@ class ResetPasswordScreen extends HookWidget {
                               ),
                             );
                           } else {
-                            RMSnackBar.showErrorSnackBar(
+                            Snackbars.error(
                               context,
                               message: 'Passwords do not match',
                             );
