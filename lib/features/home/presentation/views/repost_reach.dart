@@ -135,6 +135,7 @@ class _CommentReachState extends State<RepostReach> {
 
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
+      String postRating = "normal";
   @override
   Widget build(BuildContext context) {
     final postDuration = timeago.format(widget.postFeedModel!.post!.createdAt!);
@@ -143,10 +144,10 @@ class _CommentReachState extends State<RepostReach> {
     final controller = useTextEditingController();
     final replyFeature = useState("everyone");
     final _mediaList = useState<List<UploadFileDto>>([]);
-    String postRating = "normal";
+    
     final triggerProgressIndicator = useState(true);
     final comments = useState<List<CommentModel>>([]);
-    final scrollController = useScrollController();
+       final scrollController = useScrollController();
     //final  post = widget.postFeedModel.post;
     int nAudios =
         _mediaList.value.where((e) => FileUtils.isAudio(e.file)).length;
@@ -305,16 +306,7 @@ class _CommentReachState extends State<RepostReach> {
                             _mentionList.value = controllerKey
                                 .currentState!.controller!.text.mentions;
                           });
-                          globals.socialServiceBloc!.add(CreateRepostEvent(
-                input: CreateRepostInput(
-                    repostedPostId: widget.postFeedModel!.postId,
-                    repostedPostOwnerId: widget.postFeedModel!.postOwnerId,
-                    content: controllerKey.currentState!.controller!.text,                      
-                    location:
-                        globals.user!.showLocation! ? globals.location! : 'nil',
-                    postRating: postRating,
-                    mentionList: _mentionList.value,
-                    commentOption: replyFeature.value)));
+                        
 
                           // globals.mentionList!.add(controllerKey
                           //     .currentState!.controller!.markupText);

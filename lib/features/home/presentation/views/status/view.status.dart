@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,14 +19,29 @@ import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 import 'package:story_time/story_page_view/story_page_view.dart';
 
-class ViewMyStatus extends HookWidget {
+class ViewMyStatus extends StatefulHookWidget {
   const ViewMyStatus({Key? key, required this.status}) : super(key: key);
   final List<StatusModel> status;
+
+  @override
+  State<ViewMyStatus> createState() => _ViewMyStatusState();
+}
+
+class _ViewMyStatusState extends State<ViewMyStatus> {
+  final audioPlayer = AudioPlayer();
+  bool isPlaying = true;
+
+  @override
+  void dispose() {
+    audioPlayer.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final duration = useState(5);
+
     final indicatorController = useState(IndicatorAnimationCommand());
 
     return Scaffold(
@@ -33,7 +49,14 @@ class ViewMyStatus extends HookWidget {
         indicatorAnimationController: indicatorController,
         // indicatorDuration: Duration(seconds: duration.value),
         itemBuilder: (context, pageIndex, storyIndex) {
-          final story = status[storyIndex];
+          final story = widget.status[storyIndex];
+          if (story.statusData?.audioMedia != null) {
+            indicatorController.value = IndicatorAnimationCommand(
+                duration: const Duration(seconds: 30));
+          } else {
+            indicatorController.value =
+                IndicatorAnimationCommand(duration: const Duration(seconds: 5));
+          }
           if (story.statusData?.videoMedia != null) {
             indicatorController.value = IndicatorAnimationCommand(
                 duration: const Duration(seconds: 30));
@@ -62,6 +85,78 @@ class ViewMyStatus extends HookWidget {
                       ),
                     ),
                   ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 44, left: 8),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Helper.renderProfilePicture(
+                              story.profileModel!.profilePicture),
+                          SizedBox(width: getScreenWidth(12)),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '@${globals.user!.username!}',
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
+
+          if (story.statusData!.audioMedia != null ||
+              (story.statusData!.audioMedia ?? '').isNotEmpty) {
+            debugPrint("audio Player file: ${story.statusData!.audioMedia}");
+            audioPlayer.play(UrlSource("${story.statusData!.audioMedia}"));
+            //audioPlayer.play(UrlSource("https://www.kozco.com/tech/LRMonoPhase4.mp3"));
+            return Stack(
+              children: [
+                if ((story.statusData!.background ?? '').contains('0x'))
+                  Positioned.fill(
+                    child: Container(
+                      height: size.height,
+                      width: size.width,
+                      decoration: BoxDecoration(
+                        color: Helper.getStatusBgColour(
+                            story.statusData!.background!),
+                      ),
+                      child: Center(
+                        child: Text(
+                          story.statusData!.caption!,
+                          textAlign: Helper.getAlignment(
+                              story.statusData!.alignment!)['align'],
+                          style: Helper.getFont(story.statusData!.font!),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Positioned.fill(
+                    child: Container(color: AppColors.black),
+                  ),
+                Positioned.fill(
+                  child: SizedBox(
+                      height: size.height,
+                      width: size.width,
+                      child: Center(
+                        child: Helper.renderProfilePicture(
+                            story.profileModel!.profilePicture,
+                            size: 100),
+                      )),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 44, left: 8),
@@ -200,7 +295,8 @@ class ViewMyStatus extends HookWidget {
                   color: Colors.white,
                   icon: const Icon(Icons.more_horiz_rounded),
                   onPressed: () {
-                    showStoryBottomSheet(context, status: status[storyIndex]);
+                    showStoryBottomSheet(context,
+                        status: widget.status[storyIndex]);
                   },
                 ),
               ),
@@ -209,7 +305,7 @@ class ViewMyStatus extends HookWidget {
         },
         pageLength: 1,
         storyLength: (int pageIndex) {
-          return status.length;
+          return widget.status.length;
         },
         onPageLimitReached: () {
           RouteNavigators.pop(context);
@@ -219,13 +315,19 @@ class ViewMyStatus extends HookWidget {
   }
 }
 
-class ViewUserStatus extends HookWidget {
+class ViewUserStatus extends StatefulWidget {
   const ViewUserStatus({Key? key, required this.status, this.isMuted})
       : super(key: key);
   //final List<StatusFeedResponseModel> status;
   final List<StatusFeedModel> status;
   final bool? isMuted;
 
+  @override
+  State<ViewUserStatus> createState() => _ViewUserStatusState();
+}
+
+class _ViewUserStatusState extends State<ViewUserStatus> {
+  final AudioPlayer audioPlayer = AudioPlayer();
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -246,7 +348,7 @@ class ViewUserStatus extends HookWidget {
             return StoryPageView(
               indicatorAnimationController: indicatorController,
               itemBuilder: (context, pageIndex, storyIndex) {
-                final story = status[storyIndex];
+                final story = widget.status[storyIndex];
 
                 if (story.status?.statusData?.videoMedia != null) {
                   indicatorController.value = IndicatorAnimationCommand(
@@ -255,7 +357,89 @@ class ViewUserStatus extends HookWidget {
                   indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 5));
                 }
-
+                if (story.status?.statusData?.audioMedia != null) {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 30));
+                } else {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 5));
+                }
+                if (story.status?.statusData!.audioMedia != null ||
+                    (story.status?.statusData!.audioMedia ?? '').isNotEmpty) {
+                  debugPrint(
+                      "audio Player file: ${story.status?.statusData!.audioMedia}");
+                  audioPlayer.play(
+                      UrlSource("${story.status?.statusData!.audioMedia}"));
+                  //audioPlayer.play(UrlSource("https://www.kozco.com/tech/LRMonoPhase4.mp3"));
+                  return Stack(
+                    children: [
+                      if ((story.status?.statusData!.background ?? '')
+                          .contains('0x'))
+                        Positioned.fill(
+                          child: Container(
+                            height: size.height,
+                            width: size.width,
+                            decoration: BoxDecoration(
+                              color: Helper.getStatusBgColour(
+                                  '${story.status?.statusData!.background}'),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${story.status?.statusData!.caption}',
+                                textAlign: Helper.getAlignment(
+                                        '${story.status?.statusData!.alignment}')[
+                                    'align'],
+                                style: Helper.getFont(
+                                    '${story.status?.statusData!.font}'),
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        Positioned.fill(
+                          child: Container(color: AppColors.black),
+                        ),
+                      Positioned.fill(
+                        child: SizedBox(
+                            height: size.height,
+                            width: size.width,
+                            child: Center(
+                              child: Helper.renderProfilePicture(
+                                  story.status?.profileModel!.profilePicture,
+                                  size: 100),
+                            )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 44, left: 8),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Helper.renderProfilePicture(
+                                    story.status?.profileModel!.profilePicture),
+                                SizedBox(width: getScreenWidth(12)),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '@${globals.user!.username!}',
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(16),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }
                 if (story.status!.statusData!.imageMedia != null ||
                     (story.status!.statusData!.imageMedia ?? '').isNotEmpty) {
                   return Stack(
@@ -518,7 +702,7 @@ class ViewUserStatus extends HookWidget {
                 // );
               },
               gestureItemBuilder: (context, pageIndex, storyIndex) {
-                final story = status[storyIndex];
+                final story = widget.status[storyIndex];
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -540,8 +724,8 @@ class ViewUserStatus extends HookWidget {
                             onPressed: () async {
                               final res = await showUserStoryBottomSheet(
                                   context,
-                                  isMuted: isMuted,
-                                  status: status[storyIndex]);
+                                  isMuted: widget.isMuted,
+                                  status: widget.status[storyIndex]);
                               if (res == null) return;
                               if (res is MuteResult) {
                                 Navigator.pop(context, res);
@@ -610,7 +794,7 @@ class ViewUserStatus extends HookWidget {
               },
               pageLength: 1,
               storyLength: (int pageIndex) {
-                return status.length;
+                return widget.status.length;
               },
               onPageLimitReached: () {
                 Navigator.pop(context);
