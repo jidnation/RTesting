@@ -2371,70 +2371,71 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                             _myStatus.value));
                                                               },
                                                             ),
-                                                          ...List.generate(
-                                                            _userStatus
-                                                                .value.length,
-                                                            (index) =>
-                                                                UserStory(
-                                                              size: size,
-                                                              isMe: false,
-                                                              isLive: false,
-                                                              isMuted: false,
-                                                              hasWatched: false,
-                                                              image: _userStatus
-                                                                  .value[index]
-                                                                  .status![0]
-                                                                  .statusOwnerProfile!
-                                                                  .profilePicture,
-                                                              username: _userStatus
-                                                                  .value[index]
-                                                                  .status![
-                                                                      index]
-                                                                  .statusOwnerProfile!
-                                                                  .username!,
-                                                              onTap: () async {
-                                                                // RouteNavigators
-                                                                //     .route(
-                                                                //   context,
-                                                                //   ViewUserStatus(
-                                                                //       status: _userStatus
-                                                                //           .value[
-                                                                //               index]
-                                                                //           .status!),
-                                                                // );
-                                                                final res = await Navigator.push(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                        builder: (c) => ViewUserStatus(
-                                                                            isMuted:
-                                                                                false,
-                                                                            status:
-                                                                                _userStatus.value[index].status!)));
-                                                                if (res == null)
-                                                                  return;
-                                                                if (res
-                                                                    is MuteResult) {
-                                                                  _mutedStatus
-                                                                      .value = [
-                                                                    ..._mutedStatus
-                                                                        .value,
-                                                                    _userStatus
-                                                                            .value[
+                                                          if (_userStatus
+                                                              .value.isNotEmpty)
+                                                            ...List.generate(
+                                                              _userStatus
+                                                                  .value.length,
+                                                              (index) =>
+                                                                  UserStory(
+                                                                size: size,
+                                                                isMe: false,
+                                                                isLive: false,
+                                                                isMuted: false,
+                                                                hasWatched:
+                                                                    false,
+                                                                image: _userStatus
+                                                                    .value[
                                                                         index]
-                                                                  ];
-                                                                  _userStatus
-                                                                      .value = [
-                                                                    ..._userStatus
-                                                                        .value
-                                                                  ]..removeAt(
-                                                                      index);
-                                                                }
-                                                              },
+                                                                    .status![0]
+                                                                    .statusOwnerProfile!
+                                                                    .profilePicture,
+                                                                username: _userStatus
+                                                                    .value[
+                                                                        index]
+                                                                    .status![0]
+                                                                    .statusOwnerProfile!
+                                                                    .username!,
+                                                                onTap:
+                                                                    () async {
+                                                                  // RouteNavigators
+                                                                  //     .route(
+                                                                  //   context,
+                                                                  //   ViewUserStatus(
+                                                                  //       status: _userStatus
+                                                                  //           .value[
+                                                                  //               index]
+                                                                  //           .status!),
+                                                                  // );
+                                                                  final res = await Navigator.push(
+                                                                      context,
+                                                                      MaterialPageRoute(
+                                                                          builder: (c) => ViewUserStatus(
+                                                                              isMuted: false,
+                                                                              status: _userStatus.value[index].status!)));
+                                                                  if (res ==
+                                                                      null)
+                                                                    return;
+                                                                  if (res
+                                                                      is MuteResult) {
+                                                                    _mutedStatus
+                                                                        .value = [
+                                                                      ..._mutedStatus
+                                                                          .value,
+                                                                      _userStatus
+                                                                              .value[
+                                                                          index]
+                                                                    ];
+                                                                    _userStatus
+                                                                        .value = [
+                                                                      ..._userStatus
+                                                                          .value
+                                                                    ]..removeAt(
+                                                                        index);
+                                                                  }
+                                                                },
+                                                              ),
                                                             ),
-                                                          ),
-                                                          // ..._userStatus.value.map(
-                                                          //   (e) =>
-                                                          // ),
                                                         ],
                                                       ),
                                                     ).paddingOnly(l: 11),
@@ -2682,13 +2683,16 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                           }
                                                         },
                                                         onLike: () {
+                                                          // showPostReactors(
+                                                          //     context,
+                                                          //     postId: _posts
+                                                          //         .value[index]
+                                                          //         .post!
+                                                          //         .postId!);
                                                           HapticFeedback
                                                               .mediumImpact();
                                                           handleTap(index);
-                                                          // Console.log(
-                                                          //     'Like Data',
-                                                          //     _posts.value[index]
-                                                          //         .toJson());
+
                                                           if (active.contains(
                                                               index)) {
                                                             if (_posts

@@ -147,6 +147,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                           TabBar(
                             isScrollable: false,
                             indicatorWeight: 1.5,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
                             indicatorColor: Colors.transparent,
                             unselectedLabelColor: AppColors.textColor2,
                             labelColor: AppColors.white,
@@ -219,6 +220,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                             return ChatItem(
                                               onTap: () {
                                                 handleTap(index);
+
                                                 if (active.contains(index)) {
                                                   globals.userBloc!.add(
                                                       GetRecipientProfileEvent(
@@ -227,6 +229,8 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                                               .authId!));
                                                 }
                                               },
+                                              quotedFromPost: tailMessage
+                                                  .value[index].quotedFromPost,
                                               id: usersList.value[index].authId,
                                               username:
                                                   '@${usersList.value[index].username}',
@@ -272,11 +276,13 @@ class ChatItem extends StatelessWidget {
       required this.status,
       required this.username,
       this.id,
+      this.quotedFromPost,
       this.onTap})
       : super(key: key);
 
   final String username;
   final String status;
+  final bool? quotedFromPost;
   final String? avatar;
   final String? id;
   final Function()? onTap;
@@ -313,17 +319,35 @@ class ChatItem extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Container(
-                constraints: BoxConstraints(maxWidth: getScreenWidth(250)),
-                child: Text(
-                  status,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.greyShade3,
-                    fontWeight: FontWeight.w400,
+              Row(
+                children: [
+                  Visibility(
+                    visible: quotedFromPost != null,
+                    child: Icon(
+                      (quotedFromPost ?? false)
+                          ? Icons.view_timeline_outlined
+                          : Icons.history_toggle_off,
+                      color: AppColors.greyShade3,
+                      size: 14,
+                    ),
                   ),
-                ),
+                  Container(
+                    margin: quotedFromPost != null
+                        ? const EdgeInsets.only(left: 4)
+                        : null,
+                    constraints: BoxConstraints(maxWidth: getScreenWidth(250)),
+                    child: Text(
+                      status,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.greyShade3,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           )

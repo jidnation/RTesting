@@ -26,11 +26,8 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-import 'package:readmore/readmore.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/components/bottom_sheet_list_tile.dart';
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -73,7 +70,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
   Widget build(BuildContext context) {
     final post = useState<PostFeedModel>(widget.postFeedModel!);
     final comments = useState<List<CommentModel>>([]);
-    final postDuration = timeago.format(widget.postFeedModel!.post!.createdAt!);
+    final postDuration = timeago.format(
+        widget.postFeedModel!.post!.createdAt != null
+            ? widget.postFeedModel!.post!.createdAt!
+            : DateTime.now());
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
     final scrollController = useScrollController();
@@ -1417,14 +1417,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                     suffixIcon: IconButton(
                         icon: const Icon(Icons.emoji_emotions_outlined),
                         onPressed: () {
-                          RouteNavigators.route(context,
-                              CommentReach(postFeedModel: widget.postFeedModel));
+                          RouteNavigators.route(
+                              context,
+                              CommentReach(
+                                  postFeedModel: widget.postFeedModel));
                         }),
                   ),
                 ),
                 IconButton(
                     onPressed: () async {
-                     // Navigator.pop(context);
+                      // Navigator.pop(context);
                       final image = await MediaService()
                           .pickFromGallery(context: context, maxAssets: 1);
                       if (image == null) {

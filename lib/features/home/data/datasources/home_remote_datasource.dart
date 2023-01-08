@@ -5,15 +5,14 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
-import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -1244,19 +1243,19 @@ class HomeRemoteDataSource {
   }
 
   Future<List<VirtualPostLikeModel>> getLikesOnPost({
-    required String? postId,
+    required String postId,
   }) async {
     String q = r'''
         query getLikesOnPost($postId: String!) {
           getLikesOnPost(postId: $postId){
-            profile {
-                ''' +
-        UserSchema.schema +
-        '''
-            }
             authId
             postId
-            likeId
+            profile {
+                ''' +
+        MiniProfileSchema.schema +
+        '''
+            }
+            created_at
           }
         }''';
     try {
@@ -1629,15 +1628,16 @@ class HomeRemoteDataSource {
       final tempList = (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedResponseModel.fromJson(e))
           .toList();
-      List<StatusFeedResponseModel> list = [];
-      if (tempList.isNotEmpty) {
-        final groupedList =
-            tempList.first.status!.groupBy((item) => item.status!.authId!);
-        groupedList.forEach((key, value) {
-          list.add(StatusFeedResponseModel(id: key, status: value.toList()));
-        });
-      }
-      return list;
+      Console.log('STATUSSESS LENGTH', tempList.length);
+      // List<StatusFeedResponseModel> list = [];
+      // if (tempList.isNotEmpty) {
+      //   final groupedList =
+      //       tempList.first.status!.groupBy((item) => item.status!.authId!);
+      //   groupedList.forEach((key, value) {
+      //     list.add(StatusFeedResponseModel(id: key, status: value.toList()));
+      //   });
+      // }
+      return tempList;
     } catch (e) {
       rethrow;
     }

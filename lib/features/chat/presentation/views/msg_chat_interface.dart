@@ -85,6 +85,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
     });
+    if (widget.quotedData != null) {
+      focusNode.requestFocus();
+    }
   }
 
   @override
@@ -134,6 +137,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     final isSending = useState<bool>(false);
     final showIsSending = useState<bool>(false);
     final controller = useTextEditingController();
+    final _quotedData = useState(widget.quotedData);
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
@@ -264,6 +268,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             if (state is GetThreadMessagesSuccess) {
               isSending.value = false;
               showIsSending.value = false;
+              _controller.jumpTo(_controller.position.maxScrollExtent);
+            }
+
+            if (state is ChatSendSuccess) {
+              isSending.value = false;
+              showIsSending.value = false;
+              _quotedData.value = null;
+              _controller.jumpTo(_controller.position.maxScrollExtent);
             }
 
             if (state is ChatUploadSuccess) {
@@ -281,8 +293,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   threadId: widget.thread?.id,
                   value: state.imgUrl,
                   type: 'image',
-                  quotedData: widget.quotedData,
-                  messageMode: widget.quotedData == null
+                  quotedData: _quotedData.value,
+                  messageMode: _quotedData.value == null
                       ? MessageMode.direct.name
                       : MessageMode.quoted.name));
 
@@ -431,8 +443,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     const SizedBox.shrink()
                                   else
                                     ListView.separated(
-                                        physics: NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         shrinkWrap: true,
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
                                         itemBuilder: (c, i) => MsgBubble(
                                               msgDate: '',
                                               isMe: globals.user!.id ==
@@ -445,9 +460,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                               timeStamp: Helper.parseChatTime(
                                                   globals.userChat![i].sentAt ??
                                                       ''),
+                                              chat: globals.userChat![i],
                                             ),
                                         separatorBuilder: (c, i) => SizedBox(
-                                              height: 0,
+                                              height: 10,
                                             ),
                                         itemCount: globals.userChat!.length)
                                   // Column(
@@ -497,6 +513,64 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  Visibility(
+                                    visible: _quotedData.value != null,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.primaryColor
+                                              .withOpacity(0.0),
+                                          border: Border(
+                                              top: BorderSide(
+                                                  color: AppColors.greyShade5,
+                                                  width: 1))),
+                                      width: double.infinity,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                8, 8, 8, 0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Replying to a post...',
+                                                    style: TextStyle(
+                                                        color: AppColors.black),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                    onTap: () => _quotedData
+                                                        .value = null,
+                                                    child: Icon(Icons.close))
+                                              ],
+                                            ),
+                                          ),
+                                          // SizedBox(
+                                          //   height: 8,
+                                          // ),
+                                          Divider(
+                                            color: AppColors.greyShade5,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              Chat(
+                                                          quotedData:
+                                                              _quotedData.value)
+                                                      .quotedContent ??
+                                                  '',
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: AppColors.greyShade1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                   Row(children: [
                                     Flexible(
                                         child: !isRecording
@@ -713,9 +787,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                       value: value,
                                                       type: 'text',
                                                       quotedData:
-                                                          widget.quotedData,
+                                                          _quotedData.value,
                                                       messageMode:
-                                                          widget.quotedData ==
+                                                          _quotedData.value ==
                                                                   null
                                                               ? MessageMode
                                                                   .direct.name

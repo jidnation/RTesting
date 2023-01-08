@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
@@ -234,6 +235,21 @@ class ViewUserStatus extends HookWidget {
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
     final indicatorController = useState(IndicatorAnimationCommand());
+    final keyboardController = KeyboardVisibilityController();
+    // useEffect(() {
+    //   keyboardController.onChange.listen((event) {
+    //     if (event) {
+    //       indicatorController.value =
+    //           IndicatorAnimationCommand(duration: Duration(minutes: 1000));
+    //       // indicatorController.value = IndicatorAnimationCommand(pause: true);
+    //     } else {
+    //       // indicatorController.value = IndicatorAnimationCommand(resume: true);
+    //     }
+    //
+    //     // Snackbars.success(context, message: event.toString());
+    //   }
+    //   );
+    // }, []);
     return Scaffold(
       body: BlocConsumer<ChatBloc, ChatState>(
           bloc: globals.chatBloc,
@@ -246,378 +262,394 @@ class ViewUserStatus extends HookWidget {
             }
           },
           builder: (context, state) {
-            return StoryPageView(
-              indicatorAnimationController: indicatorController,
-              itemBuilder: (context, pageIndex, storyIndex) {
-                final story = status[storyIndex];
+            return KeyboardVisibilityBuilder(
+                controller: keyboardController,
+                builder: (context, value) {
+                  return StoryPageView(
+                    indicatorAnimationController: indicatorController,
+                    itemBuilder: (context, pageIndex, storyIndex) {
+                      final story = status[storyIndex];
 
-                if (story.status?.statusData?.videoMedia != null) {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 30));
-                } else {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 5));
-                }
+                      if (story.status?.statusData?.videoMedia != null) {
+                        indicatorController.value = IndicatorAnimationCommand(
+                            duration: const Duration(seconds: 30));
+                      } else {
+                        indicatorController.value = IndicatorAnimationCommand(
+                            duration: const Duration(seconds: 5));
+                      }
 
-                if (story.status!.statusData!.imageMedia != null ||
-                    (story.status!.statusData!.imageMedia ?? '').isNotEmpty) {
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Container(color: AppColors.black),
-                      ),
-                      Positioned.fill(
-                        child: SizedBox(
-                          height: size.height,
-                          width: size.width,
-                          child: CachedNetworkImage(
-                            imageUrl: story.status!.statusData!.imageMedia!,
-                            fit: BoxFit.fitWidth,
-                            placeholder: (context, url) =>
-                                const CupertinoActivityIndicator(
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 44, left: 8),
-                        child: Column(
+                      if (story.status!.statusData!.imageMedia != null ||
+                          (story.status!.statusData!.imageMedia ?? '')
+                              .isNotEmpty) {
+                        return Stack(
                           children: [
-                            Row(
-                              children: [
-                                Helper.renderProfilePicture(
-                                    story.statusOwnerProfile!.profilePicture),
-                                SizedBox(width: getScreenWidth(12)),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      (story.statusOwnerProfile!.firstName! +
-                                              ' ' +
-                                              story.statusOwnerProfile!
-                                                  .lastName!)
-                                          .toTitleCase(),
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(16),
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
+                            Positioned.fill(
+                              child: Container(color: AppColors.black),
+                            ),
+                            Positioned.fill(
+                              child: SizedBox(
+                                height: size.height,
+                                width: size.width,
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      story.status!.statusData!.imageMedia!,
+                                  fit: BoxFit.fitWidth,
+                                  placeholder: (context, url) =>
+                                      const CupertinoActivityIndicator(
+                                    color: AppColors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 44, left: 8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Helper.renderProfilePicture(story
+                                          .statusOwnerProfile!.profilePicture),
+                                      SizedBox(width: getScreenWidth(12)),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            (story.statusOwnerProfile!
+                                                        .firstName! +
+                                                    ' ' +
+                                                    story.statusOwnerProfile!
+                                                        .lastName!)
+                                                .toTitleCase(),
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(16),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          Text(
+                                            '@${story.statusOwnerProfile!.username!}',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Container(color: AppColors.black),
+                          ),
+                          //check typename from model and display widgets accordingly
+
+                          if ((story.status?.statusData?.background ?? '')
+                              .contains('0x'))
+                            Positioned.fill(
+                              child: Container(
+                                height: size.height,
+                                width: size.width,
+                                decoration: BoxDecoration(
+                                  color: Helper.getStatusBgColour(
+                                      story.status!.statusData!.background!),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    story.status!.statusData!.caption!,
+                                    textAlign: Helper.getAlignment(story.status!
+                                        .statusData!.alignment!)['align'],
+                                    style: Helper.getFont(
+                                        story.status!.statusData!.font!),
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Positioned.fill(
+                              child: story.status?.type == 'video'
+                                  ? Container(
+                                      height: size.height,
+                                      width: size.width,
+                                      color: AppColors.black,
+                                      child: VideoPreview(
+                                        isLocalVideo: false,
+                                        loop: true,
+                                        showControls: false,
+                                        path: story
+                                            .status!.statusData!.videoMedia!,
+                                      ),
+                                    )
+                                  : Container(
+                                      height: size.height,
+                                      width: size.width,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(story.status
+                                                  ?.statusData?.background ??
+                                              ''),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          story.status!.statusData!.caption!,
+                                          textAlign: Helper.getAlignment(story
+                                                  .status
+                                                  ?.statusData
+                                                  ?.alignment ??
+                                              '')['align'],
+                                          style: Helper.getFont(
+                                              story.status?.statusData?.font ??
+                                                  ''),
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      '@${story.statusOwnerProfile!.username!}',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(13),
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 44, left: 8),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Helper.renderProfilePicture(story
+                                        .statusOwnerProfile!.profilePicture),
+                                    SizedBox(width: getScreenWidth(12)),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          (story.statusOwnerProfile!
+                                                      .firstName! +
+                                                  ' ' +
+                                                  story.statusOwnerProfile!
+                                                      .lastName!)
+                                              .toTitleCase(),
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(16),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          '@${story.statusOwnerProfile!.username!}',
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                return Stack(
-                  children: [
-                    Positioned.fill(
-                      child: Container(color: AppColors.black),
-                    ),
-                    //check typename from model and display widgets accordingly
-
-                    if ((story.status?.statusData?.background ?? '')
-                        .contains('0x'))
-                      Positioned.fill(
-                        child: Container(
-                          height: size.height,
-                          width: size.width,
-                          decoration: BoxDecoration(
-                            color: Helper.getStatusBgColour(
-                                story.status!.statusData!.background!),
-                          ),
-                          child: Center(
-                            child: Text(
-                              story.status!.statusData!.caption!,
-                              textAlign: Helper.getAlignment(story
-                                  .status!.statusData!.alignment!)['align'],
-                              style: Helper.getFont(
-                                  story.status!.statusData!.font!),
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      Positioned.fill(
-                        child: story.status?.type == 'video'
-                            ? Container(
-                                height: size.height,
-                                width: size.width,
-                                color: AppColors.black,
-                                child: VideoPreview(
-                                  isLocalVideo: false,
-                                  loop: true,
-                                  showControls: false,
-                                  path: story.status!.statusData!.videoMedia!,
-                                ),
-                              )
-                            : Container(
-                                height: size.height,
-                                width: size.width,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        story.status?.statusData?.background ??
-                                            ''),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    story.status!.statusData!.caption!,
-                                    textAlign: Helper.getAlignment(
-                                        story.status?.statusData?.alignment ??
-                                            '')['align'],
-                                    style: Helper.getFont(
-                                        story.status?.statusData?.font ?? ''),
-                                  ),
-                                ),
-                              ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 44, left: 8),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Helper.renderProfilePicture(
-                                  story.statusOwnerProfile!.profilePicture),
-                              SizedBox(width: getScreenWidth(12)),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (story.statusOwnerProfile!.firstName! +
-                                            ' ' +
-                                            story.statusOwnerProfile!.lastName!)
-                                        .toTitleCase(),
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(16),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    '@${story.statusOwnerProfile!.username!}',
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(13),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
                           ),
                         ],
-                      ),
-                    ),
-                  ],
-                );
+                      );
 
-                //final image = images[storyIndex];
-                // return Stack(
-                //   children: [
-                //     Positioned.fill(
-                //       child: Container(color: AppColors.black),
-                //     ),
-                //     //check typename from model and display widgets accordingly
-                //     if ((story.status?.statusData?.background ?? '')
-                //         .contains('0x'))
-                //       Positioned.fill(
-                //         child: Container(
-                //           height: size.height,
-                //           width: size.width,
-                //           decoration: BoxDecoration(
-                //             color: Helper.getStatusBgColour(
-                //                 story.status!.statusData!.background!),
-                //           ),
-                //           child: Center(
-                //             child: Text(
-                //               story.status!.statusData!.caption!,
-                //               textAlign: Helper.getAlignment(story
-                //                   .status!.statusData!.alignment!)['align'],
-                //               style: Helper.getFont(
-                //                   story.status!.statusData!.font!),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     else
-                //       Positioned.fill(
-                //         child: Container(
-                //           height: size.height,
-                //           width: size.width,
-                //           decoration: BoxDecoration(
-                //             image: DecorationImage(
-                //               image: AssetImage(
-                //                   (story.status?.statusData?.background ?? '')),
-                //               fit: BoxFit.cover,
-                //             ),
-                //           ),
-                //           child: Center(
-                //             child: Text(
-                //               story.status!.statusData!.caption!,
-                //               textAlign: Helper.getAlignment(
-                //                   story.status?.statusData?.alignment ??
-                //                       '')['align'],
-                //               style: Helper.getFont(
-                //                   story.status?.statusData?.font ?? ''),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     Padding(
-                //       padding: const EdgeInsets.only(top: 44, left: 8),
-                //       child: Row(
-                //         children: [
-                //           Helper.renderProfilePicture(
-                //               story.statusCreatorModel!.profilePicture ?? ''),
-                //           SizedBox(width: getScreenWidth(12)),
-                //           Column(
-                //             mainAxisSize: MainAxisSize.min,
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Text(
-                //                 (story.statusCreatorModel!.firstName! +
-                //                         ' ' +
-                //                         story.statusCreatorModel!.lastName!)
-                //                     .toTitleCase(),
-                //                 style: TextStyle(
-                //                   fontSize: getScreenHeight(16),
-                //                   color: Colors.white,
-                //                   fontWeight: FontWeight.w600,
-                //                 ),
-                //               ),
-                //               Text(
-                //                 '@${story.statusCreatorModel!.username!}',
-                //                 style: TextStyle(
-                //                   fontSize: getScreenHeight(13),
-                //                   color: Colors.white,
-                //                   fontWeight: FontWeight.w500,
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ],
-                // );
-              },
-              gestureItemBuilder: (context, pageIndex, storyIndex) {
-                final story = status[storyIndex];
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 44),
-                        child: Container(
-                          height: getScreenHeight(30),
-                          decoration: BoxDecoration(
-                            color: AppColors.black.withOpacity(0.5),
-                            shape: BoxShape.circle,
+                      //final image = images[storyIndex];
+                      // return Stack(
+                      //   children: [
+                      //     Positioned.fill(
+                      //       child: Container(color: AppColors.black),
+                      //     ),
+                      //     //check typename from model and display widgets accordingly
+                      //     if ((story.status?.statusData?.background ?? '')
+                      //         .contains('0x'))
+                      //       Positioned.fill(
+                      //         child: Container(
+                      //           height: size.height,
+                      //           width: size.width,
+                      //           decoration: BoxDecoration(
+                      //             color: Helper.getStatusBgColour(
+                      //                 story.status!.statusData!.background!),
+                      //           ),
+                      //           child: Center(
+                      //             child: Text(
+                      //               story.status!.statusData!.caption!,
+                      //               textAlign: Helper.getAlignment(story
+                      //                   .status!.statusData!.alignment!)['align'],
+                      //               style: Helper.getFont(
+                      //                   story.status!.statusData!.font!),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       )
+                      //     else
+                      //       Positioned.fill(
+                      //         child: Container(
+                      //           height: size.height,
+                      //           width: size.width,
+                      //           decoration: BoxDecoration(
+                      //             image: DecorationImage(
+                      //               image: AssetImage(
+                      //                   (story.status?.statusData?.background ?? '')),
+                      //               fit: BoxFit.cover,
+                      //             ),
+                      //           ),
+                      //           child: Center(
+                      //             child: Text(
+                      //               story.status!.statusData!.caption!,
+                      //               textAlign: Helper.getAlignment(
+                      //                   story.status?.statusData?.alignment ??
+                      //                       '')['align'],
+                      //               style: Helper.getFont(
+                      //                   story.status?.statusData?.font ?? ''),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     Padding(
+                      //       padding: const EdgeInsets.only(top: 44, left: 8),
+                      //       child: Row(
+                      //         children: [
+                      //           Helper.renderProfilePicture(
+                      //               story.statusCreatorModel!.profilePicture ?? ''),
+                      //           SizedBox(width: getScreenWidth(12)),
+                      //           Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             crossAxisAlignment: CrossAxisAlignment.start,
+                      //             children: [
+                      //               Text(
+                      //                 (story.statusCreatorModel!.firstName! +
+                      //                         ' ' +
+                      //                         story.statusCreatorModel!.lastName!)
+                      //                     .toTitleCase(),
+                      //                 style: TextStyle(
+                      //                   fontSize: getScreenHeight(16),
+                      //                   color: Colors.white,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //               Text(
+                      //                 '@${story.statusCreatorModel!.username!}',
+                      //                 style: TextStyle(
+                      //                   fontSize: getScreenHeight(13),
+                      //                   color: Colors.white,
+                      //                   fontWeight: FontWeight.w500,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ],
+                      // );
+                    },
+                    gestureItemBuilder: (context, pageIndex, storyIndex) {
+                      final story = status[storyIndex];
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 44),
+                              child: Container(
+                                height: getScreenHeight(30),
+                                decoration: BoxDecoration(
+                                  color: AppColors.black.withOpacity(0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  color: Colors.white,
+                                  icon: const Icon(Icons.more_horiz_rounded),
+                                  onPressed: () async {
+                                    final res = await showUserStoryBottomSheet(
+                                        context,
+                                        isMuted: isMuted,
+                                        status: status[storyIndex]);
+                                    if (res == null) return;
+                                    if (res is MuteResult) {
+                                      Navigator.pop(context, res);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
                           ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            color: Colors.white,
-                            icon: const Icon(Icons.more_horiz_rounded),
-                            onPressed: () async {
-                              final res = await showUserStoryBottomSheet(
-                                  context,
-                                  isMuted: isMuted,
-                                  status: status[storyIndex]);
-                              if (res == null) return;
-                              if (res is MuteResult) {
-                                Navigator.pop(context, res);
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    CustomRoundTextField(
-                      hintText: 'Reach out to...',
-                      hintStyle: TextStyle(
-                        color: AppColors.white.withOpacity(0.5),
-                        fontSize: getScreenHeight(14),
-                      ),
-                      textStyle: TextStyle(
-                        color: AppColors.white,
-                        fontSize: getScreenHeight(14),
-                      ),
-                      controller: controller,
-                      isFilled: true,
-                      textCapitalization: TextCapitalization.none,
-                      fillColor: AppColors.black.withOpacity(0.3),
-                      enabledBorderSide: const BorderSide(
-                        width: 0.5,
-                        color: AppColors.white,
-                      ),
-                      focusedBorderSide: const BorderSide(
-                        width: 0.5,
-                        color: AppColors.white,
-                      ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          if (controller.text.isNotEmpty) {
-                            globals.chatBloc!.add(
-                              SendChatMessageEvent(
-                                  senderId: globals.user!.id,
-                                  receiverId: story.statusOwnerProfile!.authId,
-                                  value: controller.text.trim(),
-                                  type: 'text',
-                                  quotedData: jsonEncode(story.toJson()),
-                                  messageMode: MessageMode.quoted.name),
-                            );
-                            toast('Sending message...',
-                                duration: Toast.LENGTH_LONG);
-                            controller.clear();
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: SvgPicture.asset(
-                            'assets/svgs/send.svg',
-                            width: 25,
-                            height: 25,
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ),
-                    ).paddingOnly(b: 35, r: 8, l: 8),
-                  ],
-                );
-              },
-              pageLength: 1,
-              storyLength: (int pageIndex) {
-                return status.length;
-              },
-              onPageLimitReached: () {
-                Navigator.pop(context);
-              },
-            );
+                          CustomRoundTextField(
+                            hintText: 'Reach out to...',
+                            hintStyle: TextStyle(
+                              color: AppColors.white.withOpacity(0.5),
+                              fontSize: getScreenHeight(14),
+                            ),
+                            textStyle: TextStyle(
+                              color: AppColors.white,
+                              fontSize: getScreenHeight(14),
+                            ),
+                            controller: controller,
+                            isFilled: true,
+                            textCapitalization: TextCapitalization.none,
+                            fillColor: AppColors.black.withOpacity(0.3),
+                            enabledBorderSide: const BorderSide(
+                              width: 0.5,
+                              color: AppColors.white,
+                            ),
+                            focusedBorderSide: const BorderSide(
+                              width: 0.5,
+                              color: AppColors.white,
+                            ),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                if (controller.text.isNotEmpty) {
+                                  globals.chatBloc!.add(
+                                    SendChatMessageEvent(
+                                        senderId: globals.user!.id,
+                                        receiverId:
+                                            story.statusOwnerProfile!.authId,
+                                        value: controller.text.trim(),
+                                        type: 'text',
+                                        quotedData: jsonEncode(story.toJson()),
+                                        messageMode: MessageMode.quoted.name),
+                                  );
+                                  toast('Sending message...',
+                                      duration: Toast.LENGTH_LONG);
+                                  controller.clear();
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SvgPicture.asset(
+                                  'assets/svgs/send.svg',
+                                  width: 25,
+                                  height: 25,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ),
+                          ).paddingOnly(b: 35, r: 8, l: 8),
+                        ],
+                      );
+                    },
+                    pageLength: 1,
+                    storyLength: (int pageIndex) {
+                      return status.length;
+                    },
+                    onPageLimitReached: () {
+                      Navigator.pop(context);
+                    },
+                  );
+                });
           }),
     );
   }

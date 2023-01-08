@@ -1,19 +1,24 @@
+import 'dart:convert';
+
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 
 class Chat {
-  Chat({
-    // this._id,
-    this.id,
-    this.senderId,
-    this.receiverId,
-    // this.receivers,
-    this.type,
-    this.value,
-    this.threadId,
-    this.sentAt,
-    this.createdAt,
-    this.updatedAt,
-  });
+  Chat(
+      {
+      // this._id,
+      this.id,
+      this.senderId,
+      this.receiverId,
+      // this.receivers,
+      this.type,
+      this.value,
+      this.threadId,
+      this.sentAt,
+      this.createdAt,
+      this.updatedAt,
+      this.quotedData});
   //late final Null _id;
   String? id;
   String? senderId;
@@ -67,6 +72,60 @@ class Chat {
     _data['updated_at'] =
         updatedAt != null ? updatedAt!.toIso8601String() : null;
     return _data;
+  }
+
+  bool? get quotedFromPost {
+    if (quotedData == null) return null;
+    if (jsonDecode(quotedData!)['status'] == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  StatusFeedModel? get quotedStatus {
+    if (quotedData == null) return null;
+    if (!(quotedFromPost ?? false)) {
+      return StatusFeedModel.fromJson(jsonDecode(quotedData!));
+    }
+    return null;
+  }
+
+  PostFeedModel? get quotedPost {
+    if (quotedData == null) return null;
+    if (quotedFromPost ?? false) {
+      return PostFeedModel.fromJson(jsonDecode(quotedData!));
+    }
+    return null;
+  }
+
+  String? get quotedType {
+    if (quotedData == null) return null;
+    if (quotedFromPost ?? false) {
+      if ((quotedPost?.post?.content ?? '').isNotEmpty) return 'text';
+      if ((quotedPost?.post?.isOnlyImages ?? false) &&
+          (quotedPost?.post?.imageMediaItems?.length ?? 0) == 1) return 'image';
+      if (quotedPost?.post?.isOnlyAudio ?? false) return 'audio';
+      if (quotedPost?.post?.isOnlyVideo ?? false) return 'video';
+      if ((quotedPost?.post?.isOnlyImages ?? false) &&
+          (quotedPost?.post?.imageMediaItems?.length ?? 0) > 1) return 'images';
+    } else {
+      return quotedStatus?.status?.type;
+    }
+    return null;
+  }
+
+  String? get quotedContent {
+    if (quotedData == null) return null;
+    if (quotedFromPost ?? false) {
+      return quotedType == 'text'
+          ? quotedPost?.post?.content ?? ''
+          : 'Media attachment(s)';
+    } else {
+      return quotedType == 'text'
+          ? quotedStatus?.status?.statusData?.content ?? ''
+          : 'Media attachment';
+    }
   }
 }
 

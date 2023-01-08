@@ -19,6 +19,7 @@ import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/post_reactors.dart';
 import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:share_plus/share_plus.dart';
@@ -715,5 +716,15 @@ Future<int?> showMediaUploadOption({
         ],
       );
     },
+  );
+}
+
+Future showPostReactors(BuildContext context, {required String postId}) async {
+  return showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) => PostReactors(
+      postId: postId,
+    ),
   );
 }
