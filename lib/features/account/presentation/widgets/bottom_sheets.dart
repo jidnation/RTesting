@@ -23,6 +23,8 @@ import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../timeline/timeline_feed.dart';
+
 Future showProfileMenuBottomSheet(BuildContext context,
     {required User user, bool isStarring = false}) {
   return showModalBottomSheet(
@@ -263,7 +265,8 @@ Future showReacherCardBottomSheet(BuildContext context,
             bloc: globals.userBloc,
             listener: (context, state) {
               if (state is UserLoaded) {
-                Snackbars.success(context, message: "Reached user successfully" );
+                Snackbars.success(context,
+                    message: "Reached user successfully");
                 RouteNavigators.pop(context);
               }
               if (state is UserError) {
@@ -496,6 +499,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: true,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status muted successfully!');
+            timeLineFeedStore.getUserStatus();
           }
           if (state is UnmuteStatusSuccess) {
             RouteNavigators.pop(context);
@@ -505,6 +509,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: false,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status unmuted successfully!');
+            timeLineFeedStore.getUserStatus();
           }
           if (state is ReportStatusSuccess) {
             RouteNavigators.pop(context);

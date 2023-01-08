@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
@@ -23,9 +24,10 @@ import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
 import '../../core/utils/helpers.dart';
 import '../account/presentation/views/account.dart';
+import '../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
+import '../home/presentation/views/full_post.dart';
 import '../home/presentation/widgets/moment_audio_player.dart';
-import 'fullpost.dart';
 
 class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
@@ -77,6 +79,7 @@ class TimeLineBox extends StatelessWidget {
     }
 
     var src = GlobalKey();
+    final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
     void takeScreenShot() async {
       RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
           as RenderRepaintBoundary; // the key provided
@@ -105,8 +108,9 @@ class TimeLineBox extends StatelessWidget {
       key: src,
       child: GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (builder) => TimeLineFullPostScreen(
-                  timeLineModel: timeLineModel,
+            builder: (builder) => FullPostScreen(
+                  postFeedModel: timeLineFeedStore.getPostModel(
+                      timeLineModel: timeLineModel),
                 ))),
         child: Container(
           width: SizeConfig.screenWidth,
@@ -335,10 +339,48 @@ class TimeLineBox extends StatelessWidget {
                     const SizedBox(height: 8),
                     Visibility(
                       visible: tPostInfo.content!.isNotEmpty,
-                      child: CustomText(
-                        text: tPostInfo.content.toString().trim(),
-                        size: 14,
-                      ),
+                      child: ExpandableText(
+                        "${tPostInfo.content}",
+                        prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                        prefixStyle: TextStyle(
+                            fontSize: getScreenHeight(12),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.primaryColor),
+                        onPrefixTap: () {
+                          tooltipkey.currentState?.ensureTooltipVisible();
+                        },
+                        expandText: 'see more',
+                        maxLines: 2,
+                        linkColor: Colors.blue,
+                        animation: true,
+                        expanded: false,
+                        collapseText: 'see less',
+                        onHashtagTap: (value) {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return DictionaryDialog(
+                                  abbr: value,
+                                  meaning: '',
+                                  word: '',
+                                );
+                              });
+                        },
+                        onMentionTap: (value) {},
+                        mentionStyle: const TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: Colors.blue),
+                        hashtagStyle: const TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: Colors.blue),
+                      ).paddingSymmetric(h: 16, v: 10),
+                    ),
+                    Tooltip(
+                      key: tooltipkey,
+                      triggerMode: TooltipTriggerMode.manual,
+                      showDuration: const Duration(seconds: 1),
+                      message: 'This reach has been edited',
                     ),
                     SizedBox(height: tPostInfo.content!.isNotEmpty ? 8 : 0),
                     Visibility(
@@ -380,9 +422,9 @@ class TimeLineBox extends StatelessWidget {
                         ),
                     SizedBox(
                         height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
-                    timeLineModel.videoLink.isNotEmpty
+                    timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
                         ? Container(
-                            height: 350,
+                            height: 550,
                             width: SizeConfig.screenWidth,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
@@ -392,7 +434,8 @@ class TimeLineBox extends StatelessWidget {
                                 // TimeLineVideoPreview(
                                 //   path: tPostInfo.videoMediaItem!,
                                 TimeLineVideoPlayer(
-                              videoUrl: timeLineModel.videoLink,
+                              videoUrl: timeLineModel
+                                  .getPostFeed.post!.videoMediaItem!,
                               // ),
                             ),
                           )

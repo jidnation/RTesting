@@ -1,9 +1,12 @@
 import 'dart:developer';
 
+import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '/core/services/moment/graphql_strings.dart' as gql_string;
 import '../../core/utils/app_globals.dart';
+import '../home/data/models/status.model.dart';
+import '../home/data/repositories/social_service_repository.dart';
 import 'models/post_feed.dart';
 
 class TimeLineQuery {
@@ -73,6 +76,38 @@ class TimeLineQuery {
     log('from my timeline-post-getting-query::::: $queryResult');
     if (queryResult.data != null) {
       return Post.fromJson(queryResult.data!['getPost']);
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool?> getReachingRelationship(
+      {required String userId, required String type}) async {
+    HttpLink link = HttpLink(
+      "https://api.myreach.me/",
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+
+    Map<String, dynamic> queryVariables = {'type': type, 'userId': userId};
+
+    QueryResult queryResult = await qlClient.query(
+      // here it's get type so using query method
+      QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(
+            gql_string.getReachingRelation,
+          ),
+          variables: queryVariables),
+    );
+    log('from my reach-getting-query::::: $queryResult');
+    if (queryResult.data != null) {
+      return queryResult.data!['getReachRelationship'] ?? false;
     } else {
       return null;
     }
@@ -156,4 +191,52 @@ class TimeLineQuery {
     log('from my post-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikePost'] ?? false;
   }
+
+  Future<Either<String, List<StatusModel>>?> getAllStatus({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await SocialServiceRepository().getAllStatus(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      print('::::::::::::::::::::::::::::from status:: $posts');
+      return posts;
+    } on GraphQLError catch (e) {
+      return null;
+    }
+  }
+
+  Future<Either<String, List<StatusFeedResponseModel>>?>? getStatusFeed({
+    required int pageLimit,
+    required int pageNumber,
+  }) async {
+    try {
+      final posts = await SocialServiceRepository().getStatusFeed(
+        pageLimit: pageLimit,
+        pageNumber: pageNumber,
+      );
+      print('::::::::::::::::::::::::::::from status:: $posts');
+      return posts;
+    } on GraphQLError catch (e) {
+      return null;
+    }
+  }
+
+  // Future<Either<String, List<StatusFeedResponseModel>>?>? getMutedStatus({
+  //   required int pageLimit,
+  //   required int pageNumber,
+  // }) async {
+  //   try {
+  //     final posts = await SocialServiceRepository().muteStatus(
+  //       pageLimit: pageLimit,
+  //       pageNumber: pageNumber,
+  //     );
+  //     print('::::::::::::::::::::::::::::from status:: $posts');
+  //     return posts;
+  //   } on GraphQLError catch (e) {
+  //     return null;
+  //   }
+  // }
 }

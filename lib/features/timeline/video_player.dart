@@ -42,7 +42,132 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: 3.7 / 3.6,
+      aspectRatio: 7.8 / 12.3,
+      videoPlayerController: _videoPlayerController,
+      autoPlay: false,
+      allowFullScreen: true,
+      // fullScreenByDefault: true,
+      looping: true,
+      // progressIndicatorDelay:
+      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: toggleVideo,
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
+
+      hideControlsTimer: const Duration(seconds: 1),
+
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: Colors.red,
+        handleColor: Colors.blue,
+        backgroundColor: Colors.grey,
+        bufferedColor: Colors.lightGreen,
+      ),
+      placeholder: Container(
+        color: const Color(0xff001824),
+      ),
+      // autoInitialize: true,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _videoPlayerController.dispose();
+    // _chewieController?.dispose();
+  }
+
+  Future<void> toggleVideo() async {
+    await _videoPlayerController.pause();
+    await initializePlayer();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return
+        // Stack(children: [
+        Container(
+      width: size.width,
+      height: size.height,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+          color: AppColors.audioPlayerBg,
+          borderRadius: BorderRadius.circular(15)),
+      child: _chewieController != null &&
+              _chewieController!.videoPlayerController.value.isInitialized
+          ? VisibilityDetector(
+              key: Key('my-widget-key'),
+              onVisibilityChanged: (visibilityInfo) {
+                var visiblePercentage = visibilityInfo.visibleFraction * 100;
+                visiblePercentage > 60
+                    ? _chewieController!.videoPlayerController.play()
+                    : _chewieController!.videoPlayerController.pause();
+              },
+              child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Chewie(
+                    controller: _chewieController!,
+                  )),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text('Loading'),
+                ]),
+    );
+  }
+}
+
+///
+/// for fullPost
+///
+class TimeLineVideoPlayer2 extends StatefulWidget {
+  final String videoUrl;
+  const TimeLineVideoPlayer2({
+    Key? key,
+    required this.videoUrl,
+  }) : super(key: key);
+
+  @override
+  _TimeLineVideoPlayer2State createState() => _TimeLineVideoPlayer2State();
+}
+
+class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
+  late VideoPlayerController _videoPlayerController;
+
+  ChewieController? _chewieController;
+  int? bufferDelay;
+  bool isPlaying = false;
+  bool isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initializePlayer();
+  }
+
+  Future<void> initializePlayer() async {
+    _videoPlayerController = await momentFeedStore.videoControllerService
+        .getControllerForVideo(widget.videoUrl);
+    await Future.wait([_videoPlayerController.initialize()]);
+    _createChewieController();
+    setState(() {});
+  }
+
+  void _createChewieController() {
+    _chewieController = ChewieController(
+      aspectRatio: 8.3 / 12,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       allowFullScreen: true,

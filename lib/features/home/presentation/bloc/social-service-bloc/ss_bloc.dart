@@ -631,7 +631,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         var tempArr = [];
 
         for (var element in event.media) {
+          print("::::uploading tracing:::1 element::: $element");
+          print("::::uploading tracing:::2 list::: $tempMap");
           tempMap[element.id] = element.file;
+          print("::::uploading tracing:::3 list::: $tempMap");
           Console.log('element in media', element);
         }
         Console.log('temp map', tempMap);

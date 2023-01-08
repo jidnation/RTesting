@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:reach_me/features/timeline/models/post_feed.dart';
 import 'package:reach_me/features/timeline/query.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
+
+import '../../core/components/snackbar.dart';
 
 class PostStore extends ValueNotifier<List<CustomPostModel>> {
   //creating a singleton class
@@ -39,17 +42,59 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
     }
   }
 
-  votePost({required String id, required String voteType}) async {
+  votePost(BuildContext context,
+      {required String id, required String voteType}) async {
     List<CustomPostModel> currentData = value;
     CustomPostModel actualModel =
         currentData.firstWhere((element) => element.id == id);
     String postID = actualModel.post.postId!;
-    bool response = await timeLineQuery.votePost(
-      postId: postID,
-      voteType: voteType,
-    );
-    if (response) {
-      updateTimeLine(id);
+
+    if (voteType.toLowerCase() == 'downvote') {
+      bool? res = await getReachRelationship(
+          usersId: actualModel.post.postOwnerProfile!.authId!,
+          type: 'reaching');
+      // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
+      if (res != null && res) {
+        bool response = await timeLineQuery.votePost(
+          postId: postID,
+          voteType: voteType,
+        );
+        if (response) {
+          updateTimeLine(id);
+          Snackbars.success(
+            context,
+            message:
+                'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
+            milliseconds: 1300,
+          );
+        }
+        if (voteType.toLowerCase() == 'downvote') {
+          timeLineFeedStore.removePost(context, id);
+        }
+      } else {
+        Snackbars.error(
+          context,
+          message: 'Operation failed, You are not reaching this user.',
+          milliseconds: 1300,
+        );
+      }
+    } else {
+      bool response = await timeLineQuery.votePost(
+        postId: postID,
+        voteType: voteType,
+      );
+      if (response) {
+        updateTimeLine(id);
+        Snackbars.success(
+          context,
+          message:
+              'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
+          milliseconds: 1300,
+        );
+      }
+      if (voteType.toLowerCase() == 'downvote') {
+        timeLineFeedStore.removePost(context, id);
+      }
     }
   }
 
@@ -68,6 +113,30 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
       actualModel.post.nComments = response.nComments!;
     }
     notifyListeners();
+  }
+
+  updatePostList(String id, {required Post post}) {
+    List<CustomPostModel> currentData = value;
+    currentData.insert(0, CustomPostModel(id, post: post));
+    notifyListeners();
+  }
+
+  updatePostActions(List<TimeLineModel> posts) {
+    value.clear();
+    for (TimeLineModel postFeed in posts) {
+      Post post = postFeed.getPostFeed.post!;
+      value.add(CustomPostModel(postFeed.id, post: post));
+    }
+    notifyListeners();
+  }
+
+  Future<bool?> getReachRelationship(
+      {required String usersId, required String type}) async {
+    bool? response = await timeLineQuery.getReachingRelationship(
+      userId: usersId,
+      type: type,
+    );
+    return response;
   }
 }
 

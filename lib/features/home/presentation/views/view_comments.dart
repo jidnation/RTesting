@@ -1,6 +1,6 @@
 // import 'dart:io';
 // import 'dart:math';
-
+//
 // import 'package:audio_waveforms/audio_waveforms.dart';
 // import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 // import 'package:flutter/cupertino.dart';
@@ -28,25 +28,19 @@
 // import 'package:reach_me/features/home/data/models/post_model.dart';
 // import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 // import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-
-// import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 // import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 // import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-
-// import '../../../../core/models/file_result.dart';
-// import '../../../chat/presentation/widgets/audio_player.dart';
-// import '../widgets/post_media.dart';
-
+//
 // class ViewCommentsScreen extends StatefulHookWidget {
 //   static String id = 'view_comments_screen';
 //   const ViewCommentsScreen({Key? key, required this.post}) : super(key: key);
-
+//
 //   final PostFeedModel post;
-
+//
 //   @override
 //   State<ViewCommentsScreen> createState() => _ViewCommentsScreenState();
 // }
-
+//
 // class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
 //   bool emojiShowing = false;
 //   FocusNode focusNode = FocusNode();
@@ -54,14 +48,14 @@
 //   bool isRecordingInit = false;
 //   bool isRecording = false;
 //   Set active = {};
-
+//
 //   handleTap(index) {
 //     if (active.isNotEmpty) active.clear();
 //     setState(() {
 //       active.add(index);
 //     });
 //   }
-
+//
 //   @override
 //   void initState() {
 //     super.initState();
@@ -74,7 +68,7 @@
 //       }
 //     });
 //   }
-
+//
 //   @override
 //   void dispose() {
 //     super.dispose();
@@ -82,7 +76,7 @@
 //     focusNode.dispose();
 //     recorderController.dispose();
 //   }
-
+//
 //   void _initialiseController() {
 //     recorderController = RecorderController()
 //       ..androidEncoder = AndroidEncoder.aac
@@ -90,7 +84,7 @@
 //       ..iosEncoder = IosEncoder.kAudioFormatLinearPCM
 //       ..sampleRate = 16000;
 //   }
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     final reachDM = useState(false);
@@ -102,7 +96,7 @@
 //     final isTyping = useState<bool>(false);
 //     final likeId = useState<String?>(null);
 //     final imageList = useState<List<UploadFileDto>>([]);
-
+//
 //     useEffect(() {
 //       globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
 //           postId: widget.post.postId, pageLimit: 50, pageNumber: 1));
@@ -137,7 +131,7 @@
 //                         curve: Curves.easeOut,
 //                       );
 //                     });
-
+//
 //                     Snackbars.success(context,
 //                         message: "Your commment has been posted");
 //                     triggerProgressIndicator.value = false;
@@ -156,18 +150,18 @@
 //                   if (state is GetAllCommentsOnPostSuccess) {
 //                     comments.value = state.data!.reversed.toList();
 //                   }
-
+//
 //                   if (state is GetAllCommentsOnPostError) {
 //                     Snackbars.error(context, message: state.error);
 //                   }
-
+//
 //                   //if (state is UnlikeCommentOnPostSuccess ||
 //                   // state is LikeCommentOnPostSuccess) {
 //                   //globals.socialServiceBloc!.add(GetAllCommentLikesEvent(
 //                   //  commentId: comments.value[index].commentId));
-
+//
 //                   //}
-
+//
 //                   if (state is GetAllCommentLikesSuccess) {
 //                     commentLike.value = state.data!.firstWhere(
 //                         (element) => element.authId == globals.user!.id);
@@ -176,9 +170,9 @@
 //                         .likeId;
 //                     print(likeId);
 //                   }
-
+//
 //                   if (state is LikeCommentOnPostSuccess) {}
-
+//
 //                   if (state is UnlikeCommentOnPostSuccess) {
 //                     // commentUnlike.value = state.unlikeComment;
 //                     //isLiked.value = false;
@@ -186,19 +180,19 @@
 //                   if (state is UnlikeCommentOnPostError) {
 //                     int pos = comments.value
 //                         .indexWhere((e) => e.commentId == state.commentId);
-//                     comments.value[pos].isLiked = true;
+//                     comments.value[pos].isLiked = 'true';
 //                     comments.value[pos].nLikes =
 //                         (comments.value[pos].nLikes ?? 0) + 1;
 //                   }
-
+//
 //                   if (state is LikeCommentOnPostError) {
 //                     int pos = comments.value
 //                         .indexWhere((e) => e.commentId == state.commentId);
-//                     comments.value[pos].isLiked = true;
+//                     comments.value[pos].isLiked = 'true';
 //                     comments.value[pos].nLikes =
 //                         (comments.value[pos].nLikes ?? 1) - 1;
 //                   }
-
+//
 //                   if (state is MediaUploadSuccess) {
 //                     String? audioUrl = state.image!;
 //                     globals.socialServiceBloc!.add(CommentOnPostEvent(
@@ -347,8 +341,8 @@
 //                                         return CommentsTile(
 //                                           comment: comments.value[index],
 //                                           isLiked:
-//                                               comments.value[index].isLiked ??
-//                                                       false
+//                                               comments.value[index].isLiked !=
+//                                                       'false'
 //                                                   ? true
 //                                                   : false,
 //                                           onLike: () {
@@ -358,10 +352,11 @@
 //                                             handleTap(index);
 //                                             if (active.contains(index)) {
 //                                               if (comments
-//                                                   .value[index].isLiked!) {
+//                                                       .value[index].isLiked !=
+//                                                   'false') {
 //                                                 comments.value[index].isLiked =
-//                                                     false;
-
+//                                                     'false';
+//
 //                                                 comments.value[index].nLikes =
 //                                                     (comments.value[index]
 //                                                                 .nLikes ??
@@ -372,7 +367,7 @@
 //                                                         commentId: comments
 //                                                             .value[index]
 //                                                             .commentId));
-
+//
 //                                                 if (likeId.value != null) {
 //                                                   globals.socialServiceBloc!
 //                                                       .add(
@@ -381,7 +376,7 @@
 //                                                             .value[index]
 //                                                             .commentId!,
 //                                                         likeId: likeId.value
-
+//
 //                                                         //commentLike
 //                                                         //  .value!.likeId!,
 //                                                         ),
@@ -389,7 +384,7 @@
 //                                                 }
 //                                               } else {
 //                                                 comments.value[index].isLiked =
-//                                                     true;
+//                                                     'true';
 //                                                 comments.value[index].nLikes =
 //                                                     (comments.value[index]
 //                                                                 .nLikes ??
@@ -571,7 +566,7 @@
 //                                                         onTap: () {
 //                                                           recorderController
 //                                                               .stop();
-
+//
 //                                                           setState(() {
 //                                                             isRecording =
 //                                                                 !isRecording;
@@ -666,9 +661,9 @@
 //                                                               .post.postId,
 //                                                           content:
 //                                                               controller.text,
-
+//
 //                                                           //audioMediaItem: ' ',
-
+//
 //                                                           userId:
 //                                                               globals.user!.id,
 //                                                           postOwnerId: widget
@@ -687,7 +682,7 @@
 //                                                     await getTemporaryDirectory();
 //                                                 String? path =
 //                                                     '${tempDir.path}/comment_sound.aac';
-
+//
 //                                                 if (isRecording) {
 //                                                   path =
 //                                                       await recorderController
@@ -696,13 +691,13 @@
 //                                                   globals.socialServiceBloc!
 //                                                       .add(MediaUploadEvent(
 //                                                           media: audio));
-
+//
 //                                                   print(path);
 //                                                 } else {
 //                                                   await recorderController
 //                                                       .record(path);
 //                                                 }
-
+//
 //                                                 setState(() {
 //                                                   isRecording = !isRecording;
 //                                                 });
@@ -802,27 +797,27 @@
 //     );
 //   }
 // }
-
+//
 // class AltViewCommentsScreen extends StatefulHookWidget {
 //   static String id = 'view_comments_screen';
 //   const AltViewCommentsScreen({Key? key, required this.post}) : super(key: key);
-
+//
 //   final PostModel post;
-
+//
 //   @override
 //   State<AltViewCommentsScreen> createState() => _AltViewCommentsScreenState();
 // }
-
+//
 // class _AltViewCommentsScreenState extends State<AltViewCommentsScreen> {
 //   Set active = {};
-
+//
 //   handleTap(index) {
 //     if (active.isNotEmpty) active.clear();
 //     setState(() {
 //       active.add(index);
 //     });
 //   }
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     final reachDM = useState(false);
@@ -882,7 +877,7 @@
 //                   if (state is GetAllCommentsOnPostSuccess) {
 //                     comments.value = state.data!.reversed.toList();
 //                   }
-
+//
 //                   if (state is GetAllCommentsOnPostError) {
 //                     Snackbars.error(context, message: state.error);
 //                   }
@@ -896,7 +891,7 @@
 //                 },
 //                 builder: (context, state) {
 //                   bool isLoading = state is GetAllCommentsOnPostLoading;
-
+//
 //                   return ProgressHUD(
 //                     child: Column(
 //                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1120,7 +1115,7 @@
 //     );
 //   }
 // }
-
+//
 // class CommentsTile extends StatelessWidget {
 //   const CommentsTile({
 //     Key? key,
@@ -1210,12 +1205,11 @@
 //                   .paddingOnly(r: 0, l: 0, b: 10, t: 0)
 //             else
 //               const SizedBox.shrink(),
-
 //             comment.imageMediaItems!.isNotEmpty
 //                 ? CommentMedia(comment: comment)
 //                     .paddingOnly(l: 16, r: 16, b: 10, t: 0)
 //                 // const Text('This is it'),
-
+//
 //                 : const SizedBox.shrink(),
 //             SizedBox(height: getScreenHeight(10)),
 //             Row(

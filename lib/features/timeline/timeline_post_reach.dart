@@ -8,7 +8,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/audio_recording_service.dart';
@@ -17,7 +16,6 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/core/utils/formatters.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/core/utils/regex_util.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
@@ -25,30 +23,24 @@ import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_blo
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import 'package:reach_me/features/dictionary/presentation/views/add_to_glossary.dart';
-import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
-import '../bloc/user-bloc/user_bloc.dart';
+import '../home/presentation/bloc/user-bloc/user_bloc.dart';
+import '../home/presentation/views/post_reach.dart';
 
-class UploadFileDto {
-  File file;
-  String id;
-  FileResult? fileResult;
-  UploadFileDto({required this.file, required this.id, this.fileResult});
-}
-
-class PostReach extends StatefulHookWidget {
-  const PostReach({Key? key}) : super(key: key);
+class TimeLinePostReach extends StatefulHookWidget {
+  const TimeLinePostReach({Key? key}) : super(key: key);
 
   @override
-  State<PostReach> createState() => _PostReachState();
+  State<TimeLinePostReach> createState() => _TimeLinePostReachState();
 }
 
-class _PostReachState extends State<PostReach> {
+class _TimeLinePostReachState extends State<TimeLinePostReach> {
   bool nudity = false;
   bool graphicViolence = false;
   bool sensitive = false;
@@ -174,11 +166,10 @@ class _PostReachState extends State<PostReach> {
                             if (controllerKey.currentState!.controller!.text
                                     .isNotEmpty ||
                                 _mediaList.value.isNotEmpty) {
+                              ///////
                               if (_mediaList.value.isNotEmpty) {
-                                globals.socialServiceBloc!.add(
-                                    UploadPostMediaEvent(
-                                        media: _mediaList.value));
-
+                                timeLineFeedStore.createMediaPost(context,
+                                    mediaList: _mediaList.value);
                                 setState(() {
                                   _mentionList.value = controllerKey
                                       .currentState!.controller!.text.mentions;
@@ -196,11 +187,14 @@ class _PostReachState extends State<PostReach> {
                                     "Mention: ${controllerKey.currentState!.controller!.markupText}");
 
                                 setState(() {});
-                              } else {
+                              }
+                              //////
+                              else {
                                 setState(() {
                                   _mentionList.value = controllerKey
                                       .currentState!.controller!.text.mentions;
                                 });
+
                                 debugPrint(
                                     "Mentions Value List: ${_mentionList.value}");
                                 globals.socialServiceBloc!.add(CreatePostEvent(
@@ -214,8 +208,8 @@ class _PostReachState extends State<PostReach> {
                                     "Mention: ${controllerKey.currentState!.controller!.markupText}");
                                 debugPrint(
                                     "Mention: ${controllerKey.currentState!.controller!.text}");
+                                RouteNavigators.pop(context);
                               }
-                              RouteNavigators.pop(context);
                             }
                           },
                         ),
@@ -1093,436 +1087,5 @@ class _PostReachState extends State<PostReach> {
           ],
         );
     }
-  }
-}
-
-class TagLocation extends StatelessWidget {
-  const TagLocation({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, size: 17),
-                    padding: EdgeInsets.zero,
-                    splashColor: Colors.transparent,
-                    splashRadius: 20,
-                    constraints: const BoxConstraints(),
-                    onPressed: () => RouteNavigators.pop(context),
-                  ),
-                  const Text(
-                    'Tag Location',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Container(
-                      width: 36,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(
-                        Icons.check,
-                        size: 17,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    onPressed: () => RouteNavigators.pop(context),
-                  ),
-                ],
-              ).paddingSymmetric(h: 16),
-              const SizedBox(height: 22),
-              const CustomRoundTextField(
-                hintText: 'Search Location',
-              ).paddingSymmetric(h: 16),
-              const SizedBox(height: 15),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(33),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Nigeria',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 26,
-                        height: 26,
-                        decoration: const BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Color(0xFFC4C4C4),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ).paddingSymmetric(h: 16),
-              const SizedBox(height: 10),
-              ListTile(
-                title: const Text(
-                  'Michael Okpara University of Agriculture',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textColor2,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                subtitle: Text(
-                  'Owerri, Imo State, Nigeria',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textColor2.withOpacity(0.5),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              ListTile(
-                title: const Text(
-                  'Michael Okpara University of Agriculture',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textColor2,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                subtitle: Text(
-                  'Owerri, Imo State, Nigeria',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textColor2.withOpacity(0.5),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class EditReach extends HookWidget {
-  const EditReach({Key? key, required this.post}) : super(key: key);
-  final PostModel post;
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    final controller = useTextEditingController(text: post.content ?? '');
-    final counter = useState(
-        (post.content ?? '').trim().split(RegexUtil.spaceOrNewLine).length);
-    return Scaffold(
-      body: SafeArea(
-        child: SizedBox(
-          width: size.width,
-          height: size.height,
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 17),
-                              padding: EdgeInsets.zero,
-                              splashColor: Colors.transparent,
-                              splashRadius: 20,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => RouteNavigators.pop(context),
-                            ),
-                            const SizedBox(width: 20),
-                            const Text(
-                              'Edit reach',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: SvgPicture.asset('assets/svgs/send.svg'),
-                          onPressed: () {
-                            if (controller.text.isNotEmpty) {
-                              globals.socialServiceBloc!.add(EditContentEvent(
-                                content: controller.text,
-                                postId: post.postId,
-                              ));
-                              RouteNavigators.pop(context);
-                            }
-                          },
-                        ),
-                      ],
-                    ).paddingSymmetric(h: 16),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Helper.renderProfilePicture(
-                              globals.user!.profilePicture,
-                              size: 33,
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '@${globals.user!.username}',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textColor2,
-                                  ),
-                                ),
-                                Text(
-                                  globals.location ?? '',
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.greyShade1),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '${counter.value}/200',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textColor2,
-                          ),
-                        ),
-                      ],
-                    ).paddingSymmetric(h: 16),
-                    const SizedBox(height: 20),
-                    const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
-                    TextField(
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      minLines: 1,
-                      maxLines: 6,
-                      controller: controller,
-                      // maxLength: 200,
-                      inputFormatters: [
-                        MaxWordTextInputFormatter(maxWords: 200)
-                      ],
-                      // maxLength: 200,
-                      onChanged: (val) {
-                        counter.value =
-                            val.trim().split(RegexUtil.spaceOrNewLine).length;
-                        if (counter.value >= 200) {
-                          Snackbars.error(context,
-                              message: '200 words limit reached!');
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "What's on your mind?",
-                        counterText: '',
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.greyShade1,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                      ),
-                    ).paddingSymmetric(h: 16),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                color: const Color(0xFFF5F5F5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10)),
-                              ),
-                              builder: (context) {
-                                return ListView(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 27,
-                                      vertical: 10,
-                                    ),
-                                    children: [
-                                      Container(
-                                        height: 4,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.greyShade5
-                                              .withOpacity(0.5),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                      ).paddingSymmetric(h: size.width / 2.7),
-                                      SizedBox(height: getScreenHeight(21)),
-                                      Center(
-                                        child: Text(
-                                          'Who can reply',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(16),
-                                            color: AppColors.black,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(5)),
-                                      Center(
-                                        child: Text(
-                                          'Identify who can reply to this reach.',
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(14),
-                                            color: AppColors.greyShade3,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(20)),
-                                      InkWell(
-                                        onTap: () {},
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          minLeadingWidth: 14,
-                                          leading: SvgPicture.asset(
-                                              'assets/svgs/world.svg'),
-                                          title: Text(
-                                            'Everyone can reply',
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(16),
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(10)),
-                                      InkWell(
-                                        onTap: () {},
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          minLeadingWidth: 14,
-                                          leading: SvgPicture.asset(
-                                              'assets/svgs/people-you-follow.svg'),
-                                          title: Text(
-                                            'People you follow',
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(16),
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(10)),
-                                      InkWell(
-                                        onTap: () {},
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          minLeadingWidth: 14,
-                                          leading: SvgPicture.asset(
-                                              'assets/svgs/people-you-mention.svg'),
-                                          title: Text(
-                                            'Only people you mention',
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(16),
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: getScreenHeight(10)),
-                                      InkWell(
-                                        onTap: () {},
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.zero,
-                                          minLeadingWidth: 14,
-                                          leading: SvgPicture.asset(
-                                              'assets/svgs/none.svg'),
-                                          title: Text(
-                                            'None',
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(16),
-                                              color: AppColors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ]);
-                              });
-                        },
-                        child: Row(
-                          children: [
-                            SvgPicture.asset('assets/svgs/world.svg',
-                                height: 30),
-                            const SizedBox(width: 9),
-                            const Text(
-                              'Everyone can reply',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.textColor2,
-                              ),
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

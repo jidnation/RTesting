@@ -1,10 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart' as pt;
 import 'package:reach_me/features/timeline/post_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
 
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
+import '../home/presentation/views/comment_reach.dart';
 import '../home/presentation/views/moment_feed.dart';
 import 'models/post_feed.dart';
 
@@ -37,6 +43,9 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
 
   @override
   Widget build(BuildContext context) {
+    pt.PostFeedModel _postModel =
+        timeLineFeedStore.getPostModelById(widget.timeLineId);
+
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Container(
         height: 40,
@@ -49,10 +58,12 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            InkWell(
-              onTap: () {
+            CupertinoButton(
+              minSize: 0,
+              onPressed: () {
                 postStore.likePost(widget.timeLineId);
               },
+              padding: EdgeInsets.zero,
               child: SvgPicture.asset(
                 tPostInfo.isLiked!
                     ? 'assets/svgs/like-active.svg'
@@ -72,7 +83,11 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
           ]),
           InkWell(
             onTap: () {
-              // replyMomentComment(context, userCommentTextCtrl);
+              RouteNavigators.route(
+                  context,
+                  CommentReach(
+                      postFeedModel: timeLineFeedStore
+                          .getPostModelById(widget.timeLineId)));
             },
             child:
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -91,11 +106,23 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
               )
             ]),
           ),
-          SvgPicture.asset(
-            'assets/svgs/message.svg',
-            color: Colors.black,
-            width: 24.44,
-            height: 22,
+          CupertinoButton(
+            minSize: 0,
+            onPressed: () {
+              if (_postModel.postOwnerId != globals.userId) {
+                HapticFeedback.mediumImpact();
+
+                timeLineFeedStore.messageUer(context,
+                    email: _postModel.postOwnerId!);
+              }
+            },
+            padding: EdgeInsets.zero,
+            child: SvgPicture.asset(
+              'assets/svgs/message.svg',
+              color: Colors.black,
+              width: 24.44,
+              height: 22,
+            ),
           ),
         ]),
       ),
@@ -108,13 +135,16 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
           ),
           child: Row(children: [
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              GestureDetector(
-                onTap: () {
+              CupertinoButton(
+                minSize: 0,
+                onPressed: () {
                   postStore.votePost(
+                    context,
                     id: widget.timeLineId,
                     voteType: 'Upvote',
                   );
                 },
+                padding: EdgeInsets.zero,
                 child: SizedBox(
                   width: 30,
                   child: SvgPicture.asset(
@@ -138,13 +168,16 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
             ]),
             const SizedBox(width: 12),
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              GestureDetector(
-                onTap: () {
+              CupertinoButton(
+                minSize: 0,
+                onPressed: () {
                   postStore.votePost(
+                    context,
                     id: widget.timeLineId,
                     voteType: 'Downvote',
                   );
                 },
+                padding: EdgeInsets.zero,
                 child: SizedBox(
                   width: 30,
                   child: SvgPicture.asset(

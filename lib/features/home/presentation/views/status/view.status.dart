@@ -315,7 +315,7 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
   }
 }
 
-class ViewUserStatus extends StatefulWidget {
+class ViewUserStatus extends StatefulHookWidget {
   const ViewUserStatus({Key? key, required this.status, this.isMuted})
       : super(key: key);
   //final List<StatusFeedResponseModel> status;

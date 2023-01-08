@@ -522,6 +522,12 @@ mutation($postId: String!) {
   }
 ''';
 
+const String getReachingRelation = r''' 
+query ($userId: String!, $type: String! ) {
+  getReachRelationship(userIdToReach: $userId, typeOfRelationship: $type)
+  }
+''';
+
 ///
 /// 23 in total
 /// 4 used

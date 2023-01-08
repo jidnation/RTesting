@@ -177,6 +177,9 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                                 globals.socialServiceBloc!.add(DeletePostEvent(
                                     postId: postFeedModel.postId));
                                 RouteNavigators.pop(context);
+                                timeLineFeedStore.removePost(
+                                    context, timeLineModel.id,
+                                    isDelete: true);
                               }),
                           KebabBottomTextButton(
                             label: 'Share Post',

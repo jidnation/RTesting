@@ -1,14 +1,19 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/timeline/post_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_post_reach.dart';
+import 'package:reach_me/features/timeline/timeline_user_story.dart';
 
 import '../../core/components/empty_state.dart';
 import '../../core/components/profile_picture.dart';
@@ -18,7 +23,9 @@ import '../../core/utils/constants.dart';
 import '../../core/utils/dimensions.dart';
 import '../chat/presentation/views/chats_list_screen.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
-import '../home/presentation/views/post_reach.dart';
+import '../home/presentation/views/status/view.status.dart';
+import '../home/presentation/views/status/widgets/user_posting.dart';
+import '../home/presentation/views/timeline.dart';
 
 class TimeLineFeed extends StatefulWidget {
   static const String id = "timeline_screen";
@@ -31,16 +38,20 @@ class TimeLineFeed extends StatefulWidget {
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 final PostStore postStore = PostStore();
+RefreshController _refreshController = RefreshController(initialRefresh: false);
 
 class _TimeLineFeedState extends State<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
     globals.userBloc!.add(GetUserProfileEvent(email: globals.userId!));
+    timeLineFeedStore.getMyStatus();
+    timeLineFeedStore.getUserStatus();
   }
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ProgressHUD(
       child: SafeArea(
         child: Scaffold(
@@ -96,7 +107,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                   height: getScreenHeight(22),
                 ),
                 onPressed: () =>
-                    RouteNavigators.route(context, const PostReach()),
+                    RouteNavigators.route(context, const TimeLinePostReach()),
+                // RouteNavigators.route(context, const PostReach()),
               ),
               IconButton(
                 icon: SvgPicture.asset(
@@ -123,161 +135,285 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
             child: SizedBox(
               height: SizeConfig.screenHeight,
               width: SizeConfig.screenWidth,
-              child: Column(children: [
-                // Visibility(
-                //   visible: _posts.value.isNotEmpty,
-                //   child: Container(
-                //     color: AppColors.white,
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.stretch,
-                //       children: [
-                //         SizedBox(
-                //           height: getScreenHeight(105),
-                //           child: SingleChildScrollView(
-                //             scrollDirection: Axis.horizontal,
-                //             physics: const BouncingScrollPhysics(),
-                //             child: SizedBox(
-                //               child: Row(
-                //                 children: [
-                //                   UserStory(
-                //                     size: size,
-                //                     image: globals.user!.profilePicture ?? '',
-                //                     isMe: true,
-                //                     isLive: false,
-                //                     hasWatched: false,
-                //                     username: 'Add Status',
-                //                     isMeOnTap: () async {
-                //                       var cameras = await availableCameras();
-                //                       RouteNavigators.route(
-                //                           context,
-                //                           UserPosting(
-                //                             phoneCameras: cameras,
-                //                             initialIndex: 0,
-                //                           ));
-                //                       return;
-                //                     },
-                //                   ),
-                //                   if (_myStatus.value.isEmpty)
-                //                     const SizedBox.shrink()
-                //                   else
-                //                     UserStory(
-                //                       size: size,
-                //                       image: globals.user!.profilePicture ?? '',
-                //                       isMe: false,
-                //                       isLive: false,
-                //                       hasWatched: false,
-                //                       username: 'Your status',
-                //                       onTap: () {
-                //                         RouteNavigators.route(context,
-                //                             ViewMyStatus(status: _myStatus.value));
-                //                       },
-                //                     ),
-                //                   ...List.generate(
-                //                     _userStatus.value.length,
-                //                     (index) => UserStory(
-                //                       size: size,
-                //                       isMe: false,
-                //                       isLive: false,
-                //                       hasWatched: false,
-                //                       image: _userStatus.value[index].status![0]
-                //                           .statusOwnerProfile!.profilePicture,
-                //                       username: _userStatus
-                //                           .value[index]
-                //                           .status![index]
-                //                           .statusOwnerProfile!
-                //                           .username!,
-                //                       onTap: () async {
-                //                         // RouteNavigators
-                //                         //     .route(
-                //                         //   context,
-                //                         //   ViewUserStatus(
-                //                         //       status: _userStatus
-                //                         //           .value[
-                //                         //               index]
-                //                         //           .status!),
-                //                         // );
-                //                         final res = await Navigator.push(
-                //                             context,
-                //                             MaterialPageRoute(
-                //                                 builder: (c) => ViewUserStatus(
-                //                                     isMuted: false,
-                //                                     status: _userStatus
-                //                                         .value[index].status!)));
-                //                         if (res == null) return;
-                //                         if (res is MuteResult) {
-                //                           _mutedStatus.value = [
-                //                             ..._mutedStatus.value,
-                //                             _userStatus.value[index]
-                //                           ];
-                //                           _userStatus.value = [..._userStatus.value]
-                //                             ..removeAt(index);
-                //                         }
-                //                       },
-                //                     ),
-                //                   ),
-                //                   // ..._userStatus.value.map(
-                //                   //   (e) =>
-                //                   // ),
-                //                 ],
-                //               ),
-                //             ).paddingOnly(left: 11),
-                //           ),
-                //         ),
-                //         SizedBox(height: getScreenHeight(5)),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(height: 20),
-                ValueListenableBuilder(
-                    valueListenable: TimeLineFeedStore(),
-                    builder: (context, List<TimeLineModel> value, child) {
-                      print('from the timeLine room.........??? $value }');
-                      final List<TimeLineModel> timeLinePosts = value;
-                      return timeLineFeedStore.gettingPosts
-                          ? const Expanded(
-                              child: SingleChildScrollView(
-                                child: SkeletonLoadingWidget(),
+              child: ValueListenableBuilder(
+                  valueListenable: TimeLineFeedStore(),
+                  builder: (context, List<TimeLineModel> value, child) {
+                    print('from the timeLine room.........??? $value }');
+                    final List<StatusModel> _myStatus =
+                        timeLineFeedStore.myStatus;
+                    List<StatusFeedResponseModel> _userStatus =
+                        timeLineFeedStore.userStatus;
+                    List<StatusFeedResponseModel> _mutedStatus =
+                        timeLineFeedStore.mutedStatus;
+                    final List<TimeLineModel> timeLinePosts = value;
+                    return timeLineFeedStore.gettingPosts
+                        ? const Expanded(
+                            child: SingleChildScrollView(
+                              child: SkeletonLoadingWidget(),
+                            ),
+                          )
+                        : Column(children: [
+                            const Divider(
+                              thickness: 4,
+                              height: 0,
+                              color: AppColors.grey,
+                            ),
+                            const SizedBox(height: 5),
+                            Visibility(
+                              visible: timeLineFeedStore.length > 0,
+                              child: Container(
+                                color: AppColors.white,
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        height: getScreenHeight(105),
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          child: SizedBox(
+                                            child: Row(
+                                              children: [
+                                                TimeLineUserStory(
+                                                  size: MediaQuery.of(context)
+                                                      .size,
+                                                  image: globals.user!
+                                                          .profilePicture ??
+                                                      '',
+                                                  isMe: true,
+                                                  isLive: false,
+                                                  hasWatched: false,
+                                                  username: 'Add Status',
+                                                  isMeOnTap: () async {
+                                                    var cameras =
+                                                        await availableCameras();
+                                                    RouteNavigators.route(
+                                                        context,
+                                                        UserPosting(
+                                                          phoneCameras: cameras,
+                                                          initialIndex: 0,
+                                                        ));
+                                                    return;
+                                                  },
+                                                ),
+                                                if (_myStatus.isEmpty)
+                                                  const SizedBox.shrink()
+                                                else
+                                                  UserStory(
+                                                    size: size,
+                                                    image: globals.user!
+                                                            .profilePicture ??
+                                                        '',
+                                                    isMe: false,
+                                                    isLive: false,
+                                                    hasWatched: false,
+                                                    username: 'Your status',
+                                                    onTap: () {
+                                                      RouteNavigators.route(
+                                                          context,
+                                                          ViewMyStatus(
+                                                              status:
+                                                                  _myStatus));
+                                                    },
+                                                  ),
+                                                ...List.generate(
+                                                  _userStatus.length,
+                                                  (index) => UserStory(
+                                                    size: size,
+                                                    isMe: false,
+                                                    isLive: false,
+                                                    hasWatched: false,
+                                                    image: _userStatus[index]
+                                                        .status![0]
+                                                        .statusOwnerProfile!
+                                                        .profilePicture,
+                                                    username: _userStatus[index]
+                                                        .status![index]
+                                                        .statusOwnerProfile!
+                                                        .username!,
+                                                    onTap: () async {
+                                                      // RouteNavigators
+                                                      //     .route(
+                                                      //   context,
+                                                      //   ViewUserStatus(
+                                                      //       status: _userStatus
+                                                      //           .value[
+                                                      //               index]
+                                                      //           .status!),
+                                                      // );
+                                                      final res = await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (c) => ViewUserStatus(
+                                                                  isMuted:
+                                                                      false,
+                                                                  status: _userStatus[
+                                                                          index]
+                                                                      .status!)));
+                                                      if (res == null) return;
+                                                      if (res is MuteResult) {
+                                                        _mutedStatus = [
+                                                          ..._mutedStatus,
+                                                          _userStatus[index]
+                                                        ];
+                                                        _userStatus = [
+                                                          ..._userStatus
+                                                        ]..removeAt(index);
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                                // ..._userStatus.value.map(
+                                                //   (e) =>
+                                                // ),
+                                              ],
+                                            ),
+                                          ).paddingOnly(left: 11),
+                                        ),
+                                      ),
+                                      SizedBox(height: getScreenHeight(5)),
+                                    ]),
                               ),
-                            )
-                          : Expanded(
-                              child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const ScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              itemBuilder: (context, index) {
-                                TimeLineModel post = timeLinePosts[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 15),
-                                  child: Stack(children: [
-                                    TimeLineBox(
-                                      timeLineModel: post,
+                            ),
+                            SizedBox(height: getScreenHeight(2)),
+                            Visibility(
+                              visible: timeLineFeedStore.length > 0 &&
+                                  _mutedStatus.isNotEmpty,
+                              child: Container(
+                                color: AppColors.white,
+                                child: ListTileTheme(
+                                  dense: true,
+                                  child: ExpansionTile(
+                                    collapsedIconColor: AppColors.greyShade4,
+                                    iconColor: AppColors.greyShade4,
+                                    title: Text(
+                                      'Muted Statuses',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.greyShade3),
                                     ),
-                                    Positioned(
-                                        bottom: 10,
-                                        left: 30,
-                                        right: 30,
-                                        child: ValueListenableBuilder(
-                                            valueListenable: PostStore(),
-                                            builder: (context,
-                                                List<CustomPostModel> value,
-                                                child) {
-                                              print(
-                                                  'from the timeLine room.........??? $value }');
-                                              final List<CustomPostModel>
-                                                  posts = value;
-                                              return TimeLineBoxActionRow(
-                                                timeLineId: post.id,
-                                                posts: posts,
-                                              );
-                                            })),
-                                  ]),
-                                );
-                              },
-                              itemCount: timeLineFeedStore.length,
-                            ));
-                    }),
-              ]),
+                                    childrenPadding:
+                                        EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                    tilePadding:
+                                        EdgeInsets.symmetric(horizontal: 16),
+                                    children: [
+                                      Row(
+                                        children: [
+                                          ...List.generate(
+                                            _mutedStatus.length,
+                                            (index) => UserStory(
+                                              size: size,
+                                              isMe: false,
+                                              isLive: false,
+                                              isMuted: true,
+                                              hasWatched: false,
+                                              image: _mutedStatus[index]
+                                                  .status![0]
+                                                  .statusOwnerProfile!
+                                                  .profilePicture,
+                                              username: _mutedStatus[index]
+                                                  .status![index]
+                                                  .statusOwnerProfile!
+                                                  .username!,
+                                              onTap: () async {
+                                                final res = await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (c) =>
+                                                            ViewUserStatus(
+                                                                isMuted: true,
+                                                                status: _mutedStatus[
+                                                                        index]
+                                                                    .status!)));
+                                                if (res == null) return;
+                                                if (res is MuteResult) {
+                                                  _userStatus = [
+                                                    ..._userStatus,
+                                                    _mutedStatus[index]
+                                                  ];
+                                                  _mutedStatus = [
+                                                    ..._mutedStatus
+                                                  ]..removeAt(index);
+                                                }
+                                                // RouteNavigators
+                                                //     .route(
+                                                //   context,
+                                                //   ViewUserStatus(
+                                                //       status: _mutedStatus
+                                                //           .value[
+                                                //               index]
+                                                //           .status!),
+                                                // );
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                                child: SmartRefresher(
+                                    enablePullDown: true,
+                                    physics: const BouncingScrollPhysics(),
+                                    onRefresh: () {
+                                      timeLineFeedStore
+                                          .refreshFeed(_refreshController);
+                                      // await Future.delayed(const Duration(seconds: 10));
+                                      // _refreshController.refreshCompleted();
+                                    },
+                                    controller: _refreshController,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const ScrollPhysics(),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      itemBuilder: (context, index) {
+                                        TimeLineModel post =
+                                            timeLinePosts[index];
+                                        return Visibility(
+                                          visible: post.isShowing,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 15),
+                                            child: Stack(children: [
+                                              TimeLineBox(
+                                                timeLineModel: post,
+                                              ),
+                                              Positioned(
+                                                  bottom: 10,
+                                                  left: 30,
+                                                  right: 30,
+                                                  child: ValueListenableBuilder(
+                                                      valueListenable:
+                                                          PostStore(),
+                                                      builder: (context,
+                                                          List<CustomPostModel>
+                                                              value,
+                                                          child) {
+                                                        print(
+                                                            'from the timeLine room.........??? $value }');
+                                                        final List<
+                                                                CustomPostModel>
+                                                            posts = value;
+                                                        return TimeLineBoxActionRow(
+                                                          timeLineId: post.id,
+                                                          posts: posts,
+                                                        );
+                                                      })),
+                                            ]),
+                                          ),
+                                        );
+                                      },
+                                      itemCount: timeLineFeedStore.length,
+                                    ))),
+                          ]);
+                    // );
+                  }),
             ),
           ),
         ),
