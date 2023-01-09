@@ -130,6 +130,8 @@ dependencies:
 #  light_compressor: ^2.0.1
   ffmpeg_kit_flutter: ^4.5.1
   agora_rtc_engine: ^6.1.0
+  story_page_view: ^1.0.0
+  story_view: ^0.14.0
 
 
 

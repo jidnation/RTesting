@@ -275,7 +275,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               isSending.value = false;
               showIsSending.value = false;
               _quotedData.value = null;
-              _controller.jumpTo(_controller.position.maxScrollExtent);
+              // _controller.jumpTo(_controller.position.maxScrollExtent);
             }
 
             if (state is ChatUploadSuccess) {

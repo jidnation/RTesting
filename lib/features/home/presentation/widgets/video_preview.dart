@@ -52,14 +52,14 @@ class _VideoPreviewState extends State<VideoPreview> {
             ? BetterPlayerDataSourceType.file
             : BetterPlayerDataSourceType.network,
         widget.path,
-        cacheConfiguration: const BetterPlayerCacheConfiguration(
+        cacheConfiguration: BetterPlayerCacheConfiguration(
           useCache: true,
           // preCacheSize: 10 * 1024 * 1024,
           // maxCacheSize: 10 * 1024 * 1024,
           // maxCacheFileSize: 10 * 1024 * 1024,
 
           ///Android only option to use cached video between app sessions
-          key: "testCacheKey",
+          key: widget.path,
         ));
 
     _betterPlayerController = BetterPlayerController(

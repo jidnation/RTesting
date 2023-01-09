@@ -1579,6 +1579,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  story_page_view:
+    dependency: "direct main"
+    description:
+      name: story_page_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   story_time:
     dependency: "direct main"
     description:
@@ -1586,6 +1593,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.6"
+  story_view:
+    dependency: "direct main"
+    description:
+      name: story_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   stream_channel:
     dependency: transitive
     description:

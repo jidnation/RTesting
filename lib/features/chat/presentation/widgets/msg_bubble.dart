@@ -257,11 +257,11 @@ class MsgBubble extends StatelessWidget {
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
               height: 55,
-              width: 220,
+              // width: 220,
               clipBehavior: Clip.hardEdge,
-              //padding:
-              //const EdgeInsets.only(top: 7, left: 2, right: 4, bottom: 13),
-              // margin: const EdgeInsets.all(4),
+              constraints: BoxConstraints(
+                maxWidth: size.width * .56,
+              ),
               padding: const EdgeInsets.only(top: 5, bottom: 3),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
