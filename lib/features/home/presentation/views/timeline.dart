@@ -38,6 +38,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
@@ -947,6 +948,7 @@ class PostFeedReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
+
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -1284,10 +1286,12 @@ class PostFeedReacherCard extends HookWidget {
                                 CupertinoButton(
                                   minSize: 0,
                                   onPressed: () {
-                                    // RouteNavigators.route(
-                                    //     context,
-                                    //     ViewCommentsScreen(
-                                    //         post: postFeedModel!));
+                                    RouteNavigators.route(
+                                        context,
+                                        // ViewCommentsScreen(
+                                        //     post: postFeedModel!)
+                                        CommentReach(
+                                            postFeedModel: postFeedModel));
                                   },
                                   padding: EdgeInsets.zero,
                                   child: SvgPicture.asset(

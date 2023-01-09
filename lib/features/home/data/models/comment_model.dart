@@ -8,12 +8,14 @@ class CommentModel {
   int? nLikes;
   List<String>? imageMediaItems;
   String? audioMediaItem;
+  String? videoMediaItem;
   DateTime? createdAt;
   CommentProfileModel? commentOwnerProfile;
   CommentProfileModel? postOwnerProfile;
   List<CommentLikeModel>? like;
   String? isLiked;
   int? nreply;
+
   CommentModel({
     this.postId,
     this.authId,
@@ -24,6 +26,7 @@ class CommentModel {
     this.nLikes,
     this.imageMediaItems,
     this.audioMediaItem,
+    this.videoMediaItem,
     this.commentOwnerProfile,
     this.postOwnerProfile,
     this.createdAt,
@@ -43,6 +46,7 @@ class CommentModel {
             ? null
             : List<String>.from(json["imageMediaItems"].map((x) => x)),
         audioMediaItem: json["audioMediaItem"],
+        videoMediaItem: json["videoMediaItem"],
         createdAt: DateTime.parse(json["created_at"]),
         commentOwnerProfile: json["commentOwnerProfile"] != null
             ? CommentProfileModel.fromJson(json["commentOwnerProfile"])
@@ -61,8 +65,9 @@ class CommentModel {
         "commentId": commentId,
         "commentSlug": commentSlug,
         "content": content,
-        "nRepliess": nReplies,
+        "nReplies": nReplies,
         "audioMediaItem": audioMediaItem,
+        "videoMediaItem": videoMediaItem,
         "isLiked": isLiked,
         "imageMediaItem": imageMediaItems == null
             ? null
@@ -125,27 +130,36 @@ class CommentLikeModel {
   String? authId;
   String? likeId;
   String? commentId;
+  CommentProfileModel? profile;
+  DateTime? createdAt;
 
   CommentLikeModel({
     this.postId,
     this.authId,
     this.likeId,
     this.commentId,
+    this.profile,
+    this.createdAt,
   });
 
   factory CommentLikeModel.fromJson(Map<String, dynamic> json) =>
       CommentLikeModel(
-        postId: json["postId"],
-        authId: json["authId"],
-        likeId: json["likeId"],
-        commentId: json["commentId"],
-      );
+          postId: json["postId"],
+          authId: json["authId"],
+          likeId: json["likeId"],
+          commentId: json["commentId"],
+          createdAt: DateTime.parse(json["created_at"]),
+          profile: json["profile"] != null
+              ? CommentProfileModel.fromJson(json["profile"])
+              : null);
 
   Map<String, dynamic> toJson() => {
         "postId": postId,
         "authId": authId,
         "likeId": likeId,
         "commentId": commentId,
+        "profile": profile == null ? null : profile!.toJson(),
+        "created_at": createdAt!.toIso8601String(),
       };
 
   @override

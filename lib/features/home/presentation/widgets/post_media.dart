@@ -705,9 +705,6 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   final MediaService _mediaService = MediaService();
 
   @override
-  void initState() {
-    super.initState();
-  }
 
   getThumbnail() async {
     final res = await _mediaService.getVideoThumbnail(videoPath: widget.url);

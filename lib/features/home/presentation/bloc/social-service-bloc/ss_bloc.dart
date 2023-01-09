@@ -132,9 +132,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       try {
         final response = await socialServiceRepository.commentOnPost(
             postId: event.postId!,
-            content: event.content!,
+            content: event.content,
             userId: event.userId!,
             imageMediaItems: event.imageMediaItems,
+            videoMediaItem: event.videoMediaItem,
             audioMediaItem: event.audioMediaItem,
             postOwnerId: event.postOwnerId!);
         response.fold(
@@ -333,7 +334,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetSingleCommentOnPostLoading());
       try {
         final response = await socialServiceRepository.getSingleCommentOnPost(
-          postId: event.commentId!,
+          commentId: event.commentId!,
         );
         response.fold(
           (error) => emit(GetSingleCommentOnPostError(error: error)),
@@ -591,13 +592,14 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetVotedPostsLoading());
       try {
         print("pageLimit ${event.pageLimit}");
-        print("pageNumber ${event.pageNumber}");
-        print("vote tyoe ${event.voteType}");
+         print("pageNumber ${event.pageNumber}");
+          print("vote tyoe ${event.voteType}");
         final response = await socialServiceRepository.getVotedPosts(
-            pageLimit: event.pageLimit!,
-            pageNumber: event.pageNumber!,
-            voteType: event.voteType!,
-            authId: "");
+          pageLimit: event.pageLimit!,
+          pageNumber: event.pageNumber!,
+          voteType: event.voteType!,
+          authId: ""
+        );
         response.fold(
           (error) => emit(GetVotedPostsError(error: error)),
           (posts) => emit(
@@ -630,10 +632,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         var tempArr = [];
 
         for (var element in event.media) {
-          print("::::uploading tracing:::1 element::: $element");
-          print("::::uploading tracing:::2 list::: $tempMap");
           tempMap[element.id] = element.file;
-          print("::::uploading tracing:::3 list::: $tempMap");
           Console.log('element in media', element);
         }
         Console.log('temp map', tempMap);

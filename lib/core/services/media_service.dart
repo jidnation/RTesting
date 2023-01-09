@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;

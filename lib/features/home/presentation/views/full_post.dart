@@ -27,6 +27,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
@@ -137,10 +138,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
     void takeScreenShot() async {
       RenderRepaintBoundary boundary = scr.currentContext!.findRenderObject()
-      as RenderRepaintBoundary; // the key provided
+          as RenderRepaintBoundary; // the key provided
       ui.Image image = await boundary.toImage();
       ByteData? byteData =
-      await image.toByteData(format: ui.ImageByteFormat.png);
+          await image.toByteData(format: ui.ImageByteFormat.png);
       debugPrint("Byte Data: $byteData");
       await saveImage(byteData!.buffer.asUint8List());
     }
@@ -308,7 +309,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
             if (state is LikeCommentOnPostSuccess) {
               globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
-                  commentId: state.commentLikeModel!.commentId,));
+                  commentId: state.commentLikeModel!.commentId));
             }
 
             if (state is UnlikeCommentOnPostSuccess) {
@@ -351,7 +352,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                       elevation: 0,
                       leading: IconButton(
                         onPressed: () {
-                          RouteNavigators.pop(context);
+                          RouteNavigators.route(context, const TimelineScreen());
+                          // RouteNavigators.pop(context);
                         },
                         icon: const Icon(
                           Icons.arrow_back,
@@ -393,16 +395,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                       ),
                                       child: Column(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.start,
+                                            MainAxisAlignment.start,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                            CrossAxisAlignment.stretch,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Row(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               CupertinoButton(
                                                 minSize: 0,
@@ -414,23 +416,23 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               .postFeedModel!
                                                               .postOwnerId));
                                                   widget.postFeedModel!
-                                                      .postOwnerId ==
-                                                      globals.user!.id
+                                                              .postOwnerId ==
+                                                          globals.user!.id
                                                       ? RouteNavigators.route(
-                                                      context,
-                                                      const AccountScreen())
+                                                          context,
+                                                          const AccountScreen())
                                                       : RouteNavigators.route(
-                                                      context,
-                                                      RecipientAccountProfile(
-                                                        recipientEmail:
-                                                        'email',
-                                                        recipientImageUrl: widget
-                                                            .postFeedModel!
-                                                            .profilePicture,
-                                                        recipientId: widget
-                                                            .postFeedModel!
-                                                            .postOwnerId,
-                                                      ));
+                                                          context,
+                                                          RecipientAccountProfile(
+                                                            recipientEmail:
+                                                                'email',
+                                                            recipientImageUrl: widget
+                                                                .postFeedModel!
+                                                                .profilePicture,
+                                                            recipientId: widget
+                                                                .postFeedModel!
+                                                                .postOwnerId,
+                                                          ));
                                                 },
                                                 child: Row(
                                                   children: [
@@ -441,16 +443,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     ).paddingOnly(l: 13, t: 10),
                                                     SizedBox(
                                                         width:
-                                                        getScreenWidth(9)),
+                                                            getScreenWidth(9)),
                                                     Column(
                                                       mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       mainAxisSize:
-                                                      MainAxisSize.min,
+                                                          MainAxisSize.min,
                                                       children: [
                                                         Row(
                                                           children: [
@@ -458,13 +460,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               '@${widget.postFeedModel!.username!}',
                                                               style: TextStyle(
                                                                 fontSize:
-                                                                getScreenHeight(
-                                                                    14),
+                                                                    getScreenHeight(
+                                                                        14),
                                                                 fontFamily:
-                                                                'Poppins',
+                                                                    'Poppins',
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .w500,
+                                                                    FontWeight
+                                                                        .w500,
                                                                 color: AppColors
                                                                     .textColor2,
                                                               ),
@@ -472,52 +474,52 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                             const SizedBox(
                                                                 width: 3),
                                                             widget.postFeedModel!
-                                                                .verified!
+                                                                    .verified!
                                                                 ? SvgPicture.asset(
-                                                                'assets/svgs/verified.svg')
+                                                                    'assets/svgs/verified.svg')
                                                                 : const SizedBox
-                                                                .shrink()
+                                                                    .shrink()
                                                           ],
                                                         ),
                                                         Row(
                                                           children: [
                                                             Text(
                                                               widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location! ==
-                                                                  'nil' ||
-                                                                  widget.postFeedModel!.post!.location! ==
-                                                                      'NIL' ||
-                                                                  widget.postFeedModel!.post!
-                                                                      .location ==
-                                                                      null
+                                                                              .postFeedModel!
+                                                                              .post!
+                                                                              .location! ==
+                                                                          'nil' ||
+                                                                      widget.postFeedModel!.post!.location! ==
+                                                                          'NIL' ||
+                                                                      widget.postFeedModel!.post!
+                                                                              .location ==
+                                                                          null
                                                                   ? ''
                                                                   : widget.postFeedModel!.post!.location!
-                                                                  .length >
-                                                                  23
-                                                                  ? widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location!
-                                                                  .substring(
-                                                                  0,
-                                                                  23)
-                                                                  : widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location!,
+                                                                              .length >
+                                                                          23
+                                                                      ? widget
+                                                                          .postFeedModel!
+                                                                          .post!
+                                                                          .location!
+                                                                          .substring(
+                                                                              0,
+                                                                              23)
+                                                                      : widget
+                                                                          .postFeedModel!
+                                                                          .post!
+                                                                          .location!,
                                                               style: TextStyle(
                                                                 fontSize:
-                                                                getScreenHeight(
-                                                                    10),
+                                                                    getScreenHeight(
+                                                                        10),
                                                                 fontFamily:
-                                                                'Poppins',
+                                                                    'Poppins',
                                                                 letterSpacing:
-                                                                0.4,
+                                                                    0.4,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .w400,
+                                                                    FontWeight
+                                                                        .w400,
                                                                 color: AppColors
                                                                     .textColor2,
                                                               ),
@@ -526,15 +528,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               postDuration,
                                                               style: TextStyle(
                                                                 fontSize:
-                                                                getScreenHeight(
-                                                                    10),
+                                                                    getScreenHeight(
+                                                                        10),
                                                                 fontFamily:
-                                                                'Poppins',
+                                                                    'Poppins',
                                                                 letterSpacing:
-                                                                0.4,
+                                                                    0.4,
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .w400,
+                                                                    FontWeight
+                                                                        .w400,
                                                                 color: AppColors
                                                                     .textColor2,
                                                               ),
@@ -548,7 +550,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               ),
                                               Row(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   //  SvgPicture.asset('assets/svgs/starred.svg'),
                                                   SizedBox(
@@ -558,15 +560,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       await showReacherCardBottomSheet(
                                                         context,
                                                         downloadPost:
-                                                        takeScreenShot,
+                                                            takeScreenShot,
                                                         postFeedModel: widget
                                                             .postFeedModel!,
                                                       );
                                                     },
                                                     iconSize:
-                                                    getScreenHeight(19),
+                                                        getScreenHeight(19),
                                                     padding:
-                                                    const EdgeInsets.all(0),
+                                                        const EdgeInsets.all(0),
                                                     icon: SvgPicture.asset(
                                                         'assets/svgs/kebab card.svg'),
                                                   ),
@@ -575,95 +577,95 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             ],
                                           ),
                                           widget.postFeedModel!.post!.content ==
-                                              null
+                                                  null
                                               ? const SizedBox.shrink()
                                               : ExpandableText(
-                                            "${widget.postFeedModel!.post!.content}",
-                                            prefixText: widget
-                                                .postFeedModel!
-                                                .post!
-                                                .edited!
-                                                ? "(Reach Edited)"
-                                                : null,
-                                            prefixStyle: TextStyle(
-                                                fontSize:
-                                                getScreenHeight(12),
-                                                fontFamily: 'Poppins',
-                                                fontWeight:
-                                                FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryColor),
-                                            onPrefixTap: () {
-                                              tooltipkey.currentState
-                                                  ?.ensureTooltipVisible();
-                                            },
-                                            expandText: 'see more',
-                                            maxLines: 2,
-                                            linkColor: Colors.blue,
-                                            animation: true,
-                                            expanded: false,
-                                            collapseText: 'see less',
-                                            onHashtagTap: (value) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext
-                                                  context) {
-                                                    return DictionaryDialog(
-                                                      abbr: value,
-                                                      meaning: '',
-                                                      word: '',
-                                                    );
-                                                  });
-                                              print('Tapped Url');
-                                            },
-                                            onMentionTap: (value) {
-                                              print('Tapped Url');
-                                            },
-                                            mentionStyle: const TextStyle(
-                                                decoration: TextDecoration
-                                                    .underline,
-                                                color: Colors.blue),
-                                            hashtagStyle: const TextStyle(
-                                                decoration: TextDecoration
-                                                    .underline,
-                                                color: Colors.blue),
-                                          ).paddingSymmetric(
-                                              h: 16, v: 10),
+                                                  "${widget.postFeedModel!.post!.content}",
+                                                  prefixText: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .edited!
+                                                      ? "(Reach Edited)"
+                                                      : null,
+                                                  prefixStyle: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(12),
+                                                      fontFamily: 'Poppins',
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: AppColors
+                                                          .primaryColor),
+                                                  onPrefixTap: () {
+                                                    tooltipkey.currentState
+                                                        ?.ensureTooltipVisible();
+                                                  },
+                                                  expandText: 'see more',
+                                                  maxLines: 2,
+                                                  linkColor: Colors.blue,
+                                                  animation: true,
+                                                  expanded: false,
+                                                  collapseText: 'see less',
+                                                  onHashtagTap: (value) {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return DictionaryDialog(
+                                                            abbr: value,
+                                                            meaning: '',
+                                                            word: '',
+                                                          );
+                                                        });
+                                                    print('Tapped Url');
+                                                  },
+                                                  onMentionTap: (value) {
+                                                    print('Tapped Url');
+                                                  },
+                                                  mentionStyle: const TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.blue),
+                                                  hashtagStyle: const TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.blue),
+                                                ).paddingSymmetric(
+                                                  h: 16, v: 10),
                                           Tooltip(
                                             key: tooltipkey,
                                             triggerMode:
-                                            TooltipTriggerMode.manual,
+                                                TooltipTriggerMode.manual,
                                             showDuration:
-                                            const Duration(seconds: 1),
+                                                const Duration(seconds: 1),
                                             message:
-                                            'This reach has been edited',
+                                                'This reach has been edited',
                                           ),
                                           if ((widget.postFeedModel?.post
-                                              ?.imageMediaItems ??
-                                              [])
-                                              .isNotEmpty ||
+                                                          ?.imageMediaItems ??
+                                                      [])
+                                                  .isNotEmpty ||
                                               (widget.postFeedModel?.post
-                                                  ?.videoMediaItem ??
-                                                  '')
+                                                          ?.videoMediaItem ??
+                                                      '')
                                                   .isNotEmpty)
                                             PostMedia(
-                                                post: widget
-                                                    .postFeedModel!.post!)
+                                                    post: widget
+                                                        .postFeedModel!.post!)
                                                 .paddingOnly(
-                                                r: 16, l: 16, b: 16, t: 10)
+                                                    r: 16, l: 16, b: 16, t: 10)
                                           else
                                             const SizedBox.shrink(),
                                           (widget.postFeedModel?.post
-                                              ?.audioMediaItem ??
-                                              '')
-                                              .isNotEmpty
+                                                          ?.audioMediaItem ??
+                                                      '')
+                                                  .isNotEmpty
                                               ? PostAudioMedia(
-                                              path: widget
-                                                  .postFeedModel!
-                                                  .post!
-                                                  .audioMediaItem!)
-                                              .paddingOnly(
-                                              l: 16, r: 16, b: 10, t: 0)
+                                                      path: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .audioMediaItem!)
+                                                  .paddingOnly(
+                                                      l: 16, r: 16, b: 10, t: 0)
                                               : const SizedBox.shrink(),
 
                                           // likes and message
@@ -681,16 +683,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   if (active.contains(widget
                                                       .postFeedModel!.post)) {
                                                     if (widget.postFeedModel!
-                                                        .post?.isLiked ??
+                                                            .post?.isLiked ??
                                                         false) {
                                                       widget.postFeedModel!.post
                                                           ?.isLiked = false;
                                                       widget.postFeedModel!.post
                                                           ?.nLikes = (widget
-                                                          .postFeedModel!
-                                                          .post
-                                                          ?.nLikes ??
-                                                          1) -
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.nLikes ??
+                                                              1) -
                                                           1;
                                                       globals.socialServiceBloc!
                                                           .add(UnlikePostEvent(
@@ -703,10 +705,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           ?.isLiked = true;
                                                       widget.postFeedModel!.post
                                                           ?.nLikes = (widget
-                                                          .postFeedModel!
-                                                          .post
-                                                          ?.nLikes ??
-                                                          0) +
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.nLikes ??
+                                                              0) +
                                                           1;
                                                       globals.socialServiceBloc!
                                                           .add(
@@ -730,20 +732,20 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        12),
+                                                        BorderRadius.circular(
+                                                            12),
                                                     color:
-                                                    const Color(0xFFF5F5F5),
+                                                        const Color(0xFFF5F5F5),
                                                   ),
                                                   child: Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisSize:
-                                                    MainAxisSize.min,
+                                                        MainAxisSize.min,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
@@ -762,9 +764,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postFeedModel!
                                                                   .post)) {
                                                             if (widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.isLiked ??
+                                                                    .postFeedModel!
+                                                                    .post
+                                                                    ?.isLiked ??
                                                                 false) {
                                                               widget
                                                                   .postFeedModel!
@@ -774,19 +776,19 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postFeedModel!
                                                                   .post
                                                                   ?.nLikes = (widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes ??
-                                                                  1) -
+                                                                          .postFeedModel!
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      1) -
                                                                   1;
                                                               globals
                                                                   .socialServiceBloc!
                                                                   .add(
-                                                                  UnlikePostEvent(
-                                                                    postId: widget
-                                                                        .postFeedModel!
-                                                                        .postId,
-                                                                  ));
+                                                                      UnlikePostEvent(
+                                                                postId: widget
+                                                                    .postFeedModel!
+                                                                    .postId,
+                                                              ));
                                                             } else {
                                                               widget
                                                                   .postFeedModel!
@@ -796,10 +798,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postFeedModel!
                                                                   .post
                                                                   ?.nLikes = (widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes ??
-                                                                  0) +
+                                                                          .postFeedModel!
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      0) +
                                                                   1;
                                                               globals
                                                                   .socialServiceBloc!
@@ -813,30 +815,30 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           }
                                                         },
                                                         padding:
-                                                        EdgeInsets.zero,
+                                                            EdgeInsets.zero,
                                                         child: likePost.value ||
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post!
-                                                                .isLiked!
+                                                                widget
+                                                                    .postFeedModel!
+                                                                    .post!
+                                                                    .isLiked!
                                                             ? SvgPicture.asset(
-                                                          'assets/svgs/like-active.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        )
+                                                                'assets/svgs/like-active.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              )
                                                             : SvgPicture.asset(
-                                                          'assets/svgs/like.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        ),
+                                                                'assets/svgs/like.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              ),
                                                       ),
                                                       SizedBox(
                                                           width: getScreenWidth(
@@ -846,10 +848,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           '${post.value.post!.nLikes}',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -860,10 +862,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           'Likes',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -878,7 +880,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               GestureDetector(
                                                 onTap: () {
                                                   if (widget.postFeedModel!
-                                                      .postOwnerId !=
+                                                          .postOwnerId !=
                                                       widget.postFeedModel!
                                                           .feedOwnerId) {
                                                     HapticFeedback
@@ -909,38 +911,38 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   ),
                                                   decoration: BoxDecoration(
                                                       borderRadius:
-                                                      BorderRadius.circular(
-                                                          12),
+                                                          BorderRadius.circular(
+                                                              12),
                                                       color: widget
-                                                          .postFeedModel!
-                                                          .postOwnerId !=
-                                                          globals.userId
+                                                                  .postFeedModel!
+                                                                  .postOwnerId !=
+                                                              globals.userId
                                                           ? const Color(
-                                                          0xFFF5F5F5)
+                                                              0xFFF5F5F5)
                                                           : AppColors.disabled),
                                                   child: Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     mainAxisSize:
-                                                    MainAxisSize.min,
+                                                        MainAxisSize.min,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
                                                         onPressed: () {
                                                           if (widget
-                                                              .postFeedModel!
-                                                              .postOwnerId !=
+                                                                  .postFeedModel!
+                                                                  .postOwnerId !=
                                                               widget
                                                                   .postFeedModel!
                                                                   .feedOwnerId) {
                                                             HapticFeedback
                                                                 .mediumImpact();
                                                             reachDM.value =
-                                                            true;
+                                                                true;
 
                                                             handleTap(widget
                                                                 .postFeedModel!
@@ -958,13 +960,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           }
                                                         },
                                                         padding:
-                                                        const EdgeInsets
-                                                            .all(0),
+                                                            const EdgeInsets
+                                                                .all(0),
                                                         child: SvgPicture.asset(
                                                           'assets/svgs/message.svg',
                                                           height:
-                                                          getScreenHeight(
-                                                              20),
+                                                              getScreenHeight(
+                                                                  20),
                                                           width: getScreenWidth(
                                                               20),
                                                         ),
@@ -972,16 +974,16 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       FittedBox(
                                                         child: Text(
                                                           widget.postFeedModel!
-                                                              .postOwnerId ==
-                                                              globals.userId
+                                                                      .postOwnerId ==
+                                                                  globals.userId
                                                               ? "Message"
                                                               : 'Message user',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -1006,12 +1008,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   if (active.contains(widget
                                                       .postFeedModel!.post)) {
                                                     if ((widget.postFeedModel!
-                                                        .vote ??
-                                                        [])
+                                                                .vote ??
+                                                            [])
                                                         .isEmpty) {
                                                       setState(() {
                                                         shoutoutPost.value =
-                                                        true;
+                                                            true;
                                                       });
                                                       globals.socialServiceBloc!
                                                           .add(VotePostEvent(
@@ -1023,11 +1025,11 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     } else {
                                                       globals.socialServiceBloc!
                                                           .add(
-                                                          DeletePostVoteEvent(
-                                                            voteId: widget
-                                                                .postFeedModel!
-                                                                .postId,
-                                                          ));
+                                                              DeletePostVoteEvent(
+                                                        voteId: widget
+                                                            .postFeedModel!
+                                                            .postId,
+                                                      ));
                                                     }
                                                   }
                                                 },
@@ -1043,20 +1045,20 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        12),
+                                                        BorderRadius.circular(
+                                                            12),
                                                     color:
-                                                    const Color(0xFFF5F5F5),
+                                                        const Color(0xFFF5F5F5),
                                                   ),
                                                   child: Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     mainAxisSize:
-                                                    MainAxisSize.min,
+                                                        MainAxisSize.min,
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
@@ -1072,64 +1074,64 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postFeedModel!
                                                                   .post)) {
                                                             if ((widget.postFeedModel!
-                                                                .vote ??
-                                                                [])
+                                                                        .vote ??
+                                                                    [])
                                                                 .isEmpty) {
                                                               setState(() {
                                                                 shoutoutPost
-                                                                    .value =
-                                                                true;
+                                                                        .value =
+                                                                    true;
                                                               });
                                                               globals
                                                                   .socialServiceBloc!
                                                                   .add(
-                                                                  VotePostEvent(
-                                                                    voteType:
+                                                                      VotePostEvent(
+                                                                voteType:
                                                                     'Upvote',
-                                                                    postId: widget
-                                                                        .postFeedModel!
-                                                                        .postId,
-                                                                  ));
+                                                                postId: widget
+                                                                    .postFeedModel!
+                                                                    .postId,
+                                                              ));
                                                             } else {
                                                               globals
                                                                   .socialServiceBloc!
                                                                   .add(
-                                                                  DeletePostVoteEvent(
-                                                                    voteId: widget
-                                                                        .postFeedModel!
-                                                                        .postId,
-                                                                  ));
+                                                                      DeletePostVoteEvent(
+                                                                voteId: widget
+                                                                    .postFeedModel!
+                                                                    .postId,
+                                                              ));
                                                             }
                                                           }
                                                         },
                                                         padding:
-                                                        EdgeInsets.zero,
+                                                            EdgeInsets.zero,
                                                         child: shoutoutPost
-                                                            .value ==
-                                                            true ||
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post!
-                                                                .isVoted ==
-                                                                'Upvote'
+                                                                        .value ==
+                                                                    true ||
+                                                                widget
+                                                                        .postFeedModel!
+                                                                        .post!
+                                                                        .isVoted ==
+                                                                    'Upvote'
                                                             ? SvgPicture.asset(
-                                                          'assets/svgs/shoutup-active.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        )
+                                                                'assets/svgs/shoutup-active.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              )
                                                             : SvgPicture.asset(
-                                                          'assets/svgs/shoutup.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        ),
+                                                                'assets/svgs/shoutup.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              ),
                                                       ),
                                                       SizedBox(
                                                           width: getScreenWidth(
@@ -1139,10 +1141,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           '${post.value.post!.nUpvotes}',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -1153,10 +1155,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           'Shoutout',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -1183,8 +1185,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .postFeedModel!
                                                                 .postOwnerId,
                                                             type:
-                                                            ReachRelationshipType
-                                                                .reacher));
+                                                                ReachRelationshipType
+                                                                    .reacher));
                                                   }
                                                 },
                                                 child: Container(
@@ -1199,20 +1201,20 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   ),
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        8),
+                                                        BorderRadius.circular(
+                                                            8),
                                                     color:
-                                                    const Color(0xFFF5F5F5),
+                                                        const Color(0xFFF5F5F5),
                                                   ),
                                                   child: Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
                                                     mainAxisSize:
-                                                    MainAxisSize.min,
+                                                        MainAxisSize.min,
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
                                                       CupertinoButton(
                                                         minSize: 0,
@@ -1238,27 +1240,27 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           }
                                                         },
                                                         padding:
-                                                        EdgeInsets.zero,
+                                                            EdgeInsets.zero,
                                                         child: shoutdownPost
-                                                            .value
+                                                                .value
                                                             ? SvgPicture.asset(
-                                                          'assets/svgs/shoutdown-active.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        )
+                                                                'assets/svgs/shoutdown-active.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              )
                                                             : SvgPicture.asset(
-                                                          'assets/svgs/shoutdown.svg',
-                                                          height:
-                                                          getScreenHeight(
-                                                              20),
-                                                          width:
-                                                          getScreenWidth(
-                                                              20),
-                                                        ),
+                                                                'assets/svgs/shoutdown.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              ),
                                                       ),
                                                       SizedBox(
                                                           width: getScreenWidth(
@@ -1268,10 +1270,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           '${widget.postFeedModel!.post!.nDownvotes}',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -1282,10 +1284,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           'Shoutdown',
                                                           style: TextStyle(
                                                             fontSize:
-                                                            getScreenHeight(
-                                                                12),
+                                                                getScreenHeight(
+                                                                    12),
                                                             fontWeight:
-                                                            FontWeight.w500,
+                                                                FontWeight.w500,
                                                             color: AppColors
                                                                 .textColor3,
                                                           ),
@@ -1304,7 +1306,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                 ),
                                 SizedBox(
                                   height:
-                                  MediaQuery.of(context).size.height * 0.01,
+                                      MediaQuery.of(context).size.height * 0.01,
                                 ),
                                 const Divider(),
                                 Padding(
@@ -1317,7 +1319,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           onPressed: () {
                                             setState(() {
                                               showCommentField.value =
-                                              !showCommentField.value;
+                                                  !showCommentField.value;
                                             });
                                           },
                                           icon: const Icon(
@@ -1328,102 +1330,102 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                 const Divider(),
                                 showCommentField.value
                                     ? comments.value.isEmpty
-                                    ? const Center(
-                                    child: Text('No comments yet'))
-                                    : ListView.builder(
-                                  physics:
-                                  const BouncingScrollPhysics(),
-                                  controller: scrollController,
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  itemCount: comments.value.length,
-                                  itemBuilder: (context, index) {
-                                    // if (comments
-                                    //         .value[index].audioMediaItem ==
-                                    //     null) {
-                                    //   comments.value[index].audioMediaItem =
-                                    //       ' ';
-                                    // }
-                                    return CommentsTile(
-                                      comment: comments.value[index],
-                                      isLiked: comments
-                                          .value[index].isLiked!,
-                                      onLike: () {
-                                        print(
-                                            "${comments.value[index].isLiked}");
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-                                        if (active.contains(index)) {
-                                          if (comments.value[index]
-                                              .isLiked !=
-                                              "false") {
-                                            // comments.value[index]
-                                            //     .nLikes = (comments
-                                            //             .value[index]
-                                            //             .nLikes ??
-                                            //         1) -
-                                            //     1;
+                                        ? const Center(
+                                            child: Text('No comments yet'))
+                                        : ListView.builder(
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            controller: scrollController,
+                                            shrinkWrap: true,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            itemCount: comments.value.length,
+                                            itemBuilder: (context, index) {
+                                              // if (comments
+                                              //         .value[index].audioMediaItem ==
+                                              //     null) {
+                                              //   comments.value[index].audioMediaItem =
+                                              //       ' ';
+                                              // }
+                                              return CommentsTile(
+                                                comment: comments.value[index],
+                                                isLiked: comments
+                                                    .value[index].isLiked!,
+                                                onLike: () {
+                                                  print(
+                                                      "${comments.value[index].isLiked}");
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (comments.value[index]
+                                                            .isLiked !=
+                                                        "false") {
+                                                      // comments.value[index]
+                                                      //     .nLikes = (comments
+                                                      //             .value[index]
+                                                      //             .nLikes ??
+                                                      //         1) -
+                                                      //     1;
 
-                                            // comments.value[index]
-                                            //     .isLiked = "false";
+                                                      // comments.value[index]
+                                                      //     .isLiked = "false";
 
-                                            globals.socialServiceBloc!
-                                                .add(
-                                              UnlikeCommentOnPostEvent(
-                                                commentId: comments
-                                                    .value[index]
-                                                    .commentId,
-                                                likeId: comments
-                                                    .value[index]
-                                                    .isLiked,
-                                              ),
-                                            );
-                                          } else {
-                                            // comments.value[index]
-                                            //     .nLikes = (comments
-                                            //             .value[index]
-                                            //             .nLikes ??
-                                            //         0) +
-                                            //     1;
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        UnlikeCommentOnPostEvent(
+                                                          commentId: comments
+                                                              .value[index]
+                                                              .commentId,
+                                                          likeId: comments
+                                                              .value[index]
+                                                              .isLiked,
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      // comments.value[index]
+                                                      //     .nLikes = (comments
+                                                      //             .value[index]
+                                                      //             .nLikes ??
+                                                      //         0) +
+                                                      //     1;
 
-                                            globals.socialServiceBloc!
-                                                .add(
-                                                LikeCommentOnPostEvent(
-                                                  postId: comments
-                                                      .value[index]
-                                                      .postId,
-                                                  commentId: comments
-                                                      .value[index]
-                                                      .commentId,
-                                                ));
-                                          }
-                                        }
-                                      },
-                                      onMessage: () {
-                                        HapticFeedback.mediumImpact();
-                                        reachDM.value = true;
-                                        handleTap(index);
-                                        if (active.contains(index)) {
-                                          globals.userBloc!.add(
-                                              GetRecipientProfileEvent(
-                                                  email: comments
-                                                      .value[index]
-                                                      .authId!));
-                                        }
-                                      },
-                                    );
-                                  },
-                                )
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                              LikeCommentOnPostEvent(
+                                                        postId: comments
+                                                            .value[index]
+                                                            .postId,
+                                                        commentId: comments
+                                                            .value[index]
+                                                            .commentId,
+                                                      ));
+                                                    }
+                                                  }
+                                                },
+                                                onMessage: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  reachDM.value = true;
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: comments
+                                                                .value[index]
+                                                                .authId!));
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          )
                                     : const SizedBox.shrink(),
                                 const SizedBox(height: 80),
                               ],
                             ),
                           ),
                           Positioned(
-                            //top: 670,
+                              //top: 670,
                               bottom:
-                              ((MediaQuery.of(context).size.height) * 0.01),
+                                  ((MediaQuery.of(context).size.height) * 0.01),
                               child: commentField(controller, showEmoji,
                                   postFeedModel: widget.postFeedModel,
                                   isReaching: isReaching.value))
@@ -1682,13 +1684,13 @@ class CommentsTile extends StatelessWidget {
                   comment.authId == globals.user!.id
                       ? RouteNavigators.route(context, const AccountScreen())
                       : RouteNavigators.route(
-                      context,
-                      RecipientAccountProfile(
-                        recipientEmail: 'email',
-                        recipientImageUrl:
-                        comment.commentOwnerProfile!.profilePicture,
-                        recipientId: comment.authId,
-                      ));
+                          context,
+                          RecipientAccountProfile(
+                            recipientEmail: 'email',
+                            recipientImageUrl:
+                                comment.commentOwnerProfile!.profilePicture,
+                            recipientId: comment.authId,
+                          ));
                   progress?.dismiss();
                 });
               },
@@ -1721,14 +1723,14 @@ class CommentsTile extends StatelessWidget {
             comment.content == null
                 ? const SizedBox.shrink()
                 : Text(
-              comment.content.toString(),
-              style: TextStyle(
-                fontSize: getScreenHeight(14),
-                color: AppColors.textColor2,
-              ),
-            ),
+                    comment.content.toString(),
+                    style: TextStyle(
+                      fontSize: getScreenHeight(14),
+                      color: AppColors.textColor2,
+                    ),
+                  ),
             if ((((comment.imageMediaItems ?? []).isNotEmpty) &&
-                comment.audioMediaItem == null) ||
+                    comment.audioMediaItem == null) ||
                 (comment.videoMediaItem ?? '').isNotEmpty)
               CommentMedia(comment: comment)
                   .paddingOnly(l: 16, r: 16, b: 10, t: 0),
@@ -1736,15 +1738,15 @@ class CommentsTile extends StatelessWidget {
             //const SizedBox.shrink(),
             comment.audioMediaItem != null
                 ? Row(
-              children: [
-                Expanded(
-                  child: CommentAudioMedia(
-                    path: comment.audioMediaItem ?? '',
-                    isPlaying: false,
-                  ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
-                ),
-              ],
-            )
+                    children: [
+                      Expanded(
+                        child: CommentAudioMedia(
+                          path: comment.audioMediaItem ?? '',
+                          isPlaying: false,
+                        ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                      ),
+                    ],
+                  )
                 : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
@@ -1771,15 +1773,15 @@ class CommentsTile extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           child: comment.isLiked != "false"
                               ? SvgPicture.asset(
-                            'assets/svgs/like-active.svg',
-                            height: getScreenHeight(20),
-                            width: getScreenWidth(20),
-                          )
+                                  'assets/svgs/like-active.svg',
+                                  height: getScreenHeight(20),
+                                  width: getScreenWidth(20),
+                                )
                               : SvgPicture.asset(
-                            'assets/svgs/like.svg',
-                            height: getScreenHeight(20),
-                            width: getScreenWidth(20),
-                          ),
+                                  'assets/svgs/like.svg',
+                                  height: getScreenHeight(20),
+                                  width: getScreenWidth(20),
+                                ),
                         ),
                         SizedBox(width: getScreenWidth(4)),
                         FittedBox(

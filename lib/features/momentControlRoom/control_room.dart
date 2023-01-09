@@ -5,7 +5,9 @@ import 'package:video_player/video_player.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
+import '../../core/services/navigation/navigation_service.dart';
 import '../home/presentation/views/moment_feed.dart';
+import '../home/presentation/views/status/widgets/user_posting.dart';
 import 'models/get_comments_model.dart';
 import 'models/get_moment_feed.dart';
 import 'moment_cacher.dart';
@@ -227,10 +229,9 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response) {
       getMoment(momentId: momentId, id: id);
     }
-    notifyListeners();
+    notifyListeners(); 
   }
 
-  /////
   likingMomentComment({required String commentId, required String id}) async {
     List<MomentModel> currentList = value;
     MomentModel actualMomentModel =
@@ -298,7 +299,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       // for (CustomMomentCommentModel momentComment in currentCommentList) {
       //   if (momentComment.id == id) {
       commentModel.getMomentComment.isLiked = response.isLiked!;
-      commentModel.getMomentComment.nReplies = response.nReplies!;
+      commentModel.getMomentComment.nComments = response.nComments!;
       commentModel.getMomentComment.nLikes = response.nLikes;
       notifyListeners();
       return;
@@ -307,29 +308,29 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
   }
 
-  // postMoment(BuildContext context, {required String? videoUrl}) async {
-  //   if (videoUrl != null) {
-  //     print(":::::::::::::::::::::::::::n printing starrted :::::");
-  //     var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
-  //     if (res) {
-  //       Snackbars.success(
-  //         context,
-  //         message: 'Moment successfully created',
-  //         milliseconds: 1300,
-  //       );
-  //       momentCtrl.clearPostingData();
-  //       RouteNavigators.pop(context);
-  //     } else {
-  //       Snackbars.error(
-  //         context,
-  //         message: 'Operation Failed, Try again.',
-  //         milliseconds: 1400,
-  //       );
-  //     }
-  //     _postingMoment = false;
-  //     notifyListeners();
-  //   }
-  // }
+  postMoment(BuildContext context, {required String? videoUrl}) async {
+    if (videoUrl != null) {
+      print(":::::::::::::::::::::::::::n printing starrted :::::");
+      var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+      if (res) {
+        Snackbars.success(
+          context,
+          message: 'Moment successfully created',
+          milliseconds: 1300, 
+        );
+        momentCtrl.clearPostingData();
+        RouteNavigators.pop(context);
+      } else {
+        Snackbars.error(
+          context,
+          message: 'Operation Failed, Try again.',
+          milliseconds: 1400,
+        );
+      }
+      _postingMoment = false;
+      notifyListeners();
+    }
+  }
 
   reachUser({required String toReachId, required String id}) async {
     var response = await momentQuery.reachUser(reachingId: toReachId);
@@ -357,39 +358,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       Snackbars.success(
         context,
         message: 'Moment successfully created',
-        milliseconds: 1300,
-      );
-      updateMomentComments(id: momentModel.id);
-      getMoment(momentId: momentModel.momentId, id: momentModel.id);
-    } else {
-      Snackbars.error(
-        context,
-        message: 'Unable to post your comment, Try again Later.',
-        milliseconds: 1300,
-      );
-    }
-    _postingUserComment = false;
-    notifyListeners();
-    return response;
-  }
-
-  // ($momentId: String!, $commentId: String!, $content: String!)
-  Future<bool> replyCommentOnMoment(BuildContext context,
-      {required String id,
-      required String commentId,
-      required String userInput}) async {
-    _postingUserComment = true;
-    notifyListeners();
-    MomentModel momentModel = value.firstWhere((element) => element.id == id);
-    bool response = await momentQuery.replyMomentComment(
-      momentId: momentModel.momentId,
-      commentId: commentId,
-      content: userInput,
-    );
-    if (response) {
-      Snackbars.success(
-        context,
-        message: 'comment successfully created',
         milliseconds: 1300,
       );
       updateMomentComments(id: momentModel.id);
@@ -437,7 +405,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       for (GetMomentComment element in response) {
         updateCommentList.add(CustomMomentCommentModel(element));
       }
-      updateCommentList = updateCommentList.reversed.toList();
       actualMomentModel.momentComments = updateCommentList;
       print(
           "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
@@ -446,6 +413,80 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     _gettingUserComment = false;
     notifyListeners();
   }
+
+  // ($momentId: String!, $commentId: String!, $content: String!)
+  Future<bool> replyCommentOnMoment(BuildContext context,
+      {required String id,
+      required String commentId,
+      required String userInput}) async {
+    _postingUserComment = true;
+    notifyListeners();
+    MomentModel momentModel = value.firstWhere((element) => element.id == id);
+    bool response = await momentQuery.replyMomentComment(
+      momentId: momentModel.momentId,
+      commentId: commentId,
+      comment: userInput,
+    );
+    if (response) {
+      Snackbars.success(
+        context,
+        message: 'Moment successfully created',
+        milliseconds: 1300,
+      );
+      updateMomentComments(id: momentModel.id);
+      getMoment(momentId: momentModel.momentId, id: momentModel.id);
+    } else {
+      Snackbars.error(
+        context,
+        message: 'Unable to post your comment, Try again Later.',
+        milliseconds: 1300,
+      );
+    }
+    _postingUserComment = false;
+    notifyListeners();
+    return response;
+  }
+  //
+  // getMomentComments(
+  //     {required String momentId, int? pageLimit, int? pageNumber}) async {
+  //   _gettingUserComment = true;
+  //   List<GetMomentComment>? response =
+  //       await momentQuery.getMomentComments(momentId: momentId);
+  //   if (response != null) {
+  //     print(
+  //         "::::::::::::::::::::::::::::;; getting momment Comments done::::::::::::::::");
+  //     // _momentComments.clear();
+  //     for (GetMomentComment element in response) {
+  //       // _momentComments.add(CustomMomentCommentModel(element));
+  //     }
+  //   }
+  //   _gettingUserComment = false;
+  //   notifyListeners();
+  // }
+
+  //TODO: making it flexible with the previous comment length
+  // updateMomentComments({required String id}) async {
+  //   _gettingUserComment = true;
+  //   List<MomentModel> currentList = value;
+  //   MomentModel actualMomentModel =
+  //       currentList.firstWhere((element) => element.id == id);
+
+  //   List<GetMomentComment>? response = await momentQuery.getMomentComments(
+  //       momentId: actualMomentModel.momentId);
+  //   if (response != null) {
+  //     List<CustomMomentCommentModel> updateCommentList = [];
+  //     for (GetMomentComment element in response) {
+  //       updateCommentList.add(CustomMomentCommentModel(element));
+  //     }
+  //     updateCommentList = updateCommentList.reversed.toList();
+  //     actualMomentModel.momentComments = updateCommentList;
+  //     print(
+  //         "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
+  //     notifyListeners();
+  //   }
+  //   _gettingUserComment = false;
+  //   notifyListeners();
+  // }
 
   Future<List<CustomMomentCommentModel>> getMyMomentComments(
       {required String momentId, int? pageLimit, int? pageNumber}) async {
@@ -457,8 +498,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         data.add(CustomMomentCommentModel(element));
       }
       data.reversed;
-      print(
-          "::::::::::::::::::::: from moment getting endPoint :::::::: $data");
       return data;
     } else {
       return [];

@@ -367,7 +367,7 @@ class GetPostError extends SocialServiceState {
 class GetSingleCommentOnPostLoading extends SocialServiceState {}
 
 class GetSingleCommentOnPostSuccess extends SocialServiceState {
-  final VirtualCommentModel? data;
+  final CommentModel? data;
   GetSingleCommentOnPostSuccess({this.data});
 }
 
