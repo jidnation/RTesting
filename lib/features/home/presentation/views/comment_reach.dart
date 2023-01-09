@@ -1,35 +1,27 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:permission_handler/permission_handler.dart' as permit;
-import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/views/full_post.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:audio_waveforms/audio_waveforms.dart';
 
 import '../../../../core/components/snackbar.dart';
-import '../../../../core/models/file_result.dart';
 import '../../../../core/services/audio_recording_service.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -37,11 +29,9 @@ import '../../../../core/utils/app_globals.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/file_utils.dart';
-import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/regex_util.dart';
 import '../../../account/presentation/views/account.dart';
-import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
@@ -49,7 +39,6 @@ import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
-
 import '../widgets/post_media.dart';
 import 'comment_reach_media.dart';
 
@@ -270,7 +259,8 @@ class _CommentReachState extends State<CommentReach> {
                               .add(MediaUploadEvent(media: media.value!.file));
                           // .add(UploadPostMediaEvent(media: _mediaList));
                           globals.postContent =
-                              controllerKey.currentState!.controller?.text ?? ' ';
+                              controllerKey.currentState!.controller?.text ??
+                                  ' ';
                         } else {
                           globals.socialServiceBloc!.add(CommentOnPostEvent(
                               postId: widget.postFeedModel!.post!.postId,
@@ -1247,7 +1237,6 @@ class _CommentReachState extends State<CommentReach> {
                               const SizedBox(width: 20),
                               IconButton(
                                   onPressed: () async {
-
                                     _recording.record(
                                         fileName: 'comment_reach_aud.aac');
                                   },

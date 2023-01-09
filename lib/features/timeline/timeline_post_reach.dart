@@ -70,6 +70,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
     // _controller.jumpTo(_controller.position.maxScrollExtent);
   }
 
+  int maxCount = 11000;
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
     try {
@@ -138,84 +139,91 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                   shrinkWrap: true,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 17),
-                              padding: EdgeInsets.zero,
-                              splashColor: Colors.transparent,
-                              splashRadius: 20,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => RouteNavigators.pop(context),
-                            ),
-                            const SizedBox(width: 20),
-                            const Text(
-                              'Create a reach',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w400,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 17),
+                                padding: EdgeInsets.zero,
+                                splashColor: Colors.transparent,
+                                splashRadius: 20,
+                                constraints: const BoxConstraints(),
+                                onPressed: () => RouteNavigators.pop(context),
                               ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: SvgPicture.asset('assets/svgs/send.svg'),
-                          onPressed: () {
-                            if (controllerKey.currentState!.controller!.text
-                                    .isNotEmpty ||
-                                _mediaList.value.isNotEmpty) {
-                              ///////
-                              if (_mediaList.value.isNotEmpty) {
-                                timeLineFeedStore.createMediaPost(context,
-                                    mediaList: _mediaList.value);
-                                setState(() {
-                                  _mentionList.value = controllerKey
-                                      .currentState!.controller!.text.mentions;
-                                });
-                                globals.postContent = controllerKey
-                                    .currentState!.controller!.text;
-                                globals.postCommentOption = replyFeature.value;
-                                globals.postRating = postRating;
-                                globals.mentionList = _mentionList.value;
+                              const SizedBox(width: 20),
+                              const Text(
+                                'Create a reach',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: SvgPicture.asset('assets/svgs/send.svg'),
+                            onPressed: () {
+                              if (controllerKey.currentState!.controller!.text
+                                      .isNotEmpty ||
+                                  _mediaList.value.isNotEmpty) {
+                                ///////
+                                if (_mediaList.value.isNotEmpty) {
+                                  timeLineFeedStore.createMediaPost(context,
+                                      mediaList: _mediaList.value);
+                                  setState(() {
+                                    _mentionList.value = controllerKey
+                                        .currentState!
+                                        .controller!
+                                        .text
+                                        .mentions;
+                                  });
+                                  globals.postContent = controllerKey
+                                      .currentState!.controller!.text;
+                                  globals.postCommentOption =
+                                      replyFeature.value;
+                                  globals.postRating = postRating;
+                                  globals.mentionList = _mentionList.value;
 
-                                // globals.mentionList!.add(controllerKey
-                                //     .currentState!.controller!.markupText);
+                                  // globals.mentionList!.add(controllerKey
+                                  //     .currentState!.controller!.markupText);
 
-                                debugPrint(
-                                    "Mention: ${controllerKey.currentState!.controller!.markupText}");
+                                  debugPrint(
+                                      "Mention: ${controllerKey.currentState!.controller!.markupText}");
 
-                                setState(() {});
+                                  setState(() {});
+                                }
+                                //////
+                                else {
+                                  setState(() {
+                                    _mentionList.value = controllerKey
+                                        .currentState!
+                                        .controller!
+                                        .text
+                                        .mentions;
+                                  });
+
+                                  debugPrint(
+                                      "Mentions Value List: ${_mentionList.value}");
+                                  globals.socialServiceBloc!.add(
+                                      CreatePostEvent(
+                                          content: controllerKey
+                                              .currentState!.controller!.text,
+                                          commentOption: replyFeature.value,
+                                          location: getUserLocation(),
+                                          postRating: postRating,
+                                          mentionList: _mentionList.value));
+                                  debugPrint(
+                                      "Mention: ${controllerKey.currentState!.controller!.markupText}");
+                                  debugPrint(
+                                      "Mention: ${controllerKey.currentState!.controller!.text}");
+                                  timeLineFeedStore.initialize(context,
+                                      isPosting: true);
+                                }
                               }
-                              //////
-                              else {
-                                setState(() {
-                                  _mentionList.value = controllerKey
-                                      .currentState!.controller!.text.mentions;
-                                });
-
-                                debugPrint(
-                                    "Mentions Value List: ${_mentionList.value}");
-                                globals.socialServiceBloc!.add(CreatePostEvent(
-                                    content: controllerKey
-                                        .currentState!.controller!.text,
-                                    commentOption: replyFeature.value,
-                                    location: getUserLocation(),
-                                    postRating: postRating,
-                                    mentionList: _mentionList.value));
-                                debugPrint(
-                                    "Mention: ${controllerKey.currentState!.controller!.markupText}");
-                                debugPrint(
-                                    "Mention: ${controllerKey.currentState!.controller!.text}");
-                                timeLineFeedStore.refreshFeed2(context);
-                                RouteNavigators.pop(context);
-                              }
-                            }
-                          },
-                        ),
-                      ],
-                    ).paddingSymmetric(h: 16),
+                            },
+                          ),
+                        ]).paddingSymmetric(h: 16),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -343,16 +351,17 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                           return FlutterMentions(
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            maxLength: 1100,
-                            // minLines: null,
-
+                            maxLength: maxCount,
                             suggestionPosition: SuggestionPosition.Bottom,
                             onChanged: (val) {
                               counter.value = val
                                   .trim()
                                   .split(RegexUtil.spaceOrNewLine)
                                   .length;
-                              if (counter.value >= 200) {
+                              if (counter.value == 200) {
+                                setState(() {
+                                  maxCount = val.length;
+                                });
                                 Snackbars.error(context,
                                     message: '200 words limit reached!');
                                 // setState(() {

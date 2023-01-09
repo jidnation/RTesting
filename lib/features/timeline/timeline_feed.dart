@@ -8,7 +8,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
-import 'package:reach_me/features/timeline/post_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
@@ -17,6 +16,7 @@ import 'package:reach_me/features/timeline/timeline_user_story.dart';
 
 import '../../core/components/empty_state.dart';
 import '../../core/components/profile_picture.dart';
+import '../../core/components/rm_spinner.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/app_globals.dart';
 import '../../core/utils/constants.dart';
@@ -37,8 +37,6 @@ class TimeLineFeed extends StatefulWidget {
 }
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
-final PostStore postStore = PostStore();
-RefreshController _refreshController = RefreshController(initialRefresh: false);
 
 class _TimeLineFeedState extends State<TimeLineFeed> {
   @override
@@ -138,6 +136,7 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
+                    ScrollController scrollController = ScrollController();
                     print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
@@ -146,16 +145,21 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                     List<StatusFeedResponseModel> _mutedStatus =
                         timeLineFeedStore.mutedStatus;
                     final List<TimeLineModel> timeLinePosts = value;
+                    RefreshController _refreshController =
+                        RefreshController(initialRefresh: false);
+
                     return timeLineFeedStore.gettingPosts
                         ? const SingleChildScrollView(
                             child: SkeletonLoadingWidget(),
                           )
                         : Column(children: [
-                            const Divider(
-                              thickness: 4,
-                              height: 0,
-                              color: AppColors.grey,
-                            ),
+                            timeLineFeedStore.isPosting
+                                ? const LinearLoader()
+                                : const Divider(
+                                    thickness: 4,
+                                    height: 0,
+                                    color: AppColors.grey,
+                                  ),
                             const SizedBox(height: 5),
                             Visibility(
                               visible: timeLineFeedStore.length > 0,
@@ -358,9 +362,23 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                 child: SmartRefresher(
                                     enablePullDown: true,
                                     physics: const BouncingScrollPhysics(),
+                                    scrollController: scrollController,
+                                    onLoading: () {
+                                      print(
+                                          ":::::::::::::::::::::::::: am here::::::::::");
+                                      scrollController.position.animateTo(
+                                        50,
+                                        duration:
+                                            const Duration(milliseconds: 100),
+                                        curve: Curves.linear,
+                                      );
+                                    },
                                     onRefresh: () {
-                                      timeLineFeedStore
-                                          .refreshFeed(_refreshController);
+                                      timeLineFeedStore.initialize(
+                                        context,
+                                        refreshController: _refreshController,
+                                        isRefresh: true,
+                                      );
                                       // await Future.delayed(const Duration(seconds: 10));
                                       // _refreshController.refreshCompleted();
                                     },
@@ -386,23 +404,11 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                   bottom: 10,
                                                   left: 30,
                                                   right: 30,
-                                                  child: ValueListenableBuilder(
-                                                      valueListenable:
-                                                          PostStore(),
-                                                      builder: (context,
-                                                          List<CustomPostModel>
-                                                              value,
-                                                          child) {
-                                                        print(
-                                                            'from the timeLine room.........??? $value }');
-                                                        final List<
-                                                                CustomPostModel>
-                                                            posts = value;
-                                                        return TimeLineBoxActionRow(
-                                                          timeLineId: post.id,
-                                                          posts: posts,
-                                                        );
-                                                      })),
+                                                  child: TimeLineBoxActionRow(
+                                                    timeLineId: post.id,
+                                                    post:
+                                                        post.getPostFeed.post!,
+                                                  )),
                                             ]),
                                           ),
                                         );

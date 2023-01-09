@@ -40,6 +40,7 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
@@ -212,12 +213,12 @@ class _CommentReachState extends State<RepostReach> {
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is CreateRepostSuccess) {
-            Snackbars.success(context,
-                message: "Reach has been reposted on your timeline");
-
-            globals.socialServiceBloc!
-                .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-            Navigator.pop(context);
+            // Snackbars.success(context,
+            //     message: "Reach has been reposted on your timeline");
+            timeLineFeedStore.initialize(context, isPostEditing: true);
+            // globals.socialServiceBloc!
+            //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+            // Navigator.pop(context);
           }
           if (state is CreateRepostError) {
             Snackbars.error(context, message: state.error);
@@ -264,32 +265,36 @@ class _CommentReachState extends State<RepostReach> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 17),
-                          padding: EdgeInsets.zero,
-                          splashColor: Colors.transparent,
-                          splashRadius: 20,
-                          constraints: const BoxConstraints(),
-                          onPressed: () => RouteNavigators.pop(context),
+                    Row(children: [
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 17),
+                        padding: EdgeInsets.zero,
+                        splashColor: Colors.transparent,
+                        splashRadius: 20,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => RouteNavigators.pop(context),
+                      ),
+                      const SizedBox(width: 20),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.65,
+                        child: FittedBox(
+                          child: RichText(
+                              text: TextSpan(
+                                  text: 'Reply to ',
+                                  style: const TextStyle(
+                                      color: AppColors.textColor5,
+                                      fontSize: 16),
+                                  children: [
+                                TextSpan(
+                                  text: '@${widget.postFeedModel!.username}',
+                                  style: const TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 16),
+                                )
+                              ])),
                         ),
-                        const SizedBox(width: 20),
-                        RichText(
-                            text: TextSpan(
-                                text: 'Reply to ',
-                                style: const TextStyle(
-                                    color: AppColors.textColor5, fontSize: 16),
-                                children: [
-                              TextSpan(
-                                text: '@${widget.postFeedModel!.username}',
-                                style: const TextStyle(
-                                    color: AppColors.primaryColor,
-                                    fontSize: 16),
-                              )
-                            ]))
-                      ],
-                    ),
+                      )
+                    ]),
                     IconButton(
                       icon: SvgPicture.asset('assets/svgs/send.svg'),
                       onPressed: () {

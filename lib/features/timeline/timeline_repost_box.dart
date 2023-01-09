@@ -35,7 +35,9 @@ class TimelineRepostedPost extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
           border: Border.all(color: AppColors.greyShade10)),
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start, children: [
         //////
         Row(children: [
           Container(

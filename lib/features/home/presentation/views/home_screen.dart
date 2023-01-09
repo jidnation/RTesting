@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     momentFeedStore.initialize();
-    timeLineFeedStore.initialize();
+    timeLineFeedStore.initialize(context);
     super.initState();
   }
 

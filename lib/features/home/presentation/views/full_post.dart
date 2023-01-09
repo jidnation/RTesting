@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -15,11 +14,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
@@ -27,13 +26,9 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-import 'package:readmore/readmore.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/components/bottom_sheet_list_tile.dart';
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -45,8 +40,10 @@ import '../../../account/presentation/views/account.dart';
 import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../data/models/comment_model.dart';
 import '../widgets/post_media.dart';
+import 'home_screen.dart';
 
 class FullPostScreen extends StatefulHookWidget {
   static String id = 'full_post_screen';
@@ -262,7 +259,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
               });
 
               Snackbars.success(context,
-                  message: "Your commment has been posted");
+                  message: "Your comment has been posted");
               triggerProgressIndicator.value = false;
               globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
                   postId: widget.postFeedModel!.postId,
@@ -352,7 +349,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                       elevation: 0,
                       leading: IconButton(
                         onPressed: () {
-                          RouteNavigators.route(context, const TimelineScreen());
+                          RouteNavigators.route(context, const HomeScreen());
+                          // Get.close(2);
                           // RouteNavigators.pop(context);
                         },
                         icon: const Icon(
@@ -440,7 +438,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       widget.postFeedModel!
                                                           .profilePicture,
                                                       size: 33,
-                                                    ).paddingOnly(l: 13, t: 10),
+                                                    ).paddingOnly(
+                                                        left: 13, top: 10),
                                                     SizedBox(
                                                         width:
                                                             getScreenWidth(9)),
@@ -540,11 +539,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 color: AppColors
                                                                     .textColor2,
                                                               ),
-                                                            ).paddingOnly(l: 6),
+                                                            ).paddingOnly(
+                                                                left: 6),
                                                           ],
                                                         )
                                                       ],
-                                                    ).paddingOnly(t: 10),
+                                                    ).paddingOnly(top: 10),
                                                   ],
                                                 ),
                                               ),
@@ -630,7 +630,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           .underline,
                                                       color: Colors.blue),
                                                 ).paddingSymmetric(
-                                                  h: 16, v: 10),
+                                                  horizontal: 16, vertical: 10),
                                           Tooltip(
                                             key: tooltipkey,
                                             triggerMode:
@@ -652,7 +652,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     post: widget
                                                         .postFeedModel!.post!)
                                                 .paddingOnly(
-                                                    r: 16, l: 16, b: 16, t: 10)
+                                                    right: 16,
+                                                    left: 16,
+                                                    bottom: 16,
+                                                    top: 10)
                                           else
                                             const SizedBox.shrink(),
                                           (widget.postFeedModel?.post
@@ -665,7 +668,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           .post!
                                                           .audioMediaItem!)
                                                   .paddingOnly(
-                                                      l: 16, r: 16, b: 10, t: 0)
+                                                      left: 16,
+                                                      right: 16,
+                                                      bottom: 10,
+                                                      top: 0)
                                               : const SizedBox.shrink(),
 
                                           // likes and message
@@ -856,7 +862,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           'Likes',
@@ -970,7 +976,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           width: getScreenWidth(
                                                               20),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           widget.postFeedModel!
@@ -994,7 +1000,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ),
                                               ),
                                             ],
-                                          ).paddingOnly(l: 16, b: 16),
+                                          ).paddingOnly(left: 16, bottom: 16),
 
                                           // shoutout and shoutdown
                                           Row(
@@ -1149,7 +1155,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 6),
+                                                      ).paddingOnly(right: 6),
                                                       FittedBox(
                                                         child: Text(
                                                           'Shoutout',
@@ -1278,7 +1284,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           'Shoutdown',
@@ -1298,7 +1304,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ),
                                               ),
                                             ],
-                                          ).paddingOnly(l: 16)
+                                          ).paddingOnly(left: 16)
                                         ],
                                       ),
                                     ),
@@ -1733,7 +1739,7 @@ class CommentsTile extends StatelessWidget {
                     comment.audioMediaItem == null) ||
                 (comment.videoMediaItem ?? '').isNotEmpty)
               CommentMedia(comment: comment)
-                  .paddingOnly(l: 16, r: 16, b: 10, t: 0),
+                  .paddingOnly(left: 16, right: 16, bottom: 10, top: 0),
             //else
             //const SizedBox.shrink(),
             comment.audioMediaItem != null
@@ -1743,7 +1749,7 @@ class CommentsTile extends StatelessWidget {
                         child: CommentAudioMedia(
                           path: comment.audioMediaItem ?? '',
                           isPlaying: false,
-                        ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                        ).paddingOnly(right: 0, left: 0, bottom: 10, top: 0),
                       ),
                     ],
                   )
@@ -1815,6 +1821,6 @@ class CommentsTile extends StatelessWidget {
               ],
             )
           ],
-        )).paddingOnly(b: 10, r: 20, l: 20);
+        )).paddingOnly(bottom: 10, right: 20, left: 20);
   }
 }
