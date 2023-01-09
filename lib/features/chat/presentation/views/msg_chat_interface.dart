@@ -25,11 +25,11 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/call/presentation/views/initiate_audio_call.dart';
+import 'package:reach_me/features/call/presentation/views/initiate_video_call.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
-import 'package:reach_me/features/video-call/video_call_screen.dart';
-import 'package:reach_me/features/voice-call/voice_call_screen.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -215,7 +215,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/video.svg'),
               onPressed: () {
-                RouteNavigators.route(context, const VideoCallScreen());
+                RouteNavigators.route(context,
+                    InitiateVideoCall(recipient: widget.recipientUser));
               },
               splashRadius: 20,
             ),
@@ -227,7 +228,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             child: IconButton(
               icon: SvgPicture.asset('assets/svgs/call.svg'),
               onPressed: () {
-                RouteNavigators.route(context, const VoiceCallScreen());
+                RouteNavigators.route(context,
+                    InitiateAudioCall(recipient: widget.recipientUser));
               },
               splashRadius: 20,
             ),

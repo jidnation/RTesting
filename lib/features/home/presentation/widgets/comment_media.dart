@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
-import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/presentation/widgets/gallery_view.dart';
@@ -296,13 +294,16 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       }
     });
 
+
     await playerController!.preparePlayer(filePath);
+
     // await playerController.startPlayer();
     if (mounted) setState(() {});
   }
 
   Future<PlayerController> getPlayerController(
       String path, String playerkey) async {
+
     if (playerkey != null && playerControllers.containsKey(playerkey)) {
       return playerControllers[playerkey]!;
     }
@@ -324,6 +325,7 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       decoration: const BoxDecoration(
           color: AppColors.audioPlayerBg,
           borderRadius: BorderRadius.all(Radius.circular(15))),
+
       child: Row(children: [
         GestureDetector(
           onTap: () async {
