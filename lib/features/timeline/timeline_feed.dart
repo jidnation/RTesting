@@ -147,10 +147,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                         timeLineFeedStore.mutedStatus;
                     final List<TimeLineModel> timeLinePosts = value;
                     return timeLineFeedStore.gettingPosts
-                        ? const Expanded(
-                            child: SingleChildScrollView(
-                              child: SkeletonLoadingWidget(),
-                            ),
+                        ? const SingleChildScrollView(
+                            child: SkeletonLoadingWidget(),
                           )
                         : Column(children: [
                             const Divider(

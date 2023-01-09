@@ -14,6 +14,7 @@ import 'package:reach_me/features/timeline/post_media.dart';
 import 'package:reach_me/features/timeline/show_reacher_bottom_card.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
+import 'package:reach_me/features/timeline/timeline_repost_box.dart';
 import 'package:reach_me/features/timeline/video_player.dart';
 
 import '../../core/components/snackbar.dart';
@@ -465,6 +466,13 @@ class TimeLineBox extends StatelessWidget {
                                 tPostInfo.content!.isNotEmpty)
                             ? 8
                             : 0),
+                    (timeLineModel.getPostFeed.post!.repostedPost != null)
+                        ? TimelineRepostedPost(
+                            tPostInfo: timeLineFeedStore
+                                .getPostModel(timeLineModel: timeLineModel)
+                                .post!,
+                          ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
+                        : const SizedBox.shrink(),
                     const SizedBox(height: 42),
                   ]),
             ),

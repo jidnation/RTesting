@@ -43,9 +43,6 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
 
   @override
   Widget build(BuildContext context) {
-    pt.PostFeedModel _postModel =
-        timeLineFeedStore.getPostModelById(widget.timeLineId);
-
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Container(
         height: 40,
@@ -109,6 +106,8 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
           CupertinoButton(
             minSize: 0,
             onPressed: () {
+              pt.PostFeedModel _postModel =
+                  timeLineFeedStore.getPostModelById(widget.timeLineId);
               if (_postModel.postOwnerId != globals.userId) {
                 HapticFeedback.mediumImpact();
 

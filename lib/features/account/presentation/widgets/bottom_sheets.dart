@@ -566,6 +566,8 @@ Future showUserStoryBottomSheet(BuildContext context,
                               globals.socialServiceBloc!.add(ReportStatusEvent(
                                   reportReason: res as String,
                                   statusId: status.status?.statusId ?? ''));
+                              await Future.delayed(const Duration(seconds: 4));
+                              timeLineFeedStore.refreshFeed2(context);
                             },
                             color: const Color(0xFFE50101),
                           ),
@@ -579,7 +581,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
-                              onPressed: () {
+                              onPressed: () async {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(StarUserEvent(
                                     userIdToStar:
@@ -601,7 +603,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',
-                              onPressed: () {
+                              onPressed: () async {
                                 if ((status.status?.isMuted ?? false) &&
                                     (isMuted ?? false)) {
                                   globals.showLoader(context);
@@ -610,6 +612,9 @@ Future showUserStoryBottomSheet(BuildContext context,
                                           idToUnmute: status
                                                   .statusOwnerProfile?.authId ??
                                               ''));
+                                  await Future.delayed(
+                                      const Duration(seconds: 4));
+                                  timeLineFeedStore.refreshFeed2(context);
                                 } else {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -618,6 +623,9 @@ Future showUserStoryBottomSheet(BuildContext context,
                                                   .statusOwnerProfile?.authId ??
                                               ''));
                                 }
+                                await Future.delayed(
+                                    const Duration(seconds: 4));
+                                timeLineFeedStore.refreshFeed2(context);
                               }),
                         ],
                       ),

@@ -208,6 +208,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                     "Mention: ${controllerKey.currentState!.controller!.markupText}");
                                 debugPrint(
                                     "Mention: ${controllerKey.currentState!.controller!.text}");
+                                timeLineFeedStore.refreshFeed2(context);
                                 RouteNavigators.pop(context);
                               }
                             }

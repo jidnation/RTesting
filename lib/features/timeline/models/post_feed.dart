@@ -112,6 +112,7 @@ class Post {
     this.isRepost,
     this.isVoted,
     this.repostedPostId,
+    this.repostedPost,
     this.repostedPostOwnerId,
     this.repostedPostOwnerProfile,
     this.postOwnerProfile,
@@ -132,6 +133,7 @@ class Post {
   int? nDownvotes;
   final String? location;
   final String? postRating;
+  final Post? repostedPost;
   final String? postSlug;
   final bool? edited;
   final String? commentOption;
@@ -148,6 +150,9 @@ class Post {
   final DateTime? updatedAt;
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
+        repostedPost: json["repostedPost"] != null
+            ? Post.fromJson(json["repostedPost"])
+            : null,
         authId: json["authId"],
         postId: json["postId"],
         content: json["content"] ?? "",

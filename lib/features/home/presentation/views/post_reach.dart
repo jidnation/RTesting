@@ -32,6 +32,7 @@ import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dar
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 
 class UploadFileDto {
@@ -1279,11 +1280,16 @@ class EditReach extends HookWidget {
                           icon: SvgPicture.asset('assets/svgs/send.svg'),
                           onPressed: () {
                             if (controller.text.isNotEmpty) {
-                              globals.socialServiceBloc!.add(EditContentEvent(
-                                content: controller.text,
-                                postId: post.postId,
-                              ));
-                              RouteNavigators.pop(context);
+                              timeLineFeedStore.editPost(context,
+                                  content: controller.text,
+                                  postId: post.postId!);
+
+                              // globals.socialServiceBloc!.add(EditContentEvent(
+                              //   content: controller.text,
+                              //   postId: post.postId,
+                              // ));
+                              // RouteNavigators.pop(context);
+
                             }
                           },
                         ),

@@ -29,11 +29,17 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
         currentData.firstWhere((element) => element.id == id);
     String postID = actualModel.post.postId!;
     if (!actualModel.post.isLiked!) {
+      actualModel.post.isLiked = true;
+      actualModel.post.nLikes = actualModel.post.nLikes! + 1;
+      notifyListeners();
       bool response = await timeLineQuery.likePost(postId: postID);
       if (response) {
         updateTimeLine(id);
       }
     } else {
+      actualModel.post.isLiked = false;
+      actualModel.post.nLikes = actualModel.post.nLikes! - 1;
+      notifyListeners();
       bool response =
           await timeLineQuery.unlikePost(postId: actualModel.post.postId!);
       if (response) {
@@ -51,8 +57,7 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
 
     if (voteType.toLowerCase() == 'downvote') {
       bool? res = await getReachRelationship(
-          usersId: actualModel.post.postOwnerProfile!.authId!,
-          type: 'reaching');
+          usersId: actualModel.post.postOwnerProfile!.authId!, type: 'reacher');
       // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
       if (res != null && res) {
         bool response = await timeLineQuery.votePost(
@@ -60,13 +65,18 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
           voteType: voteType,
         );
         if (response) {
-          updateTimeLine(id);
-          Snackbars.success(
-            context,
-            message:
-                'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
-            milliseconds: 1300,
-          );
+          timeLineFeedStore.refreshFeed2(context);
+          voteType.toLowerCase() == 'upvote'
+              ? Snackbars.success(
+                  context,
+                  message: 'You have successfully shouted up this post.',
+                  milliseconds: 1300,
+                )
+              : Snackbars.success(
+                  context,
+                  message: 'You have successfully shouted down this post.',
+                  milliseconds: 1300,
+                );
         }
         if (voteType.toLowerCase() == 'downvote') {
           timeLineFeedStore.removePost(context, id);
@@ -74,7 +84,7 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
       } else {
         Snackbars.error(
           context,
-          message: 'Operation failed, You are not reaching this user.',
+          message: 'Operation failed, This user is not reaching you.',
           milliseconds: 1300,
         );
       }
@@ -84,7 +94,7 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
         voteType: voteType,
       );
       if (response) {
-        updateTimeLine(id);
+        timeLineFeedStore.refreshFeed2(context);
         Snackbars.success(
           context,
           message:
@@ -115,11 +125,11 @@ class PostStore extends ValueNotifier<List<CustomPostModel>> {
     notifyListeners();
   }
 
-  updatePostList(String id, {required Post post}) {
-    List<CustomPostModel> currentData = value;
-    currentData.insert(0, CustomPostModel(id, post: post));
-    notifyListeners();
-  }
+  // updatePostList(String id, {required Post post}) {
+  //   List<CustomPostModel> currentData = value;
+  //   currentData.insert(0, CustomPostModel(id, post: post));
+  //   notifyListeners();
+  // }
 
   updatePostActions(List<TimeLineModel> posts) {
     value.clear();

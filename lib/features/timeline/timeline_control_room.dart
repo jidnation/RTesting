@@ -85,6 +85,50 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       profilePicture: postOwner.profilePicture,
       verified: postOwner.verified,
       post: pt.PostModel(
+        repostedPost: timeLineModel.getPostFeed.post!.repostedPost != null
+            ? pt.PostModel(
+                authId: postD.repostedPost?.authId,
+                repostedPostOwnerId: postD.repostedPost?.repostedPostOwnerId,
+                repostedPostId: postD.repostedPost?.repostedPostId,
+                postRating: postD.repostedPost?.postRating,
+                createdAt: postD.repostedPost?.createdAt,
+                isVoted: postD.repostedPost?.isVoted,
+                isLiked: postD.repostedPost?.isLiked,
+                isRepost: postD.repostedPost?.isRepost,
+                videoMediaItem: postD.repostedPost?.videoMediaItem,
+                audioMediaItem: postD.repostedPost?.audioMediaItem,
+                commentOption: postD.repostedPost?.commentOption,
+                content: postD.repostedPost?.content,
+                edited: postD.repostedPost?.edited,
+                hashTags: postD.repostedPost?.hashTags,
+                imageMediaItems: postD.repostedPost?.imageMediaItems,
+                location: postD.repostedPost?.location,
+                mentionList: postD.repostedPost?.mentionList,
+                nComments: postD.repostedPost?.nComments,
+                nDownvotes: postD.repostedPost?.nDownvotes,
+                nUpvotes: postD.repostedPost?.nUpvotes,
+                nLikes: postD.repostedPost?.nLikes,
+                postSlug: postD.repostedPost?.postSlug,
+                postOwnerProfile: postD.repostedPost!.postOwnerProfile != null
+                    ? pt.PostProfileModel(
+                        authId: postD.repostedPost!.postOwnerProfile!.authId,
+                        firstName:
+                            postD.repostedPost!.postOwnerProfile!.firstName,
+                        lastName:
+                            postD.repostedPost!.postOwnerProfile!.lastName,
+                        username:
+                            postD.repostedPost!.postOwnerProfile!.username,
+                        location:
+                            postD.repostedPost!.postOwnerProfile!.location,
+                        profilePicture: postD
+                            .repostedPost!.postOwnerProfile!.profilePicture,
+                        verified:
+                            postD.repostedPost!.postOwnerProfile!.verified,
+                        profileSlug:
+                            postD.repostedPost!.postOwnerProfile!.profileSlug)
+                    : null,
+              )
+            : null,
         authId: postD.authId,
         repostedPostOwnerId: postD.repostedPostOwnerId,
         repostedPostId: postD.repostedPostId,
@@ -116,6 +160,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             profilePicture: postD.postOwnerProfile!.profilePicture,
             verified: postD.postOwnerProfile!.verified,
             profileSlug: postD.postOwnerProfile!.profileSlug),
+        repostedPostOwnerProfile: postD.repostedPostOwnerProfile != null
+            ? pt.PostProfileModel(
+                authId: postD.repostedPostOwnerProfile!.authId,
+                firstName: postD.repostedPostOwnerProfile!.firstName,
+                lastName: postD.repostedPostOwnerProfile!.lastName,
+                username: postD.repostedPostOwnerProfile!.username,
+                location: postD.repostedPostOwnerProfile!.location,
+                profilePicture: postD.repostedPostOwnerProfile!.profilePicture,
+                verified: postD.repostedPostOwnerProfile!.verified,
+                profileSlug: postD.repostedPostOwnerProfile!.profileSlug)
+            : null,
       ),
       reachingRelationship: timeLineModel.getPostFeed.reachingRelationship,
       createdAt: timeLineModel.getPostFeed.createdAt,
@@ -148,24 +203,24 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
-  updateTimeLine() async {
-    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
-    if (response != null) {
-      for (GetPostFeed postFeed in response) {
-        Post post = postFeed.post!;
-        if (!_availablePostIds.contains(post.postId)) {
-          value.insert(
-              0,
-              TimeLineModel(
-                getPostFeed: postFeed,
-                isShowing: post.isVoted!.toLowerCase().trim() != 'downvote',
-              ));
-          postStore.updatePostList(value[0].id, post: post);
-        }
-      }
-    }
-    notifyListeners();
-  }
+  // updateTimeLine() async {
+  //   List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
+  //   if (response != null) {
+  //     for (GetPostFeed postFeed in response) {
+  //       Post post = postFeed.post!;
+  //       if (!_availablePostIds.contains(post.postId)) {
+  //         value.insert(
+  //             0,
+  //             TimeLineModel(
+  //               getPostFeed: postFeed,
+  //               isShowing: post.isVoted!.toLowerCase().trim() != 'downvote',
+  //             ));
+  //         postStore.updatePostList(value[0].id, post: post);
+  //       }
+  //     }
+  //   }
+  //   notifyListeners();
+  // }
 
   pt.PostFeedModel getPostModelById(String timeLineId) {
     List<TimeLineModel> currentPosts = value;
@@ -237,6 +292,30 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
+  refreshFeed2(BuildContext context, {bool? isTextEditing}) async {
+    List<GetPostFeed>? posts = await timeLineQuery.getAllPostFeeds();
+    getUserStatus();
+    getMyStatus();
+    if (posts != null) {
+      value.clear();
+      for (GetPostFeed element in posts) {
+        value.add(TimeLineModel(
+          getPostFeed: element,
+          isShowing: element.post!.isVoted!.toLowerCase().trim() != 'downvote',
+        ));
+      }
+      postStore.updatePostActions(value);
+      if (isTextEditing ?? false) {
+        Snackbars.success(
+          context,
+          message: 'You have successfully edit your post',
+          milliseconds: 1500,
+        );
+      }
+    }
+    notifyListeners();
+  }
+
   ///
   /// for post reach page
   ///
@@ -299,7 +378,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             mentionList: globals.mentionList,
             postRating: globals.postRating);
     if (response.isRight()) {
-      updateTimeLine();
+      refreshFeed2(context);
       Snackbars.success(context, message: 'Your reach has been posted');
       Get.close(2);
     }
@@ -320,6 +399,19 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         RouteNavigators.route(
             context, MsgChatInterface(recipientUser: userInfo));
       }
+    }
+  }
+
+  editPost(BuildContext context,
+      {required String content, required String postId}) async {
+    final Either<String, pt.PostModel> response =
+        await SocialServiceRepository().editContent(
+      content: content,
+      postId: postId,
+    );
+    if (response.isRight()) {
+      refreshFeed2(context, isTextEditing: true);
+      Get.back();
     }
   }
 }
