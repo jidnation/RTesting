@@ -229,14 +229,17 @@ class ViewMyStatus extends HookWidget {
 }
 
 class ViewUserStatus extends HookWidget {
-  const ViewUserStatus({Key? key, required this.status}) : super(key: key);
+  const ViewUserStatus({Key? key, required this.status, this.isMuted})
+      : super(key: key);
   //final List<StatusFeedResponseModel> status;
   final List<StatusFeedModel> status;
+  final bool? isMuted;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
+    final indicatorController = useState(IndicatorAnimationCommand());
     return Scaffold(
       body: BlocConsumer<ChatBloc, ChatState>(
           bloc: globals.chatBloc,
@@ -250,9 +253,17 @@ class ViewUserStatus extends HookWidget {
           },
           builder: (context, state) {
             return StoryPageView(
-              indicatorDuration: const Duration(seconds: 7),
+              indicatorAnimationController: indicatorController,
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = status[storyIndex];
+
+                if (story.status?.statusData?.videoMedia != null) {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 30));
+                } else {
+                  indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 5));
+                }
 
                 if (story.status!.statusData!.imageMedia != null ||
                     (story.status!.statusData!.imageMedia ?? '').isNotEmpty) {
@@ -339,7 +350,8 @@ class ViewUserStatus extends HookWidget {
                     ),
                     //check typename from model and display widgets accordingly
 
-                    if (story.status!.statusData!.background!.contains('0x'))
+                    if ((story.status?.statusData?.background ?? '')
+                        .contains('0x'))
                       Positioned.fill(
                         child: Container(
                           height: size.height,
@@ -361,26 +373,40 @@ class ViewUserStatus extends HookWidget {
                       )
                     else
                       Positioned.fill(
-                        child: Container(
-                          height: size.height,
-                          width: size.width,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  story.status!.statusData!.background!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              story.status!.statusData!.caption!,
-                              textAlign: Helper.getAlignment(story
-                                  .status!.statusData!.alignment!)['align'],
-                              style: Helper.getFont(
-                                  story.status!.statusData!.font!),
-                            ),
-                          ),
-                        ),
+                        child: story.status?.type == 'video'
+                            ? Container(
+                                height: size.height,
+                                width: size.width,
+                                color: AppColors.black,
+                                child: VideoPreview(
+                                  isLocalVideo: false,
+                                  loop: true,
+                                  showControls: false,
+                                  path: story.status!.statusData!.videoMedia!,
+                                ),
+                              )
+                            : Container(
+                                height: size.height,
+                                width: size.width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        story.status?.statusData?.background ??
+                                            ''),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    story.status!.statusData!.caption!,
+                                    textAlign: Helper.getAlignment(
+                                        story.status?.statusData?.alignment ??
+                                            '')['align'],
+                                    style: Helper.getFont(
+                                        story.status?.statusData?.font ?? ''),
+                                  ),
+                                ),
+                              ),
                       ),
                     Padding(
                       padding: const EdgeInsets.only(top: 44, left: 8),
@@ -552,9 +578,15 @@ class ViewUserStatus extends HookWidget {
                             padding: EdgeInsets.zero,
                             color: Colors.white,
                             icon: const Icon(Icons.more_horiz_rounded),
-                            onPressed: () {
-                              showUserStoryBottomSheet(context,
+                            onPressed: () async {
+                              final res = await showUserStoryBottomSheet(
+                                  context,
+                                  isMuted: isMuted,
                                   status: status[storyIndex]);
+                              if (res == null) return;
+                              if (res is MuteResult) {
+                                Navigator.pop(context, res);
+                              }
                             },
                           ),
                         ),
@@ -631,4 +663,10 @@ class ViewUserStatus extends HookWidget {
           }),
     );
   }
+}
+
+class MuteResult {
+  final bool isMute;
+  final String userId;
+  MuteResult({required this.isMute, required this.userId});
 }

@@ -1,8 +1,12 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
+import '../views/moment_feed.dart';
+import '../views/status/widgets/user_posting.dart';
 
 class MomentsAppBar extends StatelessWidget {
   final PageController pageController;
@@ -70,8 +74,16 @@ class MomentsAppBar extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(0),
                 constraints: const BoxConstraints(),
-                onPressed: () {
-                  //Navigator.pop(context);
+                onPressed: () async {
+                  var cameras = await availableCameras();
+                  Get.to(
+                    () => UserPosting(
+                      initialIndex: 2,
+                      phoneCameras: cameras,
+                    ),
+                    transition: Transition.fadeIn,
+                  );
+                  momentFeedStore.currentVideoController.pause();
                 },
               ),
             ),
@@ -93,8 +105,16 @@ class MomentsAppBar extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(0),
               constraints: const BoxConstraints(),
-              onPressed: () {
-                //Navigator.pop(context);
+              onPressed: () async {
+                var cameras = await availableCameras();
+                Get.to(
+                  () => UserPosting(
+                    initialIndex: 0,
+                    phoneCameras: cameras,
+                  ),
+                  transition: Transition.fadeIn,
+                );
+                momentFeedStore.currentVideoController.pause();
               },
             ),
           ]),

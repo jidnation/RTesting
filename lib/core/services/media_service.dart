@@ -9,8 +9,7 @@ import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
-
-
+// import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
@@ -234,11 +233,12 @@ class MediaService {
   //     android: AndroidConfig(isSharedStorage: true, saveAt: SaveAt.Movies),
   //     ios: IOSConfig(saveInGallery: true),
   //   );
+  //   File(filePath).delete();
   //   // final res = await VideoCompress.compressVideo(
   //   //   filePath,
   //   //   quality: VideoQuality.DefaultQuality,
   //   // );
-
+  //
   //   // print('size1:::::::::::::::${res!.filesize! / 1024}');
   //   return response.destinationPath;
   // }
@@ -373,56 +373,111 @@ class MediaService {
         fileName: thumbnailPath.split('/').last);
   }
 
-  Future<String?> videoAudioMerger(BuildContext context,
-      {required String videoPath,
-      required String audioPath,
-      required int time}) async {
-    String timeLimit = '00:00:';
-    String outputPath = '/storage/emulated/0/Download/output.mp4';
-    String? fileUrl;
-    if (await Permission.storage.request().isGranted) {
-      if (time.toInt() < 10) {
-        timeLimit = timeLimit + '0' + time.toString();
-      } else {
-        timeLimit = timeLimit + time.toString();
-      }
+  // Future<String?> videoAudioMerger(BuildContext context,
+  //     {required String videoPath,
+  //     required String audioPath,
+  //     required int time}) async {
+  //   String timeLimit = '00:00:';
+  //   String outputPath = '/storage/emulated/0/Download/output.mp4';
+  //   String? fileUrl;
+  //   if (await Permission.storage.request().isGranted) {
+  //     if (time.toInt() < 10) {
+  //       timeLimit = timeLimit + '0' + time.toString();
+  //     } else {
+  //       timeLimit = timeLimit + time.toString();
+  //     }
+  //
+  //     /// To combine audio with video
+  //     ///
+  //     /// Merging video and audio, with audio re-encoding
+  //     /// -c:v copy -c:a aac
+  //     ///
+  //     /// Copying the audio without re-encoding
+  //     /// -c copy
+  //     ///
+  //     /// Replacing audio stream
+  //     /// -c:v copy -c:a aac -map 0:v:0 -map 1:a:0
+  //     String commandToExecute =
+  //         '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
+  //
+  //     await FFmpegKit.executeAsync(commandToExecute, (session) async {
+  //       final ReturnCode? returnCode = await session.getReturnCode();
+  //       if (ReturnCode.isSuccess(returnCode)) {
+  //         String file = await compressMomentVideo(filePath: outputPath);
+  //         fileUrl = await urlConverter(filePath: file);
+  //         momentFeedStore.postMoment(context, videoUrl: fileUrl);
+  //         // SUCCESS
+  //       } else if (ReturnCode.isCancel(returnCode)) {
+  //         fileUrl = null;
+  //         // CANCEL
+  //       } else {
+  //         fileUrl = null;
+  //         // ERROR
+  //       }
+  //     });
+  //     return fileUrl;
+  //   } else if (await Permission.storage.isPermanentlyDenied) {
+  //     openAppSettings();
+  //   } else {
+  //     return null;
+  //   }
+  //   return null;
+  // }
 
-      /// To combine audio with video
-      ///
-      /// Merging video and audio, with audio re-encoding
-      /// -c:v copy -c:a aac
-      ///
-      /// Copying the audio without re-encoding
-      /// -c copy
-      ///
-      /// Replacing audio stream
-      /// -c:v copy -c:a aac -map 0:v:0 -map 1:a:0
-      String commandToExecute =
-          '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
-
-      // FFmpegKit.executeAsync(commandToExecute, (session) async {
-      //   final ReturnCode? returnCode = await session.getReturnCode();
-      //   if (ReturnCode.isSuccess(returnCode)) {
-      //     String file = await compressMomentVideo(filePath: outputPath);
-      //     fileUrl = await urlConverter(filePath: file);
-      //     momentFeedStore.postMoment(context, videoUrl: fileUrl);
-      //     // SUCCESS
-      //   } else if (ReturnCode.isCancel(returnCode)) {
-      //     fileUrl = null;
-      //     // CANCEL
-      //   } else {
-      //     fileUrl = null;
-      //     // ERROR
-      //   }
-      // });
-      return fileUrl;
-    } else if (await Permission.storage.isPermanentlyDenied) {
-      openAppSettings();
-    } else {
-      return null;
-    }
-    return null;
-  }
+  // Future<String?> videoAudioViewerMerger(BuildContext context,
+  //     {required String videoPath,
+  //     required String audioPath,
+  //     required int time}) async {
+  //   String timeLimit = '00:00:';
+  //   String outputPath = '/storage/emulated/0/Download/viewer.mp4';
+  //   String? fileUrl;
+  //
+  //   momentFeedStore.updateMerger(true);
+  //   if (await Permission.storage.request().isGranted) {
+  //     if (time.toInt() < 10) {
+  //       timeLimit = timeLimit + '0' + time.toString();
+  //     } else {
+  //       timeLimit = timeLimit + time.toString();
+  //     }
+  //
+  //     /// To combine audio with video
+  //     ///
+  //     /// Merging video and audio, with audio re-encoding
+  //     /// -c:v copy -c:a aac
+  //     ///
+  //     /// Copying the audio without re-encoding
+  //     /// -c copy
+  //     ///
+  //     /// Replacing audio stream
+  //     /// -c:v copy -c:a aac -map 0:v:0 -map 1:a:0
+  //     String commandToExecute =
+  //         '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
+  //     print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
+  //     await FFmpegKit.executeAsync(commandToExecute, (session) async {
+  //       final ReturnCode? returnCode = await session.getReturnCode();
+  //       if (ReturnCode.isSuccess(returnCode)) {
+  //         print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
+  //         momentFeedStore.updateMerger(false, isDone: true);
+  //         momentCtrl.mergedVideoPath(outputPath);
+  //         // SUCCESS
+  //       } else if (ReturnCode.isCancel(returnCode)) {
+  //         fileUrl = null;
+  //         // CANCEL
+  //       } else {
+  //         print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
+  //
+  //         fileUrl = null;
+  //         // ERROR
+  //       }
+  //     });
+  //     return fileUrl;
+  //   } else if (await Permission.storage.isPermanentlyDenied) {
+  //     openAppSettings();
+  //   } else {
+  //     return null;
+  //   }
+  //   return null;
+  // }
 
   Future<FileResult?> downloadFile({required String url}) async {
     final filename = url.split('/').last;

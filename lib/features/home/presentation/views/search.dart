@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/snackbar.dart';
@@ -16,6 +17,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
+import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
@@ -39,6 +41,7 @@ class _SearchScreenState extends State<SearchScreen>
     final _searchString = useState<String>('');
     final _hasText = useState<bool>(false);
     final _searchController = useTextEditingController();
+    final _userList = useState<List<ProfileIndexModel>>([]);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -89,8 +92,8 @@ class _SearchScreenState extends State<SearchScreen>
         ],
       ),
       body: SizedBox(
-        width: size.width,
-        height: size.height,
+        // width: size.width,
+        // height: size.height,
         child: !_hasText.value
             ? const SearchStories()
             : BlocConsumer<SocialServiceBloc, SocialServiceState>(
@@ -98,6 +101,7 @@ class _SearchScreenState extends State<SearchScreen>
                 listener: (context, state) {
                   if (state is SearchProfileSuccess) {
                     globals.userList = state.users!;
+                    _userList.value = state.users!;
                   } else if (state is SearchProfileError) {
                     Snackbars.error(context, message: state.error);
                   }
@@ -106,14 +110,14 @@ class _SearchScreenState extends State<SearchScreen>
                   if (state is UserLoading) {
                     return const Center(child: CupertinoActivityIndicator());
                   }
-                  if (globals.userList!.isEmpty) {
+                  if (_userList.value.isEmpty) {
                     return SearchNoResultFound(size: size)
                         .paddingSymmetric(h: 16);
                   }
                   return ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: globals.userList!.length,
+                    itemCount: _userList.value.length,
                     itemBuilder: (context, index) {
                       return SearchResultCard(
                         displayName: (globals.userList![index].firstName! +
@@ -121,9 +125,9 @@ class _SearchScreenState extends State<SearchScreen>
                                 globals.userList![index].lastName!)
                             .toTitleCase(),
                         //: globals.userList![index].,
-                        username: globals.userList![index].username,
-                        imageUrl: globals.userList![index].profilePicture,
-                        id: globals.userList![index].authId,
+                        username: _userList.value[index].username,
+                        imageUrl: _userList.value[index].profilePicture,
+                        id: _userList.value[index].authId,
                       );
                     },
                   );
@@ -263,17 +267,22 @@ class SearchStories extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final imgList = [
-      'assets/images/frame.png',
-      'assets/images/frame.png',
-      'assets/images/frame.png',
+      'assets/images/billboard.png',
+      'assets/images/billboard.png',
+      'assets/images/billboard.png',
     ];
+    // final imgList = [
+    //   'assets/images/frame.png',
+    //   'assets/images/frame.png',
+    //   'assets/images/frame.png',
+    // ];
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
               margin: const EdgeInsets.all(5.0),
               child: Image.asset(
                 item,
-                fit: BoxFit.cover,
-                gaplessPlayback: true,
+                fit: BoxFit.fill,
+                // gaplessPlayback: true,
               ),
             ))
         .toList();
@@ -285,17 +294,17 @@ class SearchStories extends HookWidget {
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          SizedBox(height: getScreenHeight(50)),
+          SizedBox(height: getScreenHeight(26)),
           Stack(
             alignment: Alignment.bottomCenter,
             children: [
               SizedBox(
                 width: size.width,
-                height: getScreenHeight(315),
+                // height: getScreenHeight(315),
                 child: CarouselSlider.builder(
                   itemCount: imgList.length,
                   options: CarouselOptions(
-                    height: getScreenHeight(200),
+                    // height: getScreenHeight(200),
                     viewportFraction: 1,
                     aspectRatio: 2.0,
                     initialPage: 0,
@@ -306,7 +315,7 @@ class SearchStories extends HookWidget {
                     autoPlayAnimationDuration:
                         const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
+                    enlargeCenterPage: false,
                     scrollDirection: Axis.horizontal,
                     disableCenter: true,
                     onPageChanged: (index, reason) {
@@ -321,26 +330,27 @@ class SearchStories extends HookWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: imgList.map((url) {
-                  int index = imgList.indexOf(url);
+                children: imgList.mapIndexed((i, url) {
+                  // int index = imgList.indexOf(url);
+                  bool selected = true;
                   return Container(
-                    width: 7.0,
-                    height: 7.0,
+                    width: _currentIndex.value == i ? 8 : 5.0,
+                    height: _currentIndex.value == i ? 8 : 5.0,
                     margin: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                      horizontal: 3.0,
+                      vertical: 12.0,
+                      horizontal: 1.0,
                     ),
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _currentIndex.value == index
+                        color: _currentIndex.value == i
                             ? AppColors.primaryColor
-                            : AppColors.greyShade4),
+                            : AppColors.white),
                   );
                 }).toList(),
               ),
             ],
           ),
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(9)),
           GestureDetector(
             onTap: () => _showLeadingContent.value = !_showLeadingContent.value,
             child: Container(
@@ -371,7 +381,7 @@ class SearchStories extends HookWidget {
               ),
             ),
           ),
-          SizedBox(height: getScreenHeight(10)),
+          SizedBox(height: getScreenHeight(9)),
           Visibility(
             visible: _showLeadingContent.value,
             child: Container(
@@ -400,7 +410,7 @@ class SearchStories extends HookWidget {
               ]),
             ).paddingSymmetric(h: 16),
           ),
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(9)),
           GestureDetector(
             onTap: () =>
                 _showHappeningContent.value = !_showHappeningContent.value,

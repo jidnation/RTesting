@@ -181,7 +181,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, bool>> unlikeCommentOnPost({
+  Future<Either<String, String>> unlikeCommentOnPost({
     required String commentLikeId,
     required String likeId,
   }) async {
@@ -308,14 +308,14 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, VirtualCommentModel>> getSingleCommentOnPost({
-    required String postId,
+  Future<Either<String,CommentModel>> getSingleCommentOnPost({
+    required String commentId,
   }) async {
     try {
-      final virtualComment = await _homeRemoteDataSource.getSingleCommentOnPost(
-        postId: postId,
+      final Comment = await _homeRemoteDataSource.getSingleCommentOnPost(
+        commentId: commentId,
       );
-      return Right(virtualComment);
+      return Right(Comment);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

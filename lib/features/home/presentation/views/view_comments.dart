@@ -187,21 +187,21 @@ class _ViewCommentsScreenState extends State<ViewCommentsScreen> {
                   if (state is UnlikeCommentOnPostSuccess) {
                     likeId.value = "false";
                   }
-                  // if (state is UnlikeCommentOnPostError) {
-                  //   int pos = comments.value
-                  //       .indexWhere((e) => e.commentId == state.commentId);
-                  //   comments.value[pos].isLiked = true;
-                  //   comments.value[pos].nLikes =
-                  //       (comments.value[pos].nLikes ?? 0) + 1;
-                  // }
+                  if (state is UnlikeCommentOnPostError) {
+                    int pos = comments.value
+                        .indexWhere((e) => e.commentId == state.commentId);
+                    // comments.value[pos].isLiked = true;
+                    comments.value[pos].nLikes =
+                        (comments.value[pos].nLikes ?? 0) + 1;
+                  }
 
-                  // if (state is LikeCommentOnPostError) {
-                  //   int pos = comments.value
-                  //       .indexWhere((e) => e.commentId == state.commentId);
-                  //   comments.value[pos].isLiked = true;
-                  //   comments.value[pos].nLikes =
-                  //       (comments.value[pos].nLikes ?? 1) - 1;
-                  // }
+                  if (state is LikeCommentOnPostError) {
+                    int pos = comments.value
+                        .indexWhere((e) => e.commentId == state.commentId);
+                    // comments.value[pos].isLiked = true;
+                    comments.value[pos].nLikes =
+                        (comments.value[pos].nLikes ?? 1) - 1;
+                  }
 
                   if (state is MediaUploadSuccess) {
                     String? audioUrl = state.image!;

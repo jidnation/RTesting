@@ -34,7 +34,7 @@ class CommentMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> imageList = [];
-    bool hasVideo = (comment.videoMediaItem)!.isNotEmpty;
+    bool hasVideo = (comment.videoMediaItem ?? '').isNotEmpty;
 
     int nImages = (comment.imageMediaItems ?? []).length;
     print(

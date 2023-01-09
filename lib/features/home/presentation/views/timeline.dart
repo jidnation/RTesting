@@ -1999,6 +1999,7 @@ class _TimelineScreenState extends State<TimelineScreen>
     final _currentPost = useState<PostFeedModel?>(null);
     final _myStatus = useState<List<StatusModel>>([]);
     final _userStatus = useState<List<StatusFeedResponseModel>>([]);
+    final _mutedStatus = useState<List<StatusFeedResponseModel>>([]);
     var size = MediaQuery.of(context).size;
     debugPrint(globals.token);
     return Scaffold(
@@ -2169,7 +2170,15 @@ class _TimelineScreenState extends State<TimelineScreen>
                     _myStatus.value = state.status!;
                   }
                   if (state is GetStatusFeedSuccess) {
-                    _userStatus.value = state.status!;
+                    final muted = state.status!
+                        .where((e) => e.status?.first.status?.isMuted ?? false)
+                        .toList();
+                    final unmuted = state.status!
+                        .where(
+                            (e) => !(e.status?.first.status?.isMuted ?? false))
+                        .toList();
+                    _userStatus.value = unmuted;
+                    _mutedStatus.value = muted;
                   }
                   if (state is GetAllStatusError) {
                     Snackbars.error(context, message: state.error);
@@ -2378,16 +2387,43 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                       index]
                                                                   .statusOwnerProfile!
                                                                   .username!,
-                                                              onTap: () {
-                                                                RouteNavigators
-                                                                    .route(
-                                                                  context,
-                                                                  ViewUserStatus(
-                                                                      status: _userStatus
-                                                                          .value[
-                                                                              index]
-                                                                          .status!),
-                                                                );
+                                                              onTap: () async {
+                                                                // RouteNavigators
+                                                                //     .route(
+                                                                //   context,
+                                                                //   ViewUserStatus(
+                                                                //       status: _userStatus
+                                                                //           .value[
+                                                                //               index]
+                                                                //           .status!),
+                                                                // );
+                                                                final res = await Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (c) => ViewUserStatus(
+                                                                            isMuted:
+                                                                                false,
+                                                                            status:
+                                                                                _userStatus.value[index].status!)));
+                                                                if (res == null)
+                                                                  return;
+                                                                if (res
+                                                                    is MuteResult) {
+                                                                  _mutedStatus
+                                                                      .value = [
+                                                                    ..._mutedStatus
+                                                                        .value,
+                                                                    _userStatus
+                                                                            .value[
+                                                                        index]
+                                                                  ];
+                                                                  _userStatus
+                                                                      .value = [
+                                                                    ..._userStatus
+                                                                        .value
+                                                                  ]..removeAt(
+                                                                      index);
+                                                                }
                                                               },
                                                             ),
                                                           ),
@@ -2402,6 +2438,101 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                 SizedBox(
                                                     height: getScreenHeight(5)),
                                               ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: getScreenHeight(2)),
+                                        Visibility(
+                                          visible: _posts.value.isNotEmpty &&
+                                              _mutedStatus.value.isNotEmpty,
+                                          child: Container(
+                                            color: AppColors.white,
+                                            child: ListTileTheme(
+                                              dense: true,
+                                              child: ExpansionTile(
+                                                collapsedIconColor:
+                                                    AppColors.greyShade4,
+                                                iconColor: AppColors.greyShade4,
+                                                title: Text(
+                                                  'Muted Statuses',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          AppColors.greyShade3),
+                                                ),
+                                                childrenPadding:
+                                                    EdgeInsets.fromLTRB(
+                                                        16, 0, 16, 16),
+                                                tilePadding:
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 16),
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      ...List.generate(
+                                                        _mutedStatus
+                                                            .value.length,
+                                                        (index) => UserStory(
+                                                          size: size,
+                                                          isMe: false,
+                                                          isLive: false,
+                                                          isMuted: true,
+                                                          hasWatched: false,
+                                                          image: _mutedStatus
+                                                              .value[index]
+                                                              .status![0]
+                                                              .statusOwnerProfile!
+                                                              .profilePicture,
+                                                          username: _mutedStatus
+                                                              .value[index]
+                                                              .status![index]
+                                                              .statusOwnerProfile!
+                                                              .username!,
+                                                          onTap: () async {
+                                                            final res = await Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (c) => ViewUserStatus(
+                                                                        isMuted:
+                                                                            true,
+                                                                        status: _mutedStatus
+                                                                            .value[index]
+                                                                            .status!)));
+                                                            if (res == null)
+                                                              return;
+                                                            if (res
+                                                                is MuteResult) {
+                                                              _userStatus
+                                                                  .value = [
+                                                                ..._userStatus
+                                                                    .value,
+                                                                _mutedStatus
+                                                                        .value[
+                                                                    index]
+                                                              ];
+                                                              _mutedStatus
+                                                                  .value = [
+                                                                ..._mutedStatus
+                                                                    .value
+                                                              ]..removeAt(
+                                                                  index);
+                                                            }
+                                                            // RouteNavigators
+                                                            //     .route(
+                                                            //   context,
+                                                            //   ViewUserStatus(
+                                                            //       status: _mutedStatus
+                                                            //           .value[
+                                                            //               index]
+                                                            //           .status!),
+                                                            // );
+                                                          },
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -2690,6 +2821,7 @@ class PostFeedReacherCard extends HookWidget {
   Widget build(BuildContext context) {
     final postDuration = timeago.format(postFeedModel!.post!.createdAt!);
     var scr = GlobalKey();
+
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -3029,11 +3161,10 @@ class PostFeedReacherCard extends HookWidget {
                                   onPressed: () {
                                     RouteNavigators.route(
                                         context,
-                                          CommentReach(
-                                           postFeedModel: postFeedModel)
                                         // ViewCommentsScreen(
                                         //     post: postFeedModel!)
-                                        );
+                                        CommentReach(
+                                            postFeedModel: postFeedModel));
                                   },
                                   padding: EdgeInsets.zero,
                                   child: SvgPicture.asset(
@@ -3179,12 +3310,14 @@ class UserStory extends StatelessWidget {
     required this.hasWatched,
     this.image,
     this.isMeOnTap,
+    this.isMuted,
     this.onTap,
   }) : super(key: key);
   final Size size;
   final bool isMe;
   final bool isLive;
   final bool hasWatched;
+  final bool? isMuted;
   final String username;
   final String? image;
   final Function()? isMeOnTap;
@@ -3204,9 +3337,11 @@ class UserStory extends StatelessWidget {
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: !isLive
-                            ? AppColors.primaryColor
-                            : const Color(0xFFDE0606),
+                        color: isMuted ?? false
+                            ? AppColors.greyShade10
+                            : !isLive
+                                ? AppColors.primaryColor
+                                : const Color(0xFFDE0606),
                       ),
                       child: Container(
                           padding: const EdgeInsets.all(3.5),
@@ -3289,6 +3424,7 @@ class UserStory extends StatelessWidget {
               style: TextStyle(
                   fontSize: getScreenHeight(11),
                   fontWeight: FontWeight.w400,
+                  color: isMuted ?? false ? AppColors.greyShade3 : null,
                   overflow: TextOverflow.ellipsis))
         ],
       ).paddingOnly(r: 25),

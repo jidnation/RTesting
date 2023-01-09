@@ -33,7 +33,6 @@ class CommentModel {
     this.like,
     this.isLiked,
   });
-
   factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
         postId: json["postId"],
         authId: json["authId"],
@@ -60,14 +59,13 @@ class CommentModel {
         //   : List<CommentLikeModel>.from(
         //       json["like"].map((x) => CommentLikeModel.fromJson(x))),
       );
-
   Map<String, dynamic> toJson() => {
         "postId": postId,
         "authId": authId,
         "commentId": commentId,
         "commentSlug": commentSlug,
         "content": content,
-        "nRepliess": nReplies,
+        "nReplies": nReplies,
         "audioMediaItem": audioMediaItem,
         "videoMediaItem": videoMediaItem,
         "isLiked": isLiked,

@@ -97,6 +97,7 @@ const reachUser = r'''
     reachUser(userIdToReach: $userIdToReach){
     isReaching
   }  
+  }
 ''';
 
 //used

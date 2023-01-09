@@ -14,6 +14,7 @@ import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -794,7 +795,6 @@ class HomeRemoteDataSource {
         variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
       }
       final result = await _client.mutate(gql(q), variables: variables);
-
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -998,7 +998,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<bool> unlikeCommentOnPost({
+  Future<String> unlikeCommentOnPost({
     required String commentId,
     required String likeId,
   }) async {
@@ -1025,7 +1025,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
 
-      return result.data!['unlikeCommentOnPost'] as bool;
+      return result.data!['unlikeCommentOnPost'] as String;
     } catch (e) {
       rethrow;
     }
@@ -1305,31 +1305,26 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<VirtualCommentModel> getSingleCommentOnPost({
-    required String? postId,
+  Future<CommentModel> getSingleCommentOnPost({
+    required String? commentId,
   }) async {
     String q = r'''
-        query getSingleCommentOnPost($postId: String!) {
-          getSingleCommentOnPost(postId: $postId){
-              profile {
+        query getSingleCommentOnPost($commentId: String!) {
+          getSingleCommentOnPost(commentId: $commentId){
                 ''' +
-        UserSchema.schema +
-        '''
-            }
-               ''' +
         CommentSchema.schema +
         '''
-          }
+            }
         }''';
     try {
       final result = await _client.query(gql(q), variables: {
-        'postId': postId,
+        'commentId': commentId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      return VirtualCommentModel.fromJson(
+      return CommentModel.fromJson(
           result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
@@ -1474,7 +1469,7 @@ class HomeRemoteDataSource {
         mutation muteStatus(
           $idToMute: String!
           ) {
-          createStatus(
+          muteStatus(
             idToMute: $idToMute
           ){   
                authId
@@ -1501,8 +1496,8 @@ class HomeRemoteDataSource {
         mutation unmuteStatus(
           $idToUnmute: String!
           ) {
-          createStatus(
-            $idToUnmute: $idToUnmute
+          unmuteStatus(
+            idToUnmute: $idToUnmute
           )
         }''';
     try {
@@ -1523,11 +1518,11 @@ class HomeRemoteDataSource {
     required String statusId,
   }) async {
     String q = r'''
-        mutation unmuteStatus(
+        mutation reportStatus(
           $reportReason: String!
           $statusId: String!
           ) {
-          createStatus(
+          reportStatus(
             reportReason: $reportReason
             statusId: $statusId
           ){
@@ -1874,4 +1869,53 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+  // Future<bool> joinLiveStream({
+  //   required String? channelName,
+  // }) async {
+  //   String q = r'''
+  //            mutation joinLiveStream(
+  //             $channelName:String!
+  //            ){
+  //              joinLiveStream(
+  //               channelName: $channelName
+  //              )
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'channelName': channelName,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('joinLiveStream', result.data);
+  //     return result.data!['joinLiveStream'] as bool;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  // Future<StreamResponse> initiateLiveStreaming({
+  //   required String? startedAt,
+  // }) async {
+  //   String q = r'''
+  //            mutation initiateLiveStream(
+  //             $startedAt:String!
+  //            ){
+  //              token,
+  //              channelName
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'startedAt': startedAt,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('Initiate LiveStreaming', result.data);
+  //     return StreamResponse.fromJson(result.data!['initiateLiveStream']);
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 }

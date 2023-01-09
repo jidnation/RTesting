@@ -95,6 +95,9 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     onNewCameraSelected(widget.phoneCameras[0]);
+    setState(() {
+      index = widget.initialIndex;
+    });
   }
 
   @override

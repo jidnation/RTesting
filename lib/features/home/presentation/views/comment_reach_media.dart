@@ -36,7 +36,7 @@ class CommentReachMedia extends HookWidget {
 
     if (isAudio) {
       return CommentReachAudioMedia(
-          path: fileResult.file.path, onCancel: onClose! );
+          path: fileResult.file.path, onCancel: onClose!);
     }
 
     return Stack(

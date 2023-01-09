@@ -127,11 +127,9 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   better_player: ^0.0.83
   uuid: ^3.0.7
-
 #  light_compressor: ^2.0.1
   ffmpeg_kit_flutter: ^4.5.1
   agora_rtc_engine: ^6.1.0
-
 
 
 

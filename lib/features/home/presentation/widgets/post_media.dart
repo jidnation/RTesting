@@ -40,7 +40,6 @@ class _PostMediaState extends State<PostMedia> {
     if (hasVideo) imageVideoList.add(widget.post.videoMediaItem ?? '');
     int imageVideoTotal = imageVideoList.length;
     if (imageVideoTotal == 1) {
-      debugPrint("Post Rating: ${widget.post.postRating}");
       if (widget.post.postRating == "Sensitive" ||
           widget.post.postRating == "Graphic Violence" ||
           widget.post.postRating == "Nudity") {
@@ -706,9 +705,6 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   final MediaService _mediaService = MediaService();
 
   @override
-  void initState() {
-    super.initState();
-  }
 
   getThumbnail() async {
     final res = await _mediaService.getVideoThumbnail(videoPath: widget.url);

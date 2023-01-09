@@ -334,7 +334,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetSingleCommentOnPostLoading());
       try {
         final response = await socialServiceRepository.getSingleCommentOnPost(
-          postId: event.postId!,
+          commentId: event.commentId!,
         );
         response.fold(
           (error) => emit(GetSingleCommentOnPostError(error: error)),

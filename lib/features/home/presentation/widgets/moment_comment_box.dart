@@ -4,13 +4,17 @@ import 'package:flutter_svg/svg.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/momentControlRoom/models/get_comments_model.dart';
 
+import '../../../../core/components/snackbar.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dialog_box.dart';
 import '../../../../core/utils/dimensions.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../momentControlRoom/control_room.dart';
 import '../views/moment_feed.dart';
 import 'moment_audio_player.dart';
+
+FocusNode replyCommentFocus = FocusNode();
 
 class MomentCommentBox extends HookWidget {
   final MomentModel momentFeed;
@@ -66,12 +70,27 @@ class MomentCommentBox extends HookWidget {
               weight: FontWeight.w600,
             ),
             const SizedBox(height: 1.5),
-            CustomText(
-              text: cInfo.location.toString().toCapitalized(),
-              color: const Color(0xff252525).withOpacity(0.5),
-              size: 11.44,
-              weight: FontWeight.w600,
-            ),
+            Row(children: [
+              Visibility(
+                visible: cInfo.location!.isNotEmpty,
+                child: Row(children: [
+                  CustomText(
+                    text: cInfo.location.toString().toCapitalized(),
+                    color: const Color(0xff252525).withOpacity(0.5),
+                    size: 11.44,
+                    weight: FontWeight.w600,
+                  ),
+                  const SizedBox(width: 5),
+                ]),
+              ),
+              CustomText(
+                text: Helper.parseUserLastSeen(
+                    commentInfo.getMomentComment.createdAt!),
+                color: const Color(0xff252525).withOpacity(0.5),
+                size: 11.44,
+                weight: FontWeight.w600,
+              ),
+            ]),
           ])
         ]),
         const SizedBox(height: 10),
@@ -144,52 +163,7 @@ class MomentCommentBox extends HookWidget {
                   ]),
                   InkWell(
                     onTap: () {
-                      CustomDialog.openDialogBox(
-                          height: 200,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const CustomText(
-                                  text: 'Enter your comments',
-                                  size: 15,
-                                  weight: FontWeight.w600,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 30),
-                                Row(children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 50,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xfff5f5f5),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: TextFormField(
-                                        controller: userCommentTextCtrl,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  InkWell(
-                                      onTap: () async {
-                                        // FocusScope.of(context).unfocus();
-                                        // bool isDone = await momentFeedStore.commentOnMoment(context,
-                                        //     id: momentFeed.id,
-                                        //     userComment: inputController.text.isNotEmpty
-                                        //         ? inputController.text
-                                        //         : null);
-                                        // isDone ? inputController.clear() : null;
-                                      },
-                                      child: SvgPicture.asset(
-                                          'assets/svgs/send.svg'))
-                                ])
-                              ]));
+                      replyMomentComment(context, userCommentTextCtrl);
                     },
                     child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -241,5 +215,63 @@ class MomentCommentBox extends HookWidget {
         ])
       ]),
     );
+  }
+
+  void replyMomentComment(
+      BuildContext context, TextEditingController userCommentTextCtrl) {
+    FocusScope.of(context).autofocus(replyCommentFocus);
+    CustomDialog.openDialogBox(
+        height: 200,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const CustomText(
+            text: 'Enter your comments',
+            size: 15,
+            weight: FontWeight.w600,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 30),
+          Row(children: [
+            Expanded(
+              child: Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xfff5f5f5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextFormField(
+                  controller: userCommentTextCtrl,
+                  focusNode: replyCommentFocus,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            InkWell(
+                onTap: () async {
+                  FocusScope.of(context).unfocus();
+                  if (userCommentTextCtrl.text.isNotEmpty) {
+                    bool isDone = await momentFeedStore.replyCommentOnMoment(
+                        context,
+                        id: momentFeed.id,
+                        commentId: commentInfo.getMomentComment.commentId!,
+                        userInput: userCommentTextCtrl.text);
+                    isDone ? userCommentTextCtrl.clear() : null;
+                  } else {
+                    Snackbars.error(
+                      context,
+                      message: 'Input Field can not be empty',
+                      milliseconds: 1400,
+                    );
+                    // FocusScope.of(context).f(replyCommentFocus);
+                  }
+                },
+                child: SvgPicture.asset('assets/svgs/send.svg'))
+          ]),
+        ]));
   }
 }

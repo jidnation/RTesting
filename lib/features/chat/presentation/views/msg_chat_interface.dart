@@ -426,22 +426,40 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   if (globals.userChat!.isEmpty)
                                     const SizedBox.shrink()
                                   else
-                                    Column(
-                                      children: List.generate(
-                                        globals.userChat!.length,
-                                        (index) => MsgBubble(
-                                          msgDate: '',
-                                          isMe: globals.user!.id ==
-                                              globals.userChat![index].senderId,
-                                          label:
-                                              globals.userChat![index].content!,
-                                          size: size,
-                                          timeStamp: Helper.parseChatTime(
-                                              globals.userChat![index].sentAt ??
-                                                  ''),
-                                        ),
-                                      ),
-                                    )
+                                    ListView.separated(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemBuilder: (c, i) => MsgBubble(
+                                              msgDate: '',
+                                              isMe: globals.user!.id ==
+                                                  globals.userChat![i].senderId,
+                                              label:
+                                                  globals.userChat![i].content!,
+                                              size: size,
+                                              timeStamp: Helper.parseChatTime(
+                                                  globals.userChat![i].sentAt ??
+                                                      ''),
+                                            ),
+                                        separatorBuilder: (c, i) => SizedBox(
+                                              height: 0,
+                                            ),
+                                        itemCount: globals.userChat!.length)
+                                  // Column(
+                                  //   children: List.generate(
+                                  //     globals.userChat!.length,
+                                  //     (index) => MsgBubble(
+                                  //       msgDate: '',
+                                  //       isMe: globals.user!.id ==
+                                  //           globals.userChat![index].senderId,
+                                  //       label:
+                                  //           globals.userChat![index].value!,
+                                  //       size: size,
+                                  //       timeStamp: Helper.parseChatTime(
+                                  //           globals.userChat![index].sentAt ??
+                                  //               ''),
+                                  //     ),
+                                  //   ),
+                                  // )
                                 ],
                               ).paddingOnly(r: 15, l: 15),
                             ),

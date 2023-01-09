@@ -1,3 +1,22 @@
+// class ChatSchema {
+//   ChatSchema._();
+//
+//   static String get schema {
+//     return r'''
+//       _id
+//       id
+//       senderId
+//       receiverId
+//       receivers
+//       type
+//       value
+//       threadId
+//       sentAt
+//       createdAt
+//       updatedAt
+//           ''';
+//   }
+// }
 class ChatSchema {
   ChatSchema._();
 
@@ -6,12 +25,12 @@ class ChatSchema {
       id 
       senderId 
       receiverId
-      content 
       contentType 
+      content 
       threadId 
-      sentAt 
+      sentAt
       messageMode
-      created_at
+      created_at 
       updated_at 
           ''';
   }
@@ -55,13 +74,13 @@ class ChatThreadSchema {
 
 //   static String get schema {
 //     return r'''
-//       id 
-//       senderId 
+//       id
+//       senderId
 //       receiverId
-//       type 
-//       value 
-//       threadId 
-//       sentAt 
+//       type
+//       value
+//       threadId
+//       sentAt
 //           ''';
 //   }
 // }

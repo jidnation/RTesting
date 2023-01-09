@@ -109,10 +109,9 @@ class SavePostSchema {
 
 class CommentSchema {
   CommentSchema._();
-
   static String get schema {
     return r'''
-            commentId 
+            commentId
             authId
             commentSlug
             content
@@ -248,6 +247,7 @@ class CommentLikeSchema {
 
   static String get schema {
     return r'''
+            likeId
             authId
             created_at
             postId

@@ -305,11 +305,16 @@ class _CommentReachState extends State<RepostReach> {
                             _mentionList.value = controllerKey
                                 .currentState!.controller!.text.mentions;
                           });
-                          globals.postContent =
-                              controllerKey.currentState!.controller!.text;
-                          globals.postCommentOption = replyFeature.value;
-                          globals.postRating = postRating;
-                          globals.mentionList = _mentionList.value;
+                          globals.socialServiceBloc!.add(CreateRepostEvent(
+                input: CreateRepostInput(
+                    repostedPostId: widget.postFeedModel!.postId,
+                    repostedPostOwnerId: widget.postFeedModel!.postOwnerId,
+                    content: controllerKey.currentState!.controller!.text,                      
+                    location:
+                        globals.user!.showLocation! ? globals.location! : 'nil',
+                    postRating: postRating,
+                    mentionList: _mentionList.value,
+                    commentOption: replyFeature.value)));
 
                           // globals.mentionList!.add(controllerKey
                           //     .currentState!.controller!.markupText);
