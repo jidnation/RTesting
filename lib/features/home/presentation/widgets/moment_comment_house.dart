@@ -297,7 +297,7 @@ class MomentCommentStation2 extends StatelessWidget {
                                   commentInfo: commentData,
                                 );
                               },
-                              itemCount: momentFeed.nComment,
+                              itemCount: momentFeed.momentComments.length,
                             )),
                           ]),
                     ),

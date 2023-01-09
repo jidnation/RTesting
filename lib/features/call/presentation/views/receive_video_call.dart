@@ -60,7 +60,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           debugPrint("local user ${connection.localUid} joined");
-          stopWatchTimer.onStartTimer();
+
           setState(() {
             _localUserJoined = true;
             _localuid = connection.localUid;
@@ -167,8 +167,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                               bottom: 110,
                               right: 20,
                               child: SizedBox(
-                                width: size.width * 0.4,
-                                height: size.height * 0.3,
+                                width: size.width * 0.3,
+                                height: size.height * 0.2,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(5),
                                   child: _localPreview(

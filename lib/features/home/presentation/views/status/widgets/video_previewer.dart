@@ -129,13 +129,21 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             MomentActions(
                               label: 'Filters',
                               svgUrl: 'assets/svgs/filter-n.svg',
+                              onClick: () {
+                                // RouteNavigators.route(
+                                //   context,
+                                //   VideoEditor(
+                                //     file: widget.videoFile,
+                                //   ),
+                                // );
+                              },
                             ),
-                            SizedBox(height: 20),
-                            MomentActions(
+                            const SizedBox(height: 20),
+                            const MomentActions(
                               label: 'Voice over',
                               svgUrl: 'assets/svgs/mic.svg',
                             ),
@@ -325,17 +333,16 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
                         } else {
-                          print(
-                              ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-                          // String vFile =
-                          //     await MediaService().compressMomentVideo(
-                          //   filePath: widget.videoFile.path,
-                          // );
-                          String? videoUrl = await FileConverter()
-                              .convertMe(filePath: 'vFile');
+                          String vFile =
+                              await MediaService().compressMomentVideo(
+                            filePath: widget.videoFile.path,
+                          );
+                          String? videoUrl =
+                              await FileConverter().convertMe(filePath: vFile);
                           if (videoUrl != null) {
                             var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
+                              videoMediaItem: videoUrl,
+                            );
                             if (res) {
                               Snackbars.success(
                                 context,

@@ -8,8 +8,9 @@ import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
-import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
+
+import '../models/virtual_models.dart';
 
 // abstract class IUserRepository {
 //   Future<Either<String, User>> createAccount({
@@ -313,7 +314,7 @@ class UserRepository {
       return Left(e.message);
     }
   }
- 
+
   Future<Either<String, Block>> blocKUser({
     required String idToBlock,
   }) async {
@@ -338,7 +339,7 @@ class UserRepository {
       return Left(e.message);
     }
   }
-  
+
   Future<Either<String, List<Block>>> getBlockedList() async {
     try {
       final getBlockedList = await _homeRemoteDataSource.getBlockList();
@@ -353,7 +354,8 @@ class UserRepository {
   }) async {
     print("initiate repo");
     try {
-      final initiate = await _homeRemoteDataSource.initiateLiveStreaming(startedAt: startedAt);
+      final initiate = await _homeRemoteDataSource.initiateLiveStreaming(
+          startedAt: startedAt);
       return Right(initiate);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -365,7 +367,7 @@ class UserRepository {
   }) async {
     try {
       final join =
-      await _homeRemoteDataSource.joinLiveStream(channelName: channelName);
+          await _homeRemoteDataSource.joinLiveStream(channelName: channelName);
 
       return Right(join);
     } on GraphQLError catch (e) {

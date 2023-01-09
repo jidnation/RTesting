@@ -32,6 +32,7 @@ import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dar
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/file_utils.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../bloc/user-bloc/user_bloc.dart';
 
 class UploadFileDto {
@@ -200,8 +201,6 @@ class _PostReachState extends State<PostReach> {
                                 setState(() {
                                   _mentionList.value = controllerKey
                                       .currentState!.controller!.text.mentions;
-
-                                  
                                 });
                                 debugPrint(
                                     "Mentions Value List: ${_mentionList.value}");
@@ -212,7 +211,6 @@ class _PostReachState extends State<PostReach> {
                                     location: getUserLocation(),
                                     postRating: postRating,
                                     mentionList: _mentionList.value));
-
                                 debugPrint(
                                     "Mention: ${controllerKey.currentState!.controller!.markupText}");
                                 debugPrint(
@@ -544,7 +542,6 @@ class _PostReachState extends State<PostReach> {
                             ..removeAt(index);
                         },
                       ).paddingSymmetric(h: 16)
-                 
                     else
                       const SizedBox.shrink(),
                     if (_mediaList.value
@@ -830,7 +827,7 @@ class _PostReachState extends State<PostReach> {
                                   });
                             },
                             icon: const Icon(Icons.flag)),
-                       
+
                         IconButton(
                           onPressed: () async {
                             final res = await showMediaUploadOption(
@@ -881,7 +878,6 @@ class _PostReachState extends State<PostReach> {
                             }
                             setState(() {});
                           },
-                      
                           splashColor: Colors.transparent,
                           splashRadius: 20,
                           padding: EdgeInsets.zero,
@@ -940,7 +936,6 @@ class _PostReachState extends State<PostReach> {
                           ],
                           child: SvgPicture.asset('assets/svgs/mic.svg'),
                         ),
-                    
                       ],
                     ),
                   ],
@@ -1285,11 +1280,16 @@ class EditReach extends HookWidget {
                           icon: SvgPicture.asset('assets/svgs/send.svg'),
                           onPressed: () {
                             if (controller.text.isNotEmpty) {
-                              globals.socialServiceBloc!.add(EditContentEvent(
-                                content: controller.text,
-                                postId: post.postId,
-                              ));
-                              RouteNavigators.pop(context);
+                              timeLineFeedStore.editPost(context,
+                                  content: controller.text,
+                                  postId: post.postId!);
+
+                              // globals.socialServiceBloc!.add(EditContentEvent(
+                              //   content: controller.text,
+                              //   postId: post.postId,
+                              // ));
+                              // RouteNavigators.pop(context);
+
                             }
                           },
                         ),

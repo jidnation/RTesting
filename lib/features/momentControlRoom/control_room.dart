@@ -229,7 +229,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response) {
       getMoment(momentId: momentId, id: id);
     }
-    notifyListeners(); 
+    notifyListeners();
   }
 
   likingMomentComment({required String commentId, required String id}) async {
@@ -299,7 +299,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       // for (CustomMomentCommentModel momentComment in currentCommentList) {
       //   if (momentComment.id == id) {
       commentModel.getMomentComment.isLiked = response.isLiked!;
-      commentModel.getMomentComment.nComments = response.nComments!;
+      commentModel.getMomentComment.nReplies = response.nReplies!;
       commentModel.getMomentComment.nLikes = response.nLikes;
       notifyListeners();
       return;
@@ -316,7 +316,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         Snackbars.success(
           context,
           message: 'Moment successfully created',
-          milliseconds: 1300, 
+          milliseconds: 1300,
         );
         momentCtrl.clearPostingData();
         RouteNavigators.pop(context);
@@ -425,7 +425,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     bool response = await momentQuery.replyMomentComment(
       momentId: momentModel.momentId,
       commentId: commentId,
-      comment: userInput,
+      content: userInput,
     );
     if (response) {
       Snackbars.success(

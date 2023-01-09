@@ -179,7 +179,7 @@ class MomentQuery {
   replyMomentComment(
       {required String momentId,
       required String commentId,
-      required String comment}) async {
+      required String content}) async {
     HttpLink link = HttpLink(
       "https://api.myreach.me/",
       defaultHeaders: <String, String>{
@@ -195,20 +195,18 @@ class MomentQuery {
     Map<String, dynamic> commentBody = {
       'momentId': momentId,
       'commentId': commentId,
-      'comment': comment,
+      'content': content,
     };
-
-    Map<String, dynamic> momentVariables = {'commentBody': commentBody};
 
     QueryResult queryResult = await qlClient.mutate(MutationOptions(
       fetchPolicy: FetchPolicy.networkOnly,
       document: gql(
         gql_string.replyMomentComment,
       ),
-      variables: momentVariables,
+      variables: commentBody,
     ));
     log('from my reply comment-query::::: $queryResult');
-    return queryResult.data?['createMomentComment']['authId'] != null;
+    return queryResult.data?['replyMomentComment']['authId'] != null;
   }
 
   reachUser({required String reachingId}) async {
