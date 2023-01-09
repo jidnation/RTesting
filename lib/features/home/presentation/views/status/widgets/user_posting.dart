@@ -22,6 +22,8 @@ import 'create_posting.dart';
 import 'moment_posting.dart';
 import 'moment_posting_timer.dart';
 import 'moment_recording_control_room.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/host_post.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/live_screen.dart';
 
 class UserPosting extends StatefulHookWidget {
   final List<CameraDescription> phoneCameras;
@@ -134,7 +136,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
       CreatePosting(controller: controller),
       MomentPosting(
           controller: controller, slidingController: sliderController),
-      MomentPosting(
+      LiveScreen(
         controller: controller,
         slidingController: sliderController,
       ),
@@ -323,7 +325,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                       ),
                                     );
                               }
-                            : () async {
+                            : index == 1 ? () async {
                                 if (_isRecording) {
                                   await stopRecording(context);
                                   // _startVideoPlayer();
@@ -333,41 +335,46 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                     videoController: controller,
                                   );
                                 }
-                              },
-                        child: Container(
-                          height: 80,
-                          width: 80,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(70),
-                            color: _isRecording
-                                ? Colors.red
-                                : Colors.black.withOpacity(0.5),
-                          ),
+                              } : () async{
+                            RouteNavigators.route(context, HostPost());
+                      },
                           child: Container(
-                            height: 70,
-                            width: 70,
-                            padding: const EdgeInsets.all(22),
+                            height: 80,
+                            width: 80,
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              color: Colors.white,
                               borderRadius: BorderRadius.circular(70),
+                              color: _isRecording
+                                  ? Colors.red
+                                  : Colors.black.withOpacity(0.5),
                             ),
-                            child: index == 0
-                                ? SvgPicture.asset(
-                                    'assets/svgs/Camera.svg',
-                                    color: AppColors.black,
-                                  )
-                                : _isRecording
-                                    ? const Icon(
-                                        Icons.stop,
-                                        color: Colors.red,
-                                      )
-                                    : Image.asset(
-                                        'assets/images/play-btn.png',
-                                        fit: BoxFit.contain,
-                                      ),
+                            child: Container(
+                              height: 70,
+                              width: 70,
+                              padding: const EdgeInsets.all(22),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(70),
+                              ),
+                              child: index == 0
+                                  ? SvgPicture.asset(
+                                'assets/svgs/Camera.svg',
+                                color: AppColors.black,
+                              )
+                                  : index == 1
+                                  ? Image.asset(
+                                'assets/images/play-btn.png',
+                                fit: BoxFit.contain,
+                              )
+                                  : index == 2 ?
+                              SvgPicture.asset(
+                                  'assets/svgs/fluent_live-24-regular.svg',
+                                  fit: BoxFit.contain,
+                                  color: Colors.black
+                              ) :
+                              Container(),
+                            ),
                           ),
-                        ),
                       ),
                       SizedBox(width: getScreenWidth(30)),
                       Row(mainAxisSize: MainAxisSize.min, children: [

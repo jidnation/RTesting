@@ -14,6 +14,7 @@ import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -743,13 +744,14 @@ class HomeRemoteDataSource {
     }
   }
 
-Future<CommentModel> commentOnPost({
+  Future<CommentModel> commentOnPost({
     required String postId,
     String? content,
     required String userId,
     required String postOwnerId,
     List<String>? imageMediaItems,
     String? audioMediaItem,
+    String? videoMediaItem,
   }) async {
     String q = r'''
         mutation commentOnPost(
@@ -758,6 +760,7 @@ Future<CommentModel> commentOnPost({
           $postOwnerId: String!
           $imageMediaItems:[String]
           $audioMediaItem:String
+          $videoMediaItem:String
           ) {
           commentOnPost(
             commentBody: {
@@ -766,6 +769,7 @@ Future<CommentModel> commentOnPost({
               postOwnerId: $postOwnerId
               imageMediaItems:$imageMediaItems
               audioMediaItem:$audioMediaItem
+              videoMediaItem:$videoMediaItem
           }) {
             ''' +
         CommentSchema.schema +
@@ -786,6 +790,10 @@ Future<CommentModel> commentOnPost({
       if (imageMediaItems != null) {
         variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
       }
+
+      if (videoMediaItem != null) {
+        variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
+      }
       final result = await _client.mutate(gql(q), variables: variables);
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
@@ -795,6 +803,7 @@ Future<CommentModel> commentOnPost({
       rethrow;
     }
   }
+
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
         mutation deletePostComment($commentId: String!) {
@@ -968,10 +977,9 @@ Future<CommentModel> commentOnPost({
             postId: $postId
             commentId: $commentId
           ) {
-           authId
-           commentId
-           postId
-           likeId
+            ''' +
+        CommentLikeSchema.schema +
+        '''
           }
         }''';
     try {
@@ -990,7 +998,7 @@ Future<CommentModel> commentOnPost({
     }
   }
 
-  Future<bool> unlikeCommentOnPost({
+  Future<String> unlikeCommentOnPost({
     required String commentId,
     required String likeId,
   }) async {
@@ -1017,7 +1025,7 @@ Future<CommentModel> commentOnPost({
         throw GraphQLError(message: result.message);
       }
 
-      return result.data!['unlikeCommentOnPost'] as bool;
+      return result.data!['unlikeCommentOnPost'] as String;
     } catch (e) {
       rethrow;
     }
@@ -1297,31 +1305,26 @@ Future<CommentModel> commentOnPost({
     }
   }
 
-  Future<VirtualCommentModel> getSingleCommentOnPost({
-    required String? postId,
+  Future<CommentModel> getSingleCommentOnPost({
+    required String? commentId,
   }) async {
     String q = r'''
-        query getSingleCommentOnPost($postId: String!) {
-          getSingleCommentOnPost(postId: $postId){
-              profile {
+        query getSingleCommentOnPost($commentId: String!) {
+          getSingleCommentOnPost(commentId: $commentId){
                 ''' +
-        UserSchema.schema +
-        '''
-            }
-               ''' +
         CommentSchema.schema +
         '''
-          }
+            }
         }''';
     try {
       final result = await _client.query(gql(q), variables: {
-        'postId': postId,
+        'commentId': commentId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      return VirtualCommentModel.fromJson(
+      return CommentModel.fromJson(
           result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
@@ -1866,4 +1869,53 @@ Future<CommentModel> commentOnPost({
       rethrow;
     }
   }
+
+  // Future<bool> joinLiveStream({
+  //   required String? channelName,
+  // }) async {
+  //   String q = r'''
+  //            mutation joinLiveStream(
+  //             $channelName:String!
+  //            ){
+  //              joinLiveStream(
+  //               channelName: $channelName
+  //              )
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'channelName': channelName,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('joinLiveStream', result.data);
+  //     return result.data!['joinLiveStream'] as bool;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  // Future<StreamResponse> initiateLiveStreaming({
+  //   required String? startedAt,
+  // }) async {
+  //   String q = r'''
+  //            mutation initiateLiveStream(
+  //             $startedAt:String!
+  //            ){
+  //              token,
+  //              channelName
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'startedAt': startedAt,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('Initiate LiveStreaming', result.data);
+  //     return StreamResponse.fromJson(result.data!['initiateLiveStream']);
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 }

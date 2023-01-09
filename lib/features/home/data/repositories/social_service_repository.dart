@@ -110,6 +110,7 @@ class SocialServiceRepository {
     required String postOwnerId,
     String? audioMediaItem,
     List<String>? imageMediaItems,
+    String? videoMediaItem,
   }) async {
     try {
       final comment = await _homeRemoteDataSource.commentOnPost(
@@ -119,6 +120,7 @@ class SocialServiceRepository {
         postOwnerId: postOwnerId,
         imageMediaItems: imageMediaItems,
         audioMediaItem: audioMediaItem,
+        videoMediaItem: videoMediaItem,
       );
       return Right(comment);
     } on GraphQLError catch (e) {
@@ -179,7 +181,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, bool>> unlikeCommentOnPost({
+  Future<Either<String, String>> unlikeCommentOnPost({
     required String commentLikeId,
     required String likeId,
   }) async {
@@ -306,14 +308,14 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String, VirtualCommentModel>> getSingleCommentOnPost({
-    required String postId,
+  Future<Either<String,CommentModel>> getSingleCommentOnPost({
+    required String commentId,
   }) async {
     try {
-      final virtualComment = await _homeRemoteDataSource.getSingleCommentOnPost(
-        postId: postId,
+      final Comment = await _homeRemoteDataSource.getSingleCommentOnPost(
+        commentId: commentId,
       );
-      return Right(virtualComment);
+      return Right(Comment);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

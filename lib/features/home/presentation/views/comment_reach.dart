@@ -1247,28 +1247,6 @@ class _CommentReachState extends State<CommentReach> {
                               const SizedBox(width: 20),
                               IconButton(
                                   onPressed: () async {
-                                    // setState(() {
-                                    //   isRecording = true;
-                                    //   emojiShowing = false;
-                                    // });
-                                    // var tempDir =
-                                    //     await getTemporaryDirectory();
-                                    // path =
-                                    //     '${tempDir.path}/comment_sound.aac';
-
-                                    // await recorderController.record(path);
-
-                                    // if (isRecording) {
-                                    //   path =
-                                    //       await recorderController.stop();
-                                    //   print(path);
-                                    //   File audio = File(path!);
-                                    //   globals.socialServiceBloc!.add(
-                                    //       MediaUploadEvent(media: audio));
-                                    // } else {
-                                    //   await recorderController
-                                    //       .record(path);
-                                    // }
 
                                     _recording.record(
                                         fileName: 'comment_reach_aud.aac');

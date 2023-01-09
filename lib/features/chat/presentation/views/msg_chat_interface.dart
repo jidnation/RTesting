@@ -275,7 +275,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                 threadId: '${globals.user!.id}--${widget.recipientUser!.id}',
                 value: state.imgUrl,
                 type: 'image',
-              ));
+                messageMode: '',
+                sentAt:''
+                
+               // Helper.parseChatTime(globals.userChat![index].sentAt ??
+                                               //  ''),
+               ),
+              
+              );
 
               isSending.value = true;
               showIsSending.value = true;
@@ -429,7 +436,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                               isMe: globals.user!.id ==
                                                   globals.userChat![i].senderId,
                                               label:
-                                                  globals.userChat![i].value!,
+                                                  globals.userChat![i].content!,
                                               size: size,
                                               timeStamp: Helper.parseChatTime(
                                                   globals.userChat![i].sentAt ??
@@ -672,8 +679,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
-                                                    type: 'text',
-                                                    value:
+                                                    contentType: 'text',
+                                                    content:
                                                         controller.text.trim());
                                                 globals.userChat!.add(temp);
                                                 controller.clear();
@@ -700,6 +707,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                         '${globals.user!.id}--${widget.recipientUser!.id}',
                                                     value: value,
                                                     type: 'text',
+                                                    messageMode: '',
+                                                    sentAt: ''
+                                                  //   Helper.parseChatTime(globals.userChat![index].sentAt ??
+                                                  // ''),
                                                   ),
                                                 );
                                                 isSending.value = true;

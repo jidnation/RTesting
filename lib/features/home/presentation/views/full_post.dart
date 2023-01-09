@@ -27,6 +27,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
@@ -66,8 +67,8 @@ class FullPostScreen extends StatefulHookWidget {
 class _FullPostScreenState extends State<FullPostScreen> {
   @override
   void initState() {
-    globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-        postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
+    // globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+    //     postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
     super.initState();
   }
 
@@ -88,7 +89,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final shoutdownPost = useState(false);
     final _currentPost = useState<PostFeedModel?>(null);
     final commentOption = widget.postFeedModel!.post!.commentOption;
-    final likeId = useState<String?>(null);
+    final isLiked = useState<String?>(null);
     final reachingList = useState<List<VirtualReach>?>([]);
     final isReaching = useState(false);
     final triggerProgressIndicator = useState(true);
@@ -187,6 +188,70 @@ class _FullPostScreenState extends State<FullPostScreen> {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
           bloc: globals.socialServiceBloc,
           listener: ((context, state) {
+            if (state is MediaUploadSuccess) {
+              String? audioMediaItem;
+              String? videoMediaItem;
+              List<String>? imageMediaItem;
+              if (FileUtils.fileType(state.image!) == 'audio') {
+                audioMediaItem = state.image!;
+              }
+              if (FileUtils.fileType(state.image!) == 'video') {
+                videoMediaItem = state.image!;
+              }
+              if (FileUtils.fileType(state.image!) == 'image') {
+                imageMediaItem = [];
+                imageMediaItem.add(state.image!);
+              }
+              globals.socialServiceBloc!.add(CommentOnPostEvent(
+                  postId: widget.postFeedModel!.postId,
+                  userId: globals.user!.id,
+                  content: globals.postContent,
+                  postOwnerId: widget.postFeedModel!.postOwnerId,
+                  audioMediaItem: audioMediaItem ?? null,
+                  videoMediaItem: videoMediaItem ?? null,
+                  imageMediaItems: imageMediaItem ?? []));
+
+              // if ((FileUtils.fileType(url) == 'audio') ||
+              //     (FileUtils.fileType(url) == 'image') ||
+              //     (FileUtils.fileType(url) == 'video')) {
+              //   if (FileUtils.fileType(url) == 'audio')
+              //     print('This is an audioFile');
+
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     audioMediaItem: url.isNotEmpty ? url : ' ',
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+
+              // if (FileUtils.fileType(url) == 'image') {
+              //   print('This is a image file');
+              //   List<String> imageMediaItem = [];
+              //   imageMediaItem.add(url);
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     imageMediaItems:
+              //         imageMediaItem.isNotEmpty ? imageMediaItem : [],
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+
+              // if (FileUtils.fileType(url) == 'video') {
+              //   print('This is a video file');
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     videoMediaItem: url.isNotEmpty ? url : ' ',
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+            }
+
             if (state is CommentOnPostSuccess) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
@@ -241,44 +306,26 @@ class _FullPostScreenState extends State<FullPostScreen> {
             if (state is GetAllCommentsOnPostSuccess) {
               comments.value = state.data!.reversed.toList();
             }
-            if (state is MediaUploadSuccess) {
-              String url = state.image!;
 
-              if (FileUtils.fileType(url) == 'audio') {
-                print('This is an audioFile');
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  audioMediaItem: url.isNotEmpty ? url : ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              } else if (FileUtils.fileType(url) == 'image') {
-                print('This is a image file');
-                List<String> imageMediaItem = [];
-                imageMediaItem.add(url);
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  imageMediaItems:
-                      imageMediaItem.isNotEmpty ? imageMediaItem : [],
-                  audioMediaItem: ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              } else if (FileUtils.fileType(url) == 'video') {
-                print('This is a video file');
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  videoMediaItem: url.isNotEmpty ? url : ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              }
+            if (state is LikeCommentOnPostSuccess) {
+              globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
+                  commentId: state.commentLikeModel!.commentId));
             }
 
-            if (state is LikeCommentOnPostSuccess) {}
+            if (state is UnlikeCommentOnPostSuccess) {
+              globals.socialServiceBloc!.add(
+                  GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
+            }
+
+            if (state is GetSingleCommentOnPostSuccess) {
+              comments.value
+                  .firstWhere((e) => e.commentId == state.data!.commentId)
+                  .isLiked = state.data!.isLiked;
+
+              comments.value
+                  .firstWhere((e) => e.commentId == state.data!.commentId)
+                  .nLikes = state.data!.nLikes;
+            }
           }),
           builder: ((context, state) {
             return SafeArea(
@@ -305,7 +352,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                       elevation: 0,
                       leading: IconButton(
                         onPressed: () {
-                          RouteNavigators.pop(context);
+                          RouteNavigators.route(context, const TimelineScreen());
+                          // RouteNavigators.pop(context);
                         },
                         icon: const Icon(
                           Icons.arrow_back,
@@ -831,16 +879,14 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   width: getScreenWidth(15)),
                                               GestureDetector(
                                                 onTap: () {
-                                                 
-                                                  if (
-                                                     widget.postFeedModel!
-                                                                      .postOwnerId !=
-                                                                  globals.userId
-                                                          ) {
+                                                  if (widget.postFeedModel!
+                                                          .postOwnerId !=
+                                                      widget.postFeedModel!
+                                                          .feedOwnerId) {
                                                     HapticFeedback
                                                         .mediumImpact();
                                                     reachDM.value = true;
-                                                      
+
                                                     handleTap(widget
                                                         .postFeedModel!.post);
                                                     if (active.contains(widget
@@ -887,12 +933,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       CupertinoButton(
                                                         minSize: 0,
                                                         onPressed: () {
-                                                          if (
-                                                           widget.postFeedModel!
-                                                                      .postOwnerId !=
-                                                                  globals.userId
-                                                                  ) {
-                                                                  
+                                                          if (widget
+                                                                  .postFeedModel!
+                                                                  .postOwnerId !=
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .feedOwnerId) {
                                                             HapticFeedback
                                                                 .mediumImpact();
                                                             reachDM.value =
@@ -1295,67 +1341,54 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 horizontal: 15),
                                             itemCount: comments.value.length,
                                             itemBuilder: (context, index) {
-                                              debugPrint(
-                                                      "${comments.value[index].isLiked}");
-                                                      debugPrint(
-                                                      "${comments.value[index]}");
-
-                                                      debugPrint(
-                                                      "${comments.value[index].imageMediaItems}");
+                                              // if (comments
+                                              //         .value[index].audioMediaItem ==
+                                              //     null) {
+                                              //   comments.value[index].audioMediaItem =
+                                              //       ' ';
+                                              // }
                                               return CommentsTile(
                                                 comment: comments.value[index],
-                                                isLiked: comments.value[index]
-                                                            .isLiked ?? "false",
-                                                     
-                                                                                                       
+                                                isLiked: comments
+                                                    .value[index].isLiked!,
                                                 onLike: () {
-                                                  debugPrint(
+                                                  print(
                                                       "${comments.value[index].isLiked}");
-                                                      
                                                   HapticFeedback.mediumImpact();
                                                   handleTap(index);
                                                   if (active.contains(index)) {
                                                     if (comments.value[index]
-                                                        .isLiked! != "false") {
+                                                            .isLiked !=
+                                                        "false") {
                                                       // comments.value[index]
-                                                      //     .isLiked = false;
-
-                                                      comments.value[index]
-                                                          .nLikes = (comments
-                                                                  .value[index]
-                                                                  .nLikes ??
-                                                              1) -
-                                                          1;
-                                                      // globals.socialServiceBloc!.add(
-                                                      //     GetAllCommentLikesEvent(
-                                                      //         commentId: comments
+                                                      //     .nLikes = (comments
                                                       //             .value[index]
-                                                      //             .commentId));
+                                                      //             .nLikes ??
+                                                      //         1) -
+                                                      //     1;
 
-                                                      // if (likeId.value !=
-                                                      //     null) {
-                                                         globals
-                                                            .socialServiceBloc!
-                                                            .add(
-                                                          UnlikeCommentOnPostEvent(
-                                                              commentId: comments
-                                                                  .value[index]
-                                                                  .commentId!,
-                                                              likeId: comments.value[index].isLiked,
-                                                                  
+                                                      // comments.value[index]
+                                                      //     .isLiked = "false";
 
-                                                              //commentLike
-                                                              //  .value!.likeId!,
-                                                              ),
-                                                        );
-                                                     // }
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        UnlikeCommentOnPostEvent(
+                                                          commentId: comments
+                                                              .value[index]
+                                                              .commentId,
+                                                          likeId: comments
+                                                              .value[index]
+                                                              .isLiked,
+                                                        ),
+                                                      );
                                                     } else {
-                                                        comments.value[index]
-                                                          .nLikes = (comments
-                                                                  .value[index]
-                                                                  .nLikes ??
-                                                              0) +
-                                                          1;
+                                                      // comments.value[index]
+                                                      //     .nLikes = (comments
+                                                      //             .value[index]
+                                                      //             .nLikes ??
+                                                      //         0) +
+                                                      //     1;
+
                                                       globals.socialServiceBloc!
                                                           .add(
                                                               LikeCommentOnPostEvent(
@@ -1621,6 +1654,7 @@ class CommentsTile extends StatelessWidget {
   final String isLiked;
   @override
   Widget build(BuildContext context) {
+    print('This is the Isliked value $isLiked');
     return Container(
         padding: const EdgeInsets.only(
           left: 14,
@@ -1695,58 +1729,26 @@ class CommentsTile extends StatelessWidget {
                       color: AppColors.textColor2,
                     ),
                   ),
-
-            comment.imageMediaItems == []
-                ? const SizedBox.shrink()
-                : CommentMedia(comment: comment)
-
-                    // if (((comment.imageMediaItems ?? []).isNotEmpty) &&
-                    //     comment.audioMediaItem == null)
-                    //   // ||(comment.videoMediaItem ?? '').isNotEmpty
-
-                    //   // const Text('error is the thing')
-                    //   CommentMedia(comment: comment)
-                    .paddingOnly(l: 16, r: 16, b: 10, t: 0),
+            if ((((comment.imageMediaItems ?? []).isNotEmpty) &&
+                    comment.audioMediaItem == null) ||
+                (comment.videoMediaItem ?? '').isNotEmpty)
+              CommentMedia(comment: comment)
+                  .paddingOnly(l: 16, r: 16, b: 10, t: 0),
             //else
             //const SizedBox.shrink(),
-            (comment.audioMediaItem ?? ' ').isNotEmpty
+            comment.audioMediaItem != null
                 ? Row(
                     children: [
                       Expanded(
                         child: CommentAudioMedia(
-                                path: comment.audioMediaItem ?? '')
-                            .paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                          path: comment.audioMediaItem ?? '',
+                          isPlaying: false,
+                        ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
                       ),
                     ],
                   )
-                :
-
-                // if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
-                //   Text(
-                //     comment.content!,
-                //     style: TextStyle(
-                //       fontSize: getScreenHeight(14),
-                //       color: AppColors.textColor2,
-                //     ),
-                //   )
-                // else if (comment.audioMediaItem!.isNotEmpty)
-                //   Row(
-                //     children: [
-                //       Expanded(
-                //         child: CommentAudioMedia(
-                //           path: comment.audioMediaItem!,
-                //           isPlaying: false,
-                //         ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
-                //       ),
-                //     ],
-                //   )
-                //   const SizedBox.shrink(),
-                // comment.imageMediaItems!.isNotEmpty
-                //     ? CommentMedia(comment: comment)
-                //         .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                //     :
-                //const SizedBox.shrink(),
-                SizedBox(height: getScreenHeight(10)),
+                : const SizedBox.shrink(),
+            SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -1769,7 +1771,7 @@ class CommentsTile extends StatelessWidget {
                           onPressed: onLike,
                           minSize: 0,
                           padding: EdgeInsets.zero,
-                          child: isLiked != "false"
+                          child: comment.isLiked != "false"
                               ? SvgPicture.asset(
                                   'assets/svgs/like-active.svg',
                                   height: getScreenHeight(20),

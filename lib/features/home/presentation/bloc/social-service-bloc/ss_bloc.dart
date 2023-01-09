@@ -132,9 +132,10 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       try {
         final response = await socialServiceRepository.commentOnPost(
             postId: event.postId!,
-            content: event.content!,
+            content: event.content,
             userId: event.userId!,
             imageMediaItems: event.imageMediaItems,
+            videoMediaItem: event.videoMediaItem,
             audioMediaItem: event.audioMediaItem,
             postOwnerId: event.postOwnerId!);
         response.fold(
@@ -333,7 +334,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetSingleCommentOnPostLoading());
       try {
         final response = await socialServiceRepository.getSingleCommentOnPost(
-          postId: event.postId!,
+          commentId: event.commentId!,
         );
         response.fold(
           (error) => emit(GetSingleCommentOnPostError(error: error)),

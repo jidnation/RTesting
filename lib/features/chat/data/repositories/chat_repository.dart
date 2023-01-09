@@ -33,6 +33,8 @@ class ChatRepository {
     required String? threadId,
     required String? value,
     required String? type,
+    required String? messageMode,
+    required String? sentAt,
   }) async {
     try {
       final chat = await _chatRemoteDataSource.sendTextMessage(
@@ -41,6 +43,8 @@ class ChatRepository {
         threadId: threadId,
         value: value,
         type: type,
+        messageMode: messageMode,
+        sentAt: sentAt,
       );
       return Right(chat);
     } on GraphQLError catch (e) {
