@@ -13,6 +13,17 @@ import '../../../account/presentation/widgets/image_placeholder.dart';
 import '../bloc/call_bloc.dart';
 import 'initiate_video_call.dart';
 
+enum AudioCallState {
+  connecting('connecting'),
+  calling('calling'),
+  ongoing('ongoing call'),
+  failed('failed'),
+  disconnected('disconnected');
+
+  final String message;
+  const AudioCallState(this.message);
+
+}
 class ReceiveAudioCall extends StatefulWidget {
   const ReceiveAudioCall({
     super.key,
@@ -32,9 +43,25 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
   bool _localUserJoined = false;
   int? _localuid;
   bool muteMic = false;
+  AudioCallState callState = AudioCallState.connecting;
   late RtcEngine _engine;
   final StopWatchTimer stopWatchTimer =
       StopWatchTimer(mode: StopWatchMode.countUp);
+
+  @override
+  initState() {
+    initAgora();
+    super.initState();
+  }
+
+  @override
+  dispose() {
+    _engine.disableAudio();
+    _engine.leaveChannel();
+    _engine.release();
+    stopWatchTimer.dispose();
+    super.dispose();
+  }
 
   Future<void> initAgora() async {
     await [Permission.microphone, Permission.camera].request();
@@ -56,6 +83,7 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
           setState(() {
             _localUserJoined = true;
             _localuid = connection.localUid;
+            callState = AudioCallState.ongoing;
           });
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
@@ -65,11 +93,21 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
             _remoteUid = remoteUid;
           });
         },
+        onUserMuteAudio: (connection, remoteUid, muted) {
+          Console.log('remote uid', remoteUid);
+          Console.log(remoteUid.toString(), muted);
+
+          Fluttertoast.showToast(
+              msg: muted
+                  ? '${widget.user} is muted'
+                  : '${widget.user} is unmuted');
+        },
         onUserOffline: (RtcConnection connection, int remoteUid,
             UserOfflineReasonType reason) {
           debugPrint("remote user $remoteUid left channel");
           setState(() {
             _remoteUid = null;
+            callState = AudioCallState.disconnected;
           });
           endCall();
         },
@@ -82,8 +120,6 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
       ),
     );
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-    await _engine.enableVideo();
-    await _engine.startPreview();
     await join();
     globals.callBloc!.add(
       AnswerPrivateCall(channelName: widget.channelName),
@@ -107,7 +143,6 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
   endCall() {
     Navigator.pop(context);
     Fluttertoast.showToast(msg: 'call ended');
-    setState(() {});
   }
 
   @override
@@ -146,14 +181,29 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Ongoing call',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.white,
-                    ),
-                  ),
+                  _localUserJoined
+                      ? StreamBuilder<int>(
+                          stream: stopWatchTimer.rawTime,
+                          initialData: 0,
+                          builder: (context, snap) {
+                            final value = snap.data;
+                            final displayTime = StopWatchTimer.getDisplayTime(
+                                value!,
+                                milliSecond: false);
+                            return Text(
+                              displayTime,
+                              style: const TextStyle(color: Colors.white),
+                            );
+                          },
+                        )
+                      : Text(
+                          callState.message,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.white,
+                          ),
+                        ),
                 ],
               ),
             ),

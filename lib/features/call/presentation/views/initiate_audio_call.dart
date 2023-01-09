@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../core/components/profile_picture.dart';
 import '../../../../core/models/user.dart';
@@ -16,7 +18,16 @@ import '../bloc/call_bloc.dart';
 
 const appId = "5741afe670ba4684aec914fb19eeb82a";
 
-enum AudioCallState { connecting, calling, ongoing, failed,disconnected }
+enum AudioCallState {
+  connecting('connecting'),
+  calling('calling'),
+  ongoing('ongoing call'),
+  failed('failed'),
+  disconnected('disconnected');
+
+  final String message;
+  const AudioCallState(this.message);
+}
 
 class InitiateAudioCall extends StatefulWidget {
   const InitiateAudioCall({super.key, this.recipient});
@@ -34,13 +45,15 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
   int? _remoteUid;
   bool _isJoined = false;
   late RtcEngine agoraEngine;
-
+  final StopWatchTimer stopWatchTimer =
+      StopWatchTimer(mode: StopWatchMode.countUp);
   AudioCallState callState = AudioCallState.connecting;
   final assetsAudioPlayer = AssetsAudioPlayer();
 
   @override
   void initState() {
     setupVoiceSDKEngine();
+    playRingingSound();
     dropCallIfNotPickedUp();
     super.initState();
   }
@@ -51,6 +64,8 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
     agoraEngine.disableVideo();
     agoraEngine.leaveChannel();
     agoraEngine.release();
+    stopWatchTimer.dispose();
+    stopRingingSound();
     super.dispose();
   }
 
@@ -86,8 +101,12 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
           setState(() {
             _isJoined = true;
             callState = AudioCallState.calling;
+            stopWatchTimer.onStartTimer();
             showCallMessage();
           });
+        },
+        onUserMuteAudio: (connection, remoteUid, muted) {
+          Console.log(remoteUid.toString(), muted);
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           setState(() {
@@ -106,7 +125,6 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
             showCallMessage();
             Navigator.pop(context);
           });
-          playRingingSound();
         },
       ),
     );
@@ -135,7 +153,7 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
     );
   }
 
-   muteMicrophone() async {
+  muteMicrophone() async {
     muteMic = !muteMic;
     await agoraEngine.muteLocalAudioStream(muteMic);
     Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
@@ -181,17 +199,33 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
                             imageUrl: widget.recipient!.profilePicture,
                           ),
                     const SizedBox(height: 20),
-                    Text(
-                      callState.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    ),
+                    _isJoined
+                        ? StreamBuilder<int>(
+                            stream: stopWatchTimer.rawTime,
+                            initialData: 0,
+                            builder: (context, snap) {
+                              final value = snap.data;
+                              final displayTime = StopWatchTimer.getDisplayTime(
+                                  value!,
+                                  milliSecond: false);
+                              return Text(
+                                displayTime,
+                                style: const TextStyle(color: Colors.white),
+                              );
+                            },
+                          )
+                        : Text(
+                            callState.message,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                          ),
                   ],
                   crossAxisAlignment: CrossAxisAlignment.center,
                 ),
-              ),     Positioned(
+              ),
+              Positioned(
                 bottom: 0,
                 child: Stack(
                   children: [
@@ -282,7 +316,6 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
                   ],
                 ),
               )
-        
             ],
           );
         },

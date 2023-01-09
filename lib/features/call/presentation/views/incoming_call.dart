@@ -41,14 +41,15 @@ class IncomingCall extends StatelessWidget {
     FlutterRingtonePlayer.stop();
     globals.callBloc!.add(AnswerPrivateCall(channelName: channelName));
     Get.off(
-      () => callType == 'Voice'
+      () => callType == 'audio'
           ? ReceiveAudioCall(channelName: channelName, token: token, user: user)
           : ReceiveVideoCall(channelName: channelName, token: token),
     );
   }
 
   rejectCall() {
-    isRinging = false;    FlutterRingtonePlayer.stop();
+    isRinging = false;
+    FlutterRingtonePlayer.stop();
 
     globals.callBloc!.add(RejectPrivateCall(channelName: channelName));
     Get.back();
