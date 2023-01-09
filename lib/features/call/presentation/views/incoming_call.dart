@@ -49,6 +49,8 @@ class IncomingCall extends StatelessWidget {
 
   rejectCall() {
     isRinging = false;
+    FlutterRingtonePlayer.stop();
+
     globals.callBloc!.add(RejectPrivateCall(channelName: channelName));
     Get.back();
   }
