@@ -22,8 +22,8 @@ enum AudioCallState {
 
   final String message;
   const AudioCallState(this.message);
-
 }
+
 class ReceiveAudioCall extends StatefulWidget {
   const ReceiveAudioCall({
     super.key,
@@ -53,6 +53,14 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
     initAgora();
     super.initState();
   }
+
+    muteMicrophone() async {
+    muteMic = !muteMic;
+    await _engine.muteLocalAudioStream(muteMic);
+    Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
+    setState(() {});
+  }
+
 
   @override
   dispose() {
@@ -238,7 +246,7 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => muteMicrophone(),
                           child: Stack(
                             children: [
                               const Opacity(
@@ -254,7 +262,9 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
                                 right: 10,
                                 bottom: 10,
                                 child: SvgPicture.asset(
-                                  'assets/svgs/mic.svg',
+                                  muteMic
+                                      ? 'assets/svgs/mic_slash.svg'
+                                      : 'assets/svgs/mic.svg',
                                   color: AppColors.white,
                                 ),
                               ),
