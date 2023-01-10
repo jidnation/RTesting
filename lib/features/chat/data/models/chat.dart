@@ -2,13 +2,11 @@ import 'package:reach_me/core/models/user.dart';
 
 class Chat {
   Chat({
-    // this._id,
     this.id,
     this.senderId,
     this.receiverId,
-    // this.receivers,
-    this.type,
-    this.value,
+    this.content,
+    this.contentType,
     this.threadId,
     this.sentAt,
     this.createdAt,
@@ -18,11 +16,12 @@ class Chat {
   String? id;
   String? senderId;
   String? receiverId;
+  String? contentType;
   //  List<dynamic> receivers;
-  String? type;
-  String? value;
+  String? content;
   String? threadId;
   String? sentAt;
+  String? messageMode;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -32,14 +31,15 @@ class Chat {
     senderId = json['senderId'];
     receiverId = json['receiverId'];
     // receivers = List.castFrom<dynamic, dynamic>(json['receivers']);
-    type = json['type'];
-    value = json['value'];
+    contentType = json['contentType'];
+    content = json['content'];
     threadId = json['threadId'];
     sentAt = json['sentAt'];
+    messageMode = json['messageMode'];
     createdAt =
-        json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null;
+        json['createdAt'] != null ? DateTime.parse(json['created_at']) : null;
     updatedAt =
-        json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null;
+        json['updatedAt'] != null ? DateTime.parse(json['updated_at']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -49,13 +49,13 @@ class Chat {
     _data['senderId'] = senderId;
     _data['receiverId'] = receiverId;
     //  _data['receivers'] = receivers;
-    _data['type'] = type;
-    _data['value'] = value;
+    _data['contentType'] = contentType;
+    _data['content'] = content;
     _data['threadId'] = threadId;
     _data['sentAt'] = sentAt;
-    _data['createdAt'] =
+    _data['created_at'] =
         createdAt != null ? createdAt!.toIso8601String() : null;
-    _data['updatedAt'] =
+    _data['updated_at'] =
         updatedAt != null ? updatedAt!.toIso8601String() : null;
     return _data;
   }

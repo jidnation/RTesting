@@ -299,7 +299,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       // for (CustomMomentCommentModel momentComment in currentCommentList) {
       //   if (momentComment.id == id) {
       commentModel.getMomentComment.isLiked = response.isLiked!;
-      commentModel.getMomentComment.nComments = response.nComments!;
+      commentModel.getMomentComment.nReplies = response.nReplies!;
       commentModel.getMomentComment.nLikes = response.nLikes;
       notifyListeners();
       return;
@@ -373,6 +373,46 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
     return response;
   }
+  //
+  // getMomentComments(
+  //     {required String momentId, int? pageLimit, int? pageNumber}) async {
+  //   _gettingUserComment = true;
+  //   List<GetMomentComment>? response =
+  //       await momentQuery.getMomentComments(momentId: momentId);
+  //   if (response != null) {
+  //     print(
+  //         "::::::::::::::::::::::::::::;; getting momment Comments done::::::::::::::::");
+  //     // _momentComments.clear();
+  //     for (GetMomentComment element in response) {
+  //       // _momentComments.add(CustomMomentCommentModel(element));
+  //     }
+  //   }
+  //   _gettingUserComment = false;
+  //   notifyListeners();
+  // }
+
+  //TODO: making it flexible with the previous comment length
+  updateMomentComments({required String id}) async {
+    _gettingUserComment = true;
+    List<MomentModel> currentList = value;
+    MomentModel actualMomentModel =
+        currentList.firstWhere((element) => element.id == id);
+
+    List<GetMomentComment>? response = await momentQuery.getMomentComments(
+        momentId: actualMomentModel.momentId);
+    if (response != null) {
+      List<CustomMomentCommentModel> updateCommentList = [];
+      for (GetMomentComment element in response) {
+        updateCommentList.add(CustomMomentCommentModel(element));
+      }
+      actualMomentModel.momentComments = updateCommentList;
+      print(
+          "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
+      notifyListeners();
+    }
+    _gettingUserComment = false;
+    notifyListeners();
+  }
 
   // ($momentId: String!, $commentId: String!, $content: String!)
   Future<bool> replyCommentOnMoment(BuildContext context,
@@ -385,7 +425,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     bool response = await momentQuery.replyMomentComment(
       momentId: momentModel.momentId,
       commentId: commentId,
-      comment: userInput,
+      content: userInput,
     );
     if (response) {
       Snackbars.success(
@@ -425,28 +465,28 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   // }
 
   //TODO: making it flexible with the previous comment length
-  updateMomentComments({required String id}) async {
-    _gettingUserComment = true;
-    List<MomentModel> currentList = value;
-    MomentModel actualMomentModel =
-        currentList.firstWhere((element) => element.id == id);
+  // updateMomentComments({required String id}) async {
+  //   _gettingUserComment = true;
+  //   List<MomentModel> currentList = value;
+  //   MomentModel actualMomentModel =
+  //       currentList.firstWhere((element) => element.id == id);
 
-    List<GetMomentComment>? response = await momentQuery.getMomentComments(
-        momentId: actualMomentModel.momentId);
-    if (response != null) {
-      List<CustomMomentCommentModel> updateCommentList = [];
-      for (GetMomentComment element in response) {
-        updateCommentList.add(CustomMomentCommentModel(element));
-      }
-      updateCommentList = updateCommentList.reversed.toList();
-      actualMomentModel.momentComments = updateCommentList;
-      print(
-          "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
-      notifyListeners();
-    }
-    _gettingUserComment = false;
-    notifyListeners();
-  }
+  //   List<GetMomentComment>? response = await momentQuery.getMomentComments(
+  //       momentId: actualMomentModel.momentId);
+  //   if (response != null) {
+  //     List<CustomMomentCommentModel> updateCommentList = [];
+  //     for (GetMomentComment element in response) {
+  //       updateCommentList.add(CustomMomentCommentModel(element));
+  //     }
+  //     updateCommentList = updateCommentList.reversed.toList();
+  //     actualMomentModel.momentComments = updateCommentList;
+  //     print(
+  //         "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
+  //     notifyListeners();
+  //   }
+  //   _gettingUserComment = false;
+  //   notifyListeners();
+  // }
 
   Future<List<CustomMomentCommentModel>> getMyMomentComments(
       {required String momentId, int? pageLimit, int? pageNumber}) async {

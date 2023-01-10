@@ -198,7 +198,7 @@ class LikeCommentOnPostError extends SocialServiceState {
 class UnlikeCommentOnPostLoading extends SocialServiceState {}
 
 class UnlikeCommentOnPostSuccess extends SocialServiceState {
-  final bool? unlikeComment;
+  final String? unlikeComment;
   UnlikeCommentOnPostSuccess({this.unlikeComment});
 }
 
@@ -367,7 +367,7 @@ class GetPostError extends SocialServiceState {
 class GetSingleCommentOnPostLoading extends SocialServiceState {}
 
 class GetSingleCommentOnPostSuccess extends SocialServiceState {
-  final VirtualCommentModel? data;
+  final CommentModel? data;
   GetSingleCommentOnPostSuccess({this.data});
 }
 

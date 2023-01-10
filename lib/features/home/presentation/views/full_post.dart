@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -15,11 +14,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
@@ -28,11 +27,8 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
-import 'package:readmore/readmore.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../../../core/components/bottom_sheet_list_tile.dart';
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -44,8 +40,10 @@ import '../../../account/presentation/views/account.dart';
 import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../data/models/comment_model.dart';
 import '../widgets/post_media.dart';
+import 'home_screen.dart';
 
 class FullPostScreen extends StatefulHookWidget {
   static String id = 'full_post_screen';
@@ -66,8 +64,8 @@ class FullPostScreen extends StatefulHookWidget {
 class _FullPostScreenState extends State<FullPostScreen> {
   @override
   void initState() {
-    globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-        postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
+    // globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+    //     postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
     super.initState();
   }
 
@@ -88,7 +86,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
     final shoutdownPost = useState(false);
     final _currentPost = useState<PostFeedModel?>(null);
     final commentOption = widget.postFeedModel!.post!.commentOption;
-    final likeId = useState<String?>(null);
+    final isLiked = useState<String?>(null);
     final reachingList = useState<List<VirtualReach>?>([]);
     final isReaching = useState(false);
     final triggerProgressIndicator = useState(true);
@@ -187,6 +185,70 @@ class _FullPostScreenState extends State<FullPostScreen> {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
           bloc: globals.socialServiceBloc,
           listener: ((context, state) {
+            if (state is MediaUploadSuccess) {
+              String? audioMediaItem;
+              String? videoMediaItem;
+              List<String>? imageMediaItem;
+              if (FileUtils.fileType(state.image!) == 'audio') {
+                audioMediaItem = state.image!;
+              }
+              if (FileUtils.fileType(state.image!) == 'video') {
+                videoMediaItem = state.image!;
+              }
+              if (FileUtils.fileType(state.image!) == 'image') {
+                imageMediaItem = [];
+                imageMediaItem.add(state.image!);
+              }
+              globals.socialServiceBloc!.add(CommentOnPostEvent(
+                  postId: widget.postFeedModel!.postId,
+                  userId: globals.user!.id,
+                  content: globals.postContent,
+                  postOwnerId: widget.postFeedModel!.postOwnerId,
+                  audioMediaItem: audioMediaItem ?? null,
+                  videoMediaItem: videoMediaItem ?? null,
+                  imageMediaItems: imageMediaItem ?? []));
+
+              // if ((FileUtils.fileType(url) == 'audio') ||
+              //     (FileUtils.fileType(url) == 'image') ||
+              //     (FileUtils.fileType(url) == 'video')) {
+              //   if (FileUtils.fileType(url) == 'audio')
+              //     print('This is an audioFile');
+
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     audioMediaItem: url.isNotEmpty ? url : ' ',
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+
+              // if (FileUtils.fileType(url) == 'image') {
+              //   print('This is a image file');
+              //   List<String> imageMediaItem = [];
+              //   imageMediaItem.add(url);
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     imageMediaItems:
+              //         imageMediaItem.isNotEmpty ? imageMediaItem : [],
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+
+              // if (FileUtils.fileType(url) == 'video') {
+              //   print('This is a video file');
+              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+              //     content: globals.postContent,
+              //     postId: widget.postFeedModel!.postId,
+              //     userId: globals.user!.id,
+              //     videoMediaItem: url.isNotEmpty ? url : ' ',
+              //     postOwnerId: widget.postFeedModel!.postOwnerId,
+              //   ));
+              // }
+            }
+
             if (state is CommentOnPostSuccess) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
@@ -197,7 +259,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
               });
 
               Snackbars.success(context,
-                  message: "Your commment has been posted");
+                  message: "Your comment has been posted");
               triggerProgressIndicator.value = false;
               globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
                   postId: widget.postFeedModel!.postId,
@@ -241,44 +303,26 @@ class _FullPostScreenState extends State<FullPostScreen> {
             if (state is GetAllCommentsOnPostSuccess) {
               comments.value = state.data!.reversed.toList();
             }
-            if (state is MediaUploadSuccess) {
-              String url = state.image!;
 
-              if (FileUtils.fileType(url) == 'audio') {
-                print('This is an audioFile');
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  audioMediaItem: url.isNotEmpty ? url : ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              } else if (FileUtils.fileType(url) == 'image') {
-                print('This is a image file');
-                List<String> imageMediaItem = [];
-                imageMediaItem.add(url);
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  imageMediaItems:
-                      imageMediaItem.isNotEmpty ? imageMediaItem : [],
-                  audioMediaItem: ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              } else if (FileUtils.fileType(url) == 'video') {
-                print('This is a video file');
-                globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  content: globals.postContent,
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  videoMediaItem: url.isNotEmpty ? url : ' ',
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                ));
-              }
+            if (state is LikeCommentOnPostSuccess) {
+              globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
+                  commentId: state.commentLikeModel!.commentId));
             }
 
-            if (state is LikeCommentOnPostSuccess) {}
+            if (state is UnlikeCommentOnPostSuccess) {
+              globals.socialServiceBloc!.add(
+                  GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
+            }
+
+            if (state is GetSingleCommentOnPostSuccess) {
+              comments.value
+                  .firstWhere((e) => e.commentId == state.data!.commentId)
+                  .isLiked = state.data!.isLiked;
+
+              comments.value
+                  .firstWhere((e) => e.commentId == state.data!.commentId)
+                  .nLikes = state.data!.nLikes;
+            }
           }),
           builder: ((context, state) {
             return SafeArea(
@@ -305,7 +349,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
                       elevation: 0,
                       leading: IconButton(
                         onPressed: () {
-                          RouteNavigators.pop(context);
+                          RouteNavigators.route(context, const HomeScreen());
+                          // Get.close(2);
+                          // RouteNavigators.pop(context);
                         },
                         icon: const Icon(
                           Icons.arrow_back,
@@ -392,7 +438,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       widget.postFeedModel!
                                                           .profilePicture,
                                                       size: 33,
-                                                    ).paddingOnly(l: 13, t: 10),
+                                                    ).paddingOnly(
+                                                        left: 13, top: 10),
                                                     SizedBox(
                                                         width:
                                                             getScreenWidth(9)),
@@ -492,11 +539,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 color: AppColors
                                                                     .textColor2,
                                                               ),
-                                                            ).paddingOnly(l: 6),
+                                                            ).paddingOnly(
+                                                                left: 6),
                                                           ],
                                                         )
                                                       ],
-                                                    ).paddingOnly(t: 10),
+                                                    ).paddingOnly(top: 10),
                                                   ],
                                                 ),
                                               ),
@@ -582,7 +630,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           .underline,
                                                       color: Colors.blue),
                                                 ).paddingSymmetric(
-                                                  h: 16, v: 10),
+                                                  horizontal: 16, vertical: 10),
                                           Tooltip(
                                             key: tooltipkey,
                                             triggerMode:
@@ -604,7 +652,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     post: widget
                                                         .postFeedModel!.post!)
                                                 .paddingOnly(
-                                                    r: 16, l: 16, b: 16, t: 10)
+                                                    right: 16,
+                                                    left: 16,
+                                                    bottom: 16,
+                                                    top: 10)
                                           else
                                             const SizedBox.shrink(),
                                           (widget.postFeedModel?.post
@@ -617,7 +668,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           .post!
                                                           .audioMediaItem!)
                                                   .paddingOnly(
-                                                      l: 16, r: 16, b: 10, t: 0)
+                                                      left: 16,
+                                                      right: 16,
+                                                      bottom: 10,
+                                                      top: 0)
                                               : const SizedBox.shrink(),
 
                                           // likes and message
@@ -808,7 +862,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           'Likes',
@@ -831,16 +885,14 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   width: getScreenWidth(15)),
                                               GestureDetector(
                                                 onTap: () {
-                                                 
-                                                  if (
-                                                     widget.postFeedModel!
-                                                                      .postOwnerId !=
-                                                                  globals.userId
-                                                          ) {
+                                                  if (widget.postFeedModel!
+                                                          .postOwnerId !=
+                                                      widget.postFeedModel!
+                                                          .feedOwnerId) {
                                                     HapticFeedback
                                                         .mediumImpact();
                                                     reachDM.value = true;
-                                                      
+
                                                     handleTap(widget
                                                         .postFeedModel!.post);
                                                     if (active.contains(widget
@@ -887,12 +939,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       CupertinoButton(
                                                         minSize: 0,
                                                         onPressed: () {
-                                                          if (
-                                                           widget.postFeedModel!
-                                                                      .postOwnerId !=
-                                                                  globals.userId
-                                                                  ) {
-                                                                  
+                                                          if (widget
+                                                                  .postFeedModel!
+                                                                  .postOwnerId !=
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .feedOwnerId) {
                                                             HapticFeedback
                                                                 .mediumImpact();
                                                             reachDM.value =
@@ -924,7 +976,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                           width: getScreenWidth(
                                                               20),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           widget.postFeedModel!
@@ -948,7 +1000,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ),
                                               ),
                                             ],
-                                          ).paddingOnly(l: 16, b: 16),
+                                          ).paddingOnly(left: 16, bottom: 16),
 
                                           // shoutout and shoutdown
                                           Row(
@@ -1103,7 +1155,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 6),
+                                                      ).paddingOnly(right: 6),
                                                       FittedBox(
                                                         child: Text(
                                                           'Shoutout',
@@ -1232,7 +1284,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                 .textColor3,
                                                           ),
                                                         ),
-                                                      ).paddingOnly(r: 8),
+                                                      ).paddingOnly(right: 8),
                                                       FittedBox(
                                                         child: Text(
                                                           'Shoutdown',
@@ -1252,7 +1304,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ),
                                               ),
                                             ],
-                                          ).paddingOnly(l: 16)
+                                          ).paddingOnly(left: 16)
                                         ],
                                       ),
                                     ),
@@ -1295,67 +1347,54 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 horizontal: 15),
                                             itemCount: comments.value.length,
                                             itemBuilder: (context, index) {
-                                              debugPrint(
-                                                      "${comments.value[index].isLiked}");
-                                                      debugPrint(
-                                                      "${comments.value[index]}");
-
-                                                      debugPrint(
-                                                      "${comments.value[index].imageMediaItems}");
+                                              // if (comments
+                                              //         .value[index].audioMediaItem ==
+                                              //     null) {
+                                              //   comments.value[index].audioMediaItem =
+                                              //       ' ';
+                                              // }
                                               return CommentsTile(
                                                 comment: comments.value[index],
-                                                isLiked: comments.value[index]
-                                                            .isLiked ?? "false",
-                                                     
-                                                                                                       
+                                                isLiked: comments
+                                                    .value[index].isLiked!,
                                                 onLike: () {
-                                                  debugPrint(
+                                                  print(
                                                       "${comments.value[index].isLiked}");
-                                                      
                                                   HapticFeedback.mediumImpact();
                                                   handleTap(index);
                                                   if (active.contains(index)) {
                                                     if (comments.value[index]
-                                                        .isLiked! != "false") {
+                                                            .isLiked !=
+                                                        "false") {
                                                       // comments.value[index]
-                                                      //     .isLiked = false;
-
-                                                      comments.value[index]
-                                                          .nLikes = (comments
-                                                                  .value[index]
-                                                                  .nLikes ??
-                                                              1) -
-                                                          1;
-                                                      // globals.socialServiceBloc!.add(
-                                                      //     GetAllCommentLikesEvent(
-                                                      //         commentId: comments
+                                                      //     .nLikes = (comments
                                                       //             .value[index]
-                                                      //             .commentId));
+                                                      //             .nLikes ??
+                                                      //         1) -
+                                                      //     1;
 
-                                                      // if (likeId.value !=
-                                                      //     null) {
-                                                         globals
-                                                            .socialServiceBloc!
-                                                            .add(
-                                                          UnlikeCommentOnPostEvent(
-                                                              commentId: comments
-                                                                  .value[index]
-                                                                  .commentId!,
-                                                              likeId: comments.value[index].isLiked,
-                                                                  
+                                                      // comments.value[index]
+                                                      //     .isLiked = "false";
 
-                                                              //commentLike
-                                                              //  .value!.likeId!,
-                                                              ),
-                                                        );
-                                                     // }
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        UnlikeCommentOnPostEvent(
+                                                          commentId: comments
+                                                              .value[index]
+                                                              .commentId,
+                                                          likeId: comments
+                                                              .value[index]
+                                                              .isLiked,
+                                                        ),
+                                                      );
                                                     } else {
-                                                        comments.value[index]
-                                                          .nLikes = (comments
-                                                                  .value[index]
-                                                                  .nLikes ??
-                                                              0) +
-                                                          1;
+                                                      // comments.value[index]
+                                                      //     .nLikes = (comments
+                                                      //             .value[index]
+                                                      //             .nLikes ??
+                                                      //         0) +
+                                                      //     1;
+
                                                       globals.socialServiceBloc!
                                                           .add(
                                                               LikeCommentOnPostEvent(
@@ -1621,6 +1660,7 @@ class CommentsTile extends StatelessWidget {
   final String isLiked;
   @override
   Widget build(BuildContext context) {
+    print('This is the Isliked value $isLiked');
     return Container(
         padding: const EdgeInsets.only(
           left: 14,
@@ -1695,58 +1735,26 @@ class CommentsTile extends StatelessWidget {
                       color: AppColors.textColor2,
                     ),
                   ),
-
-            comment.imageMediaItems == []
-                ? const SizedBox.shrink()
-                : CommentMedia(comment: comment)
-
-                    // if (((comment.imageMediaItems ?? []).isNotEmpty) &&
-                    //     comment.audioMediaItem == null)
-                    //   // ||(comment.videoMediaItem ?? '').isNotEmpty
-
-                    //   // const Text('error is the thing')
-                    //   CommentMedia(comment: comment)
-                    .paddingOnly(l: 16, r: 16, b: 10, t: 0),
+            if ((((comment.imageMediaItems ?? []).isNotEmpty) &&
+                    comment.audioMediaItem == null) ||
+                (comment.videoMediaItem ?? '').isNotEmpty)
+              CommentMedia(comment: comment)
+                  .paddingOnly(left: 16, right: 16, bottom: 10, top: 0),
             //else
             //const SizedBox.shrink(),
-            (comment.audioMediaItem ?? ' ').isNotEmpty
+            comment.audioMediaItem != null
                 ? Row(
                     children: [
                       Expanded(
                         child: CommentAudioMedia(
-                                path: comment.audioMediaItem ?? '')
-                            .paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                          path: comment.audioMediaItem ?? '',
+                          isPlaying: false,
+                        ).paddingOnly(right: 0, left: 0, bottom: 10, top: 0),
                       ),
                     ],
                   )
-                :
-
-                // if (comment.content!.isNotEmpty && comment.audioMediaItem == null)
-                //   Text(
-                //     comment.content!,
-                //     style: TextStyle(
-                //       fontSize: getScreenHeight(14),
-                //       color: AppColors.textColor2,
-                //     ),
-                //   )
-                // else if (comment.audioMediaItem!.isNotEmpty)
-                //   Row(
-                //     children: [
-                //       Expanded(
-                //         child: CommentAudioMedia(
-                //           path: comment.audioMediaItem!,
-                //           isPlaying: false,
-                //         ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
-                //       ),
-                //     ],
-                //   )
-                //   const SizedBox.shrink(),
-                // comment.imageMediaItems!.isNotEmpty
-                //     ? CommentMedia(comment: comment)
-                //         .paddingOnly(l: 16, r: 16, b: 10, t: 0)
-                //     :
-                //const SizedBox.shrink(),
-                SizedBox(height: getScreenHeight(10)),
+                : const SizedBox.shrink(),
+            SizedBox(height: getScreenHeight(10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -1769,7 +1777,7 @@ class CommentsTile extends StatelessWidget {
                           onPressed: onLike,
                           minSize: 0,
                           padding: EdgeInsets.zero,
-                          child: isLiked != "false"
+                          child: comment.isLiked != "false"
                               ? SvgPicture.asset(
                                   'assets/svgs/like-active.svg',
                                   height: getScreenHeight(20),
@@ -1813,6 +1821,6 @@ class CommentsTile extends StatelessWidget {
               ],
             )
           ],
-        )).paddingOnly(b: 10, r: 20, l: 20);
+        )).paddingOnly(bottom: 10, right: 20, left: 20);
   }
 }

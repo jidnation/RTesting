@@ -77,7 +77,7 @@ mutation($momentId: String!, $caption: String!, $sound: String, $hashTags: [Stri
 
 const replyMomentComment = r'''
 mutation($momentId: String!, $commentId: String!, $content: String!) {
-    replyMomentComment(momentId: $momentId, content: $content, content: $commentId){
+    replyMomentComment(replyInput: {momentId: $momentId, content: $content, commentId: $commentId}){
     authId
     }
   }
@@ -238,7 +238,7 @@ query ($momentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
     videoMediaItem,
     audioMediaItem,
     nLikes,
-    nComments,
+    nReplies,
     isLiked,
     commentOwnerProfile{
       username,
@@ -304,7 +304,8 @@ query ($commentId: String!) {
     videoMediaItem,
     audioMediaItem,
     nLikes,
-    nComments,
+    authId,
+    nReplies,
     isLiked,
     commentOwnerProfile{
       username,
@@ -356,6 +357,225 @@ query ($replyId: String!) {
       profilePicture
     },
     }
+  }
+''';
+
+////////////
+///TimeLine String
+////////////
+const String getPostFeeds = r''' 
+query ($pageNumber: Int!, $pageLimit: Int! ) {
+  getPostFeed(page_limit: $pageLimit, page_number: $pageNumber){
+    reachingRelationship,
+    created_at,
+    updated_at,
+    feedOwnerProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        verified,
+        profileSlug,
+        location,
+        profilePicture,
+        location
+    },
+    voterProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+    },
+    post{
+     repostedPost{
+        authId,
+      postId,
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      isVoted,
+      postSlug,
+      edited,
+      postOwnerProfile{
+          authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+      },
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+    }
+  }
+  }
+''';
+
+const String getPost = r''' 
+query ($postId: String!) {
+  getPost(postId: $postId){
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+  }
+  }
+''';
+
+const likePost = r'''
+mutation($postId: String!) {
+    likePost (postId: $postId){
+    authId
+  }
+  }
+''';
+
+const votePost = r'''
+mutation($postId: String!, $voteType: String!) {
+    votePost(postId: $postId, voteType: $voteType)
+  }
+''';
+
+const unlikePost = r'''
+mutation($postId: String!) {
+    unlikePost (postId: $postId)
+  }
+''';
+
+const String getReachingRelation = r''' 
+query ($userId: String!, $type: String! ) {
+  getReachRelationship(userIdToReach: $userId, typeOfRelationship: $type)
   }
 ''';
 

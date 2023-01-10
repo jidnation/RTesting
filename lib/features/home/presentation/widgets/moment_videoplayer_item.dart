@@ -47,8 +47,8 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       allowFullScreen: true,
       // fullScreenByDefault: true,
       looping: true,
-      progressIndicatorDelay:
-          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      // progressIndicatorDelay:
+      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
@@ -160,8 +160,8 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
       allowFullScreen: true,
       // fullScreenByDefault: true,
       looping: true,
-      progressIndicatorDelay:
-          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      // progressIndicatorDelay:
+      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(

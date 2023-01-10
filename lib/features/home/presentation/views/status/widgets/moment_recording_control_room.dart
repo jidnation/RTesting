@@ -10,6 +10,7 @@ import 'package:reach_me/features/home/presentation/views/status/widgets/user_po
 import 'package:reach_me/features/home/presentation/views/status/widgets/video_previewer.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';
@@ -139,10 +140,10 @@ class MomentVideoControl {
             final ReturnCode? returnCode = await session.getReturnCode();
             if (ReturnCode.isSuccess(returnCode)) {
               print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
-              // String file = await MediaService()
-              //     .compressMomentVideo(filePath: outputPath);
-              // momentCtrl.mergedVideoPath(file);
-              // videoController = VideoPlayerController.file(File(file));
+              String file = await MediaService()
+                  .compressMomentVideo(filePath: outputPath);
+              momentCtrl.mergedVideoPath(file);
+              videoController = VideoPlayerController.file(File(file));
               await videoController!.initialize().then((_) {
                 RouteNavigators.routeReplace(
                   context,
