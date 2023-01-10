@@ -101,8 +101,7 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
           setState(() {
             _isJoined = true;
             callState = AudioCallState.calling;
-            stopWatchTimer.onStartTimer();
-            showCallMessage();
+
           });
         },
         onUserMuteAudio: (connection, remoteUid, muted) {
@@ -113,8 +112,9 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
             _remoteUid = remoteUid;
             callState = AudioCallState.ongoing;
             isRinging = false;
+            stopWatchTimer.onStartTimer();
+
             stopRingingSound();
-            showCallMessage();
           });
         },
         onUserOffline: (RtcConnection connection, int remoteUid,
@@ -137,7 +137,7 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
   }
 
   showCallMessage() {
-    Fluttertoast.showToast(msg: callState.name);
+    Fluttertoast.showToast(msg: callState.message);
   }
 
   void join(String token, String channelName) async {
@@ -198,8 +198,16 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
                             height: getScreenHeight(100),
                             imageUrl: widget.recipient!.profilePicture,
                           ),
-                    const SizedBox(height: 20),
-                    _isJoined
+                    const SizedBox(height: 10),
+                    Text(
+                      widget.recipient!.firstName!,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    _remoteUid != null
                         ? StreamBuilder<int>(
                             stream: stopWatchTimer.rawTime,
                             initialData: 0,
