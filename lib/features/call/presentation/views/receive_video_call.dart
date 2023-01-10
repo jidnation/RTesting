@@ -120,6 +120,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
     muteMic = !muteMic;
     await _engine.muteLocalAudioStream(muteMic);
     Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
+    setState(() {});
   }
 
   endCall() {
@@ -326,7 +327,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const [
-           CircularProgressIndicator(color: Colors.black),
+          CircularProgressIndicator(color: Colors.black),
         ],
       );
     }
