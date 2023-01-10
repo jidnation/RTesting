@@ -2,15 +2,20 @@ import 'package:better_player/better_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../home/data/models/post_model.dart';
 import '../home/presentation/views/moment_feed.dart';
 
 class TimeLineVideoPlayer extends StatefulWidget {
+  final PostModel post;
   final String videoUrl;
   const TimeLineVideoPlayer({
     Key? key,
+    required this.post,
     required this.videoUrl,
   }) : super(key: key);
 
@@ -90,42 +95,94 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
     await initializePlayer();
   }
 
+  bool show = false;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return
-        // Stack(children: [
-        Container(
-      width: size.width,
-      height: size.height,
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-          color: AppColors.audioPlayerBg,
-          borderRadius: BorderRadius.circular(15)),
-      child: _chewieController != null &&
-              _chewieController!.videoPlayerController.value.isInitialized
-          ? VisibilityDetector(
-              key: Key('my-widget-key'),
-              onVisibilityChanged: (visibilityInfo) {
-                var visiblePercentage = visibilityInfo.visibleFraction * 100;
-                visiblePercentage > 60
-                    ? _chewieController!.videoPlayerController.play()
-                    : _chewieController!.videoPlayerController.pause();
-              },
-              child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Chewie(
-                    controller: _chewieController!,
-                  )),
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
-    );
+
+    if (widget.post.postRating == "Sensitive" ||
+        widget.post.postRating == "Graphic Violence" ||
+        widget.post.postRating == "Nudity") {
+      if (show) {
+        return Container(
+          width: size.width,
+          height: size.height,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+              color: AppColors.audioPlayerBg,
+              borderRadius: BorderRadius.circular(15)),
+          child: _chewieController != null &&
+                  _chewieController!.videoPlayerController.value.isInitialized
+              ? VisibilityDetector(
+                  key: Key('my-widget-key'),
+                  onVisibilityChanged: (visibilityInfo) {
+                    var visiblePercentage =
+                        visibilityInfo.visibleFraction * 100;
+                    visiblePercentage > 60
+                        ? _chewieController!.videoPlayerController.play()
+                        : _chewieController!.videoPlayerController.pause();
+                  },
+                  child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Chewie(
+                        controller: _chewieController!,
+                      )),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 20),
+                      Text('Loading'),
+                    ]),
+        );
+      } else {
+        return ImageBlur(
+            widget.post,
+           const  SizedBox(),
+             () {
+        
+          setState(() {
+            show = true;
+          });
+        });
+      }
+    } else {
+      return
+          // Stack(children: [
+          Container(
+        width: size.width,
+        height: size.height,
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+            color: AppColors.audioPlayerBg,
+            borderRadius: BorderRadius.circular(15)),
+        child: _chewieController != null &&
+                _chewieController!.videoPlayerController.value.isInitialized
+            ? VisibilityDetector(
+                key: Key('my-widget-key'),
+                onVisibilityChanged: (visibilityInfo) {
+                  var visiblePercentage = visibilityInfo.visibleFraction * 100;
+                  visiblePercentage > 60
+                      ? _chewieController!.videoPlayerController.play()
+                      : _chewieController!.videoPlayerController.pause();
+                },
+                child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Chewie(
+                      controller: _chewieController!,
+                    )),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 20),
+                    Text('Loading'),
+                  ]),
+      );
+    }
   }
 }
 

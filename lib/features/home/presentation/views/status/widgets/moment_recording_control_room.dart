@@ -136,32 +136,32 @@ class MomentVideoControl {
               '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
           print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
           File(outputPath).delete();
-          await FFmpegKit.executeAsync(commandToExecute, (session) async {
-            final ReturnCode? returnCode = await session.getReturnCode();
-            if (ReturnCode.isSuccess(returnCode)) {
-              print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
-              String file = await MediaService()
-                  .compressMomentVideo(filePath: outputPath);
-              momentCtrl.mergedVideoPath(file);
-              videoController = VideoPlayerController.file(File(file));
-              await videoController!.initialize().then((_) {
-                RouteNavigators.routeReplace(
-                  context,
-                  VideoPreviewer(
-                    videoFile: File(outputPath),
-                    videoController: videoController!,
-                  ),
-                );
-              });
-              // SUCCESS
-            } else if (ReturnCode.isCancel(returnCode)) {
-              // CANCEL
-            } else {
-              print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
+          // await FFmpegKit.executeAsync(commandToExecute, (session) async {
+          //   final ReturnCode? returnCode = await session.getReturnCode();
+          //   if (ReturnCode.isSuccess(returnCode)) {
+          //     print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
+          //     String file = await MediaService()
+          //         .compressMomentVideo(filePath: outputPath);
+          //     momentCtrl.mergedVideoPath(file);
+          //     videoController = VideoPlayerController.file(File(file));
+          //     await videoController!.initialize().then((_) {
+          //       RouteNavigators.routeReplace(
+          //         context,
+          //         VideoPreviewer(
+          //           videoFile: File(outputPath),
+          //           videoController: videoController!,
+          //         ),
+          //       );
+          //     });
+          //     // SUCCESS
+          //   } else if (ReturnCode.isCancel(returnCode)) {
+          //     // CANCEL
+          //   } else {
+          //     print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
 
-              // ERROR
-            }
-          });
+          //     // ERROR
+          //   }
+          // });
         } else if (await Permission.storage.isPermanentlyDenied) {
           openAppSettings();
         }

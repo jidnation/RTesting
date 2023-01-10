@@ -191,6 +191,7 @@ class TimelineRepostedPost extends StatelessWidget {
                     // TimeLineVideoPreview(
                     //   path: tPostInfo.videoMediaItem!,
                     TimeLineVideoPlayer(
+                      post: tPostInfo,
                   videoUrl: tPostInfo.repostedPost!.videoMediaItem!,
                   // ),
                 ),
