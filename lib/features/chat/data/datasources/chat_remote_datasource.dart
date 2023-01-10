@@ -3,6 +3,7 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/chat_schema.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IChatRemoteDataSource {
 //   Future<User> createAccount({
@@ -179,6 +180,67 @@ class ChatRemoteDataSource {
       //   }
       // });
       return result;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> joinLiveStream({
+    required String? channelName,
+  }) async {
+    print("initiate repo3");
+    String q = r'''
+             mutation joinLiveStream(
+              $channelName:String!
+             ){
+               joinLiveStream(
+                channelName: $channelName
+               )
+             }''';
+    try {
+      print("initiate repo4");
+      final result = await _client.mutate(gql(q), variables: {
+        'channelName': channelName,
+      });
+      if (result is GraphQLError) {
+        print("initiate repo5");
+        print(result.message.toString());
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('joinLiveStream', result.data);
+      print(result.data!.toString());
+      return result.data!['joinLiveStream'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<StreamResponse> initiateLiveStreaming({
+    required String? startedAt,
+  }) async {
+    String q = r'''
+             mutation initiateLiveStream(
+              $startedAt:String!
+             ){
+                initiateLiveStream(
+                startedAt: $startedAt
+               ){
+                token,
+                channelName
+               }
+             }''';
+    try {
+      final result = await _client.mutate(gql(q), variables: {
+        'startedAt': startedAt,
+      });
+      if (result is GraphQLError) {
+        print("initiate repo5");
+        print(result.message.toString());
+        throw GraphQLError(message: result.message);
+      }
+      Console.log('Initiate LiveStreaming', result.data);
+      print(result.data.toString());
+      return StreamResponse.fromJson(result.data!['initiateLiveStream']);
     } catch (e) {
       rethrow;
     }

@@ -55,3 +55,13 @@ class ChatSendError extends ChatState {
   ChatSendError({this.error});
   final String? error;
 }
+
+class JoinLiveStreamSuccess extends ChatState {
+  JoinLiveStreamSuccess({this.joinLiveStream});
+  final bool? joinLiveStream;
+}
+
+class InitiateLiveStreamingSuccess extends ChatState {
+  InitiateLiveStreamingSuccess({required this.live});
+  final StreamResponse live;
+}

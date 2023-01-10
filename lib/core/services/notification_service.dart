@@ -1,6 +1,7 @@
 import 'package:get/route_manager.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:reach_me/features/call/presentation/views/incoming_call.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/host_post.dart';
 
 import '../helper/logger.dart';
 
@@ -22,6 +23,9 @@ class NotifcationService {
       switch (result.notification.additionalData!['type']) {
         case 'call.initiated':
           openCallNotification(result);
+          break;
+        case 'stream.initiated':
+          handleStreamNotification(result);
           break;
         default:
       }
@@ -52,5 +56,17 @@ openCallNotification(OSNotificationOpenedResult result) {
         token: result.notification.additionalData!['body']['receiverToken'],
         channelName: result.notification.additionalData!['body']['channelName'],
         callType: result.notification.additionalData!['body']['callMode'],
+      ));
+}
+
+handleStreamNotification(OSNotificationOpenedResult result) {
+  Console.log("important", result.notification.body.toString());
+  Console.log('important', result.notification.additionalData);
+
+  Get.to(() => HostPost(
+        isHost: false,
+        channelName: result.notification.additionalData!['body']['channelName'],
+        token: result.notification.additionalData!['body']['audienceToken'],
+        audienceId: result.notification.additionalData!['body']['audienceId'],
       ));
 }
