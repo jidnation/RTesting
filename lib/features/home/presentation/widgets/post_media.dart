@@ -854,6 +854,7 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
             ),
           ),
         ))
+     
       ],
     ),
   );

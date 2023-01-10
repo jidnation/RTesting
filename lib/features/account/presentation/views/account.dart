@@ -38,8 +38,11 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
+import '../../../home/presentation/widgets/moment_audio_player.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -1043,7 +1046,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     )
                                   : ListView.builder(
                                       itemCount: _posts.value.length,
-                                      itemBuilder: (context, index) {
+                                      itemBuilder: (context, index) {                                        
                                         return _ReacherCard(
                                           postModel: _posts.value[index],
                                           // onLike: () {
@@ -1780,15 +1783,33 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if ((postModel!.imageMediaItems ?? []).isNotEmpty ||
-                      (postModel!.videoMediaItem ?? '').isNotEmpty)
+                  if ((postModel!.imageMediaItems ?? []).isNotEmpty )
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
+                      if(  (postModel!.videoMediaItem ?? '')
+                                  .isNotEmpty)
+                                   TimeLineVideoPlayer(
+                                                    post: postModel!,
+                                                     videoUrl: postModel!.videoMediaItem!)
+                                         
+                                          else
                   (postModel!.audioMediaItem ?? '').isNotEmpty
-                      ? PostAudioMedia(path: postModel!.audioMediaItem!)
-                          .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      ?Container(
+                        height: 59,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        width: SizeConfig.screenWidth,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xfff5f5f5)),
+                        child: Row(children: [
+                          Expanded(
+                              child: MomentAudioPlayer(
+                            audioPath: postModel!.audioMediaItem!,
+                          )),
+                        ]),
+                      )
                       : const SizedBox.shrink(),
                   (postModel?.repostedPost != null)
                       ? RepostedPost(

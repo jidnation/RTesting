@@ -41,9 +41,11 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../timeline/timeline_feed.dart';
+import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
+import '../widgets/moment_audio_player.dart';
 import '../widgets/post_media.dart';
 import '../widgets/post_reach_media.dart';
 
@@ -606,19 +608,35 @@ class _CommentReachState extends State<RepostReach> {
                                 ).paddingSymmetric(h: 16, v: 10),
                           if ((widget.postFeedModel?.post?.imageMediaItems ??
                                       [])
-                                  .isNotEmpty ||
-                              (widget.postFeedModel?.post?.videoMediaItem ?? '')
-                                  .isNotEmpty)
+                                  .isNotEmpty )
                             PostMedia(post: widget.postFeedModel!.post!)
                                 .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                           else
                             const SizedBox.shrink(),
+                          if(  (widget.postFeedModel?.post?.videoMediaItem ?? '')
+                                  .isNotEmpty)
+                                   TimeLineVideoPlayer(
+                                                    post: widget.postFeedModel!.post!,
+                                                     videoUrl: widget.postFeedModel!.post!.videoMediaItem!)
+                                         
+                                          else
+                                            const SizedBox.shrink(),
                           (widget.postFeedModel?.post?.audioMediaItem ?? '')
                                   .isNotEmpty
-                              ? PostAudioMedia(
-                                      path: widget
-                                          .postFeedModel!.post!.audioMediaItem!)
-                                  .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                              ? Container(
+                        height: 59,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        width: SizeConfig.screenWidth,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xfff5f5f5)),
+                        child: Row(children: [
+                          Expanded(
+                              child: MomentAudioPlayer(
+                            audioPath: widget.postFeedModel!.post!.audioMediaItem!,
+                          )),
+                        ]),
+                      )
                               : const SizedBox.shrink(),
                         ],
                       ),
