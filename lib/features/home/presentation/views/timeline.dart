@@ -2410,7 +2410,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   final res = await Navigator.push(
                                                                       context,
                                                                       MaterialPageRoute(
-                                                                          builder: (c) => ViewUserStatus(
+                                                                          builder: (c) => ViewUserStatus4(
                                                                               isMuted: false,
                                                                               status: _userStatus.value[index].status!)));
                                                                   if (res ==
