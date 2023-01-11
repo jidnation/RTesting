@@ -119,7 +119,11 @@ class TimelineRepostedPost extends StatelessWidget {
                   ),
                   SizedBox(
                       width: tPostInfo.location!.isNotEmpty &&
-                              tPostInfo.location!.toLowerCase().trim() != 'nil'
+                              tPostInfo.location!.toLowerCase().trim() != 'nil' ||
+                              tPostInfo.location!
+                                                        .toLowerCase()
+                                                        .trim() !=
+                                                    'NIL'
                           ? 5
                           : 0),
                 ]),

@@ -268,7 +268,10 @@ class TimeLineBox extends StatelessWidget {
                                                 tPostInfo.location!
                                                         .toLowerCase()
                                                         .trim() !=
-                                                    'nil',
+                                                    'nil' || tPostInfo.location!
+                                                        .toLowerCase()
+                                                        .trim() !=
+                                                    'NIL',
                                         child: Row(children: [
                                           CustomText(
                                             text: tPostInfo.location
