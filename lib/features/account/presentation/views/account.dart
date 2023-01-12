@@ -38,10 +38,10 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
-import '../../../home/presentation/widgets/moment_audio_player.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {

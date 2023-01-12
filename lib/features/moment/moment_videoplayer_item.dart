@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../core/utils/custom_text.dart';
-import '../views/moment_feed.dart';
+import '../../core/utils/custom_text.dart';
+import 'moment_feed.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;

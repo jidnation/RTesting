@@ -42,14 +42,14 @@ import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../chat/presentation/views/msg_chat_interface.dart';
+import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
-import '../widgets/moment_audio_player.dart';
 import 'full_post.dart';
 
 class TimelineScreen extends StatefulHookWidget {
@@ -1228,29 +1228,27 @@ class PostFeedReacherCard extends HookWidget {
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
-                    if(  (postFeedModel?.post?.videoMediaItem ?? '')
-                                  .isNotEmpty)
-                                   TimeLineVideoPlayer(
-                                                    post: postFeedModel!.post!,
-                                                     videoUrl: postFeedModel!.post!.videoMediaItem!)
-                                         
-                                          else
-                                            const SizedBox.shrink(),
+                  if ((postFeedModel?.post?.videoMediaItem ?? '').isNotEmpty)
+                    TimeLineVideoPlayer(
+                        post: postFeedModel!.post!,
+                        videoUrl: postFeedModel!.post!.videoMediaItem!)
+                  else
+                    const SizedBox.shrink(),
                   (postFeedModel?.post?.audioMediaItem ?? '').isNotEmpty
                       ? Container(
-                        height: 59,
-                        margin: const EdgeInsets.only(bottom: 10),
-                        width: SizeConfig.screenWidth,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: const Color(0xfff5f5f5)),
-                        child: Row(children: [
-                          Expanded(
-                              child: MomentAudioPlayer(
-                            audioPath: postFeedModel!.post!.audioMediaItem!,
-                          )),
-                        ]),
-                      )
+                          height: 59,
+                          margin: const EdgeInsets.only(bottom: 10),
+                          width: SizeConfig.screenWidth,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: const Color(0xfff5f5f5)),
+                          child: Row(children: [
+                            Expanded(
+                                child: MomentAudioPlayer(
+                              audioPath: postFeedModel!.post!.audioMediaItem!,
+                            )),
+                          ]),
+                        )
                       : const SizedBox.shrink(),
                   (postFeedModel?.post?.repostedPost != null)
                       ? RepostedPost(

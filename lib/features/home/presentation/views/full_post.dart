@@ -26,7 +26,6 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/components/snackbar.dart';
@@ -40,10 +39,11 @@ import '../../../account/presentation/views/account.dart';
 import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
+import '../../../moment/comment_media.dart';
+import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
-import '../widgets/moment_audio_player.dart';
 import '../widgets/post_media.dart';
 import 'home_screen.dart';
 
@@ -642,22 +642,29 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             message:
                                                 'This reach has been edited',
                                           ),
-                                           if ((widget.postFeedModel?.post?.imageMediaItems ??
-                                      [])
-                                  .isNotEmpty )
-                            PostMedia(post: widget.postFeedModel!.post!)
-                                .paddingOnly(right: 16, left: 16, bottom: 16, top: 10)
-                          else
-                            const SizedBox.shrink(),
-                                          if (
-                                              (widget.postFeedModel?.post
-                                                          ?.videoMediaItem ??
-                                                      '')
-                                                  .isNotEmpty)
-                                                  TimeLineVideoPlayer(
-                                                    post: widget.postFeedModel!.post!,
-                                                     videoUrl: widget.postFeedModel!.post!.videoMediaItem!)
-                                         
+                                          if ((widget.postFeedModel?.post
+                                                      ?.imageMediaItems ??
+                                                  [])
+                                              .isNotEmpty)
+                                            PostMedia(
+                                                    post: widget
+                                                        .postFeedModel!.post!)
+                                                .paddingOnly(
+                                                    right: 16,
+                                                    left: 16,
+                                                    bottom: 16,
+                                                    top: 10)
+                                          else
+                                            const SizedBox.shrink(),
+                                          if ((widget.postFeedModel?.post
+                                                      ?.videoMediaItem ??
+                                                  '')
+                                              .isNotEmpty)
+                                            TimeLineVideoPlayer(
+                                                post:
+                                                    widget.postFeedModel!.post!,
+                                                videoUrl: widget.postFeedModel!
+                                                    .post!.videoMediaItem!)
                                           else
                                             const SizedBox.shrink(),
                                           (widget.postFeedModel?.post
@@ -665,20 +672,27 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       '')
                                                   .isNotEmpty
                                               ? Container(
-                        height: 59,
-                        margin: const EdgeInsets.only(bottom: 10),
-                        width: SizeConfig.screenWidth,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: const Color(0xfff5f5f5)),
-                        child: Row(children: [
-                          Expanded(
-                              child: MomentAudioPlayer(
-                            audioPath: widget.postFeedModel!.post!.audioMediaItem!,
-                          )),
-                        ]),
-                      )
-                                                 
+                                                  height: 59,
+                                                  margin: const EdgeInsets.only(
+                                                      bottom: 10),
+                                                  width: SizeConfig.screenWidth,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color: const Color(
+                                                          0xfff5f5f5)),
+                                                  child: Row(children: [
+                                                    Expanded(
+                                                        child:
+                                                            MomentAudioPlayer(
+                                                      audioPath: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .audioMediaItem!,
+                                                    )),
+                                                  ]),
+                                                )
                                               : const SizedBox.shrink(),
 
                                           // likes and message
@@ -749,139 +763,140 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       const Color(0xFFF5F5F5),
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    CupertinoButton(
-                                                      minSize: 0,
-                                                      onPressed: () {
-                                                        HapticFeedback
-                                                            .mediumImpact();
-                                                        handleTap(widget
-                                                            .postFeedModel!
-                                                            .post);
-                                                        // Console.log(
-                                                        //     'Like Data',
-                                                        //     _posts.value[index]
-                                                        //         .toJson());
-                                                        if (active.contains(
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post)) {
-                                                          if (widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.isLiked ??
-                                                              false) {
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.isLiked = false;
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.nLikes = (widget
-                                                                        .postFeedModel!
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    1) -
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                                    UnlikePostEvent(
-                                                              postId: widget
-                                                                  .postFeedModel!
-                                                                  .postId,
-                                                            ));
-                                                          } else {
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.isLiked = true;
-                                                            widget
-                                                                .postFeedModel!
-                                                                .post
-                                                                ?.nLikes = (widget
-                                                                        .postFeedModel!
-                                                                        .post
-                                                                        ?.nLikes ??
-                                                                    0) +
-                                                                1;
-                                                            globals
-                                                                .socialServiceBloc!
-                                                                .add(
-                                                              LikePostEvent(
-                                                                  postId: widget
-                                                                      .postFeedModel!
-                                                                      .postId),
-                                                            );
-                                                          }
-                                                        }
-                                                      },
-                                                      padding: EdgeInsets.zero,
-                                                      child: likePost.value ||
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      CupertinoButton(
+                                                        minSize: 0,
+                                                        onPressed: () {
+                                                          HapticFeedback
+                                                              .mediumImpact();
+                                                          handleTap(widget
+                                                              .postFeedModel!
+                                                              .post);
+                                                          // Console.log(
+                                                          //     'Like Data',
+                                                          //     _posts.value[index]
+                                                          //         .toJson());
+                                                          if (active.contains(
                                                               widget
                                                                   .postFeedModel!
-                                                                  .post!
-                                                                  .isLiked!
-                                                          ? SvgPicture.asset(
-                                                              'assets/svgs/like-active.svg',
-                                                              height:
-                                                                  getScreenHeight(
-                                                                      20),
-                                                              width:
-                                                                  getScreenWidth(
-                                                                      20),
-                                                            )
-                                                          : SvgPicture.asset(
-                                                              'assets/svgs/like.svg',
-                                                              height:
-                                                                  getScreenHeight(
-                                                                      20),
-                                                              width:
-                                                                  getScreenWidth(
-                                                                      20),
-                                                            ),
-                                                    ),
-                                                    SizedBox(
-                                                        width:
-                                                            getScreenWidth(8)),
-                                                    FittedBox(
-                                                      child: Text(
-                                                        '${post.value.post!.nLikes}',
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              getScreenHeight(
-                                                                  12),
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: AppColors
-                                                              .textColor3,
+                                                                  .post)) {
+                                                            if (widget
+                                                                    .postFeedModel!
+                                                                    .post
+                                                                    ?.isLiked ??
+                                                                false) {
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.isLiked = false;
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.nLikes = (widget
+                                                                          .postFeedModel!
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      1) -
+                                                                  1;
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                      UnlikePostEvent(
+                                                                postId: widget
+                                                                    .postFeedModel!
+                                                                    .postId,
+                                                              ));
+                                                            } else {
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.isLiked = true;
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.nLikes = (widget
+                                                                          .postFeedModel!
+                                                                          .post
+                                                                          ?.nLikes ??
+                                                                      0) +
+                                                                  1;
+                                                              globals
+                                                                  .socialServiceBloc!
+                                                                  .add(
+                                                                LikePostEvent(
+                                                                    postId: widget
+                                                                        .postFeedModel!
+                                                                        .postId),
+                                                              );
+                                                            }
+                                                          }
+                                                        },
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        child: likePost.value ||
+                                                                widget
+                                                                    .postFeedModel!
+                                                                    .post!
+                                                                    .isLiked!
+                                                            ? SvgPicture.asset(
+                                                                'assets/svgs/like-active.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              )
+                                                            : SvgPicture.asset(
+                                                                'assets/svgs/like.svg',
+                                                                height:
+                                                                    getScreenHeight(
+                                                                        20),
+                                                                width:
+                                                                    getScreenWidth(
+                                                                        20),
+                                                              ),
+                                                      ),
+                                                      SizedBox(
+                                                          width: getScreenWidth(
+                                                              8)),
+                                                      FittedBox(
+                                                        child: Text(
+                                                          '${post.value.post!.nLikes}',
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                getScreenHeight(
+                                                                    12),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: AppColors
+                                                                .textColor3,
+                                                          ),
+                                                        ),
+                                                      ).paddingOnly(right: 8),
+                                                      FittedBox(
+                                                        child: Text(
+                                                          'Likes',
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                getScreenHeight(
+                                                                    12),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: AppColors
+                                                                .textColor3,
+                                                          ),
                                                         ),
                                                       ),
-                                                    ).paddingOnly(right: 8),
-                                                    FittedBox(
-                                                      child: Text(
-                                                        'Likes',
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              getScreenHeight(
-                                                                  12),
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: AppColors
-                                                              .textColor3,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ]
-                                                ),
+                                                    ]),
                                               ),
                                             ),
                                             SizedBox(width: getScreenWidth(15)),

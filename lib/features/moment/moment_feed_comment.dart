@@ -3,9 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/custom_text.dart';
-import '../../../momentControlRoom/control_room.dart';
-import '../views/moment_feed.dart';
+import 'momentControlRoom/control_room.dart';
 import 'moment_comment_house.dart';
+import 'moment_feed.dart';
 
 class MomentFeedComment extends StatefulWidget {
   final MomentModel momentFeed;

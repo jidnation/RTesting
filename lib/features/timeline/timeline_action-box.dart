@@ -10,7 +10,7 @@ import '../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
 import '../home/presentation/views/comment_reach.dart';
-import '../home/presentation/views/moment_feed.dart';
+import '../moment/moment_feed.dart';
 import 'models/post_feed.dart';
 
 class TimeLineBoxActionRow extends StatelessWidget {

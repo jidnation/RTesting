@@ -9,7 +9,7 @@ import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
-import '../views/moment_feed.dart';
+import 'moment_feed.dart';
 
 class MomentAudioPlayer extends StatefulWidget {
   final String audioPath;

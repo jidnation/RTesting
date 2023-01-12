@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/moment_count_down_timer.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
 
-import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/controller.dart';
-import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/custom_text.dart';
-import '../../../../../../core/utils/dimensions.dart';
-import 'status_widgets.dart';
+import '../../core/services/media_service.dart';
+import '../../core/services/moment/controller.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/custom_text.dart';
+import '../../core/utils/dimensions.dart';
+import 'moment_actions.dart';
+import 'moment_count_down_timer.dart';
 
 class MomentPosting extends StatefulWidget {
   final CameraController? controller;
