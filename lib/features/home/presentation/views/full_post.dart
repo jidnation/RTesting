@@ -682,332 +682,321 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               : const SizedBox.shrink(),
 
                                           // likes and message
-                                          Row(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
+                                          Row(children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                HapticFeedback.mediumImpact();
+                                                handleTap(
+                                                    widget.postFeedModel!.post);
+                                                // Console.log(
+                                                //     'Like Data',
+                                                //     _posts.value[index]
+                                                //         .toJson());
+                                                if (active.contains(widget
+                                                    .postFeedModel!.post)) {
+                                                  if (widget.postFeedModel!.post
+                                                          ?.isLiked ??
+                                                      false) {
+                                                    widget.postFeedModel!.post
+                                                        ?.isLiked = false;
+                                                    widget.postFeedModel!.post
+                                                        ?.nLikes = (widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes ??
+                                                            1) -
+                                                        1;
+                                                    globals.socialServiceBloc!
+                                                        .add(UnlikePostEvent(
+                                                      postId: widget
+                                                          .postFeedModel!
+                                                          .postId,
+                                                    ));
+                                                  } else {
+                                                    widget.postFeedModel!.post
+                                                        ?.isLiked = true;
+                                                    widget.postFeedModel!.post
+                                                        ?.nLikes = (widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes ??
+                                                            0) +
+                                                        1;
+                                                    globals.socialServiceBloc!
+                                                        .add(
+                                                      LikePostEvent(
+                                                          postId: widget
+                                                              .postFeedModel!
+                                                              .postId),
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                              child: Container(
+                                                width: size.width -
+                                                    (size.width - 124),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color:
+                                                      const Color(0xFFF5F5F5),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+                                                        handleTap(widget
+                                                            .postFeedModel!
+                                                            .post);
+                                                        // Console.log(
+                                                        //     'Like Data',
+                                                        //     _posts.value[index]
+                                                        //         .toJson());
+                                                        if (active.contains(
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post)) {
+                                                          if (widget
+                                                                  .postFeedModel!
+                                                                  .post
+                                                                  ?.isLiked ??
+                                                              false) {
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.isLiked = false;
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes = (widget
+                                                                        .postFeedModel!
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    1) -
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: widget
+                                                                  .postFeedModel!
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.isLiked = true;
+                                                            widget
+                                                                .postFeedModel!
+                                                                .post
+                                                                ?.nLikes = (widget
+                                                                        .postFeedModel!
+                                                                        .post
+                                                                        ?.nLikes ??
+                                                                    0) +
+                                                                1;
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: widget
+                                                                      .postFeedModel!
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                      padding: EdgeInsets.zero,
+                                                      child: likePost.value ||
+                                                              widget
+                                                                  .postFeedModel!
+                                                                  .post!
+                                                                  .isLiked!
+                                                          ? SvgPicture.asset(
+                                                              'assets/svgs/like-active.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            )
+                                                          : SvgPicture.asset(
+                                                              'assets/svgs/like.svg',
+                                                              height:
+                                                                  getScreenHeight(
+                                                                      20),
+                                                              width:
+                                                                  getScreenWidth(
+                                                                      20),
+                                                            ),
+                                                    ),
+                                                    SizedBox(
+                                                        width:
+                                                            getScreenWidth(8)),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        '${post.value.post!.nLikes}',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ).paddingOnly(right: 8),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        'Likes',
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              getScreenHeight(
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ]
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: getScreenWidth(15)),
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (widget.postFeedModel!
+                                                        .postOwnerId !=
+                                                    widget.postFeedModel!
+                                                        .feedOwnerId) {
                                                   HapticFeedback.mediumImpact();
+                                                  reachDM.value = true;
+
                                                   handleTap(widget
                                                       .postFeedModel!.post);
-                                                  // Console.log(
-                                                  //     'Like Data',
-                                                  //     _posts.value[index]
-                                                  //         .toJson());
                                                   if (active.contains(widget
                                                       .postFeedModel!.post)) {
-                                                    if (widget.postFeedModel!
-                                                            .post?.isLiked ??
-                                                        false) {
-                                                      widget.postFeedModel!.post
-                                                          ?.isLiked = false;
-                                                      widget.postFeedModel!.post
-                                                          ?.nLikes = (widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes ??
-                                                              1) -
-                                                          1;
-                                                      globals.socialServiceBloc!
-                                                          .add(UnlikePostEvent(
-                                                        postId: widget
-                                                            .postFeedModel!
-                                                            .postId,
-                                                      ));
-                                                    } else {
-                                                      widget.postFeedModel!.post
-                                                          ?.isLiked = true;
-                                                      widget.postFeedModel!.post
-                                                          ?.nLikes = (widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes ??
-                                                              0) +
-                                                          1;
-                                                      globals.socialServiceBloc!
-                                                          .add(
-                                                        LikePostEvent(
-                                                            postId: widget
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: widget
                                                                 .postFeedModel!
-                                                                .postId),
-                                                      );
-                                                    }
+                                                                .postOwnerId!));
                                                   }
-                                                },
-                                                child: Container(
-                                                  width: size.width -
-                                                      (size.width - 124),
-                                                  height: size.width -
-                                                      (size.width - 50),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 11,
-                                                    vertical: 7,
-                                                  ),
-                                                  decoration: BoxDecoration(
+                                                }
+                                              },
+                                              child: Container(
+                                                width: size.width -
+                                                    (size.width - 163),
+                                                height: size.width -
+                                                    (size.width - 50),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 11,
+                                                  vertical: 7,
+                                                ),
+                                                decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12),
-                                                    color:
-                                                        const Color(0xFFF5F5F5),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      CupertinoButton(
-                                                        minSize: 0,
-                                                        onPressed: () {
+                                                    color: widget.postFeedModel!
+                                                                .postOwnerId !=
+                                                            globals.userId
+                                                        ? const Color(
+                                                            0xFFF5F5F5)
+                                                        : AppColors.disabled),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    CupertinoButton(
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        if (widget
+                                                                .postFeedModel!
+                                                                .postOwnerId !=
+                                                            widget
+                                                                .postFeedModel!
+                                                                .feedOwnerId) {
                                                           HapticFeedback
                                                               .mediumImpact();
+                                                          reachDM.value = true;
+
                                                           handleTap(widget
                                                               .postFeedModel!
                                                               .post);
-                                                          // Console.log(
-                                                          //     'Like Data',
-                                                          //     _posts.value[index]
-                                                          //         .toJson());
                                                           if (active.contains(
                                                               widget
                                                                   .postFeedModel!
                                                                   .post)) {
-                                                            if (widget
-                                                                    .postFeedModel!
-                                                                    .post
-                                                                    ?.isLiked ??
-                                                                false) {
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.isLiked = false;
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes = (widget
-                                                                          .postFeedModel!
-                                                                          .post
-                                                                          ?.nLikes ??
-                                                                      1) -
-                                                                  1;
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                      UnlikePostEvent(
-                                                                postId: widget
-                                                                    .postFeedModel!
-                                                                    .postId,
-                                                              ));
-                                                            } else {
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.isLiked = true;
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .post
-                                                                  ?.nLikes = (widget
-                                                                          .postFeedModel!
-                                                                          .post
-                                                                          ?.nLikes ??
-                                                                      0) +
-                                                                  1;
-                                                              globals
-                                                                  .socialServiceBloc!
-                                                                  .add(
-                                                                LikePostEvent(
-                                                                    postId: widget
+                                                            globals.userBloc!.add(
+                                                                GetRecipientProfileEvent(
+                                                                    email: widget
                                                                         .postFeedModel!
-                                                                        .postId),
-                                                              );
-                                                            }
+                                                                        .postOwnerId!));
                                                           }
-                                                        },
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        child: likePost.value ||
-                                                                widget
-                                                                    .postFeedModel!
-                                                                    .post!
-                                                                    .isLiked!
-                                                            ? SvgPicture.asset(
-                                                                'assets/svgs/like-active.svg',
-                                                                height:
-                                                                    getScreenHeight(
-                                                                        20),
-                                                                width:
-                                                                    getScreenWidth(
-                                                                        20),
-                                                              )
-                                                            : SvgPicture.asset(
-                                                                'assets/svgs/like.svg',
-                                                                height:
-                                                                    getScreenHeight(
-                                                                        20),
-                                                                width:
-                                                                    getScreenWidth(
-                                                                        20),
-                                                              ),
+                                                        }
+                                                      },
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0),
+                                                      child: SvgPicture.asset(
+                                                        'assets/svgs/message.svg',
+                                                        height:
+                                                            getScreenHeight(20),
+                                                        width:
+                                                            getScreenWidth(20),
                                                       ),
-                                                      SizedBox(
-                                                          width: getScreenWidth(
-                                                              8)),
-                                                      FittedBox(
-                                                        child: Text(
-                                                          '${post.value.post!.nLikes}',
-                                                          style: TextStyle(
-                                                            fontSize:
-                                                                getScreenHeight(
-                                                                    12),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color: AppColors
-                                                                .textColor3,
-                                                          ),
-                                                        ),
-                                                      ).paddingOnly(right: 8),
-                                                      FittedBox(
-                                                        child: Text(
-                                                          'Likes',
-                                                          style: TextStyle(
-                                                            fontSize:
-                                                                getScreenHeight(
-                                                                    12),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color: AppColors
-                                                                .textColor3,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                  width: getScreenWidth(15)),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (widget.postFeedModel!
-                                                          .postOwnerId !=
-                                                      widget.postFeedModel!
-                                                          .feedOwnerId) {
-                                                    HapticFeedback
-                                                        .mediumImpact();
-                                                    reachDM.value = true;
-
-                                                    handleTap(widget
-                                                        .postFeedModel!.post);
-                                                    if (active.contains(widget
-                                                        .postFeedModel!.post)) {
-                                                      globals.userBloc!.add(
-                                                          GetRecipientProfileEvent(
-                                                              email: widget
-                                                                  .postFeedModel!
-                                                                  .postOwnerId!));
-                                                    }
-                                                  }
-                                                },
-                                                child: Container(
-                                                  width: size.width -
-                                                      (size.width - 163),
-                                                  height: size.width -
-                                                      (size.width - 50),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 11,
-                                                    vertical: 7,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      color: widget
-                                                                  .postFeedModel!
-                                                                  .postOwnerId !=
-                                                              globals.userId
-                                                          ? const Color(
-                                                              0xFFF5F5F5)
-                                                          : AppColors.disabled),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      CupertinoButton(
-                                                        minSize: 0,
-                                                        onPressed: () {
-                                                          if (widget
-                                                                  .postFeedModel!
-                                                                  .postOwnerId !=
-                                                              widget
-                                                                  .postFeedModel!
-                                                                  .feedOwnerId) {
-                                                            HapticFeedback
-                                                                .mediumImpact();
-                                                            reachDM.value =
-                                                                true;
-
-                                                            handleTap(widget
-                                                                .postFeedModel!
-                                                                .post);
-                                                            if (active.contains(
-                                                                widget
-                                                                    .postFeedModel!
-                                                                    .post)) {
-                                                              globals.userBloc!.add(
-                                                                  GetRecipientProfileEvent(
-                                                                      email: widget
-                                                                          .postFeedModel!
-                                                                          .postOwnerId!));
-                                                            }
-                                                          }
-                                                        },
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        child: SvgPicture.asset(
-                                                          'assets/svgs/message.svg',
-                                                          height:
+                                                    ).paddingOnly(right: 8),
+                                                    FittedBox(
+                                                      child: Text(
+                                                        widget.postFeedModel!
+                                                                    .postOwnerId ==
+                                                                globals.userId
+                                                            ? "Message"
+                                                            : 'Message user',
+                                                        style: TextStyle(
+                                                          fontSize:
                                                               getScreenHeight(
-                                                                  20),
-                                                          width: getScreenWidth(
-                                                              20),
-                                                        ),
-                                                      ).paddingOnly(right: 8),
-                                                      FittedBox(
-                                                        child: Text(
-                                                          widget.postFeedModel!
-                                                                      .postOwnerId ==
-                                                                  globals.userId
-                                                              ? "Message"
-                                                              : 'Message user',
-                                                          style: TextStyle(
-                                                            fontSize:
-                                                                getScreenHeight(
-                                                                    12),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color: AppColors
-                                                                .textColor3,
-                                                          ),
+                                                                  12),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .textColor3,
                                                         ),
                                                       ),
-                                                    ],
-                                                  ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
-                                          ).paddingOnly(left: 16, bottom: 16),
+                                            ),
+                                          ]).paddingOnly(left: 16, bottom: 16),
 
                                           // shoutout and shoutdown
                                           Row(
@@ -1188,19 +1177,29 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   HapticFeedback.mediumImpact();
                                                   handleTap(widget
                                                       .postFeedModel!.post);
-
-                                                  if (active.contains(widget
-                                                      .postFeedModel!.post)) {
-                                                    shoutdownPost.value = true;
-                                                    globals.userBloc!.add(
-                                                        GetReachRelationshipEvent(
-                                                            userIdToReach: widget
-                                                                .postFeedModel!
-                                                                .postOwnerId,
-                                                            type:
-                                                                ReachRelationshipType
-                                                                    .reacher));
-                                                  }
+                                                  timeLineFeedStore.shoutDown(
+                                                      context,
+                                                      postId: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .postId!,
+                                                      authId: widget
+                                                          .postFeedModel!
+                                                          .post!
+                                                          .postOwnerProfile!
+                                                          .authId!);
+                                                  // if (active.contains(widget
+                                                  //     .postFeedModel!.post)) {
+                                                  //   shoutdownPost.value = true;
+                                                  //   globals.userBloc!.add(
+                                                  //       GetReachRelationshipEvent(
+                                                  //           userIdToReach: widget
+                                                  //               .postFeedModel!
+                                                  //               .postOwnerId,
+                                                  //           type:
+                                                  //               ReachRelationshipType
+                                                  //                   .reacher));
+                                                  // }
                                                 },
                                                 child: Container(
                                                   width: size.width -

@@ -168,6 +168,7 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                               label: 'Edit content',
                               isLoading: _isLoading,
                               onPressed: () {
+
                                 globals.socialServiceBloc!.add(
                                     GetPostEvent(postId: postFeedModel.postId));
                               }),

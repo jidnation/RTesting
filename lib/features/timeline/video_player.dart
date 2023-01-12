@@ -87,7 +87,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
   void dispose() {
     super.dispose();
     _videoPlayerController.dispose();
-    // _chewieController?.dispose();
+    _chewieController?.dispose();
   }
 
   Future<void> toggleVideo() async {
