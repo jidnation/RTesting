@@ -41,11 +41,9 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../timeline/timeline_feed.dart';
-import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
-import '../widgets/moment_audio_player.dart';
 import '../widgets/post_media.dart';
 import '../widgets/post_reach_media.dart';
 
