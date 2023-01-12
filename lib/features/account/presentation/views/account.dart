@@ -2177,8 +2177,8 @@ Future _showReacherCardBottomSheet(
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is GetPostSuccess) {
-            // RouteNavigators.pop(context);
-            // RouteNavigators.route(context, EditReach(post: state.data!));
+            RouteNavigators.pop(context);
+            RouteNavigators.route(context, EditReach(post: state.data!));
           }
           if (state is GetPostError) {
             RouteNavigators.pop(context);

@@ -236,18 +236,25 @@ class _CommentReachState extends State<CommentReach> {
                         onPressed: () => RouteNavigators.pop(context),
                       ),
                       const SizedBox(width: 20),
-                      RichText(
-                          text: TextSpan(
-                              text: 'Reply to ',
-                              style: const TextStyle(
-                                  color: AppColors.textColor5, fontSize: 16),
-                              children: [
-                            TextSpan(
-                              text: '@${widget.postFeedModel!.username}',
-                              style: const TextStyle(
-                                  color: AppColors.primaryColor, fontSize: 16),
-                            )
-                          ]))
+                      SizedBox(
+                        width: SizeConfig.screenWidth * 0.6,
+                        child: FittedBox(
+                          child: RichText(
+                              text: TextSpan(
+                                  text: 'Reply to ',
+                                  style: const TextStyle(
+                                      color: AppColors.textColor5,
+                                      fontSize: 16),
+                                  children: [
+                                TextSpan(
+                                  text: '@${widget.postFeedModel!.username}',
+                                  style: const TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 16),
+                                )
+                              ])),
+                        ),
+                      )
                     ],
                   ),
                   IconButton(

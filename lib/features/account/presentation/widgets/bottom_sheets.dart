@@ -567,7 +567,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                   reportReason: res as String,
                                   statusId: status.status?.statusId ?? ''));
                               await Future.delayed(const Duration(seconds: 4));
-                              timeLineFeedStore.initialize(context);
+                              timeLineFeedStore.initialize();
                             },
                             color: const Color(0xFFE50101),
                           ),
@@ -614,7 +614,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                               ''));
                                   await Future.delayed(
                                       const Duration(seconds: 4));
-                                  timeLineFeedStore.initialize(context);
+                                  timeLineFeedStore.initialize();
                                 } else {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -625,7 +625,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                 }
                                 await Future.delayed(
                                     const Duration(seconds: 4));
-                                timeLineFeedStore.initialize(context);
+                                timeLineFeedStore.initialize();
                               }),
                         ],
                       ),

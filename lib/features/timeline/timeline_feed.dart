@@ -136,7 +136,7 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
-                    ScrollController scrollController = ScrollController();
+                    // ScrollController scrollController = ScrollController();
                     print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
@@ -363,25 +363,12 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                     ? EmptyTimelineWidget(
                                         loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
-                                        enablePullDown: true,
                                         physics: const BouncingScrollPhysics(),
-                                        scrollController: scrollController,
-                                        onLoading: () {
-                                          print(
-                                              ":::::::::::::::::::::::::: am here::::::::::");
-                                          scrollController.position.animateTo(
-                                            50,
-                                            duration: const Duration(
-                                                milliseconds: 100),
-                                            curve: Curves.linear,
-                                          );
-                                        },
                                         onRefresh: () {
                                           timeLineFeedStore.initialize(
-                                            context,
                                             refreshController:
                                                 _refreshController,
-                                            isRefresh: true,
+                                            // isRefresh: true,
                                           );
                                           // await Future.delayed(const Duration(seconds: 10));
                                           // _refreshController.refreshCompleted();

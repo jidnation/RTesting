@@ -50,7 +50,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
 
-  final ScrollController _controller = ScrollController();
+  // final ScrollController _controller = ScrollController();
   // bool _isPlaying = false;
   // final _soundRecorderController = RecorderController()
   //   ..androidEncoder = AndroidEncoder.aac
@@ -61,14 +61,14 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
   final AudioRecordingService _recordingService = AudioRecordingService();
 
 // This is what you're looking for!
-  void _scrollDown() {
-    _controller.animateTo(
-      _controller.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 1),
-      curve: Curves.fastOutSlowIn,
-    );
-    // _controller.jumpTo(_controller.position.maxScrollExtent);
-  }
+//   void _scrollDown() {
+//     _controller.animateTo(
+//       _controller.position.maxScrollExtent,
+//       duration: const Duration(milliseconds: 1),
+//       curve: Curves.fastOutSlowIn,
+//     );
+//     // _controller.jumpTo(_controller.position.maxScrollExtent);
+//   }
 
   int maxCount = 11000;
   Future<File?> getImage(ImageSource source) async {
@@ -217,8 +217,6 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                       "Mention: ${controllerKey.currentState!.controller!.markupText}");
                                   debugPrint(
                                       "Mention: ${controllerKey.currentState!.controller!.text}");
-                                  timeLineFeedStore.initialize(context,
-                                      isPosting: true);
                                 }
                               }
                             },
