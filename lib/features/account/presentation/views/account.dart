@@ -31,15 +31,13 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
-import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -338,17 +336,9 @@ class _AccountScreenState extends State<AccountScreen>
       globals.socialServiceBloc!
           .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-        pageLimit: 50,
-        pageNumber: 1,
-        voteType: 'Upvote',
-        authId: ""
-      ));
+          pageLimit: 50, pageNumber: 1, voteType: 'Upvote', authId: ""));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-        pageLimit: 50,
-        pageNumber: 1,
-        voteType: 'Downvote',
-        authId: ""
-      ));
+          pageLimit: 50, pageNumber: 1, voteType: 'Downvote', authId: ""));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -1151,7 +1141,6 @@ class _AccountScreenState extends State<AccountScreen>
                                             }
                                           },
                                         );
-                                   
                                       },
                                     ),
                             ),
@@ -1339,7 +1328,7 @@ class _AccountScreenState extends State<AccountScreen>
                                         pageNumber: 1,
                                         voteType: 'Downvote',
                                         authId: ""));
-                              },   
+                              },
                               child: _shoutDowns.value.isEmpty
                                   ? ListView(
                                       padding: EdgeInsets.zero,
@@ -2157,8 +2146,8 @@ Future _showReacherCardBottomSheet(
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is GetPostSuccess) {
-            RouteNavigators.pop(context);
-            RouteNavigators.route(context, EditReach(post: state.data!));
+            // RouteNavigators.pop(context);
+            // RouteNavigators.route(context, EditReach(post: state.data!));
           }
           if (state is GetPostError) {
             RouteNavigators.pop(context);
@@ -2256,9 +2245,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   late final _commentsRefreshController =
       RefreshController(initialRefresh: false);
 
-  late final _likesRefreshController =
-      RefreshController(initialRefresh: false);
-        Set active = {};
+  late final _likesRefreshController = RefreshController(initialRefresh: false);
+  Set active = {};
 
   handleTap(index) {
     if (active.isNotEmpty) active.clear();
@@ -2404,11 +2392,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshFailed();
           }
 
-             if (state is GetLikedPostsSuccess) {
-                  debugPrint("LikedPosts ${state.posts}");
-                  _likedPosts.value = state.posts!;
-                  _likesRefreshController.refreshCompleted();
-                }
+          if (state is GetLikedPostsSuccess) {
+            debugPrint("LikedPosts ${state.posts}");
+            _likedPosts.value = state.posts!;
+            _likesRefreshController.refreshCompleted();
+          }
           if (state is GetPersonalCommentsSuccess) {
             _comments.value = state.data!;
             _commentsRefreshController.refreshCompleted();
@@ -3216,10 +3204,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   ),
 
                                 // RECEPIENT LIKES TAB
-                                  if (timelineLoading)
+                                if (timelineLoading)
                                   const CircularLoader()
-                                  else
-                                      Refresher(
+                                else
+                                  Refresher(
                                     controller: _likesRefreshController,
                                     onRefresh: () {
                                       globals.socialServiceBloc!
@@ -3230,98 +3218,103 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       ));
                                     },
                                     child: _likedPosts.value.isEmpty
-                                        ?       ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title: "Likes they made",
-                                      subtitle: "Find post they liked",
-                                    )
-                                  ],
-                                )
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Likes they made",
+                                                subtitle:
+                                                    "Find post they liked",
+                                              )
+                                            ],
+                                          )
                                         : ListView.builder(
                                             itemCount: _likedPosts.value.length,
                                             itemBuilder: (context, index) {
-                                           return PostFeedReacherCard(
-                                          likingPost: false,
-                                          postFeedModel:
-                                              _likedPosts.value[index],
-                                          isLiked: _likedPosts
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          isVoted: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          voteType: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? _likedPosts.value[index]
-                                                  .vote![0].voteType
-                                              : null,
-                                          onMessage: () {
-                                           // reachDM.value = true;
+                                              return PostFeedReacherCard(
+                                                likingPost: false,
+                                                postFeedModel:
+                                                    _likedPosts.value[index],
+                                                isLiked: _likedPosts
+                                                        .value[index]
+                                                        .like!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                isVoted: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                voteType: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? _likedPosts.value[index]
+                                                        .vote![0].voteType
+                                                    : null,
+                                                onMessage: () {
+                                                  // reachDM.value = true;
 
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _likedPosts
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Upvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Downvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onLike: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              if (_likedPosts.value[index].like!
-                                                  .isNotEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _likedPosts
-                                                      .value[index].postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _likedPosts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Upvote',
                                                       postId: _likedPosts
-                                                          .value[index].postId),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        );
-                                   
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Downvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_likedPosts.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _likedPosts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _likedPosts
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
                                             },
                                           ),
                                   ),
-
-                                
-                                  
-                          
                               ],
                             ),
                           ),
