@@ -1,18 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:file_picker/src/platform_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/host_post.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/join_post.dart';
 
-import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
-import 'status_widgets.dart';
 
 class LiveScreen extends StatefulWidget {
   final CameraController? controller;

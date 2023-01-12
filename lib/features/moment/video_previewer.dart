@@ -5,22 +5,19 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
 import 'package:video_player/video_player.dart';
 
-
-import '../../../../../../core/components/snackbar.dart';
-import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/querys.dart';
-import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/constants.dart';
-import '../../../../../../core/utils/custom_text.dart';
-import '../../../../../../core/utils/dimensions.dart';
-import '../../../../../../core/utils/file_url_converter.dart';
-import '../../moment_feed.dart';
+import '../../core/components/snackbar.dart';
+import '../../core/services/media_service.dart';
+import '../../core/services/moment/querys.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/constants.dart';
+import '../../core/utils/custom_text.dart';
+import '../../core/utils/dimensions.dart';
 import 'moment_actions.dart';
+import 'moment_feed.dart';
 import 'moment_preview_editor.dart';
-
 
 class VideoPreviewer extends StatefulHookWidget {
   final VideoPlayerController videoController;
@@ -39,7 +36,6 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     widget.videoController.dispose();
     super.dispose();
   }
-
 
   bool isPlaying = false;
   bool isUploading = false;
@@ -332,8 +328,8 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           // );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
-                         } 
-                         //else {
+                        }
+                        //else {
                         //   String vFile =
                         //       await MediaService().compressMomentVideo(
                         //     filePath: widget.videoFile.path,
@@ -429,4 +425,3 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
     );
   }
 }
-
