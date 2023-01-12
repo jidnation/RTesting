@@ -290,16 +290,16 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                   child: ExpansionTile(
                                     collapsedIconColor: AppColors.greyShade4,
                                     iconColor: AppColors.greyShade4,
-                                    title: Text(
+                                    title: const  Text(
                                       'Muted Statuses',
                                       style: TextStyle(
                                           fontSize: 14,
                                           color: AppColors.greyShade3),
                                     ),
                                     childrenPadding:
-                                        EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                        const EdgeInsets.fromLTRB(16, 0, 16, 16),
                                     tilePadding:
-                                        EdgeInsets.symmetric(horizontal: 16),
+                                       const  EdgeInsets.symmetric(horizontal: 16),
                                     children: [
                                       Row(
                                         children: [

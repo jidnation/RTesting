@@ -332,35 +332,36 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           // );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
-                        } else {
-                          String vFile =
-                              await MediaService().compressMomentVideo(
-                            filePath: widget.videoFile.path,
-                          );
-                          String? videoUrl =
-                              await FileConverter().convertMe(filePath: vFile);
-                          if (videoUrl != null) {
-                            var res = await MomentQuery.postMoment(
-                              videoMediaItem: videoUrl,
-                            );
-                            if (res) {
-                              Snackbars.success(
-                                context,
-                                message: 'Moment successfully created',
-                                milliseconds: 1300,
-                              );
-                              momentFeedStore.fetchMoment();
-                              momentCtrl.clearPostingData();
-                              RouteNavigators.pop(context);
-                            } else {
-                              Snackbars.error(
-                                context,
-                                message: 'Operation Failed, Try again.',
-                                milliseconds: 1400,
-                              );
-                            }
-                          }
-                        }
+                         } 
+                         //else {
+                        //   String vFile =
+                        //       await MediaService().compressMomentVideo(
+                        //     filePath: widget.videoFile.path,
+                        //   );
+                        //   String? videoUrl =
+                        //       await FileConverter().convertMe(filePath: vFile);
+                        //   if (videoUrl != null) {
+                        //     var res = await MomentQuery.postMoment(
+                        //       videoMediaItem: videoUrl,
+                        //     );
+                        //     if (res) {
+                        //       Snackbars.success(
+                        //         context,
+                        //         message: 'Moment successfully created',
+                        //         milliseconds: 1300,
+                        //       );
+                        //       momentFeedStore.fetchMoment();
+                        //       momentCtrl.clearPostingData();
+                        //       RouteNavigators.pop(context);
+                        //     } else {
+                        //       Snackbars.error(
+                        //         context,
+                        //         message: 'Operation Failed, Try again.',
+                        //         milliseconds: 1400,
+                        //       );
+                        //     }
+                        //   }
+                        // }
                         // else
                         // {
                         //   print(

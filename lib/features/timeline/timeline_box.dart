@@ -435,6 +435,9 @@ class TimeLineBox extends StatelessWidget {
                                 // TimeLineVideoPreview(
                                 //   path: tPostInfo.videoMediaItem!,
                                 TimeLineVideoPlayer(
+                                  post:  timeLineFeedStore
+                                .getPostModel(timeLineModel: timeLineModel)
+                                .post!,
                               videoUrl: timeLineModel
                                   .getPostFeed.post!.videoMediaItem!,
                               // ),

@@ -41,7 +41,9 @@ import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../timeline/timeline_feed.dart';
+import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
+import '../widgets/moment_audio_player.dart';
 import '../widgets/post_media.dart';
 import 'home_screen.dart';
 
@@ -640,38 +642,43 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                             message:
                                                 'This reach has been edited',
                                           ),
-                                          if ((widget.postFeedModel?.post
-                                                          ?.imageMediaItems ??
-                                                      [])
-                                                  .isNotEmpty ||
+                                           if ((widget.postFeedModel?.post?.imageMediaItems ??
+                                      [])
+                                  .isNotEmpty )
+                            PostMedia(post: widget.postFeedModel!.post!)
+                                .paddingOnly(right: 16, left: 16, bottom: 16, top: 10)
+                          else
+                            const SizedBox.shrink(),
+                                          if (
                                               (widget.postFeedModel?.post
                                                           ?.videoMediaItem ??
                                                       '')
                                                   .isNotEmpty)
-                                            PostMedia(
-                                                    post: widget
-                                                        .postFeedModel!.post!)
-                                                .paddingOnly(
-                                                    right: 16,
-                                                    left: 16,
-                                                    bottom: 16,
-                                                    top: 10)
+                                                  TimeLineVideoPlayer(
+                                                    post: widget.postFeedModel!.post!,
+                                                     videoUrl: widget.postFeedModel!.post!.videoMediaItem!)
+                                         
                                           else
                                             const SizedBox.shrink(),
                                           (widget.postFeedModel?.post
                                                           ?.audioMediaItem ??
                                                       '')
                                                   .isNotEmpty
-                                              ? PostAudioMedia(
-                                                      path: widget
-                                                          .postFeedModel!
-                                                          .post!
-                                                          .audioMediaItem!)
-                                                  .paddingOnly(
-                                                      left: 16,
-                                                      right: 16,
-                                                      bottom: 10,
-                                                      top: 0)
+                                              ? Container(
+                        height: 59,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        width: SizeConfig.screenWidth,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xfff5f5f5)),
+                        child: Row(children: [
+                          Expanded(
+                              child: MomentAudioPlayer(
+                            audioPath: widget.postFeedModel!.post!.audioMediaItem!,
+                          )),
+                        ]),
+                      )
+                                                 
                                               : const SizedBox.shrink(),
 
                                           // likes and message

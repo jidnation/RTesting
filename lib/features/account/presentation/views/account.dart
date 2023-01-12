@@ -31,13 +31,18 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
+import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
+import '../../../home/presentation/views/post_reach.dart';
+import '../../../home/presentation/widgets/moment_audio_player.dart';
 import '../../../home/presentation/widgets/post_media.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
@@ -336,9 +341,17 @@ class _AccountScreenState extends State<AccountScreen>
       globals.socialServiceBloc!
           .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-          pageLimit: 50, pageNumber: 1, voteType: 'Upvote', authId: ""));
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Upvote',
+        authId: ""
+      ));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-          pageLimit: 50, pageNumber: 1, voteType: 'Downvote', authId: ""));
+        pageLimit: 50,
+        pageNumber: 1,
+        voteType: 'Downvote',
+        authId: ""
+      ));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -1769,15 +1782,33 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if ((postModel!.imageMediaItems ?? []).isNotEmpty ||
-                      (postModel!.videoMediaItem ?? '').isNotEmpty)
+                  if ((postModel!.imageMediaItems ?? []).isNotEmpty )
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
+                      if(  (postModel!.videoMediaItem ?? '')
+                                  .isNotEmpty)
+                                   TimeLineVideoPlayer(
+                                                    post: postModel!,
+                                                     videoUrl: postModel!.videoMediaItem!)
+
+                                          else
                   (postModel!.audioMediaItem ?? '').isNotEmpty
-                      ? PostAudioMedia(path: postModel!.audioMediaItem!)
-                          .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      ?Container(
+                        height: 59,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        width: SizeConfig.screenWidth,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xfff5f5f5)),
+                        child: Row(children: [
+                          Expanded(
+                              child: MomentAudioPlayer(
+                            audioPath: postModel!.audioMediaItem!,
+                          )),
+                        ]),
+                      )
                       : const SizedBox.shrink(),
                   (postModel?.repostedPost != null)
                       ? RepostedPost(
@@ -2392,11 +2423,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshFailed();
           }
 
-          if (state is GetLikedPostsSuccess) {
-            debugPrint("LikedPosts ${state.posts}");
-            _likedPosts.value = state.posts!;
-            _likesRefreshController.refreshCompleted();
-          }
+             if (state is GetLikedPostsSuccess) {
+                  debugPrint("LikedPosts ${state.posts}");
+                  _likedPosts.value = state.posts!;
+                  _likesRefreshController.refreshCompleted();
+                }
           if (state is GetPersonalCommentsSuccess) {
             _comments.value = state.data!;
             _commentsRefreshController.refreshCompleted();
@@ -3204,10 +3235,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   ),
 
                                 // RECEPIENT LIKES TAB
-                                if (timelineLoading)
+                                  if (timelineLoading)
                                   const CircularLoader()
-                                else
-                                  Refresher(
+                                  else
+                                      Refresher(
                                     controller: _likesRefreshController,
                                     onRefresh: () {
                                       globals.socialServiceBloc!
@@ -3218,45 +3249,38 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       ));
                                     },
                                     child: _likedPosts.value.isEmpty
-                                        ? ListView(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            children: const [
-                                              EmptyTabWidget(
-                                                title: "Likes they made",
-                                                subtitle:
-                                                    "Find post they liked",
-                                              )
-                                            ],
-                                          )
+                                        ?       ListView(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  children: const [
+                                    EmptyTabWidget(
+                                      title: "Likes they made",
+                                      subtitle: "Find post they liked",
+                                    )
+                                  ],
+                                )
                                         : ListView.builder(
                                             itemCount: _likedPosts.value.length,
                                             itemBuilder: (context, index) {
-                                              return PostFeedReacherCard(
-                                                likingPost: false,
-                                                postFeedModel:
-                                                    _likedPosts.value[index],
-                                                isLiked: _likedPosts
-                                                        .value[index]
-                                                        .like!
-                                                        .isNotEmpty
-                                                    ? true
-                                                    : false,
-                                                isVoted: _likedPosts
-                                                        .value[index]
-                                                        .vote!
-                                                        .isNotEmpty
-                                                    ? true
-                                                    : false,
-                                                voteType: _likedPosts
-                                                        .value[index]
-                                                        .vote!
-                                                        .isNotEmpty
-                                                    ? _likedPosts.value[index]
-                                                        .vote![0].voteType
-                                                    : null,
-                                                onMessage: () {
-                                                  // reachDM.value = true;
+                                           return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _likedPosts.value[index],
+                                          isLiked: _likedPosts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _likedPosts.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                           // reachDM.value = true;
 
                                                   handleTap(index);
                                                   if (active.contains(index)) {
@@ -3315,6 +3339,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                             },
                                           ),
                                   ),
+
+                                
+                                  
+                          
                               ],
                             ),
                           ),
