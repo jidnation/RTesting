@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +17,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
@@ -49,7 +52,8 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
         indicatorAnimationController: _indicatorController,
         onStoryIndexChanged: (int newStoryIndex) {
           final story = widget.status[newStoryIndex];
-          if (story.statusData?.videoMedia != null) {
+          if (story.statusData?.videoMedia != null ||
+              story.statusData?.videoMedia != null) {
             _indicatorController.value = IndicatorAnimationCommand(
                 duration: const Duration(seconds: 30));
           } else {
@@ -362,23 +366,19 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
           builder: (context, state) {
             return StoryPageView(
               indicatorAnimationController: _indicatorController,
+              onStoryIndexChanged: (int newStoryIndex) {
+                final story = widget.status[newStoryIndex];
+                if (story.status?.statusData?.videoMedia != null ||
+                    story.status?.statusData?.videoMedia != null) {
+                  _indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 30));
+                } else {
+                  _indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 5));
+                }
+              },
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = widget.status[storyIndex];
-
-                if (story.status?.statusData?.videoMedia != null) {
-                  _indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 30));
-                } else {
-                  _indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 5));
-                }
-                if (story.status?.statusData?.audioMedia != null) {
-                  _indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 30));
-                } else {
-                  _indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 5));
-                }
                 if (story.status?.statusData!.audioMedia != null ||
                     (story.status?.statusData!.audioMedia ?? '').isNotEmpty) {
                   debugPrint(
@@ -420,7 +420,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             width: size.width,
                             child: Center(
                               child: Helper.renderProfilePicture(
-                                  story.status?.profileModel!.profilePicture,
+                                  story.status?.profileModel?.profilePicture,
                                   size: 100),
                             )),
                       ),
@@ -431,7 +431,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             Row(
                               children: [
                                 Helper.renderProfilePicture(
-                                    story.status?.profileModel!.profilePicture),
+                                    story.status?.profileModel?.profilePicture),
                                 SizedBox(width: getScreenWidth(12)),
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -569,6 +569,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                 width: size.width,
                                 color: AppColors.black,
                                 child: VideoPreview(
+                                  key: Key(story.status!.statusId!),
                                   isLocalVideo: false,
                                   loop: true,
                                   showControls: false,
@@ -809,14 +810,12 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                           if (controller.text.isNotEmpty) {
                             globals.chatBloc!.add(
                               SendChatMessageEvent(
-                                senderId: globals.user!.id,
-                                receiverId: story.statusOwnerProfile!.authId,
-                                threadId:
-                                    '${globals.user!.id}--${story.statusOwnerProfile!.authId}',
-                                value: controller.text.trim(),
-                                type: 'text',
-                                messageMode: '',
-                              ),
+                                  senderId: globals.user!.id,
+                                  receiverId: story.statusOwnerProfile!.authId,
+                                  value: controller.text.trim(),
+                                  type: 'text',
+                                  quotedData: jsonEncode(story.toJson()),
+                                  messageMode: MessageMode.quoted.name),
                             );
                             toast('Sending message...',
                                 duration: Toast.LENGTH_LONG);
