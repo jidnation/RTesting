@@ -13,7 +13,6 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/presentation/widgets/gallery_view.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
-import 'package:reach_me/features/momentControlRoom/moment_cacher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -294,7 +293,6 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       }
     });
 
-
     await playerController!.preparePlayer(filePath);
 
     // await playerController.startPlayer();
@@ -303,7 +301,6 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
 
   Future<PlayerController> getPlayerController(
       String path, String playerkey) async {
-
     if (playerkey != null && playerControllers.containsKey(playerkey)) {
       return playerControllers[playerkey]!;
     }
@@ -325,7 +322,6 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       decoration: const BoxDecoration(
           color: AppColors.audioPlayerBg,
           borderRadius: BorderRadius.all(Radius.circular(15))),
-
       child: Row(children: [
         GestureDetector(
           onTap: () async {

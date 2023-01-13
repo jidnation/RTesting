@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/utils/custom_text.dart';
+import '../../core/utils/custom_text.dart';
 
 class MomentPreviewEditor extends StatelessWidget {
   final String label;

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../core/utils/constants.dart';
-import '../../../../core/utils/dimensions.dart';
-import '../../../momentControlRoom/control_room.dart';
-import '../views/moment_feed.dart';
+import '../../core/utils/constants.dart';
+import '../../core/utils/dimensions.dart';
+import 'momentControlRoom/control_room.dart';
+import 'moment_feed.dart';
 
 class UserCommentBox extends HookWidget {
   const UserCommentBox({

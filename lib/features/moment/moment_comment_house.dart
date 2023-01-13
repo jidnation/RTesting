@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:reach_me/features/home/presentation/widgets/user_comment_input_layout.dart';
+import 'package:reach_me/features/moment/user_comment_input_layout.dart';
 
 import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
-import '../../../momentControlRoom/control_room.dart';
-import '../views/moment_feed.dart';
+import 'momentControlRoom/control_room.dart';
 import 'moment_comment_box.dart';
+import 'moment_feed.dart';
 import 'moment_videoplayer_item.dart';
 
 class MomentCommentStation extends StatelessWidget {

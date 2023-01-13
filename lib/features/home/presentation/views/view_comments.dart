@@ -28,14 +28,9 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-
-import 'package:reach_me/features/home/presentation/views/comment_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:reach_me/features/home/presentation/widgets/comment_media.dart';
 
-import '../../../../core/models/file_result.dart';
-import '../../../chat/presentation/widgets/audio_player.dart';
-import '../widgets/post_media.dart';
+import '../../../moment/comment_media.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';

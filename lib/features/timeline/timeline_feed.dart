@@ -24,8 +24,8 @@ import '../../core/utils/dimensions.dart';
 import '../chat/presentation/views/chats_list_screen.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/status/view.status.dart';
-import '../home/presentation/views/status/widgets/user_posting.dart';
 import '../home/presentation/views/timeline.dart';
+import '../moment/user_posting.dart';
 
 class TimeLineFeed extends StatefulWidget {
   static const String id = "timeline_screen";
@@ -136,7 +136,7 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
-                    ScrollController scrollController = ScrollController();
+                    // ScrollController scrollController = ScrollController();
                     print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
@@ -290,16 +290,16 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                   child: ExpansionTile(
                                     collapsedIconColor: AppColors.greyShade4,
                                     iconColor: AppColors.greyShade4,
-                                    title: const  Text(
+                                    title: const Text(
                                       'Muted Statuses',
                                       style: TextStyle(
                                           fontSize: 14,
                                           color: AppColors.greyShade3),
                                     ),
-                                    childrenPadding:
-                                        const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                                    tilePadding:
-                                       const  EdgeInsets.symmetric(horizontal: 16),
+                                    childrenPadding: const EdgeInsets.fromLTRB(
+                                        16, 0, 16, 16),
+                                    tilePadding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
                                     children: [
                                       Row(
                                         children: [
@@ -359,62 +359,54 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                               ),
                             ),
                             Expanded(
-                                child: SmartRefresher(
-                                    enablePullDown: true,
-                                    physics: const BouncingScrollPhysics(),
-                                    scrollController: scrollController,
-                                    onLoading: () {
-                                      print(
-                                          ":::::::::::::::::::::::::: am here::::::::::");
-                                      scrollController.position.animateTo(
-                                        50,
-                                        duration:
-                                            const Duration(milliseconds: 100),
-                                        curve: Curves.linear,
-                                      );
-                                    },
-                                    onRefresh: () {
-                                      timeLineFeedStore.initialize(
-                                        context,
-                                        refreshController: _refreshController,
-                                        isRefresh: true,
-                                      );
-                                      // await Future.delayed(const Duration(seconds: 10));
-                                      // _refreshController.refreshCompleted();
-                                    },
-                                    controller: _refreshController,
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: const ScrollPhysics(),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      itemBuilder: (context, index) {
-                                        TimeLineModel post =
-                                            timeLinePosts[index];
-                                        return Visibility(
-                                          visible: post.isShowing,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 15),
-                                            child: Stack(children: [
-                                              TimeLineBox(
-                                                timeLineModel: post,
+                                child: value.isEmpty
+                                    ? EmptyTimelineWidget(
+                                        loading: timeLineFeedStore.gettingPosts)
+                                    : SmartRefresher(
+                                        physics: const BouncingScrollPhysics(),
+                                        onRefresh: () {
+                                          timeLineFeedStore.initialize(
+                                            refreshController:
+                                                _refreshController,
+                                            // isRefresh: true,
+                                          );
+                                          // await Future.delayed(const Duration(seconds: 10));
+                                          // _refreshController.refreshCompleted();
+                                        },
+                                        controller: _refreshController,
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          physics: const ScrollPhysics(),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          itemBuilder: (context, index) {
+                                            TimeLineModel post =
+                                                timeLinePosts[index];
+                                            return Visibility(
+                                              visible: post.isShowing,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 15),
+                                                child: Stack(children: [
+                                                  TimeLineBox(
+                                                    timeLineModel: post,
+                                                  ),
+                                                  Positioned(
+                                                      bottom: 10,
+                                                      left: 30,
+                                                      right: 30,
+                                                      child:
+                                                          TimeLineBoxActionRow(
+                                                        timeLineId: post.id,
+                                                        post: post
+                                                            .getPostFeed.post!,
+                                                      )),
+                                                ]),
                                               ),
-                                              Positioned(
-                                                  bottom: 10,
-                                                  left: 30,
-                                                  right: 30,
-                                                  child: TimeLineBoxActionRow(
-                                                    timeLineId: post.id,
-                                                    post:
-                                                        post.getPostFeed.post!,
-                                                  )),
-                                            ]),
-                                          ),
-                                        );
-                                      },
-                                      itemCount: timeLineFeedStore.length,
-                                    ))),
+                                            );
+                                          },
+                                          itemCount: timeLineFeedStore.length,
+                                        ))),
                           ]);
                     // );
                   }),

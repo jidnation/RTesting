@@ -10,7 +10,7 @@ import '../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
 import '../home/presentation/views/comment_reach.dart';
-import '../home/presentation/views/moment_feed.dart';
+import '../moment/moment_feed.dart';
 import 'models/post_feed.dart';
 
 class TimeLineBoxActionRow extends StatelessWidget {
@@ -24,7 +24,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
   final String timeLineId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext routeContext) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Container(
         height: 40,
@@ -63,7 +63,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
           InkWell(
             onTap: () {
               RouteNavigators.route(
-                  context,
+                  routeContext,
                   CommentReach(
                       postFeedModel:
                           timeLineFeedStore.getPostModelById(timeLineId)));
@@ -93,7 +93,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
               if (_postModel.postOwnerId != globals.userId) {
                 HapticFeedback.mediumImpact();
 
-                timeLineFeedStore.messageUer(context,
+                timeLineFeedStore.messageUer(routeContext,
                     email: _postModel.postOwnerId!);
               }
             },
@@ -120,7 +120,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
                 minSize: 0,
                 onPressed: () {
                   timeLineFeedStore.votePost(
-                    context,
+                    routeContext,
                     id: timeLineId,
                     voteType: 'Upvote',
                   );
@@ -153,7 +153,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
                 minSize: 0,
                 onPressed: () {
                   timeLineFeedStore.votePost(
-                    context,
+                    routeContext,
                     id: timeLineId,
                     voteType: 'Downvote',
                   );

@@ -72,7 +72,7 @@ class ApiClient {
 
     try {
       final response = await _dio.get(
-        'https://api.myreach.me/utility/get-signed-url/$fileName',
+        'https://live.myreach.me/utility/get-signed-url/$fileName',
       );
       Console.log('responseee', response);
       return response.data;

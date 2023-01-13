@@ -1,16 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:file_picker/src/platform_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
 
-import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/custom_text.dart';
 import '../../../../../../core/utils/dimensions.dart';
-import 'status_widgets.dart';
 
 class LiveScreen extends StatefulWidget {
   final CameraController? controller;
@@ -26,7 +21,6 @@ class LiveScreen extends StatefulWidget {
 }
 
 class _LiveScreenState extends State<LiveScreen> {
-
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     widget.controller!.setFlashMode(FlashMode.auto);
@@ -43,8 +37,8 @@ class _LiveScreenState extends State<LiveScreen> {
           clipBehavior: Clip.hardEdge,
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(15),
-              )),
+            bottom: Radius.circular(15),
+          )),
           // height: size.height * 0.8,
           child: CameraPreview(
             widget.controller!,
@@ -75,9 +69,7 @@ class _LiveScreenState extends State<LiveScreen> {
                           constraints: const BoxConstraints(),
                         ),
                         InkWell(
-                          onTap: () async {
-
-                          },
+                          onTap: () async {},
                           child: Container(
                               height: 40,
                               width: 40,
@@ -92,8 +84,7 @@ class _LiveScreenState extends State<LiveScreen> {
                                 color: Colors.white,
                                 width: 10,
                                 // fit: BoxFit.contain,
-                              )
-                          ),
+                              )),
                         ),
                       ]),
                 ),
@@ -115,12 +106,10 @@ class _LiveScreenState extends State<LiveScreen> {
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                          color: Colors.white,
-                                          width: 3
-                                      )
-                                  ),
+                                          color: Colors.white, width: 3)),
                                   child: const CircleAvatar(
-                                    backgroundImage: AssetImage("assets/images/user.png"),
+                                    backgroundImage:
+                                        AssetImage("assets/images/user.png"),
                                   ),
                                 ),
                                 Positioned(
@@ -129,12 +118,10 @@ class _LiveScreenState extends State<LiveScreen> {
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                            color: Colors.white,
-                                            width: 3
-                                        )
-                                    ),
+                                            color: Colors.white, width: 3)),
                                     child: const CircleAvatar(
-                                      backgroundImage: AssetImage("assets/images/user.png"),
+                                      backgroundImage:
+                                          AssetImage("assets/images/user.png"),
                                     ),
                                   ),
                                 ),
@@ -144,12 +131,10 @@ class _LiveScreenState extends State<LiveScreen> {
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                            color: Colors.white,
-                                            width: 3
-                                        )
-                                    ),
+                                            color: Colors.white, width: 3)),
                                     child: const CircleAvatar(
-                                      backgroundImage: AssetImage("assets/images/user.png"),
+                                      backgroundImage:
+                                          AssetImage("assets/images/user.png"),
                                     ),
                                   ),
                                 ),
@@ -159,12 +144,10 @@ class _LiveScreenState extends State<LiveScreen> {
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                            color: Colors.white,
-                                            width: 3
-                                        )
-                                    ),
+                                            color: Colors.white, width: 3)),
                                     child: const CircleAvatar(
-                                      backgroundImage: AssetImage("assets/images/user.png"),
+                                      backgroundImage:
+                                          AssetImage("assets/images/user.png"),
                                     ),
                                   ),
                                 ),
@@ -174,18 +157,16 @@ class _LiveScreenState extends State<LiveScreen> {
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                            color: Colors.white,
-                                            width: 3
-                                        )
-                                    ),
+                                            color: Colors.white, width: 3)),
                                     child: const CircleAvatar(
-                                      backgroundImage: AssetImage("assets/images/user.png"),
+                                      backgroundImage:
+                                          AssetImage("assets/images/user.png"),
                                     ),
                                   ),
                                 ),
                                 const Positioned(
                                   left: 140,
-                                  child:  Padding(
+                                  child: Padding(
                                     padding: const EdgeInsets.only(top: 12.0),
                                     child: Text(
                                       "9 Reachers are active now",
@@ -193,12 +174,10 @@ class _LiveScreenState extends State<LiveScreen> {
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
-                                          fontWeight: FontWeight.w600
-                                      ),
+                                          fontWeight: FontWeight.w600),
                                     ),
                                   ),
                                 ),
-
                               ],
                             ),
                           ),

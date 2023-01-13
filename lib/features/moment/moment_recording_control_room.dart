@@ -1,16 +1,13 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/utils/dialog_box.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/video_previewer.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
+import 'package:reach_me/features/moment/video_previewer.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../../../core/services/media_service.dart';
 import '../../../../../../core/services/navigation/navigation_service.dart';
 import '../../../../../../core/utils/constants.dart';
 import '../../../../../../core/utils/custom_text.dart';

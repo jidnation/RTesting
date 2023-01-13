@@ -8,22 +8,24 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:neon_circular_timer/neon_circular_timer.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/host_post.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/live_screen.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/posting_type.dart';
 
-import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/controller.dart';
-import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/constants.dart';
-import '../../../../../../core/utils/count_down_timer.dart';
-import '../../../../../../core/utils/dimensions.dart';
-import '../../../../../../core/utils/file_utils.dart';
-import '../create.status.dart';
-import 'create_posting.dart';
+import '../../core/services/media_service.dart';
+import '../../core/services/moment/controller.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/constants.dart';
+import '../../core/utils/count_down_timer.dart';
+import '../../core/utils/dimensions.dart';
+import '../../core/utils/file_utils.dart';
+import '../home/presentation/views/status/create.status.dart';
+import '../home/presentation/views/status/widgets/create_posting.dart';
 import 'moment_posting.dart';
 import 'moment_posting_timer.dart';
 import 'moment_recording_control_room.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/host_post.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/live_screen.dart';
 
 class UserPosting extends StatefulHookWidget {
   final List<CameraDescription> phoneCameras;
@@ -52,6 +54,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
   bool _isRecordingInProgress = false;
   String selectedTime = '15s';
   int time = 15;
+
   void onNewCameraSelected(CameraDescription cameraDescription) async {
     final previousCameraController = controller;
     // Instantiating the camera controller
@@ -217,58 +220,60 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                           ]),
                     ),
                   ),
-                  Visibility(
-                    visible: index == 1,
-                    child: Positioned(
-                      bottom: 70,
-                      right: 0,
-                      left: 0,
-                      child: controller!.value.isRecordingVideo
-                          ? CountDownTimer(
-                              time: time,
-                              timeController: timeController,
-                              onFinish: () {
-                                stopRecording(context);
-                              },
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                  MomentPostingTimer(
-                                    time: '3m',
-                                    isSelected: selectedTime == '3m',
-                                    onClick: () {
-                                      setState(() {
-                                        selectedTime = '3m';
-                                        time = 3 * 60;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(width: 5),
-                                  MomentPostingTimer(
-                                    time: '60s',
-                                    isSelected: selectedTime == '60s',
-                                    onClick: () {
-                                      setState(() {
-                                        selectedTime = '60s';
-                                        time = 60;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(width: 5),
-                                  MomentPostingTimer(
-                                    time: '15s',
-                                    isSelected: selectedTime == '15s',
-                                    onClick: () {
-                                      setState(() {
-                                        selectedTime = '15s';
-                                        time = 15;
-                                      });
+                  index != 2
+                      ? Visibility(
+                          visible: index == 1,
+                          child: Positioned(
+                            bottom: 70,
+                            right: 0,
+                            left: 0,
+                            child: controller!.value.isRecordingVideo
+                                ? CountDownTimer(
+                                    time: time,
+                                    timeController: timeController,
+                                    onFinish: () {
+                                      stopRecording(context);
                                     },
                                   )
-                                ]),
-                    ),
-                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                        MomentPostingTimer(
+                                          time: '3m',
+                                          isSelected: selectedTime == '3m',
+                                          onClick: () {
+                                            setState(() {
+                                              selectedTime = '3m';
+                                              time = 3 * 60;
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(width: 5),
+                                        MomentPostingTimer(
+                                          time: '60s',
+                                          isSelected: selectedTime == '60s',
+                                          onClick: () {
+                                            setState(() {
+                                              selectedTime = '60s';
+                                              time = 60;
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(width: 5),
+                                        MomentPostingTimer(
+                                          time: '15s',
+                                          isSelected: selectedTime == '15s',
+                                          onClick: () {
+                                            setState(() {
+                                              selectedTime = '15s';
+                                              time = 15;
+                                            });
+                                          },
+                                        )
+                                      ]),
+                          ),
+                        )
+                      : Container()
                 ]),
                 const SizedBox(height: 20),
                 Row(
@@ -325,56 +330,73 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                       ),
                                     );
                               }
-                            : index == 1 ? () async {
-                                if (_isRecording) {
-                                  await stopRecording(context);
-                                  // _startVideoPlayer();
-                                } else {
-                                  print('..........stopped recording');
-                                  await momentVideoControl.startVideoRecording(
-                                    videoController: controller,
-                                  );
-                                }
-                              } : () async{
-                            RouteNavigators.route(context, HostPost());
-                      },
-                          child: Container(
-                            height: 80,
-                            width: 80,
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(70),
-                              color: _isRecording
-                                  ? Colors.red
-                                  : Colors.black.withOpacity(0.5),
-                            ),
-                            child: Container(
-                              height: 70,
-                              width: 70,
-                              padding: const EdgeInsets.all(22),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(70),
-                              ),
-                              child: index == 0
-                                  ? SvgPicture.asset(
-                                'assets/svgs/Camera.svg',
-                                color: AppColors.black,
-                              )
-                                  : index == 1
-                                  ? Image.asset(
-                                'assets/images/play-btn.png',
-                                fit: BoxFit.contain,
-                              )
-                                  : index == 2 ?
-                              SvgPicture.asset(
-                                  'assets/svgs/fluent_live-24-regular.svg',
-                                  fit: BoxFit.contain,
-                                  color: Colors.black
-                              ) :
-                              Container(),
-                            ),
+                            : index == 1
+                                ? () async {
+                                    if (_isRecording) {
+                                      await stopRecording(context);
+                                      // _startVideoPlayer();
+                                    } else {
+                                      print('..........stopped recording');
+                                      await momentVideoControl
+                                          .startVideoRecording(
+                                        videoController: controller,
+                                      );
+                                    }
+                                  }
+                                : () async {
+                                    globals.chatBloc!.add(
+                                        InitiateLiveStreamEvent(
+                                            startedAt: '12/31/2022'));
+                                    print(
+                                        "org ${globals.streamLive!.channelName}");
+                                    print("org ${globals.streamLive!.token}");
+                                    RouteNavigators.route(
+                                        context,
+                                        const HostPost(
+                                          isHost: true,
+                                        ));
+                                    // globals.chatBloc!.add(JoinStreamEvent(channelName: globals.streamLive!.channelName));
+                                    // RouteNavigators.route(context, const HostPost(isHost: true,));
+                                  },
+                        child: Container(
+                          height: 80,
+                          width: 80,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(70),
+                            color: _isRecording
+                                ? Colors.red
+                                : Colors.black.withOpacity(0.5),
                           ),
+                          child: Container(
+                            height: 70,
+                            width: 70,
+                            padding: const EdgeInsets.all(22),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(70),
+                            ),
+                            child: index == 0
+                                ? SvgPicture.asset(
+                                    'assets/svgs/Camera.svg',
+                                    color: AppColors.black,
+                                  )
+                                : index == 1
+                                    ? _isRecording
+                                        ? const Icon(
+                                            Icons.stop,
+                                            color: Colors.red,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/play-btn.png',
+                                            fit: BoxFit.contain,
+                                          )
+                                    : SvgPicture.asset(
+                                        'assets/svgs/fluent_live-24-regular.svg',
+                                        color: AppColors.black,
+                                      ),
+                          ),
+                        ),
                       ),
                       SizedBox(width: getScreenWidth(30)),
                       Row(mainAxisSize: MainAxisSize.min, children: [

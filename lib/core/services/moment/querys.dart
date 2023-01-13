@@ -2,19 +2,21 @@ import 'dart:developer';
 
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import '../../../features/home/presentation/views/status/widgets/user_posting.dart';
-import '../../../features/momentControlRoom/models/moment_model.dart';
+import '../../../features/moment/momentControlRoom/models/get_comments_model.dart';
+import '../../../features/moment/momentControlRoom/models/get_moment_feed.dart';
+import '../../../features/moment/user_posting.dart';
 import '../../utils/app_globals.dart';
 import 'graphql_strings.dart' as gql_string;
 
 class MomentQuery {
+  static String hostUrl = "https://live.myreach.me/";
   static Future<bool> postMoment(
       {required String videoMediaItem,
       List<String>? hashTags,
       List<String>? mentionList,
       String? sound}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -55,7 +57,7 @@ class MomentQuery {
 
   deleteMoment({required String momentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -80,7 +82,7 @@ class MomentQuery {
 
   likeMoment({required String momentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -106,7 +108,7 @@ class MomentQuery {
   Future<bool> likeMomentComment(
       {required String momentId, required String commentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -141,7 +143,7 @@ class MomentQuery {
     List<String>? images,
   }) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -181,7 +183,7 @@ class MomentQuery {
       required String commentId,
       required String content}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -211,7 +213,7 @@ class MomentQuery {
 
   reachUser({required String reachingId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -236,7 +238,7 @@ class MomentQuery {
 
   unlikeMoment({required String momentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -262,7 +264,7 @@ class MomentQuery {
   unlikeMomentComment(
       {required String commentId, required String likeId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -293,7 +295,7 @@ class MomentQuery {
       required int pageNumber,
       String? authIdToGet}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -332,7 +334,7 @@ class MomentQuery {
 
   Future<Moment?>? getMoment({required String momentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -363,7 +365,7 @@ class MomentQuery {
   Future<GetMomentComment?>? getMomentComment(
       {required String commentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -393,7 +395,7 @@ class MomentQuery {
 
   static getMomentLikes({required String momentId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -428,7 +430,7 @@ class MomentQuery {
     int? pageNumber,
   }) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },

@@ -38,10 +38,10 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
-import '../../../home/presentation/widgets/moment_audio_player.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -1046,7 +1046,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     )
                                   : ListView.builder(
                                       itemCount: _posts.value.length,
-                                      itemBuilder: (context, index) {                                        
+                                      itemBuilder: (context, index) {
                                         return _ReacherCard(
                                           postModel: _posts.value[index],
                                           // onLike: () {
@@ -1154,7 +1154,6 @@ class _AccountScreenState extends State<AccountScreen>
                                             }
                                           },
                                         );
-                                   
                                       },
                                     ),
                             ),
@@ -1342,7 +1341,7 @@ class _AccountScreenState extends State<AccountScreen>
                                         pageNumber: 1,
                                         voteType: 'Downvote',
                                         authId: ""));
-                              },   
+                              },
                               child: _shoutDowns.value.isEmpty
                                   ? ListView(
                                       padding: EdgeInsets.zero,
@@ -1793,7 +1792,7 @@ class _ReacherCard extends HookWidget {
                                    TimeLineVideoPlayer(
                                                     post: postModel!,
                                                      videoUrl: postModel!.videoMediaItem!)
-                                         
+
                                           else
                   (postModel!.audioMediaItem ?? '').isNotEmpty
                       ?Container(
@@ -2277,9 +2276,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   late final _commentsRefreshController =
       RefreshController(initialRefresh: false);
 
-  late final _likesRefreshController =
-      RefreshController(initialRefresh: false);
-        Set active = {};
+  late final _likesRefreshController = RefreshController(initialRefresh: false);
+  Set active = {};
 
   handleTap(index) {
     if (active.isNotEmpty) active.clear();
@@ -3284,58 +3282,60 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                           onMessage: () {
                                            // reachDM.value = true;
 
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _likedPosts
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Upvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Downvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onLike: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              if (_likedPosts.value[index].like!
-                                                  .isNotEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _likedPosts
-                                                      .value[index].postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _likedPosts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Upvote',
                                                       postId: _likedPosts
-                                                          .value[index].postId),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        );
-                                   
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Downvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_likedPosts.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _likedPosts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _likedPosts
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
                                             },
                                           ),
                                   ),

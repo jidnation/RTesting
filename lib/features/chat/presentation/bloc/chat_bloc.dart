@@ -9,6 +9,7 @@ import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/data/repositories/chat_repository.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 
 part 'chat_event.dart';
@@ -136,6 +137,40 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       } on GraphQLError catch (e) {
         emit(ChatUploadError(error: e.message));
+      }
+    });
+
+    on<InitiateLiveStreamEvent>((event, emit) async {
+      emit(ChatLoading());
+      try {
+        final response =
+            await chatRepository.initiateLiveStream(startedAt: event.startedAt);
+        response.fold(
+          (error) => emit(ChatError(error: error)),
+          (live) {
+            globals.streamLive = live;
+            print("the ${live.channelName}");
+            print("the ${live.token}");
+            emit(InitiateLiveStreamingSuccess(live: live));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(ChatError(error: e.message));
+      }
+    });
+
+    on<JoinStreamEvent>((event, emit) async {
+      emit(ChatLoading());
+
+      try {
+        final response =
+            await chatRepository.joinStream(channelName: event.channelName);
+        response.fold(
+            (error) => emit(ChatError(error: error)),
+            (joinLiveStream) =>
+                emit(JoinLiveStreamSuccess(joinLiveStream: joinLiveStream)));
+      } on GraphQLError catch (e) {
+        emit(ChatError(error: e.message));
       }
     });
   }
