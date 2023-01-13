@@ -1,6 +1,7 @@
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoPreview extends StatefulWidget {
   final bool isLocalVideo;
@@ -22,11 +23,16 @@ class VideoPreview extends StatefulWidget {
 
 class _VideoPreviewState extends State<VideoPreview> {
   late BetterPlayerController _betterPlayerController;
+  late VideoPlayerController _videoPlayerController;
 
   @override
   void initState() {
     super.initState();
+    initBetterPlayer();
+    // initializePlayer();
+  }
 
+  void initBetterPlayer() {
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
             placeholder: Center(
@@ -92,26 +98,6 @@ class _VideoPreviewState extends State<VideoPreview> {
         child: BetterPlayer(
           controller: _betterPlayerController,
         ),
-        // child: BetterPlayer(
-        //   controller: BetterPlayerController(
-        //     BetterPlayerConfiguration(
-        //         autoDispose: true,
-        //         overlay: Container(
-        //           width: double.infinity,
-        //           color: AppColors.black.withOpacity(0.1),
-        //         ),
-        //         controlsConfiguration: const BetterPlayerControlsConfiguration(
-        //             enableQualities: false,
-        //             enableSubtitles: false,
-        //             enableAudioTracks: false,
-        //             enableOverflowMenu: false),
-        //         autoPlay: true,
-        //         aspectRatio: widget.aspectRatio ?? 0.8),
-        //     betterPlayerDataSource: widget.isLocalVideo
-        //         ? BetterPlayerDataSource.file(widget.path)
-        //         : BetterPlayerDataSource.network(widget.path),
-        //   ),
-        // ),
       ),
     );
   }

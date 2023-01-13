@@ -153,7 +153,8 @@ class ViewMyStatus extends HookWidget {
                           width: size.width,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(story.statusData!.background!),
+                              image: AssetImage(
+                                  story.statusData?.background ?? ''),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -161,8 +162,9 @@ class ViewMyStatus extends HookWidget {
                             child: Text(
                               story.statusData!.caption!,
                               textAlign: Helper.getAlignment(
-                                  story.statusData!.alignment!)['align'],
-                              style: Helper.getFont(story.statusData!.font!),
+                                  story.statusData?.alignment ?? '')['align'],
+                              style:
+                                  Helper.getFont(story.statusData?.font ?? ''),
                             ),
                           ),
                         ),

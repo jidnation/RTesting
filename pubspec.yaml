@@ -125,7 +125,9 @@ dependencies:
   path: ^1.8.2
   flutter_audio_cutter: ^1.0.3+1
   flutter_cache_manager: ^3.3.0
-  better_player: ^0.0.83
+  better_player:
+    git:
+      url: https://github.com/tintran-dev/betterplayer.git
   uuid: ^3.0.7
 #  light_compressor: ^2.0.1
   ffmpeg_kit_flutter: ^4.5.1

@@ -19,7 +19,7 @@ class PostReactors extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _loading = useState(false);
+    final _loading = useState(true);
     final _reactors = useState<List<VirtualPostLikeModel>>([]);
     useEffect(() {
       globals.socialServiceBloc!.add(GetLikesOnPostEvent(postId: postId));
