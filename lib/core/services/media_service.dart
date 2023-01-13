@@ -5,11 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_cutter/audio_cutter.dart';
+// import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
-// import 'package:light_compressor/light_compressor.dart';
+//import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;
@@ -236,7 +238,7 @@ class MediaService {
   //   //   filePath,
   //   //   quality: VideoQuality.DefaultQuality,
   //   // );
-  //
+
   //   // print('size1:::::::::::::::${res!.filesize! / 1024}');
   //   return response.destinationPath;
   // }
@@ -417,7 +419,7 @@ class MediaService {
   //   } else if (await Permission.storage.isPermanentlyDenied) {
   //     openAppSettings();
   //   } else {
-  //     return null;
+  //     return null;ad
   //   }
   //   return null;
   // }

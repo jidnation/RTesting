@@ -70,3 +70,14 @@ class UploadImageFileEvent extends ChatEvent {
   UploadImageFileEvent({required this.file});
   final File file;
 }
+
+class InitiateLiveStreamEvent extends ChatEvent {
+  final String startedAt;
+
+  InitiateLiveStreamEvent({required this.startedAt});
+}
+
+class JoinStreamEvent extends ChatEvent {
+  final String channelName;
+  JoinStreamEvent({required this.channelName});
+}

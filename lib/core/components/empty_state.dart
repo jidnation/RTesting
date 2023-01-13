@@ -66,6 +66,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                 listener: (context, state) {
                   if (state is UserLoaded) {
                     reachingUser.value = false;
+                    // setState(() {});
                   }
                   if (state is UserError) {
                     if (state.error!.contains('reaching')) {
@@ -129,16 +130,15 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                   // if (suggestedUsers
                                   //         .value[index].reaching!.reacherId ==
                                   //     null) {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            suggestedUsers.value[index].id!));
-                                  }
-                                   else {
-                                    globals.userBloc!.add(
-                                        DelReachRelationshipEvent(
-                                            userIdToDelete: suggestedUsers
-                                                .value[index].id!));
-                                  }
+                                  globals.userBloc!.add(ReachUserEvent(
+                                      userIdToReach:
+                                          suggestedUsers.value[index].id!));
+                                } else {
+                                  globals.userBloc!.add(
+                                      DelReachRelationshipEvent(
+                                          userIdToDelete:
+                                              suggestedUsers.value[index].id!));
+                                }
                                 //}
                               },
                               onDelete: () {
@@ -161,8 +161,9 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                               isLoading: active.contains(index)
                                   ? reachingUser.value
                                   : false,
-                              label:
-                                  active.contains(index) ? reachLabel.value : 'Reach',
+                              label: active.contains(index)
+                                  ? reachLabel.value
+                                  : 'Reach',
                             );
                           },
                           itemCount: suggestedUsers.value.length,
@@ -364,6 +365,7 @@ class SkeletonLoadingWidget extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 5,
       itemBuilder: (context, index) => Padding(

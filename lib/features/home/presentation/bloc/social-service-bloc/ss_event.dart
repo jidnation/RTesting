@@ -181,8 +181,8 @@ class DeleteSavedPostEvent extends SocialServiceEvent {
 }
 
 class GetSingleCommentOnPostEvent extends SocialServiceEvent {
-  final String? postId;
-  GetSingleCommentOnPostEvent({required this.postId});
+  final String? commentId;
+  GetSingleCommentOnPostEvent({required this.commentId});
 }
 
 class GetPostFeedEvent extends SocialServiceEvent {

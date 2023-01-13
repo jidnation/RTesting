@@ -10,11 +10,14 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dialog.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
+import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/app_globals.dart';
 import '../../../account/presentation/views/account.dart';
+import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/video_player.dart';
 
 class RepostedPost extends StatelessWidget {
   final PostModel post;
@@ -43,10 +46,8 @@ class RepostedPost extends StatelessWidget {
                 minSize: 0,
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                 
                   final progress = ProgressHUD.of(context);
-                  progress
-                      ?.showWithText('Viewing Reacher...');
+                  progress?.showWithText('Viewing Reacher...');
                   // Future.delayed(const Duration(seconds: 3),
                   //         () {
                   //       globals.userBloc!.add(
@@ -66,24 +67,22 @@ class RepostedPost extends StatelessWidget {
                   //       progress?.dismiss();
                   //     });
 
-                   Future.delayed(const Duration(seconds: 3),
-                          () {
-                        globals.userBloc!.add(
-                            GetRecipientProfileEvent(
-                                email: post.repostedPostOwnerProfile!.authId));
-                         post.repostedPostOwnerProfile!.authId ==
-                            globals.user!.id
-                            ? RouteNavigators.route(
-                            context, const AccountScreen())
-                            : RouteNavigators.route(
+                  Future.delayed(const Duration(seconds: 3), () {
+                    globals.userBloc!.add(GetRecipientProfileEvent(
+                        email: post.repostedPostOwnerProfile!.authId));
+                    post.repostedPostOwnerProfile!.authId == globals.user!.id
+                        ? RouteNavigators.route(context, const AccountScreen())
+                        : RouteNavigators.route(
                             context,
                             RecipientAccountProfile(
                               recipientEmail: 'email',
-                              recipientImageUrl:  post.repostedPostOwnerProfile!.profilePicture,
-                              recipientId:  post.repostedPostOwnerProfile!.authId,
+                              recipientImageUrl:
+                                  post.repostedPostOwnerProfile!.profilePicture,
+                              recipientId:
+                                  post.repostedPostOwnerProfile!.authId,
                             ));
-                        progress?.dismiss();
-                      });
+                    progress?.dismiss();
+                  });
                 },
                 child: Row(
                   children: [
@@ -199,10 +198,30 @@ class RepostedPost extends StatelessWidget {
                   ],
                 ).paddingSymmetric(h: 16, v: 10),
           if ((post.repostedPost?.imageMediaItems ?? []).isNotEmpty)
-            Helper.renderPostImages(post.repostedPost!, context)
-                .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+            PostMedia(post: post).paddingOnly(r: 16, l: 16, b: 16, t: 10)
           else
             const SizedBox.shrink(),
+          if ((post.repostedPost?.videoMediaItem ?? '').isNotEmpty)
+            TimeLineVideoPlayer(
+                post: post, videoUrl: post.repostedPost?.videoMediaItem ?? '')
+          else
+            const SizedBox.shrink(),
+          (post.repostedPost?.audioMediaItem ?? '').isNotEmpty
+              ? Container(
+                  height: 59,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  width: SizeConfig.screenWidth,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xfff5f5f5)),
+                  child: Row(children: [
+                    Expanded(
+                        child: MomentAudioPlayer(
+                      audioPath: post.repostedPost?.audioMediaItem ?? '',
+                    )),
+                  ]),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );

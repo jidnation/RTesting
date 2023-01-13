@@ -13,6 +13,8 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
 
+import '../../features/call/presentation/bloc/call_bloc.dart';
+
 final GetIt getIt = GetIt.instance;
 
 class AppGlobals {
@@ -25,6 +27,8 @@ class AppGlobals {
   AuthBloc? authBloc;
   UserBloc? userBloc;
   ChatBloc? chatBloc;
+  CallBloc? callBloc;
+
   SocialServiceBloc? socialServiceBloc;
   DictionaryBloc? dictionaryBloc;
   String? token;
@@ -57,6 +61,7 @@ class AppGlobals {
     authBloc = AuthBloc();
     userBloc = UserBloc();
     chatBloc = ChatBloc();
+    callBloc = CallBloc();
     socialServiceBloc = SocialServiceBloc();
     dictionaryBloc = DictionaryBloc();
     token = '';
@@ -75,6 +80,7 @@ class AppGlobals {
     authBloc!.close();
     userBloc!.close();
     chatBloc!.close();
+    callBloc!.close();
     socialServiceBloc!.close();
     dictionaryBloc!.close();
   }

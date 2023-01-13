@@ -41,6 +41,9 @@ import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 
+import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/video_player.dart';
+
 class AccountScreen extends StatefulHookWidget {
   static const String id = "account_screen";
   const AccountScreen({Key? key}) : super(key: key);
@@ -1772,15 +1775,33 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if ((postModel!.imageMediaItems ?? []).isNotEmpty ||
-                      (postModel!.videoMediaItem ?? '').isNotEmpty)
+                  if ((postModel!.imageMediaItems ?? []).isNotEmpty )
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
+                      if(  (postModel!.videoMediaItem ?? '')
+                                  .isNotEmpty)
+                                   TimeLineVideoPlayer(
+                                                    post: postModel!,
+                                                     videoUrl: postModel!.videoMediaItem!)
+
+                                          else
                   (postModel!.audioMediaItem ?? '').isNotEmpty
-                      ? PostAudioMedia(path: postModel!.audioMediaItem!)
-                          .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                      ?Container(
+                        height: 59,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        width: SizeConfig.screenWidth,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: const Color(0xfff5f5f5)),
+                        child: Row(children: [
+                          Expanded(
+                              child: MomentAudioPlayer(
+                            audioPath: postModel!.audioMediaItem!,
+                          )),
+                        ]),
+                      )
                       : const SizedBox.shrink(),
                   (postModel?.repostedPost != null)
                       ? RepostedPost(
@@ -2248,6 +2269,16 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   late final _commentsRefreshController =
       RefreshController(initialRefresh: false);
 
+  late final _likesRefreshController = RefreshController(initialRefresh: false);
+  Set active = {};
+
+  handleTap(index) {
+    if (active.isNotEmpty) active.clear();
+    setState(() {
+      active.add(index);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -2384,6 +2415,12 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             Snackbars.error(context, message: state.error);
             _reachoutsRefreshController.refreshFailed();
           }
+
+             if (state is GetLikedPostsSuccess) {
+                  debugPrint("LikedPosts ${state.posts}");
+                  _likedPosts.value = state.posts!;
+                  _likesRefreshController.refreshCompleted();
+                }
           if (state is GetPersonalCommentsSuccess) {
             _comments.value = state.data!;
             _commentsRefreshController.refreshCompleted();
@@ -3119,34 +3156,34 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                                       ));
                                                 },
                                                 onComment: () {
-                                                  RouteNavigators.route(
-                                                      context,
-                                                      ViewCommentsScreen(
-                                                        post: PostFeedModel(
-                                                            firstName: globals
-                                                                .recipientUser!
-                                                                .firstName,
-                                                            lastName: globals
-                                                                .recipientUser!
-                                                                .lastName,
-                                                            location: globals
-                                                                .recipientUser!
-                                                                .location,
-                                                            profilePicture: globals
-                                                                .recipientUser!
-                                                                .profilePicture,
-                                                            postId: _posts
-                                                                .value[index]
-                                                                .postId,
-                                                            postOwnerId: globals
-                                                                .recipientUser!
-                                                                .id,
-                                                            username: globals
-                                                                .recipientUser!
-                                                                .username,
-                                                            post: _posts
-                                                                .value[index]),
-                                                      ));
+                                                  // RouteNavigators.route(
+                                                  //     context,
+                                                  //     ViewCommentsScreen(
+                                                  //       post: PostFeedModel(
+                                                  //           firstName: globals
+                                                  //               .recipientUser!
+                                                  //               .firstName,
+                                                  //           lastName: globals
+                                                  //               .recipientUser!
+                                                  //               .lastName,
+                                                  //           location: globals
+                                                  //               .recipientUser!
+                                                  //               .location,
+                                                  //           profilePicture: globals
+                                                  //               .recipientUser!
+                                                  //               .profilePicture,
+                                                  //           postId: _posts
+                                                  //               .value[index]
+                                                  //               .postId,
+                                                  //           postOwnerId: globals
+                                                  //               .recipientUser!
+                                                  //               .id,
+                                                  //           username: globals
+                                                  //               .recipientUser!
+                                                  //               .username,
+                                                  //           post: _posts
+                                                  //               .value[index]),
+                                                  //     ));
                                                 },
                                               );
                                             },
@@ -3190,8 +3227,22 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                           ),
                                   ),
 
-                                //LIKES TAB
-                                ListView(
+                                // RECEPIENT LIKES TAB
+                                  if (timelineLoading)
+                                  const CircularLoader()
+                                  else
+                                      Refresher(
+                                    controller: _likesRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetLikedPostsEvent(
+                                        pageLimit: 50,
+                                        pageNumber: 1,
+                                        authId: widget.recipientId,
+                                      ));
+                                    },
+                                    child: _likedPosts.value.isEmpty
+                                        ?       ListView(
                                   padding: EdgeInsets.zero,
                                   shrinkWrap: true,
                                   children: const [
@@ -3200,7 +3251,91 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       subtitle: "Find post they liked",
                                     )
                                   ],
-                                ),
+                                )
+                                        : ListView.builder(
+                                            itemCount: _likedPosts.value.length,
+                                            itemBuilder: (context, index) {
+                                           return PostFeedReacherCard(
+                                          likingPost: false,
+                                          postFeedModel:
+                                              _likedPosts.value[index],
+                                          isLiked: _likedPosts
+                                                  .value[index].like!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          isVoted: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? true
+                                              : false,
+                                          voteType: _likedPosts
+                                                  .value[index].vote!.isNotEmpty
+                                              ? _likedPosts.value[index]
+                                                  .vote![0].voteType
+                                              : null,
+                                          onMessage: () {
+                                           // reachDM.value = true;
+
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _likedPosts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Upvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Downvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_likedPosts.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _likedPosts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _likedPosts
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
+
+                                
+                                  
+                          
                               ],
                             ),
                           ),

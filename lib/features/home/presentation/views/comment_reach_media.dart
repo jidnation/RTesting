@@ -28,9 +28,16 @@ class CommentReachMedia extends HookWidget {
   @override
   Widget build(BuildContext context) {
     bool isVideo = FileUtils.isVideo(fileResult.file);
+    bool isAudio = FileUtils.isAudio(fileResult.file);
+
     String? duration = fileResult.duration == null
         ? null
         : StringUtil.formatDuration(Duration(seconds: fileResult.duration!));
+
+    if (isAudio) {
+      return CommentReachAudioMedia(
+          path: fileResult.file.path, onCancel: onClose!);
+    }
 
     return Stack(
       alignment: Alignment.topRight,

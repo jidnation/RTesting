@@ -11,7 +11,12 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository? _authRepository = AuthRepository();
+
   AuthBloc() : super(AuthInitial()) {
+    on<LogoutEvent>((event, emit) {
+      _authRepository!.deregisterDeviceForNotifications();
+    });
+
     on<RegisterUserEvent>(((event, emit) async {
       emit(AuthLoading());
       try {
@@ -60,6 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             SecureStorage.writeSecureData('email', globals.email!);
             SecureStorage.writeSecureData('fname', user.firstName!);
             SecureStorage.writeSecureData('userId', user.id!);
+            _authRepository!.registerDeviceForNotifications();
             emit(Authenticated(message: 'User logged in successfully'));
           },
         );

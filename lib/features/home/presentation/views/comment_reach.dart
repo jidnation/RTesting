@@ -1,34 +1,27 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:permission_handler/permission_handler.dart' as permit;
-import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/presentation/views/full_post.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_reach_media.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:audio_waveforms/audio_waveforms.dart';
 
 import '../../../../core/components/snackbar.dart';
-import '../../../../core/models/file_result.dart';
 import '../../../../core/services/audio_recording_service.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -36,19 +29,18 @@ import '../../../../core/utils/app_globals.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/file_utils.dart';
-import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/regex_util.dart';
 import '../../../account/presentation/views/account.dart';
-import '../../../account/presentation/widgets/bottom_sheets.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
+import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
 import '../bloc/user-bloc/user_bloc.dart';
-
 import '../widgets/post_media.dart';
 import 'comment_reach_media.dart';
 
@@ -156,7 +148,7 @@ class _CommentReachState extends State<CommentReach> {
     final _recentWords = useState<List<Map<String, dynamic>>>([]);
     final _mentionUsers = useState<List<Map<String, dynamic>>>([]);
     final _mentionList = useState<List<String>>([]);
-    // final imageList = useState<List<UploadFileDto>>([]);
+    var media = useState<UploadFileDto?>(null);
 
     useMemoized(() {
       globals.dictionaryBloc!
@@ -244,18 +236,25 @@ class _CommentReachState extends State<CommentReach> {
                         onPressed: () => RouteNavigators.pop(context),
                       ),
                       const SizedBox(width: 20),
-                      RichText(
-                          text: TextSpan(
-                              text: 'Reply to ',
-                              style: const TextStyle(
-                                  color: AppColors.textColor5, fontSize: 16),
-                              children: [
-                            TextSpan(
-                              text: '@${widget.postFeedModel!.username}',
-                              style: const TextStyle(
-                                  color: AppColors.primaryColor, fontSize: 16),
-                            )
-                          ]))
+                      SizedBox(
+                        width: SizeConfig.screenWidth * 0.6,
+                        child: FittedBox(
+                          child: RichText(
+                              text: TextSpan(
+                                  text: 'Reply to ',
+                                  style: const TextStyle(
+                                      color: AppColors.textColor5,
+                                      fontSize: 16),
+                                  children: [
+                                TextSpan(
+                                  text: '@${widget.postFeedModel!.username}',
+                                  style: const TextStyle(
+                                      color: AppColors.primaryColor,
+                                      fontSize: 16),
+                                )
+                              ])),
+                        ),
+                      )
                     ],
                   ),
                   IconButton(
@@ -263,18 +262,20 @@ class _CommentReachState extends State<CommentReach> {
                     onPressed: () {
                       if (controllerKey
                               .currentState!.controller!.text.isNotEmpty ||
-                          _mediaList.isNotEmpty) {
-                        if (_mediaList.isNotEmpty) {
+                          media.value != null) {
+                        if (media.value != null) {
                           globals.socialServiceBloc!
-                              .add(UploadPostMediaEvent(media: _mediaList));
+                              .add(MediaUploadEvent(media: media.value!.file));
+                          // .add(UploadPostMediaEvent(media: _mediaList));
+                          globals.postContent =
+                              controllerKey.currentState!.controller?.text ??
+                                  ' ';
                         } else {
                           globals.socialServiceBloc!.add(CommentOnPostEvent(
                               postId: widget.postFeedModel!.post!.postId,
                               content:
                                   controllerKey.currentState!.controller!.text,
-
                               //audioMediaItem: ' ',
-
                               userId: globals.user!.id,
                               postOwnerId: widget.postFeedModel!.post!
                                   .postOwnerProfile!.authId));
@@ -291,7 +292,10 @@ class _CommentReachState extends State<CommentReach> {
                         //         postRating: 'normal',
                         //         commentOption: 'everyone')));
                       }
-                      RouteNavigators.pop(context);
+
+                      RouteNavigators.route(context,
+                          FullPostScreen(postFeedModel: widget.postFeedModel));
+                      controllerKey.currentState!.controller!.clear();
                     },
                   ),
                 ],
@@ -567,21 +571,38 @@ class _CommentReachState extends State<CommentReach> {
                                     ],
                                   ).paddingSymmetric(h: 16, v: 10),
                             if ((widget.postFeedModel?.post?.imageMediaItems ??
-                                        [])
-                                    .isNotEmpty ||
-                                (widget.postFeedModel?.post?.videoMediaItem ??
-                                        '')
-                                    .isNotEmpty)
+                                    [])
+                                .isNotEmpty)
                               PostMedia(post: widget.postFeedModel!.post!)
                                   .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                             else
                               const SizedBox.shrink(),
+                            if ((widget.postFeedModel?.post?.videoMediaItem ??
+                                    '')
+                                .isNotEmpty)
+                              TimeLineVideoPlayer(
+                                  post: widget.postFeedModel!.post!,
+                                  videoUrl: widget
+                                      .postFeedModel!.post!.videoMediaItem!)
+                            else
+                              const SizedBox.shrink(),
                             (widget.postFeedModel?.post?.audioMediaItem ?? '')
                                     .isNotEmpty
-                                ? PostAudioMedia(
-                                        path: widget.postFeedModel!.post!
-                                            .audioMediaItem!)
-                                    .paddingOnly(l: 16, r: 16, b: 10, t: 0)
+                                ? Container(
+                                    height: 59,
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    width: SizeConfig.screenWidth,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: const Color(0xfff5f5f5)),
+                                    child: Row(children: [
+                                      Expanded(
+                                          child: MomentAudioPlayer(
+                                        audioPath: widget.postFeedModel!.post!
+                                            .audioMediaItem!,
+                                      )),
+                                    ]),
+                                  )
                                 : const SizedBox.shrink(),
                           ],
                         ),
@@ -619,8 +640,8 @@ class _CommentReachState extends State<CommentReach> {
                             key: controllerKey,
                             maxLengthEnforcement: MaxLengthEnforcement.enforced,
                             maxLength: 1100,
+                            focusNode: focusNode,
                             // minLines: null,
-
                             suggestionPosition: SuggestionPosition.Bottom,
                             onChanged: (val) {
                               counter.value = val
@@ -636,6 +657,7 @@ class _CommentReachState extends State<CommentReach> {
                                 // });
                               }
                             },
+
                             decoration: const InputDecoration(
                               counterText: '',
                               hintText: "Comment to this reach",
@@ -794,62 +816,38 @@ class _CommentReachState extends State<CommentReach> {
                       ),
 
                       const SizedBox(height: 10),
-                      if (_mediaList.isNotEmpty)
+                      // if (_mediaList.isNotEmpty)
+                      if (media.value != null)
                         CommentReachMedia(
-                          fileResult: _mediaList
-                              .where((e) =>
-                                  FileUtils.isImage(e.file) ||
-                                  FileUtils.isVideo(e.file))
-                              .first
-                              .fileResult!,
+                          fileResult: media.value!.fileResult!,
+                          //  _mediaList
+                          //     .where((e) =>
+                          //         FileUtils.isImage(e.file) ||
+                          //         FileUtils.isVideo(e.file))
+                          //     .first
+                          //     .fileResult!,
                           onClose: () {
-                            //_mediaList.clear();
-                           setState(() {
-                               _mediaList = [..._mediaList]..removeAt(0);
-                           });
+                            // setState(() {
+                            //   _mediaList = [..._mediaList]..removeAt(0);
+                            // });
+                            media.value = null;
                           },
                         )
                       else
                         const SizedBox.shrink(),
-                      if (_mediaList
-                              //     .where((e) => FileUtils.isAudio(e.file)) ==
-                              // _mediaList.value
-                              //     .firstWhere((e) => FileUtils.isAudio(e.file))
-                              .indexWhere((e) => FileUtils.isAudio(e.file)) >=
-                          0)
-                        CommentReachAudioMedia(
-                            path: _mediaList.first.file.path,
-                            onCancel: () {
-                              _mediaList = [..._mediaList]..removeAt(0);
-                            })
-                      else
-                        const SizedBox.shrink(),
-
-                      ValueListenableBuilder(
-                          valueListenable: _recording.recording,
-                          builder: (BuildContext context, bool value,
-                              Widget? child) {
-                            return Visibility(
-                                visible: value,
-                                child: AudioRecordWidget(
-                                  recorderController:
-                                      _recording.recorderController,
-                                  onSend: () async {
-                                    final res = await _recording.stop();
-                                    if (res == null) return;
-                                    _mediaList = [
-                                      ..._mediaList,
-                                      UploadFileDto(
-                                          file: res.file,
-                                          id: Random().nextInt(100).toString(),
-                                          fileResult: res)
-                                    ];
-                                  },
-                                  onDelete: () {
-                                    _recording.stop();
-                                  },
-                                ));
-                          })
+                      // if (_mediaList
+                      //         //     .where((e) => FileUtils.isAudio(e.file)) ==
+                      //         // _mediaList.value
+                      //         //     .firstWhere((e) => FileUtils.isAudio(e.file))
+                      //         .indexWhere((e) => FileUtils.isAudio(e.file)) >=
+                      //     0)
+                      //   CommentReachAudioMedia(
+                      //       path: _mediaList.first.file.path,
+                      //       onCancel: () {
+                      //         _mediaList = [..._mediaList]..removeAt(0);
+                      //       })
+                      // else
+                      //   const SizedBox.shrink(),
 
                       //                                   value: 'Sensitive',
                       //                                   activeColor: AppColors
@@ -1219,20 +1217,29 @@ class _CommentReachState extends State<CommentReach> {
                                                 if (image == null) {
                                                   return;
                                                 } else {
-                                                  for (var e in image) {
-                                                    setState(() {
-                                                      _mediaList.add(
-                                                          UploadFileDto(
-                                                              file: e.file,
-                                                              fileResult: e,
-                                                              id: Random()
-                                                                  .nextInt(100)
-                                                                  .toString()));
-                                                    });
+                                                  // for (var e in image) {
+                                                  //   setState(() {
+                                                  //     _mediaList.add(
+                                                  //         UploadFileDto(
+                                                  //             file: e.file,
+                                                  //             fileResult: e,
+                                                  //             id: Random()
+                                                  //                 .nextInt(100)
+                                                  //                 .toString()));
+                                                  //   });
 
-                                                    debugPrint(
-                                                        "MediaList $_mediaList");
-                                                  }
+                                                  //   debugPrint(
+                                                  //       "MediaList $_mediaList");
+                                                  // }
+
+                                                  media.value = UploadFileDto(
+                                                      file: image.first.file,
+                                                      fileResult: image.first,
+                                                      id: Random()
+                                                          .nextInt(100)
+                                                          .toString());
+                                                  print(
+                                                      'image is ${media.value!.fileResult!.file.path}');
                                                 }
                                                 // globals.socialServiceBloc!
                                                 //     .add(UploadPostMediaEvent(
@@ -1256,29 +1263,6 @@ class _CommentReachState extends State<CommentReach> {
                               const SizedBox(width: 20),
                               IconButton(
                                   onPressed: () async {
-                                    // setState(() {
-                                    //   isRecording = true;
-                                    //   emojiShowing = false;
-                                    // });
-                                    // var tempDir =
-                                    //     await getTemporaryDirectory();
-                                    // path =
-                                    //     '${tempDir.path}/comment_sound.aac';
-
-                                    // await recorderController.record(path);
-
-                                    // if (isRecording) {
-                                    //   path =
-                                    //       await recorderController.stop();
-                                    //   print(path);
-                                    //   File audio = File(path!);
-                                    //   globals.socialServiceBloc!.add(
-                                    //       MediaUploadEvent(media: audio));
-                                    // } else {
-                                    //   await recorderController
-                                    //       .record(path);
-                                    // }
-
                                     _recording.record(
                                         fileName: 'comment_reach_aud.aac');
                                   },
@@ -1324,13 +1308,16 @@ class _CommentReachState extends State<CommentReach> {
                                   textAlign: TextAlign.center,
                                 )),
                             onEmojiSelected: (category, emoji) {
-                              controller
-                                ..text += emoji.emoji
-                                ..selection = TextSelection.fromPosition(
-                                    TextPosition(
-                                        offset: controller.text.length));
+                              controllerKey.currentState!.controller!.text +=
+                                  emoji.emoji;
+                              // ..selection = TextSelection.fromPosition(
+                              //     TextPosition(
+                              //         offset: controllerKey.currentState!
+                              //             .controller!.text.length));
                               setState(() {
-                                controller.text = controller.text;
+                                controllerKey.currentState!.controller!.text =
+                                    controllerKey
+                                        .currentState!.controller!.text;
                               });
                               if (!isTyping.value) {
                                 setState(() {
@@ -1341,6 +1328,36 @@ class _CommentReachState extends State<CommentReach> {
                           ),
                         ),
                       ),
+                      ValueListenableBuilder(
+                          valueListenable: _recording.recording,
+                          builder: (BuildContext context, bool value,
+                              Widget? child) {
+                            return Visibility(
+                                visible: value,
+                                child: AudioRecordWidget(
+                                  recorderController:
+                                      _recording.recorderController,
+                                  onSend: () async {
+                                    final res = await _recording.stop();
+                                    if (res == null) return;
+
+                                    media.value = UploadFileDto(
+                                        file: res.file,
+                                        id: Random().nextInt(100).toString(),
+                                        fileResult: res);
+                                    // _mediaList = [
+                                    //   ..._mediaList,
+                                    //   UploadFileDto(
+                                    //       file: res.file,
+                                    //       id: Random().nextInt(100).toString(),
+                                    //       fileResult: res)
+                                    // ];
+                                  },
+                                  onDelete: () {
+                                    _recording.stop();
+                                  },
+                                ));
+                          })
                       // isRecording
                       //     ? Row(
                       //         children: [

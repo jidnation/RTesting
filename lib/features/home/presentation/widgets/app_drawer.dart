@@ -8,14 +8,13 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
+import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
-
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
 class AppDrawer extends HookWidget {
@@ -297,6 +296,7 @@ class AppDrawer extends HookWidget {
             action: 'Logout',
             icon: 'assets/svgs/logout.svg',
             onPressed: () {
+              globals.authBloc!.add(LogoutEvent());
               SecureStorage.deleteSecureData();
               RouteNavigators.routeNoWayHome(context, const LoginScreen());
             },

@@ -29,7 +29,8 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
     super.initState();
 
     setAudio(widget.sourceFile);
-
+  
+  
     myAudioPlayer.onPlayerStateChanged.listen((event) {
       setState(() {
         isPlaying = event == PlayerState.playing;

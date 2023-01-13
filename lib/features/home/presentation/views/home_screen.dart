@@ -9,10 +9,10 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/notification.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
-import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
-import 'moment_feed.dart';
+import '../../../moment/moment_feed.dart';
+import '../../../timeline/timeline_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
   static const String id = "home_screen";
@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     momentFeedStore.initialize();
+    timeLineFeedStore.initialize();
     super.initState();
   }
 
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     final pages = [
-      TimelineScreen(scaffoldKey: scaffoldKey.value),
+      // TimelineScreen(scaffoldKey: scaffoldKey.value),
+      TimeLineFeed(scaffoldKey: scaffoldKey.value),
       SearchScreen(scaffoldKey: scaffoldKey.value),
       // const VideoMomentScreen(),
       // TestingScreen(),

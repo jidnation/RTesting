@@ -109,19 +109,19 @@ class SavePostSchema {
 
 class CommentSchema {
   CommentSchema._();
-
   static String get schema {
     return r'''
-            commentId 
+            commentId
             authId
             commentSlug
             content
             created_at
-            nComments
+            nReplies
             nLikes
             postId
             imageMediaItems
             audioMediaItem
+            videoMediaItem
             isLiked
             postOwnerProfile {
               ''' +
@@ -160,6 +160,8 @@ class CommentProfileSchema {
   static String get schema {
     return r'''
             firstName
+            authId
+            bio
             lastName
             location
             profilePicture
@@ -245,6 +247,7 @@ class CommentLikeSchema {
 
   static String get schema {
     return r'''
+            likeId
             authId
             created_at
             postId
@@ -270,3 +273,4 @@ class PostVoteSchema {
         ''';
   }
 }
+

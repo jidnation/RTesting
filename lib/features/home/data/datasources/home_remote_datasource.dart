@@ -5,14 +5,17 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -749,14 +752,16 @@ class HomeRemoteDataSource {
     required String postOwnerId,
     List<String>? imageMediaItems,
     String? audioMediaItem,
+    String? videoMediaItem,
   }) async {
     String q = r'''
         mutation commentOnPost(
           $postId: String!
-          $content: String!
+          $content: String
           $postOwnerId: String!
           $imageMediaItems:[String]
           $audioMediaItem:String
+          $videoMediaItem:String
           ) {
           commentOnPost(
             commentBody: {
@@ -765,6 +770,7 @@ class HomeRemoteDataSource {
               postOwnerId: $postOwnerId
               imageMediaItems:$imageMediaItems
               audioMediaItem:$audioMediaItem
+              videoMediaItem:$videoMediaItem
           }) {
             ''' +
         CommentSchema.schema +
@@ -786,8 +792,10 @@ class HomeRemoteDataSource {
         variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
       }
 
+      if (videoMediaItem != null) {
+        variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
+      }
       final result = await _client.mutate(gql(q), variables: variables);
-
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
@@ -970,10 +978,9 @@ class HomeRemoteDataSource {
             postId: $postId
             commentId: $commentId
           ) {
-           authId
-           commentId
-           postId
-           likeId
+            ''' +
+        CommentLikeSchema.schema +
+        '''
           }
         }''';
     try {
@@ -992,7 +999,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<bool> unlikeCommentOnPost({
+  Future<String> unlikeCommentOnPost({
     required String commentId,
     required String likeId,
   }) async {
@@ -1019,7 +1026,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
 
-      return result.data!['unlikeCommentOnPost'] as bool;
+      return result.data!['unlikeCommentOnPost'] as String;
     } catch (e) {
       rethrow;
     }
@@ -1326,31 +1333,26 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<VirtualCommentModel> getSingleCommentOnPost({
-    required String? postId,
+  Future<CommentModel> getSingleCommentOnPost({
+    required String? commentId,
   }) async {
     String q = r'''
-        query getSingleCommentOnPost($postId: String!) {
-          getSingleCommentOnPost(postId: $postId){
-              profile {
+        query getSingleCommentOnPost($commentId: String!) {
+          getSingleCommentOnPost(commentId: $commentId){
                 ''' +
-        UserSchema.schema +
-        '''
-            }
-               ''' +
         CommentSchema.schema +
         '''
-          }
+            }
         }''';
     try {
       final result = await _client.query(gql(q), variables: {
-        'postId': postId,
+        'commentId': commentId,
       });
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
 
-      return VirtualCommentModel.fromJson(
+      return CommentModel.fromJson(
           result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
@@ -1896,4 +1898,53 @@ class HomeRemoteDataSource {
       rethrow;
     }
   }
+
+  // Future<bool> joinLiveStream({
+  //   required String? channelName,
+  // }) async {
+  //   String q = r'''
+  //            mutation joinLiveStream(
+  //             $channelName:String!
+  //            ){
+  //              joinLiveStream(
+  //               channelName: $channelName
+  //              )
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'channelName': channelName,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('joinLiveStream', result.data);
+  //     return result.data!['joinLiveStream'] as bool;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  // Future<StreamResponse> initiateLiveStreaming({
+  //   required String? startedAt,
+  // }) async {
+  //   String q = r'''
+  //            mutation initiateLiveStream(
+  //             $startedAt:String!
+  //            ){
+  //              token,
+  //              channelName
+  //            }''';
+  //   try {
+  //     final result = await _client.mutate(gql(q), variables: {
+  //       'startedAt': startedAt,
+  //     });
+  //     if (result is GraphQLError) {
+  //       throw GraphQLError(message: result.message);
+  //     }
+  //     Console.log('Initiate LiveStreaming', result.data);
+  //     return StreamResponse.fromJson(result.data!['initiateLiveStream']);
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 }

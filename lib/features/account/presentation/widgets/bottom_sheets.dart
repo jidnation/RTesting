@@ -24,6 +24,8 @@ import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../timeline/timeline_feed.dart';
+
 Future showProfileMenuBottomSheet(BuildContext context,
     {required User user, bool isStarring = false}) {
   return showModalBottomSheet(
@@ -498,6 +500,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: true,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status muted successfully!');
+            timeLineFeedStore.getUserStatus();
           }
           if (state is UnmuteStatusSuccess) {
             RouteNavigators.pop(context);
@@ -507,6 +510,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: false,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status unmuted successfully!');
+            timeLineFeedStore.getUserStatus();
           }
           if (state is ReportStatusSuccess) {
             RouteNavigators.pop(context);
@@ -563,6 +567,8 @@ Future showUserStoryBottomSheet(BuildContext context,
                               globals.socialServiceBloc!.add(ReportStatusEvent(
                                   reportReason: res as String,
                                   statusId: status.status?.statusId ?? ''));
+                              await Future.delayed(const Duration(seconds: 4));
+                              timeLineFeedStore.initialize();
                             },
                             color: const Color(0xFFE50101),
                           ),
@@ -576,7 +582,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                               }),
                           KebabBottomTextButton(
                               label: 'Star user',
-                              onPressed: () {
+                              onPressed: () async {
                                 globals.showLoader(context);
                                 globals.userBloc!.add(StarUserEvent(
                                     userIdToStar:
@@ -598,7 +604,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',
-                              onPressed: () {
+                              onPressed: () async {
                                 if ((status.status?.isMuted ?? false) &&
                                     (isMuted ?? false)) {
                                   globals.showLoader(context);
@@ -607,6 +613,9 @@ Future showUserStoryBottomSheet(BuildContext context,
                                           idToUnmute: status
                                                   .statusOwnerProfile?.authId ??
                                               ''));
+                                  await Future.delayed(
+                                      const Duration(seconds: 4));
+                                  timeLineFeedStore.initialize();
                                 } else {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -615,6 +624,9 @@ Future showUserStoryBottomSheet(BuildContext context,
                                                   .statusOwnerProfile?.authId ??
                                               ''));
                                 }
+                                await Future.delayed(
+                                    const Duration(seconds: 4));
+                                timeLineFeedStore.initialize();
                               }),
                         ],
                       ),

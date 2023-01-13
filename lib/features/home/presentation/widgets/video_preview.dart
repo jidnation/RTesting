@@ -35,7 +35,7 @@ class _VideoPreviewState extends State<VideoPreview> {
   void initBetterPlayer() {
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
-            placeholder: Center(
+            placeholder: const Center(
               child: CircularProgressIndicator(
                 color: AppColors.white,
               ),
