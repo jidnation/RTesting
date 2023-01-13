@@ -5,17 +5,14 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
-import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
-import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -1352,8 +1349,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
 
-      return CommentModel.fromJson(
-          result.data!['getSingleCommentOnPost']);
+      return CommentModel.fromJson(result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
     }

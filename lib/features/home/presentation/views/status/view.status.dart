@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +15,6 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
-import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
@@ -51,7 +48,7 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
       body: StoryPageView(
         indicatorAnimationController: _indicatorController,
         onStoryIndexChanged: (int newStoryIndex) {
-          final story = status[newStoryIndex];
+          final story = widget.status[newStoryIndex];
           if (story.statusData?.videoMedia != null) {
             _indicatorController.value = IndicatorAnimationCommand(
                 duration: const Duration(seconds: 30));
@@ -61,7 +58,7 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
           }
         },
         itemBuilder: (context, pageIndex, storyIndex) {
-          final story = status[storyIndex];
+          final story = widget.status[storyIndex];
           if (story.statusData!.imageMedia != null ||
               (story.statusData!.imageMedia ?? '').isNotEmpty) {
             return Stack(
@@ -104,13 +101,13 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-
-                              Text(timeago.format(story.createdAt!),
-                              style: TextStyle(
-                                 fontSize: getScreenHeight(16),
-                                 color: Colors.white,
+                              Text(
+                                timeago.format(story.createdAt!),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
-                              ),
+                                ),
                               )
                             ],
                           ),
@@ -364,22 +361,22 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
           },
           builder: (context, state) {
             return StoryPageView(
-              indicatorAnimationController: indicatorController,
+              indicatorAnimationController: _indicatorController,
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = widget.status[storyIndex];
 
                 if (story.status?.statusData?.videoMedia != null) {
-                  indicatorController.value = IndicatorAnimationCommand(
+                  _indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 30));
                 } else {
-                  indicatorController.value = IndicatorAnimationCommand(
+                  _indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 5));
                 }
                 if (story.status?.statusData?.audioMedia != null) {
-                  indicatorController.value = IndicatorAnimationCommand(
+                  _indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 30));
                 } else {
-                  indicatorController.value = IndicatorAnimationCommand(
+                  _indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 5));
                 }
                 if (story.status?.statusData!.audioMedia != null ||
@@ -516,13 +513,13 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          timeago.format(story.status!.createdAt!),
+                                          timeago
+                                              .format(story.status!.createdAt!),
                                           style: TextStyle(
                                             fontSize: getScreenHeight(13),
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
-
                                         )
                                       ],
                                     ),
@@ -638,17 +635,17 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                         ),
                                       ),
                                       const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            timeago.format(story.status!.createdAt!),
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(13),
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-
+                                      Expanded(
+                                        child: Text(
+                                          timeago
+                                              .format(story.status!.createdAt!),
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        )
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ],
@@ -819,8 +816,6 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                 value: controller.text.trim(),
                                 type: 'text',
                                 messageMode: '',
-                                sentAt: Helper.parseChatTime(''
-                                                  ),
                               ),
                             );
                             toast('Sending message...',

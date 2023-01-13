@@ -737,7 +737,8 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             HapticFeedback
                                                                 .mediumImpact();
                                                             reachDM.value =
-                                                                true;
+                                                                _posts.value[
+                                                                    index];
 
                                                             handleTap(index);
                                                             if (active.contains(
