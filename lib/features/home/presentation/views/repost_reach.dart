@@ -215,7 +215,7 @@ class _CommentReachState extends State<RepostReach> {
           if (state is CreateRepostSuccess) {
             // Snackbars.success(context,
             //     message: "Reach has been reposted on your timeline");
-            timeLineFeedStore.initialize(context, isPostEditing: true);
+            timeLineFeedStore.initialize(isTextEditing: true);
             // globals.socialServiceBloc!
             //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
             // Navigator.pop(context);

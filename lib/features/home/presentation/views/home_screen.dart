@@ -11,8 +11,8 @@ import 'package:reach_me/features/home/presentation/views/notification.dart';
 import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
+import '../../../moment/moment_feed.dart';
 import '../../../timeline/timeline_feed.dart';
-import 'moment_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
   static const String id = "home_screen";
@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     momentFeedStore.initialize();
-    timeLineFeedStore.initialize(context);
+    timeLineFeedStore.initialize();
     super.initState();
   }
 

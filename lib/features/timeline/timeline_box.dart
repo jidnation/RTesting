@@ -28,7 +28,7 @@ import '../account/presentation/views/account.dart';
 import '../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
-import '../home/presentation/widgets/moment_audio_player.dart';
+import '../moment/moment_audio_player.dart';
 
 class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
@@ -265,10 +265,14 @@ class TimeLineBox extends StatelessWidget {
                                       Visibility(
                                         visible:
                                             tPostInfo!.location!.isNotEmpty &&
+                                                    tPostInfo.location!
+                                                            .toLowerCase()
+                                                            .trim() !=
+                                                        'nil' ||
                                                 tPostInfo.location!
                                                         .toLowerCase()
                                                         .trim() !=
-                                                    'nil',
+                                                    'NIL',
                                         child: Row(children: [
                                           CustomText(
                                             text: tPostInfo.location
@@ -435,9 +439,9 @@ class TimeLineBox extends StatelessWidget {
                                 // TimeLineVideoPreview(
                                 //   path: tPostInfo.videoMediaItem!,
                                 TimeLineVideoPlayer(
-                                  post:  timeLineFeedStore
-                                .getPostModel(timeLineModel: timeLineModel)
-                                .post!,
+                              post: timeLineFeedStore
+                                  .getPostModel(timeLineModel: timeLineModel)
+                                  .post!,
                               videoUrl: timeLineModel
                                   .getPostFeed.post!.videoMediaItem!,
                               // ),

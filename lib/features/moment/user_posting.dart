@@ -14,15 +14,15 @@ import 'package:reach_me/features/home/presentation/views/status/widgets/host_po
 import 'package:reach_me/features/home/presentation/views/status/widgets/live_screen.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/posting_type.dart';
 
-import '../../../../../../core/services/media_service.dart';
-import '../../../../../../core/services/moment/controller.dart';
-import '../../../../../../core/services/navigation/navigation_service.dart';
-import '../../../../../../core/utils/constants.dart';
-import '../../../../../../core/utils/count_down_timer.dart';
-import '../../../../../../core/utils/dimensions.dart';
-import '../../../../../../core/utils/file_utils.dart';
-import '../create.status.dart';
-import 'create_posting.dart';
+import '../../core/services/media_service.dart';
+import '../../core/services/moment/controller.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/constants.dart';
+import '../../core/utils/count_down_timer.dart';
+import '../../core/utils/dimensions.dart';
+import '../../core/utils/file_utils.dart';
+import '../home/presentation/views/status/create.status.dart';
+import '../home/presentation/views/status/widgets/create_posting.dart';
 import 'moment_posting.dart';
 import 'moment_posting_timer.dart';
 import 'moment_recording_control_room.dart';

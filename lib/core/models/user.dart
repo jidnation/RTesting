@@ -108,33 +108,50 @@ class User {
 }
 
 class ChatUser {
-  ChatUser({
-    this.firstName,
-    this.id,
-    this.lastName,
-    this.profilePicture,
-    this.username,
-  });
-  String? id;
+  String? authId;
   String? firstName;
   String? lastName;
+  String? location;
   String? profilePicture;
+  String? profileSlug;
+  bool? verified;
   String? username;
+  String? bio;
+
+  ChatUser({
+    this.authId,
+    this.firstName,
+    this.lastName,
+    this.location,
+    this.profilePicture,
+    this.profileSlug,
+    this.username,
+    this.verified,
+    this.bio,
+  });
 
   factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
-        id: json["id"],
+        authId: json["authId"],
+        location: json["location"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        verified: json["verified"],
         username: json["username"],
+        bio: json["bio"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
+        "authId": authId,
+        "location": location,
         "firstName": firstName,
         "lastName": lastName,
         "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "verified": verified,
         "username": username,
+        "bio": bio,
       };
 }
 

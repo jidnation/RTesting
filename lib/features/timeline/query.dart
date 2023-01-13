@@ -10,10 +10,11 @@ import '../home/data/repositories/social_service_repository.dart';
 import 'models/post_feed.dart';
 
 class TimeLineQuery {
+  static String hostUrl = "https://api.myreach.me/";
   Future<List<GetPostFeed>?> getAllPostFeeds(
       {int? pageLimit, int? pageNumber, String? authIdToGet}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -52,7 +53,7 @@ class TimeLineQuery {
 
   Future<Post?> getPost({required String postId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -84,7 +85,7 @@ class TimeLineQuery {
   Future<bool?> getReachingRelationship(
       {required String userId, required String type}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -115,7 +116,7 @@ class TimeLineQuery {
 
   Future<bool> likePost({required String postId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -141,7 +142,7 @@ class TimeLineQuery {
   Future<bool> votePost(
       {required String postId, required String voteType}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },
@@ -169,7 +170,7 @@ class TimeLineQuery {
 
   unlikePost({required String postId}) async {
     HttpLink link = HttpLink(
-      "https://api.myreach.me/",
+      hostUrl,
       defaultHeaders: <String, String>{
         'Authorization': 'Bearer ${globals.token}',
       },

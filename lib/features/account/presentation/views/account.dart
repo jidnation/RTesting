@@ -34,14 +34,14 @@ import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
-import '../../../home/presentation/widgets/moment_audio_player.dart';
 import '../../../home/presentation/widgets/post_media.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -105,6 +105,7 @@ class _AccountScreenState extends State<AccountScreen>
         unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
         labelColor: AppColors.white,
+        padding: const EdgeInsets.only(left: 16),
         labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
         indicator: BoxDecoration(
@@ -341,17 +342,9 @@ class _AccountScreenState extends State<AccountScreen>
       globals.socialServiceBloc!
           .add(GetLikedPostsEvent(pageLimit: 50, pageNumber: 1));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-        pageLimit: 50,
-        pageNumber: 1,
-        voteType: 'Upvote',
-        authId: ""
-      ));
+          pageLimit: 50, pageNumber: 1, voteType: 'Upvote', authId: ""));
       globals.socialServiceBloc!.add(GetVotedPostsEvent(
-        pageLimit: 50,
-        pageNumber: 1,
-        voteType: 'Downvote',
-        authId: ""
-      ));
+          pageLimit: 50, pageNumber: 1, voteType: 'Downvote', authId: ""));
       return null;
     }, []);
     var size = MediaQuery.of(context).size;
@@ -2177,8 +2170,8 @@ Future _showReacherCardBottomSheet(
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is GetPostSuccess) {
-            // RouteNavigators.pop(context);
-            // RouteNavigators.route(context, EditReach(post: state.data!));
+            RouteNavigators.pop(context);
+            RouteNavigators.route(context, EditReach(post: state.data!));
           }
           if (state is GetPostError) {
             RouteNavigators.pop(context);

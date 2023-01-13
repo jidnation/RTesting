@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/momentControlRoom/models/get_comments_model.dart';
 
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/utils/constants.dart';
@@ -11,9 +10,10 @@ import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dialog_box.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
-import '../../../momentControlRoom/control_room.dart';
-import '../views/moment_feed.dart';
+import 'momentControlRoom/control_room.dart';
+import 'momentControlRoom/models/get_comments_model.dart';
 import 'moment_audio_player.dart';
+import 'moment_feed.dart';
 
 class MomentCommentBox extends HookWidget {
   final MomentModel momentFeed;

@@ -3,11 +3,11 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../core/components/snackbar.dart';
-import '../../core/services/moment/querys.dart';
-import '../../core/services/navigation/navigation_service.dart';
-import '../home/presentation/views/moment_feed.dart';
-import '../home/presentation/views/status/widgets/user_posting.dart';
+import '../../../core/components/snackbar.dart';
+import '../../../core/services/moment/querys.dart';
+import '../../../core/services/navigation/navigation_service.dart';
+import '../moment_feed.dart';
+import '../user_posting.dart';
 import 'models/get_comments_model.dart';
 import 'models/get_moment_feed.dart';
 import 'moment_cacher.dart';

@@ -3,16 +3,16 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:reach_me/features/home/presentation/views/status/widgets/user_posting.dart';
+import 'package:reach_me/features/moment/moment_videoplayer_item.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
 
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dimensions.dart';
-import '../../../momentControlRoom/control_room.dart';
-import '../widgets/moment_appbar.dart';
-import '../widgets/moment_feed_comment.dart';
-import '../widgets/moment_videoplayer_item.dart';
-import '../widgets/video_loader.dart';
+import '../home/presentation/widgets/video_loader.dart';
+import 'momentControlRoom/control_room.dart';
+import 'moment_appbar.dart';
+import 'moment_feed_comment.dart';
 
 class MomentFeed extends StatefulWidget {
   final PageController pageController;

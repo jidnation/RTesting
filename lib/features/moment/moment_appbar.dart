@@ -2,11 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:reach_me/features/moment/user_posting.dart';
 
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
-import '../views/moment_feed.dart';
-import '../views/status/widgets/user_posting.dart';
+import 'moment_feed.dart';
 
 class MomentsAppBar extends StatelessWidget {
   final PageController pageController;

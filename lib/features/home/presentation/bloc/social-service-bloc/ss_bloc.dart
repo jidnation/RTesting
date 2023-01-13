@@ -16,6 +16,7 @@ import 'package:reach_me/features/home/data/repositories/social_service_reposito
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 
+import '../../../../timeline/timeline_feed.dart';
 import '../../../data/dtos/create.repost.input.dart';
 
 part 'ss_event.dart';
@@ -40,8 +41,9 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         response.fold(
           (error) => emit(CreatePostError(error: error)),
           (post) {
+            timeLineFeedStore.initialize(isPosting: true);
             Console.log('post data bloc', post.toJson());
-            emit(CreatePostSuccess(post: post));
+            // emit(CreatePostSuccess(post: post));
           },
         );
       } on GraphQLError catch (e) {
@@ -330,6 +332,21 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(GetLikesOnPostError(error: e.message));
       }
     });
+    on<GetVotesOnPostEvent>((event, emit) async {
+      emit(GetVotesOnPostLoading());
+      try {
+        final response = await socialServiceRepository.getVotesOnPost(
+          postId: event.postId!,
+          voteType: event.voteType!,
+        );
+        response.fold(
+          (error) => emit(GetVotesOnPostError(error: error)),
+          (data) => emit(GetVotesOnPostSuccess(data: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetVotesOnPostError(error: e.message));
+      }
+    });
     on<GetSingleCommentOnPostEvent>((event, emit) async {
       emit(GetSingleCommentOnPostLoading());
       try {
@@ -592,14 +609,13 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetVotedPostsLoading());
       try {
         print("pageLimit ${event.pageLimit}");
-         print("pageNumber ${event.pageNumber}");
-          print("vote tyoe ${event.voteType}");
+        print("pageNumber ${event.pageNumber}");
+        print("vote tyoe ${event.voteType}");
         final response = await socialServiceRepository.getVotedPosts(
-          pageLimit: event.pageLimit!,
-          pageNumber: event.pageNumber!,
-          voteType: event.voteType!,
-          authId: ""
-        );
+            pageLimit: event.pageLimit!,
+            pageNumber: event.pageNumber!,
+            voteType: event.voteType!,
+            authId: "");
         response.fold(
           (error) => emit(GetVotedPostsError(error: error)),
           (posts) => emit(

@@ -34,19 +34,18 @@ class ChatRepository {
     required String? threadId,
     required String? value,
     required String? type,
-    required String? messageMode,
-    required String? sentAt,
+    String? quotedData,
+    required String messageMode,
   }) async {
     try {
       final chat = await _chatRemoteDataSource.sendTextMessage(
-        senderId: senderId,
-        receiverId: receiverId,
-        threadId: threadId,
-        value: value,
-        type: type,
-        messageMode: messageMode,
-        sentAt: sentAt,
-      );
+          senderId: senderId,
+          receiverId: receiverId,
+          threadId: threadId,
+          value: value,
+          type: type,
+          messageMode: messageMode,
+          quotedData: quotedData);
       return Right(chat);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -54,12 +53,14 @@ class ChatRepository {
   }
 
   Future<Either<String, List<Chat>>> getThreadMessages({
-    required String? id,
+    String? threadId,
+    String? receiverId,
     String? fromMessageId,
   }) async {
     try {
       final chat = await _chatRemoteDataSource.getThreadMessages(
-        id: id,
+        threadId: threadId,
+        receiverId: receiverId,
         fromMessageId: fromMessageId,
       );
       return Right(chat);
@@ -69,9 +70,10 @@ class ChatRepository {
   }
 
   Future<Either<String, List<ChatsThread>>> getUserThreads(
-      {required String? id}) async {
+      {int? pageLimit, int? pageNumber}) async {
     try {
-      final userThreads = await _chatRemoteDataSource.getUserThreads(id: id);
+      final userThreads = await _chatRemoteDataSource.getUserThreads(
+          pageNumber: pageNumber, pageLimit: pageLimit);
       return Right(userThreads);
     } on GraphQLError catch (e) {
       return Left(e.message);

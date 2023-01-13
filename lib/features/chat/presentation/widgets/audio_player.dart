@@ -1,12 +1,9 @@
 import 'dart:async';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart' as pathfile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-//import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 
@@ -288,27 +285,34 @@ class _PlayAudioState extends State<PlayAudio> {
           ),
         ),
         Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                StringUtil.formatDuration(
-                    Duration(milliseconds: currentDuration)),
-                style: TextStyle(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 52, right: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: Text(
+                    StringUtil.formatDuration(
+                        Duration(milliseconds: currentDuration)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: widget.isMe
+                            ? AppColors.white
+                            : AppColors.textColor2,
+                        fontSize: 10),
+                  ),
+                ),
+                Text(
+                  widget.timeStamp,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 10,
                     fontWeight: FontWeight.w400,
                     color: widget.isMe ? AppColors.white : AppColors.textColor2,
-                    fontSize: 10),
-              ),
-              Text(
-                widget.timeStamp,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: widget.isMe ? AppColors.white : AppColors.textColor2,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

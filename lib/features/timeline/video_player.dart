@@ -3,12 +3,11 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
-import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../home/data/models/post_model.dart';
-import '../home/presentation/views/moment_feed.dart';
+import '../moment/moment_feed.dart';
 
 class TimeLineVideoPlayer extends StatefulWidget {
   final PostModel post;
@@ -138,11 +137,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                     ]),
         );
       } else {
-        return ImageBlur(
-            widget.post,
-           const  SizedBox(),
-             () {
-        
+        return ImageBlur(widget.post, const SizedBox(), () {
           setState(() {
             show = true;
           });
@@ -263,8 +258,8 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
   @override
   void dispose() {
     super.dispose();
-    _videoPlayerController.dispose();
-    // _chewieController?.dispose();
+    // _videoPlayerController.dispose();
+    _chewieController?.dispose();
   }
 
   Future<void> toggleVideo() async {

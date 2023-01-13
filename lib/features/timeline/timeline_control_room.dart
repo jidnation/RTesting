@@ -55,17 +55,15 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   bool _isPosting = false;
   bool get isPosting => _isPosting;
 
-  initialize(BuildContext context,
+  initialize(
       {bool? isTextEditing,
-      bool? isPostEditing,
       bool? isPosting,
       bool? isUpvoting,
       bool? isRefresh,
       RefreshController? refreshController}) async {
-    if ((isPostEditing ?? false) ||
-        (isPosting ?? false) ||
-        (isTextEditing ?? false)) {
-      Get.close(1);
+    if ((isPosting ?? false) || (isTextEditing ?? false)) {
+      // Get.to(() => const TimeLineFeed());
+      Get.back();
       _isPosting = true;
     } else {
       ((isUpvoting ?? false) || (isRefresh ?? false))
@@ -78,27 +76,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (response != null) {
       length > 0 ? value.clear() : null;
       if (isTextEditing ?? false) {
-        Get.snackbar(
-          '',
-          '',
-          titleText: const SizedBox.shrink(),
-          messageText: CustomText(
-            text: 'You have successfully edit your post',
-            color: const Color(0xFF1C8B43),
-            size: getScreenHeight(16),
-          ),
-          borderWidth: 0.5,
-          icon: SvgPicture.asset(
-            'assets/svgs/like.svg',
-            color: const Color(0xFF1C8B43),
-          ),
-          backgroundColor: const Color(0xFFE0FFDD),
-          borderColor: const Color(0xFF1C8B43),
-          borderRadius: 16,
-          duration: const Duration(milliseconds: 1500),
-        );
-      }
-      if (isPostEditing ?? false) {
         Get.snackbar(
           '',
           '',
@@ -198,7 +175,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           voteType: voteType,
         );
         if (response) {
-          timeLineFeedStore.initialize(context);
+          timeLineFeedStore.initialize();
           voteType.toLowerCase() == 'upvote'
               ? Snackbars.success(
                   context,
@@ -227,7 +204,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         voteType: voteType,
       );
       if (response) {
-        initialize(context, isUpvoting: true);
+        initialize(isUpvoting: true);
         Snackbars.success(
           context,
           message:
@@ -575,7 +552,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             mentionList: globals.mentionList,
             postRating: globals.postRating);
     if (response.isRight()) {
-      initialize(context);
+      initialize();
       Snackbars.success(context, message: 'Your reach has been posted');
       Get.close(2);
     }
@@ -607,8 +584,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       postId: postId,
     );
     if (response.isRight()) {
-      initialize(context, isTextEditing: true);
-      Get.back();
+      initialize(isTextEditing: true);
     }
   }
 
@@ -622,7 +598,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         voteType: 'Downvote',
       );
       if (response) {
-        timeLineFeedStore.initialize(context, isUpvoting: true);
+        timeLineFeedStore.initialize(isUpvoting: true);
         Snackbars.success(
           context,
           message: 'You have successfully shouted down this post.',
