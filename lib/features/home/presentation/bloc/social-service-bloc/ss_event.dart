@@ -159,6 +159,12 @@ class GetLikesOnPostEvent extends SocialServiceEvent {
   GetLikesOnPostEvent({required this.postId});
 }
 
+class GetVotesOnPostEvent extends SocialServiceEvent {
+  final String? postId;
+  final String? voteType;
+  GetVotesOnPostEvent({required this.postId, required this.voteType});
+}
+
 class GetPostEvent extends SocialServiceEvent {
   final String? postId;
   GetPostEvent({required this.postId});

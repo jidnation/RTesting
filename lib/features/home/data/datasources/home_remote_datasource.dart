@@ -1275,6 +1275,33 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<List<VirtualPostVoteModel>> getVotesOnPost(
+      {required String postId, required String voteType}) async {
+    String q = r'''
+        query getVotesOnPost($postId: String!, $voteType: String!, ) {
+          getVotesOnPost(postId: $postId, vote_type: $voteType){
+            authId
+            postId
+            voteType
+            created_at
+          }
+        }''';
+    try {
+      final result = await _client
+          .query(gql(q), variables: {'postId': postId, 'vote_type': voteType});
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      return (result.data!['getVotesOnPost'] as List)
+          .map((e) => VirtualPostVoteModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<PostModel> getPost({required String? postId}) async {
     String q = r'''
         query getPost($postId: String!) {

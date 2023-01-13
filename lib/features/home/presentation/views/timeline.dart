@@ -798,14 +798,6 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                     .reacher));
                                                           }
                                                         },
-                                                        onShowLikes: () {
-                                                          showPostReactors(
-                                                              context,
-                                                              postId: _posts
-                                                                  .value[index]
-                                                                  .post!
-                                                                  .postId!);
-                                                        },
                                                         onLike: () {
                                                           HapticFeedback
                                                               .mediumImpact();
@@ -935,19 +927,13 @@ class PostFeedReacherCard extends HookWidget {
     this.onUpvote,
     this.onViewProfile,
     this.voterProfile,
-    this.onShowLikes,
     required this.isVoted,
     required this.voteType,
     required this.isLiked,
   }) : super(key: key);
   final PostFeedModel? postFeedModel;
   final bool likingPost;
-  final Function()? onLike,
-      onMessage,
-      onUpvote,
-      onDownvote,
-      onViewProfile,
-      onShowLikes;
+  final Function()? onLike, onMessage, onUpvote, onDownvote, onViewProfile;
   final bool isLiked, isVoted;
   final String? voteType;
   final PostProfileModel? voterProfile;
@@ -1262,7 +1248,10 @@ class PostFeedReacherCard extends HookWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 GestureDetector(
-                                  onLongPress: onShowLikes,
+                                  onLongPress: () {
+                                    // showPostReactors(context,
+                                    //     postId: postFeedModel!.post!.postId!);
+                                  },
                                   child: CupertinoButton(
                                     minSize: 0,
                                     onPressed: onLike,
@@ -1355,21 +1344,27 @@ class PostFeedReacherCard extends HookWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CupertinoButton(
-                                    minSize: 0,
-                                    onPressed: onUpvote,
-                                    padding: EdgeInsets.zero,
-                                    child: isVoted && voteType == 'Upvote'
-                                        ? SvgPicture.asset(
-                                            'assets/svgs/shoutup-active.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
-                                          )
-                                        : SvgPicture.asset(
-                                            'assets/svgs/shoutup.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
-                                          ),
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      // showPostReactors(context,
+                                      //     postId: postFeedModel!.post!.postId!);
+                                    },
+                                    child: CupertinoButton(
+                                      minSize: 0,
+                                      onPressed: onUpvote,
+                                      padding: EdgeInsets.zero,
+                                      child: isVoted && voteType == 'Upvote'
+                                          ? SvgPicture.asset(
+                                              'assets/svgs/shoutup-active.svg',
+                                              height: getScreenHeight(20),
+                                              width: getScreenWidth(20),
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/svgs/shoutup.svg',
+                                              height: getScreenHeight(20),
+                                              width: getScreenWidth(20),
+                                            ),
+                                    ),
                                   ),
                                   FittedBox(
                                     child: Text(
@@ -1387,21 +1382,27 @@ class PostFeedReacherCard extends HookWidget {
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  CupertinoButton(
-                                    minSize: 0,
-                                    onPressed: onDownvote,
-                                    padding: EdgeInsets.zero,
-                                    child: isVoted && voteType == 'Downvote'
-                                        ? SvgPicture.asset(
-                                            'assets/svgs/shoutdown-active.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
-                                          )
-                                        : SvgPicture.asset(
-                                            'assets/svgs/shoutdown.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
-                                          ),
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      // showPostReactors(context,
+                                      //     postId: postFeedModel!.post!.postId!);
+                                    },
+                                    child: CupertinoButton(
+                                      minSize: 0,
+                                      onPressed: onDownvote,
+                                      padding: EdgeInsets.zero,
+                                      child: isVoted && voteType == 'Downvote'
+                                          ? SvgPicture.asset(
+                                              'assets/svgs/shoutdown-active.svg',
+                                              height: getScreenHeight(20),
+                                              width: getScreenWidth(20),
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/svgs/shoutdown.svg',
+                                              height: getScreenHeight(20),
+                                              width: getScreenWidth(20),
+                                            ),
+                                    ),
                                   ),
                                   FittedBox(
                                     child: Text(

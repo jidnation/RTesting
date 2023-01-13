@@ -350,6 +350,20 @@ class GetLikesOnPostError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class GetVotesOnPostLoading extends SocialServiceState {}
+
+class GetVotesOnPostSuccess extends SocialServiceState {
+  final List<VirtualPostVoteModel>? data;
+  GetVotesOnPostSuccess({this.data});
+}
+
+class GetVotesOnPostError extends SocialServiceState {
+  final String error;
+  GetVotesOnPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class GetPostLoading extends SocialServiceState {}
 
 class GetPostSuccess extends SocialServiceState {
