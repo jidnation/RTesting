@@ -420,7 +420,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             width: size.width,
                             child: Center(
                               child: Helper.renderProfilePicture(
-                                  story.status?.profileModel?.profilePicture,
+                                  story.statusOwnerProfile?.profilePicture,
                                   size: 100),
                             )),
                       ),
