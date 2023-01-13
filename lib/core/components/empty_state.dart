@@ -66,6 +66,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                 listener: (context, state) {
                   if (state is UserLoaded) {
                     reachingUser.value = false;
+                    // setState(() {});
                   }
                   if (state is UserError) {
                     if (state.error!.contains('reaching')) {
