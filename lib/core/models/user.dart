@@ -1,3 +1,5 @@
+import 'package:reach_me/features/home/data/models/status.model.dart';
+
 class User {
   String? firstName;
   String? lastName;
@@ -105,6 +107,16 @@ class User {
         "verified": verified,
         "reaching": reaching!.toJson(),
       };
+
+  StatusProfileModel toStatusProfileModel() => StatusProfileModel(
+      firstName: firstName,
+      lastName: lastName,
+      authId: id,
+      profilePicture: profilePicture,
+      username: username,
+      verified: verified,
+      location: location,
+      bio: bio);
 }
 
 class ChatUser {

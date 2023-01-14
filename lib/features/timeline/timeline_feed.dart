@@ -191,12 +191,22 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                   isMeOnTap: () async {
                                                     var cameras =
                                                         await availableCameras();
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        UserPosting(
-                                                          phoneCameras: cameras,
-                                                          initialIndex: 0,
-                                                        ));
+                                                    final res =
+                                                        await RouteNavigators
+                                                            .route(
+                                                                context,
+                                                                UserPosting(
+                                                                  phoneCameras:
+                                                                      cameras,
+                                                                  initialIndex:
+                                                                      0,
+                                                                ));
+                                                    if (res == null) return;
+                                                    // timeLineFeedStore
+                                                    //     .getMyStatus();
+                                                    timeLineFeedStore
+                                                        .addNewStatus(
+                                                            res as StatusModel);
                                                     return;
                                                   },
                                                 ),
@@ -232,7 +242,7 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                         .statusOwnerProfile!
                                                         .profilePicture,
                                                     username: _userStatus[index]
-                                                        .status![index]
+                                                        .status![0]
                                                         .statusOwnerProfile!
                                                         .username!,
                                                     onTap: () async {
@@ -256,13 +266,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                                       .status!)));
                                                       if (res == null) return;
                                                       if (res is MuteResult) {
-                                                        _mutedStatus = [
-                                                          ..._mutedStatus,
-                                                          _userStatus[index]
-                                                        ];
-                                                        _userStatus = [
-                                                          ..._userStatus
-                                                        ]..removeAt(index);
+                                                        timeLineFeedStore
+                                                            .muteStatus(index);
                                                       }
                                                     },
                                                   ),
@@ -331,13 +336,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                                     .status!)));
                                                 if (res == null) return;
                                                 if (res is MuteResult) {
-                                                  _userStatus = [
-                                                    ..._userStatus,
-                                                    _mutedStatus[index]
-                                                  ];
-                                                  _mutedStatus = [
-                                                    ..._mutedStatus
-                                                  ]..removeAt(index);
+                                                  timeLineFeedStore
+                                                      .unMuteStatus(index);
                                                 }
                                                 // RouteNavigators
                                                 //     .route(

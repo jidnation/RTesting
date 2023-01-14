@@ -760,6 +760,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
                                                     type: 'text',
+                                                    quotedData: widget.quotedData,
                                                     value:
                                                         controller.text.trim());
                                                 globals.userChat!.add(temp);
