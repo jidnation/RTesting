@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/timeline/suggestion_widget.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
@@ -360,8 +361,11 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                             ),
                             Expanded(
                                 child: value.isEmpty
-                                    ? EmptyTimelineWidget(
+                                    ? UserSuggestionWidget(
                                         loading: timeLineFeedStore.gettingPosts)
+
+                                    // ? EmptyTimelineWidget(
+                                    //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
                                         physics: const BouncingScrollPhysics(),
                                         onRefresh: () {

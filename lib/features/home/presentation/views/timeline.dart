@@ -50,6 +50,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/suggestion_widget.dart';
 import '../../../timeline/video_player.dart';
 import 'full_post.dart';
 

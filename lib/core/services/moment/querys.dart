@@ -9,7 +9,7 @@ import '../../utils/app_globals.dart';
 import 'graphql_strings.dart' as gql_string;
 
 class MomentQuery {
-  static String hostUrl = "https://api.myreach.me/";
+  static String hostUrl = "https://live.myreach.me/";
   static Future<bool> postMoment(
       {required String videoMediaItem,
       List<String>? hashTags,
