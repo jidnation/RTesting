@@ -52,8 +52,14 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   bool _gettingPosts = false;
   bool get gettingPosts => _gettingPosts;
 
+  bool _gettingSuggestedUser = false;
+  bool get gettingSuggestedUser => _gettingSuggestedUser;
+
   bool _isPosting = false;
   bool get isPosting => _isPosting;
+
+  List<CustomUser> _suggestedUsers = <CustomUser>[];
+  List<CustomUser> get suggestedUser => _suggestedUsers;
 
   initialize(
       {bool? isTextEditing,
@@ -116,6 +122,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           borderRadius: 16,
           duration: const Duration(milliseconds: 1500),
         );
+      }
+      if (response.isEmpty) {
+        getSuggestedUsers();
       }
       for (GetPostFeed postFeed in response) {
         Post post = postFeed.post!;
@@ -614,6 +623,74 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       );
     }
   }
+
+  getSuggestedUsers() async {
+    _gettingSuggestedUser = true;
+    Either<String, List<User>> response =
+        await SocialServiceRepository().suggestUser();
+    if (response.isRight()) {
+      response.forEach((userList) {
+        print(
+            "<<<<<<<<<<<>>>>>>>>>>>>>>>> ::::::::: ${userList.first.reaching}");
+        for (var element in userList) {
+          print(">>>>>>>>>>>>>>>>>>>>${element.reaching?.reacherId}");
+        }
+        for (User user in userList) {
+          _suggestedUsers.add(CustomUser(user: user));
+        }
+        return;
+      });
+      _gettingSuggestedUser = false;
+      notifyListeners();
+    }
+  }
+
+  deleteSuggestedUser({required String id}) {
+    List<CustomUser> currentSuggestedUser = _suggestedUsers;
+    currentSuggestedUser.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+
+  reachUser({required String id}) async {
+    List<CustomUser> currentSuggestedUser = _suggestedUsers;
+    CustomUser actualUser =
+        currentSuggestedUser.firstWhere((element) => element.id == id);
+    bool isReaching = actualUser.user.reaching?.reachingId != null;
+    if (isReaching) {
+      actualUser.user.reaching = ReachingRelationship(reacherId: null);
+      actualUser.user.nReachers = actualUser.user.nReachers ?? 0 - 1;
+      notifyListeners();
+      final response = await UserRepository()
+          .deleteReachRelationship(userId: actualUser.user.id!);
+      if (response.isRight()) {
+        updateSuggestedList();
+      }
+    } else {
+      actualUser.user.reaching = ReachingRelationship(reacherId: 'a');
+      actualUser.user.nReachers = actualUser.user.nReachers ?? 0 + 1;
+      notifyListeners();
+      Either<String, dynamic> response =
+          await UserRepository().reachUser(userId: actualUser.user.id!);
+      if (response.isRight()) {
+        updateSuggestedList();
+      }
+    }
+  }
+
+  updateSuggestedList() async {
+    Either<String, List<User>> response =
+        await SocialServiceRepository().suggestUser();
+    if (response.isRight()) {
+      _suggestedUsers.clear();
+      response.forEach((userList) {
+        for (User user in userList) {
+          _suggestedUsers.add(CustomUser(user: user));
+        }
+        return;
+      });
+    }
+    notifyListeners();
+  }
 }
 
 class TimeLineModel {
@@ -622,4 +699,11 @@ class TimeLineModel {
   final String id;
   TimeLineModel({required this.getPostFeed, required this.isShowing})
       : id = const Uuid().v4();
+}
+
+class CustomUser {
+  final User user;
+  final String id;
+
+  CustomUser({required this.user}) : id = const Uuid().v4();
 }

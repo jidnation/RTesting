@@ -15,7 +15,6 @@ import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_post_reach.dart';
 import 'package:reach_me/features/timeline/timeline_user_story.dart';
 
-import '../../core/components/empty_state.dart';
 import '../../core/components/profile_picture.dart';
 import '../../core/components/rm_spinner.dart';
 import '../../core/services/navigation/navigation_service.dart';
@@ -137,7 +136,6 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
-                    // ScrollController scrollController = ScrollController();
                     print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
@@ -361,9 +359,7 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                             ),
                             Expanded(
                                 child: value.isEmpty
-                                    ? UserSuggestionWidget(
-                                        loading: timeLineFeedStore.gettingPosts)
-
+                                    ? const UserSuggestionWidget()
                                     // ? EmptyTimelineWidget(
                                     //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(

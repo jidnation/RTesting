@@ -8,157 +8,146 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
-import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:skeletons/skeletons.dart';
 
-class UserSuggestionWidget extends StatefulHookWidget {
-  const UserSuggestionWidget({Key? key, required this.loading})
-      : super(key: key);
+import '../../core/utils/helpers.dart';
 
-  final bool loading;
+class UserSuggestionWidget extends StatelessWidget {
+  const UserSuggestionWidget({Key? key}) : super(key: key);
 
-  @override
-  State<UserSuggestionWidget> createState() => _UserSuggestionWidgetState();
-}
-
-class _UserSuggestionWidgetState extends State<UserSuggestionWidget> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     // ([]);
     // final isLoading = useState<bool>(true);
-    useEffect(() {
-      globals.socialServiceBloc!.add(SuggestUserEvent());
-      return null;
-    }, []);
+    // useEffect(() {
+    //   globals.socialServiceBloc!.add(SuggestUserEvent());
+    //   return null;
+    // }, []);
     return SizedBox(
-      child: ListView(
-        shrinkWrap: true,
-        padding: EdgeInsets.zero,
-        physics: const NeverScrollableScrollPhysics(),
-        children: [
-          SizedBox(height: getScreenHeight(30)),
-          Text(
-            'We are happy to have you on\nReachMe ${globals.fname!.toTitleCase()} 🎉',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: getScreenHeight(20),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: getScreenHeight(12)),
-          Text(
-            "Let’s get you up to speed on the happenings and\nevents around you, reach people to see contents\nthey share.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF767474),
-              fontSize: getScreenHeight(14),
-            ),
-          ),
-          SizedBox(height: getScreenHeight(30)),
-          Text(
-            "ReachMe recommended",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textColor2,
-              fontSize: getScreenHeight(15),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: getScreenHeight(15)),
-          SizedBox(
-            height: getScreenHeight(305),
-            width: getScreenWidth(100),
-            child: Swiper(
-              loop: false,
-              allowImplicitScrolling: true,
-              itemBuilder: (BuildContext context, int index) {
-                return SuggestedUserContainer(
-                    // size: size,
-                    // profilePicture:
-                    // suggestedUsers.value[index].profilePicture,
-                    // user: suggestedUsers.value[index],
-                    // onReach: () {
-                    //   handleTap(index);
-                    //   if (active.contains(index)) {
-                    //     reachingUser.value = true;
-                    //     // if (suggestedUsers
-                    //     //         .value[index].reaching!.reacherId ==
-                    //     //     null) {
-                    //     globals.userBloc!.add(ReachUserEvent(
-                    //         userIdToReach:
-                    //         suggestedUsers.value[index].id!));
-                    //   } else {
-                    //     globals.userBloc!.add(
-                    //         DelReachRelationshipEvent(
-                    //             userIdToDelete:
-                    //             suggestedUsers.value[index].id!));
-                    //   }
-                    //   //}
-                    // },
-                    // onDelete: () {
-                    //   handleTap(index);
-                    //   if (active.contains(index)) {
-                    //     suggestedUsers.value.removeAt(index);
-                    //   }
-                    // },
-                    // loaderColor: AppColors.white,
-                    // btnColour: active.contains(index)
-                    //     ? reachLabel.value == 'Reaching'
-                    //     ? Colors.transparent
-                    //     : AppColors.primaryColor
-                    //     : AppColors.primaryColor,
-                    // textColor: active.contains(index)
-                    //     ? reachLabel.value == 'Reaching'
-                    //     ? AppColors.primaryColor
-                    //     : AppColors.white
-                    //     : AppColors.white,
-                    // isLoading: active.contains(index)
-                    //     ? reachingUser.value
-                    //     : false,
-                    // label: active.contains(index)
-                    //     ? reachLabel.value
-                    //     : 'Reach',
-                    );
-              },
-              // itemCount: suggestedUsers.value.length,
-              itemCount: 5,
-              viewportFraction: getScreenHeight(0.7),
-              scale: getScreenHeight(0.1),
-            ),
-          )
-        ],
-      ),
+      child: ValueListenableBuilder(
+          valueListenable: TimeLineFeedStore(),
+          builder: (context, List<TimeLineModel> value, child) {
+            return ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: getScreenHeight(30)),
+                Text(
+                  'We are happy to have you on\nReachMe ${globals.fname!.toTitleCase()} 🎉',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textColor2,
+                    fontSize: getScreenHeight(20),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: getScreenHeight(12)),
+                Text(
+                  "Let’s get you up to speed on the happenings and\nevents around you, reach people to see contents\nthey share.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF767474),
+                    fontSize: getScreenHeight(14),
+                  ),
+                ),
+                SizedBox(height: getScreenHeight(30)),
+                Text(
+                  "ReachMe recommended",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textColor2,
+                    fontSize: getScreenHeight(15),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: getScreenHeight(15)),
+                SizedBox(
+                  height: getScreenHeight(305),
+                  width: getScreenWidth(100),
+                  child: Swiper(
+                    loop: false,
+                    allowImplicitScrolling: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      CustomUser customUser =
+                          timeLineFeedStore.suggestedUser[index];
+                      return SuggestedUserContainer(
+                        user: customUser,
+                        // size: size,
+                        // profilePicture:
+                        // suggestedUsers.value[index].profilePicture,
+                        // user: suggestedUsers.value[index],
+                        // onReach: () {
+                        //   handleTap(index);
+                        //   if (active.contains(index)) {
+                        //     reachingUser.value = true;
+                        //     // if (suggestedUsers
+                        //     //         .value[index].reaching!.reacherId ==
+                        //     //     null) {
+                        //     globals.userBloc!.add(ReachUserEvent(
+                        //         userIdToReach:
+                        //         suggestedUsers.value[index].id!));
+                        //   } else {
+                        //     globals.userBloc!.add(
+                        //         DelReachRelationshipEvent(
+                        //             userIdToDelete:
+                        //             suggestedUsers.value[index].id!));
+                        //   }
+                        //   //}
+                        // },
+                        // onDelete: () {
+                        //   handleTap(index);
+                        //   if (active.contains(index)) {
+                        //     suggestedUsers.value.removeAt(index);
+                        //   }
+                        // },
+                        // loaderColor: AppColors.white,
+                        // btnColour: active.contains(index)
+                        //     ? reachLabel.value == 'Reaching'
+                        //     ? Colors.transparent
+                        //     : AppColors.primaryColor
+                        //     : AppColors.primaryColor,
+                        // textColor: active.contains(index)
+                        //     ? reachLabel.value == 'Reaching'
+                        //     ? AppColors.primaryColor
+                        //     : AppColors.white
+                        //     : AppColors.white,
+                        // isLoading: active.contains(index)
+                        //     ? reachingUser.value
+                        //     : false,
+                        // label: active.contains(index)
+                        //     ? reachLabel.value
+                        //     : 'Reach',
+                      );
+                    },
+                    // itemCount: suggestedUsers.value.length,
+                    itemCount: timeLineFeedStore.suggestedUser.length,
+                    viewportFraction: getScreenHeight(0.7),
+                    scale: getScreenHeight(0.1),
+                  ),
+                )
+              ],
+            );
+          }),
     ).paddingSymmetric(h: 13);
   }
 }
 
 class SuggestedUserContainer extends StatelessWidget {
+  final CustomUser user;
   const SuggestedUserContainer({
     Key? key,
-    // required this.size,
-    // required this.onReach,
-    // required this.user,
-    // required this.profilePicture,
-    // required this.btnColour,
-    // required this.loaderColor,
-    // required this.isLoading,
-    // required this.label,
-    // required this.textColor,
-    // required this.onDelete,
+    required this.user,
   }) : super(key: key);
-
-  // final Size size;
-  // final User user;
-  // final String? profilePicture;
-  // final VoidCallback onReach, onDelete;
-  // final Color textColor, btnColour, loaderColor;
-  // final bool isLoading;
-  // final String label;
 
   @override
   Widget build(BuildContext context) {
+    bool isReaching = user.user.reaching?.reachingId != null;
+    print(
+        ":::>>>>>> ${user.user.reaching?.reachingId} >>>>> ${user.user.reaching?.reachingId}");
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -172,8 +161,9 @@ class SuggestedUserContainer extends StatelessWidget {
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
-              // onPressed: onDelete,
-              onPressed: () {},
+              onPressed: () {
+                timeLineFeedStore.deleteSuggestedUser(id: user.id);
+              },
               constraints: const BoxConstraints(),
               padding: const EdgeInsets.all(0),
               icon: const Icon(
@@ -183,37 +173,33 @@ class SuggestedUserContainer extends StatelessWidget {
               ),
             ),
           ),
-          // Helper.renderRecommendPicture(
-          //   'profilePicture',
-          //   size: 80,
-          // ),
+          Helper.renderRecommendPicture(
+            user.user.profilePicture,
+            size: 80,
+          ),
           SizedBox(height: getScreenHeight(5)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                constraints: const BoxConstraints(
-                  maxWidth: 162,
-                ),
-                child: FittedBox(
-                  child: Text(
-                    "@{user.username}",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textColor2,
-                      fontSize: getScreenHeight(16),
-                      fontWeight: FontWeight.w600,
-                    ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Container(
+              constraints: const BoxConstraints(
+                maxWidth: 162,
+              ),
+              child: FittedBox(
+                child: Text(
+                  "@${user.user.username}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textColor2,
+                    fontSize: getScreenHeight(16),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              SizedBox(width: getScreenWidth(5)),
-              // user.verified!
-              //     ?
-              SvgPicture.asset('assets/svgs/verified.svg')
-              // : const SizedBox.shrink(),
-            ],
-          ),
+            ),
+            SizedBox(width: getScreenWidth(5)),
+            user.user.verified!
+                ? SvgPicture.asset('assets/svgs/verified.svg')
+                : const SizedBox.shrink(),
+          ]),
           SizedBox(height: getScreenHeight(20)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -224,7 +210,7 @@ class SuggestedUserContainer extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'user.nReachers.toString()',
+                      user.user.nReachers.toString(),
                       style: TextStyle(
                         fontSize: getScreenHeight(13),
                         color: AppColors.greyShade2,
@@ -248,7 +234,7 @@ class SuggestedUserContainer extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'user.nReaching.toString()',
+                      user.user.nReaching.toString(),
                       style: TextStyle(
                         fontSize: getScreenHeight(13),
                         color: AppColors.greyShade2,
@@ -272,7 +258,7 @@ class SuggestedUserContainer extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'user.nStaring.toString()',
+                      user.user.nStaring.toString(),
                       style: TextStyle(
                         fontSize: getScreenHeight(13),
                         color: AppColors.greyShade2,
@@ -293,22 +279,37 @@ class SuggestedUserContainer extends StatelessWidget {
             ],
           ),
           SizedBox(height: getScreenHeight(19)),
-          // CustomButton(
-          //   label: label,
-          //   color: btnColour,
-          //   onPressed: onReach,
-          //   isLoading: isLoading,
-          //   loaderColor: loaderColor,
-          //   labelFontSize: getScreenHeight(14),
-          //   size: size,
-          //   padding: const EdgeInsets.symmetric(
-          //     horizontal: 5,
-          //     vertical: 5,
-          //   ),
-          //   textColor: textColor,
-          //   borderSide:
-          //   const BorderSide(color: AppColors.primaryColor, width: 1),
-          // ).paddingSymmetric(h: 45),
+          // btnColour: active.contains(index)
+          //     ? reachLabel.value == 'Reaching'
+          //     ? Colors.transparent
+          //     : AppColors.primaryColor
+          //     : AppColors.primaryColor,
+          // textColor: active.contains(index)
+          //     ? reachLabel.value == 'Reaching'
+          //     ? AppColors.primaryColor
+          //     : AppColors.white
+          //     : AppColors.white,
+          // isLoading: active.contains(index)
+          //     ? reachingUser.value
+          //     : false,
+          CustomButton(
+            label: isReaching ? "Reaching" : "Reach",
+            color: isReaching ? Colors.transparent : AppColors.primaryColor,
+            // onPressed: onReach,
+            onPressed: () {
+              timeLineFeedStore.reachUser(id: user.id);
+            },
+            // isLoading: isLoading,
+            // loaderColor: loaderColor,
+            labelFontSize: getScreenHeight(14),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 5,
+            ),
+            textColor: isReaching ? AppColors.primaryColor : AppColors.white,
+            borderSide:
+                const BorderSide(color: AppColors.primaryColor, width: 1),
+          ).paddingSymmetric(h: 45),
           SizedBox(height: getScreenHeight(5)),
         ],
       ).paddingSymmetric(h: 16, v: 16),
