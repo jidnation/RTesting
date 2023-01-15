@@ -1,3 +1,15 @@
+class UserList {
+  final List<User> user;
+
+  UserList({required this.user});
+
+  factory UserList.fromJson(List<dynamic> parsedJson) {
+    List<User> user = <User>[];
+    user = parsedJson.map((i) => User.fromJson(i)).toList();
+    return UserList(user: user);
+  }
+}
+
 class User {
   String? firstName;
   String? lastName;
