@@ -43,6 +43,7 @@ void main() async {
   runApp(const MyApp());
 }
 
+
 /// Registers all the singletons we need by passing a factory function.
 Future<void> initSingletons() async {
   getIt.registerLazySingleton<AppGlobals>(() => AppGlobals());

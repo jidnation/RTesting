@@ -1261,6 +1261,8 @@ class PostFeedReacherCard extends HookWidget {
                     children: [
                       Flexible(
                         child: Container(
+                          height: 40,
+                          width: getScreenWidth(160),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 11,
                             vertical: 7,
@@ -1280,13 +1282,9 @@ class PostFeedReacherCard extends HookWidget {
                                   child: isLiked
                                       ? SvgPicture.asset(
                                           'assets/svgs/like-active.svg',
-                                          height: 25,
-                                          width: 25,
                                         )
                                       : SvgPicture.asset(
                                           'assets/svgs/like.svg',
-                                          height: 25,
-                                          width: 25,
                                         ),
                                 ),
                                 SizedBox(width: getScreenWidth(4)),
@@ -1314,8 +1312,6 @@ class PostFeedReacherCard extends HookWidget {
                                   padding: EdgeInsets.zero,
                                   child: SvgPicture.asset(
                                     'assets/svgs/comment.svg',
-                                    height: 25,
-                                    width: 25,
                                   ),
                                 ),
                                 SizedBox(width: getScreenWidth(4)),
@@ -1340,8 +1336,6 @@ class PostFeedReacherCard extends HookWidget {
                                     padding: const EdgeInsets.all(0),
                                     child: SvgPicture.asset(
                                       'assets/svgs/message.svg',
-                                      height: 25,
-                                      width: 25,
                                     ),
                                   ),
                               ]),

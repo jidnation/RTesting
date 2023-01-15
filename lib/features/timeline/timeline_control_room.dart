@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/models/user.dart';
+import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/timeline/query.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:uuid/uuid.dart';
@@ -572,6 +573,29 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       if (userInfo != null) {
         RouteNavigators.route(
             context, MsgChatInterface(recipientUser: userInfo));
+      }
+    }
+  }
+
+  getUserByUsername(BuildContext context, {required String username}) async {
+    Either<String, UserList> response =
+        await UserRepository().getUserProfileByUsername(username: username);
+    UserList? userInformation;
+    User? userInfo;
+    if (response.isRight()) {
+      response.forEach((r) {
+        userInformation = r;
+        userInfo = userInformation!.user.first;
+      });
+      if (userInformation != null) {
+        RouteNavigators.route(
+            context,
+            RecipientAccountProfile(
+              recipientCoverImageUrl: userInfo!.coverPicture,
+              recipientEmail: userInfo!.email,
+              recipientId: userInfo!.id,
+              recipientImageUrl: userInfo!.profilePicture,
+            ));
       }
     }
   }

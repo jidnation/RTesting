@@ -137,7 +137,12 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                     ]),
         );
       } else {
-        return ImageBlur(widget.post, const SizedBox(), () {
+        return ImageBlur(
+            widget.post,
+            SizedBox(
+              width: size.width,
+              height: size.height,
+            ), () {
           setState(() {
             show = true;
           });
