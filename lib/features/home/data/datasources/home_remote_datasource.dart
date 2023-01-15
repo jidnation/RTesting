@@ -12,9 +12,8 @@ import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
-import 'package:reach_me/features/home/data/models/stream_model.dart';
-import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IHomeRemoteDataSource {
 //   Future<User> createAccount({
@@ -48,6 +47,30 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       return User.fromJson(result.data!['getUserByIdOrEmail']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<UserList> getUserProfileByUsername({required String? username}) async {
+    String q = r'''
+        query getUserByUsername($username: String!) {
+          getUserByUsername(username: $username) {
+            ''' +
+        UserSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'username': username,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      print("User data ${result}");
+      //print("User data 2 ${UserList.fromJson(result)}");
+      return UserList.fromJson(result.data!['getUserByUsername']);
     } catch (e) {
       rethrow;
     }
@@ -1324,8 +1347,7 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
 
-      return CommentModel.fromJson(
-          result.data!['getSingleCommentOnPost']);
+      return CommentModel.fromJson(result.data!['getSingleCommentOnPost']);
     } catch (e) {
       rethrow;
     }

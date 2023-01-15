@@ -8,6 +8,10 @@ class GetUserProfileEvent extends UserEvent {
   GetUserProfileEvent({required this.email});
 }
 
+class GetUserByUsernameEvent extends UserEvent {
+  final String username;
+   GetUserByUsernameEvent({required this.username});
+}
 class DeleteAccountEvent extends UserEvent {
   DeleteAccountEvent();
 }
