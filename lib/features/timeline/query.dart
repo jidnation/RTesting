@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/helper/endpoints.dart';
 
 import '/core/services/moment/graphql_strings.dart' as gql_string;
 import '../../core/utils/app_globals.dart';
@@ -10,7 +11,7 @@ import '../home/data/repositories/social_service_repository.dart';
 import 'models/post_feed.dart';
 
 class TimeLineQuery {
-  static String hostUrl = "https://live.myreach.me/";
+  static String hostUrl = "${Endpoints.graphQLBaseUrl}/";
   Future<List<GetPostFeed>?> getAllPostFeeds(
       {int? pageLimit, int? pageNumber, String? authIdToGet}) async {
     HttpLink link = HttpLink(
