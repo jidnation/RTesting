@@ -53,7 +53,7 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
         onStoryIndexChanged: (int newStoryIndex) {
           final story = widget.status[newStoryIndex];
           if (story.statusData?.videoMedia != null ||
-              story.statusData?.videoMedia != null) {
+              story.statusData?.audioMedia != null) {
             _indicatorController.value = IndicatorAnimationCommand(
                 duration: const Duration(seconds: 30));
           } else {
@@ -185,6 +185,14 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+                              Text(
+                                timeago.format(story.createdAt!),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
                             ],
                           ),
                         ],
@@ -278,6 +286,14 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            Text(
+                              timeago.format(story.createdAt!),
+                              style: TextStyle(
+                                fontSize: getScreenHeight(16),
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
                           ],
                         ),
                       ],
@@ -369,7 +385,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
               onStoryIndexChanged: (int newStoryIndex) {
                 final story = widget.status[newStoryIndex];
                 if (story.status?.statusData?.videoMedia != null ||
-                    story.status?.statusData?.videoMedia != null) {
+                    story.status?.statusData?.audioMedia != null) {
                   _indicatorController.value = IndicatorAnimationCommand(
                       duration: const Duration(seconds: 30));
                 } else {
@@ -431,21 +447,50 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             Row(
                               children: [
                                 Helper.renderProfilePicture(
-                                    story.status?.profileModel?.profilePicture),
+                                    story.statusOwnerProfile!.profilePicture),
                                 SizedBox(width: getScreenWidth(12)),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '@${globals.user!.username!}',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(16),
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        (story.statusOwnerProfile!.firstName! +
+                                                ' ' +
+                                                story.statusOwnerProfile!
+                                                    .lastName!)
+                                            .toTitleCase(),
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(16),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '@${story.statusOwnerProfile!.username!}',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            timeago.format(
+                                                story.status!.createdAt!),
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -608,25 +653,26 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                               Helper.renderProfilePicture(
                                   story.statusOwnerProfile!.profilePicture),
                               SizedBox(width: getScreenWidth(12)),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (story.statusOwnerProfile!.firstName! +
-                                            ' ' +
-                                            story.statusOwnerProfile!.lastName!)
-                                        .toTitleCase(),
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(16),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (story.statusOwnerProfile!.firstName! +
+                                              ' ' +
+                                              story.statusOwnerProfile!
+                                                  .lastName!)
+                                          .toTitleCase(),
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(16),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
+                                    Row(
+                                      children: [
+                                        Text(
                                           '@${story.statusOwnerProfile!.username!}',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(13),
@@ -634,10 +680,8 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
+                                        const SizedBox(width: 4),
+                                        Text(
                                           timeago
                                               .format(story.status!.createdAt!),
                                           style: TextStyle(
@@ -645,11 +689,11 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),

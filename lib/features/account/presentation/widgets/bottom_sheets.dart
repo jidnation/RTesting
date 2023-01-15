@@ -500,7 +500,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: true,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status muted successfully!');
-            timeLineFeedStore.getUserStatus();
+            // timeLineFeedStore.getUserStatus();
           }
           if (state is UnmuteStatusSuccess) {
             RouteNavigators.pop(context);
@@ -510,7 +510,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: false,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status unmuted successfully!');
-            timeLineFeedStore.getUserStatus();
+            // timeLineFeedStore.getUserStatus();
           }
           if (state is ReportStatusSuccess) {
             RouteNavigators.pop(context);
@@ -613,9 +613,6 @@ Future showUserStoryBottomSheet(BuildContext context,
                                           idToUnmute: status
                                                   .statusOwnerProfile?.authId ??
                                               ''));
-                                  await Future.delayed(
-                                      const Duration(seconds: 4));
-                                  timeLineFeedStore.initialize();
                                 } else {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -624,9 +621,6 @@ Future showUserStoryBottomSheet(BuildContext context,
                                                   .statusOwnerProfile?.authId ??
                                               ''));
                                 }
-                                await Future.delayed(
-                                    const Duration(seconds: 4));
-                                timeLineFeedStore.initialize();
                               }),
                         ],
                       ),

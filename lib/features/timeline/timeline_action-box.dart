@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,8 +95,9 @@ class TimeLineBoxActionRow extends StatelessWidget {
               if (_postModel.postOwnerId != globals.userId) {
                 HapticFeedback.mediumImpact();
 
-                timeLineFeedStore.messageUer(routeContext,
-                    email: _postModel.postOwnerId!);
+                timeLineFeedStore.messageUser(routeContext,
+                    id: _postModel.postOwnerId!,
+                    quoteData: jsonEncode(_postModel.toJson()));
               }
             },
             padding: EdgeInsets.zero,

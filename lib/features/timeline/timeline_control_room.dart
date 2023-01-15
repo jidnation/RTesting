@@ -138,6 +138,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       _gettingPosts = false;
       notifyListeners();
     }
+    await getUserStatus();
+    await getMyStatus();
+
     if (isRefresh ?? false) {
       refreshController!.refreshCompleted();
     }
@@ -420,10 +423,31 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         await timeLineQuery.getAllStatus(pageLimit: 50, pageNumber: 1);
     if (response!.isRight()) {
       response.forEach((r) {
+        r.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
         _myStatus = r;
       });
       notifyListeners();
     }
+  }
+
+  addNewStatus(StatusModel status) {
+    _myStatus = [
+      ..._myStatus,
+      status,
+    ];
+    notifyListeners();
+  }
+
+  muteStatus(int index) {
+    _mutedStatus = [..._mutedStatus, _userStatus[index]];
+    _userStatus = [..._userStatus]..removeAt(index);
+    notifyListeners();
+  }
+
+  unMuteStatus(int index) {
+    _userStatus = [..._userStatus, _mutedStatus[index]];
+    _mutedStatus = [..._mutedStatus]..removeAt(index);
+    notifyListeners();
   }
 
   getUserStatus() async {
@@ -441,6 +465,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   getMutedStatus() {
+    _mutedStatus = [];
     for (StatusFeedResponseModel actualStatus in _userStatus) {
       List<StatusFeedModel> statusList = actualStatus.status!;
       for (StatusFeedModel status in statusList) {
@@ -570,9 +595,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   // Snackbars.success(context,
   // message: 'Your reach has been posted');
 
-  messageUer(BuildContext context, {required String email}) async {
+  messageUser(BuildContext context,
+      {required String id, String? quoteData}) async {
     Either<String, User> response =
-        await UserRepository().getUserProfile(email: email);
+        await UserRepository().getUserProfile(email: id);
     User? userInfo;
     if (response.isRight()) {
       response.forEach((r) {
@@ -580,7 +606,11 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       });
       if (userInfo != null) {
         RouteNavigators.route(
-            context, MsgChatInterface(recipientUser: userInfo));
+            context,
+            MsgChatInterface(
+              recipientUser: userInfo,
+              quotedData: quoteData,
+            ));
       }
     }
   }
