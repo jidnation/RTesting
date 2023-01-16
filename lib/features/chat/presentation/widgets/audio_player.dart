@@ -162,6 +162,7 @@ class _PlayAudioState extends State<PlayAudio> {
   bool isReadingComplete = false;
   final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
+  int position = 0;
   final MediaService _mediaService = MediaService();
 
   @override
@@ -177,11 +178,13 @@ class _PlayAudioState extends State<PlayAudio> {
       print("THE URL FIELD IS NULL!!!!");
       return;
     }
+
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {
-      currentDuration = event;
+      currentDuration = position - event;
       if (mounted) setState(() {});
     });
+
     playerController.addListener(() {
       Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
 
@@ -199,6 +202,9 @@ class _PlayAudioState extends State<PlayAudio> {
     });
     await playerController.preparePlayer(res.path);
     if (mounted) setState(() {});
+
+    position = await playerController.getDuration(DurationType.max);
+       if (mounted) setState(() {});
   }
 
   /* void _playandPause() async {
