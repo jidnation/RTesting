@@ -13,6 +13,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/presentation/widgets/gallery_view.dart';
 import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
+import 'package:reach_me/features/timeline/video_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -49,11 +50,12 @@ class CommentMedia extends StatelessWidget {
               allMediaUrls: imageList,
               index: 0,
             )
-          : CommentVideoMedia(
-              url: imageList.first,
-              allMediaUrls: imageList,
-              index: 0,
-            );
+          : TimeLineVideoPlayer2(videoUrl: imageList.first);
+      // CommentVideoMedia(
+      //     url: imageList.first,
+      //     allMediaUrls: imageList,
+      //     index: 0,
+      //   );
     } else if (imageList.length == 2) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -228,22 +230,18 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
 
 class CommentAudioMedia extends StatefulWidget {
   final String path;
-  bool isPlaying;
-  final EdgeInsets? margin, padding;
-  CommentAudioMedia(
-      {Key? key,
-      required this.path,
-      this.margin,
-      this.padding,
-      required this.isPlaying})
-      : super(key: key);
+  const CommentAudioMedia({
+    Key? key,
+    required this.path,
+  }) : super(key: key);
 
   @override
   State<CommentAudioMedia> createState() => _CommentAudioMediaState();
 }
 
 class _CommentAudioMediaState extends State<CommentAudioMedia> {
-  PlayerController? playerController;
+  bool isPlaying = false;
+  late PlayerController? playerController;
   bool isInitialised = false;
   // bool isPlaying = false;
   bool isReadingCompleted = false;
@@ -251,7 +249,8 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   int currentDuration = 0;
 
   final MediaService _mediaService = MediaService();
-  Map<String, PlayerController> playerControllers = {};
+
+  // Map<String, PlayerController> playerControllers = {};
   late VideoAudioCommentCacheService videoAudioservices =
       CachedVideoAudioService(DefaultCacheManager());
 
@@ -276,19 +275,23 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
     playerController!.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
-      // Console.log('<<AUDIO-DURATION>>', event.toString());
     });
-    playerController!.addListener(() {
-      Console.log('<<AUDIO-LISTENER>>', playerController!.playerState.name);
-      if (playerController!.playerState == PlayerState.initialized) {
+
+    playerController!.onPlayerStateChanged.listen((event) {
+      print('<<<<<AUDIO-LISTENER>>>>>>> ${playerController!.playerState.name}');
+
+      if (event == PlayerState.initialized) {
         isInitialised = true;
         if (mounted) setState(() {});
-      } else if (playerController!.playerState == PlayerState.playing) {
-        widget.isPlaying = true;
+      } else if (event == PlayerState.playing) {
+        isPlaying = true;
         if (mounted) setState(() {});
-      } else if (playerController!.playerState == PlayerState.paused ||
-          playerController!.playerState == PlayerState.stopped) {
-        widget.isPlaying = false;
+      } else if (event == PlayerState.paused) {
+        isPlaying = false;
+        if (mounted) setState(() {});
+      } else if (event == PlayerState.stopped) {
+        isPlaying = false;
+        playerController!.seekTo(10);
         if (mounted) setState(() {});
       }
     });
@@ -299,39 +302,13 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
     if (mounted) setState(() {});
   }
 
-  Future<PlayerController> getPlayerController(
-      String path, String playerkey) async {
-    if (playerkey != null && playerControllers.containsKey(playerkey)) {
-      return playerControllers[playerkey]!;
-    }
-
-    final anotherPlayerController = PlayerController();
-    await anotherPlayerController.preparePlayer(path);
-    playerControllers[anotherPlayerController.playerKey] =
-        anotherPlayerController;
-    return anotherPlayerController;
-  }
-
   @override
   Widget build(BuildContext context) {
-    //print("current duration $currentDuration");
-
-    return Container(
-      margin: widget.margin,
-      height: getScreenHeight(36),
-      decoration: const BoxDecoration(
-          color: AppColors.audioPlayerBg,
-          borderRadius: BorderRadius.all(Radius.circular(15))),
-      child: Row(children: [
-        GestureDetector(
+    return Row(children: [
+      Expanded(
+        child: GestureDetector(
           onTap: () async {
-            // playerController?.pausePlayer();
-
-            //   playerController = await getPlayerController(widget.path,playerController!.playerKey);
-            //   playerController!.startPlayer(finishMode: FinishMode.pause);
-
-            if (playerController == null) return;
-            if (widget.isPlaying) {
+            if (isPlaying) {
               playerController!.pausePlayer();
             } else {
               // playerController!.stopAllPlayers();
@@ -339,55 +316,53 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
             }
           },
           child: Icon(
-            widget.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+            isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
             size: 32,
-            color: Colors.blueAccent,
+            color: const Color(0xff0077B6),
           ),
         ),
-        SizedBox(
-          width: getScreenWidth(8),
-        ),
-        isInitialised
-            ? Expanded(
-                child: AudioFileWaveforms(
-                  size: Size(MediaQuery.of(context).size.width / 2.0, 24),
-                  playerController: playerController!,
-                  density: 2,
-                  enableSeekGesture: true,
-                  playerWaveStyle: const PlayerWaveStyle(
-                    scaleFactor: 0.2,
-                    waveThickness: 3,
-                    fixedWaveColor: AppColors.white,
-                    liveWaveColor: Colors.blueAccent,
-                    waveCap: StrokeCap.round,
-                  ),
-                ),
-              )
-            : Expanded(
-                flex: 4,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width / 2.0,
-                  child: const LinearProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(Colors.blueAccent),
-                    color: AppColors.greyShade1,
-                    backgroundColor: AppColors.greyShade1,
-                  ),
-                ),
+      ),
+      SizedBox(
+        width: getScreenWidth(8),
+      ),
+      isInitialised
+          ? AudioFileWaveforms(
+              size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+              playerController: playerController!,
+              density: 2,
+              enableSeekGesture: true,
+              playerWaveStyle: const PlayerWaveStyle(
+                scaleFactor: 0.2,
+                waveThickness: 3,
+                fixedWaveColor: AppColors.white,
+                liveWaveColor: Color(0xff0077B6),
+                waveCap: StrokeCap.round,
               ),
-        const Spacer(
-          flex: 1,
+            )
+          : SizedBox(
+              width: MediaQuery.of(context).size.width / 2.0,
+              child: const LinearProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Color(0xff0077B6),
+                ),
+                color: AppColors.greyShade1,
+                backgroundColor: AppColors.greyShade1,
+              ),
+            ),
+      const Spacer(
+        flex: 1,
+      ),
+      Text(
+        StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Color(0xff0077B6),
         ),
-        Text(
-          StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
-          style: const TextStyle(
-              fontWeight: FontWeight.w600, color: Colors.blueAccent),
-        ),
-        SizedBox(
-          width: getScreenWidth(12),
-        ),
-      ]),
-    );
+      ),
+      SizedBox(
+        width: getScreenWidth(12),
+      ),
+    ]);
   }
 
   @override

@@ -150,15 +150,15 @@ class _CommentReachState extends State<CommentReach> {
     final _mentionList = useState<List<String>>([]);
     var media = useState<UploadFileDto?>(null);
 
-    useMemoized(() {
-      globals.dictionaryBloc!
-          .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
-    });
+    // useMemoized(() {
+    //   globals.dictionaryBloc!
+    //       .add(AddWordsToMentionsEvent(pageLimit: 1000, pageNumber: 1));
+    // });
 
-    useMemoized(() {
-      globals.userBloc!.add(FetchUserReachingsEvent(
-          pageLimit: 50, pageNumber: 1, authId: globals.userId));
-    });
+    // useMemoized(() {
+    //   globals.userBloc!.add(FetchUserReachingsEvent(
+    //       pageLimit: 50, pageNumber: 1, authId: globals.userId));
+    // });
 
     return BlocListener<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
@@ -177,6 +177,34 @@ class _CommentReachState extends State<CommentReach> {
           if (state is CreateRepostLoading) {
             toast('Reposting reach...',
                 duration: const Duration(milliseconds: 100));
+          }
+
+          if (state is MediaUploadSuccess) {
+            String? audioMediaItem;
+            String? videoMediaItem;
+            List<String>? imageMediaItem;
+            if (FileUtils.fileType(state.image!) == "audio") {
+              audioMediaItem = state.image!;
+            }
+            if (FileUtils.fileType(state.image!) == "video") {
+              videoMediaItem = state.image!;
+            }
+            if (FileUtils.fileType(state.image!) == "image") {
+              imageMediaItem = [];
+              imageMediaItem.add(state.image!);
+            }
+            globals.socialServiceBloc!.add(CommentOnPostEvent(
+                postId: widget.postFeedModel!.postId,
+                userId: globals.user!.id,
+                content: globals.postContent,
+                postOwnerId: widget.postFeedModel!.postOwnerId,
+                audioMediaItem: audioMediaItem,
+                videoMediaItem: videoMediaItem,
+                imageMediaItems: imageMediaItem ?? []));
+
+            RouteNavigators.routeReplace(
+                context, FullPostScreen(postFeedModel: widget.postFeedModel));
+            controllerKey.currentState!.controller!.clear();
           }
 
           //
@@ -269,7 +297,7 @@ class _CommentReachState extends State<CommentReach> {
                           // .add(UploadPostMediaEvent(media: _mediaList));
                           globals.postContent =
                               controllerKey.currentState!.controller?.text ??
-                                  ' ';
+                                  '';
                         } else {
                           globals.socialServiceBloc!.add(CommentOnPostEvent(
                               postId: widget.postFeedModel!.post!.postId,
@@ -279,6 +307,12 @@ class _CommentReachState extends State<CommentReach> {
                               userId: globals.user!.id,
                               postOwnerId: widget.postFeedModel!.post!
                                   .postOwnerProfile!.authId));
+
+                          RouteNavigators.routeReplace(
+                              context,
+                              FullPostScreen(
+                                  postFeedModel: widget.postFeedModel));
+                          controllerKey.currentState!.controller!.clear();
                         }
                         // globals.socialServiceBloc!.add(CreateRepostEvent(
                         //     input: CreateRepostInput(
@@ -293,9 +327,9 @@ class _CommentReachState extends State<CommentReach> {
                         //         commentOption: 'everyone')));
                       }
 
-                      RouteNavigators.route(context,
-                          FullPostScreen(postFeedModel: widget.postFeedModel));
-                      controllerKey.currentState!.controller!.clear();
+                      // RouteNavigators.route(context,
+                      //     FullPostScreen(postFeedModel: widget.postFeedModel));
+                      // controllerKey.currentState!.controller!.clear();
                     },
                   ),
                 ],
