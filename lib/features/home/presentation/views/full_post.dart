@@ -66,8 +66,8 @@ class FullPostScreen extends StatefulHookWidget {
 class _FullPostScreenState extends State<FullPostScreen> {
   @override
   void initState() {
-    // globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-    //     postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
+    globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+        postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
     super.initState();
   }
 
@@ -99,10 +99,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
           type: ReachRelationshipType.reacher));
     });
 
-    useMemoized(() {
-      globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
-          postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
-    });
+    // useMemoized(() {
+    //   globals.socialServiceBloc!.add(GetAllCommentsOnPostEvent(
+    //       postId: widget.postFeedModel!.postId, pageLimit: 50, pageNumber: 1));
+    // });
 
     Set active = {};
 
@@ -201,69 +201,69 @@ class _FullPostScreenState extends State<FullPostScreen> {
         return BlocConsumer<SocialServiceBloc, SocialServiceState>(
           bloc: globals.socialServiceBloc,
           listener: ((context, state) {
-            if (state is MediaUploadSuccess) {
-              String? audioMediaItem;
-              String? videoMediaItem;
-              List<String>? imageMediaItem;
-              if (FileUtils.fileType(state.image!) == 'audio') {
-                audioMediaItem = state.image!;
-              }
-              if (FileUtils.fileType(state.image!) == 'video') {
-                videoMediaItem = state.image!;
-              }
-              if (FileUtils.fileType(state.image!) == 'image') {
-                imageMediaItem = [];
-                imageMediaItem.add(state.image!);
-              }
-              globals.socialServiceBloc!.add(CommentOnPostEvent(
-                  postId: widget.postFeedModel!.postId,
-                  userId: globals.user!.id,
-                  content: globals.postContent,
-                  postOwnerId: widget.postFeedModel!.postOwnerId,
-                  audioMediaItem: audioMediaItem ?? null,
-                  videoMediaItem: videoMediaItem ?? null,
-                  imageMediaItems: imageMediaItem ?? []));
+            // if (state is MediaUploadSuccess) {
+            //   String? audioMediaItem;
+            //   String? videoMediaItem;
+            //   List<String>? imageMediaItem;
+            //   if (FileUtils.fileType(state.image!) == "audio") {
+            //     audioMediaItem = state.image!;
+            //   }
+            //   if (FileUtils.fileType(state.image!) == "video") {
+            //     videoMediaItem = state.image!;
+            //   }
+            //   if (FileUtils.fileType(state.image!) == "image") {
+            //     imageMediaItem = [];
+            //     imageMediaItem.add(state.image!);
+            //   }
+            //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+            //       postId: widget.postFeedModel!.postId,
+            //       userId: globals.user!.id,
+            //       content: globals.postContent,
+            //       postOwnerId: widget.postFeedModel!.postOwnerId,
+            //       audioMediaItem: audioMediaItem ?? null,
+            //       videoMediaItem: videoMediaItem ?? null,
+            //       imageMediaItems: imageMediaItem ?? []));
 
-              // if ((FileUtils.fileType(url) == 'audio') ||
-              //     (FileUtils.fileType(url) == 'image') ||
-              //     (FileUtils.fileType(url) == 'video')) {
-              //   if (FileUtils.fileType(url) == 'audio')
-              //     print('This is an audioFile');
+            //   // if ((FileUtils.fileType(url) == 'audio') ||
+            //   //     (FileUtils.fileType(url) == 'image') ||
+            //   //     (FileUtils.fileType(url) == 'video')) {
+            //   //   if (FileUtils.fileType(url) == 'audio')
+            //   //     print('This is an audioFile');
 
-              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
-              //     content: globals.postContent,
-              //     postId: widget.postFeedModel!.postId,
-              //     userId: globals.user!.id,
-              //     audioMediaItem: url.isNotEmpty ? url : ' ',
-              //     postOwnerId: widget.postFeedModel!.postOwnerId,
-              //   ));
-              // }
+            //   //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+            //   //     content: globals.postContent,
+            //   //     postId: widget.postFeedModel!.postId,
+            //   //     userId: globals.user!.id,
+            //   //     audioMediaItem: url.isNotEmpty ? url : ' ',
+            //   //     postOwnerId: widget.postFeedModel!.postOwnerId,
+            //   //   ));
+            //   // }
 
-              // if (FileUtils.fileType(url) == 'image') {
-              //   print('This is a image file');
-              //   List<String> imageMediaItem = [];
-              //   imageMediaItem.add(url);
-              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
-              //     content: globals.postContent,
-              //     postId: widget.postFeedModel!.postId,
-              //     userId: globals.user!.id,
-              //     imageMediaItems:
-              //         imageMediaItem.isNotEmpty ? imageMediaItem : [],
-              //     postOwnerId: widget.postFeedModel!.postOwnerId,
-              //   ));
-              // }
+            //   // if (FileUtils.fileType(url) == 'image') {
+            //   //   print('This is a image file');
+            //   //   List<String> imageMediaItem = [];
+            //   //   imageMediaItem.add(url);
+            //   //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+            //   //     content: globals.postContent,
+            //   //     postId: widget.postFeedModel!.postId,
+            //   //     userId: globals.user!.id,
+            //   //     imageMediaItems:
+            //   //         imageMediaItem.isNotEmpty ? imageMediaItem : [],
+            //   //     postOwnerId: widget.postFeedModel!.postOwnerId,
+            //   //   ));
+            //   // }
 
-              // if (FileUtils.fileType(url) == 'video') {
-              //   print('This is a video file');
-              //   globals.socialServiceBloc!.add(CommentOnPostEvent(
-              //     content: globals.postContent,
-              //     postId: widget.postFeedModel!.postId,
-              //     userId: globals.user!.id,
-              //     videoMediaItem: url.isNotEmpty ? url : ' ',
-              //     postOwnerId: widget.postFeedModel!.postOwnerId,
-              //   ));
-              // }
-            }
+            //   // if (FileUtils.fileType(url) == 'video') {
+            //   //   print('This is a video file');
+            //   //   globals.socialServiceBloc!.add(CommentOnPostEvent(
+            //   //     content: globals.postContent,
+            //   //     postId: widget.postFeedModel!.postId,
+            //   //     userId: globals.user!.id,
+            //   //     videoMediaItem: url.isNotEmpty ? url : ' ',
+            //   //     postOwnerId: widget.postFeedModel!.postOwnerId,
+            //   //   ));
+            //   // }
+            // }
 
             if (state is CommentOnPostSuccess) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -1513,7 +1513,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                     suffixIcon: IconButton(
                         icon: const Icon(Icons.emoji_emotions_outlined),
                         onPressed: () {
-                          RouteNavigators.route(
+                          RouteNavigators.routeReplace(
                               context,
                               CommentReach(
                                   postFeedModel: widget.postFeedModel));
@@ -1697,7 +1697,6 @@ class CommentsTile extends StatelessWidget {
   final String isLiked;
   @override
   Widget build(BuildContext context) {
-    print('This is the Isliked value $isLiked');
     return Container(
         padding: const EdgeInsets.only(
           left: 14,
@@ -1780,16 +1779,28 @@ class CommentsTile extends StatelessWidget {
             //else
             //const SizedBox.shrink(),
             comment.audioMediaItem != null
-                ? Row(
+                ? Container(
+                  height: 59,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  width: SizeConfig.screenWidth,
+                  decoration: BoxDecoration( 
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xfff5f5f5)
+                  ),
+                  child:  Row(
                     children: [
                       Expanded(
                         child: CommentAudioMedia(
                           path: comment.audioMediaItem ?? '',
-                          isPlaying: false,
-                        ).paddingOnly(right: 0, left: 0, bottom: 10, top: 0),
+                          
+                        )
                       ),
                     ],
                   )
+                )
+                
+                
+               
                 : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(
