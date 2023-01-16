@@ -33,6 +33,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserError(error: e.message));
       }
     });
+
+      on<GetUserByUsernameEvent>((event, emit) async {
+      emit(GetUserByUsernameInitial());
+      try {
+        final response = await userRepository.getUserProfileByUsername(
+          username: event.username,
+        );
+        response.fold(
+          (error) => emit(GetUserByUsernameError(error: error)),
+          (users) {
+
+            emit(GetUserByUsernameSuccess(users: users));
+          },
+        );
+      } on GraphQLError catch (e) {
+        emit(UserError(error: e.message));
+      }
+    });
     on<DeleteAccountEvent>((event, emit) async {
       emit(DeleteAccountLoading());
       try {

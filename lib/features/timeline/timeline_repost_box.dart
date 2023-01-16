@@ -130,9 +130,7 @@ class TimelineRepostedPost extends StatelessWidget {
                                       tPostInfo.location!
                                               .toLowerCase()
                                               .trim() !=
-                                          'nil' ||
-                                  tPostInfo.location!.toLowerCase().trim() !=
-                                      'NIL'
+                                          'nil'
                               ? 5
                               : 0),
                     ]),

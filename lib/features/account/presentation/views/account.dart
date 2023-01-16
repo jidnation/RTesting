@@ -31,7 +31,6 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -105,7 +104,6 @@ class _AccountScreenState extends State<AccountScreen>
         unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
         labelColor: AppColors.white,
-        padding: const EdgeInsets.only(left: 16),
         labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
         indicator: BoxDecoration(
@@ -1715,9 +1713,11 @@ class _ReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    postModel!.location! == 'nil' ||
-                                            postModel!.location! == 'NIL' ||
-                                            postModel!.location == null
+                                    postModel!.location!
+                                                .toLowerCase()
+                                                .trim()
+                                                .toString() ==
+                                            'nil'
                                         ? ''
                                         : postModel!.location!.length > 23
                                             ? postModel!.location!
@@ -1775,34 +1775,31 @@ class _ReacherCard extends HookWidget {
                       ),
                     ).paddingSymmetric(v: 10, h: 16),
                   ),
-                  if ((postModel!.imageMediaItems ?? []).isNotEmpty )
+                  if ((postModel!.imageMediaItems ?? []).isNotEmpty)
                     PostMedia(post: postModel!)
                         .paddingOnly(r: 16, l: 16, b: 16, t: 10)
                   else
                     const SizedBox.shrink(),
-                      if(  (postModel!.videoMediaItem ?? '')
-                                  .isNotEmpty)
-                                   TimeLineVideoPlayer(
-                                                    post: postModel!,
-                                                     videoUrl: postModel!.videoMediaItem!)
-
-                                          else
-                  (postModel!.audioMediaItem ?? '').isNotEmpty
-                      ?Container(
-                        height: 59,
-                        margin: const EdgeInsets.only(bottom: 10),
-                        width: SizeConfig.screenWidth,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: const Color(0xfff5f5f5)),
-                        child: Row(children: [
-                          Expanded(
-                              child: MomentAudioPlayer(
-                            audioPath: postModel!.audioMediaItem!,
-                          )),
-                        ]),
-                      )
-                      : const SizedBox.shrink(),
+                  if ((postModel!.videoMediaItem ?? '').isNotEmpty)
+                    TimeLineVideoPlayer(
+                        post: postModel!, videoUrl: postModel!.videoMediaItem!)
+                  else
+                    (postModel!.audioMediaItem ?? '').isNotEmpty
+                        ? Container(
+                            height: 59,
+                            margin: const EdgeInsets.only(bottom: 10),
+                            width: SizeConfig.screenWidth,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: const Color(0xfff5f5f5)),
+                            child: Row(children: [
+                              Expanded(
+                                  child: MomentAudioPlayer(
+                                audioPath: postModel!.audioMediaItem!,
+                              )),
+                            ]),
+                          )
+                        : const SizedBox.shrink(),
                   (postModel?.repostedPost != null)
                       ? RepostedPost(
                           post: postModel!,
@@ -1837,8 +1834,6 @@ class _ReacherCard extends HookWidget {
                                       ? 'assets/svgs/like-active.svg'
                                       : 'assets/svgs/like.svg',
                                   color: likeColour,
-                                  height: 20,
-                                  width: 20,
                                 ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
@@ -1861,8 +1856,6 @@ class _ReacherCard extends HookWidget {
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
                                   'assets/svgs/comment.svg',
-                                  height: 20,
-                                  width: 20,
                                 ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
@@ -1930,7 +1923,6 @@ class _ReacherCard extends HookWidget {
                                       (postModel?.isVoted ?? '') == 'Upvote'
                                           ? 'assets/svgs/shoutup-active.svg'
                                           : 'assets/svgs/shoutup.svg',
-                                      height: 20,
                                     ),
                                   ),
                                   Flexible(
@@ -1947,7 +1939,6 @@ class _ReacherCard extends HookWidget {
                                     constraints: const BoxConstraints(),
                                     icon: SvgPicture.asset(
                                       'assets/svgs/downvote.svg',
-                                      width: 20,
                                     ),
                                   ),
                                   Flexible(
@@ -2416,11 +2407,11 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             _reachoutsRefreshController.refreshFailed();
           }
 
-             if (state is GetLikedPostsSuccess) {
-                  debugPrint("LikedPosts ${state.posts}");
-                  _likedPosts.value = state.posts!;
-                  _likesRefreshController.refreshCompleted();
-                }
+          if (state is GetLikedPostsSuccess) {
+            debugPrint("LikedPosts ${state.posts}");
+            _likedPosts.value = state.posts!;
+            _likesRefreshController.refreshCompleted();
+          }
           if (state is GetPersonalCommentsSuccess) {
             _comments.value = state.data!;
             _commentsRefreshController.refreshCompleted();
@@ -3228,10 +3219,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                   ),
 
                                 // RECEPIENT LIKES TAB
-                                  if (timelineLoading)
+                                if (timelineLoading)
                                   const CircularLoader()
-                                  else
-                                      Refresher(
+                                else
+                                  Refresher(
                                     controller: _likesRefreshController,
                                     onRefresh: () {
                                       globals.socialServiceBloc!
@@ -3242,38 +3233,45 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                       ));
                                     },
                                     child: _likedPosts.value.isEmpty
-                                        ?       ListView(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  children: const [
-                                    EmptyTabWidget(
-                                      title: "Likes they made",
-                                      subtitle: "Find post they liked",
-                                    )
-                                  ],
-                                )
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Likes they made",
+                                                subtitle:
+                                                    "Find post they liked",
+                                              )
+                                            ],
+                                          )
                                         : ListView.builder(
                                             itemCount: _likedPosts.value.length,
                                             itemBuilder: (context, index) {
-                                           return PostFeedReacherCard(
-                                          likingPost: false,
-                                          postFeedModel:
-                                              _likedPosts.value[index],
-                                          isLiked: _likedPosts
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          isVoted: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          voteType: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? _likedPosts.value[index]
-                                                  .vote![0].voteType
-                                              : null,
-                                          onMessage: () {
-                                           // reachDM.value = true;
+                                              return PostFeedReacherCard(
+                                                likingPost: false,
+                                                postFeedModel:
+                                                    _likedPosts.value[index],
+                                                isLiked: _likedPosts
+                                                        .value[index]
+                                                        .like!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                isVoted: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                voteType: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? _likedPosts.value[index]
+                                                        .vote![0].voteType
+                                                    : null,
+                                                onMessage: () {
+                                                  // reachDM.value = true;
 
                                                   handleTap(index);
                                                   if (active.contains(index)) {

@@ -51,6 +51,30 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<UserList> getUserProfileByUsername({required String? username}) async {
+    String q = r'''
+        query getUserByUsername($username: String!) {
+          getUserByUsername(username: $username) {
+            ''' +
+        UserSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      final result = await _client.query(gql(q), variables: {
+        'username': username,
+      });
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      print("User data ${result}");
+      //print("User data 2 ${UserList.fromJson(result)}");
+      return UserList.fromJson(result.data!['getUserByUsername']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<User> setUsername({required String? username}) async {
     String q = r'''
         mutation setUsername($username: String!) {
