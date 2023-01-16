@@ -66,9 +66,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       {bool? isTextEditing,
       bool? isPosting,
       bool? isUpvoting,
+      bool? isQuoting,
       bool? isRefresh,
       RefreshController? refreshController}) async {
-    if ((isPosting ?? false) || (isTextEditing ?? false)) {
+    if ((isPosting ?? false) ||
+        (isTextEditing ?? false) ||
+        (isQuoting ?? false)) {
       // Get.to(() => const TimeLineFeed());
       Get.back();
       _isPosting = true;
@@ -89,6 +92,27 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           titleText: const SizedBox.shrink(),
           messageText: CustomText(
             text: 'You have successfully edit your post',
+            color: const Color(0xFF1C8B43),
+            size: getScreenHeight(16),
+          ),
+          borderWidth: 0.5,
+          icon: SvgPicture.asset(
+            'assets/svgs/like.svg',
+            color: const Color(0xFF1C8B43),
+          ),
+          backgroundColor: const Color(0xFFE0FFDD),
+          borderColor: const Color(0xFF1C8B43),
+          borderRadius: 16,
+          duration: const Duration(milliseconds: 1500),
+        );
+      }
+      if (isQuoting ?? false) {
+        Get.snackbar(
+          '',
+          '',
+          titleText: const SizedBox.shrink(),
+          messageText: CustomText(
+            text: 'Reach has been quoted on your timeline',
             color: const Color(0xFF1C8B43),
             size: getScreenHeight(16),
           ),

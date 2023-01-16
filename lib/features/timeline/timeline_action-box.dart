@@ -10,7 +10,6 @@ import 'package:reach_me/features/timeline/timeline_feed.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
-import '../../core/utils/dimensions.dart';
 import '../home/presentation/views/comment_reach.dart';
 import '../moment/moment_feed.dart';
 import 'models/post_feed.dart';
@@ -30,8 +29,8 @@ class TimeLineBoxActionRow extends StatelessWidget {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Container(
         height: 40,
-        width: getScreenWidth(160),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
+        // width: getScreenWidth(160),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: const Color(0xfff5f5f5),
           borderRadius: BorderRadius.circular(8),
@@ -62,6 +61,7 @@ class TimeLineBoxActionRow extends StatelessWidget {
               color: const Color(0xff001824),
             )
           ]),
+          const SizedBox(width: 12),
           InkWell(
             onTap: () {
               RouteNavigators.route(
@@ -87,25 +87,35 @@ class TimeLineBoxActionRow extends StatelessWidget {
               )
             ]),
           ),
-          CupertinoButton(
-            minSize: 0,
-            onPressed: () {
-              pt.PostFeedModel _postModel =
-                  timeLineFeedStore.getPostModelById(timeLineId);
-              if (_postModel.postOwnerId != globals.userId) {
-                HapticFeedback.mediumImpact();
+          Visibility(
+            visible:
+                timeLineFeedStore.getPostModelById(timeLineId).postOwnerId !=
+                    globals.userId,
+            child: Row(
+              children: [
+                const SizedBox(width: 12),
+                CupertinoButton(
+                  minSize: 0,
+                  onPressed: () {
+                    pt.PostFeedModel _postModel =
+                        timeLineFeedStore.getPostModelById(timeLineId);
+                    if (_postModel.postOwnerId != globals.userId) {
+                      HapticFeedback.mediumImpact();
 
-                timeLineFeedStore.messageUser(routeContext,
-                    id: _postModel.postOwnerId!,
-                    quoteData: jsonEncode(_postModel.toJson()));
-              }
-            },
-            padding: EdgeInsets.zero,
-            child: SvgPicture.asset(
-              'assets/svgs/message.svg',
-              color: Colors.black,
-              width: 24.44,
-              height: 22,
+                      timeLineFeedStore.messageUser(routeContext,
+                          id: _postModel.postOwnerId!,
+                          quoteData: jsonEncode(_postModel.toJson()));
+                    }
+                  },
+                  padding: EdgeInsets.zero,
+                  child: SvgPicture.asset(
+                    'assets/svgs/message.svg',
+                    color: Colors.black,
+                    width: 24.44,
+                    height: 22,
+                  ),
+                ),
+              ],
             ),
           ),
         ]),
