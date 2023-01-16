@@ -156,21 +156,21 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 context, MsgChatInterface(recipientUser: state.user));
           }
         }
-     if(state is GetUserByUsernameSuccess){
-       var userInfo = state.users!.user.first;
-       RouteNavigators.route(
-           context,
-           RecipientAccountProfile(
-             recipientCoverImageUrl: userInfo!.coverPicture,
-             recipientEmail: userInfo!.email,
-             recipientId: userInfo!.id,
-             recipientImageUrl: userInfo!.profilePicture,
-           ));
-     }
-     if(state is GetUserByUsernameError){
-       Snackbars.error(context,
-           message: 'User Profile not found');
-     }
+        if (state is GetUserByUsernameSuccess) {
+          // var userInfo = state.users!.user.first;
+          var userInfo = state.users!;
+          RouteNavigators.route(
+              context,
+              RecipientAccountProfile(
+                recipientCoverImageUrl: userInfo.coverPicture,
+                recipientEmail: userInfo.email,
+                recipientId: userInfo.id,
+                recipientImageUrl: userInfo.profilePicture,
+              ));
+        }
+        if (state is GetUserByUsernameError) {
+          Snackbars.error(context, message: 'User Profile not found');
+        }
         if (state is GetReachRelationshipSuccess) {
           isReaching.value = state.isReaching!;
           if (shoutdownPost.value == true) {
@@ -636,8 +636,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   },
                                                   onMentionTap: (value) {
                                                     globals.userBloc!.add(
-                                                      GetUserByUsernameEvent(username: value)
-                                                    );
+                                                        GetUserByUsernameEvent(
+                                                            username: value));
                                                   },
                                                   mentionStyle: const TextStyle(
                                                       decoration: TextDecoration

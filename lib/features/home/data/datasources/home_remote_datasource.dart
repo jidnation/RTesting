@@ -51,7 +51,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<UserList> getUserProfileByUsername({required String? username}) async {
+  Future<User> getUserProfileByUsername({required String? username}) async {
     String q = r'''
         query getUserByUsername($username: String!) {
           getUserByUsername(username: $username) {
@@ -69,7 +69,7 @@ class HomeRemoteDataSource {
       }
       print("User data ${result}");
       //print("User data 2 ${UserList.fromJson(result)}");
-      return UserList.fromJson(result.data!['getUserByUsername']);
+      return User.fromJson(result.data!['getUserByUsername']);
     } catch (e) {
       rethrow;
     }

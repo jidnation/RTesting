@@ -1,3 +1,5 @@
+import '../../features/home/data/models/status.model.dart';
+
 class User {
   String? firstName;
   String? lastName;
