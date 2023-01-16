@@ -228,7 +228,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                               username:
                                                   '@${usersList.value[index].username}',
                                               status: tailMessage
-                                                  .value[index].content!,
+                                                  .value[index].value!,
                                               avatar: usersList
                                                   .value[index].profilePicture,
                                             ).paddingOnly(b: 5);

@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
@@ -14,6 +17,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
@@ -31,7 +35,8 @@ class ViewMyStatus extends StatefulHookWidget {
 class _ViewMyStatusState extends State<ViewMyStatus> {
   final audioPlayer = AudioPlayer();
   bool isPlaying = true;
-
+  final _indicatorController = ValueNotifier<IndicatorAnimationCommand>(
+      IndicatorAnimationCommand(resume: true));
   @override
   void dispose() {
     audioPlayer.stop();
@@ -41,31 +46,23 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final duration = useState(5);
-
-    final indicatorController = useState(IndicatorAnimationCommand());
 
     return Scaffold(
       body: StoryPageView(
-        indicatorAnimationController: indicatorController,
-        // indicatorDuration: Duration(seconds: duration.value),
+        indicatorAnimationController: _indicatorController,
+        onStoryIndexChanged: (int newStoryIndex) {
+          final story = widget.status[newStoryIndex];
+          if (story.statusData?.videoMedia != null ||
+              story.statusData?.audioMedia != null) {
+            _indicatorController.value = IndicatorAnimationCommand(
+                duration: const Duration(seconds: 30));
+          } else {
+            _indicatorController.value =
+                IndicatorAnimationCommand(duration: const Duration(seconds: 5));
+          }
+        },
         itemBuilder: (context, pageIndex, storyIndex) {
           final story = widget.status[storyIndex];
-          if (story.statusData?.audioMedia != null) {
-            indicatorController.value = IndicatorAnimationCommand(
-                duration: const Duration(seconds: 30));
-          } else {
-            indicatorController.value =
-                IndicatorAnimationCommand(duration: const Duration(seconds: 5));
-          }
-          if (story.statusData?.videoMedia != null) {
-            indicatorController.value = IndicatorAnimationCommand(
-                duration: const Duration(seconds: 30));
-          } else {
-            indicatorController.value =
-                IndicatorAnimationCommand(duration: const Duration(seconds: 5));
-          }
-          //final image = images[storyIndex];
           if (story.statusData!.imageMedia != null ||
               (story.statusData!.imageMedia ?? '').isNotEmpty) {
             return Stack(
@@ -108,13 +105,13 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-
-                              Text(timeago.format(story.createdAt!),
-                              style: TextStyle(
-                                 fontSize: getScreenHeight(16),
-                                 color: Colors.white,
+                              Text(
+                                timeago.format(story.createdAt!),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
-                              ),
+                                ),
                               )
                             ],
                           ),
@@ -188,6 +185,14 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+                              Text(
+                                timeago.format(story.createdAt!),
+                                style: TextStyle(
+                                  fontSize: getScreenHeight(16),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              )
                             ],
                           ),
                         ],
@@ -232,6 +237,7 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                           width: size.width,
                           color: AppColors.black,
                           child: VideoPreview(
+                            key: Key(story.statusId!),
                             isLocalVideo: false,
                             loop: true,
                             showControls: false,
@@ -243,7 +249,8 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                           width: size.width,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage(story.statusData!.background!),
+                              image: AssetImage(
+                                  story.statusData?.background ?? ''),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -251,8 +258,9 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                             child: Text(
                               story.statusData!.caption!,
                               textAlign: Helper.getAlignment(
-                                  story.statusData!.alignment!)['align'],
-                              style: Helper.getFont(story.statusData!.font!),
+                                  story.statusData?.alignment ?? '')['align'],
+                              style:
+                                  Helper.getFont(story.statusData?.font ?? ''),
                             ),
                           ),
                         ),
@@ -278,6 +286,14 @@ class _ViewMyStatusState extends State<ViewMyStatus> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+                            Text(
+                              timeago.format(story.createdAt!),
+                              style: TextStyle(
+                                fontSize: getScreenHeight(16),
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
                           ],
                         ),
                       ],
@@ -337,11 +353,21 @@ class ViewUserStatus extends StatefulHookWidget {
 
 class _ViewUserStatusState extends State<ViewUserStatus> {
   final AudioPlayer audioPlayer = AudioPlayer();
+  final _indicatorController = ValueNotifier<IndicatorAnimationCommand>(
+    IndicatorAnimationCommand(resume: true),
+  );
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
-    final indicatorController = useState(IndicatorAnimationCommand());
+
+    final keyboardController = KeyboardVisibilityController();
+    useEffect(() {
+      keyboardController.onChange.listen((event) {
+        if (event) {
+        } else {}
+      });
+    }, []);
     return Scaffold(
       body: BlocConsumer<ChatBloc, ChatState>(
           bloc: globals.chatBloc,
@@ -355,24 +381,20 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
           },
           builder: (context, state) {
             return StoryPageView(
-              indicatorAnimationController: indicatorController,
+              indicatorAnimationController: _indicatorController,
+              onStoryIndexChanged: (int newStoryIndex) {
+                final story = widget.status[newStoryIndex];
+                if (story.status?.statusData?.videoMedia != null ||
+                    story.status?.statusData?.audioMedia != null) {
+                  _indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 30));
+                } else {
+                  _indicatorController.value = IndicatorAnimationCommand(
+                      duration: const Duration(seconds: 5));
+                }
+              },
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = widget.status[storyIndex];
-
-                if (story.status?.statusData?.videoMedia != null) {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 30));
-                } else {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 5));
-                }
-                if (story.status?.statusData?.audioMedia != null) {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 30));
-                } else {
-                  indicatorController.value = IndicatorAnimationCommand(
-                      duration: const Duration(seconds: 5));
-                }
                 if (story.status?.statusData!.audioMedia != null ||
                     (story.status?.statusData!.audioMedia ?? '').isNotEmpty) {
                   debugPrint(
@@ -414,7 +436,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             width: size.width,
                             child: Center(
                               child: Helper.renderProfilePicture(
-                                  story.status?.profileModel!.profilePicture,
+                                  story.statusOwnerProfile?.profilePicture,
                                   size: 100),
                             )),
                       ),
@@ -425,21 +447,50 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                             Row(
                               children: [
                                 Helper.renderProfilePicture(
-                                    story.status?.profileModel!.profilePicture),
+                                    story.statusOwnerProfile!.profilePicture),
                                 SizedBox(width: getScreenWidth(12)),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '@${globals.user!.username!}',
-                                      style: TextStyle(
-                                        fontSize: getScreenHeight(16),
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        (story.statusOwnerProfile!.firstName! +
+                                                ' ' +
+                                                story.statusOwnerProfile!
+                                                    .lastName!)
+                                            .toTitleCase(),
+                                        style: TextStyle(
+                                          fontSize: getScreenHeight(16),
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '@${story.statusOwnerProfile!.username!}',
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            timeago.format(
+                                                story.status!.createdAt!),
+                                            style: TextStyle(
+                                              fontSize: getScreenHeight(13),
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -507,13 +558,13 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          timeago.format(story.status!.createdAt!),
+                                          timeago
+                                              .format(story.status!.createdAt!),
                                           style: TextStyle(
                                             fontSize: getScreenHeight(13),
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
-
                                         )
                                       ],
                                     ),
@@ -563,6 +614,7 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                 width: size.width,
                                 color: AppColors.black,
                                 child: VideoPreview(
+                                  key: Key(story.status!.statusId!),
                                   isLocalVideo: false,
                                   loop: true,
                                   showControls: false,
@@ -601,25 +653,26 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                               Helper.renderProfilePicture(
                                   story.statusOwnerProfile!.profilePicture),
                               SizedBox(width: getScreenWidth(12)),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (story.statusOwnerProfile!.firstName! +
-                                            ' ' +
-                                            story.statusOwnerProfile!.lastName!)
-                                        .toTitleCase(),
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(16),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (story.statusOwnerProfile!.firstName! +
+                                              ' ' +
+                                              story.statusOwnerProfile!
+                                                  .lastName!)
+                                          .toTitleCase(),
+                                      style: TextStyle(
+                                        fontSize: getScreenHeight(16),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
+                                    Row(
+                                      children: [
+                                        Text(
                                           '@${story.statusOwnerProfile!.username!}',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(13),
@@ -627,22 +680,20 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            timeago.format(story.status!.createdAt!),
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(13),
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                        
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          timeago
+                                              .format(story.status!.createdAt!),
+                                          style: TextStyle(
+                                            fontSize: getScreenHeight(13),
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         )
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -803,16 +854,12 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                           if (controller.text.isNotEmpty) {
                             globals.chatBloc!.add(
                               SendChatMessageEvent(
-                                senderId: globals.user!.id,
-                                receiverId: story.statusOwnerProfile!.authId,
-                                threadId:
-                                    '${globals.user!.id}--${story.statusOwnerProfile!.authId}',
-                                value: controller.text.trim(),
-                                type: 'text',
-                                messageMode: '',
-                                sentAt: Helper.parseChatTime(''
-                                                  ),
-                              ),
+                                  senderId: globals.user!.id,
+                                  receiverId: story.statusOwnerProfile!.authId,
+                                  value: controller.text.trim(),
+                                  type: 'text',
+                                  quotedData: jsonEncode(story.toJson()),
+                                  messageMode: MessageMode.quoted.name),
                             );
                             toast('Sending message...',
                                 duration: Toast.LENGTH_LONG);

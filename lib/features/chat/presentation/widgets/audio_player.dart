@@ -9,6 +9,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/string_util.dart';
@@ -32,8 +33,7 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
     super.initState();
 
     setAudio(widget.sourceFile);
-  
-  
+
     myAudioPlayer.onPlayerStateChanged.listen((event) {
       setState(() {
         isPlaying = event == PlayerState.playing;
@@ -232,12 +232,14 @@ class _PlayAudioState extends State<PlayAudio> {
                       ? Icon(
                           Icons.play_arrow,
                           size: 30,
-                          color: widget.isMe ? Colors.white : Colors.blue,
+                          color:
+                              widget.isMe ? Colors.white : AppColors.textColor2,
                         )
                       : Icon(
                           Icons.pause_circle,
                           size: 30,
-                          color: widget.isMe ? Colors.white : Colors.blue,
+                          color:
+                              widget.isMe ? Colors.white : AppColors.textColor2,
                         ),
                 ),
               ),
@@ -257,8 +259,10 @@ class _PlayAudioState extends State<PlayAudio> {
                       playerWaveStyle: PlayerWaveStyle(
                         scaleFactor: 0.2,
                         fixedWaveColor:
-                            widget.isMe ? Colors.grey : Colors.lightBlueAccent,
-                        liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
+                            widget.isMe ? Colors.white : AppColors.greyShade1,
+                        liveWaveColor: widget.isMe
+                            ? AppColors.greyShade1
+                            : AppColors.textColor2,
                         waveCap: StrokeCap.butt,
                       ),
                       clipBehavior: Clip.hardEdge,
@@ -278,7 +282,7 @@ class _PlayAudioState extends State<PlayAudio> {
                             )
                           : const LinearProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.blueAccent),
+                                  AppColors.textColor2),
                               color: AppColors.greyShade1,
                               backgroundColor: AppColors.greyShade1,
                             ))
@@ -299,6 +303,7 @@ class _PlayAudioState extends State<PlayAudio> {
                     color: widget.isMe ? AppColors.white : AppColors.textColor2,
                     fontSize: 10),
               ),
+              SizedBox(width: getScreenWidth(8)),
               Text(
                 widget.timeStamp,
                 textAlign: TextAlign.right,

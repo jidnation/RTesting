@@ -33,8 +33,12 @@ import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
-  const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);
+  const MsgChatInterface(
+      {Key? key, this.recipientUser, this.thread, this.quotedData})
+      : super(key: key);
   final User? recipientUser;
+  final ChatsThread? thread;
+  final String? quotedData;
 
   @override
   State<MsgChatInterface> createState() => _MsgChatInterfaceState();
@@ -76,9 +80,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       );
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
     });
+    if (widget.quotedData != null) {
+      focusNode.requestFocus();
+    }
   }
 
   @override
@@ -128,9 +137,12 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     final isSending = useState<bool>(false);
     final showIsSending = useState<bool>(false);
     final controller = useTextEditingController();
+    final _quotedData = useState(widget.quotedData);
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
@@ -258,6 +270,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             if (state is GetThreadMessagesSuccess) {
               isSending.value = false;
               showIsSending.value = false;
+              _controller.jumpTo(_controller.position.maxScrollExtent);
+            }
+
+            if (state is ChatSendSuccess) {
+              isSending.value = false;
+              showIsSending.value = false;
+              _quotedData.value = null;
+              // _controller.jumpTo(_controller.position.maxScrollExtent);
             }
 
             if (state is ChatUploadSuccess) {
@@ -270,19 +290,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               });
 
               globals.chatBloc!.add(SendChatMessageEvent(
-                senderId: globals.user!.id,
-                receiverId: widget.recipientUser!.id,
-                threadId: '${globals.user!.id}--${widget.recipientUser!.id}',
-                value: state.imgUrl,
-                type: 'image',
-                messageMode: '',
-                sentAt:''
-                
-               // Helper.parseChatTime(globals.userChat![index].sentAt ??
-                                               //  ''),
-               ),
-              
-              );
+                  senderId: globals.user!.id,
+                  receiverId: widget.recipientUser!.id,
+                  threadId: widget.thread?.id,
+                  value: state.imgUrl,
+                  type: 'image',
+                  quotedData: _quotedData.value,
+                  messageMode: _quotedData.value == null
+                      ? MessageMode.direct.name
+                      : MessageMode.quoted.name));
 
               isSending.value = true;
               showIsSending.value = true;
@@ -429,21 +445,27 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     const SizedBox.shrink()
                                   else
                                     ListView.separated(
-                                        physics: NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         shrinkWrap: true,
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
                                         itemBuilder: (c, i) => MsgBubble(
                                               msgDate: '',
                                               isMe: globals.user!.id ==
                                                   globals.userChat![i].senderId,
                                               label:
-                                                  globals.userChat![i].content!,
+                                                  globals.userChat![i].value!,
                                               size: size,
+                                              quotedData: globals
+                                                  .userChat![i].quotedData,
                                               timeStamp: Helper.parseChatTime(
                                                   globals.userChat![i].sentAt ??
                                                       ''),
+                                              chat: globals.userChat![i],
                                             ),
                                         separatorBuilder: (c, i) => SizedBox(
-                                              height: 0,
+                                              height: 10,
                                             ),
                                         itemCount: globals.userChat!.length)
                                   // Column(
@@ -493,6 +515,64 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  Visibility(
+                                    visible: _quotedData.value != null,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.primaryColor
+                                              .withOpacity(0.0),
+                                          border: Border(
+                                              top: BorderSide(
+                                                  color: AppColors.greyShade5,
+                                                  width: 1))),
+                                      width: double.infinity,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                8, 8, 8, 0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Replying to a post...',
+                                                    style: TextStyle(
+                                                        color: AppColors.black),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                    onTap: () => _quotedData
+                                                        .value = null,
+                                                    child: Icon(Icons.close))
+                                              ],
+                                            ),
+                                          ),
+                                          // SizedBox(
+                                          //   height: 8,
+                                          // ),
+                                          Divider(
+                                            color: AppColors.greyShade5,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              Chat(
+                                                          quotedData:
+                                                              _quotedData.value)
+                                                      .quotedContent ??
+                                                  '',
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: AppColors.greyShade1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                   Row(children: [
                                     Flexible(
                                         child: !isRecording
@@ -679,8 +759,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
-                                                    contentType: 'text',
-                                                    content:
+                                                    type: 'text',
+                                                    quotedData: widget.quotedData,
+                                                    value:
                                                         controller.text.trim());
                                                 globals.userChat!.add(temp);
                                                 controller.clear();
@@ -700,18 +781,23 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                 globals.chatBloc!.add(
                                                   SendChatMessageEvent(
-                                                    senderId: globals.user!.id,
-                                                    receiverId: widget
-                                                        .recipientUser!.id,
-                                                    threadId:
-                                                        '${globals.user!.id}--${widget.recipientUser!.id}',
-                                                    value: value,
-                                                    type: 'text',
-                                                    messageMode: '',
-                                                    sentAt: ''
-                                                  //   Helper.parseChatTime(globals.userChat![index].sentAt ??
-                                                  // ''),
-                                                  ),
+                                                      senderId:
+                                                          globals.user!.id,
+                                                      receiverId: widget
+                                                          .recipientUser!.id,
+                                                      threadId:
+                                                          widget.thread?.id,
+                                                      value: value,
+                                                      type: 'text',
+                                                      quotedData:
+                                                          _quotedData.value,
+                                                      messageMode:
+                                                          _quotedData.value ==
+                                                                  null
+                                                              ? MessageMode
+                                                                  .direct.name
+                                                              : MessageMode
+                                                                  .quoted.name),
                                                 );
                                                 isSending.value = true;
                                                 showIsSending.value = true;
