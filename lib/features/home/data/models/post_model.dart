@@ -141,7 +141,7 @@ class PostModel {
         "postId": postId,
         "postSlug": postSlug,
         "videoMediaItem": videoMediaItem,
-        "createdAt": createdAt == null ? null : createdAt!.toIso8601String(),
+        "created_at": createdAt == null ? null : createdAt!.toIso8601String(),
         "postOwnerProfile":
             postOwnerProfile == null ? null : postOwnerProfile!.toJson(),
         "like": like == null
@@ -154,7 +154,7 @@ class PostModel {
         "isVoted": isVoted,
         "isRepost": isRepost,
         "postRating": postRating,
-        "updatedAt": updatedAt == null ? null : updatedAt!.toIso8601String(),
+        "updated_at": updatedAt == null ? null : updatedAt!.toIso8601String(),
         "repostedPost": repostedPost == null ? null : repostedPost!.toJson(),
         "repostedPostId": repostedPostId,
         "repostedPostOwnerId": repostedPostOwnerId,
@@ -162,6 +162,32 @@ class PostModel {
             ? null
             : repostedPostOwnerProfile!.toJson(),
       };
+  bool get isOnlyImages =>
+      (imageMediaItems ?? []).isNotEmpty &&
+      (videoMediaItem ?? '').isEmpty &&
+      (audioMediaItem ?? '').isEmpty;
+
+  bool get isOnlyAudio =>
+      (imageMediaItems ?? []).isEmpty &&
+      (videoMediaItem ?? '').isNotEmpty &&
+      (audioMediaItem ?? '').isEmpty;
+
+  bool get isOnlyVideo =>
+      (imageMediaItems ?? []).isEmpty &&
+      (videoMediaItem ?? '').isEmpty &&
+      (audioMediaItem ?? '').isNotEmpty;
+
+  bool get isOnlyMedia =>
+      (content ?? '').isEmpty &&
+      ((imageMediaItems ?? []).isEmpty ||
+          (videoMediaItem ?? '').isEmpty ||
+          (audioMediaItem ?? '').isNotEmpty);
+
+  bool get isOnlyText =>
+      (content ?? '').isNotEmpty &&
+      ((imageMediaItems ?? []).isEmpty &&
+          (videoMediaItem ?? '').isEmpty &&
+          (audioMediaItem ?? '').isNotEmpty);
 }
 
 class SavePostModel {
@@ -170,28 +196,25 @@ class SavePostModel {
   String? savePostId;
   DateTime updatedAt;
 
-  SavePostModel({
-   required this.createdAt,
-   required this.post,
-   this.savePostId,
-   required this.updatedAt
-  });
+  SavePostModel(
+      {required this.createdAt,
+      required this.post,
+      this.savePostId,
+      required this.updatedAt});
 
   factory SavePostModel.fromJson(Map<String, dynamic> json) => SavePostModel(
         createdAt: DateTime.parse(json["created_at"]),
         post: PostModel.fromJson(json["post"]),
         savePostId: json["savePostId"],
-        updatedAt:  DateTime.parse(json["updated_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
       );
 
   Map<String, dynamic> toJson() => {
-       "created_at": createdAt,
-       "post": post,
-       "savePostId": savePostId,
-       "updated_at": updatedAt
+        "created_at": createdAt,
+        "post": post,
+        "savePostId": savePostId,
+        "updated_at": updatedAt
       };
-
- 
 }
 
 class PostLikeModel {
@@ -353,7 +376,7 @@ class PostFeedModel {
         // "isLiked": isLiked,
         // "isVoted": isVoted,
         // "isRepost": isRepost,
-        "updated_at": updatedAt,
+        "updated_at": updatedAt != null ? updatedAt!.toIso8601String() : null,
         // "repostedPost": repostedPost,
         // "repostedPostId": repostedPostId,
         // "repostedPostOwnerId": repostedPostOwnerId,

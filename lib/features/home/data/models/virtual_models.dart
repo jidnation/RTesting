@@ -32,7 +32,7 @@ class VirtualReach {
         "reaching": reaching == null ? null : reaching!.toJson(),
         "reachingId": reachingId,
         "reacherId": reacherId,
-        "isReaching":isReaching,
+        "isReaching": isReaching,
       };
 }
 
@@ -145,6 +145,36 @@ class VirtualPostLikeModel {
         "postId": postId,
         "authId": authId,
         "likeId": likeId,
+        "profile": profile == null ? null : profile!.toJson(),
+      };
+}
+
+class VirtualPostVoteModel {
+  String? postId;
+  String? authId;
+  String? voteType;
+  User? profile;
+
+  VirtualPostVoteModel({
+    this.postId,
+    this.authId,
+    this.voteType,
+    this.profile,
+  });
+
+  factory VirtualPostVoteModel.fromJson(Map<String, dynamic> json) =>
+      VirtualPostVoteModel(
+        postId: json["postId"],
+        authId: json["authId"],
+        voteType: json["voteType"],
+        profile:
+            json["profile"] != null ? User.fromJson(json["profile"]) : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "postId": postId,
+        "authId": authId,
+        "voteType": voteType,
         "profile": profile == null ? null : profile!.toJson(),
       };
 }

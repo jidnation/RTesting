@@ -19,7 +19,6 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
-import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -156,21 +155,21 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 context, MsgChatInterface(recipientUser: state.user));
           }
         }
-     if(state is GetUserByUsernameSuccess){
-       var userInfo = state.users!.user.first;
-       RouteNavigators.route(
-           context,
-           RecipientAccountProfile(
-             recipientCoverImageUrl: userInfo!.coverPicture,
-             recipientEmail: userInfo!.email,
-             recipientId: userInfo!.id,
-             recipientImageUrl: userInfo!.profilePicture,
-           ));
-     }
-     if(state is GetUserByUsernameError){
-       Snackbars.error(context,
-           message: 'User Profile not found');
-     }
+        if (state is GetUserByUsernameSuccess) {
+          // var userInfo = state.users!.user.first;
+          var userInfo = state.users!;
+          RouteNavigators.route(
+              context,
+              RecipientAccountProfile(
+                recipientCoverImageUrl: userInfo.coverPicture,
+                recipientEmail: userInfo.email,
+                recipientId: userInfo.id,
+                recipientImageUrl: userInfo.profilePicture,
+              ));
+        }
+        if (state is GetUserByUsernameError) {
+          Snackbars.error(context, message: 'User Profile not found');
+        }
         if (state is GetReachRelationshipSuccess) {
           isReaching.value = state.isReaching!;
           if (shoutdownPost.value == true) {
@@ -266,6 +265,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
             // }
 
             if (state is CommentOnPostSuccess) {
+              timeLineFeedStore.initialize(isUpvoting: true);
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
                   scrollController.position.minScrollExtent,
@@ -284,6 +284,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is VotePostSuccess) {
+              timeLineFeedStore.initialize(isUpvoting: true);
               if (!(state.isVoted!)) {
                 Snackbars.success(context,
                     message: 'The post you shouted down has been removed!');
@@ -297,6 +298,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
             }
             if (state is LikePostSuccess || state is UnlikePostSuccess) {
+              timeLineFeedStore.initialize(isUpvoting: true);
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
@@ -321,11 +323,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is LikeCommentOnPostSuccess) {
+              timeLineFeedStore.initialize(isUpvoting: true);
               globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
                   commentId: state.commentLikeModel!.commentId));
             }
 
             if (state is UnlikeCommentOnPostSuccess) {
+              timeLineFeedStore.initialize(isUpvoting: true);
               globals.socialServiceBloc!.add(
                   GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
             }
@@ -636,8 +640,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                   },
                                                   onMentionTap: (value) {
                                                     globals.userBloc!.add(
-                                                      GetUserByUsernameEvent(username: value)
-                                                    );
+                                                        GetUserByUsernameEvent(
+                                                            username: value));
                                                   },
                                                   mentionStyle: const TextStyle(
                                                       decoration: TextDecoration
@@ -1780,27 +1784,20 @@ class CommentsTile extends StatelessWidget {
             //const SizedBox.shrink(),
             comment.audioMediaItem != null
                 ? Container(
-                  height: 59,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  width: SizeConfig.screenWidth,
-                  decoration: BoxDecoration( 
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xfff5f5f5)
-                  ),
-                  child:  Row(
-                    children: [
-                      Expanded(
-                        child: CommentAudioMedia(
+                    height: 59,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    width: SizeConfig.screenWidth,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color(0xfff5f5f5)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: CommentAudioMedia(
                           path: comment.audioMediaItem ?? '',
-                          
-                        )
-                      ),
-                    ],
-                  )
-                )
-                
-                
-               
+                        )),
+                      ],
+                    ))
                 : const SizedBox.shrink(),
             SizedBox(height: getScreenHeight(10)),
             Row(

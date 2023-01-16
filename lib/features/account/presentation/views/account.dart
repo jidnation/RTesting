@@ -39,6 +39,7 @@ import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
+
 import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 
@@ -1882,6 +1883,8 @@ class _ReacherCard extends HookWidget {
                                       constraints: const BoxConstraints(),
                                       icon: SvgPicture.asset(
                                         'assets/svgs/message.svg',
+                                        height: 20,
+                                        width: 20,
                                       ),
                                     ),
                                   ],
@@ -3327,6 +3330,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                             },
                                           ),
                                   ),
+
+                                
+                                  
+                          
                               ],
                             ),
                           ),

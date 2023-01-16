@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' as foundation;
+
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,6 +16,7 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/audio.status.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
 
 class TextStatus extends StatefulHookWidget {
   const TextStatus({Key? key}) : super(key: key);
@@ -383,10 +385,8 @@ class _TextStatus2State extends State<TextStatus2> {
       );
     }
 
-   
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      
       backgroundColor: AppColors.black,
       body: SingleChildScrollView(
         child: Container(
@@ -402,17 +402,28 @@ class _TextStatus2State extends State<TextStatus2> {
                 : null,
           ),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(getScreenWidth(24), getScreenHeight(60),
-                getScreenWidth(24), getScreenHeight(35)),
+            padding: EdgeInsets.fromLTRB(getScreenWidth(24),
+                getScreenHeight(60), getScreenWidth(24), getScreenHeight(35)),
             child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
                 bloc: globals.socialServiceBloc,
                 listener: (context, state) {
                   if (state is CreateStatusLoading) {
                     Snackbars.success(
                       context,
-                      message: 'Uploading status...',
+                      message: 'Creating status, please wait...',
                       milliseconds: 1000,
                     );
+                  }
+                  if (state is CreateStatusSuccess) {
+                    Snackbars.success(
+                      context,
+                      message: 'Status created successfully!',
+                      milliseconds: 1000,
+                    );
+                    final status = state.status;
+                    status?.profileModel = globals.user!.toStatusProfileModel();
+                    TimeLineFeedStore().addNewStatus(status!);
+                    RouteNavigators.pop(context, status);
                   }
                 },
                 builder: (context, state) {
@@ -426,7 +437,8 @@ class _TextStatus2State extends State<TextStatus2> {
                             onPressed: () => RouteNavigators.pop(context),
                             icon: Transform.scale(
                               scale: 1.8,
-                              child: SvgPicture.asset('assets/svgs/dc-back.svg'),
+                              child:
+                                  SvgPicture.asset('assets/svgs/dc-back.svg'),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -451,12 +463,12 @@ class _TextStatus2State extends State<TextStatus2> {
                                     ),
                                   ),
                                 );
-                                RouteNavigators.pop(context);
                               }
                             },
                             icon: Transform.scale(
                               scale: 1.8,
-                              child: SvgPicture.asset('assets/svgs/dc-send.svg'),
+                              child:
+                                  SvgPicture.asset('assets/svgs/dc-send.svg'),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -513,12 +525,15 @@ class _TextStatus2State extends State<TextStatus2> {
                             ),
                             TextButton(
                               onPressed: () {
-                                for (var i = 0; i < fontsList.value.length; i++) {
+                                for (var i = 0;
+                                    i < fontsList.value.length;
+                                    i++) {
                                   if (fontsList.value[i] == currentFont.value) {
                                     if (i == fontsList.value.length - 1) {
                                       currentFont.value = fontsList.value[0];
                                     } else {
-                                      currentFont.value = fontsList.value[i + 1];
+                                      currentFont.value =
+                                          fontsList.value[i + 1];
                                     }
                                     break;
                                   }
@@ -541,7 +556,8 @@ class _TextStatus2State extends State<TextStatus2> {
                                   if (bgImgsList.value[i] ==
                                       selectedImageBg.value) {
                                     if (i == bgImgsList.value.length - 1) {
-                                      selectedImageBg.value = bgImgsList.value[0];
+                                      selectedImageBg.value =
+                                          bgImgsList.value[0];
                                     } else {
                                       selectedImageBg.value =
                                           bgImgsList.value[i + 1];
@@ -556,7 +572,9 @@ class _TextStatus2State extends State<TextStatus2> {
                             ),
                             IconButton(
                               onPressed: () {
-                                for (var i = 0; i < bgcolours.value.length; i++) {
+                                for (var i = 0;
+                                    i < bgcolours.value.length;
+                                    i++) {
                                   if (bgcolours.value[i] ==
                                           selectedColour.value ||
                                       selectedColour.value == null) {
@@ -572,7 +590,8 @@ class _TextStatus2State extends State<TextStatus2> {
                               },
                               icon: Container(
                                 decoration: BoxDecoration(
-                                  color: selectedColour.value ?? AppColors.white,
+                                  color:
+                                      selectedColour.value ?? AppColors.white,
                                   shape: BoxShape.circle,
                                 ),
                               ),

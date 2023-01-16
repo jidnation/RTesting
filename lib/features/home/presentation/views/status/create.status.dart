@@ -753,17 +753,22 @@ class BuildMediaPreview extends StatelessWidget {
             if (state is MediaUploadLoading) {
               Snackbars.success(
                 context,
-                message: 'Uploading status...',
+                message: 'Uploading media...',
                 milliseconds: 1000,
               );
             }
             if (state is MediaUploadError) {
               Snackbars.error(context, message: state.error);
             }
+            if (state is CreateStatusSuccess) {
+              final status = state.status;
+              status?.profileModel = globals.user!.toStatusProfileModel();
+              RouteNavigators.pop(context, status);
+            }
             if (state is MediaUploadSuccess) {
               Snackbars.success(
                 context,
-                message: 'Image Successfully Uploaded',
+                message: 'Media Upload Successful',
                 milliseconds: 1600,
               );
               globals.socialServiceBloc!.add(
@@ -776,7 +781,6 @@ class BuildMediaPreview extends StatelessWidget {
                   ),
                 ),
               );
-              RouteNavigators.pop(context);
             }
           },
           builder: (context, state) {

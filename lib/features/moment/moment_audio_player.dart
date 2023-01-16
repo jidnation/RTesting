@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
@@ -95,31 +96,34 @@ class _MomentAudioPlayerState extends State<MomentAudioPlayer> {
         ),
       ),
       SizedBox(
-        width: getScreenWidth(8),
+        width: getScreenWidth(3),
       ),
       isInitialised
-          ? AudioFileWaveforms(
-              size: Size(MediaQuery.of(context).size.width / 1.7, 24),
-              playerController: playerController,
-              density: 2,
-              enableSeekGesture: true,
-              playerWaveStyle: const PlayerWaveStyle(
-                scaleFactor: 0.2,
-                waveThickness: 3,
-                fixedWaveColor: Colors.white,
-                liveWaveColor: Color(0xff0077B6),
-                waveCap: StrokeCap.round,
-              ),
+          ? Expanded(
+              child: LayoutBuilder(builder: (context, constraint) {
+                return AudioFileWaveforms(
+                  size: Size(constraint.maxWidth < 250 ? 230 : 260, 24),
+                  playerController: playerController,
+                  density: 2,
+                  enableSeekGesture: true,
+                  playerWaveStyle: const PlayerWaveStyle(
+                    scaleFactor: 0.2,
+                    waveThickness: 3,
+                    fixedWaveColor: Colors.white,
+                    liveWaveColor: Color(0xff0077B6),
+                    waveCap: StrokeCap.round,
+                  ),
+                );
+              }),
             )
-          : SizedBox(
-              width: MediaQuery.of(context).size.width / 1.7,
+          : Expanded(
+              // width: MediaQuery.of(context).size.width / 1.7,
               child: const LinearProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                 color: AppColors.greyShade1,
                 backgroundColor: AppColors.greyShade1,
-              ),
+              ).paddingOnly(r: 5),
             ),
-      const Spacer(flex: 1),
       CustomText(
         text:
             StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
