@@ -212,6 +212,7 @@ class _PlayAudioState extends State<PlayAudio> {
     return Column(
       children: [
         Expanded(
+          flex: 2,
           child: Row(
             children: [
               Align(
@@ -249,43 +250,47 @@ class _PlayAudioState extends State<PlayAudio> {
               // padding: const EdgeInsets.symmetric(horizontal: 5.0),
               //child:
               isInitialised
-                  ? AudioFileWaveforms(
-                      margin:
-                          const EdgeInsets.only(top: 7, bottom: 3, right: 7),
-                      size: Size(MediaQuery.of(context).size.width / 2.5, 28),
-                      playerController: playerController,
-                      density: 1.5,
-                      enableSeekGesture: true,
-                      playerWaveStyle: PlayerWaveStyle(
-                        scaleFactor: 0.2,
-                        fixedWaveColor:
-                            widget.isMe ? Colors.white : AppColors.greyShade1,
-                        liveWaveColor: widget.isMe
-                            ? AppColors.greyShade1
-                            : AppColors.textColor2,
-                        waveCap: StrokeCap.butt,
+                  ? Expanded(
+                      child: AudioFileWaveforms(
+                        margin:
+                            const EdgeInsets.only(top: 7, bottom: 3, right: 7),
+                        size: Size(MediaQuery.of(context).size.width / 2.5, 28),
+                        playerController: playerController,
+                        density: 1.5,
+                        enableSeekGesture: true,
+                        playerWaveStyle: PlayerWaveStyle(
+                          scaleFactor: 0.2,
+                          fixedWaveColor:
+                              widget.isMe ? Colors.white : AppColors.greyShade1,
+                          liveWaveColor: widget.isMe
+                              ? AppColors.greyShade1
+                              : AppColors.textColor2,
+                          waveCap: StrokeCap.butt,
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        animationDuration: const Duration(milliseconds: 1000),
                       ),
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      animationDuration: const Duration(milliseconds: 1000),
                     )
-                  : SizedBox(
-                      width: MediaQuery.of(context).size.width / 2.5,
-                      child: widget.isMe
-                          ? const LinearProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                              color: AppColors.greyShade1,
-                              backgroundColor: AppColors.greyShade1,
-                            )
-                          : const LinearProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.textColor2),
-                              color: AppColors.greyShade1,
-                              backgroundColor: AppColors.greyShade1,
-                            ))
+                  : Expanded(
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.5,
+                          child: widget.isMe
+                              ? const LinearProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                  color: AppColors.greyShade1,
+                                  backgroundColor: AppColors.greyShade1,
+                                )
+                              : const LinearProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.textColor2),
+                                  color: AppColors.greyShade1,
+                                  backgroundColor: AppColors.greyShade1,
+                                )),
+                    )
               // ),
               //),
             ],
@@ -293,17 +298,21 @@ class _PlayAudioState extends State<PlayAudio> {
         ),
         Expanded(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text(
-                StringUtil.formatDuration(
-                    Duration(milliseconds: currentDuration)),
-                style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: widget.isMe ? AppColors.white : AppColors.textColor2,
-                    fontSize: 10),
+              Padding(
+                padding: const EdgeInsets.only(left: 29),
+                child: Text(
+                  StringUtil.formatDuration(
+                      Duration(milliseconds: currentDuration)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color:
+                          widget.isMe ? AppColors.white : AppColors.textColor2,
+                      fontSize: 10),
+                ),
               ),
-              SizedBox(width: getScreenWidth(8)),
+              SizedBox(width: getScreenWidth(20)),
               Text(
                 widget.timeStamp,
                 textAlign: TextAlign.right,

@@ -252,7 +252,6 @@ class MsgBubble extends StatelessWidget {
         ),
       );
     } else if (label.contains('aac')) {
-      //print('This is the lable link $label');
       return Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -262,7 +261,9 @@ class MsgBubble extends StatelessWidget {
               constraints: BoxConstraints(
                 maxWidth: size.width * .56,
               ),
-              padding: const EdgeInsets.only(top: 5, bottom: 3),
+              padding: const EdgeInsets.only(
+                top: 3,
+              ),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: isMe ? AppColors.primaryColor : AppColors.white),
