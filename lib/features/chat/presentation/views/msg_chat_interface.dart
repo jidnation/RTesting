@@ -521,7 +521,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       decoration: BoxDecoration(
                                           color: AppColors.primaryColor
                                               .withOpacity(0.0),
-                                          border: Border(
+
+                                          border: const Border(
+
                                               top: BorderSide(
                                                   color: AppColors.greyShade5,
                                                   width: 1))),
@@ -535,7 +537,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 8, 8, 8, 0),
                                             child: Row(
                                               children: [
-                                                Expanded(
+                                                const Expanded(
+                                                
                                                   child: Text(
                                                     'Replying to a post...',
                                                     style: TextStyle(
@@ -545,14 +548,16 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 GestureDetector(
                                                     onTap: () => _quotedData
                                                         .value = null,
-                                                    child: Icon(Icons.close))
+                                                    child:
+                                                        const Icon(Icons.close))
+                                        
                                               ],
                                             ),
                                           ),
                                           // SizedBox(
                                           //   height: 8,
                                           // ),
-                                          Divider(
+                                          const Divider(
                                             color: AppColors.greyShade5,
                                           ),
                                           Padding(
@@ -565,7 +570,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                   '',
                                               maxLines: 3,
                                               overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   color: AppColors.greyShade1),
                                             ),
                                           ),
@@ -575,122 +580,135 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   ),
                                   Row(children: [
                                     Flexible(
-                                        child: !isRecording
-                                            ? CustomRoundTextField(
-                                                focusNode: focusNode,
-                                                controller: controller,
-                                                fillColor: AppColors.white,
-                                                textCapitalization:
-                                                    TextCapitalization
-                                                        .sentences,
-                                                hintText: 'Type Message...',
-                                                hintStyle: const TextStyle(
-                                                    color: Color(0xFF666666),
-                                                    fontSize: 12),
-                                                onChanged: (val) {
-                                                  if (val.isNotEmpty) {
-                                                    setState(() {
-                                                      isTyping.value = true;
-                                                    });
-                                                  } else {
-                                                    setState(() {
-                                                      isTyping.value = false;
-                                                    });
-                                                  }
+                                      child: !isRecording
+                                          ? CustomRoundTextField(
+                                              focusNode: focusNode,
+                                              controller: controller,
+                                              fillColor: AppColors.white,
+                                              textCapitalization:
+                                                  TextCapitalization.sentences,
+                                              hintText: 'Type Message...',
+                                              hintStyle: const TextStyle(
+                                                  color: Color(0xFF666666),
+                                                  fontSize: 12),
+                                              onChanged: (val) {
+                                                if (val.isNotEmpty) {
+                                                  setState(() {
+                                                    isTyping.value = true;
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    isTyping.value = false;
+                                                  });
+                                                }
+                                              },
+                                              prefixIcon: GestureDetector(
+                                                onTap: () async {
+                                                  focusNode.unfocus();
+                                                  focusNode.canRequestFocus =
+                                                      false;
+                                                  setState(() {
+                                                    emojiShowing =
+                                                        !emojiShowing;
+                                                  });
                                                 },
-                                                prefixIcon: GestureDetector(
-                                                  onTap: () async {
-                                                    focusNode.unfocus();
-                                                    focusNode.canRequestFocus =
-                                                        false;
-                                                    setState(() {
-                                                      emojiShowing =
-                                                          !emojiShowing;
-                                                    });
-                                                  },
-                                                  child: SvgPicture.asset(
-                                                    'assets/svgs/emoji.svg',
-                                                  ).paddingAll(10),
-                                                ),
-                                                suffixIcon: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {},
-                                                      child: SvgPicture.asset(
-                                                        'assets/svgs/attach.svg',
-                                                        // width: 24,
-                                                        // height: 18,
-                                                      ),
+                                                child: SvgPicture.asset(
+                                                  'assets/svgs/emoji.svg',
+                                                ).paddingAll(10),
+                                              ),
+                                              suffixIcon: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {},
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/attach.svg',
+                                                      // width: 24,
+                                                      // height: 18,
                                                     ),
-                                                    const SizedBox(width: 15),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        showModalBottomSheet(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return ListView(
-                                                              shrinkWrap: true,
-                                                              children: [
-                                                                Column(
-                                                                    children: [
-                                                                      ListTile(
-                                                                        leading:
-                                                                            SvgPicture.asset(
-                                                                          'assets/svgs/Camera.svg',
-                                                                          color:
-                                                                              AppColors.black,
-                                                                        ),
-                                                                        title: const Text(
-                                                                            'Camera'),
-                                                                        onTap:
-                                                                            () async {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          final image =
-                                                                              await getImage(ImageSource.camera);
-                                                                          if (image !=
-                                                                              null) {
-                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      ListTile(
-                                                                        leading:
-                                                                            SvgPicture.asset('assets/svgs/gallery.svg'),
-                                                                        title: const Text(
-                                                                            'Gallery'),
-                                                                        onTap:
-                                                                            () async {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          final image =
-                                                                              await getImage(ImageSource.gallery);
-                                                                          if (image !=
-                                                                              null) {
-                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                    ]).paddingSymmetric(
-                                                                    v: 5),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                      child: SvgPicture.asset(
-                                                        'assets/svgs/gallery.svg',
-                                                      ),
+                                                  ),
+                                                  const SizedBox(width: 15),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return ListView(
+                                                            shrinkWrap: true,
+                                                            children: [
+                                                              Column(children: [
+                                                                ListTile(
+                                                                  leading:
+                                                                      SvgPicture
+                                                                          .asset(
+                                                                    'assets/svgs/Camera.svg',
+                                                                    color: AppColors
+                                                                        .black,
+                                                                  ),
+                                                                  title: const Text(
+                                                                      'Camera'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    final image =
+                                                                        await getImage(
+                                                                            ImageSource.camera);
+                                                                    if (image !=
+                                                                        null) {
+                                                                      globals
+                                                                          .chatBloc!
+                                                                          .add(UploadImageFileEvent(
+                                                                              file: image));
+                                                                    }
+                                                                  },
+                                                                ),
+                                                                ListTile(
+                                                                  leading: SvgPicture
+                                                                      .asset(
+                                                                          'assets/svgs/gallery.svg'),
+                                                                  title: const Text(
+                                                                      'Gallery'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    final image =
+                                                                        await getImage(
+                                                                            ImageSource.gallery);
+                                                                    if (image !=
+                                                                        null) {
+                                                                      globals
+                                                                          .chatBloc!
+                                                                          .add(UploadImageFileEvent(
+                                                                              file: image));
+                                                                    }
+                                                                  },
+                                                                ),
+                                                              ]).paddingSymmetric(
+                                                                  v: 5),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/gallery.svg',
                                                     ),
-                                                    const SizedBox(width: 15),
-                                                  ],
-                                                ),
-                                              )
-                                            : Row(
+                                                  ),
+                                                  const SizedBox(width: 15),
+                                                ],
+                                              ),
+                                            )
+                                          : Container(
+                                              height: 45,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  color: Colors.white),
+                                              child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
                                                         .spaceAround,
@@ -698,7 +716,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       _soundRecorder!
-                                                          .closeRecorder();
+                                                          .stopRecorder();
+                                                      // _soundRecorder
+                                                      //     ?.closeRecorder();
                                                       setState(() {
                                                         isRecording = false;
                                                       });
@@ -748,8 +768,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     ),
                                                   ),
                                                 ],
-                                              )),
-                                    const SizedBox(width: 7),
+                                              ),
+                                            ),
+                                    ),
+                                    const SizedBox(width: 6),
                                     isTyping.value
                                         ? GestureDetector(
                                             onTap: () {
@@ -760,6 +782,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
                                                     type: 'text',
+                                                    
                                                     quotedData: widget.quotedData,
                                                     value:
                                                         controller.text.trim());

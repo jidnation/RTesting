@@ -173,3 +173,4 @@ class ChatsThread {
 }
 
 enum MessageMode { quoted, direct }
+
