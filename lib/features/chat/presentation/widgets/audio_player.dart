@@ -181,7 +181,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {
-      currentDuration = position - event;
+      currentDuration = event;
       if (mounted) setState(() {});
     });
 
@@ -204,7 +204,7 @@ class _PlayAudioState extends State<PlayAudio> {
     if (mounted) setState(() {});
 
     position = await playerController.getDuration(DurationType.max);
-       if (mounted) setState(() {});
+    if (mounted) setState(() {});
   }
 
   /* void _playandPause() async {
@@ -256,47 +256,44 @@ class _PlayAudioState extends State<PlayAudio> {
               // padding: const EdgeInsets.symmetric(horizontal: 5.0),
               //child:
               isInitialised
-                  ? Expanded(
-                      child: AudioFileWaveforms(
-                        margin:
-                            const EdgeInsets.only(top: 7, bottom: 3, right: 7),
-                        size: Size(MediaQuery.of(context).size.width / 2.5, 28),
-                        playerController: playerController,
-                        density: 1.5,
-                        enableSeekGesture: true,
-                        playerWaveStyle: PlayerWaveStyle(
-                          scaleFactor: 0.2,
-                          fixedWaveColor:
-                              widget.isMe ? Colors.white : AppColors.greyShade1,
-                          liveWaveColor: widget.isMe
-                              ? AppColors.greyShade1
-                              : AppColors.textColor2,
-                          waveCap: StrokeCap.butt,
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        animationDuration: const Duration(milliseconds: 1000),
+                  ? AudioFileWaveforms(
+                      margin:
+                          const EdgeInsets.only(top: 7, bottom: 3, right: 7),
+                      size: Size(MediaQuery.of(context).size.width / 2.5, 28),
+                      playerController: playerController,
+                      density: 1.5,
+                      enableSeekGesture: true,
+                      playerWaveStyle: PlayerWaveStyle(
+                        scaleFactor: 0.2,
+                        fixedWaveColor: widget.isMe
+                            ? AppColors.greyShade1
+                            : AppColors.greyShade1,
+                        liveWaveColor:
+                            widget.isMe ? Colors.white : AppColors.textColor2,
+                        waveCap: StrokeCap.butt,
                       ),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      animationDuration: const Duration(milliseconds: 1000),
                     )
-                  : Expanded(
-                      child: SizedBox(
-                          width: MediaQuery.of(context).size.width / 2.5,
-                          child: widget.isMe
-                              ? const LinearProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                  color: AppColors.greyShade1,
-                                  backgroundColor: AppColors.greyShade1,
-                                )
-                              : const LinearProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      AppColors.textColor2),
-                                  color: AppColors.greyShade1,
-                                  backgroundColor: AppColors.greyShade1,
-                                )),
-                    )
+                  : SizedBox(
+                      width: MediaQuery.of(context).size.width / 2.5,
+                      child: widget.isMe
+                          ? const LinearProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              color: AppColors.greyShade1,
+                              backgroundColor: AppColors.greyShade1,
+                            )
+                          : const LinearProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.textColor2),
+                              color: AppColors.greyShade1,
+                              backgroundColor: AppColors.greyShade1,
+                            )),
+
               // ),
               //),
             ],
@@ -308,15 +305,38 @@ class _PlayAudioState extends State<PlayAudio> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 29),
-                child: Text(
-                  StringUtil.formatDuration(
-                      Duration(milliseconds: currentDuration)),
-                  style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color:
-                          widget.isMe ? AppColors.white : AppColors.textColor2,
-                      fontSize: 10),
-                ),
+                child: isInitialised
+                    ? !isPlaying
+                        ? Text(
+                            StringUtil.formatDuration(
+                                Duration(milliseconds: position)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: widget.isMe
+                                    ? AppColors.white
+                                    : AppColors.textColor2,
+                                fontSize: 10),
+                          )
+                        : Text(
+                            StringUtil.formatDuration(
+                                Duration(milliseconds: currentDuration)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: widget.isMe
+                                    ? AppColors.white
+                                    : AppColors.textColor2,
+                                fontSize: 10),
+                          )
+                    : Text(
+                        StringUtil.formatDuration(
+                            const Duration(milliseconds: 0)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: widget.isMe
+                                ? AppColors.white
+                                : AppColors.textColor2,
+                            fontSize: 10),
+                      ),
               ),
               SizedBox(width: getScreenWidth(20)),
               Text(
