@@ -41,6 +41,7 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
@@ -214,12 +215,10 @@ class _RepostReachState extends State<RepostReach> {
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is CreateRepostSuccess) {
-            Snackbars.success(context,
-                message: "Reach has been quoted on your timeline");
-            //timeLineFeedStore.initialize(context, isPostEditing: true);
-            globals.socialServiceBloc!
-                .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-            Navigator.pop(context);
+            timeLineFeedStore.initialize(isQuoting: true);
+            // globals.socialServiceBloc!
+            //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
+            // Navigator.pop(context);
           }
           if (state is CreateRepostError) {
             Snackbars.error(context, message: state.error);

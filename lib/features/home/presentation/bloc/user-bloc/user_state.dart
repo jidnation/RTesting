@@ -18,7 +18,7 @@ class UserUploadProfilePictureSuccess extends UserState {
 class GetUserByUsernameInitial extends UserState{}
 class GetUserByUsernameSuccess extends UserState{
   GetUserByUsernameSuccess({this.users});
-  final UserList? users;
+  final User? users;
 }
 class GetUserByUsernameError extends UserState{
   GetUserByUsernameError({this.error});

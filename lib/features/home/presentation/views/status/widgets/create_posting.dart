@@ -12,7 +12,9 @@ import '../text.status.dart';
 
 class CreatePosting extends StatefulHookWidget {
   final CameraController? controller;
-  const CreatePosting({Key? key, this.controller}) : super(key: key);
+  final BuildContext context;
+  const CreatePosting({Key? key, this.controller, required this.context})
+      : super(key: key);
 
   @override
   State<CreatePosting> createState() => _CreatePostingState();
@@ -101,7 +103,7 @@ class _CreatePostingState extends State<CreatePosting> {
                                     : Colors.transparent,
                               ),
                               child: IconButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   isTextStatus.value = true;
                                   isCameraStatus.value = false;
                                   isAudioStatus.value = false;
@@ -125,7 +127,7 @@ class _CreatePostingState extends State<CreatePosting> {
                                     : Colors.transparent,
                               ),
                               child: IconButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   isAudioStatus.value = true;
                                   isTextStatus.value = false;
                                   isCameraStatus.value = false;

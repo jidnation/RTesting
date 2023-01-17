@@ -6,8 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -18,9 +21,7 @@ import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
 
 class AudioStatus extends StatefulHookWidget {
   const AudioStatus({Key? key}) : super(key: key);
@@ -499,7 +500,6 @@ class _BuildAudioPreviewState extends State<BuildAudioPreview> {
 
   @override
   void dispose() {
-   
     audioPlayer.stop();
     super.dispose();
   }
@@ -523,7 +523,17 @@ class _BuildAudioPreviewState extends State<BuildAudioPreview> {
               createStatusDto: CreateStatusDto(
                   caption: 'NIL', type: 'audio', audioMedia: state.image),
             ));
-            RouteNavigators.pop(context);
+          }
+          if (state is CreateStatusSuccess) {
+            Snackbars.success(
+              context,
+              message: 'Status created successfully!',
+              milliseconds: 1000,
+            );
+            final status = state.status;
+            status?.profileModel = globals.user!.toStatusProfileModel();
+            TimeLineFeedStore().addNewStatus(status!);
+            RouteNavigators.pop(context, status);
           }
         },
         builder: ((context, state) {

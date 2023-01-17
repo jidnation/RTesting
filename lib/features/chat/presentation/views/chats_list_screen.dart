@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/empty_state.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
@@ -11,13 +10,13 @@ import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 class ChatsListScreen extends StatefulHookWidget {
@@ -44,11 +43,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     var size = MediaQuery.of(context).size;
     final _tabController = useTabController(initialLength: 2, initialIndex: 0);
     final usersList = useState<List<ChatUser>>([]);
+    final threads = useState<List<ChatsThread>>([]);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
 
     useMemoized(() {
-      globals.chatBloc!.add(GetUserThreadsEvent(id: globals.user!.id));
+      globals.chatBloc!.add(GetUserThreadsEvent(
+          id: globals.user!.id, pageNumber: 1, pageLimit: 20));
     });
     return Scaffold(
       body: SafeArea(
@@ -59,15 +60,17 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
             bloc: globals.chatBloc,
             listener: (context, state) {
               if (state is GetUserThreadsSuccess) {
-                usersList.value.clear();
+                // usersList.value.clear();
+                threads.value.clear();
                 tailMessage.value.clear();
                 recipientUsers.value.clear();
                 for (var thread in state.userThreads!) {
                   for (var participant in thread.participantsInfo!) {
-                    if (participant.id != globals.user!.id) {
+                    if (participant.authId != globals.user!.id) {
                       usersList.value.add(participant);
                     }
                   }
+                  threads.value = state.userThreads ?? [];
                   tailMessage.value.add(thread.tailMessage!);
                 }
               }
@@ -144,6 +147,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                           TabBar(
                             isScrollable: false,
                             indicatorWeight: 1.5,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
                             indicatorColor: Colors.transparent,
                             unselectedLabelColor: AppColors.textColor2,
                             labelColor: AppColors.white,
@@ -209,22 +213,25 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                               child: TabBarView(
                                 controller: _tabController,
                                 children: [
-                                  usersList.value.isNotEmpty
+                                  threads.value.isNotEmpty
                                       ? ListView.builder(
-                                          itemCount: usersList.value.length,
+                                          itemCount: threads.value.length,
                                           itemBuilder: (context, index) {
                                             return ChatItem(
                                               onTap: () {
                                                 handleTap(index);
+
                                                 if (active.contains(index)) {
                                                   globals.userBloc!.add(
                                                       GetRecipientProfileEvent(
                                                           email: usersList
                                                               .value[index]
-                                                              .id!));
+                                                              .authId!));
                                                 }
                                               },
-                                              id: usersList.value[index].id!,
+                                              quotedFromPost: tailMessage
+                                                  .value[index].quotedFromPost,
+                                              id: usersList.value[index].authId,
                                               username:
                                                   '@${usersList.value[index].username}',
                                               status: tailMessage
@@ -268,12 +275,14 @@ class ChatItem extends StatelessWidget {
       required this.avatar,
       required this.status,
       required this.username,
-      required this.id,
+      this.id,
+      this.quotedFromPost,
       this.onTap})
       : super(key: key);
 
   final String username;
   final String status;
+  final bool? quotedFromPost;
   final String? avatar;
   final String? id;
   final Function()? onTap;
@@ -310,17 +319,35 @@ class ChatItem extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Container(
-                constraints: BoxConstraints(maxWidth: getScreenWidth(250)),
-                child: Text(
-                  status,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.greyShade3,
-                    fontWeight: FontWeight.w400,
+              Row(
+                children: [
+                  Visibility(
+                    visible: quotedFromPost != null,
+                    child: Icon(
+                      (quotedFromPost ?? false)
+                          ? Icons.view_timeline_outlined
+                          : Icons.history_toggle_off,
+                      color: AppColors.greyShade3,
+                      size: 14,
+                    ),
                   ),
-                ),
+                  Container(
+                    margin: quotedFromPost != null
+                        ? const EdgeInsets.only(left: 4)
+                        : null,
+                    constraints: BoxConstraints(maxWidth: getScreenWidth(250)),
+                    child: Text(
+                      status,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.greyShade3,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           )

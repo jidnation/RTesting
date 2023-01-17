@@ -64,4 +64,20 @@ class ProfileIndexSchema {
   }
 }
 
+class MiniProfileSchema {
+  MiniProfileSchema._();
 
+  static String get schema {
+    return r'''
+            authId
+            firstName
+            lastName
+            location
+            profilePicture
+            profileSlug
+            username
+            verified
+            bio
+        ''';
+  }
+}

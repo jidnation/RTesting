@@ -43,7 +43,7 @@ class UserRepository {
     }
   }
 
-  Future<Either<String, UserList>> getUserProfileByUsername({
+  Future<Either<String, User>> getUserProfileByUsername({
     required String username,
   }) async {
     try {

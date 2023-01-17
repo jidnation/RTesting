@@ -103,6 +103,7 @@ class CommentReachMedia extends HookWidget {
               context,
               (isVideo)
                   ? VideoPreview(
+                      key: Key(fileResult.path),
                       path: fileResult.file.path,
                       isLocalVideo: true,
                       aspectRatio: fileResult.width! / fileResult.height!,

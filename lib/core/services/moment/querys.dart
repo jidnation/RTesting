@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/helper/endpoints.dart';
 
 import '../../../features/moment/momentControlRoom/models/get_comments_model.dart';
 import '../../../features/moment/momentControlRoom/models/get_moment_feed.dart';
@@ -9,7 +10,7 @@ import '../../utils/app_globals.dart';
 import 'graphql_strings.dart' as gql_string;
 
 class MomentQuery {
-  static String hostUrl = "https://api.myreach.me/";
+  static String hostUrl = "${Endpoints.graphQLBaseUrl}/";
   static Future<bool> postMoment(
       {required String videoMediaItem,
       List<String>? hashTags,
