@@ -115,6 +115,7 @@ dependencies:
   ffmpeg_kit_flutter: ^4.5.1
   story_page_view: ^1.0.0
   story_view: ^0.14.0
+  image_crop: ^0.4.1
 
 
 

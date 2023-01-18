@@ -21,7 +21,6 @@ import 'package:reach_me/features/account/presentation/views/personal_info_setti
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class EditProfileScreen extends StatefulHookWidget {
   static const String id = "edit_profile_screen";
@@ -33,20 +32,19 @@ class EditProfileScreen extends StatefulHookWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<File?> getImage(ImageSource source) async {
-    List<AssetEntity>? res = await AssetPicker.pickAssets(context,
-        pickerConfig: AssetPickerConfig(
-          maxAssets: 1,
-          specialPickerType: SpecialPickerType.noPreview,
-        ));
-    if (res == null || res.isEmpty) return null;
+    final _picker = ImagePicker();
+    final imageFile = await _picker.pickImage(
+      source: source,
+      imageQuality: 50,
+      maxHeight: 900,
+      maxWidth: 600,
+    );
 
     File? result;
-    for (var e in res) {
-      final file = await e.originFile;
-      if (file == null) return null;
-      result = file;
-    }
-    if (result != null) {
+
+    if (imageFile != null) {
+      print("::::::::::::: ");
+      result = File(imageFile.path);
       try {
         result = await _cropImage(imageFile: result);
         File? image = result;
@@ -80,6 +78,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<File?> _cropImage({required File imageFile}) async {
+    // File croppedImage = await ImageCrop.sampleImage(
+    //   file: imageFile,
+    //   preferredSize: context.size?.longestSide.ceil(),
+    // );
     CroppedFile? croppedImage = await ImageCropper().cropImage(
       sourcePath: imageFile.path,
       cropStyle: CropStyle.circle,
@@ -94,9 +96,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         IOSUiSettings(
           title: 'Edit Picture',
         ),
-        WebUiSettings(
-          context: context,
-        ),
+        // WebUiSettings(
+        //   context: context,
+        // ),
       ],
     );
 
