@@ -38,7 +38,8 @@ class TimeLineFeed extends StatefulWidget {
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 
-class _TimeLineFeedState extends State<TimeLineFeed> {
+class _TimeLineFeedState extends State<TimeLineFeed>
+    with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
@@ -416,4 +417,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
