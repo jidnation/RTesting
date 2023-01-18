@@ -1223,9 +1223,10 @@ class _CommentReachState extends State<CommentReach> {
                                                   Navigator.pop(context);
                                                   final image =
                                                       await MediaService()
-                                                          .getImage(
-                                                              fromGallery:
-                                                                  false);
+                                                          .pickFromCamera(
+                                                              context : context,
+                                                              enableRecording: true,
+                                                                  );
                                                   if (image == null) {
                                                     print(
                                                         "!!!!!!!!!!NO IMAGE WAS UPLOADED!!!!!!!!!!!!!!");
