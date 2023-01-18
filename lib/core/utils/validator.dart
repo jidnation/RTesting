@@ -25,6 +25,8 @@ class Validator {
     if (!pass_valid.hasMatch(_password)) {
       return '🚩 Password should contain Capital, small letter \n\t\t\t\t\t& Number & Special.';
       // return '🚩 Password must be 6 characters.';
+    } else if (value.length < 6) {
+      return '🚩 Password must be 6 characters.';
     } else {
       return null;
     }
