@@ -297,57 +297,54 @@ class _PlayAudioState extends State<PlayAudio> {
           ),
         ),
         Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 29),
-                child: isInitialised
-                    ? !isPlaying
-                        ? Text(
-                            StringUtil.formatDuration(
-                                Duration(milliseconds: position)),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: widget.isMe
-                                    ? AppColors.white
-                                    : AppColors.textColor2,
-                                fontSize: 10),
-                          )
-                        : Text(
-                            StringUtil.formatDuration(
-                                Duration(milliseconds: currentDuration)),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: widget.isMe
-                                    ? AppColors.white
-                                    : AppColors.textColor2,
-                                fontSize: 10),
-                          )
-                    : Text(
-                        StringUtil.formatDuration(
-                            const Duration(milliseconds: 0)),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            color: widget.isMe
-                                ? AppColors.white
-                                : AppColors.textColor2,
-                            fontSize: 10),
-                      ),
-              ),
-              SizedBox(width: getScreenWidth(20)),
-              Text(
-                widget.timeStamp,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: widget.isMe ? AppColors.white : AppColors.textColor2,
-
-                ),
-              ],
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 29),
+              child: isInitialised
+                  ? !isPlaying
+                      ? Text(
+                          StringUtil.formatDuration(
+                              Duration(milliseconds: position)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: widget.isMe
+                                  ? AppColors.white
+                                  : AppColors.textColor2,
+                              fontSize: 10),
+                        )
+                      : Text(
+                          StringUtil.formatDuration(
+                              Duration(milliseconds: currentDuration)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: widget.isMe
+                                  ? AppColors.white
+                                  : AppColors.textColor2,
+                              fontSize: 10),
+                        )
+                  : Text(
+                      StringUtil.formatDuration(
+                          const Duration(milliseconds: 0)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: widget.isMe
+                              ? AppColors.white
+                              : AppColors.textColor2,
+                          fontSize: 10),
+                    ),
             ),
-          ),
+            SizedBox(width: getScreenWidth(20)),
+            Text(
+              widget.timeStamp,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: widget.isMe ? AppColors.white : AppColors.textColor2,
+              ),
+            ),
+          ]),
         ),
       ],
     );

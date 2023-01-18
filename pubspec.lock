@@ -125,9 +125,11 @@ packages:
   better_player:
     dependency: "direct main"
     description:
-      name: better_player
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "91a9625524cdff448e0a9deb5047bcf20cc8dcf1"
+      url: "https://github.com/tintran-dev/betterplayer.git"
+    source: git
     version: "0.0.83"
   bloc:
     dependency: transitive
@@ -431,7 +433,7 @@ packages:
     source: hosted
     version: "2.0.1"
   ffmpeg_kit_flutter:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: ffmpeg_kit_flutter
       url: "https://pub.dartlang.org"
@@ -527,7 +529,7 @@ packages:
     source: hosted
     version: "0.7.0"
   flutter_cache_manager:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_cache_manager
       url: "https://pub.dartlang.org"
@@ -1614,6 +1616,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  story_page_view:
+    dependency: "direct main"
+    description:
+      name: story_page_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   story_time:
     dependency: "direct main"
     description:
@@ -1621,6 +1630,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.6"
+  story_view:
+    dependency: "direct main"
+    description:
+      name: story_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   stream_channel:
     dependency: transitive
     description:
@@ -1741,7 +1757,7 @@ packages:
     source: hosted
     version: "3.0.1"
   uuid:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: uuid
       url: "https://pub.dartlang.org"

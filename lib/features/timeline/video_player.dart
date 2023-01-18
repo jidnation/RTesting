@@ -46,7 +46,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: 7.8 / 12.3,
+      // aspectRatio: 7.8 / 12.3,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       allowFullScreen: true,
