@@ -2852,7 +2852,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     width: getScreenWidth(130),
                                     height: getScreenHeight(41),
                                     child: CustomButton(
-                                      label: 'Message',
+                                      label: 'Reachout',
                                       color: AppColors.white,
                                       onPressed: () {
                                         RouteNavigators.route(

@@ -45,7 +45,7 @@ class _WordLibraryState extends State<WordLibrary> {
         backgroundColor: Colors.grey.shade50,
         centerTitle: false,
         title: Text(
-          'Word Library',
+          'World Library',
           style: TextStyle(
             fontSize: getScreenHeight(16),
             fontFamily: 'Poppins',

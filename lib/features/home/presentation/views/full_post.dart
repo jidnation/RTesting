@@ -1011,7 +1011,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                     .postOwnerId ==
                                                                 globals.userId
                                                             ? "Message"
-                                                            : 'Message user',
+                                                            : 'Reachout',
                                                         style: TextStyle(
                                                           fontSize:
                                                               getScreenHeight(

@@ -1213,30 +1213,44 @@ class _CommentReachState extends State<CommentReach> {
                                         shrinkWrap: true,
                                         children: [
                                           Column(children: [
-                                            // ListTile(
-                                            //     leading:
-                                            //         SvgPicture
-                                            //             .asset(
-                                            //       'assets/svgs/Camera.svg',
-                                            //       color: AppColors
-                                            //           .black,
-                                            //     ),
-                                            //     title: const Text(
-                                            //         'Camera'),
-                                            //     onTap: () async {
-                                            //       Navigator.pop(
-                                            //           context);
-                                            //       /* final image =
-                                            //       await getImage(
-                                            //           ImageSource
-                                            //               .camera);
-                                            //   if (image != null) {
-                                            //     globals.chatBloc!.add(
-                                            //         UploadImageFileEvent(
-                                            //             file:
-                                            //                 image));
-                                            //   }*/
-                                            //     }),
+                                            ListTile(
+                                                leading: SvgPicture.asset(
+                                                  'assets/svgs/Camera.svg',
+                                                  color: AppColors.black,
+                                                ),
+                                                title: const Text('Camera'),
+                                                onTap: () async {
+                                                  Navigator.pop(context);
+                                                  final image =
+                                                      await MediaService()
+                                                          .getImage(
+                                                              fromGallery:
+                                                                  false);
+                                                  if (image == null) {
+                                                    print(
+                                                        "!!!!!!!!!!NO IMAGE WAS UPLOADED!!!!!!!!!!!!!!");
+                                                    return;
+                                                  } else {
+                                                    media.value = UploadFileDto(
+                                                        file: image.file,
+                                                        fileResult: image,
+                                                        id: Random()
+                                                            .nextInt(100)
+                                                            .toString());
+                                                    print(
+                                                        'image is ${media.value!.fileResult!.file.path}');
+                                                  }
+                                                  //  final image =
+                                                  // await getImage(
+                                                  //     ImageSource
+                                                  //         .camera);
+                                                  // if (image != null) {
+                                                  //   globals.chatBloc!.add(
+                                                  //       UploadImageFileEvent(
+                                                  //           file:
+                                                  //               image));
+                                                  // }
+                                                }),
                                             ListTile(
                                               leading: SvgPicture.asset(
                                                   'assets/svgs/gallery.svg'),
