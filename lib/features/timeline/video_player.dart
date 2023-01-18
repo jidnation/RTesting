@@ -46,7 +46,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: 7.8 / 12.3,
+      // aspectRatio: 7.8 / 12.3,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       allowFullScreen: true,
@@ -264,7 +264,7 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
   void dispose() {
     super.dispose();
     // _videoPlayerController.dispose();
-    _chewieController?.dispose();
+    // _chewieController?.dispose();
   }
 
   Future<void> toggleVideo() async {

@@ -5,7 +5,6 @@ import 'package:reach_me/core/services/graphql/gql_client.dart';
 import 'package:reach_me/core/services/graphql/schemas/post_schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/status.schema.dart';
 import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
-import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -52,7 +51,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<UserList> getUserProfileByUsername({required String? username}) async {
+  Future<User> getUserProfileByUsername({required String? username}) async {
     String q = r'''
         query getUserByUsername($username: String!) {
           getUserByUsername(username: $username) {
@@ -70,7 +69,7 @@ class HomeRemoteDataSource {
       }
       print("User data ${result}");
       //print("User data 2 ${UserList.fromJson(result)}");
-      return UserList.fromJson(result.data!['getUserByUsername']);
+      return User.fromJson(result.data!['getUserByUsername']);
     } catch (e) {
       rethrow;
     }
@@ -1272,19 +1271,19 @@ class HomeRemoteDataSource {
   }
 
   Future<List<VirtualPostLikeModel>> getLikesOnPost({
-    required String? postId,
+    required String postId,
   }) async {
     String q = r'''
         query getLikesOnPost($postId: String!) {
           getLikesOnPost(postId: $postId){
-            profile {
-                ''' +
-        UserSchema.schema +
-        '''
-            }
             authId
             postId
-            likeId
+            profile {
+                ''' +
+        MiniProfileSchema.schema +
+        '''
+            }
+            created_at
           }
         }''';
     try {
@@ -1298,6 +1297,33 @@ class HomeRemoteDataSource {
 
       return (result.data!['getLikesOnPost'] as List)
           .map((e) => VirtualPostLikeModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<VirtualPostVoteModel>> getVotesOnPost(
+      {required String postId, required String voteType}) async {
+    String q = r'''
+        query getVotesOnPost($postId: String!, $voteType: String!, ) {
+          getVotesOnPost(postId: $postId, vote_type: $voteType){
+            authId
+            postId
+            voteType
+            created_at
+          }
+        }''';
+    try {
+      final result = await _client
+          .query(gql(q), variables: {'postId': postId, 'vote_type': voteType});
+
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+
+      return (result.data!['getVotesOnPost'] as List)
+          .map((e) => VirtualPostVoteModel.fromJson(e))
           .toList();
     } catch (e) {
       rethrow;
@@ -1651,15 +1677,16 @@ class HomeRemoteDataSource {
       final tempList = (result.data!['getStatusFeed'] as List)
           .map((e) => StatusFeedResponseModel.fromJson(e))
           .toList();
-      List<StatusFeedResponseModel> list = [];
-      if (tempList.isNotEmpty) {
-        final groupedList =
-            tempList.first.status!.groupBy((item) => item.status!.authId!);
-        groupedList.forEach((key, value) {
-          list.add(StatusFeedResponseModel(id: key, status: value.toList()));
-        });
-      }
-      return list;
+      Console.log('STATUSSESS LENGTH', tempList.length);
+      // List<StatusFeedResponseModel> list = [];
+      // if (tempList.isNotEmpty) {
+      //   final groupedList =
+      //       tempList.first.status!.groupBy((item) => item.status!.authId!);
+      //   groupedList.forEach((key, value) {
+      //     list.add(StatusFeedResponseModel(id: key, status: value.toList()));
+      //   });
+      // }
+      return tempList;
     } catch (e) {
       rethrow;
     }

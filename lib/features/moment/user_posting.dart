@@ -136,7 +136,10 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
     /// POSTING TYPES
     ///
     List<Widget> postings = [
-      CreatePosting(controller: controller),
+      CreatePosting(
+        controller: controller,
+        context: context,
+      ),
       MomentPosting(
           controller: controller, slidingController: sliderController),
       LiveScreen(
@@ -288,12 +291,14 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                             final res = await MediaService()
                                 .pickFromGallery(context: context);
                             if (res != null) {
-                              RouteNavigators.route(
+                              final status = await RouteNavigators.route(
                                   context,
                                   BuildMediaPreview(
                                     path: res.first.path,
                                     isVideo: FileUtils.isVideo(res.first.file),
                                   ));
+                              if (status == null) return;
+                              RouteNavigators.pop(context, status);
                             }
                           },
                         ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 
 class RouteNavigators {
@@ -60,8 +61,8 @@ class RouteNavigators {
     );
   }
 
-  static void route(BuildContext context, [Widget? route]) {
-    Navigator.of(context).push(
+  static Future route(BuildContext context, [Widget? route]) {
+    return Navigator.of(context).push(
       Platform.isIOS
           ? CupertinoPageRoute(
               builder: (_) {
@@ -88,7 +89,7 @@ class RouteNavigators {
     );
   }
 
-  static void pop(BuildContext context) {
-    Navigator.pop(context);
+  static void pop(BuildContext context, [Object? result]) {
+    Navigator.pop(context, result);
   }
 }

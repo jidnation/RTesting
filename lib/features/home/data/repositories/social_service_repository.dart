@@ -19,16 +19,16 @@ class SocialServiceRepository {
   final HomeRemoteDataSource _homeRemoteDataSource;
   final ApiClient _apiClient;
 
-  Future<Either<String, PostModel>> createPost(
-      {String? audioMediaItem,
-      String? commentOption,
-      String? content,
-      List<String>? imageMediaItems,
-      String? videoMediaItem,
-      String? location,
-      String? postRating,
-     List<String>? mentionList,
-      }) async {
+  Future<Either<String, PostModel>> createPost({
+    String? audioMediaItem,
+    String? commentOption,
+    String? content,
+    List<String>? imageMediaItems,
+    String? videoMediaItem,
+    String? location,
+    String? postRating,
+    List<String>? mentionList,
+  }) async {
     try {
       final post = await _homeRemoteDataSource.createPost(
           audioMediaItem: audioMediaItem,
@@ -290,6 +290,21 @@ class SocialServiceRepository {
         postId: postId,
       );
       return Right(virtualPosts);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<VirtualPostVoteModel>>> getVotesOnPost({
+    required String postId,
+    required String voteType,
+  }) async {
+    try {
+      final virtualVotes = await _homeRemoteDataSource.getVotesOnPost(
+        voteType: voteType,
+        postId: postId,
+      );
+      return Right(virtualVotes);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

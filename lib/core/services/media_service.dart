@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_cropper/image_cropper.dart';
 //import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as t;
@@ -277,14 +276,28 @@ class MediaService {
 
   Future<FileResult?> pickFromCamera(
       {required BuildContext context, bool? enableRecording}) async {
+    print("::::::>>>>>> am here 0 ::::::::");
     final res = await CameraPicker.pickFromCamera(context,
         locale: Locale('en'),
         pickerConfig:
             CameraPickerConfig(enableRecording: enableRecording ?? false));
+
+    // CameraPicker.pickFromCamera(context,
+    //     locale: Locale('en'),
+    //     pickerConfig:
+    //         CameraPickerConfig(enableRecording: enableRecording ?? false));
+    print(
+        "::::::>>>>>> am here 1 :::::::: ${await res!.originFile.then((value) => value)}");
+
     if (res == null) return null;
-    final file = await res.originFile;
+    File? file = await res.originFile.then((value) => value);
+    print("::::::::::::>>>>>>><<<<<<<<< $file");
     if (file == null) return null;
-    String? thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+    String? thumbnail;
+    // = (await getVideoThumbnail(videoPath: file.path))?.path;
+    if (FileUtils.isVideo(file)) {
+      thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+    }
     return FileResult(
         path: file.path,
         size: file.lengthSync() / 1024,

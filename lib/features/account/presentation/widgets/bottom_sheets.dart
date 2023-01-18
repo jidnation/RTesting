@@ -19,6 +19,7 @@ import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
+import 'package:reach_me/features/home/presentation/views/post_reactors.dart';
 import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
 import 'package:share_plus/share_plus.dart';
@@ -499,7 +500,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: true,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status muted successfully!');
-            timeLineFeedStore.getUserStatus();
+            // timeLineFeedStore.getUserStatus();
           }
           if (state is UnmuteStatusSuccess) {
             RouteNavigators.pop(context);
@@ -509,7 +510,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                     isMute: false,
                     userId: status.statusOwnerProfile!.authId ?? ''));
             Snackbars.success(context, message: 'Status unmuted successfully!');
-            timeLineFeedStore.getUserStatus();
+            // timeLineFeedStore.getUserStatus();
           }
           if (state is ReportStatusSuccess) {
             RouteNavigators.pop(context);
@@ -599,7 +600,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                           // KebabBottomTextButton(
                           //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
-                              label: (status.status?.isMuted ?? false) &&
+                              label: (status.status?.isMuted ?? false) ||
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',
@@ -612,9 +613,6 @@ Future showUserStoryBottomSheet(BuildContext context,
                                           idToUnmute: status
                                                   .statusOwnerProfile?.authId ??
                                               ''));
-                                  await Future.delayed(
-                                      const Duration(seconds: 4));
-                                  timeLineFeedStore.initialize();
                                 } else {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -623,9 +621,6 @@ Future showUserStoryBottomSheet(BuildContext context,
                                                   .statusOwnerProfile?.authId ??
                                               ''));
                                 }
-                                await Future.delayed(
-                                    const Duration(seconds: 4));
-                                timeLineFeedStore.initialize();
                               }),
                         ],
                       ),
@@ -727,5 +722,15 @@ Future<int?> showMediaUploadOption({
         ],
       );
     },
+  );
+}
+
+Future showPostReactors(BuildContext context, {required String postId}) async {
+  return showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) => PostReactors(
+      postId: postId,
+    ),
   );
 }
