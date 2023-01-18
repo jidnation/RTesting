@@ -38,7 +38,8 @@ class TimeLineFeed extends StatefulWidget {
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 
-class _TimeLineFeedState extends State<TimeLineFeed> {
+class _TimeLineFeedState extends State<TimeLineFeed>
+    with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
@@ -50,8 +51,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return ProgressHUD(
-      child: SafeArea(
+    return SafeArea(
+      child: ProgressHUD(
         child: Scaffold(
           backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
           appBar: AppBar(
@@ -416,4 +417,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

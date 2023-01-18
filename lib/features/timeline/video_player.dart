@@ -49,20 +49,21 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
       // aspectRatio: 7.8 / 12.3,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
+      autoInitialize: true,
       allowFullScreen: true,
       // fullScreenByDefault: true,
       looping: true,
       // progressIndicatorDelay:
       //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
+      // additionalOptions: (context) {
+      //   return <OptionItem>[
+      //     OptionItem(
+      //       onTap: toggleVideo,
+      //       iconData: Icons.live_tv_sharp,
+      //       title: 'Toggle Video Src',
+      //     ),
+      //   ];
+      // },
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -85,7 +86,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
   @override
   void dispose() {
     super.dispose();
-    _videoPlayerController.dispose();
+    // _videoPlayerController.dispose();
     _chewieController?.dispose();
   }
 
@@ -224,10 +225,11 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: 8.3 / 12,
+      // aspectRatio: 8.3 / 12,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       allowFullScreen: true,
+      autoInitialize: true,
       // fullScreenByDefault: true,
       looping: true,
       // progressIndicatorDelay:
@@ -264,7 +266,7 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
   void dispose() {
     super.dispose();
     // _videoPlayerController.dispose();
-    // _chewieController?.dispose();
+    _chewieController?.dispose();
   }
 
   Future<void> toggleVideo() async {
@@ -338,7 +340,7 @@ class _TimeLineVideoPreviewState extends State<TimeLineVideoPreview> {
 
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
-            placeholder: Center(
+            placeholder: const Center(
               child: CircularProgressIndicator(
                 color: AppColors.white,
               ),
@@ -347,7 +349,7 @@ class _TimeLineVideoPreviewState extends State<TimeLineVideoPreview> {
               width: double.infinity,
               color: AppColors.black.withOpacity(0.1),
             ),
-            controlsConfiguration: BetterPlayerControlsConfiguration(
+            controlsConfiguration: const BetterPlayerControlsConfiguration(
                 enableQualities: false,
                 enableSubtitles: false,
                 enableAudioTracks: false,

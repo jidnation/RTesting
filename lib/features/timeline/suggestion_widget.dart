@@ -74,8 +74,13 @@ class UserSuggestionWidget extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       CustomUser customUser =
                           timeLineFeedStore.suggestedUser[index];
+                      bool isReaching =
+                          customUser.user.reaching?.reachingId != null;
+                      print(
+                          ":::>>>>>> ${customUser.user.reaching?.reacherId} <<<<<");
                       return SuggestedUserContainer(
                         user: customUser,
+                        isReaching: isReaching,
                         // size: size,
                         // profilePicture:
                         // suggestedUsers.value[index].profilePicture,
@@ -138,16 +143,15 @@ class UserSuggestionWidget extends StatelessWidget {
 
 class SuggestedUserContainer extends StatelessWidget {
   final CustomUser user;
+  final bool isReaching;
   const SuggestedUserContainer({
     Key? key,
     required this.user,
+    required this.isReaching,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    bool isReaching = user.user.reaching?.reachingId != null;
-    print(
-        ":::>>>>>> ${user.user.reaching?.reachingId} >>>>> ${user.user.reaching?.reachingId}");
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -181,7 +185,7 @@ class SuggestedUserContainer extends StatelessWidget {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               constraints: const BoxConstraints(
-                maxWidth: 162,
+                maxWidth: 161.5,
               ),
               child: FittedBox(
                 child: Text(
