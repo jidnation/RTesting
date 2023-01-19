@@ -46,17 +46,13 @@ class TimeLineBoxActionRow extends StatelessWidget {
                       postId: post.postId!, reactionType: 'Like');
                 }
               },
-              child: CupertinoButton(
-                minSize: 0,
-                onPressed: () {
-                  timeLineFeedStore.likePost(timeLineId);
-                },
-                padding: EdgeInsets.zero,
-                child: SvgPicture.asset(
-                  post.isLiked!
-                      ? 'assets/svgs/like-active.svg'
-                      : 'assets/svgs/like.svg',
-                ),
+              onTap: () {
+                timeLineFeedStore.likePost(timeLineId);
+              },
+              child: SvgPicture.asset(
+                post.isLiked!
+                    ? 'assets/svgs/like-active.svg'
+                    : 'assets/svgs/like.svg',
               ),
             ),
             const SizedBox(width: 3),
@@ -146,24 +142,20 @@ class TimeLineBoxActionRow extends StatelessWidget {
                         postId: post.postId!, reactionType: 'Upvote');
                   }
                 },
-                child: CupertinoButton(
-                  minSize: 0,
-                  onPressed: () {
-                    timeLineFeedStore.votePost(
-                      routeContext,
-                      id: timeLineId,
-                      voteType: 'Upvote',
-                    );
-                  },
-                  padding: EdgeInsets.zero,
-                  child: SizedBox(
-                    width: 30,
-                    child: SvgPicture.asset(
-                      post.isVoted != 'false' &&
-                              post.isVoted!.toLowerCase() == 'upvote'
-                          ? 'assets/svgs/shoutup-active.svg'
-                          : 'assets/svgs/shoutup.svg',
-                    ),
+                onTap: () {
+                  timeLineFeedStore.votePost(
+                    routeContext,
+                    id: timeLineId,
+                    voteType: 'Upvote',
+                  );
+                },
+                child: SizedBox(
+                  width: 30,
+                  child: SvgPicture.asset(
+                    post.isVoted != 'false' &&
+                            post.isVoted!.toLowerCase() == 'upvote'
+                        ? 'assets/svgs/shoutup-active.svg'
+                        : 'assets/svgs/shoutup.svg',
                   ),
                 ),
               ),
@@ -182,29 +174,26 @@ class TimeLineBoxActionRow extends StatelessWidget {
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               GestureDetector(
                 onLongPress: () {
-                  if ((post.nDownvotes ?? 0) > 0 && (post.authId == globals.user!.id!)) {
-                showPostReactors(routeContext,
-                    postId: post.postId!, reactionType: 'Downvote');
-                }
+                  if ((post.nDownvotes ?? 0) > 0 &&
+                      (post.authId == globals.user!.id!)) {
+                    showPostReactors(routeContext,
+                        postId: post.postId!, reactionType: 'Downvote');
+                  }
                 },
-                child: CupertinoButton(
-                  minSize: 0,
-                  onPressed: () {
-                    timeLineFeedStore.votePost(
-                      routeContext,
-                      id: timeLineId,
-                      voteType: 'Downvote',
-                    );
-                  },
-                  padding: EdgeInsets.zero,
-                  child: SizedBox(
-                    width: 30,
-                    child: SvgPicture.asset(
-                      post.isVoted != 'false' &&
-                              post.isVoted!.toLowerCase() == 'downvote'
-                          ? 'assets/svgs/shoutdown-active.svg'
-                          : 'assets/svgs/shoutdown.svg',
-                    ),
+                onTap: () {
+                  timeLineFeedStore.votePost(
+                    routeContext,
+                    id: timeLineId,
+                    voteType: 'Downvote',
+                  );
+                },
+                child: SizedBox(
+                  width: 30,
+                  child: SvgPicture.asset(
+                    post.isVoted != 'false' &&
+                            post.isVoted!.toLowerCase() == 'downvote'
+                        ? 'assets/svgs/shoutdown-active.svg'
+                        : 'assets/svgs/shoutdown.svg',
                   ),
                 ),
               ),
