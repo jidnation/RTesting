@@ -33,7 +33,6 @@ import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/regex_util.dart';
 import '../../../account/presentation/views/account.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
-import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../moment/moment_audio_player.dart';
@@ -1224,9 +1223,9 @@ class _CommentReachState extends State<CommentReach> {
                                                   final image =
                                                       await MediaService()
                                                           .pickFromCamera(
-                                                              context : context,
-                                                              enableRecording: true,
-                                                                  );
+                                                    context: context,
+                                                    enableRecording: true,
+                                                  );
                                                   if (image == null) {
                                                     print(
                                                         "!!!!!!!!!!NO IMAGE WAS UPLOADED!!!!!!!!!!!!!!");
