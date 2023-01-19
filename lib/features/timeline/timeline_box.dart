@@ -342,7 +342,9 @@ class TimeLineBox extends StatelessWidget {
                       visible: tPostInfo.content!.isNotEmpty,
                       child: ExpandableText(
                         "${tPostInfo.content}",
-                        prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                        prefixText: tPostInfo.edited!
+                            ? "(Reach Edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())})"
+                            : null,
                         prefixStyle: TextStyle(
                             fontSize: getScreenHeight(12),
                             fontFamily: 'Poppins',

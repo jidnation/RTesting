@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:reach_me/core/components/custom_button.dart';
@@ -6,13 +7,12 @@ import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
+import 'package:reach_me/core/utils/validator.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/validator.dart';
-import 'package:flutter/material.dart';
 
 class SignUpScreen extends HookWidget {
   static const String id = 'signup_screen';
@@ -260,13 +260,13 @@ class SignUpScreen extends HookWidget {
                                                 ? const Icon(
                                                     Icons
                                                         .visibility_off_outlined,
-                                                    size: 15,
+                                                    size: 18,
                                                     color: AppColors
                                                         .textFieldLabelColor,
                                                   )
                                                 : const Icon(
                                                     Icons.visibility,
-                                                    size: 15,
+                                                    size: 18,
                                                     color:
                                                         AppColors.primaryColor,
                                                   ),
@@ -275,8 +275,8 @@ class SignUpScreen extends HookWidget {
                                       ),
                                       TextSpan(
                                         text: _obscureString,
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(13),
+                                        style: const TextStyle(
+                                          fontSize: 15,
                                           color: AppColors.textColor,
                                           fontWeight: FontWeight.w500,
                                         ),
