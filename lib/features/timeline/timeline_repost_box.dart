@@ -127,10 +127,8 @@ class TimelineRepostedPost extends StatelessWidget {
                       ),
                       SizedBox(
                           width: tPostInfo.location!.isNotEmpty &&
-                                      tPostInfo.location!
-                                              .toLowerCase()
-                                              .trim() !=
-                                          'nil'
+                                  tPostInfo.location!.toLowerCase().trim() !=
+                                      'nil'
                               ? 5
                               : 0),
                     ]),
@@ -199,7 +197,7 @@ class TimelineRepostedPost extends StatelessWidget {
                     width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xff001824),
+                      color: Colors.transparent,
                     ),
                     child:
                         // TimeLineVideoPreview(

@@ -435,8 +435,8 @@ class TimeLineBox extends StatelessWidget {
                             height: 550,
                             width: SizeConfig.screenWidth,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: const Color(0xff001824),
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green,
                             ),
                             child:
                                 // TimeLineVideoPreview(
