@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,14 +7,13 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/validator.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/forgot_password.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
-import 'package:reach_me/core/utils/constants.dart';
-import 'package:reach_me/core/utils/validator.dart';
-import 'package:flutter/material.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 
 class LoginScreen extends HookWidget {
@@ -131,13 +131,13 @@ class LoginScreen extends HookWidget {
                                                   ? const Icon(
                                                       Icons
                                                           .visibility_off_outlined,
-                                                      size: 15,
+                                                      size: 18,
                                                       color: AppColors
                                                           .textFieldLabelColor,
                                                     )
                                                   : const Icon(
                                                       Icons.visibility,
-                                                      size: 15,
+                                                      size: 18,
                                                       color: AppColors
                                                           .primaryColor,
                                                     ),
@@ -146,8 +146,8 @@ class LoginScreen extends HookWidget {
                                         ),
                                         TextSpan(
                                           text: _obscureString,
-                                          style: TextStyle(
-                                            fontSize: getScreenHeight(13),
+                                          style: const TextStyle(
+                                            fontSize: 15,
                                             color: AppColors.textColor,
                                             fontWeight: FontWeight.w500,
                                           ),
