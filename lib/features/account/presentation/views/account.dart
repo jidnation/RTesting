@@ -39,7 +39,6 @@ import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
-
 import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 
@@ -1823,17 +1822,26 @@ class _ReacherCard extends HookWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  if (onLike != null) onLike!();
+                              GestureDetector(
+                                onLongPress: () {
+                                  if ((postModel!.nLikes ?? 0) > 0) {
+                                    showPostReactors(context,
+                                        postId: postModel!.postId!,
+                                        reactionType: 'Like');
+                                  }
                                 },
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                icon: SvgPicture.asset(
-                                  postModel!.isLiked ?? false
-                                      ? 'assets/svgs/like-active.svg'
-                                      : 'assets/svgs/like.svg',
-                                  color: likeColour,
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (onLike != null) onLike!();
+                                  },
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: SvgPicture.asset(
+                                    postModel!.isLiked ?? false
+                                        ? 'assets/svgs/like-active.svg'
+                                        : 'assets/svgs/like.svg',
+                                    color: likeColour,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
@@ -1913,16 +1921,27 @@ class _ReacherCard extends HookWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      if (onUpvote != null) onUpvote;
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      if ((postModel!.nUpvotes ?? 0) > 0 &&
+                                          (postModel!.authId ==
+                                              globals.user!.id!)) {
+                                        showPostReactors(context,
+                                            postId: postModel!.postId!,
+                                            reactionType: 'Upvote');
+                                      }
                                     },
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    icon: SvgPicture.asset(
-                                      (postModel?.isVoted ?? '') == 'Upvote'
-                                          ? 'assets/svgs/shoutup-active.svg'
-                                          : 'assets/svgs/shoutup.svg',
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (onUpvote != null) onUpvote;
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: SvgPicture.asset(
+                                        (postModel?.isVoted ?? '') == 'Upvote'
+                                            ? 'assets/svgs/shoutup-active.svg'
+                                            : 'assets/svgs/shoutup.svg',
+                                      ),
                                     ),
                                   ),
                                   Flexible(
@@ -1931,14 +1950,25 @@ class _ReacherCard extends HookWidget {
                                   Flexible(
                                       child:
                                           SizedBox(width: getScreenWidth(4))),
-                                  IconButton(
-                                    onPressed: () {
-                                      if (onDownvote != null) onDownvote;
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      if ((postModel!.nDownvotes ?? 0) > 0 &&
+                                          (postModel!.authId ==
+                                              globals.user!.id!)) {
+                                        showPostReactors(context,
+                                            postId: postModel!.postId!,
+                                            reactionType: 'Downvote');
+                                      }
                                     },
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    icon: SvgPicture.asset(
-                                      'assets/svgs/downvote.svg',
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (onDownvote != null) onDownvote;
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: SvgPicture.asset(
+                                        'assets/svgs/downvote.svg',
+                                      ),
                                     ),
                                   ),
                                   Flexible(
@@ -3330,10 +3360,6 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                             },
                                           ),
                                   ),
-
-                                
-                                  
-                          
                               ],
                             ),
                           ),

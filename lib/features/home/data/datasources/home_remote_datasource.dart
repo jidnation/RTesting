@@ -1294,7 +1294,7 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
+      Console.log("likeeessss", result.data);
       return (result.data!['getLikesOnPost'] as List)
           .map((e) => VirtualPostLikeModel.fromJson(e))
           .toList();
@@ -1306,22 +1306,27 @@ class HomeRemoteDataSource {
   Future<List<VirtualPostVoteModel>> getVotesOnPost(
       {required String postId, required String voteType}) async {
     String q = r'''
-        query getVotesOnPost($postId: String!, $voteType: String!, ) {
+        query getVotesOnPost($postId: String!, $voteType: String!) {
           getVotesOnPost(postId: $postId, vote_type: $voteType){
             authId
             postId
             voteType
             created_at
+            profile{
+              '''+
+              MiniProfileSchema.schema
+              +'''
+            }
           }
         }''';
     try {
       final result = await _client
-          .query(gql(q), variables: {'postId': postId, 'vote_type': voteType});
+          .query(gql(q), variables: {'postId': postId, 'voteType': voteType});
 
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-
+      Console.log("votesssss", result.data);
       return (result.data!['getVotesOnPost'] as List)
           .map((e) => VirtualPostVoteModel.fromJson(e))
           .toList();

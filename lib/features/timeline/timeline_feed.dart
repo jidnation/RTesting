@@ -202,8 +202,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                       0,
                                                                 ));
                                                     if (res == null) return;
-                                                    // timeLineFeedStore
-                                                    //     .getMyStatus();
                                                     timeLineFeedStore
                                                         .addNewStatus(
                                                             res as StatusModel);
@@ -246,15 +244,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                         .statusOwnerProfile!
                                                         .username!,
                                                     onTap: () async {
-                                                      // RouteNavigators
-                                                      //     .route(
-                                                      //   context,
-                                                      //   ViewUserStatus(
-                                                      //       status: _userStatus
-                                                      //           .value[
-                                                      //               index]
-                                                      //           .status!),
-                                                      // );
                                                       final res = await Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
@@ -269,12 +258,15 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                         timeLineFeedStore
                                                             .muteStatus(index);
                                                       }
+
+                                                      // Navigator.push(
+                                                      //     context,
+                                                      //     MaterialPageRoute(
+                                                      //         builder: (c) =>
+                                                      //             const StoryPage()));
                                                     },
                                                   ),
                                                 ),
-                                                // ..._userStatus.value.map(
-                                                //   (e) =>
-                                                // ),
                                               ],
                                             ),
                                           ).paddingOnly(left: 11),
@@ -339,15 +331,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   timeLineFeedStore
                                                       .unMuteStatus(index);
                                                 }
-                                                // RouteNavigators
-                                                //     .route(
-                                                //   context,
-                                                //   ViewUserStatus(
-                                                //       status: _mutedStatus
-                                                //           .value[
-                                                //               index]
-                                                //           .status!),
-                                                // );
+
+                                                // Navigator.push(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //         builder: (c) => const StoryPage()));
                                               },
                                             ),
                                           )
