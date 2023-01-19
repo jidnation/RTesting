@@ -470,6 +470,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   unMuteStatus(int index) {
+    final _status = _mutedStatus[index];
     _userStatus = [..._userStatus, _mutedStatus[index]];
     _mutedStatus = [..._mutedStatus]..removeAt(index);
     notifyListeners();
@@ -735,22 +736,22 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         currentSuggestedUser.firstWhere((element) => element.id == id);
     bool isReaching = actualUser.user.reaching?.reachingId != null;
     if (isReaching) {
-      actualUser.user.reaching = ReachingRelationship(reacherId: null);
+      actualUser.user.reaching?.reachingId = null;
       actualUser.user.nReachers = actualUser.user.nReachers ?? 0 - 1;
       notifyListeners();
       final response = await UserRepository()
           .deleteReachRelationship(userId: actualUser.user.id!);
       if (response.isRight()) {
-        updateSuggestedList();
+        // updateSuggestedList();
       }
     } else {
-      actualUser.user.reaching = ReachingRelationship(reacherId: 'a');
+      actualUser.user.reaching?.reachingId = 'reaching';
       actualUser.user.nReachers = actualUser.user.nReachers ?? 0 + 1;
       notifyListeners();
       Either<String, dynamic> response =
           await UserRepository().reachUser(userId: actualUser.user.id!);
       if (response.isRight()) {
-        updateSuggestedList();
+        // updateSuggestedList();
       }
     }
   }

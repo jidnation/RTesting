@@ -718,6 +718,21 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           // likes and message
                                           Row(children: [
                                             GestureDetector(
+                                              onLongPress: () {
+                                                          if ((post.value.post
+                                                                      ?.nLikes ??
+                                                                  0) >
+                                                              0) {
+                                                            showPostReactors(
+                                                                context,
+                                                                postId: post
+                                                                    .value
+                                                                    .post!
+                                                                    .postId!,
+                                                                reactionType:
+                                                                    'Like');
+                                                          }
+                                                        },
                                               onTap: () {
                                                 HapticFeedback.mediumImpact();
                                                 handleTap(
@@ -861,12 +876,14 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         },
                                                         padding:
                                                             EdgeInsets.zero,
-                                                        child: likePost.value ||
+                                                        child: likePost
+                                                                    .value ||
                                                                 widget
                                                                     .postFeedModel!
                                                                     .post!
                                                                     .isLiked!
-                                                            ? SvgPicture.asset(
+                                                            ? SvgPicture
+                                                                .asset(
                                                                 'assets/svgs/like-active.svg',
                                                                 height:
                                                                     getScreenHeight(
@@ -875,7 +892,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                     getScreenWidth(
                                                                         20),
                                                               )
-                                                            : SvgPicture.asset(
+                                                            : SvgPicture
+                                                                .asset(
                                                                 'assets/svgs/like.svg',
                                                                 height:
                                                                     getScreenHeight(
@@ -1015,7 +1033,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                     .postOwnerId ==
                                                                 globals.userId
                                                             ? "Message"
-                                                            : 'Message user',
+                                                            : 'Reachout',
                                                         style: TextStyle(
                                                           fontSize:
                                                               getScreenHeight(
@@ -1037,6 +1055,20 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           Row(
                                             children: [
                                               GestureDetector(
+                                                onLongPress: () {
+                                                  if ((post.value.post
+                                                                  ?.nUpvotes ??
+                                                              0) >
+                                                          0 &&
+                                                      (post.value.post
+                                                              ?.authId ==
+                                                          globals.user!.id!)) {
+                                                    showPostReactors(context,
+                                                        postId: post.value.post!
+                                                            .postId!,
+                                                        reactionType: 'Upvote');
+                                                  }
+                                                },
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
                                                   handleTap(widget
@@ -1208,6 +1240,21 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                               SizedBox(
                                                   width: getScreenWidth(15)),
                                               GestureDetector(
+                                                onLongPress: () {
+                                                  if ((post.value.post
+                                                                  ?.nDownvotes ??
+                                                              0) >
+                                                          0 &&
+                                                      (post.value.post
+                                                              ?.authId ==
+                                                          globals.user!.id!)) {
+                                                    showPostReactors(context,
+                                                        postId: post.value.post!
+                                                            .postId!,
+                                                        reactionType:
+                                                            'Downvote');
+                                                  }
+                                                },
                                                 onTap: () {
                                                   HapticFeedback.mediumImpact();
                                                   handleTap(widget

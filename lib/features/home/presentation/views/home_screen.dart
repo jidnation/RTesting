@@ -82,10 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
       key: scaffoldKey.value,
       body: WillPopScope(
         onWillPop: () => Future.sync(onWillPop),
-        child: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: pages,
+        child: SafeArea(
+          child: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: pages,
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavBar(

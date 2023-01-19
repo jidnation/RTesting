@@ -315,7 +315,7 @@ class SignUpScreen extends HookWidget {
                                     TextSpan(
                                       children: <InlineSpan>[
                                         TextSpan(
-                                          text: '• minimum 8 characters',
+                                          text: '• minimum 6 characters',
                                           style: TextStyle(
                                             fontSize: getScreenHeight(12),
                                             color: AppColors.textColor,
