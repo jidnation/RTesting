@@ -8,13 +8,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/timeline/suggestion_widget.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_post_reach.dart';
 import 'package:reach_me/features/timeline/timeline_user_story.dart';
 
-import '../../core/components/empty_state.dart';
 import '../../core/components/profile_picture.dart';
 import '../../core/components/rm_spinner.dart';
 import '../../core/services/navigation/navigation_service.dart';
@@ -38,7 +38,8 @@ class TimeLineFeed extends StatefulWidget {
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 
-class _TimeLineFeedState extends State<TimeLineFeed> {
+class _TimeLineFeedState extends State<TimeLineFeed>
+    with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
@@ -50,8 +51,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return ProgressHUD(
-      child: SafeArea(
+    return SafeArea(
+      child: ProgressHUD(
         child: Scaffold(
           backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
           appBar: AppBar(
@@ -136,7 +137,6 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
-                    // ScrollController scrollController = ScrollController();
                     print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
@@ -348,8 +348,9 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                             ),
                             Expanded(
                                 child: value.isEmpty
-                                    ? EmptyTimelineWidget(
-                                        loading: timeLineFeedStore.gettingPosts)
+                                    ? const UserSuggestionWidget()
+                                    // ? EmptyTimelineWidget(
+                                    //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
                                         physics: const BouncingScrollPhysics(),
                                         onRefresh: () {
@@ -404,4 +405,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

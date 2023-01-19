@@ -31,7 +31,6 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
-import 'package:reach_me/features/home/presentation/views/view_comments.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -105,7 +104,6 @@ class _AccountScreenState extends State<AccountScreen>
         unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
         labelColor: AppColors.white,
-        padding: const EdgeInsets.only(left: 16),
         labelPadding: const EdgeInsets.symmetric(horizontal: 10),
         overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
         indicator: BoxDecoration(
@@ -1715,9 +1713,11 @@ class _ReacherCard extends HookWidget {
                               Row(
                                 children: [
                                   Text(
-                                    postModel!.location! == 'nil' ||
-                                            postModel!.location! == 'NIL' ||
-                                            postModel!.location == null
+                                    postModel!.location!
+                                                .toLowerCase()
+                                                .trim()
+                                                .toString() ==
+                                            'nil'
                                         ? ''
                                         : postModel!.location!.length > 23
                                             ? postModel!.location!
@@ -1842,8 +1842,6 @@ class _ReacherCard extends HookWidget {
                                         ? 'assets/svgs/like-active.svg'
                                         : 'assets/svgs/like.svg',
                                     color: likeColour,
-                                    height: 20,
-                                    width: 20,
                                   ),
                                 ),
                               ),
@@ -1867,8 +1865,6 @@ class _ReacherCard extends HookWidget {
                                 constraints: const BoxConstraints(),
                                 icon: SvgPicture.asset(
                                   'assets/svgs/comment.svg',
-                                  height: 20,
-                                  width: 20,
                                 ),
                               ),
                               SizedBox(width: getScreenWidth(4)),
@@ -1946,7 +1942,6 @@ class _ReacherCard extends HookWidget {
                                         (postModel?.isVoted ?? '') == 'Upvote'
                                             ? 'assets/svgs/shoutup-active.svg'
                                             : 'assets/svgs/shoutup.svg',
-                                        height: 20,
                                       ),
                                     ),
                                   ),
@@ -1974,7 +1969,6 @@ class _ReacherCard extends HookWidget {
                                       constraints: const BoxConstraints(),
                                       icon: SvgPicture.asset(
                                         'assets/svgs/downvote.svg',
-                                        width: 20,
                                       ),
                                     ),
                                   ),
@@ -2892,7 +2886,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     width: getScreenWidth(130),
                                     height: getScreenHeight(41),
                                     child: CustomButton(
-                                      label: 'Message',
+                                      label: 'Reachout',
                                       color: AppColors.white,
                                       onPressed: () {
                                         RouteNavigators.route(

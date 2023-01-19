@@ -50,6 +50,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/suggestion_widget.dart';
 import '../../../timeline/video_player.dart';
 import 'full_post.dart';
 
@@ -1267,6 +1268,8 @@ class PostFeedReacherCard extends HookWidget {
                     children: [
                       Flexible(
                         child: Container(
+                          height: 40,
+                          width: getScreenWidth(160),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 11,
                             vertical: 7,
@@ -1295,13 +1298,9 @@ class PostFeedReacherCard extends HookWidget {
                                     child: isLiked
                                         ? SvgPicture.asset(
                                             'assets/svgs/like-active.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
                                           )
                                         : SvgPicture.asset(
                                             'assets/svgs/like.svg',
-                                            height: getScreenHeight(20),
-                                            width: getScreenWidth(20),
                                           ),
                                   ),
                                 ),
@@ -1330,8 +1329,6 @@ class PostFeedReacherCard extends HookWidget {
                                   padding: EdgeInsets.zero,
                                   child: SvgPicture.asset(
                                     'assets/svgs/comment.svg',
-                                    height: 25,
-                                    width: 25,
                                   ),
                                 ),
                                 SizedBox(width: getScreenWidth(4)),
@@ -1356,8 +1353,6 @@ class PostFeedReacherCard extends HookWidget {
                                     padding: const EdgeInsets.all(0),
                                     child: SvgPicture.asset(
                                       'assets/svgs/message.svg',
-                                      height: 25,
-                                      width: 25,
                                     ),
                                   ),
                               ]),
@@ -1400,13 +1395,13 @@ class PostFeedReacherCard extends HookWidget {
                                       child: isVoted && voteType == 'Upvote'
                                           ? SvgPicture.asset(
                                               'assets/svgs/shoutup-active.svg',
-                                              height: getScreenHeight(20),
-                                              width: getScreenWidth(20),
+                                              height: 25,
+                                              width: 25,
                                             )
                                           : SvgPicture.asset(
                                               'assets/svgs/shoutup.svg',
-                                              height: getScreenHeight(20),
-                                              width: getScreenWidth(20),
+                                              height: 25,
+                                              width: 25,
                                             ),
                                     ),
                                   ),
@@ -1444,13 +1439,13 @@ class PostFeedReacherCard extends HookWidget {
                                       child: isVoted && voteType == 'Downvote'
                                           ? SvgPicture.asset(
                                               'assets/svgs/shoutdown-active.svg',
-                                              height: getScreenHeight(20),
-                                              width: getScreenWidth(20),
+                                              height: 25,
+                                              width: 25,
                                             )
                                           : SvgPicture.asset(
                                               'assets/svgs/shoutdown.svg',
-                                              height: getScreenHeight(20),
-                                              width: getScreenWidth(20),
+                                              height: 25,
+                                              width: 25,
                                             ),
                                     ),
                                   ),

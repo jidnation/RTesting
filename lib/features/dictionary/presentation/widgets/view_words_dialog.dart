@@ -35,7 +35,7 @@ class _DictionaryDialogState extends State<DictionaryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Word Library'),
+      title: const Text('World Library'),
       content: SizedBox(
         height: 100.0,
         child: BlocConsumer<DictionaryBloc, DictionaryState>(

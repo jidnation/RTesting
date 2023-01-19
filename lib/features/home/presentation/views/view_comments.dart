@@ -1216,8 +1216,7 @@ class CommentsTile extends StatelessWidget {
                   Expanded(
                     child: CommentAudioMedia(
                       path: comment.audioMediaItem!,
-                      isPlaying: false,
-                    ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                              ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
                   ),
                 ],
               )

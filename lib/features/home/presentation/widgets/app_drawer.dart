@@ -316,7 +316,6 @@ class DrawerItem extends StatelessWidget {
       this.showIcon = true,
       this.color = AppColors.textColor2})
       : super(key: key);
-
   final String action;
   final String icon;
   final Function()? onPressed;

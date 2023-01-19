@@ -265,14 +265,10 @@ class TimeLineBox extends StatelessWidget {
                                       Visibility(
                                         visible:
                                             tPostInfo!.location!.isNotEmpty &&
-                                                    tPostInfo.location!
-                                                            .toLowerCase()
-                                                            .trim() !=
-                                                        'nil' ||
                                                 tPostInfo.location!
                                                         .toLowerCase()
                                                         .trim() !=
-                                                    'NIL',
+                                                    'nil',
                                         child: Row(children: [
                                           CustomText(
                                             text: tPostInfo.location
@@ -372,7 +368,12 @@ class TimeLineBox extends StatelessWidget {
                                 );
                               });
                         },
-                        onMentionTap: (value) {},
+                        onMentionTap: (value) {
+                          timeLineFeedStore.getUserByUsername(context,
+                              username: value);
+
+                          debugPrint("Value $value");
+                        },
                         mentionStyle: const TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.blue),

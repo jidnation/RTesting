@@ -105,7 +105,7 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                                     'Have fun viewing this: ${postFeedModel.postSlug!}');
                               }),
                           KebabBottomTextButton(
-                              label: 'Repost',
+                              label: 'Quote post',
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 RouteNavigators.route(
@@ -129,6 +129,8 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                           //   label: 'Report',
                           //   onPressed: () {
                           //     RouteNavigators.pop(context);
+                          //     RouteNavigators.route(context,
+                          //         RepostReach(postFeedModel: timeLineFeedStore.getPostModel(timeLineModel: timeLineModel)));
                           //   },
                           // ),
                           KebabBottomTextButton(
@@ -168,7 +170,6 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                               label: 'Edit content',
                               isLoading: _isLoading,
                               onPressed: () {
-
                                 globals.socialServiceBloc!.add(
                                     GetPostEvent(postId: postFeedModel.postId));
                               }),

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:mime/mime.dart';
+import 'package:reach_me/core/helper/endpoints.dart';
 import 'package:reach_me/core/helper/logger.dart';
 
 const GOOGLE_API_KEY = 'AIzaSyAV2_9BKcCkpdd4IjZOoQ9mybLAn3i9tUE';
@@ -72,7 +73,7 @@ class ApiClient {
 
     try {
       final response = await _dio.get(
-        'https://api.myreach.me/utility/get-signed-url/$fileName',
+        '${Endpoints.graphQLBaseUrl}/utility/get-signed-url/$fileName',
       );
       Console.log('responseee', response);
       return response.data;

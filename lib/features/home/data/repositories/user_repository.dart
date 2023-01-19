@@ -43,6 +43,18 @@ class UserRepository {
     }
   }
 
+  Future<Either<String, User>> getUserProfileByUsername({
+    required String username,
+  }) async {
+    try {
+      final user = await _homeRemoteDataSource.getUserProfileByUsername(
+          username: username);
+      return Right(user);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, bool>> deleteAccount() async {
     try {
       final deleted = await _homeRemoteDataSource.deleteAccount();

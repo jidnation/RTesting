@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/macbook/Documents/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/macbook/Documents/app development/flutter projects/reachme_mobile"
+export "FLUTTER_ROOT=C:\Users\JidNation\Documents\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\JidNation\Documents\PROJECT\reachme_mobile"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=/Users/macbook/Documents/app development/flutter projects/reachme_mobile/lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"

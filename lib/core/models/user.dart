@@ -1,4 +1,4 @@
-import 'package:reach_me/features/home/data/models/status.model.dart';
+import '../../features/home/data/models/status.model.dart';
 
 class User {
   String? firstName;

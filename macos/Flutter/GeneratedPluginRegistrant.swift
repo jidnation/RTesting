@@ -9,7 +9,7 @@ import agora_rtc_engine
 import assets_audio_player
 import assets_audio_player_web
 import audioplayers_darwin
-import connectivity_plus_macos
+import connectivity_plus
 import emoji_picker_flutter
 import ffmpeg_kit_flutter
 import firebase_core
@@ -21,7 +21,7 @@ import location
 import path_provider_macos
 import photo_manager
 import share_plus_macos
-import shared_preferences_macos
+import shared_preferences_foundation
 import sqflite
 import url_launcher_macos
 import video_compress
