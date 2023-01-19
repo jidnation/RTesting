@@ -76,7 +76,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
   @override
   Widget build(BuildContext context) {
     final _savedPosts = useState<List<SavePostModel>>([]);
-      final reachDM = useState(false);
+    final reachDM = useState(false);
     final viewProfile = useState(false);
     final shoutingDown = useState(false);
     final _currentPost = useState<SavePostModel?>(null);
@@ -122,26 +122,26 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
         child: BlocListener<UserBloc, UserState>(
           bloc: globals.userBloc,
           listener: (context, state) {
-              if (state is RecipientUserData) {
-                if (reachDM.value) {
-                  reachDM.value = false;
-                  RouteNavigators.route(
-                      context, MsgChatInterface(recipientUser: state.user));
-                } else if (viewProfile.value) {
-                  viewProfile.value = false;
-                  ProgressHUD.of(context)?.dismiss();
-                  globals.recipientUser = state.user;
-                  state.user!.id == globals.user!.id
-                      ? RouteNavigators.route(context, const AccountScreen())
-                      : RouteNavigators.route(
-                          context,
-                          RecipientAccountProfile(
-                            recipientEmail: 'email',
-                            recipientImageUrl: state.user!.profilePicture,
-                            recipientId: state.user!.id,
-                          ));
-                }
+            if (state is RecipientUserData) {
+              if (reachDM.value) {
+                reachDM.value = false;
+                RouteNavigators.route(
+                    context, MsgChatInterface(recipientUser: state.user));
+              } else if (viewProfile.value) {
+                viewProfile.value = false;
+                ProgressHUD.of(context)?.dismiss();
+                globals.recipientUser = state.user;
+                state.user!.id == globals.user!.id
+                    ? RouteNavigators.route(context, const AccountScreen())
+                    : RouteNavigators.route(
+                        context,
+                        RecipientAccountProfile(
+                          recipientEmail: 'email',
+                          recipientImageUrl: state.user!.profilePicture,
+                          recipientId: state.user!.id,
+                        ));
               }
+            }
           },
           child: BlocConsumer<SocialServiceBloc, SocialServiceState>(
             bloc: globals.socialServiceBloc,
@@ -690,21 +690,30 @@ class SavedPostReacherCard extends HookWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CupertinoButton(
-                            minSize: 0,
-                            onPressed: onLike,
-                            padding: EdgeInsets.zero,
-                            child: isLiked
-                                ? SvgPicture.asset(
-                                    'assets/svgs/like-active.svg',
-                                    height: getScreenHeight(20),
-                                    width: getScreenWidth(20),
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/svgs/like.svg',
-                                    height: getScreenHeight(20),
-                                    width: getScreenWidth(20),
-                                  ),
+                          GestureDetector(
+                            onLongPress: () {
+                              if ((savedPostModel!.post.nLikes ?? 0) > 0) {
+                                showPostReactors(context,
+                                    postId: savedPostModel!.post.postId!,
+                                    reactionType: 'Like');
+                              }
+                            },
+                            child: CupertinoButton(
+                              minSize: 0,
+                              onPressed: onLike,
+                              padding: EdgeInsets.zero,
+                              child: isLiked
+                                  ? SvgPicture.asset(
+                                      'assets/svgs/like-active.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/svgs/like.svg',
+                                      height: getScreenHeight(20),
+                                      width: getScreenWidth(20),
+                                    ),
+                            ),
                           ),
                           SizedBox(width: getScreenWidth(4)),
                           FittedBox(
@@ -780,21 +789,33 @@ class SavedPostReacherCard extends HookWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              CupertinoButton(
-                                minSize: 0,
-                                onPressed: onUpvote,
-                                padding: EdgeInsets.zero,
-                                child: isVoted && voteType == 'Upvote'
-                                    ? SvgPicture.asset(
-                                        'assets/svgs/shoutup-active.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
-                                      )
-                                    : SvgPicture.asset(
-                                        'assets/svgs/shoutup.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
-                                      ),
+                              GestureDetector(
+                                onLongPress: () {
+                                  if ((savedPostModel!.post.nUpvotes ?? 0) >
+                                          0 &&
+                                      (savedPostModel!.post.authId ==
+                                          globals.user!.id!)) {
+                                    showPostReactors(context,
+                                        postId: savedPostModel!.post.postId!,
+                                        reactionType: 'Upvote');
+                                  }
+                                },
+                                child: CupertinoButton(
+                                  minSize: 0,
+                                  onPressed: onUpvote,
+                                  padding: EdgeInsets.zero,
+                                  child: isVoted && voteType == 'Upvote'
+                                      ? SvgPicture.asset(
+                                          'assets/svgs/shoutup-active.svg',
+                                          height: getScreenHeight(20),
+                                          width: getScreenWidth(20),
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/svgs/shoutup.svg',
+                                          height: getScreenHeight(20),
+                                          width: getScreenWidth(20),
+                                        ),
+                                ),
                               ),
                               FittedBox(
                                 child: Text(
@@ -810,21 +831,33 @@ class SavedPostReacherCard extends HookWidget {
                                   child: SizedBox(width: getScreenWidth(4))),
                               Flexible(
                                   child: SizedBox(width: getScreenWidth(4))),
-                              CupertinoButton(
-                                minSize: 0,
-                                onPressed: onDownvote,
-                                padding: EdgeInsets.zero,
-                                child: isVoted && voteType == 'Downvote'
-                                    ? SvgPicture.asset(
-                                        'assets/svgs/shoutdown-active.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
-                                      )
-                                    : SvgPicture.asset(
-                                        'assets/svgs/shoutdown.svg',
-                                        height: getScreenHeight(20),
-                                        width: getScreenWidth(20),
-                                      ),
+                              GestureDetector(
+                                onLongPress: () {
+                                  if ((savedPostModel!.post.nDownvotes ?? 0) >
+                                          0 &&
+                                      (savedPostModel!.post.authId ==
+                                          globals.user!.id!)) {
+                                    showPostReactors(context,
+                                        postId: savedPostModel!.post.postId!,
+                                        reactionType: 'Downvote');
+                                  }
+                                },
+                                child: CupertinoButton(
+                                  minSize: 0,
+                                  onPressed: onDownvote,
+                                  padding: EdgeInsets.zero,
+                                  child: isVoted && voteType == 'Downvote'
+                                      ? SvgPicture.asset(
+                                          'assets/svgs/shoutdown-active.svg',
+                                          height: getScreenHeight(20),
+                                          width: getScreenWidth(20),
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/svgs/shoutdown.svg',
+                                          height: getScreenHeight(20),
+                                          width: getScreenWidth(20),
+                                        ),
+                                ),
                               ),
                               FittedBox(
                                 child: Text(
