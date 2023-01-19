@@ -1285,7 +1285,7 @@ class PostFeedReacherCard extends HookWidget {
                                 GestureDetector(
                                   onLongPress: () {
                                     if ((postFeedModel!.post!.nLikes ?? 0) >
-                                            0 ) {
+                                        0) {
                                       showPostReactors(context,
                                           postId: postFeedModel!.post!.postId!,
                                           reactionType: 'Like');
@@ -1379,15 +1379,16 @@ class PostFeedReacherCard extends HookWidget {
                                 children: [
                                   GestureDetector(
                                     onLongPress: () {
-                                    if ((postFeedModel!.post!.nUpvotes ?? 0) >
-                                            0 &&
-                                        (postFeedModel!.post!.authId ==
-                                            globals.user!.id!)) {
-                                      showPostReactors(context,
-                                          postId: postFeedModel!.post!.postId!,
-                                          reactionType: 'Upvote');
-                                    }
-                                  },
+                                      if ((postFeedModel!.post!.nUpvotes ?? 0) >
+                                              0 &&
+                                          (postFeedModel!.post!.authId ==
+                                              globals.user!.id!)) {
+                                        showPostReactors(context,
+                                            postId:
+                                                postFeedModel!.post!.postId!,
+                                            reactionType: 'Upvote');
+                                      }
+                                    },
                                     child: CupertinoButton(
                                       minSize: 0,
                                       onPressed: onUpvote,
@@ -1423,15 +1424,17 @@ class PostFeedReacherCard extends HookWidget {
                                           SizedBox(width: getScreenWidth(4))),
                                   GestureDetector(
                                     onLongPress: () {
-                                    if ((postFeedModel!.post!.nDownvotes ?? 0) >
-                                            0 &&
-                                        (postFeedModel!.post!.authId ==
-                                            globals.user!.id!)) {
-                                      showPostReactors(context,
-                                          postId: postFeedModel!.post!.postId!,
-                                          reactionType: 'Downvote');
-                                    }
-                                  },
+                                      if ((postFeedModel!.post!.nDownvotes ??
+                                                  0) >
+                                              0 &&
+                                          (postFeedModel!.post!.authId ==
+                                              globals.user!.id!)) {
+                                        showPostReactors(context,
+                                            postId:
+                                                postFeedModel!.post!.postId!,
+                                            reactionType: 'Downvote');
+                                      }
+                                    },
                                     child: CupertinoButton(
                                       minSize: 0,
                                       onPressed: onDownvote,

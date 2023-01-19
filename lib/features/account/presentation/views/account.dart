@@ -39,7 +39,6 @@ import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
-
 import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/video_player.dart';
 

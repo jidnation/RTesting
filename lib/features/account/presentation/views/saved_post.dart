@@ -22,6 +22,7 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -511,22 +512,22 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                 itemCount: _savedPosts.value.length,
                                 itemBuilder: (context, index) {
                                   if ((_savedPosts.value[index].post
-                                      .audioMediaItem ??
-                                      '')
+                                              .audioMediaItem ??
+                                          '')
                                       .isNotEmpty) {
                                     return AudioOnlySavedPostReacherCard(
                                       likingPost: false,
                                       isLiked: (_savedPosts
-                                          .value[index].post.isLiked ??
-                                          false)
+                                                  .value[index].post.isLiked ??
+                                              false)
                                           ? true
                                           : false,
                                       isVoted: (_savedPosts
-                                          .value[index].post.isVoted ??
-                                          '')
+                                                  .value[index].post.isVoted ??
+                                              '')
                                           .isNotEmpty,
                                       voteType:
-                                      _savedPosts.value[index].post.isVoted,
+                                          _savedPosts.value[index].post.isVoted,
                                       onViewProfile: () {
                                         viewProfile.value = true;
                                         ProgressHUD.of(context)
@@ -560,8 +561,8 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
 
                                         if (active.contains(index)) {
                                           if ((_savedPosts
-                                              .value[index].post.vote ??
-                                              [])
+                                                      .value[index].post.vote ??
+                                                  [])
                                               .isEmpty) {
                                             globals.socialServiceBloc!
                                                 .add(VotePostEvent(
@@ -582,7 +583,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                         HapticFeedback.mediumImpact();
                                         handleTap(index);
                                         _currentPost.value =
-                                        _savedPosts.value[index];
+                                            _savedPosts.value[index];
                                         if (active.contains(index)) {
                                           shoutingDown.value = true;
                                           globals.userBloc!.add(
@@ -605,16 +606,16 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                         //         .toJson());
                                         if (active.contains(index)) {
                                           if (_savedPosts
-                                              .value[index].post.isLiked ??
+                                                  .value[index].post.isLiked ??
                                               false) {
                                             _savedPosts.value[index].post
                                                 .isLiked = false;
                                             _savedPosts.value[index].post
                                                 .nLikes = (_savedPosts
-                                                .value[index]
-                                                .post
-                                                .nLikes ??
-                                                1) -
+                                                        .value[index]
+                                                        .post
+                                                        .nLikes ??
+                                                    1) -
                                                 1;
                                             globals.socialServiceBloc!
                                                 .add(UnlikePostEvent(
@@ -626,10 +627,10 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                                 .isLiked = true;
                                             _savedPosts.value[index].post
                                                 .nLikes = (_savedPosts
-                                                .value[index]
-                                                .post
-                                                .nLikes ??
-                                                0) +
+                                                        .value[index]
+                                                        .post
+                                                        .nLikes ??
+                                                    0) +
                                                 1;
                                             globals.socialServiceBloc!.add(
                                               LikePostEvent(
