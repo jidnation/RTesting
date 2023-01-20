@@ -161,10 +161,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
           RouteNavigators.route(
               context,
               RecipientAccountProfile(
-                recipientCoverImageUrl: userInfo.coverPicture,
-                recipientEmail: userInfo.email,
-                recipientId: userInfo.id,
-                recipientImageUrl: userInfo.profilePicture,
+                recipientCoverImageUrl: userInfo.user.first.coverPicture,
+                recipientEmail: userInfo.user.first.email,
+                recipientId: userInfo.user.first.id,
+                recipientImageUrl: userInfo.user.first.profilePicture,
               ));
         }
         if (state is GetUserByUsernameError) {
@@ -719,20 +719,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           Row(children: [
                                             GestureDetector(
                                               onLongPress: () {
-                                                          if ((post.value.post
-                                                                      ?.nLikes ??
-                                                                  0) >
-                                                              0) {
-                                                            showPostReactors(
-                                                                context,
-                                                                postId: post
-                                                                    .value
-                                                                    .post!
-                                                                    .postId!,
-                                                                reactionType:
-                                                                    'Like');
-                                                          }
-                                                        },
+                                                if ((post.value.post?.nLikes ??
+                                                        0) >
+                                                    0) {
+                                                  showPostReactors(context,
+                                                      postId: post
+                                                          .value.post!.postId!,
+                                                      reactionType: 'Like');
+                                                }
+                                              },
                                               onTap: () {
                                                 HapticFeedback.mediumImpact();
                                                 handleTap(
@@ -876,14 +871,12 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         },
                                                         padding:
                                                             EdgeInsets.zero,
-                                                        child: likePost
-                                                                    .value ||
+                                                        child: likePost.value ||
                                                                 widget
                                                                     .postFeedModel!
                                                                     .post!
                                                                     .isLiked!
-                                                            ? SvgPicture
-                                                                .asset(
+                                                            ? SvgPicture.asset(
                                                                 'assets/svgs/like-active.svg',
                                                                 height:
                                                                     getScreenHeight(
@@ -892,8 +885,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                     getScreenWidth(
                                                                         20),
                                                               )
-                                                            : SvgPicture
-                                                                .asset(
+                                                            : SvgPicture.asset(
                                                                 'assets/svgs/like.svg',
                                                                 height:
                                                                     getScreenHeight(

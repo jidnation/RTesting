@@ -2366,7 +2366,7 @@ class AudioOnlySavedPostReacherCard extends HookWidget {
                               minSize: 0,
                               onPressed: onLike,
                               padding: EdgeInsets.zero,
-                              child: isLiked
+                              child: isLiked || (savedPostModel!.post.isLiked != null && savedPostModel!.post.isLiked == true)
                                   ? SvgPicture.asset(
                                       'assets/svgs/like-active.svg',
                                     )
@@ -2460,7 +2460,7 @@ class AudioOnlySavedPostReacherCard extends HookWidget {
                                   minSize: 0,
                                   onPressed: onUpvote,
                                   padding: EdgeInsets.zero,
-                                  child: isVoted && voteType == 'Upvote'
+                                  child: (isVoted && voteType == 'Upvote') || savedPostModel!.post.isVoted == "Upvote"
                                       ? SvgPicture.asset(
                                           'assets/svgs/shoutup-active.svg',
                                         )
@@ -2498,7 +2498,7 @@ class AudioOnlySavedPostReacherCard extends HookWidget {
                                   minSize: 0,
                                   onPressed: onDownvote,
                                   padding: EdgeInsets.zero,
-                                  child: isVoted && voteType == 'Downvote'
+                                  child: (isVoted && voteType == 'Downvote') || savedPostModel!.post.isVoted == "Downvote"
                                       ? SvgPicture.asset(
                                           'assets/svgs/shoutdown-active.svg',
                                         )

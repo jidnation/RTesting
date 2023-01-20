@@ -241,7 +241,7 @@ class _AccountScreenState extends State<AccountScreen>
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: FittedBox(
                   child: Text(
-                    'Share',
+                    'Quote',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -262,7 +262,7 @@ class _AccountScreenState extends State<AccountScreen>
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: FittedBox(
                   child: Text(
-                    'Save',
+                    'Saved',
                     style: TextStyle(
                       fontSize: getScreenHeight(15),
                       fontWeight: FontWeight.w400,
@@ -1006,626 +1006,711 @@ class _AccountScreenState extends State<AccountScreen>
                     SizedBox(height: getScreenHeight(10)),
                     Center(child: _tabBar),
                     Expanded(
-                      child: TabBarView(
-                        physics: const BouncingScrollPhysics(),
-                        controller: _tabController,
-                        children: [
-                          //REACHES TAB
-                          if (_isLoadingPosts)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _reachoutsRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(GetAllPostsEvent(
-                                  pageLimit: 50,
-                                  pageNumber: 1,
-                                ));
-                              },
-                              child: _posts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                          title: "Reaches you’ve made",
-                                          subtitle:
-                                              "Find all posts or contributions you’ve made here ",
-                                        )
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _posts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return _ReacherCard(
-                                          postModel: _posts.value[index],
-                                          // onLike: () {
-                                          //   _likePost(index);
-                                          // },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //LIKES TAB
-                          if (_isLoadingLikes)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _likesRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(
-                                    GetLikedPostsEvent(
-                                        pageLimit: 50, pageNumber: 1));
-                              },
-                              child: _likedPosts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                          title: "Likes you made",
-                                          subtitle:
-                                              "Find post you liked and your post that was liked",
-                                        )
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _likedPosts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return PostFeedReacherCard(
-                                          likingPost: false,
-                                          postFeedModel:
-                                              _likedPosts.value[index],
-                                          isLiked: _likedPosts
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          isVoted: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          voteType: _likedPosts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? _likedPosts.value[index]
-                                                  .vote![0].voteType
-                                              : null,
-                                          onMessage: () {
-                                            reachDM.value = true;
-
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _likedPosts
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Upvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Downvote',
-                                                postId: _likedPosts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onLike: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              if (_likedPosts.value[index].like!
-                                                  .isNotEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _likedPosts
-                                                      .value[index].postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
-                                                      postId: _likedPosts
-                                                          .value[index].postId),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //COMMENTS TAB
-                          if (_isLoadingComments)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _commentsRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!
-                                    .add(GetPersonalCommentsEvent(
-                                  pageLimit: 50,
-                                  pageNumber: 1,
-                                  authId: globals.user!.id,
-                                ));
-                              },
-                              child: _comments.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                            title:
-                                                'Comments you made on a post and comments made on your post',
-                                            subtitle:
-                                                'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _comments.value.length,
-                                      itemBuilder: (context, index) {
-                                        return _CommentReachCard(
-                                          commentModel: _comments.value[index],
-                                          onMessage: () {
-                                            reachDM.value = true;
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _likedPosts
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          // onLike: () {
-                                          //   handleTap(index);
-                                          //   if (active.contains(index)) {
-                                          //     if (_likedPosts.value[index].like!
-                                          //         .isNotEmpty) {
-                                          //       globals.socialServiceBloc!
-                                          //           .add(UnlikePostEvent(
-                                          //         postId: _likedPosts
-                                          //             .value[index].postId,
-                                          //       ));
-                                          //     } else {
-                                          //       globals.socialServiceBloc!.add(
-                                          //         LikePostEvent(
-                                          //             postId: _likedPosts
-                                          //                 .value[index].postId),
-                                          //       );
-                                          //     }
-                                          //   }
-                                          // },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //SHOUTOUTS TAB
-                          if (_isLoadingComments)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _shoutoutRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(
-                                    GetVotedPostsEvent(
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (scrollNotification) {
+                          if (scrollNotification is ScrollStartNotification) {
+                            setState(() {
+                              collapseProfile();
+                            });
+                          }
+                          return false;
+                        },
+                        child: SingleChildScrollView(
+                          child: SizedBox(
+                            height: 600,
+                            child: TabBarView(
+                              physics: const BouncingScrollPhysics(),
+                              controller: _tabController,
+                              children: [
+                                //REACHES TAB
+                                if (_isLoadingPosts)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _reachoutsRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetAllPostsEvent(
                                         pageLimit: 50,
                                         pageNumber: 1,
-                                        voteType: 'Upvote',
-                                        authId: ""));
-                              },
-                              child: _shoutOuts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                            title:
-                                                "Posts you've shouted out and your posts that has been shouted out",
-                                            subtitle:
-                                                "See posts you've shouted out and your post that has been shouted out")
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _shoutOuts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return PostFeedReacherCard(
-                                          likingPost: false,
-                                          postFeedModel:
-                                              _shoutOuts.value[index],
-                                          isLiked: _shoutOuts
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          isVoted: _shoutOuts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          voteType: _shoutOuts
-                                                  .value[index].vote!.isNotEmpty
-                                              ? _shoutOuts.value[index].vote![0]
-                                                  .voteType
-                                              : null,
-                                          onMessage: () {
-                                            reachDM.value = true;
+                                      ));
+                                    },
+                                    child: _posts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Reaches you’ve made",
+                                                subtitle:
+                                                    "Find all posts or contributions you’ve made here ",
+                                              )
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _posts.value.length,
+                                            itemBuilder: (context, index) {
+                                              return _ReacherCard(
+                                                postModel: _posts.value[index],
+                                                // onLike: () {
+                                                //   _likePost(index);
+                                                // },
+                                              );
+                                            },
+                                          ),
+                                  ),
 
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _shoutOuts
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Upvote',
-                                                postId: _shoutOuts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'Downvote',
-                                                postId: _shoutOuts
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onLike: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              if (_shoutOuts.value[index].like!
-                                                  .isNotEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _shoutOuts
-                                                      .value[index].postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
-                                                      postId: _shoutOuts
-                                                          .value[index].postId),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //SHOUTDOWN TAB
-                          if (_isLoadingComments)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _shoutdownRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(
-                                    GetVotedPostsEvent(
-                                        pageLimit: 50,
-                                        pageNumber: 1,
-                                        voteType: 'Downvote',
-                                        authId: ""));
-                              },
-                              child: _shoutDowns.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                            title:
-                                                "Posts you've shouted down and your posts that has been shouted down",
-                                            subtitle:
-                                                "See posts you've shouted down and your post that has been shouted down")
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _shoutDowns.value.length,
-                                      itemBuilder: (context, index) {
-                                        return PostFeedReacherCard(
-                                          likingPost: false,
-                                          postFeedModel:
-                                              _shoutDowns.value[index],
-                                          isLiked: _shoutDowns
-                                                  .value[index].like!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          isVoted: _shoutDowns
-                                                  .value[index].vote!.isNotEmpty
-                                              ? true
-                                              : false,
-                                          voteType: _shoutDowns
-                                                  .value[index].vote!.isNotEmpty
-                                              ? _shoutDowns.value[index]
-                                                  .vote![0].voteType
-                                              : null,
-                                          onMessage: () {
-                                            reachDM.value = true;
-
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _shoutDowns
-                                                          .value[index]
-                                                          .postOwnerId!));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'upvote',
-                                                postId: _shoutDowns
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!
-                                                  .add(VotePostEvent(
-                                                voteType: 'downvote',
-                                                postId: _shoutDowns
-                                                    .value[index].postId,
-                                              ));
-                                            }
-                                          },
-                                          onLike: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              if (_shoutDowns.value[index].like!
-                                                  .isNotEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _shoutDowns
-                                                      .value[index].postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
-                                                      postId: _shoutDowns
-                                                          .value[index].postId),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        );
-                                      },
-                                    ),
-                            ),
-
-                          //SHARE TAB
-                          if (_isLoadingComments)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _shareRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!
-                                    .add(GetPersonalCommentsEvent(
-                                  pageLimit: 50,
-                                  pageNumber: 1,
-                                  authId: globals.user!.id,
-                                ));
-                              },
-                              child: _sharedPosts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                            title: "Post you shared",
-                                            subtitle: "Find post you've shared")
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _sharedPosts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return Container();
-                                      },
-                                    ),
-                            ),
-
-                          //SAVED POSTS TAB
-                          if (_isLoadingSavedPosts)
-                            const CircularLoader()
-                          else
-                            Refresher(
-                              controller: _savedPostsRefreshController,
-                              onRefresh: () {
-                                globals.socialServiceBloc!.add(
-                                    GetAllSavedPostsEvent(
-                                        pageLimit: 50, pageNumber: 1));
-                              },
-                              child: _savedPosts.value.isEmpty
-                                  ? ListView(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      children: const [
-                                        EmptyTabWidget(
-                                          title: "No saved posts",
-                                          subtitle: "",
-                                        )
-                                      ],
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _savedPosts.value.length,
-                                      itemBuilder: (context, index) {
-                                        return SavedPostReacherCard(
-                                          likingPost: false,
-                                          isLiked: (_savedPosts.value[index]
-                                                      .post.isLiked ??
-                                                  false)
-                                              ? true
-                                              : false,
-                                          isVoted: (_savedPosts.value[index]
-                                                      .post.isVoted ??
-                                                  '')
-                                              .isNotEmpty,
-                                          voteType: _savedPosts
-                                              .value[index].post.isVoted,
-                                          onViewProfile: () {
-                                            viewProfile.value = true;
-                                            ProgressHUD.of(context)
-                                                ?.showWithText(
-                                                    'Viewing Profile');
-                                            globals.userBloc!.add(
-                                                GetRecipientProfileEvent(
-                                                    email: _savedPosts
+                                //LIKES TAB
+                                if (_isLoadingLikes)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _likesRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!.add(
+                                          GetLikedPostsEvent(
+                                              pageLimit: 50, pageNumber: 1));
+                                    },
+                                    child: _likedPosts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Likes you made",
+                                                subtitle:
+                                                    "Find post you liked and your post that was liked",
+                                              )
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _likedPosts.value.length,
+                                            itemBuilder: (context, index) {
+                                              return PostFeedReacherCard(
+                                                likingPost: false,
+                                                postFeedModel:
+                                                    _likedPosts.value[index],
+                                                isLiked: _likedPosts
                                                         .value[index]
-                                                        .post
-                                                        .postOwnerProfile!
-                                                        .authId));
-                                          },
-                                          onMessage: () {
-                                            HapticFeedback.mediumImpact();
-                                            reachDM.value = true;
+                                                        .like!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                isVoted: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                voteType: _likedPosts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? _likedPosts.value[index]
+                                                        .vote![0].voteType
+                                                    : null,
+                                                onMessage: () {
+                                                  reachDM.value = true;
 
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.userBloc!.add(
-                                                  GetRecipientProfileEvent(
-                                                      email: _savedPosts
-                                                          .value[index]
-                                                          .post
-                                                          .postOwnerProfile!
-                                                          .authId));
-                                            }
-                                          },
-                                          onUpvote: () {
-                                            HapticFeedback.mediumImpact();
-                                            handleTap(index);
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _likedPosts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Upvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Downvote',
+                                                      postId: _likedPosts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_likedPosts.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _likedPosts
+                                                            .value[index]
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _likedPosts
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
 
-                                            if (active.contains(index)) {
-                                              if ((_savedPosts.value[index].post
-                                                          .vote ??
-                                                      [])
-                                                  .isEmpty) {
-                                                globals.socialServiceBloc!
-                                                    .add(VotePostEvent(
-                                                  voteType: 'Upvote',
-                                                  postId: _savedPosts
-                                                      .value[index].post.postId,
-                                                ));
-                                              } else {
-                                                globals.socialServiceBloc!
-                                                    .add(DeletePostVoteEvent(
-                                                  voteId: _savedPosts
-                                                      .value[index].post.postId,
-                                                ));
-                                              }
-                                            }
-                                          },
-                                          onDownvote: () {
-                                            HapticFeedback.mediumImpact();
-                                            handleTap(index);
-                                            _currentPost.value =
-                                                _savedPosts.value[index];
-                                            if (active.contains(index)) {
-                                              shoutingDown.value = true;
-                                              globals.userBloc!.add(
-                                                  GetReachRelationshipEvent(
-                                                      userIdToReach: _savedPosts
-                                                          .value[index]
-                                                          .post
-                                                          .postOwnerProfile!
-                                                          .authId,
-                                                      type:
-                                                          ReachRelationshipType
-                                                              .reacher));
-                                            }
-                                          },
-                                          onLike: () {
-                                            HapticFeedback.mediumImpact();
-                                            handleTap(index);
-                                            // Console.log(
-                                            //     'Like Data',
-                                            //     _posts.value[index]
-                                            //         .toJson());
-                                            if (active.contains(index)) {
-                                              if (_savedPosts.value[index].post
-                                                      .isLiked ??
-                                                  false) {
-                                                _savedPosts.value[index].post
-                                                    .isLiked = false;
-                                                _savedPosts.value[index].post
-                                                    .nLikes = (_savedPosts
+                                //COMMENTS TAB
+                                if (_isLoadingComments)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _commentsRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetPersonalCommentsEvent(
+                                        pageLimit: 50,
+                                        pageNumber: 1,
+                                        authId: globals.user!.id,
+                                      ));
+                                    },
+                                    child: _comments.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                  title:
+                                                      'Comments you made on a post and comments made on your post',
+                                                  subtitle:
+                                                      'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _comments.value.length,
+                                            itemBuilder: (context, index) {
+                                              return _CommentReachCard(
+                                                commentModel:
+                                                    _comments.value[index],
+                                                onMessage: () {
+                                                  reachDM.value = true;
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _likedPosts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                // onLike: () {
+                                                //   handleTap(index);
+                                                //   if (active.contains(index)) {
+                                                //     if (_likedPosts.value[index].like!
+                                                //         .isNotEmpty) {
+                                                //       globals.socialServiceBloc!
+                                                //           .add(UnlikePostEvent(
+                                                //         postId: _likedPosts
+                                                //             .value[index].postId,
+                                                //       ));
+                                                //     } else {
+                                                //       globals.socialServiceBloc!.add(
+                                                //         LikePostEvent(
+                                                //             postId: _likedPosts
+                                                //                 .value[index].postId),
+                                                //       );
+                                                //     }
+                                                //   }
+                                                // },
+                                              );
+                                            },
+                                          ),
+                                  ),
+
+                                //SHOUTOUTS TAB
+                                if (_isLoadingComments)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _shoutoutRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!.add(
+                                          GetVotedPostsEvent(
+                                              pageLimit: 50,
+                                              pageNumber: 1,
+                                              voteType: 'Upvote',
+                                              authId: ""));
+                                    },
+                                    child: _shoutOuts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                  title:
+                                                      "Posts you've shouted out and your posts that has been shouted out",
+                                                  subtitle:
+                                                      "See posts you've shouted out and your post that has been shouted out")
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _shoutOuts.value.length,
+                                            itemBuilder: (context, index) {
+                                              return PostFeedReacherCard(
+                                                likingPost: false,
+                                                postFeedModel:
+                                                    _shoutOuts.value[index],
+                                                isLiked: _shoutOuts.value[index]
+                                                        .like!.isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                isVoted: _shoutOuts.value[index]
+                                                        .vote!.isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                voteType: _shoutOuts
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? _shoutOuts.value[index]
+                                                        .vote![0].voteType
+                                                    : null,
+                                                onMessage: () {
+                                                  reachDM.value = true;
+
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _shoutOuts
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Upvote',
+                                                      postId: _shoutOuts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'Downvote',
+                                                      postId: _shoutOuts
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_shoutOuts.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _shoutOuts
                                                             .value[index]
-                                                            .post
-                                                            .nLikes ??
-                                                        1) -
-                                                    1;
-                                                globals.socialServiceBloc!
-                                                    .add(UnlikePostEvent(
-                                                  postId: _savedPosts
-                                                      .value[index].post.postId,
-                                                ));
-                                              } else {
-                                                _savedPosts.value[index].post
-                                                    .isLiked = true;
-                                                _savedPosts.value[index].post
-                                                    .nLikes = (_savedPosts
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _shoutOuts
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
+
+                                //SHOUTDOWN TAB
+                                if (_isLoadingComments)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _shoutdownRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!.add(
+                                          GetVotedPostsEvent(
+                                              pageLimit: 50,
+                                              pageNumber: 1,
+                                              voteType: 'Downvote',
+                                              authId: ""));
+                                    },
+                                    child: _shoutDowns.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                  title:
+                                                      "Posts you've shouted down and your posts that has been shouted down",
+                                                  subtitle:
+                                                      "See posts you've shouted down and your post that has been shouted down")
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _shoutDowns.value.length,
+                                            itemBuilder: (context, index) {
+                                              return PostFeedReacherCard(
+                                                likingPost: false,
+                                                postFeedModel:
+                                                    _shoutDowns.value[index],
+                                                isLiked: _shoutDowns
+                                                        .value[index]
+                                                        .like!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                isVoted: _shoutDowns
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? true
+                                                    : false,
+                                                voteType: _shoutDowns
+                                                        .value[index]
+                                                        .vote!
+                                                        .isNotEmpty
+                                                    ? _shoutDowns.value[index]
+                                                        .vote![0].voteType
+                                                    : null,
+                                                onMessage: () {
+                                                  reachDM.value = true;
+
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _shoutDowns
+                                                                .value[index]
+                                                                .postOwnerId!));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'upvote',
+                                                      postId: _shoutDowns
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(VotePostEvent(
+                                                      voteType: 'downvote',
+                                                      postId: _shoutDowns
+                                                          .value[index].postId,
+                                                    ));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    if (_shoutDowns.value[index]
+                                                        .like!.isNotEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _shoutDowns
                                                             .value[index]
-                                                            .post
-                                                            .nLikes ??
-                                                        0) +
-                                                    1;
-                                                globals.socialServiceBloc!.add(
-                                                  LikePostEvent(
-                                                      postId: _savedPosts
-                                                          .value[index]
-                                                          .post
-                                                          .postId),
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _shoutDowns
+                                                                .value[index]
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  ),
+
+                                // QUOTE TAB
+                                if (_isLoadingPosts)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _shareRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!
+                                          .add(GetAllPostsEvent(
+                                        pageLimit: 50,
+                                        pageNumber: 1,
+                                      ));
+                                    },
+                                    child: _posts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "Quotes you’ve made",
+                                                subtitle:
+                                                    "Find all quoted posts you’ve made here ",
+                                              )
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _posts.value.length,
+                                            itemBuilder: (context, index) {
+                                              if (_posts.value[index]
+                                                      .repostedPost !=
+                                                  null) {
+                                                return _ReacherCard(
+                                                  postModel:
+                                                      _posts.value[index],
+                                                  // onLike: () {
+                                                  //   _likePost(index);
+                                                  // },
                                                 );
                                               }
-                                            }
-                                          },
-                                          savedPostModel:
-                                              _savedPosts.value[index],
-                                          onDelete: () {
-                                            handleTap(index);
-                                            if (active.contains(index)) {
-                                              globals.socialServiceBloc!.add(
-                                                  DeleteSavedPostEvent(
-                                                      postId: _savedPosts
+                                              {
+                                                if (index ==
+                                                    ((_posts.value.length) -
+                                                        1)) {
+                                                  return const EmptyTabWidget(
+                                                    title: "Quotes you’ve made",
+                                                    subtitle:
+                                                        "Find all quoted posts you’ve made here ",
+                                                  );
+                                                } else {
+                                                  return const SizedBox
+                                                      .shrink();
+                                                }
+                                              }
+                                            },
+                                          ),
+                                  ),
+
+                                //SAVED POSTS TAB
+                                if (_isLoadingSavedPosts)
+                                  const CircularLoader()
+                                else
+                                  Refresher(
+                                    controller: _savedPostsRefreshController,
+                                    onRefresh: () {
+                                      globals.socialServiceBloc!.add(
+                                          GetAllSavedPostsEvent(
+                                              pageLimit: 50, pageNumber: 1));
+                                    },
+                                    child: _savedPosts.value.isEmpty
+                                        ? ListView(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            children: const [
+                                              EmptyTabWidget(
+                                                title: "No saved posts",
+                                                subtitle: "",
+                                              )
+                                            ],
+                                          )
+                                        : ListView.builder(
+                                            itemCount: _savedPosts.value.length,
+                                            itemBuilder: (context, index) {
+                                              return SavedPostReacherCard(
+                                                likingPost: false,
+                                                isLiked: (_savedPosts
+                                                            .value[index]
+                                                            .post
+                                                            .isLiked ??
+                                                        false)
+                                                    ? true
+                                                    : false,
+                                                isVoted: (_savedPosts
+                                                            .value[index]
+                                                            .post
+                                                            .isVoted ??
+                                                        '')
+                                                    .isNotEmpty,
+                                                voteType: _savedPosts
+                                                    .value[index].post.isVoted,
+                                                onViewProfile: () {
+                                                  viewProfile.value = true;
+                                                  ProgressHUD.of(context)
+                                                      ?.showWithText(
+                                                          'Viewing Profile');
+                                                  globals.userBloc!.add(
+                                                      GetRecipientProfileEvent(
+                                                          email: _savedPosts
+                                                              .value[index]
+                                                              .post
+                                                              .postOwnerProfile!
+                                                              .authId));
+                                                },
+                                                onMessage: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  reachDM.value = true;
+
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.userBloc!.add(
+                                                        GetRecipientProfileEvent(
+                                                            email: _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .postOwnerProfile!
+                                                                .authId));
+                                                  }
+                                                },
+                                                onUpvote: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(index);
+
+                                                  if (active.contains(index)) {
+                                                    if ((_savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .vote ??
+                                                            [])
+                                                        .isEmpty) {
+                                                      globals.socialServiceBloc!
+                                                          .add(VotePostEvent(
+                                                        voteType: 'Upvote',
+                                                        postId: _savedPosts
+                                                            .value[index]
+                                                            .post
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                              DeletePostVoteEvent(
+                                                        voteId: _savedPosts
+                                                            .value[index]
+                                                            .post
+                                                            .postId,
+                                                      ));
+                                                    }
+                                                  }
+                                                },
+                                                onDownvote: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(index);
+                                                  _currentPost.value =
+                                                      _savedPosts.value[index];
+                                                  if (active.contains(index)) {
+                                                    shoutingDown.value = true;
+                                                    globals.userBloc!.add(
+                                                        GetReachRelationshipEvent(
+                                                            userIdToReach:
+                                                                _savedPosts
+                                                                    .value[
+                                                                        index]
+                                                                    .post
+                                                                    .postOwnerProfile!
+                                                                    .authId,
+                                                            type:
+                                                                ReachRelationshipType
+                                                                    .reacher));
+                                                  }
+                                                },
+                                                onLike: () {
+                                                  HapticFeedback.mediumImpact();
+                                                  handleTap(index);
+                                                  // Console.log(
+                                                  //     'Like Data',
+                                                  //     _posts.value[index]
+                                                  //         .toJson());
+                                                  if (active.contains(index)) {
+                                                    if (_savedPosts.value[index]
+                                                            .post.isLiked ??
+                                                        false) {
+                                                      _savedPosts.value[index]
+                                                          .post.isLiked = false;
+                                                      _savedPosts
                                                           .value[index]
                                                           .post
-                                                          .postId));
-                                            }
-                                          },
-                                        );
-                                      },
-                                    ),
-                            )
-                        ],
+                                                          .nLikes = (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .nLikes ??
+                                                              1) -
+                                                          1;
+                                                      globals.socialServiceBloc!
+                                                          .add(UnlikePostEvent(
+                                                        postId: _savedPosts
+                                                            .value[index]
+                                                            .post
+                                                            .postId,
+                                                      ));
+                                                    } else {
+                                                      _savedPosts.value[index]
+                                                          .post.isLiked = true;
+                                                      _savedPosts
+                                                          .value[index]
+                                                          .post
+                                                          .nLikes = (_savedPosts
+                                                                  .value[index]
+                                                                  .post
+                                                                  .nLikes ??
+                                                              0) +
+                                                          1;
+                                                      globals.socialServiceBloc!
+                                                          .add(
+                                                        LikePostEvent(
+                                                            postId: _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .postId),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                                savedPostModel:
+                                                    _savedPosts.value[index],
+                                                onDelete: () {
+                                                  handleTap(index);
+                                                  if (active.contains(index)) {
+                                                    globals.socialServiceBloc!
+                                                        .add(DeleteSavedPostEvent(
+                                                            postId: _savedPosts
+                                                                .value[index]
+                                                                .post
+                                                                .postId));
+                                                  }
+                                                },
+                                              );
+                                            },
+                                          ),
+                                  )
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -2289,8 +2374,15 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
       RefreshController(initialRefresh: false);
   late final _commentsRefreshController =
       RefreshController(initialRefresh: false);
-
+  late final _savedPostsRefreshController =
+      RefreshController(initialRefresh: false);
   late final _likesRefreshController = RefreshController(initialRefresh: false);
+  late final _shoutoutRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _shoutdownRefreshController =
+      RefreshController(initialRefresh: false);
+  late final _shareRefreshController = RefreshController(initialRefresh: false);
+
   Set active = {};
 
   handleTap(index) {
@@ -2303,7 +2395,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     globals.socialServiceBloc!.add(GetAllPostsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
     globals.socialServiceBloc!.add(GetPersonalCommentsEvent(
@@ -2335,6 +2427,8 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         unselectedLabelColor: AppColors.textColor2,
         indicatorColor: Colors.transparent,
         labelColor: AppColors.white,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+        overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
           color: AppColors.textColor2,
@@ -2377,12 +2471,63 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                 _tabController?.animateTo(1);
                 collapseUserProfile();
               }),
-              child: FittedBox(
-                child: Text(
-                  'Comment',
-                  style: TextStyle(
-                    fontSize: getScreenHeight(15),
-                    fontWeight: FontWeight.w400,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: FittedBox(
+                  child: Text(
+                    'Comments',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            iconMargin: EdgeInsets.zero,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tabController?.animateTo(2);
+                    collapseUserProfile();
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    child: FittedBox(
+                      child: Text(
+                        'Likes',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(15),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(3);
+                collapseUserProfile();
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutout',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -2391,15 +2536,61 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           Tab(
             child: GestureDetector(
               onTap: () => setState(() {
-                _tabController?.animateTo(2);
+                _tabController?.animateTo(4);
                 collapseUserProfile();
               }),
-              child: FittedBox(
-                child: Text(
-                  'Likes',
-                  style: TextStyle(
-                    fontSize: getScreenHeight(15),
-                    fontWeight: FontWeight.w400,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: FittedBox(
+                  child: Text(
+                    'Shoutdown',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(5);
+                collapseUserProfile();
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: FittedBox(
+                  child: Text(
+                    'Quote',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Tab(
+            child: GestureDetector(
+              onTap: () => setState(() {
+                _tabController?.animateTo(6);
+                collapseUserProfile();
+              }),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: FittedBox(
+                  child: Text(
+                    'Saved',
+                    style: TextStyle(
+                      fontSize: getScreenHeight(15),
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -2418,12 +2609,15 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final reachDM = useState(false);
+    final viewProfile = useState(false);
     final _posts = useState<List<PostModel>>([]);
     final _comments = useState<List<CommentModel>>([]);
     final _likedPosts = useState<List<PostFeedModel>>([]);
     final _shoutDowns = useState<List<PostFeedModel>>([]);
     final _shoutOuts = useState<List<PostFeedModel>>([]);
     final _sharedPosts = useState<List<PostFeedModel>>([]);
+
     return Scaffold(
       body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
@@ -2510,9 +2704,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
               }
             },
             builder: (context, state) {
-              // bool _isLoading = false;
-              // bool timelineLoading = false;
-              // timelineLoading = false;
+              bool _isLoadingPosts = state is GetAllPostsLoading;
+              bool _isLoadingLikes = state is GetLikedPostsLoading;
+              bool _isLoadingComments = state is GetPersonalCommentsLoading;
+              bool _isLoadingSavedPosts = state is GetAllSavedPostsLoading;
               bool _isLoading = state is UserLoading;
               bool timelineLoading = state is GetAllPostsLoading;
               timelineLoading = state is GetPersonalCommentsLoading;
@@ -3134,233 +3329,642 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                         children: [
                           Center(child: _tabBar),
                           Expanded(
-                            child: TabBarView(
-                              controller: _tabController,
-                              children: [
-                                //REACHES TAB
-                                if (timelineLoading)
-                                  const CircularLoader()
-                                else
-                                  Refresher(
-                                    controller: _reachoutsRefreshController,
-                                    onRefresh: () {
-                                      globals.socialServiceBloc!
-                                          .add(GetAllPostsEvent(
-                                        pageLimit: 50,
-                                        pageNumber: 1,
-                                        authId: widget.recipientId,
-                                      ));
-                                    },
-                                    child: _posts.value.isEmpty
-                                        ? ListView(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            children: const [
-                                              EmptyTabWidget(
-                                                title: "Reaches you’ve made",
-                                                subtitle:
-                                                    "Find all posts or contributions you’ve made here ",
-                                              )
-                                            ],
-                                          )
-                                        : ListView.builder(
-                                            itemCount: _posts.value.length,
-                                            itemBuilder: (context, index) {
-                                              return _ReacherCard(
-                                                postModel: _posts.value[index],
-                                                onMessage: () {
-                                                  RouteNavigators.route(
-                                                      context,
-                                                      MsgChatInterface(
-                                                        recipientUser: globals
-                                                            .recipientUser,
-                                                      ));
-                                                },
-                                                onComment: () {
-                                                  // RouteNavigators.route(
-                                                  //     context,
-                                                  //     ViewCommentsScreen(
-                                                  //       post: PostFeedModel(
-                                                  //           firstName: globals
-                                                  //               .recipientUser!
-                                                  //               .firstName,
-                                                  //           lastName: globals
-                                                  //               .recipientUser!
-                                                  //               .lastName,
-                                                  //           location: globals
-                                                  //               .recipientUser!
-                                                  //               .location,
-                                                  //           profilePicture: globals
-                                                  //               .recipientUser!
-                                                  //               .profilePicture,
-                                                  //           postId: _posts
-                                                  //               .value[index]
-                                                  //               .postId,
-                                                  //           postOwnerId: globals
-                                                  //               .recipientUser!
-                                                  //               .id,
-                                                  //           username: globals
-                                                  //               .recipientUser!
-                                                  //               .username,
-                                                  //           post: _posts
-                                                  //               .value[index]),
-                                                  //     ));
-                                                },
-                                              );
-                                            },
-                                          ),
-                                  ),
+                            child: NotificationListener<ScrollNotification>(
+                              onNotification: (scrollNotification) {
+                                if (scrollNotification
+                                    is ScrollStartNotification) {
+                                  setState(() {
+                                    collapseUserProfile();
+                                  });
+                                }
+                                return false;
+                              },
+                              child: SingleChildScrollView(
+                                child: SizedBox(
+                                  height: 600,
+                                  child: TabBarView(
+                                    controller: _tabController,
+                                    children: [
+                                      //REACHES TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller:
+                                              _reachoutsRefreshController,
+                                          onRefresh: () async {
+                                            globals.socialServiceBloc!
+                                                .add(GetAllPostsEvent(
+                                              pageLimit: 50,
+                                              pageNumber: 1,
+                                              authId: widget.recipientId,
+                                            ));
+                                          },
+                                          child: _posts.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                      title:
+                                                          "Reaches you’ve made",
+                                                      subtitle:
+                                                          "Find all posts or contributions you’ve made here ",
+                                                    )
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _posts.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return _ReacherCard(
+                                                      postModel:
+                                                          _posts.value[index],
+                                                      onMessage: () {
+                                                        RouteNavigators.route(
+                                                            context,
+                                                            MsgChatInterface(
+                                                              recipientUser: globals
+                                                                  .recipientUser,
+                                                            ));
+                                                      },
+                                                      onComment: () {
+                                                        // RouteNavigators.route(
+                                                        //     context,
+                                                        //     ViewCommentsScreen(
+                                                        //       post: PostFeedModel(
+                                                        //           firstName: globals
+                                                        //               .recipientUser!
+                                                        //               .firstName,
+                                                        //           lastName: globals
+                                                        //               .recipientUser!
+                                                        //               .lastName,
+                                                        //           location: globals
+                                                        //               .recipientUser!
+                                                        //               .location,
+                                                        //           profilePicture: globals
+                                                        //               .recipientUser!
+                                                        //               .profilePicture,
+                                                        //           postId: _posts
+                                                        //               .value[index]
+                                                        //               .postId,
+                                                        //           postOwnerId: globals
+                                                        //               .recipientUser!
+                                                        //               .id,
+                                                        //           username: globals
+                                                        //               .recipientUser!
+                                                        //               .username,
+                                                        //           post: _posts
+                                                        //               .value[index]),
+                                                        //     ));
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                        ),
 
-                                //COMMENTS TAB
-                                if (timelineLoading)
-                                  const CircularLoader()
-                                else
-                                  Refresher(
-                                    controller: _commentsRefreshController,
-                                    onRefresh: () {
-                                      globals.socialServiceBloc!
-                                          .add(GetPersonalCommentsEvent(
-                                        pageLimit: 50,
-                                        pageNumber: 1,
-                                        authId: widget.recipientId,
-                                      ));
-                                    },
-                                    child: _comments.value.isEmpty
-                                        ? ListView(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            children: const [
-                                              EmptyTabWidget(
-                                                  title:
-                                                      'Comments you made on a post and comments made on your post',
-                                                  subtitle:
-                                                      'Here you will find all comments you’ve made on a post and also those made on your own posts')
-                                            ],
-                                          )
-                                        : ListView.builder(
-                                            itemCount: _comments.value.length,
-                                            itemBuilder: (context, index) {
-                                              return _CommentReachCard(
-                                                commentModel:
-                                                    _comments.value[index],
-                                              );
-                                            },
-                                          ),
-                                  ),
+                                      //COMMENTS TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller:
+                                              _commentsRefreshController,
+                                          onRefresh: () {
+                                            globals.socialServiceBloc!
+                                                .add(GetPersonalCommentsEvent(
+                                              pageLimit: 50,
+                                              pageNumber: 1,
+                                              authId: widget.recipientId,
+                                            ));
+                                          },
+                                          child: _comments.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                        title:
+                                                            'Comments you made on a post and comments made on your post',
+                                                        subtitle:
+                                                            'Here you will find all comments you’ve made on a post and also those made on your own posts')
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _comments.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return _CommentReachCard(
+                                                      commentModel: _comments
+                                                          .value[index],
+                                                    );
+                                                  },
+                                                ),
+                                        ),
 
-                                // RECEPIENT LIKES TAB
-                                if (timelineLoading)
-                                  const CircularLoader()
-                                else
-                                  Refresher(
-                                    controller: _likesRefreshController,
-                                    onRefresh: () {
-                                      globals.socialServiceBloc!
-                                          .add(GetLikedPostsEvent(
-                                        pageLimit: 50,
-                                        pageNumber: 1,
-                                        authId: widget.recipientId,
-                                      ));
-                                    },
-                                    child: _likedPosts.value.isEmpty
-                                        ? ListView(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            children: const [
-                                              EmptyTabWidget(
-                                                title: "Likes they made",
-                                                subtitle:
-                                                    "Find post they liked",
-                                              )
-                                            ],
-                                          )
-                                        : ListView.builder(
-                                            itemCount: _likedPosts.value.length,
-                                            itemBuilder: (context, index) {
-                                              return PostFeedReacherCard(
-                                                likingPost: false,
-                                                postFeedModel:
-                                                    _likedPosts.value[index],
-                                                isLiked: _likedPosts
-                                                        .value[index]
-                                                        .like!
-                                                        .isNotEmpty
-                                                    ? true
-                                                    : false,
-                                                isVoted: _likedPosts
-                                                        .value[index]
-                                                        .vote!
-                                                        .isNotEmpty
-                                                    ? true
-                                                    : false,
-                                                voteType: _likedPosts
-                                                        .value[index]
-                                                        .vote!
-                                                        .isNotEmpty
-                                                    ? _likedPosts.value[index]
-                                                        .vote![0].voteType
-                                                    : null,
-                                                onMessage: () {
-                                                  // reachDM.value = true;
+                                      // RECEPIENT LIKES TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller: _likesRefreshController,
+                                          onRefresh: () {
+                                            globals.socialServiceBloc!
+                                                .add(GetLikedPostsEvent(
+                                              pageLimit: 50,
+                                              pageNumber: 1,
+                                              authId: widget.recipientId,
+                                            ));
+                                          },
+                                          child: _likedPosts.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                      title: "Likes they made",
+                                                      subtitle:
+                                                          "Find post they liked",
+                                                    )
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _likedPosts.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return PostFeedReacherCard(
+                                                      likingPost: false,
+                                                      postFeedModel: _likedPosts
+                                                          .value[index],
+                                                      isLiked: _likedPosts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      isVoted: _likedPosts
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      voteType: _likedPosts
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? _likedPosts
+                                                              .value[index]
+                                                              .vote![0]
+                                                              .voteType
+                                                          : null,
+                                                      onMessage: () {
+                                                        // reachDM.value = true;
 
-                                                  handleTap(index);
-                                                  if (active.contains(index)) {
-                                                    globals.userBloc!.add(
-                                                        GetRecipientProfileEvent(
-                                                            email: _likedPosts
-                                                                .value[index]
-                                                                .postOwnerId!));
-                                                  }
-                                                },
-                                                onUpvote: () {
-                                                  handleTap(index);
-                                                  if (active.contains(index)) {
-                                                    globals.socialServiceBloc!
-                                                        .add(VotePostEvent(
-                                                      voteType: 'Upvote',
-                                                      postId: _likedPosts
-                                                          .value[index].postId,
-                                                    ));
-                                                  }
-                                                },
-                                                onDownvote: () {
-                                                  handleTap(index);
-                                                  if (active.contains(index)) {
-                                                    globals.socialServiceBloc!
-                                                        .add(VotePostEvent(
-                                                      voteType: 'Downvote',
-                                                      postId: _likedPosts
-                                                          .value[index].postId,
-                                                    ));
-                                                  }
-                                                },
-                                                onLike: () {
-                                                  handleTap(index);
-                                                  if (active.contains(index)) {
-                                                    if (_likedPosts.value[index]
-                                                        .like!.isNotEmpty) {
-                                                      globals.socialServiceBloc!
-                                                          .add(UnlikePostEvent(
-                                                        postId: _likedPosts
-                                                            .value[index]
-                                                            .postId,
-                                                      ));
-                                                    } else {
-                                                      globals.socialServiceBloc!
-                                                          .add(
-                                                        LikePostEvent(
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _likedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId!));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType: 'Upvote',
                                                             postId: _likedPosts
                                                                 .value[index]
-                                                                .postId),
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType:
+                                                                'Downvote',
+                                                            postId: _likedPosts
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onLike: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_likedPosts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId:
+                                                                  _likedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _likedPosts
+                                                                      .value[
+                                                                          index]
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+                                      //SHOUTOUTS TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller:
+                                              _shoutoutRefreshController,
+                                          onRefresh: () {
+                                            globals.socialServiceBloc!.add(
+                                                GetVotedPostsEvent(
+                                                    pageLimit: 50,
+                                                    pageNumber: 1,
+                                                    voteType: 'Upvote',
+                                                    authId:
+                                                        widget.recipientId));
+                                          },
+                                          child: _shoutOuts.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                        title:
+                                                            "Posts you've shouted out and your posts that has been shouted out",
+                                                        subtitle:
+                                                            "See posts you've shouted out and your post that has been shouted out")
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _shoutOuts.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return PostFeedReacherCard(
+                                                      likingPost: false,
+                                                      postFeedModel: _shoutOuts
+                                                          .value[index],
+                                                      isLiked: _shoutOuts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      isVoted: _shoutOuts
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      voteType: _shoutOuts
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? _shoutOuts
+                                                              .value[index]
+                                                              .vote![0]
+                                                              .voteType
+                                                          : null,
+                                                      onMessage: () {
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _shoutOuts
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId!));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType: 'Upvote',
+                                                            postId: _shoutOuts
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType:
+                                                                'Downvote',
+                                                            postId: _shoutOuts
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onLike: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_shoutOuts
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId: _shoutOuts
+                                                                  .value[index]
+                                                                  .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _shoutOuts
+                                                                      .value[
+                                                                          index]
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+
+                                      //SHOUTDOWN TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller:
+                                              _shoutdownRefreshController,
+                                          onRefresh: () {
+                                            globals.socialServiceBloc!.add(
+                                                GetVotedPostsEvent(
+                                                    pageLimit: 50,
+                                                    pageNumber: 1,
+                                                    voteType: 'Downvote',
+                                                    authId:
+                                                        widget.recipientId));
+                                          },
+                                          child: _shoutDowns.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                        title:
+                                                            "Posts you've shouted down and your posts that has been shouted down",
+                                                        subtitle:
+                                                            "See posts you've shouted down and your post that has been shouted down")
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _shoutDowns.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return PostFeedReacherCard(
+                                                      likingPost: false,
+                                                      postFeedModel: _shoutDowns
+                                                          .value[index],
+                                                      isLiked: _shoutDowns
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      isVoted: _shoutDowns
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? true
+                                                          : false,
+                                                      voteType: _shoutDowns
+                                                              .value[index]
+                                                              .vote!
+                                                              .isNotEmpty
+                                                          ? _shoutDowns
+                                                              .value[index]
+                                                              .vote![0]
+                                                              .voteType
+                                                          : null,
+                                                      onMessage: () {
+                                                        reachDM.value = true;
+
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals.userBloc!.add(
+                                                              GetRecipientProfileEvent(
+                                                                  email: _shoutDowns
+                                                                      .value[
+                                                                          index]
+                                                                      .postOwnerId!));
+                                                        }
+                                                      },
+                                                      onUpvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType: 'upvote',
+                                                            postId: _shoutDowns
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onDownvote: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          globals
+                                                              .socialServiceBloc!
+                                                              .add(
+                                                                  VotePostEvent(
+                                                            voteType:
+                                                                'downvote',
+                                                            postId: _shoutDowns
+                                                                .value[index]
+                                                                .postId,
+                                                          ));
+                                                        }
+                                                      },
+                                                      onLike: () {
+                                                        handleTap(index);
+                                                        if (active
+                                                            .contains(index)) {
+                                                          if (_shoutDowns
+                                                              .value[index]
+                                                              .like!
+                                                              .isNotEmpty) {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                                    UnlikePostEvent(
+                                                              postId:
+                                                                  _shoutDowns
+                                                                      .value[
+                                                                          index]
+                                                                      .postId,
+                                                            ));
+                                                          } else {
+                                                            globals
+                                                                .socialServiceBloc!
+                                                                .add(
+                                                              LikePostEvent(
+                                                                  postId: _shoutDowns
+                                                                      .value[
+                                                                          index]
+                                                                      .postId),
+                                                            );
+                                                          }
+                                                        }
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                        ),
+
+                                      // QUOTE TAB
+                                      if (timelineLoading)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                          controller: _shareRefreshController,
+                                          onRefresh: () {
+                                            globals.socialServiceBloc!.add(
+                                                GetAllPostsEvent(
+                                                    pageLimit: 50,
+                                                    pageNumber: 1,
+                                                    authId:
+                                                        widget.recipientId));
+                                          },
+                                          child: _posts.value.isEmpty
+                                              ? ListView(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  children: const [
+                                                    EmptyTabWidget(
+                                                      title:
+                                                          "Quotes you’ve made",
+                                                      subtitle:
+                                                          "Find all quoted posts you’ve made here ",
+                                                    )
+                                                  ],
+                                                )
+                                              : ListView.builder(
+                                                  itemCount:
+                                                      _posts.value.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    if (_posts.value[index]
+                                                            .repostedPost !=
+                                                        null) {
+                                                      return _ReacherCard(
+                                                        postModel:
+                                                            _posts.value[index],
+                                                        // onLike: () {
+                                                        //   _likePost(index);
+                                                        // },
                                                       );
+                                                    } else {
+                                                      if (index ==
+                                                          ((_posts.value
+                                                                  .length) -
+                                                              1)) {
+                                                        return const EmptyTabWidget(
+                                                          title:
+                                                              "Quotes you’ve made",
+                                                          subtitle:
+                                                              "Find all quoted posts you’ve made here ",
+                                                        );
+                                                      } else {
+                                                        return const SizedBox
+                                                            .shrink();
+                                                      }
                                                     }
-                                                  }
-                                                },
-                                              );
+                                                  },
+                                                ),
+                                        ),
+
+                                      //SAVED POSTS TAB
+                                      if (_isLoadingSavedPosts)
+                                        const CircularLoader()
+                                      else
+                                        Refresher(
+                                            controller:
+                                                _savedPostsRefreshController,
+                                            onRefresh: () {
+                                              globals.socialServiceBloc!.add(
+                                                  GetAllSavedPostsEvent(
+                                                      pageLimit: 50,
+                                                      pageNumber: 1));
                                             },
-                                          ),
+                                            child: ListView(
+                                              padding: EdgeInsets.zero,
+                                              shrinkWrap: true,
+                                              children: const [
+                                                EmptyTabWidget(
+                                                  title: "No saved posts",
+                                                  subtitle: "",
+                                                )
+                                              ],
+                                            ))
+                                    ],
                                   ),
-                              ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
