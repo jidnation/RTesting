@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+import 'package:image_viewer/image_viewer.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -22,6 +24,8 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/views/post_reactors.dart';
 import 'package:reach_me/features/home/presentation/views/repost_reach.dart';
 import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
+import 'package:reach_me/features/timeline/image_loader.dart';
+import 'package:reach_me/features/timeline/models/post_feed.dart' as tp;
 import 'package:share_plus/share_plus.dart';
 
 import '../../../timeline/timeline_feed.dart';
@@ -733,4 +737,115 @@ Future showPostReactors(BuildContext context, {required String postId}) async {
       postId: postId,
     ),
   );
+}
+
+Future showProfilePictureOrViewStatus(
+    BuildContext context, {tp.ErProfile? tPostOwnerInfo,
+    List<StatusFeedResponseModel>? userStatus}) async {
+  Size size = MediaQuery.of(context).size;
+ 
+  return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+              color: AppColors.greyShade7,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              )),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: Container(
+                  height: getScreenHeight(4),
+                  width: getScreenWidth(58),
+                  decoration: BoxDecoration(
+                      color: AppColors.greyShade4,
+                      borderRadius: BorderRadius.circular(40)),
+                ),
+              ).paddingOnly(t: 23),
+              SizedBox(height: getScreenHeight(20)),
+              Column(
+                children: [
+                  KebabBottomTextButton(
+                      label: 'Show Profile Picture',
+                      onPressed: () async {
+                        RouteNavigators.route(
+                            context,
+                             pictureViewer(context, ownerProfilePicture: tPostOwnerInfo)
+                                  );
+                      }),
+                  KebabBottomTextButton(
+                    label: 'View Status',
+                    onPressed: () {
+                      RouteNavigators.route(
+                          context, ViewUserStatus(status: userStatus!.firstWhere(
+                            (e) => e.id == tPostOwnerInfo!.username).status!));
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
+        );
+      });
+}
+
+
+Future showProfilePictureOrViewStatus2(
+    BuildContext context, {User? user,
+    List<StatusFeedResponseModel>? userStatus}) async {
+  Size size = MediaQuery.of(context).size;
+ 
+  return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+              color: AppColors.greyShade7,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              )),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: Container(
+                  height: getScreenHeight(4),
+                  width: getScreenWidth(58),
+                  decoration: BoxDecoration(
+                      color: AppColors.greyShade4,
+                      borderRadius: BorderRadius.circular(40)),
+                ),
+              ).paddingOnly(t: 23),
+              SizedBox(height: getScreenHeight(20)),
+              Column(
+                children: [
+                  KebabBottomTextButton(
+                      label: 'Show Profile Picture',
+                      onPressed: () async {
+                        RouteNavigators.route(
+                            context,
+                             pictureViewer2(context, ownerProfilePicture: user)
+                                  );
+                      }),
+                  KebabBottomTextButton(
+                    label: 'View Status',
+                    onPressed: () {
+                      RouteNavigators.route(
+                          context, ViewUserStatus(status: userStatus!.firstWhere(
+                            (e) => e.id == user!.username).status!));
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
+        );
+      });
 }
