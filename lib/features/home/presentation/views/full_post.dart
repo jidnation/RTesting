@@ -1659,7 +1659,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 Flexible(
                   child: CustomRoundTextField(
                     onTap: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context,
                           CommentReach(
                             postFeedModel: postFeedModel!,

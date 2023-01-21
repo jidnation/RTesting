@@ -773,7 +773,7 @@ Future showProfilePictureOrViewStatus(
                   KebabBottomTextButton(
                       label: 'Show Profile Picture',
                       onPressed: () async {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                              pictureViewer(context, ownerProfilePicture: tPostOwnerInfo)
                                   );
@@ -829,7 +829,7 @@ Future showProfilePictureOrViewStatus2(
                   KebabBottomTextButton(
                       label: 'Show Profile Picture',
                       onPressed: () async {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                              pictureViewer2(context, ownerProfilePicture: user)
                                   );
