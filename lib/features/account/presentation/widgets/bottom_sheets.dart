@@ -781,7 +781,7 @@ Future showProfilePictureOrViewStatus(
                   KebabBottomTextButton(
                     label: 'View Status',
                     onPressed: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context, ViewUserStatus(status: userStatus!.firstWhere(
                             (e) => e.id == tPostOwnerInfo!.username).status!));
                     },
@@ -837,7 +837,7 @@ Future showProfilePictureOrViewStatus2(
                   KebabBottomTextButton(
                     label: 'View Status',
                     onPressed: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context, ViewUserStatus(status: userStatus!.firstWhere(
                             (e) => e.id == user!.username).status!));
                     },
