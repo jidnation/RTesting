@@ -521,9 +521,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                       decoration: BoxDecoration(
                                           color: AppColors.primaryColor
                                               .withOpacity(0.0),
-
                                           border: const Border(
-
                                               top: BorderSide(
                                                   color: AppColors.greyShade5,
                                                   width: 1))),
@@ -538,9 +536,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             child: Row(
                                               children: [
                                                 const Expanded(
-                                                
                                                   child: Text(
-                                                    'Replying to a post...',
+                                                    'Reaching out to a post...',
                                                     style: TextStyle(
                                                         color: AppColors.black),
                                                   ),
@@ -550,7 +547,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                         .value = null,
                                                     child:
                                                         const Icon(Icons.close))
-                                        
                                               ],
                                             ),
                                           ),
@@ -782,8 +778,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
                                                     type: 'text',
-                                                    
-                                                    quotedData: widget.quotedData,
+                                                    quotedData:
+                                                        widget.quotedData,
                                                     value:
                                                         controller.text.trim());
                                                 globals.userChat!.add(temp);

@@ -154,8 +154,10 @@ class ChatsThread {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     private = json['private'];
-    participantsInfo = List<ChatUser>.from(
-        json['participantsProfile'].map((item) => ChatUser.fromJson(item)));
+    participantsInfo = json['participantsProfile'] == null
+        ? null
+        : List<ChatUser>.from(
+            json['participantsProfile'].map((item) => ChatUser.fromJson(item)));
   }
 
   Map<String, dynamic> toJson() {
@@ -173,4 +175,3 @@ class ChatsThread {
 }
 
 enum MessageMode { quoted, direct }
-

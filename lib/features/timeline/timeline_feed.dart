@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/home/presentation/views/status/widgets/status_bubble.dart';
 import 'package:reach_me/features/timeline/suggestion_widget.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
@@ -24,7 +25,6 @@ import '../../core/utils/dimensions.dart';
 import '../chat/presentation/views/chats_list_screen.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/status/view.status.dart';
-import '../home/presentation/views/timeline.dart';
 import '../moment/user_posting.dart';
 
 class TimeLineFeed extends StatefulWidget {
@@ -165,6 +165,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                               visible: timeLineFeedStore.length > 0,
                               child: Container(
                                 color: AppColors.white,
+                                padding: EdgeInsets.only(top: 8, bottom: 6),
                                 child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -211,15 +212,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                 if (_myStatus.isEmpty)
                                                   const SizedBox.shrink()
                                                 else
-                                                  UserStory(
-                                                    size: size,
-                                                    image: globals.user!
-                                                            .profilePicture ??
-                                                        '',
-                                                    isMe: false,
-                                                    isLive: false,
-                                                    hasWatched: false,
-                                                    username: 'Your status',
+                                                  StatusBubble(
+                                                    preview: _myStatus.last,
+                                                    statusCount:
+                                                        _myStatus.length,
+                                                    username: 'Your Status',
                                                     onTap: () {
                                                       RouteNavigators.route(
                                                           context,
@@ -228,17 +225,76 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                   _myStatus));
                                                     },
                                                   ),
+                                                // UserStory(
+                                                //   size: size,
+                                                //   image: globals.user!
+                                                //           .profilePicture ??
+                                                //       '',
+                                                //   isMe: false,
+                                                //   isLive: false,
+                                                //   hasWatched: false,
+                                                //   username: 'Your status',
+                                                //   onTap: () {
+                                                //     RouteNavigators.route(
+                                                //         context,
+                                                //         ViewMyStatus(
+                                                //             status:
+                                                //                 _myStatus));
+                                                //   },
+                                                // ),
+                                                // ...List.generate(
+                                                //   _userStatus.length,
+                                                //   (index) => UserStory(
+                                                //     size: size,
+                                                //     isMe: false,
+                                                //     isLive: false,
+                                                //     hasWatched: false,
+                                                //     image: _userStatus[index]
+                                                //         .status![0]
+                                                //         .statusOwnerProfile!
+                                                //         .profilePicture,
+                                                //     username: _userStatus[index]
+                                                //         .status![0]
+                                                //         .statusOwnerProfile!
+                                                //         .username!,
+                                                //     onTap: () async {
+                                                //       final res = await Navigator.push(
+                                                //           context,
+                                                //           MaterialPageRoute(
+                                                //               builder: (c) => ViewUserStatus(
+                                                //                   isMuted:
+                                                //                       false,
+                                                //                   status: _userStatus[
+                                                //                           index]
+                                                //                       .status!)));
+                                                //       if (res == null) return;
+                                                //       if (res is MuteResult) {
+                                                //         timeLineFeedStore
+                                                //             .muteStatus(index);
+                                                //       }
+                                                //
+                                                //       // Navigator.push(
+                                                //       //     context,
+                                                //       //     MaterialPageRoute(
+                                                //       //         builder: (c) =>
+                                                //       //             const StoryPage()));
+                                                //     },
+                                                //   ),
+                                                // ),
+
                                                 ...List.generate(
                                                   _userStatus.length,
-                                                  (index) => UserStory(
-                                                    size: size,
+                                                  (index) => StatusBubble(
+                                                    statusCount:
+                                                        _userStatus[index]
+                                                            .status!
+                                                            .length,
+                                                    preview: _userStatus[index]
+                                                        .status!
+                                                        .last
+                                                        .status!,
                                                     isMe: false,
                                                     isLive: false,
-                                                    hasWatched: false,
-                                                    image: _userStatus[index]
-                                                        .status![0]
-                                                        .statusOwnerProfile!
-                                                        .profilePicture,
                                                     username: _userStatus[index]
                                                         .status![0]
                                                         .statusOwnerProfile!
@@ -302,18 +358,19 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                         children: [
                                           ...List.generate(
                                             _mutedStatus.length,
-                                            (index) => UserStory(
-                                              size: size,
+                                            (index) => StatusBubble(
+                                              isMuted: true,
+                                              statusCount: _mutedStatus[index]
+                                                  .status!
+                                                  .length,
+                                              preview: _mutedStatus[index]
+                                                  .status!
+                                                  .last
+                                                  .status!,
                                               isMe: false,
                                               isLive: false,
-                                              isMuted: true,
-                                              hasWatched: false,
-                                              image: _mutedStatus[index]
-                                                  .status![0]
-                                                  .statusOwnerProfile!
-                                                  .profilePicture,
                                               username: _mutedStatus[index]
-                                                  .status![index]
+                                                  .status![0]
                                                   .statusOwnerProfile!
                                                   .username!,
                                               onTap: () async {
@@ -336,9 +393,54 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                 //     context,
                                                 //     MaterialPageRoute(
                                                 //         builder: (c) => const StoryPage()));
+
+                                                // Navigator.push(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //         builder: (c) =>
+                                                //             const StoryPage()));
                                               },
                                             ),
-                                          )
+                                          ),
+                                          // ...List.generate(
+                                          //   _mutedStatus.length,
+                                          //   (index) => UserStory(
+                                          //     size: size,
+                                          //     isMe: false,
+                                          //     isLive: false,
+                                          //     isMuted: true,
+                                          //     hasWatched: false,
+                                          //     image: _mutedStatus[index]
+                                          //         .status![0]
+                                          //         .statusOwnerProfile!
+                                          //         .profilePicture,
+                                          //     username: _mutedStatus[index]
+                                          //         .status![index]
+                                          //         .statusOwnerProfile!
+                                          //         .username!,
+                                          //     onTap: () async {
+                                          //       final res = await Navigator.push(
+                                          //           context,
+                                          //           MaterialPageRoute(
+                                          //               builder: (c) =>
+                                          //                   ViewUserStatus(
+                                          //                       isMuted: true,
+                                          //                       status: _mutedStatus[
+                                          //                               index]
+                                          //                           .status!)));
+                                          //       if (res == null) return;
+                                          //       if (res is MuteResult) {
+                                          //         timeLineFeedStore
+                                          //             .unMuteStatus(index);
+                                          //       }
+                                          //
+                                          //       // Navigator.push(
+                                          //       //     context,
+                                          //       //     MaterialPageRoute(
+                                          //       //         builder: (c) => const StoryPage()));
+                                          //     },
+                                          //   ),
+                                          // )
                                         ],
                                       )
                                     ],
