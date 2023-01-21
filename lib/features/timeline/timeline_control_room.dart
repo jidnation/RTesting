@@ -464,8 +464,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   muteStatus(int index) {
-    _mutedStatus = [..._mutedStatus, _userStatus[index], _userStatus[index]
-    , _userStatus[index], _userStatus[index], _userStatus[index], _userStatus[index]];
+    _mutedStatus = [..._mutedStatus, _userStatus[index]];
     _userStatus = [..._userStatus]..removeAt(index);
     notifyListeners();
   }

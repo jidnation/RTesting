@@ -174,157 +174,115 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                         height: getScreenHeight(105),
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          child: SizedBox(
-                                            child: Row(
-                                              children: [
-                                                TimeLineUserStory(
-                                                  size: MediaQuery.of(context)
-                                                      .size,
-                                                  image: globals.user!
-                                                          .profilePicture ??
-                                                      '',
-                                                  isMe: true,
-                                                  isLive: false,
-                                                  hasWatched: false,
-                                                  username: 'Add Status',
-                                                  isMeOnTap: () async {
-                                                    var cameras =
-                                                        await availableCameras();
-                                                    final res =
-                                                        await RouteNavigators
-                                                            .route(
-                                                                context,
-                                                                UserPosting(
-                                                                  phoneCameras:
-                                                                      cameras,
-                                                                  initialIndex:
-                                                                      0,
-                                                                ));
-                                                    if (res == null) return;
-                                                    timeLineFeedStore
-                                                        .addNewStatus(
-                                                            res as StatusModel);
-                                                    return;
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              TimeLineUserStory(
+                                                size:
+                                                    MediaQuery.of(context).size,
+                                                image: globals
+                                                        .user!.profilePicture ??
+                                                    '',
+                                                isMe: true,
+                                                isLive: false,
+                                                hasWatched: false,
+                                                username: 'Add Status',
+                                                isMeOnTap: () async {
+                                                  var cameras =
+                                                      await availableCameras();
+                                                  final res =
+                                                      await RouteNavigators
+                                                          .route(
+                                                              context,
+                                                              UserPosting(
+                                                                phoneCameras:
+                                                                    cameras,
+                                                                initialIndex: 0,
+                                                              ));
+                                                  if (res == null) return;
+                                                  timeLineFeedStore
+                                                      .addNewStatus(
+                                                          res as StatusModel);
+                                                  return;
+                                                },
+                                              ),
+                                              if (_myStatus.isEmpty)
+                                                const SizedBox.shrink()
+                                              else
+                                                StatusBubble(
+                                                  preview: _myStatus.last,
+                                                  statusCount: _myStatus.length,
+                                                  username: 'Your Status',
+                                                  onTap: () {
+                                                    RouteNavigators.route(
+                                                        context,
+                                                        ViewMyStatus(
+                                                            status: _myStatus));
                                                   },
                                                 ),
-                                                if (_myStatus.isEmpty)
-                                                  const SizedBox.shrink()
-                                                else
-                                                  StatusBubble(
-                                                    preview: _myStatus.last,
-                                                    statusCount:
-                                                        _myStatus.length,
-                                                    username: 'Your Status',
-                                                    onTap: () {
-                                                      RouteNavigators.route(
-                                                          context,
-                                                          ViewMyStatus(
-                                                              status:
-                                                                  _myStatus));
-                                                    },
-                                                  ),
-                                                // UserStory(
-                                                //   size: size,
-                                                //   image: globals.user!
-                                                //           .profilePicture ??
-                                                //       '',
-                                                //   isMe: false,
-                                                //   isLive: false,
-                                                //   hasWatched: false,
-                                                //   username: 'Your status',
-                                                //   onTap: () {
-                                                //     RouteNavigators.route(
-                                                //         context,
-                                                //         ViewMyStatus(
-                                                //             status:
-                                                //                 _myStatus));
-                                                //   },
-                                                // ),
-                                                // ...List.generate(
-                                                //   _userStatus.length,
-                                                //   (index) => UserStory(
-                                                //     size: size,
-                                                //     isMe: false,
-                                                //     isLive: false,
-                                                //     hasWatched: false,
-                                                //     image: _userStatus[index]
-                                                //         .status![0]
-                                                //         .statusOwnerProfile!
-                                                //         .profilePicture,
-                                                //     username: _userStatus[index]
-                                                //         .status![0]
-                                                //         .statusOwnerProfile!
-                                                //         .username!,
-                                                //     onTap: () async {
-                                                //       final res = await Navigator.push(
-                                                //           context,
-                                                //           MaterialPageRoute(
-                                                //               builder: (c) => ViewUserStatus(
-                                                //                   isMuted:
-                                                //                       false,
-                                                //                   status: _userStatus[
-                                                //                           index]
-                                                //                       .status!)));
-                                                //       if (res == null) return;
-                                                //       if (res is MuteResult) {
-                                                //         timeLineFeedStore
-                                                //             .muteStatus(index);
-                                                //       }
-                                                //
-                                                //       // Navigator.push(
-                                                //       //     context,
-                                                //       //     MaterialPageRoute(
-                                                //       //         builder: (c) =>
-                                                //       //             const StoryPage()));
-                                                //     },
-                                                //   ),
-                                                // ),
+                                              SizedBox(
+                                                width: 16,
+                                              ),
+                                              ListView.separated(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      NeverScrollableScrollPhysics(),
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          SizedBox(
+                                                            width: 16,
+                                                          ),
+                                                  itemBuilder: (context,
+                                                          index) =>
+                                                      StatusBubble(
+                                                        statusCount:
+                                                            _userStatus[index]
+                                                                .status!
+                                                                .length,
+                                                        preview:
+                                                            _userStatus[index]
+                                                                .status!
+                                                                .last
+                                                                .status!,
+                                                        isMe: false,
+                                                        isLive: false,
+                                                        username: _userStatus[
+                                                                index]
+                                                            .status![0]
+                                                            .statusOwnerProfile!
+                                                            .username!,
+                                                        onTap: () async {
+                                                          final res = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (c) => ViewUserStatus(
+                                                                      isMuted:
+                                                                          false,
+                                                                      status: _userStatus[
+                                                                              index]
+                                                                          .status!)));
+                                                          if (res == null)
+                                                            return;
+                                                          if (res
+                                                              is MuteResult) {
+                                                            timeLineFeedStore
+                                                                .muteStatus(
+                                                                    index);
+                                                          }
 
-                                                ...List.generate(
-                                                  _userStatus.length,
-                                                  (index) => StatusBubble(
-                                                    statusCount:
-                                                        _userStatus[index]
-                                                            .status!
-                                                            .length,
-                                                    preview: _userStatus[index]
-                                                        .status!
-                                                        .last
-                                                        .status!,
-                                                    isMe: false,
-                                                    isLive: false,
-                                                    username: _userStatus[index]
-                                                        .status![0]
-                                                        .statusOwnerProfile!
-                                                        .username!,
-                                                    onTap: () async {
-                                                      final res = await Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (c) => ViewUserStatus(
-                                                                  isMuted:
-                                                                      false,
-                                                                  status: _userStatus[
-                                                                          index]
-                                                                      .status!)));
-                                                      if (res == null) return;
-                                                      if (res is MuteResult) {
-                                                        timeLineFeedStore
-                                                            .muteStatus(index);
-                                                      }
-
-                                                      // Navigator.push(
-                                                      //     context,
-                                                      //     MaterialPageRoute(
-                                                      //         builder: (c) =>
-                                                      //             const StoryPage()));
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                                          // Navigator.push(
+                                                          //     context,
+                                                          //     MaterialPageRoute(
+                                                          //         builder: (c) =>
+                                                          //             const StoryPage()));
+                                                        },
+                                                      ),
+                                                  itemCount:
+                                                      _userStatus.length),
+                                            ],
                                           ).paddingOnly(left: 11),
                                         ),
                                       ),
@@ -354,97 +312,57 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                     tilePadding: const EdgeInsets.symmetric(
                                         horizontal: 16),
                                     children: [
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: [
-                                            ...List.generate(
-                                              _mutedStatus.length,
-                                              (index) => StatusBubble(
-                                                isMuted: true,
-                                                statusCount: _mutedStatus[index]
-                                                    .status!
-                                                    .length,
-                                                preview: _mutedStatus[index]
-                                                    .status!
-                                                    .last
-                                                    .status!,
-                                                isMe: false,
-                                                isLive: false,
-                                                username: _mutedStatus[index]
-                                                    .status![0]
-                                                    .statusOwnerProfile!
-                                                    .username!,
-                                                onTap: () async {
-                                                  final res = await Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (c) =>
-                                                              ViewUserStatus(
-                                                                  isMuted: true,
-                                                                  status: _mutedStatus[
-                                                                          index]
-                                                                      .status!)));
-                                                  if (res == null) return;
-                                                  if (res is MuteResult) {
-                                                    timeLineFeedStore
-                                                        .unMuteStatus(index);
-                                                  }
+                                      SizedBox(
+                                        height: getScreenHeight(100),
+                                        child: ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            separatorBuilder:
+                                                (context, index) => SizedBox(
+                                                      width: 16,
+                                                    ),
+                                            itemBuilder: (context, index) =>
+                                                StatusBubble(
+                                                  isMuted: true,
+                                                  statusCount:
+                                                      _mutedStatus[index]
+                                                          .status!
+                                                          .length,
+                                                  preview: _mutedStatus[index]
+                                                      .status!
+                                                      .last
+                                                      .status!,
+                                                  isMe: false,
+                                                  isLive: false,
+                                                  username: _mutedStatus[index]
+                                                      .status![0]
+                                                      .statusOwnerProfile!
+                                                      .username!,
+                                                  onTap: () async {
+                                                    final res = await Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (c) =>
+                                                                ViewUserStatus(
+                                                                    isMuted:
+                                                                        true,
+                                                                    status: _mutedStatus[
+                                                                            index]
+                                                                        .status!)));
+                                                    if (res == null) return;
+                                                    if (res is MuteResult) {
+                                                      timeLineFeedStore
+                                                          .unMuteStatus(index);
+                                                    }
 
-                                                  // Navigator.push(
-                                                  //     context,
-                                                  //     MaterialPageRoute(
-                                                  //         builder: (c) => const StoryPage()));
-
-                                                  // Navigator.push(
-                                                  //     context,
-                                                  //     MaterialPageRoute(
-                                                  //         builder: (c) =>
-                                                  //             const StoryPage()));
-                                                },
-                                              ),
-                                            ),
-                                            // ...List.generate(
-                                            //   _mutedStatus.length,
-                                            //   (index) => UserStory(
-                                            //     size: size,
-                                            //     isMe: false,
-                                            //     isLive: false,
-                                            //     isMuted: true,
-                                            //     hasWatched: false,
-                                            //     image: _mutedStatus[index]
-                                            //         .status![0]
-                                            //         .statusOwnerProfile!
-                                            //         .profilePicture,
-                                            //     username: _mutedStatus[index]
-                                            //         .status![index]
-                                            //         .statusOwnerProfile!
-                                            //         .username!,
-                                            //     onTap: () async {
-                                            //       final res = await Navigator.push(
-                                            //           context,
-                                            //           MaterialPageRoute(
-                                            //               builder: (c) =>
-                                            //                   ViewUserStatus(
-                                            //                       isMuted: true,
-                                            //                       status: _mutedStatus[
-                                            //                               index]
-                                            //                           .status!)));
-                                            //       if (res == null) return;
-                                            //       if (res is MuteResult) {
-                                            //         timeLineFeedStore
-                                            //             .unMuteStatus(index);
-                                            //       }
-                                            //
-                                            //       // Navigator.push(
-                                            //       //     context,
-                                            //       //     MaterialPageRoute(
-                                            //       //         builder: (c) => const StoryPage()));
-                                            //     },
-                                            //   ),
-                                            // )
-                                          ],
-                                        ),
+                                                    // Navigator.push(
+                                                    //     context,
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (c) =>
+                                                    //             const StoryPage()));
+                                                    
+                                                  },
+                                                ),
+                                            itemCount: _mutedStatus.length),
                                       )
                                     ],
                                   ),

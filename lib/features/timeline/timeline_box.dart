@@ -436,18 +436,21 @@ class TimeLineBox extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               color: const Color(0xff001824),
                             ),
-                            child:
-                                // TimeLineVideoPreview(
-                                //   path: tPostInfo.videoMediaItem!,
-                                TimeLineVideoPlayer(
-                              post: timeLineFeedStore
-                                  .getPostModel(timeLineModel: timeLineModel)
-                                  .post!,
-                              videoUrl: timeLineModel
-                                  .getPostFeed.post!.videoMediaItem!,
-                              // ),
-                            ),
-                          )
+                            child: Container(
+                              color: AppColors.black,
+                              height: 50,
+                            )
+                            // TimeLineVideoPreview(
+                            //   path: tPostInfo.videoMediaItem!,
+                            //     TimeLineVideoPlayer(
+                            //   post: timeLineFeedStore
+                            //       .getPostModel(timeLineModel: timeLineModel)
+                            //       .post!,
+                            //   videoUrl: timeLineModel
+                            //       .getPostFeed.post!.videoMediaItem!,
+                            //   // ),
+                            // ),
+                            )
                         : const SizedBox.shrink(),
                     SizedBox(
                         height: tPostInfo.audioMediaItem!.isNotEmpty ? 10 : 0),

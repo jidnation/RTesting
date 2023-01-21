@@ -102,36 +102,33 @@ class _StatusBubbleState extends State<StatusBubble> {
               fit: BoxFit.cover,
             );
     }
-    return Container(
-      margin: EdgeInsets.only(right: 16),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            CustomPaint(
-              painter: StatusPainter(
-                  statusCount: widget.statusCount, isMuted: widget.isMuted),
-              child: Container(
-                height: getScreenHeight(54),
-                width: getScreenHeight(54),
-                margin: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle, color: AppColors.greyShade8),
-                child: ClipOval(child: child),
-              ),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomPaint(
+            painter: StatusPainter(
+                statusCount: widget.statusCount, isMuted: widget.isMuted),
+            child: Container(
+              height: getScreenHeight(54),
+              width: getScreenHeight(54),
+              margin: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: AppColors.greyShade8),
+              child: ClipOval(child: child),
             ),
-            false
-                ? SizedBox(height: getScreenHeight(7))
-                : SizedBox(height: getScreenHeight(11)),
-            Text(widget.username.appendOverflow(11),
-                style: TextStyle(
-                    fontSize: getScreenHeight(11),
-                    fontWeight: FontWeight.w400,
-                    color: false ?? false ? AppColors.greyShade3 : null,
-                    overflow: TextOverflow.ellipsis))
-          ],
-        ),
+          ),
+          false
+              ? SizedBox(height: getScreenHeight(7))
+              : SizedBox(height: getScreenHeight(11)),
+          Text(widget.username.appendOverflow(11),
+              style: TextStyle(
+                  fontSize: getScreenHeight(11),
+                  fontWeight: FontWeight.w400,
+                  color: false ?? false ? AppColors.greyShade3 : null,
+                  overflow: TextOverflow.ellipsis))
+        ],
       ),
     );
   }
