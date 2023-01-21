@@ -51,7 +51,7 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<User> getUserProfileByUsername({required String? username}) async {
+  Future<UserList> getUserProfileByUsername({required String? username}) async {
     String q = r'''
         query getUserByUsername($username: String!) {
           getUserByUsername(username: $username) {
@@ -68,8 +68,10 @@ class HomeRemoteDataSource {
         throw GraphQLError(message: result.message);
       }
       print("User data ${result}");
+      print(
+          "User data 2 ${UserList.fromJson(result.data!['getUserByUsername'])}");
       //print("User data 2 ${UserList.fromJson(result)}");
-      return User.fromJson(result.data!['getUserByUsername']);
+      return UserList.fromJson(result.data!['getUserByUsername']);
     } catch (e) {
       rethrow;
     }
@@ -1313,9 +1315,9 @@ class HomeRemoteDataSource {
             voteType
             created_at
             profile{
-              '''+
-              MiniProfileSchema.schema
-              +'''
+              ''' +
+        MiniProfileSchema.schema +
+        '''
             }
           }
         }''';

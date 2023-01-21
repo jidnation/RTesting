@@ -6,9 +6,9 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
-import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -34,7 +34,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
-      on<GetUserByUsernameEvent>((event, emit) async {
+    on<GetUserByUsernameEvent>((event, emit) async {
       emit(GetUserByUsernameInitial());
       try {
         final response = await userRepository.getUserProfileByUsername(
@@ -43,7 +43,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         response.fold(
           (error) => emit(GetUserByUsernameError(error: error)),
           (users) {
-
             emit(GetUserByUsernameSuccess(users: users));
           },
         );
@@ -69,7 +68,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
       try {
         final response = await userRepository.getUserProfile(
-          email: event.email!,
+          email: event.email ?? '',
         );
         response.fold(
           (error) => emit(UserError(error: error)),
@@ -492,13 +491,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
     });
 
-    on<InitiateLiveStreamEvent>((event, emit) async{
+    on<InitiateLiveStreamEvent>((event, emit) async {
       emit(UserLoading());
       try {
-        final response = await userRepository.initiateLiveStream(startedAt: event.startedAt);
+        final response =
+            await userRepository.initiateLiveStream(startedAt: event.startedAt);
         response.fold(
-              (error) => emit(UserError(error: error)),
-              (live) {
+          (error) => emit(UserError(error: error)),
+          (live) {
             globals.streamLive = live;
             print("the ${live.channelName}");
             print("the ${live.token}");
@@ -515,10 +515,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       try {
         final response =
-        await userRepository.joinStream(channelName: event.channelName);
+            await userRepository.joinStream(channelName: event.channelName);
         response.fold(
-                (error) => emit(UserError(error: error)),
-                (joinLiveStream) =>
+            (error) => emit(UserError(error: error)),
+            (joinLiveStream) =>
                 emit(JoinLiveStreamSuccess(joinLiveStream: joinLiveStream)));
       } on GraphQLError catch (e) {
         emit(UserError(error: e.message));

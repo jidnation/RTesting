@@ -656,25 +656,22 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   getUserByUsername(BuildContext context, {required String username}) async {
-    Either<String, User> response =
+    Either<String, UserList> response =
         await UserRepository().getUserProfileByUsername(username: username);
-    User? userInformation;
+    UserList? userInformation;
     User? userInfo;
+
     if (response.isRight()) {
-      response.forEach((r) {
-        userInformation = r;
-        userInfo = userInformation!;
-      });
-      if (userInformation != null) {
-        RouteNavigators.route(
-            context,
-            RecipientAccountProfile(
-              recipientCoverImageUrl: userInfo!.coverPicture,
-              recipientEmail: userInfo!.email,
-              recipientId: userInfo!.id,
-              recipientImageUrl: userInfo!.profilePicture,
-            ));
-      }
+      userInfo = userInformation?.user.first;
+
+      RouteNavigators.route(
+          context,
+          RecipientAccountProfile(
+            recipientCoverImageUrl: userInfo?.coverPicture,
+            recipientEmail: userInfo?.email,
+            recipientId: userInfo?.id,
+            recipientImageUrl: userInfo?.profilePicture,
+          ));
     }
   }
 

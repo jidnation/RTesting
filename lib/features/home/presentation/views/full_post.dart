@@ -162,10 +162,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
           RouteNavigators.route(
               context,
               RecipientAccountProfile(
-                recipientCoverImageUrl: userInfo.coverPicture,
-                recipientEmail: userInfo.email,
-                recipientId: userInfo.id,
-                recipientImageUrl: userInfo.profilePicture,
+                recipientCoverImageUrl: userInfo.user.first.coverPicture,
+                recipientEmail: userInfo.user.first.email,
+                recipientId: userInfo.user.first.id,
+                recipientImageUrl: userInfo.user.first.profilePicture,
               ));
         }
         if (state is GetUserByUsernameError) {
@@ -1028,6 +1028,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           children: [
                                             GestureDetector(
                                               onLongPress: () {
+
                                                 if ((post.value.post
                                                                 ?.nUpvotes ??
                                                             0) >
@@ -1038,6 +1039,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       postId: post
                                                           .value.post!.postId!,
                                                       reactionType: 'Upvote');
+
                                                 }
                                               },
                                               onTap: () {
@@ -1138,6 +1140,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postId,
                                                             ));
                                                           }
+
                                                         }
                                                       },
                                                       padding: EdgeInsets.zero,
@@ -1182,6 +1185,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               FontWeight.w500,
                                                           color: AppColors
                                                               .textColor3,
+
                                                         ),
                                                       ),
                                                     ).paddingOnly(right: 6),
