@@ -1295,7 +1295,7 @@ class PostFeedReacherCard extends HookWidget {
                                     minSize: 0,
                                     onPressed: onLike,
                                     padding: EdgeInsets.zero,
-                                    child: isLiked
+                                    child: isLiked || (postFeedModel!.post!.isLiked != null && postFeedModel!.post!.isLiked == true)
                                         ? SvgPicture.asset(
                                             'assets/svgs/like-active.svg',
                                           )
@@ -1393,7 +1393,7 @@ class PostFeedReacherCard extends HookWidget {
                                       minSize: 0,
                                       onPressed: onUpvote,
                                       padding: EdgeInsets.zero,
-                                      child: isVoted && voteType == 'Upvote'
+                                      child: (isVoted && voteType == 'Upvote') || postFeedModel!.post!.isVoted == "Upvote"
                                           ? SvgPicture.asset(
                                               'assets/svgs/shoutup-active.svg',
                                               height: 25,
@@ -1439,7 +1439,7 @@ class PostFeedReacherCard extends HookWidget {
                                       minSize: 0,
                                       onPressed: onDownvote,
                                       padding: EdgeInsets.zero,
-                                      child: isVoted && voteType == 'Downvote'
+                                      child: (isVoted && voteType == 'Downvote') || postFeedModel!.post!.isVoted == "Downvote"
                                           ? SvgPicture.asset(
                                               'assets/svgs/shoutdown-active.svg',
                                               height: 25,

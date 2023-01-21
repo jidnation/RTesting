@@ -116,8 +116,15 @@ class RepostedPost extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              post.repostedPost!.location! == 'nil'
+                        post.repostedPost!.location!
+                                  .toLowerCase()
+                                  .trim()
+                                  .toString() ==
+                                  'nil'
                                   ? ''
+                                  : post.repostedPost!.location!.length > 23
+                                  ? post.repostedPost!.location!
+                                  .substring(0, 23)
                                   : post.repostedPost!.location!,
                               style: TextStyle(
                                 fontSize: getScreenHeight(10),

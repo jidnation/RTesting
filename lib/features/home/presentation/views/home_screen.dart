@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -116,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 // }
 
 class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({
+   BottomNavBar({
     Key? key,
     required ValueNotifier<int> currentIndex,
     required this.pageController,
@@ -125,6 +126,8 @@ class BottomNavBar extends StatelessWidget {
 
   final ValueNotifier<int> _currentIndex;
   final PageController pageController;
+  final RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +139,14 @@ class BottomNavBar extends StatelessWidget {
         pageController.jumpToPage(_currentIndex.value);
         //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
+
+        if(_currentIndex.value == 0){
+          timeLineFeedStore.initialize(
+            refreshController:
+            _refreshController,
+            // isRefresh: true,
+          );
+        }
       },
       selectedItemColor: AppColors.primaryColor,
       unselectedItemColor: AppColors.blackShade3,

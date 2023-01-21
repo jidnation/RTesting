@@ -15,15 +15,19 @@ class UserUploadProfilePictureSuccess extends UserState {
   UserUploadProfilePictureSuccess({this.user});
   final User? user;
 }
-class GetUserByUsernameInitial extends UserState{}
-class GetUserByUsernameSuccess extends UserState{
+
+class GetUserByUsernameInitial extends UserState {}
+
+class GetUserByUsernameSuccess extends UserState {
   GetUserByUsernameSuccess({this.users});
-  final User? users;
+  final UserList? users;
 }
-class GetUserByUsernameError extends UserState{
+
+class GetUserByUsernameError extends UserState {
   GetUserByUsernameError({this.error});
   final String? error;
 }
+
 class DeleteAccountSuccess extends UserState {
   DeleteAccountSuccess({this.deleted});
   final bool? deleted;
