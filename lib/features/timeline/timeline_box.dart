@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -30,7 +31,7 @@ import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
 import '../moment/moment_audio_player.dart';
 
-class TimeLineBox extends StatelessWidget {
+class TimeLineBox extends HookWidget {
   final TimeLineModel timeLineModel;
   const TimeLineBox({
     Key? key,
@@ -46,6 +47,7 @@ class TimeLineBox extends StatelessWidget {
     //working on the images
     List<String> images = tPostInfo?.imageMediaItems ?? [];
 
+    ValueNotifier<bool> isPausing = useState(false);
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -130,25 +132,30 @@ class TimeLineBox extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      Container(
-                        height: 35,
-                        width: 35,
-                        padding: EdgeInsets.all(
-                            tPostOwnerInfo!.profilePicture!.isNotEmpty ? 0 : 5),
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.circular(30),
-                            image: tPostOwnerInfo.profilePicture!.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(
-                                        tPostOwnerInfo.profilePicture!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null),
-                        child: tPostOwnerInfo.profilePicture!.isEmpty
-                            ? Image.asset("assets/images/app-logo.png")
-                            : null,
-                      ),
+                      tPostOwnerInfo != null
+                          ? Container(
+                              height: 35,
+                              width: 35,
+                              padding: EdgeInsets.all(
+                                  tPostOwnerInfo.profilePicture!.isNotEmpty
+                                      ? 0
+                                      : 5),
+                              decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(30),
+                                  image: tPostOwnerInfo
+                                          .profilePicture!.isNotEmpty
+                                      ? DecorationImage(
+                                          image: NetworkImage(
+                                              tPostOwnerInfo.profilePicture!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null),
+                              child: tPostOwnerInfo.profilePicture!.isEmpty
+                                  ? Image.asset("assets/images/app-logo.png")
+                                  : null,
+                            )
+                          : const SizedBox.shrink(),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Row(
@@ -212,13 +219,13 @@ class TimeLineBox extends StatelessWidget {
                                           children: [
                                             CustomText(
                                               text:
-                                                  "@${tPostOwnerInfo.username.toString().toCapitalized()}",
+                                                  "@${tPostOwnerInfo?.username.toString().toCapitalized()}",
                                               color: Colors.black,
                                               size: 14.28,
                                               weight: FontWeight.w600,
                                             ),
                                             const SizedBox(width: 10),
-                                            tPostOwnerInfo.verified!
+                                            tPostOwnerInfo?.verified ?? false
                                                 ? SvgPicture.asset(
                                                     'assets/svgs/verified.svg')
                                                 : const SizedBox.shrink()

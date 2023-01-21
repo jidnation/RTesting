@@ -27,6 +27,8 @@ class TimeLineBoxActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext routeContext) {
+    print(
+        "::::gjjjdgfrcct:::: ${timeLineFeedStore.getPostModelById(timeLineId).postOwnerId}");
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Container(
         height: 40,

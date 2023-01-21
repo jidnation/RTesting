@@ -62,6 +62,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<CustomUser> _suggestedUsers = <CustomUser>[];
   List<CustomUser> get suggestedUser => _suggestedUsers;
 
+  //
+  // List<CustomCounter> _likedBox = <CustomCounter>[];
+  // List<CustomCounter> get likedBox => _likedBox;
+
   initialize(
       {bool? isTextEditing,
       bool? isPosting,
@@ -156,9 +160,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         _availablePostIds.add(post.postId!);
         value.add(TimeLineModel(
           getPostFeed: postFeed,
-          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote',
+          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' && post.postOwnerProfile != null,
         ));
       }
+      // if(value.isNotEmpty){
+      //   _likedBox.isNotEmpty ? _likedBox.clear() : null;
+      //   for (TimeLineModel element in value) {
+      //     _likedBox.add(CustomCounter(id: element.id, data: LikeModel(
+      //       nLikes: element.getPostFeed.post?.nLikes ?? 0,
+      //       isLiked: element.getPostFeed.post?.isLiked ?? false,
+      //     )));
+      //   }}
       _isPosting = false;
       _gettingPosts = false;
       notifyListeners();
@@ -182,7 +194,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       notifyListeners();
       bool response = await timeLineQuery.likePost(postId: post.postId!);
       if (response) {
-        updateTimeLine(id);
+        // updateTimeLine(id);
       }
     } else {
       post.isLiked = false;
@@ -190,7 +202,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       notifyListeners();
       bool response = await timeLineQuery.unlikePost(postId: post.postId!);
       if (response) {
-        updateTimeLine(id);
+        // updateTimeLine(id);
       }
     }
   }
@@ -365,15 +377,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         nUpvotes: postD.nUpvotes,
         nLikes: postD.nLikes,
         postSlug: postD.postSlug,
-        postOwnerProfile: pt.PostProfileModel(
-            authId: postD.postOwnerProfile!.authId,
-            firstName: postD.postOwnerProfile!.firstName,
-            lastName: postD.postOwnerProfile!.lastName,
-            username: postD.postOwnerProfile!.username,
-            location: postD.postOwnerProfile!.location,
-            profilePicture: postD.postOwnerProfile!.profilePicture,
-            verified: postD.postOwnerProfile!.verified,
-            profileSlug: postD.postOwnerProfile!.profileSlug),
+        postOwnerProfile: postD.postOwnerProfile != null
+            ? pt.PostProfileModel(
+                authId: postD.postOwnerProfile!.authId,
+                firstName: postD.postOwnerProfile!.firstName,
+                lastName: postD.postOwnerProfile!.lastName,
+                username: postD.postOwnerProfile!.username,
+                location: postD.postOwnerProfile!.location,
+                profilePicture: postD.postOwnerProfile!.profilePicture,
+                verified: postD.postOwnerProfile!.verified,
+                profileSlug: postD.postOwnerProfile!.profileSlug)
+            : null,
         repostedPostOwnerProfile: postD.repostedPostOwnerProfile != null
             ? pt.PostProfileModel(
                 authId: postD.repostedPostOwnerProfile!.authId,
@@ -786,3 +800,17 @@ class CustomUser {
 
   CustomUser({required this.user}) : id = const Uuid().v4();
 }
+//
+// class LikeModel {
+//   int nLikes;
+//   bool isLiked;
+//
+//   LikeModel({required this.nLikes, required this.isLiked});
+// }
+//
+// class CustomCounter{
+//   final String id;
+//   LikeModel data;
+//
+//   CustomCounter({required this.id, required this.data});
+// }
