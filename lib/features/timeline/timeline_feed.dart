@@ -354,94 +354,97 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                     tilePadding: const EdgeInsets.symmetric(
                                         horizontal: 16),
                                     children: [
-                                      Row(
-                                        children: [
-                                          ...List.generate(
-                                            _mutedStatus.length,
-                                            (index) => StatusBubble(
-                                              isMuted: true,
-                                              statusCount: _mutedStatus[index]
-                                                  .status!
-                                                  .length,
-                                              preview: _mutedStatus[index]
-                                                  .status!
-                                                  .last
-                                                  .status!,
-                                              isMe: false,
-                                              isLive: false,
-                                              username: _mutedStatus[index]
-                                                  .status![0]
-                                                  .statusOwnerProfile!
-                                                  .username!,
-                                              onTap: () async {
-                                                final res = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (c) =>
-                                                            ViewUserStatus(
-                                                                isMuted: true,
-                                                                status: _mutedStatus[
-                                                                        index]
-                                                                    .status!)));
-                                                if (res == null) return;
-                                                if (res is MuteResult) {
-                                                  timeLineFeedStore
-                                                      .unMuteStatus(index);
-                                                }
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: [
+                                            ...List.generate(
+                                              _mutedStatus.length,
+                                              (index) => StatusBubble(
+                                                isMuted: true,
+                                                statusCount: _mutedStatus[index]
+                                                    .status!
+                                                    .length,
+                                                preview: _mutedStatus[index]
+                                                    .status!
+                                                    .last
+                                                    .status!,
+                                                isMe: false,
+                                                isLive: false,
+                                                username: _mutedStatus[index]
+                                                    .status![0]
+                                                    .statusOwnerProfile!
+                                                    .username!,
+                                                onTap: () async {
+                                                  final res = await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (c) =>
+                                                              ViewUserStatus(
+                                                                  isMuted: true,
+                                                                  status: _mutedStatus[
+                                                                          index]
+                                                                      .status!)));
+                                                  if (res == null) return;
+                                                  if (res is MuteResult) {
+                                                    timeLineFeedStore
+                                                        .unMuteStatus(index);
+                                                  }
 
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (c) => const StoryPage()));
+                                                  // Navigator.push(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (c) => const StoryPage()));
 
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (c) =>
-                                                //             const StoryPage()));
-                                              },
+                                                  // Navigator.push(
+                                                  //     context,
+                                                  //     MaterialPageRoute(
+                                                  //         builder: (c) =>
+                                                  //             const StoryPage()));
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                          // ...List.generate(
-                                          //   _mutedStatus.length,
-                                          //   (index) => UserStory(
-                                          //     size: size,
-                                          //     isMe: false,
-                                          //     isLive: false,
-                                          //     isMuted: true,
-                                          //     hasWatched: false,
-                                          //     image: _mutedStatus[index]
-                                          //         .status![0]
-                                          //         .statusOwnerProfile!
-                                          //         .profilePicture,
-                                          //     username: _mutedStatus[index]
-                                          //         .status![index]
-                                          //         .statusOwnerProfile!
-                                          //         .username!,
-                                          //     onTap: () async {
-                                          //       final res = await Navigator.push(
-                                          //           context,
-                                          //           MaterialPageRoute(
-                                          //               builder: (c) =>
-                                          //                   ViewUserStatus(
-                                          //                       isMuted: true,
-                                          //                       status: _mutedStatus[
-                                          //                               index]
-                                          //                           .status!)));
-                                          //       if (res == null) return;
-                                          //       if (res is MuteResult) {
-                                          //         timeLineFeedStore
-                                          //             .unMuteStatus(index);
-                                          //       }
-                                          //
-                                          //       // Navigator.push(
-                                          //       //     context,
-                                          //       //     MaterialPageRoute(
-                                          //       //         builder: (c) => const StoryPage()));
-                                          //     },
-                                          //   ),
-                                          // )
-                                        ],
+                                            // ...List.generate(
+                                            //   _mutedStatus.length,
+                                            //   (index) => UserStory(
+                                            //     size: size,
+                                            //     isMe: false,
+                                            //     isLive: false,
+                                            //     isMuted: true,
+                                            //     hasWatched: false,
+                                            //     image: _mutedStatus[index]
+                                            //         .status![0]
+                                            //         .statusOwnerProfile!
+                                            //         .profilePicture,
+                                            //     username: _mutedStatus[index]
+                                            //         .status![index]
+                                            //         .statusOwnerProfile!
+                                            //         .username!,
+                                            //     onTap: () async {
+                                            //       final res = await Navigator.push(
+                                            //           context,
+                                            //           MaterialPageRoute(
+                                            //               builder: (c) =>
+                                            //                   ViewUserStatus(
+                                            //                       isMuted: true,
+                                            //                       status: _mutedStatus[
+                                            //                               index]
+                                            //                           .status!)));
+                                            //       if (res == null) return;
+                                            //       if (res is MuteResult) {
+                                            //         timeLineFeedStore
+                                            //             .unMuteStatus(index);
+                                            //       }
+                                            //
+                                            //       // Navigator.push(
+                                            //       //     context,
+                                            //       //     MaterialPageRoute(
+                                            //       //         builder: (c) => const StoryPage()));
+                                            //     },
+                                            //   ),
+                                            // )
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),

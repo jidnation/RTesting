@@ -66,13 +66,14 @@ class _StatusBubbleState extends State<StatusBubble> {
     Widget child = Container();
     if (widget.preview.type == 'text') {
       child = Container(
-        color: AppColors.greyShade5,
+        color: AppColors.greyShade8,
         alignment: Alignment.center,
+        padding: EdgeInsets.all(8),
         child: Text(
           (widget.preview.statusData?.content ?? 'nil'),
           textAlign: TextAlign.center,
           maxLines: 3,
-          style: const TextStyle(fontSize: 12, height: 1),
+          style: const TextStyle(fontSize: 10, height: 1),
         ),
       );
     } else if (widget.preview.type == 'image') {
@@ -84,14 +85,17 @@ class _StatusBubbleState extends State<StatusBubble> {
       child = Center(
           child: Icon(
         Icons.audiotrack_outlined,
-        color: AppColors.primaryColor,
+        color:
+            (widget.isMuted ?? false) ? AppColors.grey : AppColors.primaryColor,
       ));
     } else if (widget.preview.type == 'video') {
       child = thumbnail == null
           ? Center(
               child: Icon(
               Icons.local_movies_outlined,
-              color: AppColors.primaryColor,
+              color: (widget.isMuted ?? false)
+                  ? AppColors.grey
+                  : AppColors.primaryColor,
             ))
           : Image.file(
               thumbnail!,

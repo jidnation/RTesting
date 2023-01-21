@@ -154,10 +154,10 @@ class ChatsThread {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     private = json['private'];
-    participantsInfo = json['participantsProfile'] == null
+    participantsInfo = json['participantsProfile'] == null || (json['participantsProfile'] as List).contains(null)
         ? null
         : List<ChatUser>.from(
-            json['participantsProfile'].map((item) => ChatUser.fromJson(item)));
+            json['participantsProfile'].map((item) => ChatUser.fromJson( item)));
   }
 
   Map<String, dynamic> toJson() {
