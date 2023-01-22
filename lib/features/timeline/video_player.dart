@@ -142,8 +142,8 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
         return ImageBlur(
             widget.post,
             SizedBox(
-              width: size.width,
               height: size.height,
+              width: size.width,
             ), () {
           setState(() {
             show = true;

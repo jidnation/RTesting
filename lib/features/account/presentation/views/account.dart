@@ -1867,8 +1867,12 @@ class _ReacherCard extends HookWidget {
                   else
                     const SizedBox.shrink(),
                   if ((postModel!.videoMediaItem ?? '').isNotEmpty)
-                    TimeLineVideoPlayer(
-                        post: postModel!, videoUrl: postModel!.videoMediaItem!)
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 2,
+                      child: TimeLineVideoPlayer(
+                          post: postModel!,
+                          videoUrl: postModel!.videoMediaItem!),
+                    )
                   else
                     (postModel!.audioMediaItem ?? '').isNotEmpty
                         ? Container(

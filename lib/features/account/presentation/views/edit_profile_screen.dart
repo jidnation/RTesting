@@ -365,22 +365,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textColor2,
                       ),
                     ),
-                    CupertinoSwitchListTile(
-                        value: showContactInfo.value,
-                        dense: true,
-                        onChanged: (val) {
-                          showContactInfo.value = !showContactInfo.value;
-                        },
-                        title: Text(
-                          'Contact Info',
-                          style: TextStyle(
-                            color: AppColors.textColor2,
-                            fontWeight: FontWeight.w400,
-                            fontSize: getScreenHeight(15),
-                          ),
-                        ),
-                        selected: showContactInfo.value,
-                        trackColor: const Color(0xFFE9E8E8)),
+                    // CupertinoSwitchListTile(
+                    //     value: showContactInfo.value,
+                    //     dense: true,
+                    //     onChanged: (val) {
+                    //       showContactInfo.value = !showContactInfo.value;
+                    //     },
+                    //     title: Text(
+                    //       'Contact Info',
+                    //       style: TextStyle(
+                    //         color: AppColors.textColor2,
+                    //         fontWeight: FontWeight.w400,
+                    //         fontSize: getScreenHeight(15),
+                    //       ),
+                    //     ),
+                    //     selected: showContactInfo.value,
+                    //     trackColor: const Color(0xFFE9E8E8)),
                     CupertinoSwitchListTile(
                         value: showLocation.value,
                         dense: true,
