@@ -609,7 +609,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                   ? 'Unmute'
                                   : 'Mute',
                               onPressed: () async {
-                                if ((status.status?.isMuted ?? false) &&
+                                if ((status.status?.isMuted ?? false) ||
                                     (isMuted ?? false)) {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -729,12 +729,14 @@ Future<int?> showMediaUploadOption({
   );
 }
 
-Future showPostReactors(BuildContext context, {required String postId}) async {
+Future showPostReactors(BuildContext context,
+    {required String postId, required String reactionType}) async {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
     builder: (context) => PostReactors(
       postId: postId,
+      reactionType: reactionType,
     ),
   );
 }

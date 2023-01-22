@@ -38,7 +38,8 @@ class TimeLineFeed extends StatefulWidget {
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 
-class _TimeLineFeedState extends State<TimeLineFeed> {
+class _TimeLineFeedState extends State<TimeLineFeed>
+    with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
@@ -50,8 +51,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return ProgressHUD(
-      child: SafeArea(
+    return SafeArea(
+      child: ProgressHUD(
         child: Scaffold(
           backgroundColor: const Color(0xFFE3E5E7).withOpacity(0.3),
           appBar: AppBar(
@@ -201,8 +202,6 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                                       0,
                                                                 ));
                                                     if (res == null) return;
-                                                    // timeLineFeedStore
-                                                    //     .getMyStatus();
                                                     timeLineFeedStore
                                                         .addNewStatus(
                                                             res as StatusModel);
@@ -245,15 +244,6 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                         .statusOwnerProfile!
                                                         .username!,
                                                     onTap: () async {
-                                                      // RouteNavigators
-                                                      //     .route(
-                                                      //   context,
-                                                      //   ViewUserStatus(
-                                                      //       status: _userStatus
-                                                      //           .value[
-                                                      //               index]
-                                                      //           .status!),
-                                                      // );
                                                       final res = await Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
@@ -268,12 +258,15 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                         timeLineFeedStore
                                                             .muteStatus(index);
                                                       }
+
+                                                      // Navigator.push(
+                                                      //     context,
+                                                      //     MaterialPageRoute(
+                                                      //         builder: (c) =>
+                                                      //             const StoryPage()));
                                                     },
                                                   ),
                                                 ),
-                                                // ..._userStatus.value.map(
-                                                //   (e) =>
-                                                // ),
                                               ],
                                             ),
                                           ).paddingOnly(left: 11),
@@ -338,15 +331,11 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
                                                   timeLineFeedStore
                                                       .unMuteStatus(index);
                                                 }
-                                                // RouteNavigators
-                                                //     .route(
-                                                //   context,
-                                                //   ViewUserStatus(
-                                                //       status: _mutedStatus
-                                                //           .value[
-                                                //               index]
-                                                //           .status!),
-                                                // );
+
+                                                // Navigator.push(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //         builder: (c) => const StoryPage()));
                                               },
                                             ),
                                           )
@@ -417,4 +406,8 @@ class _TimeLineFeedState extends State<TimeLineFeed> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

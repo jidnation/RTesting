@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart' as pt;
 import 'package:reach_me/features/timeline/timeline_feed.dart';
 
@@ -38,12 +39,16 @@ class TimeLineBoxActionRow extends StatelessWidget {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            CupertinoButton(
-              minSize: 0,
-              onPressed: () {
+            GestureDetector(
+              onLongPress: () {
+                if ((post.nLikes ?? 0) > 0) {
+                  showPostReactors(routeContext,
+                      postId: post.postId!, reactionType: 'Like');
+                }
+              },
+              onTap: () {
                 timeLineFeedStore.likePost(timeLineId);
               },
-              padding: EdgeInsets.zero,
               child: SvgPicture.asset(
                 post.isLiked!
                     ? 'assets/svgs/like-active.svg'
@@ -129,16 +134,21 @@ class TimeLineBoxActionRow extends StatelessWidget {
           ),
           child: Row(children: [
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              CupertinoButton(
-                minSize: 0,
-                onPressed: () {
+              GestureDetector(
+                onLongPress: () {
+                  if ((post.nUpvotes ?? 0) > 0 &&
+                      (post.authId == globals.user!.id!)) {
+                    showPostReactors(routeContext,
+                        postId: post.postId!, reactionType: 'Upvote');
+                  }
+                },
+                onTap: () {
                   timeLineFeedStore.votePost(
                     routeContext,
                     id: timeLineId,
                     voteType: 'Upvote',
                   );
                 },
-                padding: EdgeInsets.zero,
                 child: SizedBox(
                   width: 30,
                   child: SvgPicture.asset(
@@ -162,16 +172,21 @@ class TimeLineBoxActionRow extends StatelessWidget {
             ]),
             const SizedBox(width: 12),
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              CupertinoButton(
-                minSize: 0,
-                onPressed: () {
+              GestureDetector(
+                onLongPress: () {
+                  if ((post.nDownvotes ?? 0) > 0 &&
+                      (post.authId == globals.user!.id!)) {
+                    showPostReactors(routeContext,
+                        postId: post.postId!, reactionType: 'Downvote');
+                  }
+                },
+                onTap: () {
                   timeLineFeedStore.votePost(
                     routeContext,
                     id: timeLineId,
                     voteType: 'Downvote',
                   );
                 },
-                padding: EdgeInsets.zero,
                 child: SizedBox(
                   width: 30,
                   child: SvgPicture.asset(

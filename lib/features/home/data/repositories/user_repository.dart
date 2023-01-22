@@ -43,13 +43,14 @@ class UserRepository {
     }
   }
 
-  Future<Either<String, User>> getUserProfileByUsername({
+  Future<Either<String, UserList>> getUserProfileByUsername({
     required String username,
   }) async {
     try {
-      final user = await _homeRemoteDataSource.getUserProfileByUsername(
+      final userlist = await _homeRemoteDataSource.getUserProfileByUsername(
           username: username);
-      return Right(user);
+
+      return Right(userlist);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

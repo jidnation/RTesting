@@ -44,34 +44,12 @@ class TimeLineBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ErProfile? tOwnerInfo = timeLineModel.getPostFeed.feedOwnerProfile;
     ErProfile? tVoterInfo = timeLineModel.getPostFeed.voterProfile;
     Post? tPostInfo = timeLineModel.getPostFeed.post;
     ErProfile? tPostOwnerInfo = tPostInfo?.postOwnerProfile;
 
     //working on the images
     List<String> images = tPostInfo?.imageMediaItems ?? [];
-    bool isEven = images.length % 2 == 0;
-    String imageType = images.length == 1
-        ? 'single'
-        : images.length == 2
-            ? 'isTwo'
-            : images.length > 4
-                ? 'isMore'
-                : 'isFour';
-    Map<String, double> widthMapping = {
-      'isTwo': SizeConfig.screenWidth * 0.4,
-      'isFour': SizeConfig.screenWidth * 0.4,
-      'single': SizeConfig.screenWidth,
-      'isLast': SizeConfig.screenWidth,
-    };
-
-    Map<String, double> heightMapping = {
-      'isTwo': 150,
-      'isFour': 150,
-      'single': 300,
-      'isLast': 150,
-    };
 
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
@@ -95,20 +73,6 @@ class TimeLineBox extends StatelessWidget {
       debugPrint("Byte Data: $byteData");
       await saveImage(byteData!.buffer.asUint8List());
     }
-    // onViewProfile () {
-    //   viewProfile.value =
-    //   true;
-    //   ProgressHUD.of(
-    //       context)
-    //       ?.showWithText(
-    //       'Viewing Profile');
-    //   globals.userBloc!.add(
-    //       GetRecipientProfileEvent(
-    //           email: _posts
-    //               .value[
-    //           index]
-    //               .postOwnerId));
-    // }
 
     return RepaintBoundary(
       key: src,
@@ -349,16 +313,15 @@ class TimeLineBox extends StatelessWidget {
                                   height: 30,
                                   width: 40,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/svgs/kebab card.svg',
-                                        color: const Color(0xff717F85),
-                                      ),
-                                    ],
-                                  ),
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/svgs/kebab card.svg',
+                                          color: const Color(0xff717F85),
+                                        ),
+                                      ]),
                                 ),
                               )
                             ]),
@@ -369,7 +332,9 @@ class TimeLineBox extends StatelessWidget {
                       visible: tPostInfo.content!.isNotEmpty,
                       child: ExpandableText(
                         "${tPostInfo.content}",
-                        prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                        prefixText: tPostInfo.edited!
+                            ? "(Reach Edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())})"
+                            : null,
                         prefixStyle: TextStyle(
                             fontSize: getScreenHeight(12),
                             fontFamily: 'Poppins',
@@ -421,38 +386,7 @@ class TimeLineBox extends StatelessWidget {
                         child: TimeLinePostMedia(
                             post: timeLineFeedStore
                                 .getPostModel(timeLineModel: timeLineModel)
-                                .post!)
-
-                        // Center(
-                        //   child: Wrap(
-                        //       spacing: 5,
-                        //       runSpacing: 5,
-                        //       alignment: WrapAlignment.center,
-                        //       runAlignment: WrapAlignment.center,
-                        //       children: List.generate(
-                        //           images.length,
-                        //           (index) => Container(
-                        //                 height: heightMapping[imageType],
-                        //                 clipBehavior: Clip.hardEdge,
-                        //                 width: isEven
-                        //                     ? widthMapping[imageType]
-                        //                     : images.length == index
-                        //                         ? widthMapping['last']
-                        //                         : widthMapping[imageType],
-                        //                 decoration: BoxDecoration(
-                        //                   borderRadius: BorderRadius.circular(15),
-                        //                 ),
-                        //                 child: CachedNetworkImage(
-                        //                   imageUrl: images[index],
-                        //                   fit: BoxFit.cover,
-                        //                 ),
-                        //               )).toList()
-                        //       //     [
-                        //       //   TimeLineImageViewer(imageUrl: 'assets/images/frame.png',)
-                        //       // ]
-                        //       ),
-                        // ),
-                        ),
+                                .post!)),
                     SizedBox(
                         height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
                     timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
@@ -460,8 +394,8 @@ class TimeLineBox extends StatelessWidget {
                             height: 550,
                             width: SizeConfig.screenWidth,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: const Color(0xff001824),
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green,
                             ),
                             child:
                                 // TimeLineVideoPreview(

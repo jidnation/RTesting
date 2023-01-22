@@ -294,7 +294,7 @@ class SearchStories extends HookWidget {
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          SizedBox(height: getScreenHeight(16)),
+          SizedBox(height: getScreenHeight(8)),
           Stack(
             alignment: Alignment.bottomCenter,
             children: [

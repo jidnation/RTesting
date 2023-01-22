@@ -8,7 +8,7 @@ import 'package:flutter_audio_cutter/audio_cutter.dart';
 // import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_cropper/image_cropper.dart';
+// import 'package:image_cropper/image_cropper.dart';
 //import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_compress/video_compress.dart' as vc;
@@ -22,7 +22,7 @@ import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
 
 class MediaService {
-  final ImageCropper _cropper = ImageCropper();
+  // final ImageCropper _cropper = ImageCropper();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   Future<FileResult?> getImage({required bool fromGallery}) async {
@@ -134,37 +134,37 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> getImageCropped(
-      {required FileResult file, int? size}) async {
-    final res = await _cropper.cropImage(
-      sourcePath: file.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.ratio3x2,
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9
-      ],
-      cropStyle: CropStyle.circle,
-      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-      compressQuality: 100,
-      maxWidth: size,
-      maxHeight: size,
-      compressFormat: ImageCompressFormat.jpg,
-      uiSettings: [
-        IOSUiSettings(title: ''),
-        AndroidUiSettings(
-          toolbarTitle: 'Crop',
-          toolbarColor: Colors.black,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.square,
-          lockAspectRatio: false,
-        ),
-      ],
-    );
-    if (res == null) return null;
-    return file.copyWith(path: res.path);
-  }
+  // Future<FileResult?> getImageCropped(
+  //     {required FileResult file, int? size}) async {
+  //   final res = await _cropper.cropImage(
+  //     sourcePath: file.path,
+  //     aspectRatioPresets: [
+  //       CropAspectRatioPreset.square,
+  //       CropAspectRatioPreset.ratio3x2,
+  //       CropAspectRatioPreset.original,
+  //       CropAspectRatioPreset.ratio4x3,
+  //       CropAspectRatioPreset.ratio16x9
+  //     ],
+  //     cropStyle: CropStyle.circle,
+  //     aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+  //     compressQuality: 100,
+  //     maxWidth: size,
+  //     maxHeight: size,
+  //     compressFormat: ImageCompressFormat.jpg,
+  //     uiSettings: [
+  //       IOSUiSettings(title: ''),
+  //       AndroidUiSettings(
+  //         toolbarTitle: 'Crop',
+  //         toolbarColor: Colors.black,
+  //         toolbarWidgetColor: Colors.white,
+  //         initAspectRatio: CropAspectRatioPreset.square,
+  //         lockAspectRatio: false,
+  //       ),
+  //     ],
+  //   );
+  //   if (res == null) return null;
+  //   return file.copyWith(path: res.path);
+  // }
 
   Future<FileResult> resizeImage(
       {required FileResult file, required Size size}) async {
