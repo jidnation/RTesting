@@ -585,7 +585,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                       AppColors.greyShade4,
                                                   iconColor:
                                                       AppColors.greyShade4,
-                                                  title: Text(
+                                                  title: const Text(
                                                     'Muted Statuses',
                                                     style: TextStyle(
                                                         fontSize: 14,
@@ -593,10 +593,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             .greyShade3),
                                                   ),
                                                   childrenPadding:
-                                                      EdgeInsets.fromLTRB(
+                                                     const EdgeInsets.fromLTRB(
                                                           16, 0, 16, 16),
                                                   tilePadding:
-                                                      EdgeInsets.symmetric(
+                                                     const EdgeInsets.symmetric(
                                                           horizontal: 16),
                                                   children: [
                                                     Row(
