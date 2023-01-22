@@ -36,7 +36,7 @@ import '../moment/moment_audio_player.dart';
 class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
   final List<StatusFeedResponseModel>? userStatusFeed;
-  TimeLineBox({
+  const TimeLineBox({
     Key? key,
     required this.timeLineModel,
     this.userStatusFeed,
