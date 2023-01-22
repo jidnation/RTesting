@@ -17,6 +17,7 @@ import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
+import '../../../timeline/loading_widget.dart';
 import '../../data/models/post_model.dart';
 
 class PostMedia extends StatefulWidget {
@@ -592,6 +593,14 @@ class _PostImageMediaState extends State<PostImageMedia> {
         child: CachedNetworkImage(
           imageUrl: widget.imageUrl,
           fit: BoxFit.cover,
+          placeholder: (context, value) => Container(
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
+          ),
         ),
       ),
     );
@@ -749,13 +758,15 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
           Visibility(
             child: Positioned.fill(
               child: thumbnail == null
-                  ? const Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        child: CircularProgressIndicator(
-                          color: AppColors.white,
-                        ),
-                      ),
+                  ? Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            loadingEffect2(),
+                          ]),
                     )
                   : Container(
                       decoration: const BoxDecoration(),

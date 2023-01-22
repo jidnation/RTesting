@@ -17,12 +17,12 @@ import 'package:reach_me/features/timeline/video_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../../../../core/helper/logger.dart';
 import '../../../../core/models/file_result.dart';
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
+import '../timeline/loading_widget.dart';
 
 class CommentMedia extends StatelessWidget {
   final CommentModel comment;
@@ -222,7 +222,18 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
         width: double.infinity,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
-        child: CachedNetworkImage(imageUrl: widget.imageUrl, fit: BoxFit.cover),
+        child: CachedNetworkImage(
+          imageUrl: widget.imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, value) => Container(
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
+          ),
+        ),
       ),
     );
   }
