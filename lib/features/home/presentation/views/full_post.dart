@@ -674,10 +674,17 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     ?.videoMediaItem ??
                                                 '')
                                             .isNotEmpty)
-                                          TimeLineVideoPlayer(
-                                              post: widget.postFeedModel!.post!,
-                                              videoUrl: widget.postFeedModel!
-                                                  .post!.videoMediaItem!)
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                2,
+                                            child: TimeLineVideoPlayer(
+                                                post:
+                                                    widget.postFeedModel!.post!,
+                                                videoUrl: widget.postFeedModel!
+                                                    .post!.videoMediaItem!),
+                                          )
                                         else
                                           const SizedBox.shrink(),
                                         (widget.postFeedModel?.post
