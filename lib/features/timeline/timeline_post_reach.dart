@@ -105,7 +105,8 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
     useMemoized(() async {
       globals.userBloc!.add(FetchUserReachingsEvent(
           pageLimit: 50, pageNumber: 1, authId: globals.userId));
-      LocationData _locationData = LocationHelper.determineLocation();
+      LocationData _locationData = await LocationHelper.determineLocation();
+      debugPrint("LocationData ${_locationData.latitude.toString()}");
       globals.userBloc!.add(GetUserLocationEvent(
           lat: _locationData.latitude.toString(),
           lng: _locationData.longitude.toString()));
@@ -272,7 +273,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                         ),
                                       ),
                                       Text(
-                                        '${globals.location?.toLowerCase().trim().toString() == 'nil' ? '' : globals.location}',
+                                        '${getUserLocation().toLowerCase().trim().toString() == 'nil' ? '' : globals.location}',
                                         style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400,

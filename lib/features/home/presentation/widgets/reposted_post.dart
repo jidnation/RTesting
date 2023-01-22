@@ -116,16 +116,16 @@ class RepostedPost extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                        post.repostedPost!.location!
-                                  .toLowerCase()
-                                  .trim()
-                                  .toString() ==
-                                  'nil'
+                              post.repostedPost!.location!
+                                          .toLowerCase()
+                                          .trim()
+                                          .toString() ==
+                                      'nil'
                                   ? ''
                                   : post.repostedPost!.location!.length > 23
-                                  ? post.repostedPost!.location!
-                                  .substring(0, 23)
-                                  : post.repostedPost!.location!,
+                                      ? post.repostedPost!.location!
+                                          .substring(0, 23)
+                                      : post.repostedPost!.location!,
                               style: TextStyle(
                                 fontSize: getScreenHeight(10),
                                 fontFamily: 'Poppins',
@@ -209,8 +209,12 @@ class RepostedPost extends StatelessWidget {
           else
             const SizedBox.shrink(),
           if ((post.repostedPost?.videoMediaItem ?? '').isNotEmpty)
-            TimeLineVideoPlayer(
-                post: post, videoUrl: post.repostedPost?.videoMediaItem ?? '')
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 2,
+              child: TimeLineVideoPlayer(
+                  post: post,
+                  videoUrl: post.repostedPost?.videoMediaItem ?? ''),
+            )
           else
             const SizedBox.shrink(),
           (post.repostedPost?.audioMediaItem ?? '').isNotEmpty

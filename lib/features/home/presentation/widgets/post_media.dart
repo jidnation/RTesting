@@ -705,7 +705,6 @@ class _PostVideoMediaState extends State<PostVideoMedia> {
   final MediaService _mediaService = MediaService();
 
   @override
-
   getThumbnail() async {
     final res = await _mediaService.getVideoThumbnail(videoPath: widget.url);
     thumbnail = res;
@@ -802,7 +801,8 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
             borderRadius: BorderRadius.circular(15),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Padding(
+              child: Container(
+                color: AppColors.black,
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 1.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -835,7 +835,7 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
                         child: Container(
                           width: 70,
                           decoration: BoxDecoration(
-                              color: AppColors.black,
+                              color: AppColors.secondaryColor,
                               border: Border.all(),
                               borderRadius: BorderRadius.circular(12)),
                           child: Center(
@@ -854,7 +854,6 @@ Widget ImageBlur(PostModel post, Widget child, void Function()? onTap,
             ),
           ),
         ))
-     
       ],
     ),
   );
