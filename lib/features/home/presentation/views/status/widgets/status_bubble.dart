@@ -6,6 +6,7 @@ import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 
 class StatusBubble extends StatefulWidget {
@@ -59,16 +60,44 @@ class _StatusBubbleState extends State<StatusBubble> {
     Widget child = Container();
     if (widget.preview.type == 'text') {
       child = Container(
-        color: AppColors.greyShade8,
+        padding: const EdgeInsets.all(8),
         alignment: Alignment.center,
-        padding: EdgeInsets.all(8),
-        child: Text(
-          (widget.preview.statusData?.content ?? 'nil'),
-          textAlign: TextAlign.center,
-          maxLines: 3,
-          style: const TextStyle(fontSize: 10, height: 1),
+        decoration: BoxDecoration(
+          color: (widget.preview.statusData?.background ?? '').contains('0x')
+              ? Helper.getStatusBgColour(widget.preview.statusData!.background!)
+              : null,
+          image: widget.preview.statusData?.background != null
+              ? DecorationImage(
+                  image:
+                      AssetImage(widget.preview.statusData?.background ?? ''),
+                  fit: BoxFit.cover,
+                )
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            widget.preview.statusData?.content ?? '',
+            // textAlign: Helper.getAlignment(
+            //     widget.preview.statusData?.alignment ??
+            //         '')['align'],
+            maxLines: 3,
+            textAlign: TextAlign.center,
+            style: Helper.getFont(widget.preview.statusData?.font ?? '',
+                size: 12, height: 1),
+          ),
         ),
       );
+      // child = Container(
+      //   color: AppColors.greyShade8,
+      //   alignment: Alignment.center,
+      //   padding: EdgeInsets.all(8),
+      //   child: Text(
+      //     (widget.preview.statusData?.content ?? 'nil'),
+      //     textAlign: TextAlign.center,
+      //     maxLines: 3,
+      //     style: const TextStyle(fontSize: 10, height: 1),
+      //   ),
+      // );
     } else if (widget.preview.type == 'image') {
       child = Image.network(
         widget.preview.statusData?.imageMedia ?? '',
