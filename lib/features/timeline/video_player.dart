@@ -52,7 +52,6 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
       looping: true,
       autoInitialize: true,
       hideControlsTimer: const Duration(seconds: 1),
-
       // showControls: false,
       materialProgressColors: ChewieProgressColors(
         playedColor: Colors.red,
@@ -68,8 +67,9 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   @override
   void dispose() {
-    super.dispose();
     _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    super.dispose();
   }
 
   bool show = false;
@@ -91,7 +91,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
           child: _chewieController != null &&
                   _chewieController!.videoPlayerController.value.isInitialized
               ? VisibilityDetector(
-                  key: Key('my-widget-key'),
+                  key: Key('my-widget-key2'),
                   onVisibilityChanged: (visibilityInfo) {
                     var visiblePercentage =
                         visibilityInfo.visibleFraction * 100;
@@ -148,7 +148,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
           child: _chewieController != null &&
                   _chewieController!.videoPlayerController.value.isInitialized
               ? VisibilityDetector(
-                  key: Key('my-widget-key'),
+                  key: Key('my-widget-key3'),
                   onVisibilityChanged: (visibilityInfo) {
                     double visiblePercentage =
                         visibilityInfo.visibleFraction * 100;
@@ -180,7 +180,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
           left: 15,
           child: GestureDetector(
             onTap: () async {
-              _videoPlayerController.dispose();
+              _chewieController?.dispose();
               await Future.delayed(const Duration(seconds: 1));
               // VideoPlayer(videoUrl: widget.videoUrl);
               CustomDialog.openDialogBox(
@@ -203,7 +203,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
               ),
             ),
           ),
-        )
+        ),
       ]);
     }
   }
@@ -498,7 +498,6 @@ class _TimeLineVideoPreviewState extends State<TimeLineVideoPreview> {
 
     _betterPlayerController.addEventsListener((BetterPlayerEvent event) {
       if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
-        print('::::::::::>>>>>>>>>>>>>>>>> it is initilized');
         _betterPlayerController.setOverriddenAspectRatio(
             _betterPlayerController.videoPlayerController?.value.aspectRatio ??
                 1);

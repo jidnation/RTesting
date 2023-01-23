@@ -87,6 +87,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
     notifyListeners();
     List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
+    List<CustomCounter> likeBoxInfo = [];
     if (response != null) {
       length > 0 ? value.clear() : null;
       if (isTextEditing ?? false) {
@@ -160,17 +161,21 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         _availablePostIds.add(post.postId!);
         value.add(TimeLineModel(
           getPostFeed: postFeed,
-          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' && post.postOwnerProfile != null,
+          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' &&
+              post.postOwnerProfile != null,
         ));
       }
-      // if(value.isNotEmpty){
-      //   _likedBox.isNotEmpty ? _likedBox.clear() : null;
-      //   for (TimeLineModel element in value) {
-      //     _likedBox.add(CustomCounter(id: element.id, data: LikeModel(
-      //       nLikes: element.getPostFeed.post?.nLikes ?? 0,
-      //       isLiked: element.getPostFeed.post?.isLiked ?? false,
-      //     )));
-      //   }}
+      if (value.isNotEmpty) {
+        for (TimeLineModel element in value) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+      }
+      timeLineController.likeBox(likeBoxInfo);
       _isPosting = false;
       _gettingPosts = false;
       notifyListeners();
@@ -191,7 +196,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (!post.isLiked!) {
       post.isLiked = true;
       post.nLikes = post.nLikes! + 1;
-      notifyListeners();
+      // notifyListeners();
       bool response = await timeLineQuery.likePost(postId: post.postId!);
       if (response) {
         // updateTimeLine(id);
@@ -199,7 +204,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     } else {
       post.isLiked = false;
       post.nLikes = post.nLikes! - 1;
-      notifyListeners();
+      // notifyListeners();
       bool response = await timeLineQuery.unlikePost(postId: post.postId!);
       if (response) {
         // updateTimeLine(id);
@@ -797,17 +802,19 @@ class CustomUser {
 
   CustomUser({required this.user}) : id = const Uuid().v4();
 }
+
 //
-// class LikeModel {
-//   int nLikes;
-//   bool isLiked;
+class LikeModel {
+  int nLikes;
+  bool isLiked;
+
+  LikeModel({required this.nLikes, required this.isLiked});
+}
+
 //
-//   LikeModel({required this.nLikes, required this.isLiked});
-// }
-//
-// class CustomCounter{
-//   final String id;
-//   LikeModel data;
-//
-//   CustomCounter({required this.id, required this.data});
-// }
+class CustomCounter {
+  final String id;
+  LikeModel data;
+
+  CustomCounter({required this.id, required this.data});
+}
