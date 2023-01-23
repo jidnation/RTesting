@@ -8,8 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:neon_circular_timer/neon_circular_timer.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -360,6 +362,10 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final controller = useTextEditingController();
+    final _focusNode = useFocusNode();
+    final c = CountDownController();
+    final _timerCount = useState(0);
+    // final _timer = Timer();
 
     final keyboardController = KeyboardVisibilityController();
     useEffect(() {
@@ -367,6 +373,9 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
         if (event) {
         } else {}
       });
+      // Timer t = Timer.periodic(Duration(seconds: 30), (timer) {
+      //   _timerCount.value = timer.tick;
+      // });
     }, []);
     return Scaffold(
       body: BlocConsumer<ChatBloc, ChatState>(
@@ -702,96 +711,12 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                     ),
                   ],
                 );
-
-                //final image = images[storyIndex];
-                // return Stack(
-                //   children: [
-                //     Positioned.fill(
-                //       child: Container(color: AppColors.black),
-                //     ),
-                //     //check typename from model and display widgets accordingly
-                //     if ((story.status?.statusData?.background ?? '')
-                //         .contains('0x'))
-                //       Positioned.fill(
-                //         child: Container(
-                //           height: size.height,
-                //           width: size.width,
-                //           decoration: BoxDecoration(
-                //             color: Helper.getStatusBgColour(
-                //                 story.status!.statusData!.background!),
-                //           ),
-                //           child: Center(
-                //             child: Text(
-                //               story.status!.statusData!.caption!,
-                //               textAlign: Helper.getAlignment(story
-                //                   .status!.statusData!.alignment!)['align'],
-                //               style: Helper.getFont(
-                //                   story.status!.statusData!.font!),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     else
-                //       Positioned.fill(
-                //         child: Container(
-                //           height: size.height,
-                //           width: size.width,
-                //           decoration: BoxDecoration(
-                //             image: DecorationImage(
-                //               image: AssetImage(
-                //                   (story.status?.statusData?.background ?? '')),
-                //               fit: BoxFit.cover,
-                //             ),
-                //           ),
-                //           child: Center(
-                //             child: Text(
-                //               story.status!.statusData!.caption!,
-                //               textAlign: Helper.getAlignment(
-                //                   story.status?.statusData?.alignment ??
-                //                       '')['align'],
-                //               style: Helper.getFont(
-                //                   story.status?.statusData?.font ?? ''),
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     Padding(
-                //       padding: const EdgeInsets.only(top: 44, left: 8),
-                //       child: Row(
-                //         children: [
-                //           Helper.renderProfilePicture(
-                //               story.statusCreatorModel!.profilePicture ?? ''),
-                //           SizedBox(width: getScreenWidth(12)),
-                //           Column(
-                //             mainAxisSize: MainAxisSize.min,
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Text(
-                //                 (story.statusCreatorModel!.firstName! +
-                //                         ' ' +
-                //                         story.statusCreatorModel!.lastName!)
-                //                     .toTitleCase(),
-                //                 style: TextStyle(
-                //                   fontSize: getScreenHeight(16),
-                //                   color: Colors.white,
-                //                   fontWeight: FontWeight.w600,
-                //                 ),
-                //               ),
-                //               Text(
-                //                 '@${story.statusCreatorModel!.username!}',
-                //                 style: TextStyle(
-                //                   fontSize: getScreenHeight(13),
-                //                   color: Colors.white,
-                //                   fontWeight: FontWeight.w500,
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ],
-                // );
+              },
+              onStoryPaused: () {
+                Console.log('story page view', 'paused!!!!');
+              },
+              onStoryUnpaused: () {
+                Console.log('story page view', 'unpaused!!!!');
               },
               gestureItemBuilder: (context, pageIndex, storyIndex) {
                 final story = widget.status[storyIndex];
@@ -827,24 +752,6 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                         ),
                       ),
                     ),
-                    // TextField(
-                    //   onTap: () async {
-                    //     _indicatorController.value = IndicatorAnimationCommand(
-                    //       pause: true,
-                    //     );
-                    //     await showModalBottomSheet(
-                    //       context: context,
-                    //       builder: (context) => const SizedBox(
-                    //         height: 10,
-                    //       ),
-                    //     );
-                    //     _indicatorController.value = IndicatorAnimationCommand(
-                    //       resume: true,
-                    //     );
-                    //   },
-                    //   decoration: InputDecoration(
-                    //       hintText: 'Reply', fillColor: Colors.white),
-                    // ),
                     CustomRoundTextField(
                       hintText: 'Reach out to...',
                       hintStyle: TextStyle(
@@ -867,20 +774,6 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
                         width: 0.5,
                         color: AppColors.white,
                       ),
-                      onTap: () async {
-                        // _indicatorController.value = IndicatorAnimationCommand(
-                        //   pause: true,
-                        // );
-                        // await showModalBottomSheet(
-                        //   context: context,
-                        //   builder: (context) => const SizedBox(
-                        //     height: 10,
-                        //   ),
-                        // );
-                        // _indicatorController.value = IndicatorAnimationCommand(
-                        //   resume: true,
-                        // );
-                      },
                       suffixIcon: GestureDetector(
                         onTap: () {
                           if (controller.text.isNotEmpty) {

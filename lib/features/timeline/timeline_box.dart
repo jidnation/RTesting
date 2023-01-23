@@ -397,10 +397,7 @@ class TimeLineBox extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                               color: Colors.green,
                             ),
-                            child:
-                                // TimeLineVideoPreview(
-                                //   path: tPostInfo.videoMediaItem!,
-                                TimeLineVideoPlayer(
+                            child: TimeLineVideoPlayer(
                               post: timeLineFeedStore
                                   .getPostModel(timeLineModel: timeLineModel)
                                   .post!,
