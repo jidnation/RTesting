@@ -8,6 +8,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 import '../home/data/models/post_model.dart';
 import '../moment/moment_feed.dart';
+import 'loading_widget.dart';
 
 class TimeLineVideoPlayer extends StatefulWidget {
   final PostModel post;
@@ -46,24 +47,21 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      // aspectRatio: 7.8 / 12.3,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
-      autoInitialize: true,
       allowFullScreen: true,
-      // fullScreenByDefault: true,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      // additionalOptions: (context) {
-      //   return <OptionItem>[
-      //     OptionItem(
-      //       onTap: toggleVideo,
-      //       iconData: Icons.live_tv_sharp,
-      //       title: 'Toggle Video Src',
-      //     ),
-      //   ];
-      // },
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: toggleVideo,
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -111,7 +109,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
               color: AppColors.audioPlayerBg,
-              borderRadius: BorderRadius.circular(15)),
+              borderRadius: BorderRadius.circular(20)),
           child: _chewieController != null &&
                   _chewieController!.videoPlayerController.value.isInitialized
               ? VisibilityDetector(
@@ -129,20 +127,23 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                         controller: _chewieController!,
                       )),
                 )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 20),
-                      Text('Loading'),
-                    ]),
+              : Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        loadingEffect2(),
+                      ]),
+                ),
         );
       } else {
         return ImageBlur(
             widget.post,
             SizedBox(
-              width: size.width,
               height: size.height,
+              width: size.width,
             ), () {
           setState(() {
             show = true;
@@ -158,7 +159,15 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
             color: AppColors.audioPlayerBg,
-            borderRadius: BorderRadius.circular(15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                offset: const Offset(0.05, 0.02),
+                blurRadius: 0.4,
+                spreadRadius: 1,
+              )
+            ],
+            borderRadius: BorderRadius.circular(20)),
         child: _chewieController != null &&
                 _chewieController!.videoPlayerController.value.isInitialized
             ? VisibilityDetector(
@@ -175,13 +184,18 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                       controller: _chewieController!,
                     )),
               )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text('Loading'),
-                  ]),
+            : Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      loadingEffect2(),
+                      // const SizedBox(height: 20),
+                      // Text('Loading'),
+                    ]),
+              ),
       );
     }
   }
@@ -225,15 +239,12 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      // aspectRatio: 8.3 / 12,
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       allowFullScreen: true,
-      autoInitialize: true,
-      // fullScreenByDefault: true,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
@@ -248,7 +259,6 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
 
       // Try playing around with some of these other options:
 
-      // showControls: false,
       materialProgressColors: ChewieProgressColors(
         playedColor: Colors.red,
         handleColor: Colors.blue,
@@ -302,13 +312,17 @@ class _TimeLineVideoPlayer2State extends State<TimeLineVideoPlayer2> {
                     controller: _chewieController!,
                   )),
             )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
+          : Container(
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    loadingEffect2(),
+                    // const SizedBox(height: 20),
+                    // Text('Loading'),
+                  ]),
+            ),
     );
   }
 }
@@ -341,9 +355,9 @@ class _TimeLineVideoPreviewState extends State<TimeLineVideoPreview> {
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
             placeholder: const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.white,
-              ),
+              child: LoadingEffect(
+                  // color: AppColors.white,
+                  ),
             ),
             overlay: Container(
               width: double.infinity,
@@ -389,13 +403,16 @@ class _TimeLineVideoPreviewState extends State<TimeLineVideoPreview> {
             ? BetterPlayer(
                 controller: _betterPlayerController,
               )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text('Loading'),
-                  ]),
+            : Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      loadingEffect2(),
+                    ]),
+              ),
       ),
     );
   }

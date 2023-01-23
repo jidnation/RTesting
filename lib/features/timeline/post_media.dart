@@ -13,6 +13,7 @@ import '../../core/utils/constants.dart';
 import '../../core/utils/dimensions.dart';
 import '../home/data/models/post_model.dart';
 import '../home/presentation/widgets/gallery_view.dart';
+import 'loading_widget.dart';
 
 class TimeLineVideoMedia extends StatefulWidget {
   final String url;
@@ -702,6 +703,18 @@ class _PostImageMediaState extends State<PostImageMedia> {
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
         child: CachedNetworkImage(
+          progressIndicatorBuilder: (context, value, counter) {
+            return Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20)),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    loadingEffect2(),
+                  ]),
+            );
+          },
           imageUrl: widget.imageUrl,
           fit: BoxFit.cover,
         ),

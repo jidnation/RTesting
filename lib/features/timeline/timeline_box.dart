@@ -9,6 +9,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/timeline/image_loader.dart';
 import 'package:reach_me/features/timeline/models/post_feed.dart';
 import 'package:reach_me/features/timeline/post_media.dart';
 import 'package:reach_me/features/timeline/show_reacher_bottom_card.dart';
@@ -32,41 +35,21 @@ import '../moment/moment_audio_player.dart';
 
 class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
-  TimeLineBox({
+  final List<StatusFeedResponseModel>? userStatusFeed;
+  const TimeLineBox({
     Key? key,
     required this.timeLineModel,
+    this.userStatusFeed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    ErProfile? tOwnerInfo = timeLineModel.getPostFeed.feedOwnerProfile;
     ErProfile? tVoterInfo = timeLineModel.getPostFeed.voterProfile;
     Post? tPostInfo = timeLineModel.getPostFeed.post;
     ErProfile? tPostOwnerInfo = tPostInfo?.postOwnerProfile;
 
     //working on the images
     List<String> images = tPostInfo?.imageMediaItems ?? [];
-    bool isEven = images.length % 2 == 0;
-    String imageType = images.length == 1
-        ? 'single'
-        : images.length == 2
-            ? 'isTwo'
-            : images.length > 4
-                ? 'isMore'
-                : 'isFour';
-    Map<String, double> widthMapping = {
-      'isTwo': SizeConfig.screenWidth * 0.4,
-      'isFour': SizeConfig.screenWidth * 0.4,
-      'single': SizeConfig.screenWidth,
-      'isLast': SizeConfig.screenWidth,
-    };
-
-    Map<String, double> heightMapping = {
-      'isTwo': 150,
-      'isFour': 150,
-      'single': 300,
-      'isLast': 150,
-    };
 
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
@@ -90,20 +73,6 @@ class TimeLineBox extends StatelessWidget {
       debugPrint("Byte Data: $byteData");
       await saveImage(byteData!.buffer.asUint8List());
     }
-    // onViewProfile () {
-    //   viewProfile.value =
-    //   true;
-    //   ProgressHUD.of(
-    //       context)
-    //       ?.showWithText(
-    //       'Viewing Profile');
-    //   globals.userBloc!.add(
-    //       GetRecipientProfileEvent(
-    //           email: _posts
-    //               .value[
-    //           index]
-    //               .postOwnerId));
-    // }
 
     return RepaintBoundary(
       key: src,
@@ -166,24 +135,46 @@ class TimeLineBox extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      Container(
-                        height: 35,
-                        width: 35,
-                        padding: EdgeInsets.all(
-                            tPostOwnerInfo!.profilePicture!.isNotEmpty ? 0 : 5),
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.circular(30),
-                            image: tPostOwnerInfo.profilePicture!.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(
-                                        tPostOwnerInfo.profilePicture!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null),
-                        child: tPostOwnerInfo.profilePicture!.isEmpty
-                            ? Image.asset("assets/images/app-logo.png")
-                            : null,
+                      GestureDetector(
+                        onTap: () async {
+                          if (userStatusFeed!
+                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                            showProfilePictureOrViewStatus(context,
+                                tPostOwnerInfo: tPostOwnerInfo!,
+                                userStatus: userStatusFeed!);
+                          } else if (tPostOwnerInfo!
+                              .profilePicture!.isNotEmpty) {
+                            RouteNavigators.route(
+                              context,
+                              pictureViewer(context,
+                                  ownerProfilePicture: tPostOwnerInfo),
+                            );
+                          } else {
+                            Snackbars.error(context,
+                                message: 'No Profile Photo');
+                          }
+                        },
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          padding: EdgeInsets.all(
+                              tPostOwnerInfo!.profilePicture!.isNotEmpty
+                                  ? 0
+                                  : 5),
+                          decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(30),
+                              image: tPostOwnerInfo.profilePicture!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: NetworkImage(
+                                          tPostOwnerInfo.profilePicture!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null),
+                          child: tPostOwnerInfo.profilePicture!.isEmpty
+                              ? Image.asset("assets/images/app-logo.png")
+                              : null,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -322,16 +313,15 @@ class TimeLineBox extends StatelessWidget {
                                   height: 30,
                                   width: 40,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/svgs/kebab card.svg',
-                                        color: const Color(0xff717F85),
-                                      ),
-                                    ],
-                                  ),
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/svgs/kebab card.svg',
+                                          color: const Color(0xff717F85),
+                                        ),
+                                      ]),
                                 ),
                               )
                             ]),
@@ -342,7 +332,9 @@ class TimeLineBox extends StatelessWidget {
                       visible: tPostInfo.content!.isNotEmpty,
                       child: ExpandableText(
                         "${tPostInfo.content}",
-                        prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                        prefixText: tPostInfo.edited!
+                            ? "(Reach Edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())})"
+                            : null,
                         prefixStyle: TextStyle(
                             fontSize: getScreenHeight(12),
                             fontFamily: 'Poppins',
@@ -394,38 +386,7 @@ class TimeLineBox extends StatelessWidget {
                         child: TimeLinePostMedia(
                             post: timeLineFeedStore
                                 .getPostModel(timeLineModel: timeLineModel)
-                                .post!)
-
-                        // Center(
-                        //   child: Wrap(
-                        //       spacing: 5,
-                        //       runSpacing: 5,
-                        //       alignment: WrapAlignment.center,
-                        //       runAlignment: WrapAlignment.center,
-                        //       children: List.generate(
-                        //           images.length,
-                        //           (index) => Container(
-                        //                 height: heightMapping[imageType],
-                        //                 clipBehavior: Clip.hardEdge,
-                        //                 width: isEven
-                        //                     ? widthMapping[imageType]
-                        //                     : images.length == index
-                        //                         ? widthMapping['last']
-                        //                         : widthMapping[imageType],
-                        //                 decoration: BoxDecoration(
-                        //                   borderRadius: BorderRadius.circular(15),
-                        //                 ),
-                        //                 child: CachedNetworkImage(
-                        //                   imageUrl: images[index],
-                        //                   fit: BoxFit.cover,
-                        //                 ),
-                        //               )).toList()
-                        //       //     [
-                        //       //   TimeLineImageViewer(imageUrl: 'assets/images/frame.png',)
-                        //       // ]
-                        //       ),
-                        // ),
-                        ),
+                                .post!)),
                     SizedBox(
                         height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
                     timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
@@ -433,8 +394,8 @@ class TimeLineBox extends StatelessWidget {
                             height: 550,
                             width: SizeConfig.screenWidth,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: const Color(0xff001824),
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green,
                             ),
                             child: TimeLineVideoPlayer(
                               post: timeLineFeedStore

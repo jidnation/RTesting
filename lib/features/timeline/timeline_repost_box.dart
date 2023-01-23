@@ -140,6 +140,15 @@ class TimelineRepostedPost extends StatelessWidget {
                     size: 11.44,
                     weight: FontWeight.w600,
                   ),
+                  SizedBox(
+                      width: tPostInfo.location!.isNotEmpty &&
+                                  tPostInfo.location!.toLowerCase().trim() !=
+                                      'nil' ||
+                              tPostInfo.location!.toLowerCase().trim() !=
+                                  'NIL' ||
+                              tPostInfo.location!.toLowerCase().trim() != 'Nil'
+                          ? 5
+                          : 0),
                 ]),
               ]),
             ]),
@@ -197,7 +206,7 @@ class TimelineRepostedPost extends StatelessWidget {
                     width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xff001824),
+                      color: Colors.transparent,
                     ),
                     child: TimeLineVideoPlayer(
                       post: tPostInfo,
