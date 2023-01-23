@@ -6,6 +6,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/chat/data/datasources/chat_remote_datasource.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
+import 'package:reach_me/features/home/data/models/stream_model.dart';
 
 // abstract class IChatRepository {
 //   Future<Either<String, User>> createAccount({
@@ -33,15 +34,18 @@ class ChatRepository {
     required String? threadId,
     required String? value,
     required String? type,
+    String? quotedData,
+    required String messageMode,
   }) async {
     try {
       final chat = await _chatRemoteDataSource.sendTextMessage(
-        senderId: senderId,
-        receiverId: receiverId,
-        threadId: threadId,
-        value: value,
-        type: type,
-      );
+          senderId: senderId,
+          receiverId: receiverId,
+          threadId: threadId,
+          value: value,
+          type: type,
+          messageMode: messageMode,
+          quotedData: quotedData);
       return Right(chat);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -49,12 +53,14 @@ class ChatRepository {
   }
 
   Future<Either<String, List<Chat>>> getThreadMessages({
-    required String? id,
+    String? threadId,
+    String? receiverId,
     String? fromMessageId,
   }) async {
     try {
       final chat = await _chatRemoteDataSource.getThreadMessages(
-        id: id,
+        threadId: threadId,
+        receiverId: receiverId,
         fromMessageId: fromMessageId,
       );
       return Right(chat);
@@ -64,9 +70,10 @@ class ChatRepository {
   }
 
   Future<Either<String, List<ChatsThread>>> getUserThreads(
-      {required String? id}) async {
+      {int? pageLimit, int? pageNumber}) async {
     try {
-      final userThreads = await _chatRemoteDataSource.getUserThreads(id: id);
+      final userThreads = await _chatRemoteDataSource.getUserThreads(
+          pageNumber: pageNumber, pageLimit: pageLimit);
       return Right(userThreads);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -94,6 +101,34 @@ class ChatRepository {
       final String imgUrl = user['data'];
       return Right(imgUrl);
     } on DioError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, StreamResponse>> initiateLiveStream({
+    required String startedAt,
+  }) async {
+    print("initiate repo");
+    try {
+      final initiate = await _chatRemoteDataSource.initiateLiveStreaming(
+          startedAt: startedAt);
+      print("initiate repo2");
+      return Right(initiate);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> joinStream({
+    required String? channelName,
+  }) async {
+    try {
+      print("initiate repo2");
+      final join =
+          await _chatRemoteDataSource.joinLiveStream(channelName: channelName);
+
+      return Right(join);
+    } on GraphQLError catch (e) {
       return Left(e.message);
     }
   }

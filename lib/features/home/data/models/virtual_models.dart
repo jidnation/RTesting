@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
@@ -32,7 +33,7 @@ class VirtualReach {
         "reaching": reaching == null ? null : reaching!.toJson(),
         "reachingId": reachingId,
         "reacherId": reacherId,
-        "isReaching":isReaching,
+        "isReaching": isReaching,
       };
 }
 
@@ -124,12 +125,14 @@ class VirtualPostLikeModel {
   String? authId;
   String? likeId;
   User? profile;
+  DateTime? createdAt;
 
   VirtualPostLikeModel({
     this.postId,
     this.authId,
     this.likeId,
     this.profile,
+    this.createdAt
   });
 
   factory VirtualPostLikeModel.fromJson(Map<String, dynamic> json) =>
@@ -137,6 +140,7 @@ class VirtualPostLikeModel {
         postId: json["postId"],
         authId: json["authId"],
         likeId: json["likeId"],
+        createdAt: json["created_at"] != null? DateTime.parse(json["created_at"]):null,
         profile:
             json["profile"] != null ? User.fromJson(json["profile"]) : null,
       );
@@ -145,6 +149,41 @@ class VirtualPostLikeModel {
         "postId": postId,
         "authId": authId,
         "likeId": likeId,
+        "created_at": createdAt == null? null: createdAt!.toIso8601String(),
+        "profile": profile == null ? null : profile!.toJson(),
+      };
+}
+
+class VirtualPostVoteModel {
+  String? postId;
+  String? authId;
+  String? voteType;
+  User? profile;
+  DateTime? createdAt;
+
+  VirtualPostVoteModel({
+    this.postId,
+    this.authId,
+    this.voteType,
+    this.profile,
+    this.createdAt,
+  });
+
+  factory VirtualPostVoteModel.fromJson(Map<String, dynamic> json) =>
+      VirtualPostVoteModel(
+        postId: json["postId"],
+        authId: json["authId"],
+        voteType: json["voteType"],
+        createdAt: json["created_at"] != null? DateTime.parse(json["created_at"]):null,
+        profile:
+            json["profile"] != null ? User.fromJson(json["profile"]) : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "postId": postId,
+        "authId": authId,
+        "voteType": voteType,
+        "created_at": createdAt == null? null: createdAt!.toIso8601String(),
         "profile": profile == null ? null : profile!.toJson(),
       };
 }

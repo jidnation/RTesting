@@ -1,23 +1,27 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/status/create.status.dart';
 import 'package:reach_me/features/home/presentation/views/status/text.status.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:reach_me/core/components/snackbar.dart';
+import 'package:reach_me/features/timeline/timeline_control_room.dart';
 
 class AudioStatus extends StatefulHookWidget {
   const AudioStatus({Key? key}) : super(key: key);
@@ -48,13 +52,15 @@ class _AudioStatusState extends State<AudioStatus> {
     recorder.closeRecorder();
   }
 
-  final recorder = FlutterSoundRecorder();
+  final FlutterSoundRecorder recorder = FlutterSoundRecorder();
+  FlutterSoundPlayer? flutterSoundPlayer = FlutterSoundPlayer();
 
   Future initRecorder() async {
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       throw 'Permission not granted';
     }
+
     await recorder.openRecorder();
     await recorder.setSubscriptionDuration(const Duration(milliseconds: 500));
   }
@@ -312,10 +318,20 @@ class _AudioStatusState extends State<AudioStatus> {
                               twoDigits(duration.inMinutes.remainder(60));
                           final twoDigitSeconds =
                               twoDigits(duration.inSeconds.remainder(60));
-                          return Text(
-                            '$twoDigitMinutes: $twoDigitSeconds',
-                            style: const TextStyle(
-                                fontSize: 30, color: Colors.black),
+                          return Center(
+                            child: CircleAvatar(
+                              backgroundColor: AppColors.black,
+                              radius: 48,
+                              child: CircleAvatar(
+                                backgroundColor: AppColors.white,
+                                radius: 46,
+                                child: Text(
+                                  '$twoDigitMinutes: $twoDigitSeconds',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Colors.black),
+                                ),
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -359,6 +375,7 @@ class _AudioStatusState extends State<AudioStatus> {
                                       recordAudio = true;
                                       //!recordAudio;
                                     });
+                                    debugPrint("Started");
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -392,19 +409,18 @@ class _AudioStatusState extends State<AudioStatus> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                                 Flexible(
-                                  child: IconButton(
-                                    onPressed: () async {},
-                                    icon: Transform.scale(
-                                      scale: 1.8,
-                                      child: SvgPicture.asset(
-                                        'assets/svgs/delete.svg',
-                                        width: 25,
-                                        height: getScreenHeight(71),
-                                        color: Colors.white70,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      RouteNavigators.pop(context);
+                                    },
+                                    child: const CircleAvatar(
+                                      backgroundColor: AppColors.black,
+                                      radius: 23,
+                                      child: Icon(
+                                        Icons.delete,
+                                        color: AppColors.white,
                                       ),
                                     ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
                                   ),
                                 ),
                                 SizedBox(width: getScreenWidth(70)),
@@ -431,35 +447,33 @@ class _AudioStatusState extends State<AudioStatus> {
                                 ),
                                 SizedBox(width: getScreenWidth(70)),
                                 Flexible(
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      var filePath = await stopRecord();
+                                    child: GestureDetector(
+                                  onTap: () async {
+                                    debugPrint("Icon check");
+                                    var filePath = await stopRecord();
 
-                                      if (filePath == null) {
-                                        print('No saved file');
-                                      } else {
-                                        print('The FilePath is $filePath');
-                                      }
-                                      audioRecordComplete = File(filePath!);
-                                      print(audioRecordComplete!.path);
+                                    if (filePath == null) {
+                                      print('No saved file');
+                                    } else {
+                                      print('The FilePath is $filePath');
+                                    }
+                                    audioRecordComplete = File(filePath!);
+                                    print(audioRecordComplete!.path);
 
-                                      RouteNavigators.routeReplace(
-                                          context,
-                                          BuildAudioPreview(
-                                              audio: audioRecordComplete!));
-                                    },
-                                    icon: Transform.scale(
-                                      scale: 1.8,
-                                      child: SvgPicture.asset(
-                                        'assets/svgs/arrow-facing-down.svg',
-                                        height: getScreenHeight(71),
-                                        color: Colors.white70,
-                                      ),
+                                    RouteNavigators.routeReplace(
+                                        context,
+                                        BuildAudioPreview(
+                                            audio: audioRecordComplete!));
+                                  },
+                                  child: const CircleAvatar(
+                                    backgroundColor: AppColors.black,
+                                    radius: 23,
+                                    child: Icon(
+                                      Icons.check,
+                                      color: AppColors.white,
                                     ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
                                   ),
-                                ),
+                                )),
                               ]),
                     SizedBox(height: getScreenHeight(44)),
                   ],
@@ -473,10 +487,22 @@ class _AudioStatusState extends State<AudioStatus> {
   }
 }
 
-class BuildAudioPreview extends StatelessWidget {
+class BuildAudioPreview extends StatefulWidget {
   const BuildAudioPreview({Key? key, required this.audio}) : super(key: key);
-
   final File audio;
+
+  @override
+  State<BuildAudioPreview> createState() => _BuildAudioPreviewState();
+}
+
+class _BuildAudioPreviewState extends State<BuildAudioPreview> {
+  final AudioPlayer audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    audioPlayer.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -497,10 +523,31 @@ class BuildAudioPreview extends StatelessWidget {
               createStatusDto: CreateStatusDto(
                   caption: 'NIL', type: 'audio', audioMedia: state.image),
             ));
-            RouteNavigators.pop(context);
+          }
+          if (state is CreateStatusSuccess) {
+            Snackbars.success(
+              context,
+              message: 'Status created successfully!',
+              milliseconds: 1000,
+            );
+            final status = state.status;
+            status?.profileModel = globals.user!.toStatusProfileModel();
+            TimeLineFeedStore().addNewStatus(status!);
+            RouteNavigators.pop(context, status);
           }
         },
         builder: ((context, state) {
+          debugPrint("Audio path ${widget.audio.path}");
+
+          audioPlayer.play(
+            UrlSource(widget.audio.path),
+          );
+          audioPlayer.play(DeviceFileSource(
+            widget.audio.path,
+          ));
+          audioPlayer.play(AssetSource(widget.audio.path));
+          Uint8List bytes = widget.audio.readAsBytesSync();
+          audioPlayer.play(BytesSource(bytes));
           return Container(
             decoration: const BoxDecoration(
               color: Colors.black12,
@@ -533,8 +580,8 @@ class BuildAudioPreview extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            globals.socialServiceBloc!
-                                .add(MediaUploadEvent(media: File(audio.path)));
+                            globals.socialServiceBloc!.add(MediaUploadEvent(
+                                media: File(widget.audio.path)));
                           },
                           icon: Transform.scale(
                             scale: 1.8,
@@ -557,18 +604,19 @@ class BuildAudioPreview extends StatelessWidget {
                               ' ' +
                               '${globals.user!.lastName}',
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 25.0,
-                          ),
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600),
                         ),
 
                         Text(
-                            '${globals.user!.location}'), //To get the name of the global users
+                          '${globals.user!.location}',
+                          style: const TextStyle(fontSize: 16),
+                        ), //To get the name of the global users
                         const SizedBox(height: 10),
-                        Container(
-                          decoration:
-                              BoxDecoration(), //For the image of the User
-                        ),
+                        Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 100)
                       ],
                     ),
                   ),
@@ -580,7 +628,6 @@ class BuildAudioPreview extends StatelessWidget {
                           //CircleAvatar or
                           Column(
                             children: [
-                              
                               Container(
                                 padding: const EdgeInsets.only(left: 20),
                                 child: const Text(

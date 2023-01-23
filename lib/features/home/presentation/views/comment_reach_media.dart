@@ -28,9 +28,16 @@ class CommentReachMedia extends HookWidget {
   @override
   Widget build(BuildContext context) {
     bool isVideo = FileUtils.isVideo(fileResult.file);
+    bool isAudio = FileUtils.isAudio(fileResult.file);
+
     String? duration = fileResult.duration == null
         ? null
         : StringUtil.formatDuration(Duration(seconds: fileResult.duration!));
+
+    if (isAudio) {
+      return CommentReachAudioMedia(
+          path: fileResult.file.path, onCancel: onClose!);
+    }
 
     return Stack(
       alignment: Alignment.topRight,
@@ -56,36 +63,30 @@ class CommentReachMedia extends HookWidget {
                 ),
               ))
             : Container(),
-
-            (isVideo)
+        (isVideo)
             ? Positioned(
-              right: getScreenWidth(4),
-              bottom: getScreenWidth(5),
-              child: Padding (
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  child: Center(
-                    child: (
-                      Text(
+                right: getScreenWidth(4),
+                bottom: getScreenWidth(5),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Center(
+                      child: (Text(
                         duration ?? '',
                         style: const TextStyle(
                           color: AppColors.grey,
                         ),
-                      )
+                      )),
                     ),
-                    
-                  ),
-                  decoration:  const BoxDecoration(
+                    decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                         color: AppColors.white),
-                ),
-              
-              )
-              ):
-              Container(),
-
-               (isVideo)
+                  ),
+                ))
+            : Container(),
+        (isVideo)
             ? Positioned.fill(
                 child: Container(
                   decoration: const BoxDecoration(),
@@ -102,6 +103,7 @@ class CommentReachMedia extends HookWidget {
               context,
               (isVideo)
                   ? VideoPreview(
+                      key: Key(fileResult.path),
                       path: fileResult.file.path,
                       isLocalVideo: true,
                       aspectRatio: fileResult.width! / fileResult.height!,
@@ -141,7 +143,6 @@ class CommentReachMedia extends HookWidget {
     ).paddingOnly(r: 10);
   }
 }
-
 
 class CommentReachAudioMedia extends StatefulWidget {
   final String path;
@@ -261,7 +262,7 @@ class _CommentReachAudioMediaState extends State<CommentReachAudioMedia> {
           ),
           GestureDetector(
             onTap: widget.onCancel,
-            child:  Container(
+            child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 padding: const EdgeInsets.all(4),
                 alignment: Alignment.center,

@@ -33,8 +33,12 @@ import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
-  const MsgChatInterface({Key? key, this.recipientUser}) : super(key: key);
+  const MsgChatInterface(
+      {Key? key, this.recipientUser, this.thread, this.quotedData})
+      : super(key: key);
   final User? recipientUser;
+  final ChatsThread? thread;
+  final String? quotedData;
 
   @override
   State<MsgChatInterface> createState() => _MsgChatInterfaceState();
@@ -76,9 +80,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       );
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
     });
+    if (widget.quotedData != null) {
+      focusNode.requestFocus();
+    }
   }
 
   @override
@@ -128,9 +137,12 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     final isSending = useState<bool>(false);
     final showIsSending = useState<bool>(false);
     final controller = useTextEditingController();
+    final _quotedData = useState(widget.quotedData);
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
-          id: '${globals.user!.id}--${widget.recipientUser!.id}'));
+          threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
+      // globals.chatBloc!.add(GetThreadMessagesEvent(
+      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
@@ -258,6 +270,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
             if (state is GetThreadMessagesSuccess) {
               isSending.value = false;
               showIsSending.value = false;
+              _controller.jumpTo(_controller.position.maxScrollExtent);
+            }
+
+            if (state is ChatSendSuccess) {
+              isSending.value = false;
+              showIsSending.value = false;
+              _quotedData.value = null;
+              // _controller.jumpTo(_controller.position.maxScrollExtent);
             }
 
             if (state is ChatUploadSuccess) {
@@ -270,12 +290,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               });
 
               globals.chatBloc!.add(SendChatMessageEvent(
-                senderId: globals.user!.id,
-                receiverId: widget.recipientUser!.id,
-                threadId: '${globals.user!.id}--${widget.recipientUser!.id}',
-                value: state.imgUrl,
-                type: 'image',
-              ));
+                  senderId: globals.user!.id,
+                  receiverId: widget.recipientUser!.id,
+                  threadId: widget.thread?.id,
+                  value: state.imgUrl,
+                  type: 'image',
+                  quotedData: _quotedData.value,
+                  messageMode: _quotedData.value == null
+                      ? MessageMode.direct.name
+                      : MessageMode.quoted.name));
 
               isSending.value = true;
               showIsSending.value = true;
@@ -422,8 +445,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                     const SizedBox.shrink()
                                   else
                                     ListView.separated(
-                                        physics: NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         shrinkWrap: true,
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
                                         itemBuilder: (c, i) => MsgBubble(
                                               msgDate: '',
                                               isMe: globals.user!.id ==
@@ -431,12 +457,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                               label:
                                                   globals.userChat![i].value!,
                                               size: size,
+                                              quotedData: globals
+                                                  .userChat![i].quotedData,
                                               timeStamp: Helper.parseChatTime(
                                                   globals.userChat![i].sentAt ??
                                                       ''),
+                                              chat: globals.userChat![i],
                                             ),
                                         separatorBuilder: (c, i) => SizedBox(
-                                              height: 0,
+                                              height: 10,
                                             ),
                                         itemCount: globals.userChat!.length)
                                   // Column(
@@ -486,124 +515,200 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  Visibility(
+                                    visible: _quotedData.value != null,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.primaryColor
+                                              .withOpacity(0.0),
+
+                                          border: const Border(
+
+                                              top: BorderSide(
+                                                  color: AppColors.greyShade5,
+                                                  width: 1))),
+                                      width: double.infinity,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                8, 8, 8, 0),
+                                            child: Row(
+                                              children: [
+                                                const Expanded(
+                                                
+                                                  child: Text(
+                                                    'Replying to a post...',
+                                                    style: TextStyle(
+                                                        color: AppColors.black),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                    onTap: () => _quotedData
+                                                        .value = null,
+                                                    child:
+                                                        const Icon(Icons.close))
+                                        
+                                              ],
+                                            ),
+                                          ),
+                                          // SizedBox(
+                                          //   height: 8,
+                                          // ),
+                                          const Divider(
+                                            color: AppColors.greyShade5,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              Chat(
+                                                          quotedData:
+                                                              _quotedData.value)
+                                                      .quotedContent ??
+                                                  '',
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  color: AppColors.greyShade1),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                   Row(children: [
                                     Flexible(
-                                        child: !isRecording
-                                            ? CustomRoundTextField(
-                                                focusNode: focusNode,
-                                                controller: controller,
-                                                fillColor: AppColors.white,
-                                                textCapitalization:
-                                                    TextCapitalization
-                                                        .sentences,
-                                                hintText: 'Type Message...',
-                                                hintStyle: const TextStyle(
-                                                    color: Color(0xFF666666),
-                                                    fontSize: 12),
-                                                onChanged: (val) {
-                                                  if (val.isNotEmpty) {
-                                                    setState(() {
-                                                      isTyping.value = true;
-                                                    });
-                                                  } else {
-                                                    setState(() {
-                                                      isTyping.value = false;
-                                                    });
-                                                  }
+                                      child: !isRecording
+                                          ? CustomRoundTextField(
+                                              focusNode: focusNode,
+                                              controller: controller,
+                                              fillColor: AppColors.white,
+                                              textCapitalization:
+                                                  TextCapitalization.sentences,
+                                              hintText: 'Type Message...',
+                                              hintStyle: const TextStyle(
+                                                  color: Color(0xFF666666),
+                                                  fontSize: 12),
+                                              onChanged: (val) {
+                                                if (val.isNotEmpty) {
+                                                  setState(() {
+                                                    isTyping.value = true;
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    isTyping.value = false;
+                                                  });
+                                                }
+                                              },
+                                              prefixIcon: GestureDetector(
+                                                onTap: () async {
+                                                  focusNode.unfocus();
+                                                  focusNode.canRequestFocus =
+                                                      false;
+                                                  setState(() {
+                                                    emojiShowing =
+                                                        !emojiShowing;
+                                                  });
                                                 },
-                                                prefixIcon: GestureDetector(
-                                                  onTap: () async {
-                                                    focusNode.unfocus();
-                                                    focusNode.canRequestFocus =
-                                                        false;
-                                                    setState(() {
-                                                      emojiShowing =
-                                                          !emojiShowing;
-                                                    });
-                                                  },
-                                                  child: SvgPicture.asset(
-                                                    'assets/svgs/emoji.svg',
-                                                  ).paddingAll(10),
-                                                ),
-                                                suffixIcon: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {},
-                                                      child: SvgPicture.asset(
-                                                        'assets/svgs/attach.svg',
-                                                        // width: 24,
-                                                        // height: 18,
-                                                      ),
+                                                child: SvgPicture.asset(
+                                                  'assets/svgs/emoji.svg',
+                                                ).paddingAll(10),
+                                              ),
+                                              suffixIcon: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {},
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/attach.svg',
+                                                      // width: 24,
+                                                      // height: 18,
                                                     ),
-                                                    const SizedBox(width: 15),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        showModalBottomSheet(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return ListView(
-                                                              shrinkWrap: true,
-                                                              children: [
-                                                                Column(
-                                                                    children: [
-                                                                      ListTile(
-                                                                        leading:
-                                                                            SvgPicture.asset(
-                                                                          'assets/svgs/Camera.svg',
-                                                                          color:
-                                                                              AppColors.black,
-                                                                        ),
-                                                                        title: const Text(
-                                                                            'Camera'),
-                                                                        onTap:
-                                                                            () async {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          final image =
-                                                                              await getImage(ImageSource.camera);
-                                                                          if (image !=
-                                                                              null) {
-                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      ListTile(
-                                                                        leading:
-                                                                            SvgPicture.asset('assets/svgs/gallery.svg'),
-                                                                        title: const Text(
-                                                                            'Gallery'),
-                                                                        onTap:
-                                                                            () async {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          final image =
-                                                                              await getImage(ImageSource.gallery);
-                                                                          if (image !=
-                                                                              null) {
-                                                                            globals.chatBloc!.add(UploadImageFileEvent(file: image));
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                    ]).paddingSymmetric(
-                                                                    v: 5),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                      child: SvgPicture.asset(
-                                                        'assets/svgs/gallery.svg',
-                                                      ),
+                                                  ),
+                                                  const SizedBox(width: 15),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return ListView(
+                                                            shrinkWrap: true,
+                                                            children: [
+                                                              Column(children: [
+                                                                ListTile(
+                                                                  leading:
+                                                                      SvgPicture
+                                                                          .asset(
+                                                                    'assets/svgs/Camera.svg',
+                                                                    color: AppColors
+                                                                        .black,
+                                                                  ),
+                                                                  title: const Text(
+                                                                      'Camera'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    final image =
+                                                                        await getImage(
+                                                                            ImageSource.camera);
+                                                                    if (image !=
+                                                                        null) {
+                                                                      globals
+                                                                          .chatBloc!
+                                                                          .add(UploadImageFileEvent(
+                                                                              file: image));
+                                                                    }
+                                                                  },
+                                                                ),
+                                                                ListTile(
+                                                                  leading: SvgPicture
+                                                                      .asset(
+                                                                          'assets/svgs/gallery.svg'),
+                                                                  title: const Text(
+                                                                      'Gallery'),
+                                                                  onTap:
+                                                                      () async {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    final image =
+                                                                        await getImage(
+                                                                            ImageSource.gallery);
+                                                                    if (image !=
+                                                                        null) {
+                                                                      globals
+                                                                          .chatBloc!
+                                                                          .add(UploadImageFileEvent(
+                                                                              file: image));
+                                                                    }
+                                                                  },
+                                                                ),
+                                                              ]).paddingSymmetric(
+                                                                  v: 5),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/gallery.svg',
                                                     ),
-                                                    const SizedBox(width: 15),
-                                                  ],
-                                                ),
-                                              )
-                                            : Row(
+                                                  ),
+                                                  const SizedBox(width: 15),
+                                                ],
+                                              ),
+                                            )
+                                          : Container(
+                                              height: 45,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  color: Colors.white),
+                                              child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
                                                         .spaceAround,
@@ -611,7 +716,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       _soundRecorder!
-                                                          .closeRecorder();
+                                                          .stopRecorder();
+                                                      // _soundRecorder
+                                                      //     ?.closeRecorder();
                                                       setState(() {
                                                         isRecording = false;
                                                       });
@@ -661,8 +768,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     ),
                                                   ),
                                                 ],
-                                              )),
-                                    const SizedBox(width: 7),
+                                              ),
+                                            ),
+                                    ),
+                                    const SizedBox(width: 6),
                                     isTyping.value
                                         ? GestureDetector(
                                             onTap: () {
@@ -673,6 +782,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 Chat temp = Chat(
                                                     senderId: globals.user!.id,
                                                     type: 'text',
+                                                    
+                                                    quotedData: widget.quotedData,
                                                     value:
                                                         controller.text.trim());
                                                 globals.userChat!.add(temp);
@@ -693,14 +804,23 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                 globals.chatBloc!.add(
                                                   SendChatMessageEvent(
-                                                    senderId: globals.user!.id,
-                                                    receiverId: widget
-                                                        .recipientUser!.id,
-                                                    threadId:
-                                                        '${globals.user!.id}--${widget.recipientUser!.id}',
-                                                    value: value,
-                                                    type: 'text',
-                                                  ),
+                                                      senderId:
+                                                          globals.user!.id,
+                                                      receiverId: widget
+                                                          .recipientUser!.id,
+                                                      threadId:
+                                                          widget.thread?.id,
+                                                      value: value,
+                                                      type: 'text',
+                                                      quotedData:
+                                                          _quotedData.value,
+                                                      messageMode:
+                                                          _quotedData.value ==
+                                                                  null
+                                                              ? MessageMode
+                                                                  .direct.name
+                                                              : MessageMode
+                                                                  .quoted.name),
                                                 );
                                                 isSending.value = true;
                                                 showIsSending.value = true;

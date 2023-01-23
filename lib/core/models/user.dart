@@ -1,3 +1,17 @@
+import '../../features/home/data/models/status.model.dart';
+
+class UserList {
+  final List<User> user;
+
+  UserList({required this.user});
+
+  factory UserList.fromJson(List<dynamic> parsedJson) {
+    List<User> user = <User>[];
+    user = parsedJson.map((i) => User.fromJson(i)).toList();
+    return UserList(user: user);
+  }
+}
+
 class User {
   String? firstName;
   String? lastName;
@@ -105,36 +119,63 @@ class User {
         "verified": verified,
         "reaching": reaching!.toJson(),
       };
+
+  StatusProfileModel toStatusProfileModel() => StatusProfileModel(
+      firstName: firstName,
+      lastName: lastName,
+      authId: id,
+      profilePicture: profilePicture,
+      username: username,
+      verified: verified,
+      location: location,
+      bio: bio);
 }
 
 class ChatUser {
-  ChatUser({
-    this.firstName,
-    this.id,
-    this.lastName,
-    this.profilePicture,
-    this.username,
-  });
-  String? id;
+  String? authId;
   String? firstName;
   String? lastName;
+  String? location;
   String? profilePicture;
+  String? profileSlug;
+  bool? verified;
   String? username;
+  String? bio;
+
+  ChatUser({
+    this.authId,
+    this.firstName,
+    this.lastName,
+    this.location,
+    this.profilePicture,
+    this.profileSlug,
+    this.username,
+    this.verified,
+    this.bio,
+  });
 
   factory ChatUser.fromJson(Map<String, dynamic> json) => ChatUser(
-        id: json["id"],
+        authId: json["authId"],
+        location: json["location"],
         firstName: json["firstName"],
         lastName: json["lastName"],
         profilePicture: json["profilePicture"],
+        profileSlug: json["profileSlug"],
+        verified: json["verified"],
         username: json["username"],
+        bio: json["bio"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
+        "authId": authId,
+        "location": location,
         "firstName": firstName,
         "lastName": lastName,
         "profilePicture": profilePicture,
+        "profileSlug": profileSlug,
+        "verified": verified,
         "username": username,
+        "bio": bio,
       };
 }
 

@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
@@ -11,13 +13,11 @@ import 'package:reach_me/core/components/profile_picture.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
-import 'package:reach_me/core/utils/dimensions.dart';
-import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/core/utils/validator.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:reach_me/features/account/presentation/views/personal_info_settings.dart';
 import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
@@ -33,22 +33,26 @@ class EditProfileScreen extends StatefulHookWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
-    try {
-      final imageFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 50,
-        maxHeight: 900,
-        maxWidth: 600,
-      );
+    final imageFile = await _picker.pickImage(
+      source: source,
+      imageQuality: 50,
+      maxHeight: 900,
+      maxWidth: 600,
+    );
 
-      if (imageFile != null) {
-        File? img = File(imageFile.path);
-        img = await _cropImage(imageFile: img);
-        File? image = img;
+    File? result;
+
+    if (imageFile != null) {
+      print("::::::::::::: ");
+      result = File(imageFile.path);
+      try {
+        result = await _cropImage(imageFile: result);
+        File? image = result;
         return image;
+        // }
+      } catch (e) {
+        // print(e);
       }
-    } catch (e) {
-      // print(e);
     }
     return null;
   }
@@ -74,6 +78,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<File?> _cropImage({required File imageFile}) async {
+    // File croppedImage = await ImageCrop.sampleImage(
+    //   file: imageFile,
+    //   preferredSize: context.size?.longestSide.ceil(),
+    // );
     CroppedFile? croppedImage = await ImageCropper().cropImage(
       sourcePath: imageFile.path,
       cropStyle: CropStyle.circle,
@@ -88,9 +96,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         IOSUiSettings(
           title: 'Edit Picture',
         ),
-        WebUiSettings(
-          context: context,
-        ),
+        // WebUiSettings(
+        //   context: context,
+        // ),
       ],
     );
 
@@ -357,22 +365,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.textColor2,
                       ),
                     ),
-                    CupertinoSwitchListTile(
-                        value: showContactInfo.value,
-                        dense: true,
-                        onChanged: (val) {
-                          showContactInfo.value = !showContactInfo.value;
-                        },
-                        title: Text(
-                          'Contact Info',
-                          style: TextStyle(
-                            color: AppColors.textColor2,
-                            fontWeight: FontWeight.w400,
-                            fontSize: getScreenHeight(15),
-                          ),
-                        ),
-                        selected: showContactInfo.value,
-                        trackColor: const Color(0xFFE9E8E8)),
+                    // CupertinoSwitchListTile(
+                    //     value: showContactInfo.value,
+                    //     dense: true,
+                    //     onChanged: (val) {
+                    //       showContactInfo.value = !showContactInfo.value;
+                    //     },
+                    //     title: Text(
+                    //       'Contact Info',
+                    //       style: TextStyle(
+                    //         color: AppColors.textColor2,
+                    //         fontWeight: FontWeight.w400,
+                    //         fontSize: getScreenHeight(15),
+                    //       ),
+                    //     ),
+                    //     selected: showContactInfo.value,
+                    //     trackColor: const Color(0xFFE9E8E8)),
                     CupertinoSwitchListTile(
                         value: showLocation.value,
                         dense: true,

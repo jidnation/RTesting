@@ -39,7 +39,7 @@ class StatusModel {
   Map<String, dynamic> toJson() => {
         "type": type,
         "data": statusData!.toJson(),
-        "profile": profileModel!.toJson(),
+        "profile": profileModel == null ? null : profileModel!.toJson(),
         "authId": authId,
         "created_at": createdAt!.toIso8601String(),
         "statusId": statusId,
@@ -219,7 +219,6 @@ class StatusFeedResponseModel {
     this.status,
   });
 
-
   factory StatusFeedResponseModel.fromJson(Map<String, dynamic> json) =>
       StatusFeedResponseModel(
         id: json["_id"],
@@ -230,11 +229,11 @@ class StatusFeedResponseModel {
             : null,
       );
 
-
   Map<String, dynamic> tojson() => {
-    "_id":id,
-    "status": status != null ? status!.map((e) => e.toJson()).toList() : null,
-  };
+        "_id": id,
+        "status":
+            status != null ? status!.map((e) => e.toJson()).toList() : null,
+      };
 }
 
 // class StatusFeedResponseModel {

@@ -198,7 +198,7 @@ class LikeCommentOnPostError extends SocialServiceState {
 class UnlikeCommentOnPostLoading extends SocialServiceState {}
 
 class UnlikeCommentOnPostSuccess extends SocialServiceState {
-  final bool? unlikeComment;
+  final String? unlikeComment;
   UnlikeCommentOnPostSuccess({this.unlikeComment});
 }
 
@@ -350,6 +350,20 @@ class GetLikesOnPostError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class GetVotesOnPostLoading extends SocialServiceState {}
+
+class GetVotesOnPostSuccess extends SocialServiceState {
+  final List<VirtualPostVoteModel>? data;
+  GetVotesOnPostSuccess({this.data});
+}
+
+class GetVotesOnPostError extends SocialServiceState {
+  final String error;
+  GetVotesOnPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class GetPostLoading extends SocialServiceState {}
 
 class GetPostSuccess extends SocialServiceState {
@@ -367,7 +381,7 @@ class GetPostError extends SocialServiceState {
 class GetSingleCommentOnPostLoading extends SocialServiceState {}
 
 class GetSingleCommentOnPostSuccess extends SocialServiceState {
-  final VirtualCommentModel? data;
+  final CommentModel? data;
   GetSingleCommentOnPostSuccess({this.data});
 }
 

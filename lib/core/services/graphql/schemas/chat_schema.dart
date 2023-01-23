@@ -23,13 +23,13 @@ class ChatSchema {
   static String get schema {
     return r'''
       id 
+      threadId
       senderId 
-      receiverId
-      contentType 
-      content 
-      threadId 
-      sentAt
       messageMode
+      contentType 
+      content
+      sentAt
+      quotedData
       created_at 
       updated_at 
           ''';
@@ -42,30 +42,37 @@ class ChatThreadSchema {
   static String get schema {
     return r'''
       id 
-      participants 
-      participantsInfo {
-        firstName
-        lastName
-        profilePicture
-        id
-        username
-      }
+      participants
       tailMessage {
-        _id 
-        id 
-        senderId 
-        receiverId
-        receivers 
-        type 
-        value 
-        threadId 
-        sentAt 
-        createdAt 
-        updatedAt 
+               ''' +
+        ChatSchema.schema +
+        '''
+            }
+      private
+      participantsProfile{
+      ''' +
+        ChatUserProfileSchema.schema +
+        '''
       }
-      createdAt
-      updatedAt
           ''';
+  }
+}
+
+class ChatUserProfileSchema {
+  ChatUserProfileSchema._();
+
+  static String get schema {
+    return r'''
+            authId
+            firstName
+            lastName
+            location
+            profilePicture
+            profileSlug
+            username
+            verified
+            bio
+        ''';
   }
 }
 

@@ -1,14 +1,12 @@
 import 'dart:async';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart' as pathfile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-//import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/string_util.dart';
@@ -161,6 +159,7 @@ class _PlayAudioState extends State<PlayAudio> {
   bool isReadingComplete = false;
   final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
+  int position = 0;
   final MediaService _mediaService = MediaService();
 
   @override
@@ -176,11 +175,13 @@ class _PlayAudioState extends State<PlayAudio> {
       print("THE URL FIELD IS NULL!!!!");
       return;
     }
+
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
     });
+
     playerController.addListener(() {
       Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
 
@@ -198,6 +199,9 @@ class _PlayAudioState extends State<PlayAudio> {
     });
     await playerController.preparePlayer(res.path);
     if (mounted) setState(() {});
+
+    position = await playerController.getDuration(DurationType.max);
+    if (mounted) setState(() {});
   }
 
   /* void _playandPause() async {
@@ -211,6 +215,7 @@ class _PlayAudioState extends State<PlayAudio> {
     return Column(
       children: [
         Expanded(
+          flex: 2,
           child: Row(
             children: [
               Align(
@@ -231,12 +236,14 @@ class _PlayAudioState extends State<PlayAudio> {
                       ? Icon(
                           Icons.play_arrow,
                           size: 30,
-                          color: widget.isMe ? Colors.white : Colors.blue,
+                          color:
+                              widget.isMe ? Colors.white : AppColors.textColor2,
                         )
                       : Icon(
                           Icons.pause_circle,
                           size: 30,
-                          color: widget.isMe ? Colors.white : Colors.blue,
+                          color:
+                              widget.isMe ? Colors.white : AppColors.textColor2,
                         ),
                 ),
               ),
@@ -255,9 +262,11 @@ class _PlayAudioState extends State<PlayAudio> {
                       enableSeekGesture: true,
                       playerWaveStyle: PlayerWaveStyle(
                         scaleFactor: 0.2,
-                        fixedWaveColor:
-                            widget.isMe ? Colors.grey : Colors.lightBlueAccent,
-                        liveWaveColor: widget.isMe ? Colors.white : Colors.blue,
+                        fixedWaveColor: widget.isMe
+                            ? AppColors.greyShade1
+                            : AppColors.greyShade1,
+                        liveWaveColor:
+                            widget.isMe ? Colors.white : AppColors.textColor2,
                         waveCap: StrokeCap.butt,
                       ),
                       clipBehavior: Clip.hardEdge,
@@ -277,38 +286,65 @@ class _PlayAudioState extends State<PlayAudio> {
                             )
                           : const LinearProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.blueAccent),
+                                  AppColors.textColor2),
                               color: AppColors.greyShade1,
                               backgroundColor: AppColors.greyShade1,
-                            ))
+                            )),
+
               // ),
               //),
             ],
           ),
         ),
         Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                StringUtil.formatDuration(
-                    Duration(milliseconds: currentDuration)),
-                style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    color: widget.isMe ? AppColors.white : AppColors.textColor2,
-                    fontSize: 10),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 29),
+              child: isInitialised
+                  ? !isPlaying
+                      ? Text(
+                          StringUtil.formatDuration(
+                              Duration(milliseconds: position)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: widget.isMe
+                                  ? AppColors.white
+                                  : AppColors.textColor2,
+                              fontSize: 10),
+                        )
+                      : Text(
+                          StringUtil.formatDuration(
+                              Duration(milliseconds: currentDuration)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: widget.isMe
+                                  ? AppColors.white
+                                  : AppColors.textColor2,
+                              fontSize: 10),
+                        )
+                  : Text(
+                      StringUtil.formatDuration(
+                          const Duration(milliseconds: 0)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: widget.isMe
+                              ? AppColors.white
+                              : AppColors.textColor2,
+                          fontSize: 10),
+                    ),
+            ),
+            SizedBox(width: getScreenWidth(20)),
+            Text(
+              widget.timeStamp,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: widget.isMe ? AppColors.white : AppColors.textColor2,
               ),
-              Text(
-                widget.timeStamp,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: widget.isMe ? AppColors.white : AppColors.textColor2,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ]),
         ),
       ],
     );

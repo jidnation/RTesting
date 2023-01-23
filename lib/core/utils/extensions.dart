@@ -33,7 +33,7 @@ extension Group<T> on Iterable<T> {
     final map = <K, List<T>>{};
     for (final element in this) {
       final keyValue = key(element);
-      if (!map.containsKey(keyValue)) {
+      if (!map.containsKey(keyValue!)) {
         map[keyValue] = [];
       }
       map[keyValue]?.add(element);

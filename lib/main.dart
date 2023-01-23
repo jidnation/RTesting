@@ -19,6 +19,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
 
 import 'core/services/moment/controller.dart';
+import 'features/timeline/timeline_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MomentController(), fenix: true);
+    Get.lazyPut(() => TimeLineController(), fenix: true);
     return GraphQLProvider(
       client: clientFor(),
       child: GraphQLProvider(

@@ -5,10 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_cutter/audio_cutter.dart';
+// import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_cropper/image_cropper.dart';
-// import 'package:light_compressor/light_compressor.dart';
+// import 'package:image_cropper/image_cropper.dart';
+//import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
@@ -21,7 +22,7 @@ import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
 
 class MediaService {
-  final ImageCropper _cropper = ImageCropper();
+  // final ImageCropper _cropper = ImageCropper();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   Future<FileResult?> getImage({required bool fromGallery}) async {
@@ -133,37 +134,37 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> getImageCropped(
-      {required FileResult file, int? size}) async {
-    final res = await _cropper.cropImage(
-      sourcePath: file.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.ratio3x2,
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9
-      ],
-      cropStyle: CropStyle.circle,
-      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-      compressQuality: 100,
-      maxWidth: size,
-      maxHeight: size,
-      compressFormat: ImageCompressFormat.jpg,
-      uiSettings: [
-        IOSUiSettings(title: ''),
-        AndroidUiSettings(
-          toolbarTitle: 'Crop',
-          toolbarColor: Colors.black,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.square,
-          lockAspectRatio: false,
-        ),
-      ],
-    );
-    if (res == null) return null;
-    return file.copyWith(path: res.path);
-  }
+  // Future<FileResult?> getImageCropped(
+  //     {required FileResult file, int? size}) async {
+  //   final res = await _cropper.cropImage(
+  //     sourcePath: file.path,
+  //     aspectRatioPresets: [
+  //       CropAspectRatioPreset.square,
+  //       CropAspectRatioPreset.ratio3x2,
+  //       CropAspectRatioPreset.original,
+  //       CropAspectRatioPreset.ratio4x3,
+  //       CropAspectRatioPreset.ratio16x9
+  //     ],
+  //     cropStyle: CropStyle.circle,
+  //     aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+  //     compressQuality: 100,
+  //     maxWidth: size,
+  //     maxHeight: size,
+  //     compressFormat: ImageCompressFormat.jpg,
+  //     uiSettings: [
+  //       IOSUiSettings(title: ''),
+  //       AndroidUiSettings(
+  //         toolbarTitle: 'Crop',
+  //         toolbarColor: Colors.black,
+  //         toolbarWidgetColor: Colors.white,
+  //         initAspectRatio: CropAspectRatioPreset.square,
+  //         lockAspectRatio: false,
+  //       ),
+  //     ],
+  //   );
+  //   if (res == null) return null;
+  //   return file.copyWith(path: res.path);
+  // }
 
   Future<FileResult> resizeImage(
       {required FileResult file, required Size size}) async {
@@ -236,7 +237,7 @@ class MediaService {
   //   //   filePath,
   //   //   quality: VideoQuality.DefaultQuality,
   //   // );
-  //
+
   //   // print('size1:::::::::::::::${res!.filesize! / 1024}');
   //   return response.destinationPath;
   // }
@@ -275,14 +276,28 @@ class MediaService {
 
   Future<FileResult?> pickFromCamera(
       {required BuildContext context, bool? enableRecording}) async {
+    print("::::::>>>>>> am here 0 ::::::::");
     final res = await CameraPicker.pickFromCamera(context,
         locale: Locale('en'),
         pickerConfig:
             CameraPickerConfig(enableRecording: enableRecording ?? false));
+
+    // CameraPicker.pickFromCamera(context,
+    //     locale: Locale('en'),
+    //     pickerConfig:
+    //         CameraPickerConfig(enableRecording: enableRecording ?? false));
+    print(
+        "::::::>>>>>> am here 1 :::::::: ${await res!.originFile.then((value) => value)}");
+
     if (res == null) return null;
-    final file = await res.originFile;
+    File? file = await res.originFile.then((value) => value);
+    print("::::::::::::>>>>>>><<<<<<<<< $file");
     if (file == null) return null;
-    String? thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+    String? thumbnail;
+    // = (await getVideoThumbnail(videoPath: file.path))?.path;
+    if (FileUtils.isVideo(file)) {
+      thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
+    }
     return FileResult(
         path: file.path,
         size: file.lengthSync() / 1024,
@@ -417,7 +432,7 @@ class MediaService {
   //   } else if (await Permission.storage.isPermanentlyDenied) {
   //     openAppSettings();
   //   } else {
-  //     return null;
+  //     return null;ad
   //   }
   //   return null;
   // }

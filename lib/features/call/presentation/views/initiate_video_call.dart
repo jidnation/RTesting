@@ -222,8 +222,8 @@ class _CallScreenState extends State<InitiateVideoCall> {
                                     bottom: 110,
                                     right: 20,
                                     child: SizedBox(
-                                      width: size.width * 0.4,
-                                      height: size.height * 0.3,
+                                      width: size.width * 0.3,
+                                      height: size.height * 0.2,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(5),
                                         child: _localPreview(

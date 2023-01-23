@@ -66,6 +66,7 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                 listener: (context, state) {
                   if (state is UserLoaded) {
                     reachingUser.value = false;
+                    // setState(() {});
                   }
                   if (state is UserError) {
                     if (state.error!.contains('reaching')) {
@@ -129,16 +130,15 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                                   // if (suggestedUsers
                                   //         .value[index].reaching!.reacherId ==
                                   //     null) {
-                                    globals.userBloc!.add(ReachUserEvent(
-                                        userIdToReach:
-                                            suggestedUsers.value[index].id!));
-                                  }
-                                   else {
-                                    globals.userBloc!.add(
-                                        DelReachRelationshipEvent(
-                                            userIdToDelete: suggestedUsers
-                                                .value[index].id!));
-                                  }
+                                  globals.userBloc!.add(ReachUserEvent(
+                                      userIdToReach:
+                                          suggestedUsers.value[index].id!));
+                                } else {
+                                  globals.userBloc!.add(
+                                      DelReachRelationshipEvent(
+                                          userIdToDelete:
+                                              suggestedUsers.value[index].id!));
+                                }
                                 //}
                               },
                               onDelete: () {
@@ -161,8 +161,9 @@ class _EmptyTimelineWidgetState extends State<EmptyTimelineWidget> {
                               isLoading: active.contains(index)
                                   ? reachingUser.value
                                   : false,
-                              label:
-                                  active.contains(index) ? reachLabel.value : 'Reach',
+                              label: active.contains(index)
+                                  ? reachLabel.value
+                                  : 'Reach',
                             );
                           },
                           itemCount: suggestedUsers.value.length,
@@ -358,92 +359,93 @@ class SuggestedUserContainer extends StatelessWidget {
   }
 }
 
-class SkeletonLoadingWidget extends HookWidget {
-  const SkeletonLoadingWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 5,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SkeletonItem(
-            child: Column(
-          children: [
-            Row(
-              children: [
-                const SkeletonAvatar(
-                  style: SkeletonAvatarStyle(
-                      shape: BoxShape.circle, width: 50, height: 50),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: SkeletonParagraph(
-                    style: SkeletonParagraphStyle(
-                        lines: 3,
-                        spacing: 6,
-                        lineStyle: SkeletonLineStyle(
-                          randomLength: true,
-                          height: 10,
-                          borderRadius: BorderRadius.circular(8),
-                          minLength: MediaQuery.of(context).size.width / 6,
-                          maxLength: MediaQuery.of(context).size.width / 3,
-                        )),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 12),
-            SkeletonParagraph(
-              style: SkeletonParagraphStyle(
-                  lines: 3,
-                  spacing: 6,
-                  lineStyle: SkeletonLineStyle(
-                    randomLength: true,
-                    height: 10,
-                    borderRadius: BorderRadius.circular(8),
-                    minLength: MediaQuery.of(context).size.width / 2,
-                  )),
-            ),
-            const SizedBox(height: 12),
-            SkeletonAvatar(
-              style: SkeletonAvatarStyle(
-                width: double.infinity,
-                minHeight: MediaQuery.of(context).size.height / 8,
-                maxHeight: MediaQuery.of(context).size.height / 3,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: const [
-                    SkeletonAvatar(
-                        style: SkeletonAvatarStyle(width: 20, height: 20)),
-                    SizedBox(width: 8),
-                    SkeletonAvatar(
-                        style: SkeletonAvatarStyle(width: 20, height: 20)),
-                    SizedBox(width: 8),
-                    SkeletonAvatar(
-                        style: SkeletonAvatarStyle(width: 20, height: 20)),
-                  ],
-                ),
-                SkeletonLine(
-                  style: SkeletonLineStyle(
-                      height: 16,
-                      width: 64,
-                      borderRadius: BorderRadius.circular(8)),
-                )
-              ],
-            )
-          ],
-        )),
-      ),
-    );
-  }
-}
+// class SkeletonLoadingWidget extends HookWidget {
+//   const SkeletonLoadingWidget({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//       shrinkWrap: true,
+//       physics: const NeverScrollableScrollPhysics(),
+//       itemCount: 5,
+//       itemBuilder: (context, index) => Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: SkeletonItem(
+//             child: Column(
+//           children: [
+//             Row(
+//               children: [
+//                 const SkeletonAvatar(
+//                   style: SkeletonAvatarStyle(
+//                       shape: BoxShape.circle, width: 50, height: 50),
+//                 ),
+//                 const SizedBox(width: 8),
+//                 Expanded(
+//                   child: SkeletonParagraph(
+//                     style: SkeletonParagraphStyle(
+//                         lines: 3,
+//                         spacing: 6,
+//                         lineStyle: SkeletonLineStyle(
+//                           randomLength: true,
+//                           height: 10,
+//                           borderRadius: BorderRadius.circular(8),
+//                           minLength: MediaQuery.of(context).size.width / 6,
+//                           maxLength: MediaQuery.of(context).size.width / 3,
+//                         )),
+//                   ),
+//                 )
+//               ],
+//             ),
+//             const SizedBox(height: 12),
+//             SkeletonParagraph(
+//               style: SkeletonParagraphStyle(
+//                   lines: 3,
+//                   spacing: 6,
+//                   lineStyle: SkeletonLineStyle(
+//                     randomLength: true,
+//                     height: 10,
+//                     borderRadius: BorderRadius.circular(8),
+//                     minLength: MediaQuery.of(context).size.width / 2,
+//                   )),
+//             ),
+//             const SizedBox(height: 12),
+//             SkeletonAvatar(
+//               style: SkeletonAvatarStyle(
+//                 width: double.infinity,
+//                 minHeight: MediaQuery.of(context).size.height / 8,
+//                 maxHeight: MediaQuery.of(context).size.height / 3,
+//               ),
+//             ),
+//             const SizedBox(height: 8),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Row(
+//                   children: const [
+//                     SkeletonAvatar(
+//                         style: SkeletonAvatarStyle(width: 20, height: 20)),
+//                     SizedBox(width: 8),
+//                     SkeletonAvatar(
+//                         style: SkeletonAvatarStyle(width: 20, height: 20)),
+//                     SizedBox(width: 8),
+//                     SkeletonAvatar(
+//                         style: SkeletonAvatarStyle(width: 20, height: 20)),
+//                   ],
+//                 ),
+//                 SkeletonLine(
+//                   style: SkeletonLineStyle(
+//                       height: 16,
+//                       width: 64,
+//                       borderRadius: BorderRadius.circular(8)),
+//                 )
+//               ],
+//             )
+//           ],
+//         )),
+//       ),
+//     );
+//   }
+// }
 
 class EmptyChatListScreen extends StatelessWidget {
   const EmptyChatListScreen({

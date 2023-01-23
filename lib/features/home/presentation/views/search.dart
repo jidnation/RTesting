@@ -278,7 +278,7 @@ class SearchStories extends HookWidget {
     // ];
     final List<Widget> imageSliders = imgList
         .map((item) => Container(
-              margin: const EdgeInsets.all(5.0),
+              // margin: const EdgeInsets.all(5.0),
               child: Image.asset(
                 item,
                 fit: BoxFit.fill,
@@ -294,7 +294,7 @@ class SearchStories extends HookWidget {
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          SizedBox(height: getScreenHeight(26)),
+          SizedBox(height: getScreenHeight(8)),
           Stack(
             alignment: Alignment.bottomCenter,
             children: [
