@@ -208,10 +208,7 @@ class TimelineRepostedPost extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.transparent,
                     ),
-                    child:
-                        // TimeLineVideoPreview(
-                        //   path: tPostInfo.videoMediaItem!,
-                        TimeLineVideoPlayer(
+                    child: TimeLineVideoPlayer(
                       post: tPostInfo,
                       videoUrl: tPostInfo.repostedPost!.videoMediaItem!,
                       // ),
