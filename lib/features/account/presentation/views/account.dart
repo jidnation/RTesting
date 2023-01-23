@@ -27,11 +27,13 @@ import 'package:reach_me/features/account/presentation/widgets/image_placeholder
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/home_screen.dart';
 import 'package:reach_me/features/home/presentation/views/timeline.dart';
 import 'package:reach_me/features/home/presentation/widgets/reposted_post.dart';
+import 'package:reach_me/features/timeline/image_loader.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -1865,8 +1867,12 @@ class _ReacherCard extends HookWidget {
                   else
                     const SizedBox.shrink(),
                   if ((postModel!.videoMediaItem ?? '').isNotEmpty)
-                    TimeLineVideoPlayer(
-                        post: postModel!, videoUrl: postModel!.videoMediaItem!)
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 2,
+                      child: TimeLineVideoPlayer(
+                          post: postModel!,
+                          videoUrl: postModel!.videoMediaItem!),
+                    )
                   else
                     (postModel!.audioMediaItem ?? '').isNotEmpty
                         ? Container(
@@ -2418,6 +2424,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
         pageNumber: 1,
         voteType: 'Downvote',
         authId: widget.recipientId));
+
+    globals.socialServiceBloc!
+        .add(GetStatusFeedEvent(pageLimit: 50, pageNumber: 1));
   }
 
   TabBar get _tabBar => TabBar(
@@ -2617,7 +2626,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
     final _shoutDowns = useState<List<PostFeedModel>>([]);
     final _shoutOuts = useState<List<PostFeedModel>>([]);
     final _sharedPosts = useState<List<PostFeedModel>>([]);
-
+    final _userStatus = useState<List<StatusFeedResponseModel>>([]);
     return Scaffold(
       body: BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
@@ -2643,6 +2652,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
           if (state is GetPersonalCommentsError) {
             Snackbars.error(context, message: state.error);
             _commentsRefreshController.refreshFailed();
+          }
+          if (state is GetStatusFeedSuccess) {
+            _userStatus.value = state.status!;
           }
         },
         builder: (context, state) {
@@ -2842,53 +2854,26 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                           width: 3.0),
                                     ),
                                     onTap: () {
-                                      RouteNavigators.route(
+                                      if (_userStatus.value.any((e) =>
+                                          e.id ==
+                                          globals.recipientUser!.username)) {
+                                        showProfilePictureOrViewStatus2(
                                           context,
-                                          FullScreenWidget(
-                                            child: Stack(children: <Widget>[
-                                              Container(
-                                                color: AppColors
-                                                    .black, // Your screen background color
-                                              ),
-                                              Column(children: <Widget>[
-                                                Container(
-                                                    height:
-                                                        getScreenHeight(100)),
-                                                Container(
-                                                  height: size.height - 100,
-                                                  width: size.width,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.rectangle,
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(widget
-                                                          .recipientImageUrl!),
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ]),
-                                              Positioned(
-                                                top: 0.0,
-                                                left: 0.0,
-                                                right: 0.0,
-                                                child: AppBar(
-                                                  title: const Text(
-                                                      'Profile Picture'), // You can add title here
-                                                  leading: IconButton(
-                                                    icon: const Icon(
-                                                        Icons.arrow_back,
-                                                        color: AppColors.white),
-                                                    onPressed: () =>
-                                                        Navigator.of(context)
-                                                            .pop(),
-                                                  ),
-                                                  backgroundColor: AppColors
-                                                      .black, //You can make this transparent
-                                                  elevation: 0.0, //No shadow
-                                                ),
-                                              ),
-                                            ]),
-                                          ));
+                                          user: globals.recipientUser,
+                                          userStatus: _userStatus.value,
+                                        );
+                                      } else if (globals
+                                              .recipientUser!.profilePicture !=
+                                          null) {
+                                        RouteNavigators.route(
+                                            context,
+                                            pictureViewer2(context,
+                                                ownerProfilePicture:
+                                                    globals.recipientUser));
+                                      } else {
+                                        Snackbars.error(context,
+                                            message: 'No Profile photo');
+                                      }
                                     },
                                   ),
                           ),

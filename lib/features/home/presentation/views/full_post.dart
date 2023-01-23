@@ -1028,7 +1028,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                           children: [
                                             GestureDetector(
                                               onLongPress: () {
-
                                                 if ((post.value.post
                                                                 ?.nUpvotes ??
                                                             0) >
@@ -1039,7 +1038,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       postId: post
                                                           .value.post!.postId!,
                                                       reactionType: 'Upvote');
-
                                                 }
                                               },
                                               onTap: () {
@@ -1140,7 +1138,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                                   .postId,
                                                             ));
                                                           }
-
                                                         }
                                                       },
                                                       padding: EdgeInsets.zero,
@@ -1185,7 +1182,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                               FontWeight.w500,
                                                           color: AppColors
                                                               .textColor3,
-
                                                         ),
                                                       ),
                                                     ).paddingOnly(right: 6),

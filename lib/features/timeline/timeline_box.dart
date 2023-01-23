@@ -4,12 +4,14 @@ import 'dart:ui' as ui;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/utils/extensions.dart';
+import 'package:reach_me/features/account/presentation/widgets/bottom_sheets.dart';
+import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/timeline/image_loader.dart';
 import 'package:reach_me/features/timeline/models/post_feed.dart';
 import 'package:reach_me/features/timeline/post_media.dart';
 import 'package:reach_me/features/timeline/show_reacher_bottom_card.dart';
@@ -31,11 +33,13 @@ import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
 import '../moment/moment_audio_player.dart';
 
-class TimeLineBox extends HookWidget {
+class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
+  final List<StatusFeedResponseModel>? userStatusFeed;
   const TimeLineBox({
     Key? key,
     required this.timeLineModel,
+    this.userStatusFeed,
   }) : super(key: key);
 
   @override
@@ -47,7 +51,6 @@ class TimeLineBox extends HookWidget {
     //working on the images
     List<String> images = tPostInfo?.imageMediaItems ?? [];
 
-    ValueNotifier<bool> isPausing = useState(false);
     Future<String> saveImage(Uint8List? bytes) async {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
@@ -132,30 +135,47 @@ class TimeLineBox extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(children: [
-                      tPostOwnerInfo != null
-                          ? Container(
-                              height: 35,
-                              width: 35,
-                              padding: EdgeInsets.all(
-                                  tPostOwnerInfo.profilePicture!.isNotEmpty
-                                      ? 0
-                                      : 5),
-                              decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                  image: tPostOwnerInfo
-                                          .profilePicture!.isNotEmpty
-                                      ? DecorationImage(
-                                          image: NetworkImage(
-                                              tPostOwnerInfo.profilePicture!),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : null),
-                              child: tPostOwnerInfo.profilePicture!.isEmpty
-                                  ? Image.asset("assets/images/app-logo.png")
-                                  : null,
-                            )
-                          : const SizedBox.shrink(),
+                      GestureDetector(
+                        onTap: () async {
+                          if (userStatusFeed!
+                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                            showProfilePictureOrViewStatus(context,
+                                tPostOwnerInfo: tPostOwnerInfo!,
+                                userStatus: userStatusFeed!);
+                          } else if (tPostOwnerInfo!
+                              .profilePicture!.isNotEmpty) {
+                            RouteNavigators.route(
+                              context,
+                              pictureViewer(context,
+                                  ownerProfilePicture: tPostOwnerInfo),
+                            );
+                          } else {
+                            Snackbars.error(context,
+                                message: 'No Profile Photo');
+                          }
+                        },
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          padding: EdgeInsets.all(
+                              tPostOwnerInfo!.profilePicture!.isNotEmpty
+                                  ? 0
+                                  : 5),
+                          decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(30),
+                              image: tPostOwnerInfo.profilePicture!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: NetworkImage(
+                                          tPostOwnerInfo.profilePicture!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null),
+                          child: tPostOwnerInfo.profilePicture!.isEmpty
+                              ? Image.asset("assets/images/app-logo.png")
+                              : null,
+                        ),
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Row(
@@ -219,13 +239,13 @@ class TimeLineBox extends HookWidget {
                                           children: [
                                             CustomText(
                                               text:
-                                                  "@${tPostOwnerInfo?.username.toString().toCapitalized()}",
+                                                  "@${tPostOwnerInfo.username.toString().toCapitalized()}",
                                               color: Colors.black,
                                               size: 14.28,
                                               weight: FontWeight.w600,
                                             ),
                                             const SizedBox(width: 10),
-                                            tPostOwnerInfo?.verified ?? false
+                                            tPostOwnerInfo.verified!
                                                 ? SvgPicture.asset(
                                                     'assets/svgs/verified.svg')
                                                 : const SizedBox.shrink()

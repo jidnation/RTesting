@@ -380,6 +380,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                     bottom: 15),
                                                 child: Stack(children: [
                                                   TimeLineBox(
+                                                    userStatusFeed: _userStatus,
                                                     timeLineModel: post,
                                                   ),
                                                   Positioned(
