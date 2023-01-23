@@ -13,6 +13,7 @@ import 'package:reach_me/features/timeline/suggestion_widget.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
 import 'package:reach_me/features/timeline/timeline_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_controller.dart';
 import 'package:reach_me/features/timeline/timeline_post_reach.dart';
 import 'package:reach_me/features/timeline/timeline_user_story.dart';
 
@@ -37,6 +38,7 @@ class TimeLineFeed extends StatefulWidget {
 }
 
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
+TimeLineController timeLineController = TimeLineController();
 
 class _TimeLineFeedState extends State<TimeLineFeed>
     with AutomaticKeepAliveClientMixin<TimeLineFeed> {
