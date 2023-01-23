@@ -165,7 +165,8 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                               visible: timeLineFeedStore.length > 0,
                               child: Container(
                                 color: AppColors.white,
-                                padding: EdgeInsets.only(top: 8, bottom: 6),
+                                padding:
+                                    const EdgeInsets.only(top: 8, bottom: 6),
                                 child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.stretch,
@@ -359,7 +360,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                     //     MaterialPageRoute(
                                                     //         builder: (c) =>
                                                     //             const StoryPage()));
-                                                    
                                                   },
                                                 ),
                                             itemCount: _mutedStatus.length),

@@ -54,13 +54,6 @@ class _StatusBubbleState extends State<StatusBubble> {
     }
   }
 
-  final imageUrl =
-      'https://images.unsplash.com/photo-1622294891694-07a7ebbd9f37?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=928&q=80';
-  final imageUrl2 =
-      'https://reachme-09128734.s3.eu-west-2.amazonaws.com/27d328b1-956f-432f-8829-a103b6a17d11.jpg';
-  final videoUrl =
-      'https://reachme-09128734.s3.eu-west-2.amazonaws.com/5f403d6a-9fe5-424d-9c85-72230fad958c.mp4';
-
   @override
   Widget build(BuildContext context) {
     Widget child = Container();

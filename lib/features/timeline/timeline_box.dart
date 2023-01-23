@@ -436,9 +436,7 @@ class TimeLineBox extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               color: const Color(0xff001824),
                             ),
-                            // TimeLineVideoPreview(
-                            //   path: tPostInfo.videoMediaItem!,
-                             child:   TimeLineVideoPlayer(
+                            child: TimeLineVideoPlayer(
                               post: timeLineFeedStore
                                   .getPostModel(timeLineModel: timeLineModel)
                                   .post!,
@@ -446,7 +444,7 @@ class TimeLineBox extends StatelessWidget {
                                   .getPostFeed.post!.videoMediaItem!,
                               // ),
                             ),
-                            )
+                          )
                         : const SizedBox.shrink(),
                     SizedBox(
                         height: tPostInfo.audioMediaItem!.isNotEmpty ? 10 : 0),
