@@ -32,7 +32,7 @@ class TimeLineUserStory extends StatelessWidget {
     return InkWell(
       onTap: isMe ? isMeOnTap : onTap,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
@@ -132,7 +132,7 @@ class TimeLineUserStory extends StatelessWidget {
                   color: isMuted ?? false ? AppColors.greyShade3 : null,
                   overflow: TextOverflow.ellipsis))
         ],
-      ).paddingOnly(right: 25),
+      ).paddingOnly(right: 16),
     );
   }
 }

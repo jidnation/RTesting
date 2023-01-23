@@ -142,6 +142,7 @@ class ChatRemoteDataSource {
       Console.log('get user threads', result.data);
       var res = result.data!['getAllThreads'] as List;
       var data = res.map((e) => ChatsThread.fromJson(e)).toList();
+      data.removeWhere((element) => element.participantsInfo == null);
       return data;
     } catch (e) {
       rethrow;
