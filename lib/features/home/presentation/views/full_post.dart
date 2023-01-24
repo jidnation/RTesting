@@ -615,7 +615,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       ?.ensureTooltipVisible();
                                                 },
                                                 expandText: 'see more',
-                                                maxLines: 2,
+                                                maxLines: 3,
                                                 linkColor: Colors.blue,
                                                 animation: true,
                                                 expanded: false,
@@ -713,7 +713,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ]),
                                               )
                                             : const SizedBox.shrink(),
-
+                                        const SizedBox(height: 10),
                                         // likes and message
                                         Row(children: [
                                           GestureDetector(

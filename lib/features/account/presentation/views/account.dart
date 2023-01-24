@@ -1,3 +1,4 @@
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,9 +38,11 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/services/database/secure_storage.dart';
 import '../../../auth/presentation/views/login_screen.dart';
+import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../home/presentation/views/post_reach.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
 
 class AccountScreen extends StatefulHookWidget {
@@ -1725,7 +1728,7 @@ class _AccountScreenState extends State<AccountScreen>
 }
 
 class _ReacherCard extends HookWidget {
-  const _ReacherCard({
+  _ReacherCard({
     Key? key,
     required this.postModel,
     this.onComment,
@@ -1739,7 +1742,7 @@ class _ReacherCard extends HookWidget {
   final PostModel? postModel;
   final Function()? onLike, onComment, onMessage, onUpvote, onDownvote;
   final Color? likeColour;
-
+  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -1851,13 +1854,55 @@ class _ReacherCard extends HookWidget {
                     ],
                   ),
                   Flexible(
-                    child: Text(
-                      postModel!.content ?? '',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(14),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ).paddingSymmetric(v: 10, h: 16),
+                    child: ExpandableText(
+                      "${postModel!.content}",
+                      prefixText: postModel!.edited!
+                          ? "(Reach Edited ${Helper.parseUserLastSeen(postModel!.updatedAt.toString())})"
+                          : null,
+                      prefixStyle: TextStyle(
+                          fontSize: getScreenHeight(12),
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryColor),
+                      onPrefixTap: () {
+                        tooltipkey.currentState?.ensureTooltipVisible();
+                      },
+                      expandText: 'see more',
+                      maxLines: 3,
+                      linkColor: Colors.blue,
+                      animation: true,
+                      expanded: false,
+                      collapseText: 'see less',
+                      onHashtagTap: (value) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return DictionaryDialog(
+                                abbr: value,
+                                meaning: '',
+                                word: '',
+                              );
+                            });
+                      },
+                      onMentionTap: (value) {
+                        timeLineFeedStore.getUserByUsername(context,
+                            username: value);
+
+                        debugPrint("Value $value");
+                      },
+                      mentionStyle: const TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue),
+                      hashtagStyle: const TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue),
+                    ).paddingSymmetric(h: 16, v: 10),
+                  ),
+                  Tooltip(
+                    key: tooltipkey,
+                    triggerMode: TooltipTriggerMode.manual,
+                    showDuration: const Duration(seconds: 1),
+                    message: 'This reach has been edited',
                   ),
                   if ((postModel!.imageMediaItems ?? []).isNotEmpty)
                     PostMedia(post: postModel!)
@@ -2399,6 +2444,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   @override
   void initState() {
     super.initState();
+    debugPrint("UserId : ${widget.recipientId}");
     _tabController = TabController(length: 7, vsync: this);
     globals.socialServiceBloc!.add(GetAllPostsEvent(
         pageLimit: 50, pageNumber: 1, authId: widget.recipientId));
@@ -2639,6 +2685,16 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
             debugPrint("LikedPosts ${state.posts}");
             _likedPosts.value = state.posts!;
             _likesRefreshController.refreshCompleted();
+          }
+          if (state is GetVotedPostsSuccess) {
+            if (state.voteType == "Downvote") {
+              debugPrint("Downvote: ${state.posts}");
+              _shoutDowns.value = state.posts!;
+            }
+            if (state.voteType == "Upvote") {
+              debugPrint("Upvote: ${state.posts}");
+              _shoutOuts.value = state.posts!;
+            }
           }
           if (state is GetPersonalCommentsSuccess) {
             _comments.value = state.data!;
@@ -3821,7 +3877,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                                               .socialServiceBloc!
                                                               .add(
                                                                   VotePostEvent(
-                                                            voteType: 'upvote',
+                                                            voteType: 'Upvote',
                                                             postId: _shoutDowns
                                                                 .value[index]
                                                                 .postId,
@@ -3837,7 +3893,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                                               .add(
                                                                   VotePostEvent(
                                                             voteType:
-                                                                'downvote',
+                                                                'Downvote',
                                                             postId: _shoutDowns
                                                                 .value[index]
                                                                 .postId,

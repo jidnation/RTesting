@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
-import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/components/snackbar.dart';
@@ -40,6 +40,7 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_event.dart';
 import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
+import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
@@ -60,6 +61,7 @@ class RepostReach extends StatefulHookWidget {
 class _RepostReachState extends State<RepostReach> {
   Future<File?> getImage(ImageSource source) async {
     final _picker = ImagePicker();
+
     try {
       final imageFile = await _picker.pickImage(
         source: source,
@@ -135,6 +137,7 @@ class _RepostReachState extends State<RepostReach> {
 
   GlobalKey<FlutterMentionsState> controllerKey =
       GlobalKey<FlutterMentionsState>();
+  final GlobalKey<TooltipState> tooltipkey = GlobalKey<TooltipState>();
   String postRating = "normal";
   @override
   Widget build(BuildContext context) {
@@ -348,571 +351,604 @@ class _RepostReachState extends State<RepostReach> {
                 width: size.width,
                 height: size.height,
                 margin: const EdgeInsets.only(top: 75),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Helper.renderProfilePicture(
-                          globals.user!.profilePicture,
-                          size: 38,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (globals.user!.firstName! +
-                                            ' ' +
-                                            globals.user!.lastName!)
-                                        .toTitleCase(),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textColor2,
+                child: Expanded(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Helper.renderProfilePicture(
+                            globals.user!.profilePicture,
+                            size: 38,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      (globals.user!.firstName! +
+                                              ' ' +
+                                              globals.user!.lastName!)
+                                          .toTitleCase(),
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textColor2,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                      width: 93,
-                                      child: Text(
-                                        getUserLoation(),
-                                        overflow: TextOverflow.ellipsis,
-                                      ))
-                                ],
-                              ),
-                            ],
+                                    SizedBox(
+                                        width: 93,
+                                        child: Text(
+                                          getUserLoation(),
+                                          overflow: TextOverflow.ellipsis,
+                                        ))
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.03,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.width * 0.08,
-                          decoration: BoxDecoration(
-                              color: AppColors.greyShade9,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColors.greyShade9)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: const [
-                              Icon(
-                                Icons.location_on,
-                                size: 12,
-                              ),
-                              Text(
-                                "Location",
-                                style: TextStyle(
-                                    color: AppColors.blackShade5,
-                                    fontFamily: "Poppins",
-                                    fontSize: 11),
-                              )
-                            ],
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.03,
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Text(
-                          counter.value.toString() + '/' + '200',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: counter.value == 200
-                                ? Colors.red
-                                : AppColors.textColor2,
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: MediaQuery.of(context).size.width * 0.08,
+                            decoration: BoxDecoration(
+                                color: AppColors.greyShade9,
+                                borderRadius: BorderRadius.circular(15),
+                                border:
+                                    Border.all(color: AppColors.greyShade9)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: const [
+                                Icon(
+                                  Icons.location_on,
+                                  size: 12,
+                                ),
+                                Text(
+                                  "Location",
+                                  style: TextStyle(
+                                      color: AppColors.blackShade5,
+                                      fontFamily: "Poppins",
+                                      fontSize: 11),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ).paddingSymmetric(h: 16),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.028,
-                    ),
+                          const SizedBox(width: 20),
+                          Text(
+                            counter.value.toString() + '/' + '200',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: counter.value == 200
+                                  ? Colors.red
+                                  : AppColors.textColor2,
+                            ),
+                          ),
+                        ],
+                      ).paddingSymmetric(h: 16),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.028,
+                      ),
 
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 24),
-                          width: size.width,
-                          decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(color: AppColors.greyShade10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CupertinoButton(
-                                    minSize: 0,
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {
-                                      final progress = ProgressHUD.of(context);
-                                      progress
-                                          ?.showWithText('Viewing Reacher...');
-                                      Future.delayed(const Duration(seconds: 3),
-                                          () {
-                                        globals.userBloc!.add(
-                                            GetRecipientProfileEvent(
-                                                email: widget.postFeedModel!
-                                                    .postOwnerId));
-                                        widget.postFeedModel!.postOwnerId ==
-                                                globals.user!.id
-                                            ? RouteNavigators.route(
-                                                context, const AccountScreen())
-                                            : RouteNavigators.route(
-                                                context,
-                                                RecipientAccountProfile(
-                                                  recipientEmail: 'email',
-                                                  recipientImageUrl: widget
-                                                      .postFeedModel!
-                                                      .profilePicture,
-                                                  recipientId: widget
-                                                      .postFeedModel!
-                                                      .postOwnerId,
-                                                ));
-                                        progress?.dismiss();
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Helper.renderProfilePicture(
-                                          widget.postFeedModel!.profilePicture,
-                                          size: 40,
-                                        ).paddingOnly(l: 13, t: 10),
-                                        SizedBox(width: getScreenWidth(9)),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '@${widget.postFeedModel!.username!}',
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(14),
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColors.textColor2,
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 24),
+                            width: size.width,
+                            decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(25),
+                                border:
+                                    Border.all(color: AppColors.greyShade10)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CupertinoButton(
+                                      minSize: 0,
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        final progress =
+                                            ProgressHUD.of(context);
+                                        progress?.showWithText(
+                                            'Viewing Reacher...');
+                                        Future.delayed(
+                                            const Duration(seconds: 3), () {
+                                          globals.userBloc!.add(
+                                              GetRecipientProfileEvent(
+                                                  email: widget.postFeedModel!
+                                                      .postOwnerId));
+                                          widget.postFeedModel!.postOwnerId ==
+                                                  globals.user!.id
+                                              ? RouteNavigators.route(context,
+                                                  const AccountScreen())
+                                              : RouteNavigators.route(
+                                                  context,
+                                                  RecipientAccountProfile(
+                                                    recipientEmail: 'email',
+                                                    recipientImageUrl: widget
+                                                        .postFeedModel!
+                                                        .profilePicture,
+                                                    recipientId: widget
+                                                        .postFeedModel!
+                                                        .postOwnerId,
+                                                  ));
+                                          progress?.dismiss();
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Helper.renderProfilePicture(
+                                            widget
+                                                .postFeedModel!.profilePicture,
+                                            size: 40,
+                                          ).paddingOnly(l: 13, t: 10),
+                                          SizedBox(width: getScreenWidth(9)),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    '@${widget.postFeedModel!.username!}',
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(14),
+                                                      fontFamily: 'Poppins',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color:
+                                                          AppColors.textColor2,
+                                                    ),
                                                   ),
-                                                ),
-                                                const SizedBox(width: 3),
-                                                widget.postFeedModel!.verified!
-                                                    ? SvgPicture.asset(
-                                                        'assets/svgs/verified.svg')
-                                                    : const SizedBox.shrink()
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  widget.postFeedModel!.post!
-                                                                  .location! ==
-                                                              'nil' ||
-                                                          widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location! ==
-                                                              'NIL' ||
-                                                          widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location ==
-                                                              null
-                                                      ? ''
-                                                      : widget
-                                                                  .postFeedModel!
-                                                                  .post!
-                                                                  .location!
-                                                                  .length >
-                                                              23
-                                                          ? widget
-                                                              .postFeedModel!
-                                                              .post!
-                                                              .location!
-                                                              .substring(0, 23)
-                                                          : widget
-                                                              .postFeedModel!
-                                                              .post!
-                                                              .location!,
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(10),
-                                                    fontFamily: 'Poppins',
-                                                    letterSpacing: 0.4,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColors.textColor2,
+                                                  const SizedBox(width: 3),
+                                                  widget.postFeedModel!
+                                                          .verified!
+                                                      ? SvgPicture.asset(
+                                                          'assets/svgs/verified.svg')
+                                                      : const SizedBox.shrink()
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    widget.postFeedModel!
+                                                                    .post!.location! ==
+                                                                'nil' ||
+                                                            widget
+                                                                    .postFeedModel!
+                                                                    .post!
+                                                                    .location! ==
+                                                                'NIL' ||
+                                                            widget
+                                                                    .postFeedModel!
+                                                                    .post!
+                                                                    .location ==
+                                                                null
+                                                        ? ''
+                                                        : widget
+                                                                    .postFeedModel!
+                                                                    .post!
+                                                                    .location!
+                                                                    .length >
+                                                                23
+                                                            ? widget
+                                                                .postFeedModel!
+                                                                .post!
+                                                                .location!
+                                                                .substring(
+                                                                    0, 23)
+                                                            : widget
+                                                                .postFeedModel!
+                                                                .post!
+                                                                .location!,
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(10),
+                                                      fontFamily: 'Poppins',
+                                                      letterSpacing: 0.4,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color:
+                                                          AppColors.textColor2,
+                                                    ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  postDuration,
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        getScreenHeight(10),
-                                                    fontFamily: 'Poppins',
-                                                    letterSpacing: 0.4,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColors.textColor2,
-                                                  ),
-                                                ).paddingOnly(l: 6),
-                                              ],
-                                            )
-                                          ],
-                                        ).paddingOnly(t: 10),
-                                      ],
+                                                  Text(
+                                                    postDuration,
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          getScreenHeight(10),
+                                                      fontFamily: 'Poppins',
+                                                      letterSpacing: 0.4,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color:
+                                                          AppColors.textColor2,
+                                                    ),
+                                                  ).paddingOnly(l: 6),
+                                                ],
+                                              )
+                                            ],
+                                          ).paddingOnly(t: 10),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              widget.postFeedModel!.post!.content == null
-                                  ? const SizedBox.shrink()
-                                  : Row(
-                                      children: [
-                                        Flexible(
-                                          child: ReadMoreText(
-                                            "${widget.postFeedModel!.post!.content}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: getScreenHeight(14)),
-                                            trimLines: 3,
-                                            colorClickableText:
-                                                const Color(0xff717F85),
-                                            trimMode: TrimMode.Line,
-                                            trimCollapsedText: 'See more',
-                                            trimExpandedText: 'See less',
-                                            moreStyle: TextStyle(
-                                                fontSize: getScreenHeight(14),
-                                                fontFamily: "Roboto",
-                                                color: const Color(0xff717F85)),
-                                          ),
-                                        ),
-                                        SizedBox(width: getScreenWidth(2)),
-                                        Tooltip(
-                                          message:
-                                              'This Reach has been edited by the Reacher',
-                                          waitDuration:
-                                              const Duration(seconds: 1),
-                                          showDuration:
-                                              const Duration(seconds: 2),
-                                          child: Text(
-                                            widget.postFeedModel!.post!.edited!
-                                                ? "(Reach Edited)"
-                                                : "",
-                                            style: TextStyle(
-                                              fontSize: getScreenHeight(12),
-                                              fontFamily: 'Poppins',
-                                              fontWeight: FontWeight.w400,
-                                              color: AppColors.primaryColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ).paddingSymmetric(h: 16, v: 10),
-                              if ((widget.postFeedModel?.post
-                                          ?.imageMediaItems ??
-                                      [])
-                                  .isNotEmpty)
-                                PostMedia(post: widget.postFeedModel!.post!)
-                                    .paddingOnly(r: 16, l: 16, b: 16, t: 10)
-                              else
-                                const SizedBox.shrink(),
-                              if ((widget.postFeedModel?.post?.videoMediaItem ??
-                                      '')
-                                  .isNotEmpty)
-                                TimeLineVideoPlayer(
-                                    post: widget.postFeedModel!.post!,
-                                    videoUrl: widget
-                                        .postFeedModel!.post!.videoMediaItem!)
-                              else
-                                const SizedBox.shrink(),
-                              (widget.postFeedModel?.post?.audioMediaItem ?? '')
-                                      .isNotEmpty
-                                  ? Container(
-                                      height: 59,
-                                      margin: const EdgeInsets.only(bottom: 10),
-                                      width: SizeConfig.screenWidth,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: const Color(0xfff5f5f5)),
-                                      child: Row(children: [
-                                        Expanded(
-                                            child: MomentAudioPlayer(
-                                          audioPath: widget.postFeedModel!.post!
-                                              .audioMediaItem!,
-                                        )),
-                                      ]),
-                                    )
-                                  : const SizedBox.shrink(),
-                            ],
+                                  ],
+                                ),
+                                widget.postFeedModel!.post!.content == null
+                                    ? const SizedBox.shrink()
+                                    : ExpandableText(
+                                        "${widget.postFeedModel!.post!.content}",
+                                        prefixText: widget
+                                                .postFeedModel!.post!.edited!
+                                            ? "(Reach Edited ${Helper.parseUserLastSeen(widget.postFeedModel!.post!.updatedAt.toString())})"
+                                            : null,
+                                        prefixStyle: TextStyle(
+                                            fontSize: getScreenHeight(12),
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.primaryColor),
+                                        onPrefixTap: () {
+                                          tooltipkey.currentState
+                                              ?.ensureTooltipVisible();
+                                        },
+                                        expandText: 'see more',
+                                        maxLines: 3,
+                                        linkColor: Colors.blue,
+                                        animation: true,
+                                        expanded: false,
+                                        collapseText: 'see less',
+                                        onHashtagTap: (value) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return DictionaryDialog(
+                                                  abbr: value,
+                                                  meaning: '',
+                                                  word: '',
+                                                );
+                                              });
+                                        },
+                                        onMentionTap: (value) {
+                                          timeLineFeedStore.getUserByUsername(
+                                              context,
+                                              username: value);
+
+                                          debugPrint("Value $value");
+                                        },
+                                        mentionStyle: const TextStyle(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: Colors.blue),
+                                        hashtagStyle: const TextStyle(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: Colors.blue),
+                                      ).paddingSymmetric(h: 16, v: 10),
+                                if ((widget.postFeedModel?.post
+                                            ?.imageMediaItems ??
+                                        [])
+                                    .isNotEmpty)
+                                  PostMedia(post: widget.postFeedModel!.post!)
+                                      .paddingOnly(r: 16, l: 16, b: 16, t: 10)
+                                else
+                                  const SizedBox.shrink(),
+                                if ((widget.postFeedModel?.post
+                                            ?.videoMediaItem ??
+                                        '')
+                                    .isNotEmpty)
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 2,
+                                    child: TimeLineVideoPlayer(
+                                        post: widget.postFeedModel!.post!,
+                                        videoUrl: widget.postFeedModel!.post!
+                                            .videoMediaItem!),
+                                  )
+                                else
+                                  const SizedBox.shrink(),
+                                (widget.postFeedModel?.post?.audioMediaItem ??
+                                            '')
+                                        .isNotEmpty
+                                    ? Container(
+                                        height: 59,
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        width: SizeConfig.screenWidth,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: const Color(0xfff5f5f5)),
+                                        child: Row(children: [
+                                          Expanded(
+                                              child: MomentAudioPlayer(
+                                            audioPath: widget.postFeedModel!
+                                                .post!.audioMediaItem!,
+                                          )),
+                                        ]),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.02,
-                    ),
-                    const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
+                      const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
 
-                    BlocConsumer<DictionaryBloc, DictionaryState>(
-                      bloc: globals.dictionaryBloc,
-                      listener: (context, state) {
-                        if (state is GetWordToMentionsSuccess) {
-                          _recentWords.value = state.mentionsData
-                              .map((item) => {
-                                    "id": item["authId"],
-                                    "display": item["abbr"],
-                                    "meaning": item["meaning"],
-                                  })
-                              .toList();
+                      BlocConsumer<DictionaryBloc, DictionaryState>(
+                        bloc: globals.dictionaryBloc,
+                        listener: (context, state) {
+                          if (state is GetWordToMentionsSuccess) {
+                            _recentWords.value = state.mentionsData
+                                .map((item) => {
+                                      "id": item["authId"],
+                                      "display": item["abbr"],
+                                      "meaning": item["meaning"],
+                                    })
+                                .toList();
 
-                          _isLoading.value = false;
-                        }
+                            _isLoading.value = false;
+                          }
 
-                        if (state is LoadingWordsToMentions) {
-                          _isLoading.value = true;
-                        }
-                        if (state is GetWordToMentionsError) {
-                          Snackbars.error(context, message: state.error);
-                        }
-                      },
-                      builder: (context, state) {
-                        return Flexible(
-                          child: FlutterMentions(
-                            key: controllerKey,
-                            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            maxLength: 1100,
-                            // minLines: null,
-
-                            suggestionPosition: SuggestionPosition.Bottom,
-                            onChanged: (val) {
-                              counter.value = val
-                                  .trim()
-                                  .split(RegexUtil.spaceOrNewLine)
-                                  .length;
-                              if (counter.value >= 200) {
-                                Snackbars.error(context,
-                                    message: '200 words limit reached!');
-                                // setState(() {
-                                //   showCursor = false;
-                                //   enabled = false;
-                                // });
-                              }
-                            },
-                            decoration: const InputDecoration(
-                              counterText: '',
-                              hintText: "Quote this reach",
-                              hintStyle: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.greyShade1,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                            ),
-                            mentions: [
-                              Mention(
-                                  trigger: "#",
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                  data: _recentWords.value,
-                                  matchAll: false,
-                                  suggestionBuilder: (data) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: _isLoading.value
-                                          ? const CircularProgressIndicator()
-                                          : _recentWords.value.isEmpty
-                                              ? TextButton(
-                                                  onPressed: () {
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        const AddToGlossary());
-                                                  },
-                                                  child: const Text(
-                                                      'Add to glossary'))
-                                              : Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(
-                                                      width: 20.0,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '#${data['display']}',
-                                                          style: const TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors
-                                                                  .blueAccent),
-                                                        ),
-                                                        Text(
-                                                          data['meaning'],
-                                                          textAlign:
-                                                              TextAlign.left,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 10,
-                                                                  color: Colors
-                                                                      .black),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    // IconButton(
-                                                    //   onPressed: () {},
-                                                    //   icon: const Icon(Icons.add),
-                                                    // ),
-                                                  ],
-                                                ),
-                                    );
-                                  }),
-                              Mention(
-                                  trigger: "@",
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                  ),
-                                  data: _mentionUsers.value,
-                                  matchAll: false,
-                                  suggestionBuilder: (data) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: _isLoading.value
-                                          ? const CircularProgressIndicator()
-                                          : _mentionUsers.value.isEmpty
-                                              ? const SizedBox.shrink()
-                                              : Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const SizedBox(
-                                                      width: 20.0,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '${data['display']}',
-                                                          style: const TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors
-                                                                  .blueAccent),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    // IconButton(
-                                                    //   onPressed: () {},
-                                                    //   icon: const Icon(Icons.add),
-                                                    // ),
-                                                  ],
-                                                ),
-                                    );
-                                  }),
-                            ],
-                            // child: TextField(
-                            //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            //   minLines: 1,
-                            //   maxLines: null,
-                            //   controller: controller,
-                            //   inputFormatters: [
-                            //     MaxWordTextInputFormater(maxWords: 200)
-                            //   ],
-                            //   // maxLength: 200,
-                            //   onChanged: (val) {
-                            //     counter.value =
-                            //         val.trim().split(RegexUtil.spaceOrNewLine).length;
-                            //     if (counter.value >= 200) {
-                            //       Snackbars.error(context,
-                            //           message: '200 words limit reached!');
-                            //     }
-                            //   },
-                            //   decoration: const InputDecoration(
-                            //     counterText: '',
-                            //     hintText: "What's on your mind?",
-                            //     hintStyle: TextStyle(
-                            //       fontSize: 14,
-                            //       fontWeight: FontWeight.w400,
-                            //       color: AppColors.greyShade1,
-                            //     ),
-                            //     border: InputBorder.none,
-                            //     contentPadding: EdgeInsets.symmetric(
-                            //       horizontal: 16,
-                            //       vertical: 10,
-                            //     ),
-                            //   ),
-                            // ).paddingSymmetric(h: 16),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-                    if (_mediaList.value.isNotEmpty)
-                      PostReachMediaGrid(
-                        mediaList: _mediaList.value
-                            .where((e) =>
-                                FileUtils.isImage(e.file) ||
-                                FileUtils.isVideo(e.file))
-                            .toList(),
-                        onUpdateList: (val) {
-                          if (val.length != _mediaList.value.length) {
-                            _mediaList.value = val;
+                          if (state is LoadingWordsToMentions) {
+                            _isLoading.value = true;
+                          }
+                          if (state is GetWordToMentionsError) {
+                            Snackbars.error(context, message: state.error);
                           }
                         },
-                        onRemove: (index) {
-                          _mediaList.value = [..._mediaList.value]
-                            ..removeAt(index);
+                        builder: (context, state) {
+                          return Flexible(
+                            child: FlutterMentions(
+                              key: controllerKey,
+                              maxLengthEnforcement:
+                                  MaxLengthEnforcement.enforced,
+                              maxLength: 1100,
+                              // minLines: null,
+
+                              suggestionPosition: SuggestionPosition.Bottom,
+                              onChanged: (val) {
+                                counter.value = val
+                                    .trim()
+                                    .split(RegexUtil.spaceOrNewLine)
+                                    .length;
+                                if (counter.value >= 200) {
+                                  Snackbars.error(context,
+                                      message: '200 words limit reached!');
+                                  // setState(() {
+                                  //   showCursor = false;
+                                  //   enabled = false;
+                                  // });
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                counterText: '',
+                                hintText: "Quote this reach",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.greyShade1,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                              ),
+                              mentions: [
+                                Mention(
+                                    trigger: "#",
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                    data: _recentWords.value,
+                                    matchAll: false,
+                                    suggestionBuilder: (data) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: _isLoading.value
+                                            ? const CircularProgressIndicator()
+                                            : _recentWords.value.isEmpty
+                                                ? TextButton(
+                                                    onPressed: () {
+                                                      RouteNavigators.route(
+                                                          context,
+                                                          const AddToGlossary());
+                                                    },
+                                                    child: const Text(
+                                                        'Add to glossary'))
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 20.0,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '#${data['display']}',
+                                                            style: const TextStyle(
+                                                                fontSize: 10,
+                                                                color: Colors
+                                                                    .blueAccent),
+                                                          ),
+                                                          Text(
+                                                            data['meaning'],
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        10,
+                                                                    color: Colors
+                                                                        .black),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // IconButton(
+                                                      //   onPressed: () {},
+                                                      //   icon: const Icon(Icons.add),
+                                                      // ),
+                                                    ],
+                                                  ),
+                                      );
+                                    }),
+                                Mention(
+                                    trigger: "@",
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                    data: _mentionUsers.value,
+                                    matchAll: false,
+                                    suggestionBuilder: (data) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: _isLoading.value
+                                            ? const CircularProgressIndicator()
+                                            : _mentionUsers.value.isEmpty
+                                                ? const SizedBox.shrink()
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 20.0,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${data['display']}',
+                                                            style: const TextStyle(
+                                                                fontSize: 10,
+                                                                color: Colors
+                                                                    .blueAccent),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      // IconButton(
+                                                      //   onPressed: () {},
+                                                      //   icon: const Icon(Icons.add),
+                                                      // ),
+                                                    ],
+                                                  ),
+                                      );
+                                    }),
+                              ],
+                              // child: TextField(
+                              //   maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                              //   minLines: 1,
+                              //   maxLines: null,
+                              //   controller: controller,
+                              //   inputFormatters: [
+                              //     MaxWordTextInputFormater(maxWords: 200)
+                              //   ],
+                              //   // maxLength: 200,
+                              //   onChanged: (val) {
+                              //     counter.value =
+                              //         val.trim().split(RegexUtil.spaceOrNewLine).length;
+                              //     if (counter.value >= 200) {
+                              //       Snackbars.error(context,
+                              //           message: '200 words limit reached!');
+                              //     }
+                              //   },
+                              //   decoration: const InputDecoration(
+                              //     counterText: '',
+                              //     hintText: "What's on your mind?",
+                              //     hintStyle: TextStyle(
+                              //       fontSize: 14,
+                              //       fontWeight: FontWeight.w400,
+                              //       color: AppColors.greyShade1,
+                              //     ),
+                              //     border: InputBorder.none,
+                              //     contentPadding: EdgeInsets.symmetric(
+                              //       horizontal: 16,
+                              //       vertical: 10,
+                              //     ),
+                              //   ),
+                              // ).paddingSymmetric(h: 16),
+                            ),
+                          );
                         },
-                      ).paddingSymmetric(h: 16)
-                    else
-                      const SizedBox.shrink(),
-                    if (_mediaList.value
-                            .indexWhere((e) => FileUtils.isAudio(e.file)) >=
-                        0)
-                      PostReachAudioMedia(
-                        margin: const EdgeInsets.all(16),
-                        path: _mediaList
-                            .value[_mediaList.value
-                                .indexWhere((e) => FileUtils.isAudio(e.file))]
-                            .file
-                            .path,
-                        onCancel: () {
-                          int pos = _mediaList.value
-                              .indexWhere((e) => FileUtils.isAudio(e.file));
-                          _mediaList.value = [..._mediaList.value]
-                            ..removeAt(pos);
-                        },
-                      )
-                    else
-                      const SizedBox.shrink(),
-                    // SizedBox(
-                    //   height: MediaQuery.of(context).size.height * 0.4,
-                    // ),
-                  ],
+                      ),
+
+                      const SizedBox(height: 10),
+                      if (_mediaList.value.isNotEmpty)
+                        PostReachMediaGrid(
+                          mediaList: _mediaList.value
+                              .where((e) =>
+                                  FileUtils.isImage(e.file) ||
+                                  FileUtils.isVideo(e.file))
+                              .toList(),
+                          onUpdateList: (val) {
+                            if (val.length != _mediaList.value.length) {
+                              _mediaList.value = val;
+                            }
+                          },
+                          onRemove: (index) {
+                            _mediaList.value = [..._mediaList.value]
+                              ..removeAt(index);
+                          },
+                        ).paddingSymmetric(h: 16)
+                      else
+                        const SizedBox.shrink(),
+                      if (_mediaList.value
+                              .indexWhere((e) => FileUtils.isAudio(e.file)) >=
+                          0)
+                        PostReachAudioMedia(
+                          margin: const EdgeInsets.all(16),
+                          path: _mediaList
+                              .value[_mediaList.value
+                                  .indexWhere((e) => FileUtils.isAudio(e.file))]
+                              .file
+                              .path,
+                          onCancel: () {
+                            int pos = _mediaList.value
+                                .indexWhere((e) => FileUtils.isAudio(e.file));
+                            _mediaList.value = [..._mediaList.value]
+                              ..removeAt(pos);
+                          },
+                        )
+                      else
+                        const SizedBox.shrink(),
+                      // SizedBox(
+                      //   height: MediaQuery.of(context).size.height * 0.4,
+                      // ),
+                    ],
+                  ),
                 ),
               ),
               Positioned(

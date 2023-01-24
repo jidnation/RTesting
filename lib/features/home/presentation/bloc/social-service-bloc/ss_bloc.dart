@@ -306,7 +306,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
       emit(GetPersonalCommentsLoading());
       try {
         final response = await socialServiceRepository.getPersonalComments(
-          authId: event.authId!,
+          authId: event.authId,
           pageLimit: event.pageLimit!,
           pageNumber: event.pageNumber!,
         );

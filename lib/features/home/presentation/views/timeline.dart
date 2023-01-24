@@ -51,6 +51,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../timeline/suggestion_widget.dart';
+import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
 import 'full_post.dart';
 
@@ -1200,7 +1201,7 @@ class PostFeedReacherCard extends HookWidget {
                             tooltipkey.currentState?.ensureTooltipVisible();
                           },
                           expandText: 'see more',
-                          maxLines: 2,
+                          maxLines: 3,
                           linkColor: Colors.blue,
                           animation: true,
                           expanded: false,
@@ -1216,7 +1217,10 @@ class PostFeedReacherCard extends HookWidget {
                                   );
                                 });
                           },
-                          onMentionTap: (value) {},
+                          onMentionTap: (value) {
+                            timeLineFeedStore.getUserByUsername(context,
+                                username: value);
+                          },
                           mentionStyle: const TextStyle(
                               decoration: TextDecoration.underline,
                               color: Colors.blue),

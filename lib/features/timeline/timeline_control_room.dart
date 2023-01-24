@@ -646,10 +646,13 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         await UserRepository().getUserProfileByUsername(username: username);
     UserList? userInformation;
     User? userInfo;
-
+    debugPrint("User info 1: ${userInformation?.user.first.username}");
     if (response.isRight()) {
+      response.map(
+        (r) => userInformation = r,
+      );
       userInfo = userInformation?.user.first;
-
+      debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
           RecipientAccountProfile(
