@@ -37,10 +37,11 @@ class MsgBubble extends StatelessWidget {
     if (chat.quotedFromPost != null) {
       map = jsonDecode(quotedData!);
       if (chat.quotedFromPost ?? false) {
-        quotedTitle = isMe ? 'You replied to a post' : 'Replied to your post';
+        quotedTitle =
+            isMe ? 'You reached out to a post' : 'Reached out to your post';
       } else {
         quotedTitle =
-            isMe ? 'You replied to a status' : 'Replied to your status';
+            isMe ? 'You reached our to a status' : 'Reached out to your status';
       }
     }
     bool isMedia = (label.contains('jpg') || label.contains('aac'));

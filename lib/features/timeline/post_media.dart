@@ -703,11 +703,10 @@ class _PostImageMediaState extends State<PostImageMedia> {
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
         child: CachedNetworkImage(
-          progressIndicatorBuilder: (context, value, counter) {
+          placeholder: (context, value) {
             return Container(
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
