@@ -253,18 +253,22 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         );
       }
     } else {
-      bool response = await timeLineQuery.votePost(
-        postId: post.postId!,
-        voteType: voteType,
-      );
-      if (response) {
-        initialize(isUpvoting: true);
-        Snackbars.success(
-          context,
-          message:
-              'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
-          milliseconds: 1300,
+      if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
+        bool response = await timeLineQuery.votePost(
+          postId: post.postId!,
+          voteType: voteType,
         );
+        if (response) {
+          initialize(isUpvoting: true);
+          Snackbars.success(
+            context,
+            message:
+                'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
+            milliseconds: 1300,
+          );
+        }
+      } else {
+        deleteVotedPost(postId: post.postId!, id: id);
       }
       if (voteType.toLowerCase() == 'downvote') {
         timeLineFeedStore.removePost(context, id);
@@ -785,6 +789,15 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       });
     }
     notifyListeners();
+  }
+
+  deleteVotedPost({required String postId, required String id}) async {
+    bool response = await timeLineQuery.deleteVotedPost(postId: postId);
+    if (response) {
+      List<TimeLineModel> currentPosts = value;
+      currentPosts.removeWhere((element) => element.id == id);
+      initialize(isUpvoting: true);
+    }
   }
 }
 
