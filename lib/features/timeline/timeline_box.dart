@@ -344,7 +344,7 @@ class TimeLineBox extends StatelessWidget {
                           tooltipkey.currentState?.ensureTooltipVisible();
                         },
                         expandText: 'see more',
-                        maxLines: 2,
+                        maxLines: 3,
                         linkColor: Colors.blue,
                         animation: true,
                         expanded: false,
