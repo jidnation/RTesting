@@ -204,7 +204,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                   ),
                                   const SizedBox(width: 20),
                                   PosingType(
-                                    label: 'Moments',
+                                    label: 'Streaks',
                                     isSelected: index == 1,
                                     onClick: () {
                                       sliderController.jumpToPage(1);

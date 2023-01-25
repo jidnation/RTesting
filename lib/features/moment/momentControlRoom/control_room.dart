@@ -1,11 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
+import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/components/snackbar.dart';
+import '../../../core/services/api/api_client.dart';
 import '../../../core/services/moment/querys.dart';
 import '../../../core/services/navigation/navigation_service.dart';
+import '../../../core/utils/constants.dart';
+import '../../../core/utils/custom_text.dart';
+import '../../../core/utils/dialog_box.dart';
+import '../../../core/utils/dimensions.dart';
+import '../../../core/utils/loader.dart';
+import '../../home/data/repositories/user_repository.dart';
 import '../moment_feed.dart';
 import '../user_posting.dart';
 import 'models/get_comments_model.dart';
@@ -40,8 +51,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   bool _gettingUserComment = false;
   bool get gettingUserComment => _gettingUserComment;
 
-  bool _postingMoment = false;
-  bool get postingMoment => _postingMoment;
+  // bool _postingMoment = false;
+  // bool get postingMoment => _postingMoment;
 
   int _currentSaveIndex = 0;
   int get currentSaveIndex => _currentSaveIndex;
@@ -177,11 +188,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
   }
 
-  updateMerger(bool value, {bool? isDone}) {
-    _stillMerging = value;
-    _mergingDone = isDone ?? false;
-    notifyListeners();
-  }
+  // updateMerger(bool value, {bool? isDone}) {
+  //   _stillMerging = value;
+  //   _mergingDone = isDone ?? false;
+  //   notifyListeners();
+  // }
 
   cacheNextFive(int currentCount) async {
     late int counter;
@@ -308,27 +319,83 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
   }
 
-  postMoment(BuildContext context, {required String? videoUrl}) async {
-    if (videoUrl != null) {
-      print(":::::::::::::::::::::::::::n printing starrted :::::");
-      var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
-      if (res) {
-        Snackbars.success(
-          context,
-          message: 'Moment successfully created',
-          milliseconds: 1300,
-        );
-        momentCtrl.clearPostingData();
-        RouteNavigators.pop(context);
-      } else {
-        Snackbars.error(
-          context,
-          message: 'Operation Failed, Try again.',
-          milliseconds: 1400,
-        );
+  Future<String?> uploadMediaFile({required File file}) async {
+    var response = await ApiClient().getSignedURL(file);
+    if (response['status'] == 'success') {
+      String link = response["data"]["link"];
+      final uploadResponse = await UserRepository().uploadPhoto(
+        url: response["data"]['signedUrl'],
+        file: file,
+      );
+      if (uploadResponse.toString() == 'Right(Upload successful)') {
+        return response["data"]["link"];
       }
-      _postingMoment = false;
-      notifyListeners();
+    }
+    print(">>>>>>>>>> from media upload ::::: ${response["data"]["link"]}");
+    return null;
+  }
+
+  postMoment(BuildContext context, {required String? videoPath}) async {
+    print(
+        "file size Before compressing::::::::  ${await File(videoPath!).stat().then((value) => value.size)}");
+    CustomDialog.openDialogBox(
+        height: SizeConfig.screenHeight * 0.9,
+        width: SizeConfig.screenWidth,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              RLoader(
+                'Posting Streak',
+                textStyle: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15),
+              ),
+              CustomText(
+                text: 'Please wait....',
+                color: AppColors.primaryColor,
+                weight: FontWeight.w500,
+                size: 13,
+              )
+            ]));
+
+    ///compressing done here
+    if (videoPath != null) {
+      MediaInfo? mediaInfo = await VideoCompress.compressVideo(
+        videoPath,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: true, // It's false by default
+      );
+      print("::::::::after compression file size::: ${mediaInfo!.filesize}");
+
+      ///url converting done here
+      if (mediaInfo.file != null) {
+        String? videoUrl = await uploadMediaFile(file: mediaInfo.file!);
+
+        print(":::::::::::::::::::::::::::n printing starrted :::::");
+        if (videoUrl != null) {
+          var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+          if (res) {
+            fetchMoment();
+            momentCtrl.clearPostingData();
+            Snackbars.success(
+              context,
+              message: 'Moment successfully created',
+              milliseconds: 1300,
+            );
+            momentCtrl.clearPostingData();
+            RouteNavigators.pop(context);
+          } else {
+            Snackbars.error(
+              context,
+              message: 'Operation Failed, Try again.',
+              milliseconds: 1400,
+            );
+          }
+        }
+        // _postingMoment = false;
+        Get.close(2);
+      }
     }
   }
 
@@ -504,10 +571,10 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     }
   }
 
-  void startReading() {
-    _postingMoment = true;
-    notifyListeners();
-  }
+  // void startReading() {
+  //   _postingMoment = true;
+  //   notifyListeners();
+  // }
 }
 
 class MomentModel {

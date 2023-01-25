@@ -8,9 +8,6 @@ import 'package:reach_me/core/components/custom_textfield.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../core/components/snackbar.dart';
-import '../../core/services/media_service.dart';
-import '../../core/services/moment/querys.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/constants.dart';
 import '../../core/utils/custom_text.dart';
@@ -38,7 +35,7 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
   }
 
   bool isPlaying = false;
-  bool isUploading = false;
+  // bool isUploading = false;
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -278,44 +275,39 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                     )
                   ]),
                   Visibility(
-                    visible: !isUploading || !momentFeedStore.postingMoment,
+                    // visible: !isUploading || !momentFeedStore.postingMoment,
                     child: InkWell(
-                      onTap: () async {
-                        // momentFeedStore.startReading();
-                        setState(() {
-                          isUploading = true;
-                        });
+                      onTap: () {
+                        // setState(() {
+                        //   isUploading = true;
+                        // });
                         if (momentCtrl.audioFilePath.value.isNotEmpty) {
-                          // String noAudioFile = await MediaService()
-                          //     .removeAudio(filePath: widget.videoFile.path);
-                          // FileResult fileResult = FileResult(path: noAudioFile);
-                          // String vFile = await MediaService()
-                          //     .compressMomentVideo(
-                          //         filePath: noAudioFile); //removing the braces
-                          print(
-                              ":::::::::::::::::::::::::::n audio find boss:::::: started :::::");
-                          String? videoUrl = await MediaService().urlConverter(
-                              filePath: momentCtrl.mergedVideoPath.value);
-                          if (videoUrl != null) {
-                            var res = await MomentQuery.postMoment(
-                                videoMediaItem: videoUrl);
-                            if (res) {
-                              Snackbars.success(
-                                context,
-                                message: 'Moment successfully created',
-                                milliseconds: 1300,
-                              );
-                              momentFeedStore.fetchMoment();
-                              momentCtrl.clearPostingData();
-                              RouteNavigators.pop(context);
-                            } else {
-                              Snackbars.error(
-                                context,
-                                message: 'Operation Failed, Try again.',
-                                milliseconds: 1400,
-                              );
-                            }
-                          }
+                          momentFeedStore.postMoment(
+                            context,
+                            videoPath: momentCtrl.mergedVideoPath.value,
+                          );
+
+                          ///needed converted video
+                          // if (videoUrl != null) {
+                          //   var res = await MomentQuery.postMoment(
+                          //       videoMediaItem: videoUrl);
+                          //   if (res) {
+                          //     Snackbars.success(
+                          //       context,
+                          //       message: 'Moment successfully created',
+                          //       milliseconds: 1300,
+                          //     );
+                          //     momentFeedStore.fetchMoment();
+                          //     momentCtrl.clearPostingData();
+                          //     RouteNavigators.pop(context);
+                          //   } else {
+                          //     Snackbars.error(
+                          //       context,
+                          //       message: 'Operation Failed, Try again.',
+                          //       milliseconds: 1400,
+                          //     );
+                          //   }
+                          // }
                           // if (fileUrl != null) {
                           //   momentFeedStore.postMoment(context,
                           //       videoUrl: fileUrl);
@@ -328,70 +320,15 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           // );
                           // String? videoUrl =
                           //     await FileConverter().convertMe(filePath: vFile);
+                        } else {
+                          momentFeedStore.postMoment(
+                            context,
+                            videoPath: widget.videoFile.path,
+                          );
                         }
-                        //else {
-                        //   String vFile =
-                        //       await MediaService().compressMomentVideo(
-                        //     filePath: widget.videoFile.path,
-                        //   );
-                        //   String? videoUrl =
-                        //       await FileConverter().convertMe(filePath: vFile);
-                        //   if (videoUrl != null) {
-                        //     var res = await MomentQuery.postMoment(
-                        //       videoMediaItem: videoUrl,
-                        //     );
-                        //     if (res) {
-                        //       Snackbars.success(
-                        //         context,
-                        //         message: 'Moment successfully created',
-                        //         milliseconds: 1300,
-                        //       );
-                        //       momentFeedStore.fetchMoment();
-                        //       momentCtrl.clearPostingData();
-                        //       RouteNavigators.pop(context);
-                        //     } else {
-                        //       Snackbars.error(
-                        //         context,
-                        //         message: 'Operation Failed, Try again.',
-                        //         milliseconds: 1400,
-                        //       );
-                        //     }
-                        //   }
-                        // }
-                        // else
-                        // {
-                        //   print(
-                        //       ":::::::::info::1::: ${await widget.videoFile.stat().then((value) => value.size)}");
-                        //
-                        //   String vFile =
-                        //       await MediaService().compressMomentVideo(
-                        //     filePath: widget.videoFile.path,
-                        //   );
-                        //   String? videoUrl =
-                        //       await FileConverter().convertMe(filePath: vFile);
-                        //   if (videoUrl != null) {
-                        //     var res = await MomentQuery.postMoment(
-                        //         videoMediaItem: videoUrl);
-                        //     if (res) {
-                        //       Snackbars.success(
-                        //         context,
-                        //         message: 'Moment successfully created',
-                        //         milliseconds: 1300,
-                        //       );
-                        //       momentCtrl.clearPostingData();
-                        //       RouteNavigators.pop(context);
-                        //     } else {
-                        //       Snackbars.error(
-                        //         context,
-                        //         message: 'Operation Failed, Try again.',
-                        //         milliseconds: 1400,
-                        //       );
-                        //     }
-                        //   }
-                        // }
-                        setState(() {
-                          isUploading = false;
-                        });
+                        // setState(() {
+                        //   isUploading = false;
+                        // });
                       },
                       child: Container(
                         height: 40,
@@ -408,15 +345,15 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                       ),
                     ),
                   ),
-                  if (isUploading || momentFeedStore.postingMoment)
-                    const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 5,
-                        color: AppColors.primaryColor,
-                      ),
-                    )
+                  // if (isUploading || momentFeedStore.postingMoment)
+                  //   const SizedBox(
+                  //     height: 20,
+                  //     width: 20,
+                  //     child: CircularProgressIndicator(
+                  //       strokeWidth: 5,
+                  //       color: AppColors.primaryColor,
+                  //     ),
+                  //   )
                 ]),
           ),
           SizedBox(height: getScreenHeight(90)),
