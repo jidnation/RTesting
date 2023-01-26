@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 
+import '../../../features/moment/moment_feed.dart';
 import '../media_service.dart';
 
 class MomentController extends GetxController {
@@ -15,16 +16,12 @@ class MomentController extends GetxController {
 
   getAudioUrl() async {
     if (audioFilePath.isNotEmpty) {
-      // noAudioVideoFilePath(
-      //     await MediaService().removeAudio(filePath: videoFilePath.value));
       File cutFile = await MediaService().audioCutter(
         audioPath: audioFilePath.value,
         endTime: endTime.value,
       );
       print('..... converting.......');
-      audioUrl(await MediaService().urlConverter(filePath: cutFile.path));
-      // videoUrl(await MediaService()
-      //     .urlConverter(filePath: noAudioVideoFilePath.value));
+      audioUrl(await momentFeedStore.uploadMediaFile(file: cutFile));
       print('..... converting done.......$audioUrl');
     }
   }

@@ -32,6 +32,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
 
   @override
   void initState() {
+    print(":::::::::;;;;;;; ${widget.videoUrl}");
     super.initState();
     initializePlayer();
   }

@@ -196,12 +196,12 @@ class MediaService {
   }
 
   //converting the file to url
-  Future<String?>? urlConverter({required String filePath}) async {
-    File file = File(filePath);
-    String? fileUrl = await FileConverter().convertMe(filePath: filePath);
-    unawaited(file.delete());
-    return fileUrl;
-  }
+  // Future<String?>? urlConverter({required String filePath}) async {
+  //   File file = File(filePath);
+  //   String? fileUrl = await FileConverter().convertMe(filePath: filePath);
+  //   unawaited(file.delete());
+  //   return fileUrl;
+  // }
 
   Future<FileResult> compressVideo({required FileResult file}) async {
     final res = await vc.VideoCompress.compressVideo(
