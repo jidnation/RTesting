@@ -210,7 +210,7 @@ class Helper {
       case '0xffc12626':
         return const Color(0xFFC12626);
       default:
-        return const Color(0xFFC12626);
+        return const Color(0xFF000000);
     }
   }
 

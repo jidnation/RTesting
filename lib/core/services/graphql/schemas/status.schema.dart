@@ -23,9 +23,9 @@ class StatusSchema {
             authId
             created_at
             data {
-               ''' + 
-               StatusDataSchema.schema +
-               '''
+               ''' +
+        StatusDataSchema.schema +
+        '''
             }
             isMuted
             statusSlug
@@ -63,7 +63,9 @@ class StatusFeedResponseSchema {
 
   static String get schema {
     return r'''
-            _id
+            username
+            isMuted
+            isLiveStreamActive
             status {
               ''' +
         StatusFeedSchema.schema +
@@ -79,12 +81,12 @@ class StatusFeedSchema {
   static String get schema {
     return r'''
             created_at
-             feedOwnerProfile {
+            feedOwnerProfile {
               ''' +
         StatusProfileSchema.schema +
         '''
              }
-             reachingRelationship
+            reachingRelationship
             status {
               ''' +
         StatusSchema.schema +

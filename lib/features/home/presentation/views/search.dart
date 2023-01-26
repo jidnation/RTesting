@@ -277,13 +277,56 @@ class SearchStories extends HookWidget {
     //   'assets/images/frame.png',
     // ];
     final List<Widget> imageSliders = imgList
-        .map((item) => Container(
-              // margin: const EdgeInsets.all(5.0),
-              child: Image.asset(
-                item,
-                fit: BoxFit.fill,
-                // gaplessPlayback: true,
-              ),
+        .map((item) => Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Image.asset(
+                  item,
+                  fit: BoxFit.cover,
+                  // gaplessPlayback: true,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width * 1.5,
+                  // height: 200,
+                ),
+                Positioned(
+                  bottom: 16,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Over with talks',
+                          style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 16,
+                              height: 1.5,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Poppins'),
+                        ),
+                        SizedBox(
+                          height: 6,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Covid19 talks are not enough, we\nneed action the public reacts ',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 22,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Poppins'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             ))
         .toList();
     final _currentIndex = useState<int>(0);
@@ -306,7 +349,7 @@ class SearchStories extends HookWidget {
                   options: CarouselOptions(
                     // height: getScreenHeight(200),
                     viewportFraction: 1,
-                    aspectRatio: 2.0,
+                    aspectRatio: 1.5,
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,

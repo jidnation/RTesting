@@ -129,21 +129,30 @@ class _StatusBubbleState extends State<StatusBubble> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CustomPaint(
-            painter: StatusPainter(
-                statusCount: widget.statusCount, isMuted: widget.isMuted),
-            child: Container(
-              height: getScreenHeight(54),
-              width: getScreenHeight(54),
-              margin: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle, color: AppColors.greyShade8),
-              child: ClipOval(child: child),
-            ),
+          Stack(
+            clipBehavior: Clip.none,
+            fit: StackFit.loose,
+            children: [
+              CustomPaint(
+                painter: StatusPainter(
+                    statusCount:
+                        (widget.isLive ?? false) ? 1 : widget.statusCount,
+                    isMuted: widget.isMuted,
+                    isLive: widget.isLive),
+                child: Container(
+                  height: getScreenHeight(54),
+                  width: getScreenHeight(54),
+                  margin: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: AppColors.greyShade8),
+                  child: ClipOval(child: child),
+                ),
+              ),
+              if (widget.isLive ?? false)
+                const Positioned(bottom: -6, left: 16, child: LiveTag())
+            ],
           ),
-          false
-              ? SizedBox(height: getScreenHeight(7))
-              : SizedBox(height: getScreenHeight(11)),
+          SizedBox(height: getScreenHeight(12)),
           Text(widget.username.appendOverflow(11),
               style: TextStyle(
                   fontSize: getScreenHeight(11),
@@ -158,15 +167,18 @@ class _StatusBubbleState extends State<StatusBubble> {
 
 class StatusPainter extends CustomPainter {
   final int statusCount;
-  final bool? isMuted;
-  StatusPainter({required this.statusCount, this.isMuted});
+  final bool? isMuted, isLive;
+  StatusPainter({required this.statusCount, this.isMuted, this.isLive});
 
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..strokeWidth = 1.5
-      ..color =
-          isMuted ?? false ? AppColors.greyShade10 : AppColors.primaryColor
+      ..color = (isMuted ?? false)
+          ? AppColors.greyShade10
+          : (isLive ?? false)
+              ? const Color(0xFFDE0606)
+              : AppColors.primaryColor
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
     drawArc(canvas, paint, size);
@@ -194,5 +206,28 @@ class StatusPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class LiveTag extends StatelessWidget {
+  const LiveTag({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      child: Text('LIVE',
+          style: TextStyle(
+            fontSize: getScreenHeight(10),
+            letterSpacing: 1,
+            fontWeight: FontWeight.w400,
+            color: AppColors.white,
+          )),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        color: const Color(0xFFDE0606),
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
   }
 }
