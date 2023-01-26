@@ -573,6 +573,12 @@ mutation($postId: String!) {
   }
 ''';
 
+const deleteVotedPost = r'''
+mutation($postId: String!) {
+    deletePostVote (postId: $postId)
+  }
+''';
+
 const String getReachingRelation = r''' 
 query ($userId: String!, $type: String! ) {
   getReachRelationship(userIdToReach: $userId, typeOfRelationship: $type)

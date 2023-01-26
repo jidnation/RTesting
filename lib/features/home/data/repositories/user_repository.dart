@@ -49,7 +49,7 @@ class UserRepository {
     try {
       final userlist = await _homeRemoteDataSource.getUserProfileByUsername(
           username: username);
-
+      print("Userlists ${userlist.user.first.username}");
       return Right(userlist);
     } on GraphQLError catch (e) {
       return Left(e.message);

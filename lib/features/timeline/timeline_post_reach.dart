@@ -184,7 +184,6 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                     if (controllerKey.currentState!.controller!
                                             .text.isNotEmpty ||
                                         _mediaList.value.isNotEmpty) {
-                                      ///////
                                       if (_mediaList.value.isNotEmpty) {
                                         timeLineFeedStore.createMediaPost(
                                             context,

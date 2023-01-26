@@ -322,7 +322,7 @@ class _MomentFeedState extends State<MomentFeed> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const CustomText(
-                                    text: 'No Moment Available yet.....',
+                                    text: 'No Streak Available yet.....',
                                     color: Colors.white,
                                     weight: FontWeight.w500,
                                   ),
@@ -351,7 +351,7 @@ class _MomentFeedState extends State<MomentFeed> {
                                         // color: Colors.white,
                                       ),
                                       child: const CustomText(
-                                        text: 'Create Moment',
+                                        text: 'Create Streak',
                                         color: AppColors.white,
                                         size: 14,
                                       ),
