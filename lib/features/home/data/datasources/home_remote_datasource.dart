@@ -1264,6 +1264,8 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
+      print("VotedPOSTS: $result");
+      print("VotedPOSTS2: ${result.data!['getVotedPosts']}");
       return (result.data!['getVotedPosts'] as List)
           .map((e) => PostFeedModel.fromJson(e))
           .toList();

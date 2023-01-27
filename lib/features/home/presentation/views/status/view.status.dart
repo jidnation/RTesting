@@ -404,8 +404,8 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
               },
               itemBuilder: (context, pageIndex, storyIndex) {
                 final story = widget.status[storyIndex];
-                if (story.status?.statusData!.audioMedia != null ||
-                    (story.status?.statusData!.audioMedia ?? '').isNotEmpty) {
+                if ((story.status?.statusData!.audioMedia != null ||
+                    (story.status?.statusData!.audioMedia ?? '').isNotEmpty)) {
                   debugPrint(
                       "audio Player file: ${story.status?.statusData!.audioMedia}");
                   audioPlayer.play(

@@ -14,7 +14,7 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 
 class Helper {
   static String parseDate(DateTime? date) {
-    String? day = '', month = '';  
+    String? day = '', month = '';
     final year = date!.year.toString();
     if (date.month.toString().length < 2) {
       month = '0${date.month.toString()}';
@@ -79,8 +79,6 @@ class Helper {
     }
   }
 
-
-
   static Widget renderProfilePicture(String? profilePicture,
       {double size = 35, Color? profileColor}) {
     if (profilePicture == null) {
@@ -92,7 +90,8 @@ class Helper {
       return RecipientProfilePicture(
         width: getScreenWidth(size),
         height: getScreenHeight(size),
-        border: Border.all(color: profileColor ?? Colors.grey.shade50, width: 3.0),
+        border:
+            Border.all(color: profileColor ?? Colors.grey.shade50, width: 3.0),
         imageUrl: profilePicture,
       );
     }
@@ -128,32 +127,33 @@ class Helper {
     }
   }
 
-  static TextStyle getFont(String font) {
+  static TextStyle getFont(String font,
+      {double? size, double? height, FontWeight? fontWeight}) {
     switch (font) {
       case 'inter':
         return GoogleFonts.inter(
-          color: AppColors.white,
-          fontSize: getScreenHeight(23),
-          fontWeight: FontWeight.w500,
-        );
+            color: AppColors.white,
+            fontSize: getScreenHeight(size ?? 23),
+            fontWeight: fontWeight ?? FontWeight.w500,
+            height: height);
       case 'poppins':
         return GoogleFonts.poppins(
-          color: AppColors.white,
-          fontSize: getScreenHeight(23),
-          fontWeight: FontWeight.w500,
-        );
+            color: AppColors.white,
+            fontSize: getScreenHeight(size ?? 23),
+            fontWeight: fontWeight ?? FontWeight.w500,
+            height: height);
       case 'amita':
         return GoogleFonts.amita(
-          color: AppColors.white,
-          fontSize: getScreenHeight(23),
-          fontWeight: FontWeight.w500,
-        );
+            color: AppColors.white,
+            fontSize: getScreenHeight(size ?? 23),
+            fontWeight: fontWeight ?? FontWeight.w500,
+            height: height);
       default:
         return GoogleFonts.inter(
-          color: AppColors.white,
-          fontSize: getScreenHeight(23),
-          fontWeight: FontWeight.w500,
-        );
+            color: AppColors.white,
+            fontSize: getScreenHeight(size ?? 23),
+            fontWeight: fontWeight ?? FontWeight.w500,
+            height: height);
     }
   }
 
@@ -210,7 +210,7 @@ class Helper {
       case '0xffc12626':
         return const Color(0xFFC12626);
       default:
-        return const Color(0xFFC12626);
+        return const Color(0xFF000000);
     }
   }
 
@@ -237,18 +237,19 @@ class Helper {
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
+                    itemBuilder: (context, index) => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      //clipBehavior: Clip.hardEdge,
                       width: MediaQuery.of(context).size.width,
                       //height:MediaQuery.of(context).size.height ,
                       margin: const EdgeInsets.only(right: 50),
 
                       child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
+                          imageProvider: NetworkImage(
+                            post.imageMediaItems![index],
+                          ),
                           loadingBuilder: (context, event) => const Center(
                                 child: CupertinoActivityIndicator(
                                   color: Colors.white,
@@ -277,10 +278,9 @@ class Helper {
                           alignment: Alignment.center,
                           height: getScreenHeight(50),
                           width: getScreenWidth(50),
-                          decoration:
-                             BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.black38),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.black38),
                           child: Text(
                             "+ $remImageLength",
                             style: TextStyle(
@@ -294,154 +294,154 @@ class Helper {
               ),
             );
           });
-    } else if(post.imageMediaItems!.length == 1){
-         return GestureDetector(
-          onTap: (() =>    RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
-
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
+    } else if (post.imageMediaItems!.length == 1) {
+      return GestureDetector(
+        onTap: (() => RouteNavigators.route(
+              context,
+              ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: imageLength,
+                itemBuilder: (context, index) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                )
+                  //clipBehavior: Clip.hardEdge,
+                  width: MediaQuery.of(context).size.width,
+                  //height:MediaQuery.of(context).size.height ,
+                  margin: const EdgeInsets.only(right: 50),
+
+                  child: PhotoView(
+                      imageProvider: NetworkImage(
+                        post.imageMediaItems![index],
+                      ),
+                      loadingBuilder: (context, event) => const Center(
+                            child: CupertinoActivityIndicator(
+                              color: Colors.white,
+                            ),
+                          )),
+                ),
               ),
-          child: Container(
-            height: getScreenHeight(300),
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: CachedNetworkImage(
-              imageUrl: post.imageMediaItems![0],
-              fit: BoxFit.cover,
+            )),
+        child: Container(
+          height: getScreenHeight(300),
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: CachedNetworkImage(
+            imageUrl: post.imageMediaItems![0],
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    } else if (post.imageMediaItems!.length == 3) {
+      int remImageLength =
+          1; // length of extra image not seen in the grid at first
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: GestureDetector(
+              onTap: (() => RouteNavigators.route(
+                    context,
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: imageLength,
+                      itemBuilder: (context, index) => Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        //clipBehavior: Clip.hardEdge,
+                        width: MediaQuery.of(context).size.width,
+                        //height:MediaQuery.of(context).size.height ,
+                        margin: const EdgeInsets.only(right: 50),
+
+                        child: PhotoView(
+                            imageProvider: NetworkImage(
+                              post.imageMediaItems![index],
+                            ),
+                            loadingBuilder: (context, event) => const Center(
+                                  child: CupertinoActivityIndicator(
+                                    color: Colors.white,
+                                  ),
+                                )),
+                      ),
+                    ),
+                  )),
+              child: Container(
+                height: getScreenHeight(300),
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: post.imageMediaItems![0],
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
-        );
-    }    
-    else if (post.imageMediaItems!.length == 3) {
-      int remImageLength =  1; // length of extra image not seen in the grid at first
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: GestureDetector(
-                onTap: (() =>   RouteNavigators.route(
-                  context,
-                  ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+          SizedBox(width: getScreenWidth(5)),
+          Column(
+            mainAxisSize: MainAxisSize.min,
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
-                    ),
-                  ),
-                )
-                    ),
+            ///crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              GestureDetector(
+                onTap: (() => RouteNavigators.route(
+                      context,
+                      PhotoView(
+                        imageProvider: NetworkImage(post.imageMediaItems![1]),
+                        loadingBuilder: (context, event) => const Center(
+                          child:
+                              CupertinoActivityIndicator(color: Colors.white),
+                        ),
+                      ),
+                    )),
                 child: Container(
-                  height: getScreenHeight(300),
+                  height: getScreenHeight(150),
+                  width: getScreenWidth(180),
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: CachedNetworkImage(
-                    imageUrl: post.imageMediaItems![0],
+                    imageUrl: post.imageMediaItems![1],
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-            ),
-            SizedBox(width: getScreenWidth(5)),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-
-              ///crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                GestureDetector(
-                  onTap: (() => RouteNavigators.route(
-                        context,
-                        PhotoView(
-                          imageProvider: NetworkImage(post.imageMediaItems![1]),
-                          loadingBuilder: (context, event) => const Center(
-                            child:
-                                CupertinoActivityIndicator(color: Colors.white),
-                          ),
+              SizedBox(height: getScreenHeight(5)),
+              GestureDetector(
+                onTap: (() => RouteNavigators.route(
+                      context,
+                      PhotoView(
+                        imageProvider: NetworkImage(post.imageMediaItems![2]),
+                        loadingBuilder: (context, event) => const Center(
+                          child:
+                              CupertinoActivityIndicator(color: Colors.white),
                         ),
-                      )),
-                  child: Container(
-                    height: getScreenHeight(150),
-                    width: getScreenWidth(180),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![1],
-                      fit: BoxFit.cover,
-                    ),
+                      ),
+                    )),
+                child: Container(
+                  height: getScreenHeight(150),
+                  width: getScreenWidth(180),
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: post.imageMediaItems![2],
+                    fit: BoxFit.cover,
                   ),
                 ),
-                SizedBox(height: getScreenHeight(5)),
-                GestureDetector(
-                  onTap: (() => RouteNavigators.route(
-                        context,
-                        PhotoView(
-                          imageProvider: NetworkImage(post.imageMediaItems![2]),
-                          loadingBuilder: (context, event) => const Center(
-                            child:
-                                CupertinoActivityIndicator(color: Colors.white),
-                          ),
-                        ),
-                      )),
-                  child: Container(
-                    height: getScreenHeight(150),
-                    width: getScreenWidth(180),
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: post.imageMediaItems![2],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        );
+              ),
+            ],
+          )
+        ],
+      );
     } else {
       return GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
@@ -457,30 +457,31 @@ class Helper {
             return GestureDetector(
               onTap: (() => RouteNavigators.route(
                     context,
-                     ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: imageLength,
-                    itemBuilder: (context, index) => Container(                 
-                       decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-                    //clipBehavior: Clip.hardEdge,
-                      width: MediaQuery.of(context).size.width,
-                      //height:MediaQuery.of(context).size.height ,
-                      margin: const EdgeInsets.only(right: 50),
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: imageLength,
+                      itemBuilder: (context, index) => Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        //clipBehavior: Clip.hardEdge,
+                        width: MediaQuery.of(context).size.width,
+                        //height:MediaQuery.of(context).size.height ,
+                        margin: const EdgeInsets.only(right: 50),
 
-                      child: PhotoView(
-                          imageProvider:
-                              NetworkImage(post.imageMediaItems![index],),
-                          loadingBuilder: (context, event) => const Center(
-                                child: CupertinoActivityIndicator(
-                                  color: Colors.white,
-                                ),
-                              )),
+                        child: PhotoView(
+                            imageProvider: NetworkImage(
+                              post.imageMediaItems![index],
+                            ),
+                            loadingBuilder: (context, event) => const Center(
+                                  child: CupertinoActivityIndicator(
+                                    color: Colors.white,
+                                  ),
+                                )),
+                      ),
                     ),
-                  ),
-              )),
+                  )),
               child: Container(
                 height: getScreenHeight(300),
                 clipBehavior: Clip.hardEdge,
@@ -495,7 +496,6 @@ class Helper {
           });
     }
 
-    
     /*
        return GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
@@ -564,7 +564,7 @@ class Helper {
               ),
             );
           });
-    
+
     */
     // switch (post.imageMediaItems!.length) {
     //   case 1:
@@ -734,7 +734,7 @@ class Helper {
   //                   scrollDirection: Axis.horizontal,
   //                   shrinkWrap: true,
   //                   itemCount: imageLength,
-  //                   itemBuilder: (context, index) => Container(                 
+  //                   itemBuilder: (context, index) => Container(
   //                      decoration: BoxDecoration(
   //             borderRadius: BorderRadius.circular(8),
   //           ),
@@ -799,7 +799,7 @@ class Helper {
   //                   scrollDirection: Axis.horizontal,
   //                   shrinkWrap: true,
   //                   itemCount: imageLength,
-  //                   itemBuilder: (context, index) => Container(                 
+  //                   itemBuilder: (context, index) => Container(
   //                      decoration: BoxDecoration(
   //             borderRadius: BorderRadius.circular(8),
   //           ),
@@ -832,7 +832,7 @@ class Helper {
   //           ),
   //         ),
   //       );
-  //   }    
+  //   }
   //   else if (post.imageMediaItems!.length == 3) {
   //     int remImageLength =
   //         1; // length of extra image not seen in the grid at first
@@ -847,7 +847,7 @@ class Helper {
   //                   scrollDirection: Axis.horizontal,
   //                   shrinkWrap: true,
   //                   itemCount: imageLength,
-  //                   itemBuilder: (context, index) => Container(                 
+  //                   itemBuilder: (context, index) => Container(
   //                      decoration: BoxDecoration(
   //             borderRadius: BorderRadius.circular(8),
   //           ),
@@ -959,7 +959,7 @@ class Helper {
   //                   scrollDirection: Axis.horizontal,
   //                   shrinkWrap: true,
   //                   itemCount: imageLength,
-  //                   itemBuilder: (context, index) => Container(                 
+  //                   itemBuilder: (context, index) => Container(
   //                      decoration: BoxDecoration(
   //             borderRadius: BorderRadius.circular(8),
   //           ),
@@ -993,7 +993,6 @@ class Helper {
   //         });
   //   }
 
-    
   //   /*
   //      return GridView.builder(
   //         physics: const NeverScrollableScrollPhysics(),
@@ -1062,7 +1061,7 @@ class Helper {
   //             ),
   //           );
   //         });
-    
+
   //   */
   //   // switch (post.imageMediaItems!.length) {
   //   //   case 1:

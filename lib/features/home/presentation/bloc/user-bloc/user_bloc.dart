@@ -313,7 +313,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
       try {
         final response = await userRepository.getReachRelationship(
-          userId: event.userIdToReach!,
+          userId: event.userIdToReach ?? '',
           type: event.type!,
         );
         response.fold(
@@ -344,7 +344,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoading());
       try {
         final response = await userRepository.getStarRelationship(
-          userId: event.userIdToStar!,
+          userId: event.userIdToStar ?? '',
         );
         response.fold(
           (error) => emit(UserError(error: error)),

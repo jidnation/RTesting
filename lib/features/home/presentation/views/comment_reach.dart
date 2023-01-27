@@ -1535,7 +1535,9 @@ class _CommentReachState extends State<CommentReach> {
             }
             return Future.value(false);
           },
-        ));
+        )
+        
+        );
   }
 
   Widget replyWidget(String replyFeature) {

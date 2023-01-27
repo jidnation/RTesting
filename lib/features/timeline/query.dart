@@ -169,6 +169,31 @@ class TimeLineQuery {
     return queryResult.data?['votePost'] ?? false;
   }
 
+  deleteVotedPost({required String postId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {'postId': postId};
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.deleteVotedPost,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my post-unLiking-query::::: $queryResult');
+    return queryResult.data?['deletePostVote'] ?? false;
+  }
+
   unlikePost({required String postId}) async {
     HttpLink link = HttpLink(
       hostUrl,
@@ -225,20 +250,4 @@ class TimeLineQuery {
       return null;
     }
   }
-
-  // Future<Either<String, List<StatusFeedResponseModel>>?>? getMutedStatus({
-  //   required int pageLimit,
-  //   required int pageNumber,
-  // }) async {
-  //   try {
-  //     final posts = await SocialServiceRepository().muteStatus(
-  //       pageLimit: pageLimit,
-  //       pageNumber: pageNumber,
-  //     );
-  //     print('::::::::::::::::::::::::::::from status:: $posts');
-  //     return posts;
-  //   } on GraphQLError catch (e) {
-  //     return null;
-  //   }
-  // }
 }

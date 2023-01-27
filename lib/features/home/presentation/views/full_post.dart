@@ -615,7 +615,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                       ?.ensureTooltipVisible();
                                                 },
                                                 expandText: 'see more',
-                                                maxLines: 2,
+                                                maxLines: 3,
                                                 linkColor: Colors.blue,
                                                 animation: true,
                                                 expanded: false,
@@ -674,10 +674,17 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                     ?.videoMediaItem ??
                                                 '')
                                             .isNotEmpty)
-                                          TimeLineVideoPlayer(
-                                              post: widget.postFeedModel!.post!,
-                                              videoUrl: widget.postFeedModel!
-                                                  .post!.videoMediaItem!)
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                2,
+                                            child: TimeLineVideoPlayer(
+                                                post:
+                                                    widget.postFeedModel!.post!,
+                                                videoUrl: widget.postFeedModel!
+                                                    .post!.videoMediaItem!),
+                                          )
                                         else
                                           const SizedBox.shrink(),
                                         (widget.postFeedModel?.post
@@ -706,7 +713,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                 ]),
                                               )
                                             : const SizedBox.shrink(),
-
+                                        const SizedBox(height: 10),
                                         // likes and message
                                         Row(children: [
                                           GestureDetector(
