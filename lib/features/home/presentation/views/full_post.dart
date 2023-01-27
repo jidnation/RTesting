@@ -1512,7 +1512,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 Flexible(
                   child: CustomRoundTextField(
                     onTap: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context,
                           CommentReach(
                             postFeedModel: postFeedModel,
@@ -1540,7 +1540,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                         return;
                       } else {
                         for (var e in image) {
-                          RouteNavigators.route(
+                          RouteNavigators.routeReplace(
                               context,
                               CommentReach(
                                 postFeedModel: postFeedModel,
@@ -1581,7 +1581,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   Flexible(
                     child: CustomRoundTextField(
                       onTap: () {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                             CommentReach(
                               postFeedModel: postFeedModel!,
@@ -1623,7 +1623,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   Flexible(
                     child: CustomRoundTextField(
                       onTap: () {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                             CommentReach(
                               postFeedModel: postFeedModel!,
@@ -1666,7 +1666,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 Flexible(
                   child: CustomRoundTextField(
                     onTap: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context,
                           CommentReach(
                             postFeedModel: postFeedModel!,
