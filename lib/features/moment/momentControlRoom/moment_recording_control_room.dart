@@ -132,6 +132,7 @@ class MomentVideoControl {
                           InkWell(
                             onTap: () async {
                               Get.close(1);
+                              momentCtrl.playSound(false);
                               momentCtrl.audioFilePath("");
                               momentCtrl.audioUrl("");
                               momentCtrl
@@ -157,6 +158,8 @@ class MomentVideoControl {
                           ),
                           InkWell(
                             onTap: () async {
+                              Get.close(1);
+                              momentCtrl.playSound(false);
                               await startMergedVideoPlayer(videoFile, context);
                             },
                             child: Container(
@@ -193,6 +196,7 @@ class MomentVideoControl {
 
   Future<void> startMergedVideoPlayer(
       File videoFile, BuildContext context) async {
+    momentCtrl.getAudioUrl();
     CustomDialog.openDialogBox(
         height: SizeConfig.screenHeight * 0.9,
         width: SizeConfig.screenWidth,

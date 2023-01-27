@@ -44,6 +44,7 @@ class _AudioPreviewerState extends State<AudioPreviewer> {
           ';;;;;;;;;;;;;;;;;<<AUDIO-LISTENER>> ${playerController.playerState.name}');
       if (event == PlayerState.initialized) {
         isInitialised = true;
+        playerController.startPlayer(finishMode: FinishMode.loop);
         if (mounted) setState(() {});
       } else if (event == PlayerState.playing) {
         isPlaying = true;

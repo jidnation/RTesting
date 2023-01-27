@@ -34,7 +34,6 @@ class MomentPosting extends StatefulWidget {
 
 int countDownTime = 0;
 bool showTimer = false;
-bool playSound = false;
 
 class _MomentPostingState extends State<MomentPosting> {
   @override
@@ -49,6 +48,7 @@ class _MomentPostingState extends State<MomentPosting> {
     final size = MediaQuery.of(context).size;
     return Obx(() {
       PlatformFile soundFile = momentCtrl.audioFile.value;
+      bool playSound = momentCtrl.playSound.value;
       return Column(children: [
         Expanded(
           child: Container(
@@ -164,9 +164,7 @@ class _MomentPostingState extends State<MomentPosting> {
                                     visible: soundFile.name.isNotEmpty,
                                     child: GestureDetector(
                                       onTap: () {
-                                        setState(() {
-                                          playSound = true;
-                                        });
+                                        momentCtrl.playSound(true);
                                       },
                                       child: Icon(
                                         Icons.play_arrow,

@@ -9,9 +9,10 @@ import '../media_service.dart';
 
 class MomentController extends GetxController {
   final RxString audioUrl = ''.obs;
-  final RxString audioFilePath = ''.obs;
   final Rx<PlatformFile> audioFile = PlatformFile(name: "", size: 0).obs;
+  final RxString audioFilePath = ''.obs;
   final RxString caption = ''.obs;
+  final RxBool playSound = false.obs;
   // final RxString noAudioVideoFilePath = ''.obs;
   final RxString mergedVideoPath = ''.obs;
   final Rx<PlayerController> previewerAudioController = PlayerController().obs;

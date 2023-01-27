@@ -600,7 +600,6 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
       videoController: controller,
     );
     momentCtrl.endTime(time);
-    momentCtrl.getAudioUrl();
     File videoFile = File(rawVideo!.path);
 
     int currentUnix = DateTime.now().millisecondsSinceEpoch;
