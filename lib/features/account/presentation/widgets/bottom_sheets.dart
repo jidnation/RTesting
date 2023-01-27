@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
-import 'package:image_viewer/image_viewer.dart';
 import 'package:reach_me/core/components/bottom_sheet_list_tile.dart';
 import 'package:reach_me/core/components/snackbar.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -604,12 +602,12 @@ Future showUserStoryBottomSheet(BuildContext context,
                           // KebabBottomTextButton(
                           //     label: 'Share', onPressed: () {}),
                           KebabBottomTextButton(
-                              label: (status.status?.isMuted ?? false) &&
+                              label: (status.status?.isMuted ?? false) ||
                                       (isMuted ?? false)
                                   ? 'Unmute'
                                   : 'Mute',
                               onPressed: () async {
-                                if ((status.status?.isMuted ?? false) &&
+                                if ((status.status?.isMuted ?? false) ||
                                     (isMuted ?? false)) {
                                   globals.showLoader(context);
                                   globals.socialServiceBloc!.add(
@@ -741,11 +739,11 @@ Future showPostReactors(BuildContext context,
   );
 }
 
-Future showProfilePictureOrViewStatus(
-    BuildContext context, {tp.ErProfile? tPostOwnerInfo,
+Future showProfilePictureOrViewStatus(BuildContext context,
+    {tp.ErProfile? tPostOwnerInfo,
     List<StatusFeedResponseModel>? userStatus}) async {
   Size size = MediaQuery.of(context).size;
- 
+
   return showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
@@ -777,15 +775,19 @@ Future showProfilePictureOrViewStatus(
                       onPressed: () async {
                         RouteNavigators.routeReplace(
                             context,
-                             pictureViewer(context, ownerProfilePicture: tPostOwnerInfo)
-                                  );
+                            pictureViewer(context,
+                                ownerProfilePicture: tPostOwnerInfo));
                       }),
                   KebabBottomTextButton(
                     label: 'View Status',
                     onPressed: () {
                       RouteNavigators.routeReplace(
-                          context, ViewUserStatus(status: userStatus!.firstWhere(
-                            (e) => e.id == tPostOwnerInfo!.username).status!));
+                          context,
+                          ViewUserStatus(
+                              status: userStatus!
+                                  .firstWhere(
+                                      (e) => e.id == tPostOwnerInfo!.username)
+                                  .status!));
                     },
                   )
                 ],
@@ -796,12 +798,10 @@ Future showProfilePictureOrViewStatus(
       });
 }
 
-
-Future showProfilePictureOrViewStatus2(
-    BuildContext context, {User? user,
-    List<StatusFeedResponseModel>? userStatus}) async {
+Future showProfilePictureOrViewStatus2(BuildContext context,
+    {User? user, List<StatusFeedResponseModel>? userStatus}) async {
   Size size = MediaQuery.of(context).size;
- 
+
   return showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
@@ -831,17 +831,18 @@ Future showProfilePictureOrViewStatus2(
                   KebabBottomTextButton(
                       label: 'Show Profile Picture',
                       onPressed: () async {
-                        RouteNavigators.routeReplace(
-                            context,
-                             pictureViewer2(context, ownerProfilePicture: user)
-                                  );
+                        RouteNavigators.routeReplace(context,
+                            pictureViewer2(context, ownerProfilePicture: user));
                       }),
                   KebabBottomTextButton(
                     label: 'View Status',
                     onPressed: () {
                       RouteNavigators.routeReplace(
-                          context, ViewUserStatus(status: userStatus!.firstWhere(
-                            (e) => e.id == user!.username).status!));
+                          context,
+                          ViewUserStatus(
+                              status: userStatus!
+                                  .firstWhere((e) => e.id == user!.username)
+                                  .status!));
                     },
                   )
                 ],

@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
+import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
 import 'package:reach_me/features/home/presentation/views/status/widgets/status_bubble.dart';
 import 'package:reach_me/features/timeline/suggestion_widget.dart';
 import 'package:reach_me/features/timeline/timeline_action-box.dart';
@@ -218,14 +219,28 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   statusCount: _myStatus.length,
                                                   username: 'Your Status',
                                                   onTap: () {
+                                                    // RouteNavigators.route(
+                                                    //     context,
+                                                    //     ViewMyStatus(
+                                                    //         status: _myStatus));
+
                                                     RouteNavigators.route(
                                                         context,
-                                                        ViewMyStatus(
-                                                            status: _myStatus));
+                                                        StatusViewPage(
+                                                          isMe: true,
+                                                          status: _myStatus
+                                                              .map((e) => StatusFeedModel(
+                                                                  status: e,
+                                                                  statusOwnerProfile:
+                                                                      e.profileModel))
+                                                              .toList(),
+                                                        ));
                                                   },
                                                 ),
                                               SizedBox(
-                                                width: 16,
+                                                width: _myStatus.isNotEmpty
+                                                    ? 16
+                                                    : 0,
                                               ),
                                               ListView.separated(
                                                   scrollDirection:
@@ -251,7 +266,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                 .last
                                                                 .status!,
                                                         isMe: false,
-                                                        isLive: false,
+                                                        isLive: _userStatus[
+                                                                    index]
+                                                                .isLiveStreamActive !=
+                                                            null,
                                                         username: _userStatus[
                                                                 index]
                                                             .status![0]
@@ -261,7 +279,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                           final res = await Navigator.push(
                                                               context,
                                                               MaterialPageRoute(
-                                                                  builder: (c) => ViewUserStatus(
+                                                                  builder: (c) => StatusViewPage(
                                                                       isMuted:
                                                                           false,
                                                                       status: _userStatus[
@@ -345,7 +363,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (c) =>
-                                                                ViewUserStatus(
+                                                                StatusViewPage(
                                                                     isMuted:
                                                                         true,
                                                                     status: _mutedStatus[

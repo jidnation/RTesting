@@ -44,7 +44,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<StatusModel> _myStatus = <StatusModel>[];
   List<StatusModel> get myStatus => _myStatus;
 
-  List<StatusFeedResponseModel> _userStatus = <StatusFeedResponseModel>[];
+  List<StatusFeedResponseModel> _userStatus = List.empty(growable: true);
   List<StatusFeedResponseModel> get userStatus => _userStatus;
 
   List<StatusFeedResponseModel> _mutedStatus = <StatusFeedResponseModel>[];
@@ -487,14 +487,21 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   muteStatus(int index) {
-    _mutedStatus = [..._mutedStatus, _userStatus[index]];
+    final _status = _userStatus[index];
+    for (int i = 0; i < _status.status!.length; i++) {
+      _status.status![i].status!.isMuted = true;
+    }
+    _mutedStatus = [..._mutedStatus, _status];
     _userStatus = [..._userStatus]..removeAt(index);
     notifyListeners();
   }
 
   unMuteStatus(int index) {
     final _status = _mutedStatus[index];
-    _userStatus = [..._userStatus, _mutedStatus[index]];
+    for (int i = 0; i < _status.status!.length; i++) {
+      _status.status![i].status!.isMuted = false;
+    }
+    _userStatus = [..._userStatus, _status];
     _mutedStatus = [..._mutedStatus]..removeAt(index);
     notifyListeners();
   }
@@ -516,15 +523,24 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   getMutedStatus() {
     _mutedStatus = [];
     for (StatusFeedResponseModel actualStatus in _userStatus) {
-      List<StatusFeedModel> statusList = actualStatus.status!;
-      for (StatusFeedModel status in statusList) {
-        if (status.status?.isMuted ?? false) {
-          _mutedStatus.add(actualStatus);
-          _userStatus.remove(actualStatus);
-        }
-        break;
+      if (actualStatus.isMuted ??
+          false ||
+              (actualStatus.status ?? [])
+                  .where((e) => e.status?.isMuted ?? false)
+                  .isNotEmpty) {
+        _mutedStatus.add(actualStatus);
+        _userStatus.remove(actualStatus);
       }
-      _mutedStatus.toSet();
+
+      // List<StatusFeedModel> statusList = actualStatus.status!;
+      // for (StatusFeedModel status in statusList) {
+      //   if (status.isMuted ?? false) {
+      //     _mutedStatus.add(actualStatus);
+      //     _userStatus.remove(actualStatus);
+      //   }
+      //   break;
+      // }
+      // _mutedStatus.toSet();
     }
     notifyListeners();
   }

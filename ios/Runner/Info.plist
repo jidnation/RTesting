@@ -56,5 +56,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+    	<key>NSAllowsArbitraryLoads</key>
+    	<true/>
+    </dict>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Read your photos for display</string>
 </dict>
 </plist>
