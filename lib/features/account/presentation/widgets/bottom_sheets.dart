@@ -313,7 +313,7 @@ Future showReacherCardBottomSheet(BuildContext context,
                                     'Have fun viewing this: ${postFeedModel.post!.postSlug!}');
                               }),
                           KebabBottomTextButton(
-                              label: 'Repost',
+                              label: 'Quote post',
                               onPressed: () {
                                 RouteNavigators.pop(context);
                                 RouteNavigators.route(context,
