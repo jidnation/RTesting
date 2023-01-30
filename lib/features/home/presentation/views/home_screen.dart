@@ -13,6 +13,7 @@ import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
 import '../../../moment/moment_feed.dart';
+import '../../../moment/user_posting.dart';
 import '../../../timeline/timeline_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
@@ -35,8 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final _currentIndex = useState<int>(0);
     final _pageController = usePageController(initialPage: _currentIndex.value);
-    final scaffoldKey =
+    final ValueNotifier<GlobalKey<ScaffoldState>> scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
+    momentCtrl.userBar(scaffoldKey.value);
+    ValueNotifier<GlobalKey<ScaffoldState>> data = scaffoldKey;
     final pages = [
       // TimelineScreen(scaffoldKey: scaffoldKey.value),
       TimeLineFeed(scaffoldKey: scaffoldKey.value),

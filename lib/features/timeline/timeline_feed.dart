@@ -320,7 +320,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                         child: ListView.separated(
                                             scrollDirection: Axis.horizontal,
                                             separatorBuilder:
-                                                (context, index) => SizedBox(
+                                                (context, index) => const SizedBox(
                                                       width: 16,
                                                     ),
                                             itemBuilder: (context, index) =>

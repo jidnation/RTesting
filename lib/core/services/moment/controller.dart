@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:audio_waveforms/src/controllers/player_controller.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../features/moment/moment_feed.dart';
@@ -15,6 +16,7 @@ class MomentController extends GetxController {
   final RxBool playSound = false.obs;
   // final RxString noAudioVideoFilePath = ''.obs;
   final RxString mergedVideoPath = ''.obs;
+  final Rx<GlobalKey<ScaffoldState>?> userBar =   GlobalKey<ScaffoldState>().obs;
   final Rx<PlayerController> previewerAudioController = PlayerController().obs;
   final RxInt endTime = 0.obs;
   final RxInt momentCounter = 0.obs;
