@@ -334,7 +334,7 @@ class TimeLineBox extends StatelessWidget {
                       child: ExpandableText(
                         "${tPostInfo.content}",
                         prefixText: tPostInfo.edited!
-                            ? "(Reach Edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())})"
+                            ? "(Reach Edited)"
                             : null,
                         prefixStyle: TextStyle(
                             fontSize: getScreenHeight(12),
@@ -345,7 +345,7 @@ class TimeLineBox extends StatelessWidget {
                           tooltipkey.currentState?.ensureTooltipVisible();
                         },
                         expandText: 'see more',
-                        maxLines: 2,
+                        maxLines: 3,
                         linkColor: Colors.blue,
                         animation: true,
                         expanded: false,
@@ -379,7 +379,7 @@ class TimeLineBox extends StatelessWidget {
                       key: tooltipkey,
                       triggerMode: TooltipTriggerMode.manual,
                       showDuration: const Duration(seconds: 1),
-                      message: 'This reach has been edited',
+                      message: 'This reach was edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())}',
                     ),
                     SizedBox(height: tPostInfo.content!.isNotEmpty ? 8 : 0),
                     Visibility(

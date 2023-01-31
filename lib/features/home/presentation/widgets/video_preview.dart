@@ -1,6 +1,8 @@
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
+import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
+import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPreview extends StatefulWidget {
@@ -8,13 +10,17 @@ class VideoPreview extends StatefulWidget {
   final bool? showControls, loop;
   final String path;
   final double? aspectRatio;
+  final Function(BetterPlayerController controller)? onInitialised;
+  final BetterPlayerController? controller;
   const VideoPreview(
       {Key? key,
       required this.isLocalVideo,
       required this.path,
       this.aspectRatio,
       this.showControls,
-      this.loop})
+      this.loop,
+      this.controller,
+      this.onInitialised})
       : super(key: key);
 
   @override
@@ -24,12 +30,12 @@ class VideoPreview extends StatefulWidget {
 class _VideoPreviewState extends State<VideoPreview> {
   late BetterPlayerController _betterPlayerController;
   late VideoPlayerController _videoPlayerController;
+  bool _initialised = false;
 
   @override
   void initState() {
     super.initState();
     initBetterPlayer();
-    // initializePlayer();
   }
 
   void initBetterPlayer() {
@@ -78,6 +84,12 @@ class _VideoPreviewState extends State<VideoPreview> {
         _betterPlayerController.setOverriddenAspectRatio(
             _betterPlayerController.videoPlayerController?.value.aspectRatio ??
                 1);
+
+        if (widget.onInitialised != null) {
+          widget.onInitialised!(_betterPlayerController);
+          globals.statusVideoController = _betterPlayerController;
+        }
+        _initialised = true;
         setState(() {});
       }
     });
@@ -95,9 +107,20 @@ class _VideoPreviewState extends State<VideoPreview> {
       key: Key(widget.path),
       child: Container(
         color: AppColors.black,
-        child: BetterPlayer(
-          controller: _betterPlayerController,
-        ),
+        alignment: Alignment.center,
+        child: _initialised
+            ? BetterPlayer(
+                controller: widget.onInitialised != null
+                    ? globals.statusVideoController!
+                    : _betterPlayerController,
+              )
+            : SizedBox(
+                height: getScreenHeight(64),
+                width: getScreenWidth(64),
+                child: CircularProgressIndicator(
+                  color: AppColors.white,
+                ),
+              ),
       ),
     );
   }

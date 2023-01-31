@@ -323,7 +323,7 @@ class SocialServiceRepository {
     }
   }
 
-  Future<Either<String,CommentModel>> getSingleCommentOnPost({
+  Future<Either<String, CommentModel>> getSingleCommentOnPost({
     required String commentId,
   }) async {
     try {
@@ -553,6 +553,7 @@ class SocialServiceRepository {
           pageNumber: pageNumber,
           voteType: voteType,
           authId: authId);
+      print("Voted posts ${posts}");
       return Right(posts);
     } on GraphQLError catch (e) {
       return Left(e.message);
