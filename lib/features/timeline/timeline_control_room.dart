@@ -260,7 +260,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         );
         if (response) {
           initialize(isUpvoting: true);
-          fetchMyPost();
+          fetchMyPost(isRefresh: true);
           Snackbars.success(
             context,
             message:
@@ -734,7 +734,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (response) {
       List<TimeLineModel> currentPosts = isProfile ? _myPosts : value;
       currentPosts.removeWhere((element) => element.id == id);
-      fetchMyPost();
+      fetchMyPost(isRefresh: true);
       initialize(isUpvoting: true);
     }
   }
@@ -746,30 +746,37 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<TimeLineModel> _myPosts = <TimeLineModel>[];
   List<TimeLineModel> get myPosts => _myPosts;
 
-  fetchMyPost({int? pageNumber, int? pageLimit}) async {
-print('>>>>>>>>>>>>>>>>>>>>>${globals.userId}');
-    List<Post>? response = await timeLineQuery.getAllPosts(authIdToGet: globals.userId);
-    if(response != null) {
-      _myPosts = [];
-      for (Post post in response) {
-        _myPosts.add(
-            TimeLineModel(getPostFeed: GetPostFeed(post: post), isShowing: true));
-      }}
-    List<CustomCounter> likeBoxInfo = [];
-if (_myPosts.isNotEmpty) {
-  timeLineController.likeBox2([]);
-  for (TimeLineModel element in _myPosts) {
-    likeBoxInfo.add(CustomCounter(
-        id: element.id,
-        data: LikeModel(
-          nLikes: element.getPostFeed.post?.nLikes ?? 0,
-          isLiked: element.getPostFeed.post?.isLiked ?? false,
-        )));
+  fetchMyPost({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController}) async {
+    if (_myPosts.isEmpty || isRefresh) {
+      List<Post>? response = await timeLineQuery.getAllPosts(
+          authIdToGet: globals.userId);
+      if (response != null) {
+        _myPosts = [];
+        for (Post post in response) {
+          _myPosts.add(
+              TimeLineModel(
+                  getPostFeed: GetPostFeed(post: post), isShowing: true));
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myPosts.isNotEmpty) {
+        timeLineController.likeBox2([]);
+        for (TimeLineModel element in _myPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeBox2(likeBoxInfo);
+        if(refreshController != null){
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
   }
-      timeLineController.likeBox2(likeBoxInfo);
-}
-    notifyListeners();
-}
 }
 
 class TimeLineModel {

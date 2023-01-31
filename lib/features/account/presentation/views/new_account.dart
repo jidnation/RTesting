@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
@@ -40,7 +41,8 @@ class NewAccountScreen extends HookWidget {
         .of(context)
         .size;
     return Obx((){
-      bool foldMe = timeLineController.isScrolling.value;
+      timeLineFeedStore.fetchMyPost(isRefresh: false);
+      bool foldMe = !timeLineController.isScrolling.value;
 return
       SizedBox(
         height: SizeConfig.screenHeight,
@@ -406,7 +408,7 @@ return
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-const SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -495,7 +497,6 @@ Column(
                             isSelected: selectedTab.value == value,
                             value: value,
                             onClick: () {
-                              timeLineFeedStore.fetchMyPost();
                               selectedTab.value = value;
                             });
                       }),
@@ -516,6 +517,8 @@ class ReachTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    RefreshController _refreshController =
+    RefreshController(initialRefresh: false);
     return ValueListenableBuilder(
     valueListenable: TimeLineFeedStore(),
     builder: (context, List<TimeLineModel> value, child) {
@@ -524,37 +527,52 @@ class ReachTab extends StatelessWidget {
     child: NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
         if (scrollNotification is ScrollStartNotification) {
+          timeLineController.isScrolling(true);
           print(":;;;;;;;;;;;;;;;;;;;::::::::::::::");
         }
         return false;
       },
-      child: ListView.builder(
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        physics: const ScrollPhysics(),
-        itemBuilder: (context, index){
-          TimeLineModel post = data[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: Stack(children: [
-              TimeLineBox(
-                timeLineModel: post,
-              ),
-              Positioned(
-                  bottom: 10,
-                  left: 30,
-                  right: 30,
-                  child:
-                  TimeLineBoxActionRow(
-                    timeLineId: post.id,
-                    isProfile: true,
-                    post: post
-                        .getPostFeed.post!,
-                  )),
-            ]),
+      child: SmartRefresher(
+        physics: const BouncingScrollPhysics(),
+        onRefresh: () {
+          timeLineFeedStore.fetchMyPost(
+            isRefresh: true,
+            refreshController:
+            _refreshController,
+            // isRefresh: true,
           );
+          // await Future.delayed(const Duration(seconds: 10));
+          // _refreshController.refreshCompleted();
         },
+        controller: _refreshController,
+        child: ListView.builder(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          physics: const ScrollPhysics(),
+          itemBuilder: (context, index){
+            TimeLineModel post = data[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Stack(children: [
+                TimeLineBox(
+                  timeLineModel: post,
+                ),
+                Positioned(
+                    bottom: 10,
+                    left: 30,
+                    right: 30,
+                    child:
+                    TimeLineBoxActionRow(
+                      timeLineId: post.id,
+                      isProfile: true,
+                      post: post
+                          .getPostFeed.post!,
+                    )),
+              ]),
+            );
+          },
 itemCount: data.length,
+        ),
       ),
     ),
       );
