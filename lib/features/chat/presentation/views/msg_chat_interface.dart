@@ -283,10 +283,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               showIsSending.value = false;
               _quotedData.value = null;
               // _controller.jumpTo(_controller.position.maxScrollExtent);
+              
             }
             if (state is UserUploadingImage) {
               toast('Uploading media...',
-                  duration: const Duration(milliseconds: 700));
+                  duration: const Duration(milliseconds: 1000));
             }
 
             if (state is ChatUploadError) {
@@ -301,8 +302,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   curve: Curves.easeOut,
                 );
               });
-              toast('Media Upload Succesfully...',
-                  duration: const Duration(milliseconds: 100));
+              toast('Uploading media...',
+                  duration: const Duration(milliseconds: 300));
               globals.chatBloc!.add(SendChatMessageEvent(
                   senderId: globals.user!.id,
                   receiverId: widget.recipientUser!.id,

@@ -62,7 +62,7 @@ class _SearchScreenState extends State<SearchScreen>
         ).paddingOnly(t: 10, l: 10),
         title: CustomRoundTextField(
           hintText: 'Search ReachMe',
-          fillColor: AppColors.white,
+          fillColor: const Color.fromARGB(255, 240, 240, 243),
           controller: _searchController,
           maxLines: 1,
           onChanged: (val) {
