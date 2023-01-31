@@ -66,11 +66,11 @@ class _DictionaryViewState extends State<DictionaryView> {
             onPressed: () =>
                 RouteNavigators.route(context, const SearchHistory()),
           ),
-          DictionaryTab(
-            contentText: 'World Library',
-            onPressed: () =>
-                RouteNavigators.route(context, const WordLibrary()),
-          ),
+          // DictionaryTab(
+          //   contentText: 'World Library',
+          //   onPressed: () =>
+          //       RouteNavigators.route(context, const WordLibrary()),
+          // ),
         ],
       ),
     );

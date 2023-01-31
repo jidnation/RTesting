@@ -85,20 +85,20 @@ class AppDrawer extends HookWidget {
                                   ),
                                 ],
                               ),
-                              GestureDetector(
-                                onTap: () =>
-                                    showOtherItem.value = !showOtherItem.value,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    showOtherItem.value
-                                        ? Icons.keyboard_arrow_down
-                                        : Icons.keyboard_arrow_up,
-                                    color: AppColors.textColor2,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
+                              // GestureDetector(
+                              //   onTap: () =>
+                              //       showOtherItem.value = !showOtherItem.value,
+                              //   child: Padding(
+                              //     padding: const EdgeInsets.all(8.0),
+                              //     child: Icon(
+                              //       showOtherItem.value
+                              //           ? Icons.keyboard_arrow_down
+                              //           : Icons.keyboard_arrow_up,
+                              //       color: AppColors.textColor2,
+                              //       size: 20,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
