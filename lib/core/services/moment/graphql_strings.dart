@@ -498,6 +498,115 @@ query ($pageNumber: Int!, $pageLimit: Int! ) {
   }
 ''';
 
+const String getAllPosts = r''' 
+query ($pageNumber: Int!, $pageLimit: Int! , $authId: String) {
+  getAllPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
+    created_at,
+    updated_at,
+     repostedPost{
+        authId,
+      postId,
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      isVoted,
+      postSlug,
+      edited,
+      postOwnerProfile{
+          authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+      },
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+    
+  }
+  }
+''';
+
 const String getPost = r''' 
 query ($postId: String!) {
   getPost(postId: $postId){

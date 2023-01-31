@@ -851,7 +851,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     color: AppColors.greyShade5),
                               )),
                           SizedBox(height: getScreenHeight(15)),
-                        ],
+                        ]
                       ).paddingOnly(t: 50),
                     ),
                     Visibility(
@@ -1050,7 +1050,7 @@ class _AccountScreenState extends State<AccountScreen>
                                                 subtitle:
                                                     "Find all posts or contributions you’ve made here ",
                                               )
-                                            ],
+                                            ]
                                           )
                                         : ListView.builder(
                                             itemCount: _posts.value.length,

@@ -250,4 +250,44 @@ class TimeLineQuery {
       return null;
     }
   }
+
+  Future<List<Post>?> getAllPosts(
+      {int? pageLimit, int? pageNumber, String? authIdToGet}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+
+    // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
+    Map<String, dynamic> queryVariables = {
+      'pageLimit': pageLimit ?? 50,
+      'pageNumber': pageNumber ?? 1
+    };
+
+    authIdToGet != null
+        ? queryVariables.addAll({'authId': authIdToGet})
+        : null;
+
+    QueryResult queryResult = await qlClient.query(
+      // here it's get type so using query method
+      QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(
+            gql_string.getAllPosts,
+          ),
+          variables: queryVariables),
+    );
+    log('from my-my-timeline-query::::: $queryResult');
+    if (queryResult.data != null) {
+      return GetAllPostsModel.fromJson(queryResult.data!).getAllPosts;
+    } else {
+      return null;
+    }
+  }
 }
