@@ -168,8 +168,8 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                               bottom: 110,
                               right: 20,
                               child: SizedBox(
-                                width: size.width * 0.3,
-                                height: size.height * 0.2,
+                                width: size.width * 0.25,
+                                height: size.height * 0.15,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(5),
                                   child: _localPreview(
