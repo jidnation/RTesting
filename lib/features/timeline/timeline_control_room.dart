@@ -188,8 +188,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
-  likePost(String id, {required bool isProfile}) async {
-    List<TimeLineModel> currentData = isProfile ? myPosts : value;
+  likePost(String id, {required String type}) async {
+    List<TimeLineModel> currentData = getExactValue(type);
     TimeLineModel actualModel =
         currentData.firstWhere((element) => element.id == id);
     Post post = actualModel.getPostFeed.post!;
@@ -213,8 +213,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   votePost(BuildContext context,
-      {required String id, required String voteType, required bool isProfile}) async {
-    List<TimeLineModel> currentData = isProfile? _myPosts : value;
+      {required String id, required String voteType, required String type}) async {
+
+    List<TimeLineModel> currentData = getExactValue(type);
     TimeLineModel actualModel =
         currentData.firstWhere((element) => element.id == id);
     Post post = actualModel.getPostFeed.post!;
@@ -243,7 +244,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
                 );
         }
         if (voteType.toLowerCase() == 'downvote') {
-          timeLineFeedStore.removePost(context, id, isProfile: isProfile);
+          timeLineFeedStore.removePost(context, id, type: type);
         }
       } else {
         Snackbars.error(
@@ -270,10 +271,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
         }
       } else {
-        deleteVotedPost(postId: post.postId!, id: id, isProfile: isProfile);
+        deleteVotedPost(postId: post.postId!, id: id, type: type);
       }
       if (voteType.toLowerCase() == 'downvote') {
-        timeLineFeedStore.removePost(context, id, isProfile: isProfile);
+        timeLineFeedStore.removePost(context, id, type: type);
       }
     }
   }
@@ -428,9 +429,21 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     ) : null;
     return postFeedModel;
   }
+  
+  List<TimeLineModel> getExactValue(String  type){
+    Map<String, dynamic> mapper = {
+      'profile' : _myPosts,
+      'post' : value,
+      'likes': _myLikedPosts
+    };
+    
+    return mapper[type];
+  }
+  
 
-  removePost(BuildContext context, String id, {bool? isDelete, required bool isProfile}) {
-    List<TimeLineModel> currentPosts = isProfile? _myPosts : value;
+  removePost(BuildContext context, String id, {bool? isDelete, required String type}) {
+
+    List<TimeLineModel> currentPosts = getExactValue(type);
     currentPosts.removeWhere((element) => element.id == id);
     if (isDelete ?? false) {
       Snackbars.success(
@@ -442,8 +455,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
-  pt.PostFeedModel? getPostModelById(String timeLineId, {required bool isProfile}) {
-    List<TimeLineModel> currentPosts = isProfile ? _myPosts : value;
+  pt.PostFeedModel? getPostModelById(String timeLineId, {required String type}) {
+    List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
     return getPostModel(timeLineModel: actualModel);
@@ -748,10 +761,11 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
-  deleteVotedPost({required String postId, required String id, required bool isProfile}) async {
+  deleteVotedPost({required String postId, required String id, required String type}) async {
     bool response = await timeLineQuery.deleteVotedPost(postId: postId);
     if (response) {
-      List<TimeLineModel> currentPosts = isProfile ? _myPosts : value;
+     
+      List<TimeLineModel> currentPosts = getExactValue(type);
       currentPosts.removeWhere((element) => element.id == id);
       fetchMyPost(isRefresh: true);
       initialize(isUpvoting: true);
@@ -765,7 +779,14 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<TimeLineModel> _myPosts = <TimeLineModel>[];
   List<TimeLineModel> get myPosts => _myPosts;
 
+
+  List<TimeLineModel> _myLikedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myLikedPosts => _myLikedPosts;
+
+
+
   fetchMyPost({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController}) async {
+    fetchMyLikedPosts(isRefresh: false);
     if (_myPosts.isEmpty || isRefresh) {
       List<Post>? response = await timeLineQuery.getAllPosts(
           authIdToGet: globals.userId);
@@ -796,7 +817,44 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       notifyListeners();
     }
   }
+
+  fetchMyLikedPosts({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController}) async {
+    if (_myLikedPosts.isEmpty || isRefresh) {
+      List<GetPostFeed>? response = await timeLineQuery.getLikedPosts(
+          authIdToGet: globals.userId);
+      if (response != null) {
+        _myLikedPosts = [];
+        for (GetPostFeed postFeed in response) {
+          Post post = postFeed.post!;
+          _availablePostIds.add(post.postId!);
+          _myLikedPosts.add(TimeLineModel(
+            getPostFeed: postFeed,
+            isShowing: true,
+          ));
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myLikedPosts.isNotEmpty) {
+        timeLineController.likeBox3([]);
+        for (TimeLineModel element in _myLikedPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeBox3(likeBoxInfo);
+        if(refreshController != null){
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
 }
+
+
 
 class TimeLineModel {
   final GetPostFeed getPostFeed;

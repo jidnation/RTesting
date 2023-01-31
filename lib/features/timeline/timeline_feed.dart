@@ -431,6 +431,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                       child:
                                                           TimeLineBoxActionRow(
                                                         timeLineId: post.id,
+                                                        type: 'post',
                                                         post: post
                                                             .getPostFeed.post!,
                                                       )),

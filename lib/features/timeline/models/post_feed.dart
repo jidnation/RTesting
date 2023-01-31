@@ -21,6 +21,22 @@ class GetAllPostsModel {
   );
 }
 
+class GetLikedPosts {
+  GetLikedPosts({
+    this.typename,
+     this.getLikedPosts,
+  });
+
+  final List<GetPostFeed>? getLikedPosts;
+  final String? typename;
+
+  factory GetLikedPosts.fromJson(Map<String, dynamic> json) => GetLikedPosts(
+    typename: json["__typename"],
+    getLikedPosts: List<GetPostFeed>.from(json["getLikedPosts"].map((x) => GetPostFeed.fromJson(x))),
+  );
+
+}
+
 
 class PostFeedModel {
   PostFeedModel({

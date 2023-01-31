@@ -7,26 +7,28 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 
-import '../../../../core/components/custom_button.dart';
-import '../../../../core/components/profile_picture.dart';
-import '../../../../core/services/navigation/navigation_service.dart';
-import '../../../../core/utils/app_globals.dart';
-import '../../../../core/utils/constants.dart';
-import '../../../../core/utils/custom_text.dart';
-import '../../../home/presentation/views/home_screen.dart';
-import '../../../timeline/timeline_action-box.dart';
-import '../../../timeline/timeline_box.dart';
-import '../../../timeline/timeline_control_room.dart';
-import '../../../timeline/timeline_feed.dart';
-import '../widgets/bottom_sheets.dart';
-import 'account.details.dart';
-import 'edit_profile_screen.dart';
+import '../../core/components/custom_button.dart';
+import '../../core/components/profile_picture.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/app_globals.dart';
+import '../../core/utils/constants.dart';
+import '../../core/utils/custom_text.dart';
+import '../account/presentation/views/account.details.dart';
+import '../account/presentation/views/edit_profile_screen.dart';
+import '../account/presentation/widgets/bottom_sheets.dart';
+import '../home/presentation/views/home_screen.dart';
+import '../timeline/timeline_action-box.dart';
+import '../timeline/timeline_box.dart';
+import '../timeline/timeline_control_room.dart';
+import '../timeline/timeline_feed.dart';
+import 'tabs.dart';
 
 class NewAccountScreen extends HookWidget {
   const NewAccountScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    timeLineFeedStore.fetchMyPost(isRefresh: false);
     List<String> pageTab = [
       'Reaches',
       'Likes',
@@ -36,12 +38,15 @@ class NewAccountScreen extends HookWidget {
       'Quote',
       "Saved"
     ];
+    Map<String, Widget> profileTabMapping = {
+      "reaches" :  const ReachTab(),
+      'likes' : const LikedTab(),
+    };
     ValueNotifier<String> selectedTab = useState('Reaches');
     var size = MediaQuery
         .of(context)
         .size;
     return Obx((){
-      timeLineFeedStore.fetchMyPost(isRefresh: false);
       bool foldMe = !timeLineController.isScrolling.value;
 return
       SizedBox(
@@ -482,7 +487,7 @@ Column(
               ),
             ),
                 Container(
-                  height: 80,
+                  height: 60,
                   width: SizeConfig.screenWidth,
                   color: AppColors.backgroundShade4,
                   child: ListView.builder(
@@ -501,85 +506,19 @@ Column(
                             });
                       }),
                 ),
-                const ReachTab(),
+                profileTabMapping[selectedTab.value.toLowerCase()] ?? Container(),
               ]
           ),
         ),
       );
   });
   }
+
+
+
 }
 
-class ReachTab extends StatelessWidget {
-  const ReachTab({
-    Key? key,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    RefreshController _refreshController =
-    RefreshController(initialRefresh: false);
-    return ValueListenableBuilder(
-    valueListenable: TimeLineFeedStore(),
-    builder: (context, List<TimeLineModel> value, child) {
-      List<TimeLineModel> data = timeLineFeedStore.myPosts;
-      return Expanded(
-    child: NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        if (scrollNotification is ScrollStartNotification) {
-          timeLineController.isScrolling(true);
-          print(":;;;;;;;;;;;;;;;;;;;::::::::::::::");
-        }
-        return false;
-      },
-      child: SmartRefresher(
-        physics: const BouncingScrollPhysics(),
-        onRefresh: () {
-          timeLineFeedStore.fetchMyPost(
-            isRefresh: true,
-            refreshController:
-            _refreshController,
-            // isRefresh: true,
-          );
-          // await Future.delayed(const Duration(seconds: 10));
-          // _refreshController.refreshCompleted();
-        },
-        controller: _refreshController,
-        child: ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          physics: const ScrollPhysics(),
-          itemBuilder: (context, index){
-            TimeLineModel post = data[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: Stack(children: [
-                TimeLineBox(
-                  timeLineModel: post,
-                ),
-                Positioned(
-                    bottom: 10,
-                    left: 30,
-                    right: 30,
-                    child:
-                    TimeLineBoxActionRow(
-                      timeLineId: post.id,
-                      isProfile: true,
-                      post: post
-                          .getPostFeed.post!,
-                    )),
-              ]),
-            );
-          },
-itemCount: data.length,
-        ),
-      ),
-    ),
-      );
-
-    });
-  }
-}
 
 class ProfileTab extends StatelessWidget {
   const ProfileTab({
@@ -602,7 +541,7 @@ class ProfileTab extends StatelessWidget {
           Container(
             constraints: const BoxConstraints(
               minWidth: 100,
-              maxHeight: 60,
+              maxHeight: 40,
             ),
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 15),

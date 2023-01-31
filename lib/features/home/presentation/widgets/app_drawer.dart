@@ -17,8 +17,9 @@ import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
-import '../../../account/presentation/views/new_account.dart';
+import '../../../profile/new_account.dart';
 import '../../../moment/user_posting.dart';
+import '../../../timeline/timeline_feed.dart';
 
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -245,6 +246,7 @@ class AppDrawer extends HookWidget {
                         icon: 'assets/svgs/profile.svg',
                         onPressed: () {
                           momentCtrl.userBar.value?.currentState!.closeDrawer();
+                          timeLineController.isScrolling(false);
                           RouteNavigators.route(context, const NewAccountScreen());
 
                           // RouteNavigators.route(context, const AccountScreen());

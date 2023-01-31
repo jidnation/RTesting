@@ -305,7 +305,7 @@ class TimeLineBox extends StatelessWidget {
                                 onTap: () async {
                                   await showReacherTimeLineCardBottomSheet(
                                     context,
-                                    isProfile: userStatusFeed == null,
+                                    type: userStatusFeed == null ? 'profile' : 'post',
                                     downloadPost: takeScreenShot,
                                     timeLineModel: timeLineModel,
                                   );

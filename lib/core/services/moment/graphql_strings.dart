@@ -496,7 +496,147 @@ query ($pageNumber: Int!, $pageLimit: Int! ) {
     }
   }
   }
+
 ''';
+
+
+const String getLikedPosts = r''' 
+query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
+  getLikedPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
+    reachingRelationship,
+    created_at,
+    updated_at,
+    feedOwnerProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        verified,
+        profileSlug,
+        location,
+        profilePicture,
+        location
+    },
+    voterProfile{
+       authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+    },
+    post{
+     repostedPost{
+        authId,
+      postId,
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      isVoted,
+      postSlug,
+      edited,
+      postOwnerProfile{
+          authId,
+        firstName,
+        lastName,
+        username,
+        bio,
+        profileSlug,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+      },
+      authId,
+      postId,
+      postOwnerProfile{
+        authId,
+        firstName,
+        lastName,
+        profileSlug,
+        username,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      content,
+      imageMediaItems,
+      videoMediaItem,
+      audioMediaItem,
+      nUpvotes,
+      nLikes,
+      nComments,
+      nDownvotes,
+      location,
+      postRating,
+      postSlug,
+      edited,
+      commentOption,
+      mentionList,
+      hashTags,
+      isRepost,
+      repostedPostId,
+      repostedPostOwnerId,
+      repostedPostOwnerProfile{
+         authId,
+        firstName,
+        lastName,
+        username,
+        profileSlug,
+        bio,
+        verified,
+        location,
+        profilePicture,
+        location
+      },
+      isLiked,
+      isVoted,
+      created_at,
+      updated_at
+    }
+  }
+  }
+
+''';
+
+
 
 const String getAllPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String) {
