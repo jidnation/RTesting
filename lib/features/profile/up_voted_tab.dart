@@ -8,17 +8,17 @@ import '../timeline/timeline_box.dart';
 import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
-class ReachTab extends StatefulWidget {
-  const ReachTab({
+class UpVotedTab extends StatefulWidget {
+  const UpVotedTab({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<ReachTab> createState() => _ReachTabState();
+  State<UpVotedTab> createState() => _UpVotedTabState();
 }
 
 late ScrollController _controller;
-class _ReachTabState extends State<ReachTab> {
+class _UpVotedTabState extends State<UpVotedTab> {
 
   @override
   void initState() {
@@ -38,30 +38,31 @@ class _ReachTabState extends State<ReachTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myPosts;
+          List<TimeLineModel> data = timeLineFeedStore.myUpVotedPosts;
           return Expanded(
             child: SmartRefresher(
               physics: const BouncingScrollPhysics(),
               onRefresh: () {
-                timeLineFeedStore.fetchMyPost(
+                timeLineFeedStore.fetchMyVotedPosts(
                   isRefresh: true,
+                  type: 'Upvote',
                   refreshController:
                   _refreshController,
-                  // isRefresh: true,
                 );
               },
               controller: _refreshController,
               child: data.isEmpty ? ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children:  const [
-                    EmptyTabWidget(
-                      title: "Reaches you’ve made",
-                      subtitle:
-                      "Find all posts or contributions you’ve made here ",
-                    )
-                  ]
-              ) : ListView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              children:  const [
+                EmptyTabWidget(
+                    title:
+                    "Posts you've shouted out and your posts that has been shouted out",
+                    subtitle:
+                    "See posts you've shouted out and your post that has been shouted out")
+              ],
+            )
+                : ListView.builder(
                 shrinkWrap: true,
                 controller: _controller,
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -82,7 +83,7 @@ class _ReachTabState extends State<ReachTab> {
                           child:
                           TimeLineBoxActionRow(
                             timeLineId: post.id,
-                            type: 'profile',
+                            type: 'upvote',
                             post: post
                                 .getPostFeed.post!,
                           )),

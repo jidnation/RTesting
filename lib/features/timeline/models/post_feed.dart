@@ -21,6 +21,21 @@ class GetAllPostsModel {
   );
 }
 
+class GetVotedPosts {
+  GetVotedPosts({
+    this.typename,
+    this.getVotedPosts,
+  });
+
+  final List<GetPostFeed>? getVotedPosts;
+  final String? typename;
+
+  factory GetVotedPosts.fromJson(Map<String, dynamic> json) => GetVotedPosts(
+    typename: json["__typename"],
+    getVotedPosts: List<GetPostFeed>.from(json["getVotedPosts"].map((x) => GetPostFeed.fromJson(x))),
+  );
+}
+
 class GetLikedPosts {
   GetLikedPosts({
     this.typename,
@@ -35,6 +50,42 @@ class GetLikedPosts {
     getLikedPosts: List<GetPostFeed>.from(json["getLikedPosts"].map((x) => GetPostFeed.fromJson(x))),
   );
 
+}
+
+class GetAllSavedPosts {
+  GetAllSavedPosts({
+    this.getAllSavedPosts,
+    this.typename,
+  });
+
+  final List<GetAllSavedPost>? getAllSavedPosts;
+  final String? typename;
+
+  factory GetAllSavedPosts.fromJson(Map<String, dynamic> json) => GetAllSavedPosts(
+    typename: json["__typename"],
+    getAllSavedPosts: List<GetAllSavedPost>.from(json["getAllSavedPosts"].map((x) => GetAllSavedPost.fromJson(x))),
+  );
+}
+
+class GetAllSavedPost {
+  GetAllSavedPost({
+    this.createdAt,
+    this.updatedAt,
+    this.savedPostId,
+    this.post,
+  });
+
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final String? savedPostId;
+  final Post? post;
+
+  factory GetAllSavedPost.fromJson(Map<String, dynamic> json) => GetAllSavedPost(
+    createdAt: DateTime.parse(json["created_at"]),
+    updatedAt: DateTime.parse(json["updated_at"]),
+    savedPostId: json["savedPostId"],
+    post: Post.fromJson(json["post"]),
+  );
 }
 
 

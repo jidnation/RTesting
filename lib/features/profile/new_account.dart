@@ -23,12 +23,23 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 import 'tabs.dart';
 
-class NewAccountScreen extends HookWidget {
+class NewAccountScreen extends StatefulHookWidget {
   const NewAccountScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  State<NewAccountScreen> createState() => _NewAccountScreenState();
+}
+
+
+
+class _NewAccountScreenState extends State<NewAccountScreen> {
+  @override
+  void initState() {
     timeLineFeedStore.fetchMyPost(isRefresh: false);
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
     List<String> pageTab = [
       'Reaches',
       'Likes',
@@ -41,6 +52,9 @@ class NewAccountScreen extends HookWidget {
     Map<String, Widget> profileTabMapping = {
       "reaches" :  const ReachTab(),
       'likes' : const LikedTab(),
+      'shoutouts': const UpVotedTab(),
+      'shoutdown': const DownVotedTab(),
+      'saved': const SavedTab(),
     };
     ValueNotifier<String> selectedTab = useState('Reaches');
     var size = MediaQuery
@@ -269,7 +283,7 @@ return
                                               color: AppColors.greyShade2,
                                               fontWeight: FontWeight.w400),
                                         ),
-                                      ],
+                                      ]
                                     ),
                                   ),
                                   SizedBox(width: getScreenWidth(20)),
@@ -513,9 +527,6 @@ Column(
       );
   });
   }
-
-
-
 }
 
 

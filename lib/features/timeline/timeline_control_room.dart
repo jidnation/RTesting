@@ -434,7 +434,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     Map<String, dynamic> mapper = {
       'profile' : _myPosts,
       'post' : value,
-      'likes': _myLikedPosts
+      'likes': _myLikedPosts,
+      'upvote': _myUpVotedPosts,
+      'downvote': _myDownVotedPosts,
+      'save': _mySavedPosts,
     };
     
     return mapper[type];
@@ -456,6 +459,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   pt.PostFeedModel? getPostModelById(String timeLineId, {required String type}) {
+    print(":::::::::::::::::: type ::: $type");
     List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
@@ -784,9 +788,23 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<TimeLineModel> get myLikedPosts => _myLikedPosts;
 
 
+  List<TimeLineModel> _myUpVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myUpVotedPosts => _myUpVotedPosts;
+
+  List<TimeLineModel> _myDownVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myDownVotedPosts => _myDownVotedPosts;
+
+
+  List<TimeLineModel> _mySavedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get mySavedPosts => _mySavedPosts;
+
+
 
   fetchMyPost({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController}) async {
     fetchMyLikedPosts(isRefresh: false);
+    fetchMySavedPosts(isRefresh: false);
+    fetchMyVotedPosts(isRefresh: false, type: 'Upvote');
+    fetchMyVotedPosts(isRefresh: false, type: 'Downvote');
     if (_myPosts.isEmpty || isRefresh) {
       List<Post>? response = await timeLineQuery.getAllPosts(
           authIdToGet: globals.userId);
@@ -849,6 +867,84 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           refreshController.refreshCompleted();
         }
       }
+      notifyListeners();
+    }
+  }
+
+
+  fetchMySavedPosts({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController}) async {
+    if (_mySavedPosts.isEmpty || isRefresh) {
+      List<GetAllSavedPost>? response = await timeLineQuery.getAllSavedPosts(
+          );
+      if (response != null) {
+        _mySavedPosts = [];
+        for (GetAllSavedPost savedPost in response) {
+          Post post = savedPost.post!;
+          _availablePostIds.add(post.postId!);
+          _mySavedPosts.add(TimeLineModel(
+            getPostFeed: GetPostFeed(post: savedPost.post, updatedAt: savedPost.updatedAt, createdAt: savedPost.createdAt),
+            isShowing: true,
+          ));
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_mySavedPosts.isNotEmpty) {
+        timeLineController.likeSavedBox([]);
+        for (TimeLineModel element in _mySavedPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeSavedBox(likeBoxInfo);
+        if(refreshController != null){
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+
+  fetchMyVotedPosts({int? pageNumber, int? pageLimit, required bool isRefresh,  RefreshController? refreshController, required String type}) async {
+    List<TimeLineModel> data = [];
+    if ((type.toLowerCase() == 'upvote' ? _myUpVotedPosts.isEmpty : _myDownVotedPosts.isEmpty) || isRefresh) {
+      print("::::::::::: am in here boss 0");
+      List<GetPostFeed>? response = await timeLineQuery.getVotedPosts(
+          authIdToGet: globals.userId, votingType: type);
+      if (response != null) {
+        type.toLowerCase() == 'upvote' ? _myUpVotedPosts = [] : _myDownVotedPosts = [];
+        type.toLowerCase() == 'upvote' ? timeLineController.likeUpBox([]) : timeLineController.likeDownBox([]);
+        for (GetPostFeed postFeed in response) {
+          Post post = postFeed.post!;
+          _availablePostIds.add(post.postId!);
+          data.add(TimeLineModel(
+            getPostFeed: postFeed,
+            isShowing: true,
+          ));
+        }
+        type.toLowerCase() == 'upvote' ? _myUpVotedPosts = data : _myDownVotedPosts = data ;
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (type.toLowerCase() == 'upvote' ? _myUpVotedPosts.isNotEmpty : _myDownVotedPosts.isNotEmpty) {
+
+        for (TimeLineModel element in type.toLowerCase() == 'upvote' ? _myUpVotedPosts : _myDownVotedPosts) {
+
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        type.toLowerCase() == 'upvote' ? timeLineController.likeUpBox(likeBoxInfo) : timeLineController.likeDownBox(likeBoxInfo);
+
+      }
+        if(refreshController != null){
+          refreshController.refreshCompleted();
+        }
       notifyListeners();
     }
   }

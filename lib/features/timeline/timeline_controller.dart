@@ -5,13 +5,19 @@ class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox3 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeUpBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeSavedBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeDownBox = <CustomCounter>[].obs;
   RxBool isScrolling = false.obs;
 
   RxList<CustomCounter> getExactBox(String type) {
     Map<String, dynamic> mapper = {
       'profile': likeBox2,
       'post': likeBox,
-      'likes': likeBox3
+      'likes': likeBox3,
+      'upvote': likeUpBox,
+      'downvote': likeDownBox,
+      'save': likeSavedBox,
     };
     return mapper[type];
   }
