@@ -3,15 +3,16 @@ import 'package:reach_me/features/timeline/timeline_control_room.dart';
 
 class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
+  RxBool isScrolling = false.obs;
 
-  likePost({required String id}) {
+  likePost({required String id, required bool isProfile}) {
     LikeModel likeModel = LikeModel(nLikes: 0, isLiked: false);
-    CustomCounter actualModel =
-        likeBox.firstWhere((element) => element.id == id);
-    int index = likeBox.indexOf(actualModel);
-    int index2 = likeBox.indexWhere((element) => element.id == id);
+    CustomCounter actualModel = isProfile ?
+        likeBox2.firstWhere((element) => element.id == id) : likeBox.firstWhere((element) => element.id == id);
+    int index = isProfile ? likeBox2.indexOf(actualModel) : likeBox.indexOf(actualModel);
+    // int index2 = likeBox.indexWhere((element) => element.id == id);
 
-    print("::::::::::: index 1::: $index  :::::::::: index2 :::; $index2");
     // likeBox.forEach((key, value) {
     //   if (key == id) {
     if (actualModel.data.isLiked) {
@@ -21,18 +22,27 @@ class TimeLineController extends GetxController {
       likeModel.isLiked = true;
       likeModel.nLikes = actualModel.data.nLikes + 1;
     }
-    likeBox[index] = CustomCounter(id: id, data: likeModel);
+    isProfile ? likeBox2[index] = CustomCounter(id: id, data: likeModel) : likeBox[index] = CustomCounter(id: id, data: likeModel);
     // }
     //   likeBox[key] = likeModel;
     // });
   }
 
-  LikeModel getLikeValues({required String id}) {
+  LikeModel getLikeValues({required String id, required bool isProfile}) {
     late LikeModel likeValue;
-    for (CustomCounter customCounter in likeBox) {
-      if (customCounter.id == id) {
-        likeValue = customCounter.data;
-        return likeValue;
+    if(isProfile) {
+      for (CustomCounter customCounter in likeBox2) {
+        if (customCounter.id == id) {
+          likeValue = customCounter.data;
+          return likeValue;
+        }
+      }
+    }else{
+      for (CustomCounter customCounter in likeBox) {
+        if (customCounter.id == id) {
+          likeValue = customCounter.data;
+          return likeValue;
+        }
       }
     }
     print("::::::::::>>>><<<< still returning empty}");

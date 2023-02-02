@@ -30,6 +30,8 @@ PODS:
   - AgoraRtcEngine_iOS/SuperResolution (4.1.0)
   - AgoraRtcEngine_iOS/VirtualBackground (4.1.0)
   - AgoraRtcEngine_iOS/VQA (4.1.0)
+  - all_sensors (0.0.1):
+    - Flutter
   - assets_audio_player (0.0.1):
     - Flutter
   - assets_audio_player_web (0.0.1):
@@ -274,6 +276,7 @@ PODS:
 
 DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
+  - all_sensors (from `.symlinks/plugins/all_sensors/ios`)
   - assets_audio_player (from `.symlinks/plugins/assets_audio_player/ios`)
   - assets_audio_player_web (from `.symlinks/plugins/assets_audio_player_web/ios`)
   - audio_waveforms (from `.symlinks/plugins/audio_waveforms/ios`)
@@ -356,6 +359,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   agora_rtc_engine:
     :path: ".symlinks/plugins/agora_rtc_engine/ios"
+  all_sensors:
+    :path: ".symlinks/plugins/all_sensors/ios"
   assets_audio_player:
     :path: ".symlinks/plugins/assets_audio_player/ios"
   assets_audio_player_web:
@@ -450,6 +455,7 @@ SPEC CHECKSUMS:
   AgoraIrisEventFlutter_iOS: d7ee4acb57d9042dbe9d64229bfe9bf8e32b6f2f
   AgoraIrisRTC_iOS: 820fbab2d78d870a1bad4b1a02f950a390c73b48
   AgoraRtcEngine_iOS: 33f0136ad4196b2a31c8470e6b536fe77fb25f8b
+  all_sensors: 13f46502204bebbd1e06b65ff3d7cdaa03d88b26
   assets_audio_player: edee322b9cb625571b830b35872ead1a295fd917
   assets_audio_player_web: 19826380c44375761aa0b9053665c1e3fbc3b86b
   audio_waveforms: cd736909ebc6b6a164eb74701d8c705ce3241e1c

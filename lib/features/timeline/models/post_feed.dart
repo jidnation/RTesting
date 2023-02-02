@@ -3,6 +3,25 @@ import 'dart:convert';
 PostFeedModel postFeedModelFromJson(String str) =>
     PostFeedModel.fromJson(json.decode(str));
 
+GetAllPostsModel getAllPostsModelFromJson(String str) => GetAllPostsModel.fromJson(json.decode(str));
+
+
+class GetAllPostsModel {
+  GetAllPostsModel({
+    this.typename,
+     this.getAllPosts,
+  });
+
+  final List<Post>? getAllPosts;
+  final String? typename;
+
+  factory GetAllPostsModel.fromJson(Map<String, dynamic> json) => GetAllPostsModel(
+    typename: json["__typename"],
+    getAllPosts: List<Post>.from(json["getAllPosts"].map((x) => Post.fromJson(x))),
+  );
+}
+
+
 class PostFeedModel {
   PostFeedModel({
     this.typename,

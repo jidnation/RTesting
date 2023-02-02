@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:get/utils.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -22,6 +24,7 @@ import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
+import '../../core/utils/custom_text.dart';
 import '../timeline/loading_widget.dart';
 
 class CommentMedia extends StatelessWidget {
@@ -256,12 +259,10 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   bool isInitialised = false;
   // bool isPlaying = false;
   bool isReadingCompleted = false;
-  //final currentDurationStream = StreamController<int>();
   int currentDuration = 0;
 
   final MediaService _mediaService = MediaService();
 
-  // Map<String, PlayerController> playerControllers = {};
   late VideoAudioCommentCacheService videoAudioservices =
       CachedVideoAudioService(DefaultCacheManager());
 
@@ -534,43 +535,134 @@ class _CommentVideoMediaState extends State<CommentVideoMedia> {
   }
 }
 
-// class CommentVideoPlayer extends StatefulWidget {
-//   const CommentVideoPlayer({Key? key}) : super(key: key);
+// class VoiceMessageAudioController {
 
-//   @override
-//   State<CommentVideoPlayer> createState() => _CommentVideoPlayerState();
+//   PlayerController? _currentPlayer;
+//   Map<String, PlayerController> playerControllers = {};
+
+//   void startOrStopPlayer(String path) async {
+//     _currentPlayer?.pausePlayer();
+
+//     _currentPlayer = await getPlayerController(path);
+//     _currentPlayer!.startPlayer(finishMode: FinishMode.pause);
+//   }
+
+//   Future<PlayerController> getPlayerController(String path) async {
+//     if (playerControllers.containsKey(path)) {
+//       return playerControllers[path]!;
+//     }
+//     final playerController = PlayerController();
+//     await playerController.preparePlayer(path);
+//     playerControllers[path] = playerController;
+//     return playerController;
+//   }
+
+//   dispose() {
+//     playerControllers.forEach((key, value) {
+//       value.dispose();
+//     });
+//   }
 // }
 
-// class _CommentVideoPlayerState extends State<CommentVideoPlayer> {
-//   late VideoPlayerController _controller;
+
+
+// class AudioWavePlayer extends StatefulWidget {
+//   AudioWavePlayer({this.playerController, super.key});
+//   PlayerController? playerController;
+
+//   @override
+//   State<AudioWavePlayer> createState() => _AudioWavePlayerState();
+// }
+
+// class _AudioWavePlayerState extends State<AudioWavePlayer> {
+//   PlayerController? current;
+
+//   final MediaService _mediaService = MediaService();
+
+//   VoiceMessageAudioController controller = VoiceMessageAudioController();
+  
 
 //   @override
 //   void initState() {
 //     super.initState();
-
-//     _playVideo(init: true);
-//   }
-
-//   void _playVideo({int index = 0, bool init = false}) {
-//     _controller = VideoPlayerController.network('')
-//       ..addListener(() {
-//         setState(() {});
-//       })
-//       ..setLooping(true)
-//       ..initialize().then((value) => _controller.play());
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return Container(
-//       child: VideoPlayer(_controller),
-
+//     return Row(
+//       children: [
+//         InkWell(
+//           onTap: () {
+//             // controller.startOrStopPlayer(path);
+//           },
+//           child: Icon(
+//             controller._currentPlayer!.playerState == PlayerState.playing
+//                 ? Icons.pause_rounded
+//                 : Icons.play_arrow_rounded,
+//             size: 32,
+//             color: const Color(0xff0077B6),
+//           ),
+//         ),
+//         SizedBox(
+//           width: getScreenWidth(3),
+//         ),
+//         widget.playerController!.playerState != PlayerState.stopped
+//             ? Expanded(child: LayoutBuilder(
+//                 builder: (p0, p1) {
+//                   return AudioFileWaveforms(
+//                     size: Size(p1.maxWidth < 250 ? 230 : 260, 24),
+//                     playerController: widget.playerController!,
+//                     density: 2,
+//                     enableSeekGesture: true,
+//                     playerWaveStyle: const PlayerWaveStyle(
+//                       scaleFactor: 0.2,
+//                       waveThickness: 3,
+//                       fixedWaveColor: Colors.white,
+//                       liveWaveColor: Color(0xff0077B6),
+//                       waveCap: StrokeCap.round,
+//                     ),
+//                   );
+//                 },
+//               ))
+//             : Expanded(
+//                 child: const LinearProgressIndicator(
+//                   valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+//                   color: AppColors.greyShade1,
+//                   backgroundColor: AppColors.greyShade1,
+//                 ).paddingOnly(right: 5),
+//               ),
+//         // CustomText(
+//         //   text: StringUtil.formatDuration(
+//         //       Duration(milliseconds: currentDuration)),
+//         //   color: const Color(0xff0077B6),
+//         //   weight: FontWeight.w700,
+//         //   size: 14,
+//         // ),
+//         SizedBox(
+//           width: getScreenWidth(12),
+//         )
+//       ],
 //     );
+//   }
+
+//   @override
+//   void dispose() {
+//     super.dispose();
+//     // playerController.dispose();
+//   }
+// }
+
+
+// class AudioPathFile extends StatefulWidget {
+//   const AudioPathFile({super.key});
+
+//   @override
+//   State<AudioPathFile> createState() => _AudioPathFileState();
+// }
+
+// class _AudioPathFileState extends State<AudioPathFile> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container();
 //   }
 // }

@@ -194,6 +194,7 @@ class _PlayAudioState extends State<PlayAudio> {
       } else if (playerController.playerState == PlayerState.paused ||
           playerController.playerState == PlayerState.stopped) {
         isPlaying = false;
+        // playerController.seekTo(10);
         if (mounted) setState(() {});
       }
     });

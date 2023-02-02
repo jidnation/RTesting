@@ -287,7 +287,9 @@ class _AccountScreenState extends State<AccountScreen>
   double height = getScreenHeight(100);
   ScrollController scrollViewController = ScrollController();
 
-  void collapseProfile() => isCollapsed = false;
+  void collapseProfile() => setState(() {
+        isCollapsed = false;
+      });
 
   void refreshPage() {
     // switch (_tabController!.index) {
@@ -849,7 +851,7 @@ class _AccountScreenState extends State<AccountScreen>
                                     color: AppColors.greyShade5),
                               )),
                           SizedBox(height: getScreenHeight(15)),
-                        ],
+                        ]
                       ).paddingOnly(t: 50),
                     ),
                     Visibility(
@@ -1014,9 +1016,7 @@ class _AccountScreenState extends State<AccountScreen>
                       child: NotificationListener<ScrollNotification>(
                         onNotification: (scrollNotification) {
                           if (scrollNotification is ScrollStartNotification) {
-                            setState(() {
-                              collapseProfile();
-                            });
+                            collapseProfile();
                           }
                           return false;
                         },
@@ -1050,7 +1050,7 @@ class _AccountScreenState extends State<AccountScreen>
                                                 subtitle:
                                                     "Find all posts or contributions you’ve made here ",
                                               )
-                                            ],
+                                            ]
                                           )
                                         : ListView.builder(
                                             itemCount: _posts.value.length,
@@ -2659,7 +2659,9 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
   bool _isStarring = false;
   bool isUserCollapsed = true;
 
-  void collapseUserProfile() => isUserCollapsed = false;
+  void collapseUserProfile() => setState(() {
+        isUserCollapsed = false;
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -3374,9 +3376,10 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                               onNotification: (scrollNotification) {
                                 if (scrollNotification
                                     is ScrollStartNotification) {
-                                  setState(() {
-                                    collapseUserProfile();
-                                  });
+                                  // setState(() {
+                                  //   collapseUserProfile();
+                                  // });
+                                  collapseUserProfile();
                                 }
                                 return false;
                               },

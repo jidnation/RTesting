@@ -136,7 +136,7 @@ class TimeLineBox extends StatelessWidget {
                   children: [
                     Row(children: [
                       GestureDetector(
-                        onTap: () async {
+                        onTap: userStatusFeed != null ? () async {
                           if (userStatusFeed!
                               .any((e) => e.id == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
@@ -153,7 +153,7 @@ class TimeLineBox extends StatelessWidget {
                             Snackbars.error(context,
                                 message: 'No Profile Photo');
                           }
-                        },
+                        } : null,
                         child: Container(
                           height: 35,
                           width: 35,
@@ -305,6 +305,7 @@ class TimeLineBox extends StatelessWidget {
                                 onTap: () async {
                                   await showReacherTimeLineCardBottomSheet(
                                     context,
+                                    isProfile: userStatusFeed == null,
                                     downloadPost: takeScreenShot,
                                     timeLineModel: timeLineModel,
                                   );
@@ -333,7 +334,7 @@ class TimeLineBox extends StatelessWidget {
                       child: ExpandableText(
                         "${tPostInfo.content}",
                         prefixText: tPostInfo.edited!
-                            ? "(Reach Edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())})"
+                            ? "(Reach Edited)"
                             : null,
                         prefixStyle: TextStyle(
                             fontSize: getScreenHeight(12),
@@ -378,7 +379,7 @@ class TimeLineBox extends StatelessWidget {
                       key: tooltipkey,
                       triggerMode: TooltipTriggerMode.manual,
                       showDuration: const Duration(seconds: 1),
-                      message: 'This reach has been edited',
+                      message: 'This reach was edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())}',
                     ),
                     SizedBox(height: tPostInfo.content!.isNotEmpty ? 8 : 0),
                     Visibility(
@@ -386,7 +387,7 @@ class TimeLineBox extends StatelessWidget {
                         child: TimeLinePostMedia(
                             post: timeLineFeedStore
                                 .getPostModel(timeLineModel: timeLineModel)
-                                .post!)),
+                                !.post!)),
                     SizedBox(
                         height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
                     timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
@@ -399,7 +400,7 @@ class TimeLineBox extends StatelessWidget {
                             ),
                             child: TimeLineVideoPlayer(
                               post: timeLineFeedStore
-                                  .getPostModel(timeLineModel: timeLineModel)
+                                  .getPostModel(timeLineModel: timeLineModel)!
                                   .post!,
                               videoUrl: timeLineModel
                                   .getPostFeed.post!.videoMediaItem!,
@@ -435,7 +436,7 @@ class TimeLineBox extends StatelessWidget {
                     (timeLineModel.getPostFeed.post!.repostedPost != null)
                         ? TimelineRepostedPost(
                             tPostInfo: timeLineFeedStore
-                                .getPostModel(timeLineModel: timeLineModel)
+                                .getPostModel(timeLineModel: timeLineModel)!
                                 .post!,
                           ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
                         : const SizedBox.shrink(),
