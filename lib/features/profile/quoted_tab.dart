@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-
 import '../../core/components/empty_state.dart';
 import '../timeline/timeline_action-box.dart';
 import '../timeline/timeline_box.dart';
 import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
-class ReachTab extends StatefulWidget {
-  const ReachTab({
+class QuotedTab extends StatefulWidget {
+  const QuotedTab({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<ReachTab> createState() => _ReachTabState();
+  State<QuotedTab> createState() => _QuotedTabState();
 }
 
 late ScrollController _controller;
 
-class _ReachTabState extends State<ReachTab> {
+class _QuotedTabState extends State<QuotedTab> {
   @override
   void initState() {
     _controller = ScrollController();
@@ -40,7 +38,7 @@ class _ReachTabState extends State<ReachTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myPosts;
+          List<TimeLineModel> data = timeLineFeedStore.myQuotedPosts;
           return Expanded(
             child: SmartRefresher(
               physics: const BouncingScrollPhysics(),
@@ -58,9 +56,8 @@ class _ReachTabState extends State<ReachTab> {
                       shrinkWrap: true,
                       children: const [
                           EmptyTabWidget(
-                            title: "Reaches you’ve made",
-                            subtitle:
-                                "Find all posts or contributions you’ve made here ",
+                            title: "Quotes you’ve made",
+                            subtitle: "Find all quoted posts you’ve made here ",
                           )
                         ])
                   : ListView.builder(

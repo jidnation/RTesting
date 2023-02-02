@@ -8,18 +8,18 @@ import '../timeline/timeline_box.dart';
 import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
-class ReachTab extends StatefulWidget {
-  const ReachTab({
+class CommentsTab extends StatefulWidget {
+  const CommentsTab({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<ReachTab> createState() => _ReachTabState();
+  State<CommentsTab> createState() => _CommentsTabState();
 }
 
 late ScrollController _controller;
 
-class _ReachTabState extends State<ReachTab> {
+class _CommentsTabState extends State<CommentsTab> {
   @override
   void initState() {
     _controller = ScrollController();
@@ -58,10 +58,10 @@ class _ReachTabState extends State<ReachTab> {
                       shrinkWrap: true,
                       children: const [
                           EmptyTabWidget(
-                            title: "Reaches you’ve made",
-                            subtitle:
-                                "Find all posts or contributions you’ve made here ",
-                          )
+                              title:
+                                  'Comments you made on a post and comments made on your post',
+                              subtitle:
+                                  'Here you will find all comments you’ve made on a post and also those made on your own posts')
                         ])
                   : ListView.builder(
                       shrinkWrap: true,

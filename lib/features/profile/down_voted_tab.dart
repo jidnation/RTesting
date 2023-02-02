@@ -18,6 +18,7 @@ class DownVotedTab extends StatefulWidget {
 }
 
 late ScrollController _controller;
+
 class _DownVotedTabState extends State<DownVotedTab> {
   @override
   void initState() {
@@ -27,13 +28,15 @@ class _DownVotedTabState extends State<DownVotedTab> {
   }
 
   _scrollListener() {
-    _controller.offset > 100 ? timeLineController.isScrolling(true) : timeLineController.isScrolling(false);
+    _controller.offset > 100
+        ? timeLineController.isScrolling(true)
+        : timeLineController.isScrolling(false);
   }
 
   @override
   Widget build(BuildContext context) {
     RefreshController _refreshController =
-    RefreshController(initialRefresh: false);
+        RefreshController(initialRefresh: false);
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
@@ -46,55 +49,50 @@ class _DownVotedTabState extends State<DownVotedTab> {
                   timeLineFeedStore.fetchMyVotedPosts(
                     isRefresh: true,
                     type: 'Downvote',
-                    refreshController:
-                    _refreshController,
+                    refreshController: _refreshController,
                   );
                 },
                 controller: _refreshController,
-                child: data.isEmpty ? ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children:  const[
-                  EmptyTabWidget(
-                      title:
-                      "Posts you've shouted down and your posts that has been shouted down",
-                      subtitle:
-                      "See posts you've shouted down and your post that has been shouted down")
-                ]
-              )
-                  : ListView.builder(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  physics: const ScrollPhysics(),
-                  itemBuilder: (context, index){
-                    TimeLineModel post = data[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 15),
-                      child:
-                      Stack(children: [
-                        TimeLineBox(
-                          timeLineModel: post,
-                        ),
-                        Positioned(
-                            bottom: 10,
-                            left: 30,
-                            right: 30,
-                            child:
-                            TimeLineBoxActionRow(
-                              timeLineId: post.id,
-                              type: 'downvote',
-                              post: post
-                                  .getPostFeed.post!,
-                            )),
-                      ]),
-                    );
-                  },
-                  itemCount: data.length,
-                ),
+                child: data.isEmpty
+                    ? ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: const [
+                            EmptyTabWidget(
+                                title:
+                                    "Posts you've shouted down and your posts that has been shouted down",
+                                subtitle:
+                                    "See posts you've shouted down and your post that has been shouted down")
+                          ])
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        physics: const ScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          TimeLineModel post = data[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 15),
+                            child: Stack(children: [
+                              // TimeLineBox(
+                              //   timeLineModel: post, takeScreenShot: ,
+                              // ),
+                              Positioned(
+                                  bottom: 10,
+                                  left: 30,
+                                  right: 30,
+                                  child: TimeLineBoxActionRow(
+                                    timeLineId: post.id,
+                                    type: 'downvote',
+                                    post: post.getPostFeed.post!,
+                                  )),
+                            ]),
+                          );
+                        },
+                        itemCount: data.length,
+                      ),
               ),
             ),
           );
-
         });
   }
 }

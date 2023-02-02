@@ -71,9 +71,9 @@ class _SavedTabState extends State<SavedTab> {
                     padding: const EdgeInsets.only(bottom: 15),
                     child:
                     Stack(children: [
-                      TimeLineBox(
-                        timeLineModel: post,
-                      ),
+                      // TimeLineBox(
+                      //   timeLineModel: post,
+                      // ),
                       Positioned(
                           bottom: 10,
                           left: 30,
