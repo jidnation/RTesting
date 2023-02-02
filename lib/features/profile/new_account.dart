@@ -33,7 +33,7 @@ class NewAccountScreen extends StatefulHookWidget {
 class _NewAccountScreenState extends State<NewAccountScreen> {
   @override
   void initState() {
-    timeLineFeedStore.fetchMyPost(isRefresh: false);
+    timeLineFeedStore.fetchAll();
     super.initState();
   }
 
@@ -55,6 +55,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
       'shoutdown': const DownVotedTab(),
       'saved': const SavedTab(),
       'quote': const QuotedTab(),
+      'comments': const CommentsTab(),
     };
     ValueNotifier<String> selectedTab = useState('Reaches');
     var size = MediaQuery.of(context).size;

@@ -499,7 +499,6 @@ query ($pageNumber: Int!, $pageLimit: Int! ) {
 
 ''';
 
-
 const String getLikedPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
   getLikedPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
@@ -635,7 +634,6 @@ query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
   }
 
 ''';
-
 
 const String getVotedPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String, $votingType: String!)  {
@@ -885,8 +883,6 @@ query ($pageNumber: Int!, $pageLimit: Int!)  {
 
 ''';
 
-
-
 const String getAllPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String) {
   getAllPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
@@ -992,6 +988,47 @@ query ($pageNumber: Int!, $pageLimit: Int! , $authId: String) {
       created_at,
       updated_at
     
+  }
+  }
+''';
+
+const String getAllComments = r''' 
+query ($pageNumber: Int!, $pageLimit: Int! , $authId: String) {
+  getPersonalComments(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
+        postId
+    commentId,
+    content,
+    videoMediaItem,
+    audioMediaItem,
+    nReplies,
+    nLikes,
+    imageMediaItems,
+    commentId,
+    created_at,
+    isLiked,
+    commentOwnerProfile{
+      authId,
+      firstName,
+      lastName,
+      bio,
+       username,
+      verified,
+      location,
+      profileSlug,
+      profilePicture
+    },
+    postOwnerProfile{
+       authId,
+      firstName,
+      lastName,
+      bio,
+      verified,
+       username,
+      location,
+      profileSlug,
+      profilePicture
+    }
+  
   }
   }
 ''';

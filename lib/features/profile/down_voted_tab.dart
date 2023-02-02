@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-
 import '../../core/components/empty_state.dart';
 import '../timeline/timeline_action-box.dart';
 import '../timeline/timeline_box.dart';
@@ -69,23 +68,29 @@ class _DownVotedTabState extends State<DownVotedTab> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         physics: const ScrollPhysics(),
                         itemBuilder: (context, index) {
+                          GlobalKey<State<StatefulWidget>> src = GlobalKey();
                           TimeLineModel post = data[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 15),
-                            child: Stack(children: [
-                              // TimeLineBox(
-                              //   timeLineModel: post, takeScreenShot: ,
-                              // ),
-                              Positioned(
-                                  bottom: 10,
-                                  left: 30,
-                                  right: 30,
-                                  child: TimeLineBoxActionRow(
-                                    timeLineId: post.id,
-                                    type: 'downvote',
-                                    post: post.getPostFeed.post!,
-                                  )),
-                            ]),
+                            child: RepaintBoundary(
+                              key: src,
+                              child: Stack(children: [
+                                TimeLineBox(
+                                  timeLineModel: post,
+                                  takeScreenShot: () => timeLineController
+                                      .takeScreenShot(context, src),
+                                ),
+                                Positioned(
+                                    bottom: 10,
+                                    left: 30,
+                                    right: 30,
+                                    child: TimeLineBoxActionRow(
+                                      timeLineId: post.id,
+                                      type: 'downvote',
+                                      post: post.getPostFeed.post!,
+                                    )),
+                              ]),
+                            ),
                           );
                         },
                         itemCount: data.length,

@@ -1,11 +1,12 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
-
+import 'dart:ui' as ui;
 import '../../core/components/snackbar.dart';
 import '../../core/services/navigation/navigation_service.dart';
 
@@ -75,5 +76,14 @@ class TimeLineController extends GetxController {
     Snackbars.success(context, message: 'Image saved to Gallery');
     RouteNavigators.pop(context);
     return result['filePath'];
+  }
+
+  void takeScreenShot(context, GlobalKey<State<StatefulWidget>> src) async {
+    RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
+        as RenderRepaintBoundary; // the key provided
+    ui.Image image = await boundary.toImage();
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    debugPrint("Byte Data: $byteData");
+    await saveImage(context, byteData!.buffer.asUint8List());
   }
 }

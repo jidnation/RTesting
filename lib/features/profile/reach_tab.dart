@@ -69,23 +69,31 @@ class _ReachTabState extends State<ReachTab> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       physics: const ScrollPhysics(),
                       itemBuilder: (context, index) {
+                        GlobalKey<State<StatefulWidget>> src = GlobalKey();
                         TimeLineModel post = data[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 15),
-                          child: Stack(children: [
-                            // TimeLineBox(
-                            //   timeLineModel: post,
-                            // ),
-                            Positioned(
-                                bottom: 10,
-                                left: 30,
-                                right: 30,
-                                child: TimeLineBoxActionRow(
-                                  timeLineId: post.id,
-                                  type: 'profile',
-                                  post: post.getPostFeed.post!,
-                                )),
-                          ]),
+                          child: RepaintBoundary(
+                            key: src,
+                            child: Stack(children: [
+                              TimeLineBox(
+                                timeLineModel: post,
+                                takeScreenShot: () {
+                                  timeLineController.takeScreenShot(
+                                      context, src);
+                                },
+                              ),
+                              Positioned(
+                                  bottom: 10,
+                                  left: 30,
+                                  right: 30,
+                                  child: TimeLineBoxActionRow(
+                                    timeLineId: post.id,
+                                    type: 'profile',
+                                    post: post.getPostFeed.post!,
+                                  )),
+                            ]),
+                          ),
                         );
                       },
                       itemCount: data.length,

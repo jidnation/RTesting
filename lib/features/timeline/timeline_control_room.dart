@@ -26,6 +26,7 @@ import '../home/data/repositories/social_service_repository.dart';
 import '../home/data/repositories/user_repository.dart';
 import '../home/presentation/views/post_reach.dart';
 import 'models/post_feed.dart';
+import 'models/profile_comment_model.dart';
 
 class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   //creating a singleton class
@@ -805,15 +806,25 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<TimeLineModel> _mySavedPosts = <TimeLineModel>[];
   List<TimeLineModel> get mySavedPosts => _mySavedPosts;
 
+  List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
+  List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
+
+
+  fetchAll() {
+    fetchMyPost(isRefresh: false);
+    fetchMyLikedPosts(isRefresh: false);
+    fetchMySavedPosts(isRefresh: false);
+    fetchMyComments(isRefresh: false);
+    fetchMyVotedPosts(isRefresh: false, type: 'Upvote');
+    fetchMyVotedPosts(isRefresh: false, type: 'Downvote');
+  }
+
   fetchMyPost(
       {int? pageNumber,
       int? pageLimit,
       required bool isRefresh,
       RefreshController? refreshController}) async {
-    fetchMyLikedPosts(isRefresh: false);
-    fetchMySavedPosts(isRefresh: false);
-    fetchMyVotedPosts(isRefresh: false, type: 'Upvote');
-    fetchMyVotedPosts(isRefresh: false, type: 'Downvote');
+
     if (_myPosts.isEmpty || isRefresh) {
       List<Post>? response =
           await timeLineQuery.getAllPosts(authIdToGet: globals.userId);
@@ -895,6 +906,43 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       notifyListeners();
     }
   }
+
+
+  fetchMyComments(
+      {int? pageNumber,
+      int? pageLimit,
+      required bool isRefresh,
+      RefreshController? refreshController}) async {
+    if (_myLikedPosts.isEmpty || isRefresh) {
+      List<GetPersonalComment>? response =
+          await timeLineQuery.getAllComments(authIdToGet: globals.userId!);
+      if (response != null) {
+        _myPersonalComments = [];
+        for (GetPersonalComment commentFeed in response) {
+          _myPersonalComments.add(commentFeed);
+        }
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  ErProfile getPostModelMiniProfile({required CommentOwnerProfile? tPostOwnerInfo}) {
+    return ErProfile(
+        firstName: tPostOwnerInfo?.firstName,
+        lastName: tPostOwnerInfo?.lastName,
+        username: tPostOwnerInfo?.username,
+        profilePicture: tPostOwnerInfo?.profilePicture,
+        profileSlug: tPostOwnerInfo?.profilePicture,
+        verified: tPostOwnerInfo?.verified,
+        location: tPostOwnerInfo?.location,
+        bio: tPostOwnerInfo?.bio,
+        authId: tPostOwnerInfo?.authId
+    );
+  }
+
 
   fetchMySavedPosts(
       {int? pageNumber,

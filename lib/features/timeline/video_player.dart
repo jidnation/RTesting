@@ -49,6 +49,7 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
+      aspectRatio: _videoPlayerController.value.aspectRatio,
       allowFullScreen: false,
       looping: true,
       autoInitialize: true,
