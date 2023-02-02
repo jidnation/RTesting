@@ -101,7 +101,6 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
           setState(() {
             _isJoined = true;
             callState = AudioCallState.calling;
-
           });
         },
         onUserMuteAudio: (connection, remoteUid, muted) {
@@ -134,6 +133,18 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
           callType: CallType.private,
           receiverId: widget.recipient!.id!),
     );
+  }
+
+  bool isSwitched = false;
+
+  void changeAudioRoute() {
+    isSwitched = !isSwitched;
+    if (isSwitched) {
+      agoraEngine.setDefaultAudioRouteToSpeakerphone(false);
+    } else {
+      agoraEngine.setEnableSpeakerphone(false);
+    }
+    setState(() {});
   }
 
   showCallMessage() {
@@ -258,23 +269,27 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
                                 const Opacity(
                                   opacity: 0.5,
                                   child: Visibility(
-                                    visible: false,
+                                    visible: true,
                                     child: CircleAvatar(
                                       backgroundColor: Color(0xff000000),
                                       radius: 23,
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: false,
-                                  child: Positioned(
-                                    top: 10,
-                                    left: 10,
-                                    right: 10,
-                                    bottom: 10,
-                                    child: SvgPicture.asset(
-                                      'assets/svgs/video.svg',
-                                      color: AppColors.white,
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  right: 10,
+                                  bottom: 10,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      changeAudioRoute();
+                                    },
+                                    child: Icon(
+                                      isSwitched
+                                          ? Icons.phone_bluetooth_speaker
+                                          : Icons.volume_up_outlined,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
