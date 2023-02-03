@@ -94,6 +94,20 @@ class _CallScreenState extends State<InitiateVideoCall> {
           _localUserJoined = true;
         });
       },
+      onRemoteVideoStateChanged:
+          (connection, remoteUid, state, reason, elapsed) {
+        Console.log('remote video state', state);
+        if (state == RemoteVideoState.remoteVideoStateStopped) {
+          setState(() {
+            callSwitched = true;
+          });
+        } else if (state == RemoteVideoState.remoteVideoStateStarting &&
+            callSwitched == true) {
+          setState(() {
+            callSwitched = false;
+          });
+        }
+      },
       onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
         debugPrint("remote user $remoteUid joined");
         stopRingingSound();
@@ -212,7 +226,9 @@ class _CallScreenState extends State<InitiateVideoCall> {
                           children: [
                             Image.asset(
                               'assets/images/incoming_call.png',
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
                             ),
                             widget.recipient!.profilePicture == null
                                 ? Positioned(

@@ -3,6 +3,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
 import 'package:reach_me/features/call/presentation/views/receive_audio_call.dart';
@@ -19,9 +20,11 @@ class IncomingCall extends StatelessWidget {
     required this.user,
     required this.token,
     required this.callType,
+    required this.profilePicture,
+    required this.firstName,
   });
 
-  final String token, channelName, user, callType;
+  final String token, channelName, user, callType, firstName, profilePicture;
 
   bool isRinging = true;
 
@@ -43,7 +46,11 @@ class IncomingCall extends StatelessWidget {
     Get.off(
       () => callType == 'audio'
           ? ReceiveAudioCall(channelName: channelName, token: token, user: user)
-          : ReceiveVideoCall(channelName: channelName, token: token),
+          : ReceiveVideoCall(
+              channelName: channelName,
+              token: token,
+              firstName: firstName,
+              profilePicture: profilePicture),
     );
   }
 
@@ -55,8 +62,11 @@ class IncomingCall extends StatelessWidget {
     Get.back();
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    Console.log('params', '$firstName,$profilePicture');
     stopRingtone();
     var size = MediaQuery.of(context).size;
     return Scaffold(

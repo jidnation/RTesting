@@ -138,11 +138,12 @@ class _InitiateAudioCallState extends State<InitiateAudioCall> {
   bool isSwitched = false;
 
   void changeAudioRoute() {
-    isSwitched = !isSwitched;
-    if (isSwitched) {
-      agoraEngine.setDefaultAudioRouteToSpeakerphone(false);
-    } else {
+    if (!isSwitched) {
       agoraEngine.setEnableSpeakerphone(false);
+      isSwitched = !isSwitched;
+    } else {
+      agoraEngine.setEnableSpeakerphone(true);
+      isSwitched = !isSwitched;
     }
     setState(() {});
   }
