@@ -9,6 +9,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/utils.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -26,6 +27,7 @@ import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
 import '../../core/utils/custom_text.dart';
 import '../timeline/loading_widget.dart';
+import '../timeline/timeline_feed.dart';
 
 class CommentMedia extends StatelessWidget {
   final CommentModel comment;
@@ -244,9 +246,11 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
 
 class CommentAudioMedia extends StatefulWidget {
   final String path;
+  final String? id;
   const CommentAudioMedia({
     Key? key,
     required this.path,
+    this.id,
   }) : super(key: key);
 
   @override
@@ -255,7 +259,7 @@ class CommentAudioMedia extends StatefulWidget {
 
 class _CommentAudioMediaState extends State<CommentAudioMedia> {
   bool isPlaying = false;
-  late PlayerController? playerController;
+  late PlayerController playerController;
   bool isInitialised = false;
   // bool isPlaying = false;
   bool isReadingCompleted = false;
@@ -284,13 +288,13 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       filePath = audioFile.path;
     }
     // if(playerController == null) return;
-    playerController!.onCurrentDurationChanged.listen((event) {
+    playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
     });
 
-    playerController!.onPlayerStateChanged.listen((event) {
-      print('<<<<<AUDIO-LISTENER>>>>>>> ${playerController!.playerState.name}');
+    playerController.onPlayerStateChanged.listen((event) {
+      print('<<<<<AUDIO-LISTENER>>>>>>> ${playerController.playerState.name}');
 
       if (event == PlayerState.initialized) {
         isInitialised = true;
@@ -303,12 +307,12 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
         if (mounted) setState(() {});
       } else if (event == PlayerState.stopped) {
         isPlaying = false;
-        playerController!.seekTo(10);
+        playerController.seekTo(10);
         if (mounted) setState(() {});
       }
     });
 
-    await playerController!.preparePlayer(filePath);
+    await playerController.preparePlayer(filePath);
 
     // await playerController.startPlayer();
     if (mounted) setState(() {});
@@ -316,71 +320,78 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Expanded(
-        child: GestureDetector(
-          onTap: () async {
-            if (isPlaying) {
-              playerController!.pausePlayer();
+    return Obx(() {
+       bool status = timeLineController.currentStatus.value;
+      timeLineController.currentId.value == widget.id
+          ? status
+              ? playerController.startPlayer(finishMode: FinishMode.loop)
+              : playerController.pausePlayer()
+          : playerController.pausePlayer();
+      return Row(children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              if (timeLineController.currentId.value == widget.id) {
+              timeLineController.currentStatus(!status);
             } else {
-              // playerController!.stopAllPlayers();
-              playerController!.startPlayer(finishMode: FinishMode.pause);
+              timeLineController.currentId(widget.id);
             }
-          },
-          child: Icon(
-            isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-            size: 32,
-            color: const Color(0xff0077B6),
+            },
+            child: Icon(
+              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              size: 32,
+              color: const Color(0xff0077B6),
+            ),
           ),
         ),
-      ),
-      SizedBox(
-        width: getScreenWidth(8),
-      ),
-      playerController!.playerState != PlayerState.stopped
-          ? AudioFileWaveforms(
-              size: Size(MediaQuery.of(context).size.width / 2.0, 24),
-              playerController: playerController!,
-              density: 2,
-              enableSeekGesture: true,
-              playerWaveStyle: const PlayerWaveStyle(
-                scaleFactor: 0.2,
-                waveThickness: 3,
-                fixedWaveColor: AppColors.white,
-                liveWaveColor: Color(0xff0077B6),
-                waveCap: StrokeCap.round,
-              ),
-            )
-          : SizedBox(
-              width: MediaQuery.of(context).size.width / 2.0,
-              child: const LinearProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(0xff0077B6),
-                ),
-                color: AppColors.greyShade1,
-                backgroundColor: AppColors.greyShade1,
-              ),
-            ),
-      const Spacer(
-        flex: 1,
-      ),
-      Text(
-        StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          color: Color(0xff0077B6),
+        SizedBox(
+          width: getScreenWidth(8),
         ),
-      ),
-      SizedBox(
-        width: getScreenWidth(12),
-      ),
-    ]);
+        playerController.playerState != PlayerState.stopped
+            ? AudioFileWaveforms(
+                size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+                playerController: playerController,
+                density: 2,
+                enableSeekGesture: true,
+                playerWaveStyle: const PlayerWaveStyle(
+                  scaleFactor: 0.2,
+                  waveThickness: 3,
+                  fixedWaveColor: AppColors.white,
+                  liveWaveColor: Color(0xff0077B6),
+                  waveCap: StrokeCap.round,
+                ),
+              )
+            : SizedBox(
+                width: MediaQuery.of(context).size.width / 2.0,
+                child: const LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xff0077B6),
+                  ),
+                  color: AppColors.greyShade1,
+                  backgroundColor: AppColors.greyShade1,
+                ),
+              ),
+        const Spacer(
+          flex: 1,
+        ),
+        Text(
+          StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xff0077B6),
+          ),
+        ),
+        SizedBox(
+          width: getScreenWidth(12),
+        ),
+      ]);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    playerController?.dispose();
+    playerController.dispose();
   }
 }
 
@@ -534,4 +545,3 @@ class _CommentVideoMediaState extends State<CommentVideoMedia> {
     );
   }
 }
-
