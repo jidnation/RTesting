@@ -1062,6 +1062,34 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       notifyListeners();
     }
   }
+
+  fetchMorePosts({required int index}) async {
+    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
+    List<CustomCounter> likeBoxInfo = [];
+    if (response != null) {
+      for (GetPostFeed postFeed in response) {
+        Post post = postFeed.post!;
+        _availablePostIds.add(post.postId!);
+        value.add(TimeLineModel(
+          getPostFeed: postFeed,
+          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' &&
+              post.postOwnerProfile != null,
+        ));
+      }
+      if (value.isNotEmpty) {
+        for (TimeLineModel element in value) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+      }
+      timeLineController.likeBox(likeBoxInfo);
+      notifyListeners();
+    }
+  }
 }
 
 class TimeLineModel {

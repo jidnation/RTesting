@@ -28,7 +28,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
