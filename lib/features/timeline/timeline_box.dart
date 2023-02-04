@@ -32,6 +32,8 @@ import '../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
 import '../moment/moment_audio_player.dart';
+import '../profile/new_account.dart';
+import '../profile/recipientNewAccountProfile.dart';
 
 class TimeLineBox extends StatelessWidget {
   final TimeLineModel timeLineModel;
@@ -196,10 +198,10 @@ class TimeLineBox extends StatelessWidget {
                                                   .postOwnerProfile!.authId ==
                                               globals.user!.id
                                           ? RouteNavigators.route(
-                                              context, const AccountScreen())
+                                              context, const NewAccountScreen())
                                           : RouteNavigators.route(
                                               context,
-                                              RecipientAccountProfile(
+                                          RecipientNewAccountScreen(
                                                 recipientEmail: 'email',
                                                 recipientImageUrl: timeLineModel
                                                     .getPostFeed

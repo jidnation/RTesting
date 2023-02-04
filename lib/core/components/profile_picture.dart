@@ -40,13 +40,15 @@ class ProfilePicture extends StatelessWidget {
 }
 
 class CoverPicture extends StatelessWidget {
+  final String? imageUrl;
   const CoverPicture({
     Key? key,
+    this.imageUrl,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-      imageUrl: globals.user!.coverPicture ?? '',
+      imageUrl: imageUrl ?? globals.user!.coverPicture ?? '',
       placeholder: (context, url) => const CoverImagePlaceholder(),
       errorWidget: (context, url, error) => const CoverImagePlaceholder(),
       fit: BoxFit.cover,
@@ -56,11 +58,10 @@ class CoverPicture extends StatelessWidget {
 
 class RecipientCoverPicture extends StatelessWidget {
   const RecipientCoverPicture({
-        required this.imageUrl,
-
+    required this.imageUrl,
     Key? key,
   }) : super(key: key);
-    final String? imageUrl;
+  final String? imageUrl;
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(

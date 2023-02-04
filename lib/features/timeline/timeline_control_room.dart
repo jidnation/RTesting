@@ -25,6 +25,7 @@ import '../home/data/models/status.model.dart';
 import '../home/data/repositories/social_service_repository.dart';
 import '../home/data/repositories/user_repository.dart';
 import '../home/presentation/views/post_reach.dart';
+import '../profile/recipientNewAccountProfile.dart';
 import 'models/post_feed.dart';
 import 'models/profile_comment_model.dart';
 
@@ -659,7 +660,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
-          RecipientAccountProfile(
+          RecipientNewAccountScreen(
             recipientCoverImageUrl: userInfo?.coverPicture,
             recipientEmail: userInfo?.email,
             recipientId: userInfo?.id,
@@ -812,23 +813,24 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
 
-  fetchAll() {
-    fetchMyPost(isRefresh: false);
-    fetchMyLikedPosts(isRefresh: false);
-    fetchMySavedPosts(isRefresh: false);
-    fetchMyComments(isRefresh: false);
-    fetchMyVotedPosts(isRefresh: false, type: 'Upvote');
-    fetchMyVotedPosts(isRefresh: false, type: 'Downvote');
+  fetchAll({String? userId, bool? isFirst}) {
+    fetchMyPost(isRefresh: isFirst ?? false, userId: userId);
+    fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
+    fetchMySavedPosts(isRefresh: isFirst ?? false);
+    fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
+    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
+    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
   }
 
   fetchMyPost(
       {int? pageNumber,
       int? pageLimit,
+        String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myPosts.isEmpty || isRefresh) {
       List<Post>? response =
-          await timeLineQuery.getAllPosts(authIdToGet: globals.userId);
+          await timeLineQuery.getAllPosts(authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myPosts = [];
         for (Post post in response) {
@@ -872,11 +874,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyLikedPosts(
       {int? pageNumber,
       int? pageLimit,
+        String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
       List<GetPostFeed>? response =
-          await timeLineQuery.getLikedPosts(authIdToGet: globals.userId);
+          await timeLineQuery.getLikedPosts(authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myLikedPosts = [];
         for (GetPostFeed postFeed in response) {
@@ -911,11 +914,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyComments(
       {int? pageNumber,
       int? pageLimit,
+        String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
       List<GetPersonalComment>? response =
-          await timeLineQuery.getAllComments(authIdToGet: globals.userId!);
+          await timeLineQuery.getAllComments(authIdToGet: userId ?? globals.userId!);
       if (response != null) {
         _myPersonalComments = [];
         for (GetPersonalComment commentFeed in response) {
@@ -1003,6 +1007,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyVotedPosts(
       {int? pageNumber,
       int? pageLimit,
+        String? userId,
       required bool isRefresh,
       RefreshController? refreshController,
       required String type}) async {
@@ -1013,7 +1018,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         isRefresh) {
       print("::::::::::: am in here boss 0");
       List<GetPostFeed>? response = await timeLineQuery.getVotedPosts(
-          authIdToGet: globals.userId, votingType: type);
+          authIdToGet: userId ?? globals.userId, votingType: type);
       if (response != null) {
         type.toLowerCase() == 'upvote'
             ? _myUpVotedPosts = []
