@@ -1,15 +1,19 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart' as pathfile;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
 import 'package:reach_me/core/services/media_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/string_util.dart';
+import '../../../moment/moment_feed.dart';
+import '../../../timeline/timeline_feed.dart';
 
 class MyAudioPlayer extends StatefulHookWidget {
   const MyAudioPlayer({Key? key, this.sourceFile}) : super(key: key);
@@ -143,17 +147,22 @@ class _MyAudioPlayerState extends State<MyAudioPlayer> {
 
 class PlayAudio extends StatefulWidget {
   const PlayAudio(
-      {Key? key, this.audioFile, required this.isMe, required this.timeStamp})
+      {Key? key,
+      this.audioFile,
+      required this.isMe,
+      required this.timeStamp,
+      this.id})
       : super(key: key);
   final String? audioFile;
   final bool isMe;
   final String timeStamp;
+  final String? id;
   @override
   State<PlayAudio> createState() => _PlayAudioState();
 }
 
 class _PlayAudioState extends State<PlayAudio> {
-  late final PlayerController playerController;
+  late PlayerController playerController;
   bool isPlaying = false;
   bool isInitialised = false;
   bool isReadingComplete = false;
@@ -170,13 +179,17 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   void _initaliseController() async {
-    final res = await _mediaService.downloadFile(url: widget.audioFile!);
-    if (res == null) {
-      print("THE URL FIELD IS NULL!!!!");
-      return;
+    late String filePath;
+     playerController = PlayerController();
+     File? audioFile = await momentFeedStore.videoControllerService
+        .getAudioFile(widget.audioFile!);
+    if (audioFile == null) {
+      var result = await _mediaService.downloadFile(url: widget.audioFile!);
+      filePath = result!.path;
+    } else {
+      filePath = audioFile.path;
     }
-
-    playerController = PlayerController();
+    
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
@@ -187,7 +200,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
       if (playerController.playerState == PlayerState.initialized) {
         isInitialised = true;
-        setState(() {});
+        if(mounted)setState(() {});
       } else if (playerController.playerState == PlayerState.playing) {
         isPlaying = true;
         if (mounted) setState(() {});
@@ -198,7 +211,7 @@ class _PlayAudioState extends State<PlayAudio> {
         if (mounted) setState(() {});
       }
     });
-    await playerController.preparePlayer(res.path);
+    await playerController.preparePlayer(filePath);
     if (mounted) setState(() {});
 
     position = await playerController.getDuration(DurationType.max);
@@ -213,147 +226,240 @@ class _PlayAudioState extends State<PlayAudio> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Row(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () {
-                    if (isPlaying) {
-                      playerController.pausePlayer();
-                    } else {
-                      playerController.startPlayer(
-                          finishMode: FinishMode.pause);
-                    }
-                    setState(() {
-                      isPlaying = !isPlaying;
-                    });
-                  },
-                  icon: !isPlaying
-                      ? Icon(
-                          Icons.play_arrow,
-                          size: 30,
-                          color:
-                              widget.isMe ? Colors.white : AppColors.textColor2,
-                        )
-                      : Icon(
-                          Icons.pause_circle,
-                          size: 30,
-                          color:
-                              widget.isMe ? Colors.white : AppColors.textColor2,
-                        ),
+    return Obx(() {
+      bool status = timeLineController.currentStatus.value;
+      timeLineController.currentId.value == widget.id
+          ? status
+              ? playerController.startPlayer(finishMode: FinishMode.loop)
+              : playerController.pausePlayer()
+          : playerController.pausePlayer();
+      return Column(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Row(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      if (timeLineController.currentId.value == widget.id) {
+                        timeLineController.currentStatus(!status);
+                      } else {
+                        timeLineController.currentId(widget.id);
+                      }
+                    },
+                    icon: !isPlaying
+                        ? Icon(
+                            Icons.play_arrow,
+                            size: 30,
+                            color: widget.isMe
+                                ? Colors.white
+                                : AppColors.textColor2,
+                          )
+                        : Icon(
+                            Icons.pause_circle,
+                            size: 30,
+                            color: widget.isMe
+                                ? Colors.white
+                                : AppColors.textColor2,
+                          ),
+                  ),
                 ),
-              ),
-              //Expanded(
-              // child:
-              //Container(
-              // padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              //child:
-              isInitialised
-                  ? AudioFileWaveforms(
-                      margin:
-                          const EdgeInsets.only(top: 7, bottom: 3, right: 7),
-                      size: Size(MediaQuery.of(context).size.width / 2.5, 28),
-                      playerController: playerController,
-                      density: 1.5,
-                      enableSeekGesture: true,
-                      playerWaveStyle: PlayerWaveStyle(
-                        scaleFactor: 0.2,
-                        fixedWaveColor: widget.isMe
-                            ? AppColors.greyShade1
-                            : AppColors.greyShade1,
-                        liveWaveColor:
-                            widget.isMe ? Colors.white : AppColors.textColor2,
-                        waveCap: StrokeCap.butt,
-                      ),
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      animationDuration: const Duration(milliseconds: 1000),
-                    )
-                  : SizedBox(
-                      width: MediaQuery.of(context).size.width / 2.5,
-                      child: widget.isMe
-                          ? const LinearProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                              color: AppColors.greyShade1,
-                              backgroundColor: AppColors.greyShade1,
-                            )
-                          : const LinearProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.textColor2),
-                              color: AppColors.greyShade1,
-                              backgroundColor: AppColors.greyShade1,
-                            )),
+                //Expanded(
+                // child:
+                //Container(
+                // padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                //child:
+                isInitialised
+                    ? AudioFileWaveforms(
+                        margin:
+                            const EdgeInsets.only(top: 7, bottom: 3, right: 7),
+                        size: Size(MediaQuery.of(context).size.width / 2.5, 28),
+                        playerController: playerController,
+                        density: 1.5,
+                        enableSeekGesture: true,
+                        playerWaveStyle: PlayerWaveStyle(
+                          scaleFactor: 0.2,
+                          fixedWaveColor: widget.isMe
+                              ? AppColors.greyShade1
+                              : AppColors.greyShade1,
+                          liveWaveColor:
+                              widget.isMe ? Colors.white : AppColors.textColor2,
+                          waveCap: StrokeCap.butt,
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        animationDuration: const Duration(milliseconds: 1000),
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: widget.isMe
+                            ? const LinearProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                color: AppColors.greyShade1,
+                                backgroundColor: AppColors.greyShade1,
+                              )
+                            : const LinearProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.textColor2),
+                                color: AppColors.greyShade1,
+                                backgroundColor: AppColors.greyShade1,
+                              )),
 
-              // ),
-              //),
-            ],
+                // ),
+                //),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 29),
-              child: isInitialised
-                  ? !isPlaying
-                      ? Text(
-                          StringUtil.formatDuration(
-                              Duration(milliseconds: position)),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              color: widget.isMe
-                                  ? AppColors.white
-                                  : AppColors.textColor2,
-                              fontSize: 10),
-                        )
-                      : Text(
-                          StringUtil.formatDuration(
-                              Duration(milliseconds: currentDuration)),
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              color: widget.isMe
-                                  ? AppColors.white
-                                  : AppColors.textColor2,
-                              fontSize: 10),
-                        )
-                  : Text(
-                      StringUtil.formatDuration(
-                          const Duration(milliseconds: 0)),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          color: widget.isMe
-                              ? AppColors.white
-                              : AppColors.textColor2,
-                          fontSize: 10),
+          Expanded(
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 29),
+                    child: isInitialised
+                        ? !isPlaying
+                            ? Text(
+                                StringUtil.formatDuration(
+                                    Duration(milliseconds: position)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: widget.isMe
+                                        ? AppColors.white
+                                        : AppColors.textColor2,
+                                    fontSize: 10),
+                              )
+                            : Text(
+                                StringUtil.formatDuration(
+                                    Duration(milliseconds: currentDuration)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: widget.isMe
+                                        ? AppColors.white
+                                        : AppColors.textColor2,
+                                    fontSize: 10),
+                              )
+                        : Text(
+                            StringUtil.formatDuration(
+                                const Duration(milliseconds: 0)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: widget.isMe
+                                    ? AppColors.white
+                                    : AppColors.textColor2,
+                                fontSize: 10),
+                          ),
+                  ),
+                  SizedBox(width: getScreenWidth(20)),
+                  Text(
+                    widget.timeStamp,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          widget.isMe ? AppColors.white : AppColors.textColor2,
                     ),
-            ),
-            SizedBox(width: getScreenWidth(20)),
-            Text(
-              widget.timeStamp,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-                color: widget.isMe ? AppColors.white : AppColors.textColor2,
-              ),
-            ),
-          ]),
-        ),
-      ],
-    );
+                  ),
+                ]),
+          ),
+        ],
+      );
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     playerController.dispose();
+  }
+}
+
+enum Time { start, pause, reset }
+
+class TimerController extends ValueNotifier<Time> {
+  TimerController({Time time = Time.reset}) : super(time);
+  void startTimer() => value = Time.start;
+  void pauseTimer() => value = Time.pause;
+  void resetTimer() => value = Time.reset;
+}
+
+class TimerWidget extends StatefulWidget {
+  final TimerController controller;
+  const TimerWidget({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  _TimerWidgetState createState() => _TimerWidgetState();
+}
+
+class _TimerWidgetState extends State<TimerWidget> {
+  Duration duration = const Duration();
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(() {
+      switch (widget.controller.value) {
+        case Time.start:
+          startTimer();
+          break;
+        case Time.pause:
+          stopTimer();
+          break;
+        case Time.reset:
+          reset();
+          stopTimer();
+          break;
+      }
+    });
+  }
+
+  void reset() => setState(() => duration = const Duration());
+
+  void addTime() {
+    const addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      if (seconds < 0) {
+        timer?.cancel();
+      } else {
+        duration = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  void startTimer({bool resets = true}) {
+    if (!mounted) return;
+    timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+  }
+
+  void stopTimer() {
+    if (!mounted) return;
+    setState(() => timer?.cancel());
+  }
+
+  @override
+  Widget build(BuildContext context) => Center(child: buildTime());
+
+  Widget buildTime() {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    final twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return Text(
+      '$twoDigitMinutes:$twoDigitSeconds',
+      style: const TextStyle(
+        fontSize: 7,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 }

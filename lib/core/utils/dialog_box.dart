@@ -13,7 +13,7 @@ class CustomDialog {
           shadowColor: Colors.transparent,
           child: Container(
             height: height ?? 358,
-            width: width ?? SizeConfig.screenWidth * 0.9,
+            width: width ?? SizeConfig.screenWidth * 0.8,
             padding: const EdgeInsets.only(left: 10, right: 10, top: 15),
             decoration: BoxDecoration(
               color: Colors.white,
