@@ -40,12 +40,22 @@ class NotifcationService {
 }
 
 handleCallNotification(OSNotificationReceivedEvent event) {
+  Console.log('params',
+      event.notification.additionalData!['body']['callerProfile']['firstName']);
+  Console.log(
+      'params',
+      event.notification.additionalData!['body']['callerProfile']
+          ['profilePicture']);
   Get.to(() => IncomingCall(
         user: event.notification.additionalData!['body']['callerProfile']
             ['firstName'],
         token: event.notification.additionalData!['body']['receiverToken'],
         channelName: event.notification.additionalData!['body']['channelName'],
         callType: event.notification.additionalData!['body']['callMode'],
+        firstName: event.notification.additionalData!['body']['callerProfile']
+            ['firstName'],
+        profilePicture: event.notification.additionalData!['body']
+            ['callerProfile']['profilePicture'],
       ));
 }
 
@@ -56,6 +66,9 @@ openCallNotification(OSNotificationOpenedResult result) {
         token: result.notification.additionalData!['body']['receiverToken'],
         channelName: result.notification.additionalData!['body']['channelName'],
         callType: result.notification.additionalData!['body']['callMode'],
+        firstName: result.notification.additionalData!['body']['firstName'],
+        profilePicture: result.notification.additionalData!['body']
+            ['profilePicture'],
       ));
 }
 
