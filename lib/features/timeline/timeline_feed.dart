@@ -45,14 +45,27 @@ class TimeLineFeed extends StatefulWidget {
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 TimeLineController timeLineController = TimeLineController();
 
+late ScrollController _controller;
+
 class _TimeLineFeedState extends State<TimeLineFeed>
     with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
     globals.userBloc!.add(GetUserProfileEvent(email: globals.userId!));
     timeLineFeedStore.getMyStatus();
     timeLineFeedStore.getUserStatus();
+  }
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      int index = timeLineController.currentIndex.value;
+      timeLineController.currentIndex(index + 1);
+      timeLineFeedStore.fetchMorePosts(index: index + 1);
+    }
   }
 
   @override
@@ -413,6 +426,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                         controller: _refreshController,
                                         child: ListView.builder(
                                           shrinkWrap: true,
+                                          controller: _controller,
                                           physics: const ScrollPhysics(),
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 10),

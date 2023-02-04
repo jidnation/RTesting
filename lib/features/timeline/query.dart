@@ -9,6 +9,7 @@ import '../../core/utils/app_globals.dart';
 import '../home/data/models/status.model.dart';
 import '../home/data/repositories/social_service_repository.dart';
 import 'models/post_feed.dart';
+import 'models/profile_comment_model.dart';
 
 class TimeLineQuery {
   static String hostUrl = "${Endpoints.graphQLBaseUrl}/";
@@ -27,7 +28,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
@@ -270,9 +271,7 @@ class TimeLineQuery {
       'pageNumber': pageNumber ?? 1
     };
 
-    authIdToGet != null
-        ? queryVariables.addAll({'authId': authIdToGet})
-        : null;
+    authIdToGet != null ? queryVariables.addAll({'authId': authIdToGet}) : null;
 
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
@@ -291,8 +290,45 @@ class TimeLineQuery {
     }
   }
 
+  Future<List<GetPersonalComment>?> getAllComments(
+      {int? pageLimit, int? pageNumber, required String authIdToGet}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
 
-   Future<List<GetPostFeed>?> getLikedPosts(
+    // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
+    Map<String, dynamic> queryVariables = {
+      'pageLimit': pageLimit ?? 30,
+      'pageNumber': pageNumber ?? 1
+    };
+
+    queryVariables.addAll({'authId': authIdToGet});
+
+    QueryResult queryResult = await qlClient.query(
+      // here it's get type so using query method
+      QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(
+            gql_string.getAllComments,
+          ),
+          variables: queryVariables),
+    );
+    log('from my-my-timeline-query::::: $queryResult');
+    if (queryResult.data != null) {
+      return GetMyCommentsModel.fromJson(queryResult.data!).getPersonalComments;
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<GetPostFeed>?> getLikedPosts(
       {int? pageLimit, int? pageNumber, String? authIdToGet}) async {
     HttpLink link = HttpLink(
       hostUrl,
@@ -311,18 +347,17 @@ class TimeLineQuery {
       'pageNumber': pageNumber ?? 1
     };
 
-    authIdToGet != null
-        ? queryVariables.addAll({'authId': authIdToGet})
-        : null;
+    authIdToGet != null ? queryVariables.addAll({'authId': authIdToGet}) : null;
 
+    print(":::::::::::::::::::::::::::::::::::::: $authIdToGet ");
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(
-            gql_string.getLikedPosts,
-          ),
-          variables: queryVariables,
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gql_string.getLikedPosts,
+        ),
+        variables: queryVariables,
       ),
     );
     log('from my-liked-query::::: $queryResult');
@@ -332,8 +367,6 @@ class TimeLineQuery {
       return null;
     }
   }
-
-
 
   Future<List<GetAllSavedPost>?> getAllSavedPosts(
       {int? pageLimit, int? pageNumber}) async {
@@ -357,11 +390,11 @@ class TimeLineQuery {
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(
-            gql_string.getAllSavedPost,
-          ),
-          variables: queryVariables,
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gql_string.getAllSavedPost,
+        ),
+        variables: queryVariables,
       ),
     );
     log('from my-saved-posts-query::::: $queryResult');
@@ -373,7 +406,10 @@ class TimeLineQuery {
   }
 
   Future<List<GetPostFeed>?> getVotedPosts(
-      {int? pageLimit, int? pageNumber, String? authIdToGet, required String votingType}) async {
+      {int? pageLimit,
+      int? pageNumber,
+      String? authIdToGet,
+      required String votingType}) async {
     HttpLink link = HttpLink(
       hostUrl,
       defaultHeaders: <String, String>{
@@ -392,18 +428,16 @@ class TimeLineQuery {
       "votingType": votingType
     };
 
-    authIdToGet != null
-        ? queryVariables.addAll({'authId': authIdToGet})
-        : null;
+    authIdToGet != null ? queryVariables.addAll({'authId': authIdToGet}) : null;
 
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
-          fetchPolicy: FetchPolicy.networkOnly,
-          document: gql(
-            gql_string.getVotedPosts,
-          ),
-          variables: queryVariables,
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gql_string.getVotedPosts,
+        ),
+        variables: queryVariables,
       ),
     );
     log('from my-liked-query::::: $queryResult');

@@ -18,6 +18,8 @@ import '../../../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../account/presentation/views/account.dart';
 import '../moment/moment_audio_player.dart';
+import '../profile/new_account.dart';
+import '../profile/recipientNewAccountProfile.dart';
 
 class TimelineRepostedPost extends StatelessWidget {
   final PostModel tPostInfo;
@@ -75,10 +77,10 @@ class TimelineRepostedPost extends StatelessWidget {
                             email: tPostOwnerInfo.authId));
                         tPostOwnerInfo.authId == globals.user!.id
                             ? RouteNavigators.route(
-                                context, const AccountScreen())
+                                context, const NewAccountScreen())
                             : RouteNavigators.route(
                                 context,
-                                RecipientAccountProfile(
+                            RecipientNewAccountScreen(
                                   recipientEmail: 'email',
                                   recipientImageUrl:
                                       tPostOwnerInfo.profilePicture,

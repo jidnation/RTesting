@@ -678,181 +678,179 @@ class _AccountScreenState extends State<AccountScreen>
                     ),
                     Visibility(
                       visible: isCollapsed,
-                      child: Column(
-                        children: [
-                          SizedBox(height: getScreenHeight(10)),
-                          Text(
-                              ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                  .toTitleCase(),
-                              style: TextStyle(
-                                fontSize: getScreenHeight(17),
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textColor2,
-                              )),
-                          Text('@${globals.user!.username ?? 'username'}',
+                      child: Column(children: [
+                        SizedBox(height: getScreenHeight(10)),
+                        Text(
+                            ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                .toTitleCase(),
+                            style: TextStyle(
+                              fontSize: getScreenHeight(17),
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColor2,
+                            )),
+                        Text('@${globals.user!.username ?? 'username'}',
+                            style: TextStyle(
+                              fontSize: getScreenHeight(13),
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textColor2,
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 0)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReachers.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reachers',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 1)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nReaching.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Reaching',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 2)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        globals.user!.nStaring.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'Star',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: getScreenWidth(20)),
+                                InkWell(
+                                  onTap: () => RouteNavigators.route(context,
+                                      const AccountStatsInfo(index: 3)),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        //nblock Variable here
+                                        globals.user!.nBlocked.toString(),
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.textColor2,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(width: getScreenWidth(5)),
+                                      Text(
+                                        'EX',
+                                        style: TextStyle(
+                                            fontSize: getScreenHeight(15),
+                                            color: AppColors.greyShade2,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(290),
+                            child: Text(
+                              globals.user!.bio ?? '',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: getScreenHeight(13),
+                                color: AppColors.greyShade2,
                                 fontWeight: FontWeight.w400,
-                                color: AppColors.textColor2,
-                              )),
-                          SizedBox(height: getScreenHeight(15)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Row(
-                                children: [
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 0)),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nReachers.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(width: getScreenWidth(5)),
-                                        Text(
-                                          'Reachers',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(20)),
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 1)),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nReaching.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(width: getScreenWidth(5)),
-                                        Text(
-                                          'Reaching',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(20)),
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 2)),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          globals.user!.nStaring.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(width: getScreenWidth(5)),
-                                        Text(
-                                          'Star',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: getScreenWidth(20)),
-                                  InkWell(
-                                    onTap: () => RouteNavigators.route(context,
-                                        const AccountStatsInfo(index: 3)),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          //nblock Variable here
-                                          globals.user!.nBlocked.toString(),
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.textColor2,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(width: getScreenWidth(5)),
-                                        Text(
-                                          'EX',
-                                          style: TextStyle(
-                                              fontSize: getScreenHeight(15),
-                                              color: AppColors.greyShade2,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
                               ),
-                            ],
-                          ),
-                          globals.user!.bio != null && globals.user!.bio != ''
-                              ? SizedBox(height: getScreenHeight(20))
-                              : const SizedBox.shrink(),
-                          SizedBox(
-                              width: getScreenWidth(290),
-                              child: Text(
-                                globals.user!.bio ?? '',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(13),
-                                  color: AppColors.greyShade2,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              )),
-                          globals.user!.bio != null && globals.user!.bio != ''
-                              ? SizedBox(height: getScreenHeight(20))
-                              : const SizedBox.shrink(),
-                          SizedBox(
-                              width: getScreenWidth(145),
-                              height: getScreenHeight(45),
-                              child: CustomButton(
-                                label: 'Edit Profile',
-                                labelFontSize: getScreenHeight(14),
-                                color: AppColors.white,
-                                onPressed: () {
-                                  RouteNavigators.route(
-                                      context, const EditProfileScreen());
-                                },
-                                size: size,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 9,
-                                  horizontal: 21,
-                                ),
-                                textColor: AppColors.textColor2,
-                                borderSide: const BorderSide(
-                                    color: AppColors.greyShade5),
-                              )),
-                          SizedBox(height: getScreenHeight(15)),
-                        ]
-                      ).paddingOnly(t: 50),
+                            )),
+                        globals.user!.bio != null && globals.user!.bio != ''
+                            ? SizedBox(height: getScreenHeight(20))
+                            : const SizedBox.shrink(),
+                        SizedBox(
+                            width: getScreenWidth(145),
+                            height: getScreenHeight(45),
+                            child: CustomButton(
+                              label: 'Edit Profile',
+                              labelFontSize: getScreenHeight(14),
+                              color: AppColors.white,
+                              onPressed: () {
+                                RouteNavigators.route(
+                                    context, const EditProfileScreen());
+                              },
+                              size: size,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 9,
+                                horizontal: 21,
+                              ),
+                              textColor: AppColors.textColor2,
+                              borderSide:
+                                  const BorderSide(color: AppColors.greyShade5),
+                            )),
+                        SizedBox(height: getScreenHeight(15)),
+                      ]).paddingOnly(t: 50),
                     ),
                     Visibility(
                       visible: isCollapsed ? true : false,
@@ -1045,13 +1043,12 @@ class _AccountScreenState extends State<AccountScreen>
                                             padding: EdgeInsets.zero,
                                             shrinkWrap: true,
                                             children: const [
-                                              EmptyTabWidget(
-                                                title: "Reaches you’ve made",
-                                                subtitle:
-                                                    "Find all posts or contributions you’ve made here ",
-                                              )
-                                            ]
-                                          )
+                                                EmptyTabWidget(
+                                                  title: "Reaches you’ve made",
+                                                  subtitle:
+                                                      "Find all posts or contributions you’ve made here ",
+                                                )
+                                              ])
                                         : ListView.builder(
                                             itemCount: _posts.value.length,
                                             itemBuilder: (context, index) {
@@ -2169,44 +2166,42 @@ class _CommentReachCard extends HookWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Helper.renderProfilePicture(
-                            globals.user!.profilePicture,
-                            size: 33,
-                          ).paddingOnly(l: 13, t: 10),
-                          SizedBox(width: getScreenWidth(9)),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '@${commentModel!.commentOwnerProfile!.username}',
-                                    style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textColor2,
-                                    ),
+                      Row(children: [
+                        Helper.renderProfilePicture(
+                          globals.user!.profilePicture,
+                          size: 33,
+                        ).paddingOnly(l: 13, t: 10),
+                        SizedBox(width: getScreenWidth(9)),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '@${commentModel!.commentOwnerProfile!.username}',
+                                  style: TextStyle(
+                                    fontSize: getScreenHeight(15),
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textColor2,
                                   ),
-                                  // const SizedBox(width: 3),
-                                  // SvgPicture.asset('assets/svgs/verified.svg')
-                                ],
-                              ),
-                              Text(
-                                'Comment on @${commentModel!.commentOwnerProfile!.username}',
-                                style: TextStyle(
-                                  fontSize: getScreenHeight(11),
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor2,
                                 ),
+                                // const SizedBox(width: 3),
+                                // SvgPicture.asset('assets/svgs/verified.svg')
+                              ],
+                            ),
+                            Text(
+                              'Comment on @${commentModel!.commentOwnerProfile!.username}',
+                              style: TextStyle(
+                                fontSize: getScreenHeight(11),
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColor2,
                               ),
-                            ],
-                          ).paddingOnly(t: 10),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ).paddingOnly(t: 10),
+                      ]),
                     ],
                   ),
                   Flexible(

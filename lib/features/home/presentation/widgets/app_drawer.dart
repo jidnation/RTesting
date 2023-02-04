@@ -45,7 +45,7 @@ class AppDrawer extends HookWidget {
                         borderRadius: BorderRadius.circular(30),
                         splashColor: AppColors.backgroundShade4,
                         onTap: () {
-                          RouteNavigators.route(context, const AccountScreen());
+                          RouteNavigators.route(context, const NewAccountScreen());
                         },
                         child: const Padding(
                             padding: EdgeInsets.all(8.0),
@@ -57,7 +57,7 @@ class AppDrawer extends HookWidget {
                         borderRadius: BorderRadius.circular(25),
                         splashColor: AppColors.backgroundShade4,
                         onTap: () {
-                          RouteNavigators.route(context, const AccountScreen());
+                          RouteNavigators.route(context, const NewAccountScreen());
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(left: 10),
@@ -256,7 +256,7 @@ class AppDrawer extends HookWidget {
                       icon: 'assets/svgs/reaches.svg',
                       onPressed: () {
                         momentCtrl.userBar.value?.currentState!.closeDrawer();
-                        RouteNavigators.route(context, const AccountScreen());
+                        RouteNavigators.route(context, const NewAccountScreen());
                       },
                     ),
                     DrawerItem(

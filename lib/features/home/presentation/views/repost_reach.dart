@@ -42,6 +42,8 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
@@ -456,10 +458,10 @@ class _RepostReachState extends State<RepostReach> {
                                                           globals.user!.id
                                                       ? RouteNavigators.route(
                                                           context,
-                                                          const AccountScreen())
+                                                          const NewAccountScreen())
                                                       : RouteNavigators.route(
                                                           context,
-                                                          RecipientAccountProfile(
+                                                      RecipientNewAccountScreen(
                                                             recipientEmail:
                                                                 'email',
                                                             recipientImageUrl: widget

@@ -14,6 +14,7 @@ import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
 import '../../../moment/moment_feed.dart';
 import '../../../moment/user_posting.dart';
+import '../../../profile/new_account.dart';
 import '../../../timeline/timeline_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // TestingScreen(),
       MomentFeed(pageController: _pageController),
       const NotificationsScreen(),
-      const AccountScreen(),
+      const NewAccountScreen(),
     ];
     useEffect(() {
       globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
