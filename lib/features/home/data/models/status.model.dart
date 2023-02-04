@@ -212,16 +212,24 @@ class StatusFeedModel {
 
 class StatusFeedResponseModel {
   String? id;
+  String? username;
+  bool? isMuted;
+  String? isLiveStreamActive;
   List<StatusFeedModel>? status;
 
   StatusFeedResponseModel({
     this.id,
     this.status,
+    this.isMuted,
+    this.username,
+    this.isLiveStreamActive,
   });
 
   factory StatusFeedResponseModel.fromJson(Map<String, dynamic> json) =>
       StatusFeedResponseModel(
-        id: json["_id"],
+        username: json['username'],
+        isMuted: json['isMuted'],
+        isLiveStreamActive: json['isLiveStreamActive'],
         status: json["status"] != null
             ? (json["status"] as List)
                 .map((i) => StatusFeedModel.fromJson(i))
@@ -230,7 +238,9 @@ class StatusFeedResponseModel {
       );
 
   Map<String, dynamic> tojson() => {
-        "_id": id,
+        "username": username,
+        "isMuted": isMuted,
+        "isLiveStreamActive": isLiveStreamActive,
         "status":
             status != null ? status!.map((e) => e.toJson()).toList() : null,
       };

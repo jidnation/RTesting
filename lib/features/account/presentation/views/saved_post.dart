@@ -33,6 +33,8 @@ import '../../../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../../../home/presentation/widgets/post_media.dart';
 import '../../../home/presentation/widgets/reposted_post.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/video_player.dart';
 
 class SavedPostScreen extends StatefulHookWidget {
@@ -136,7 +138,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                     ? RouteNavigators.route(context, const AccountScreen())
                     : RouteNavigators.route(
                         context,
-                        RecipientAccountProfile(
+                    RecipientNewAccountScreen(
                           recipientEmail: 'email',
                           recipientImageUrl: state.user!.profilePicture,
                           recipientId: state.user!.id,
@@ -801,10 +803,10 @@ class SavedPostReacherCard extends HookWidget {
                             savedPostModel!.post.postOwnerProfile!.authId ==
                                     globals.user!.id
                                 ? RouteNavigators.route(
-                                    context, const AccountScreen())
+                                    context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientAccountProfile(
+                                    RecipientNewAccountScreen(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -1303,10 +1305,10 @@ class TextOnlySavedPostReacherCard extends HookWidget {
                             savedPostModel!.post.postOwnerProfile!.authId ==
                                     globals.user!.id
                                 ? RouteNavigators.route(
-                                    context, const AccountScreen())
+                                    context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientAccountProfile(
+                                    RecipientNewAccountScreen(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -1768,10 +1770,10 @@ class VideoOnlySavedPostReacherCard extends HookWidget {
                             savedPostModel!.post.postOwnerProfile!.authId ==
                                     globals.user!.id
                                 ? RouteNavigators.route(
-                                    context, const AccountScreen())
+                                    context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientAccountProfile(
+                                    RecipientNewAccountScreen(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -2200,10 +2202,10 @@ class AudioOnlySavedPostReacherCard extends HookWidget {
                             savedPostModel!.post.postOwnerProfile!.authId ==
                                     globals.user!.id
                                 ? RouteNavigators.route(
-                                    context, const AccountScreen())
+                                    context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientAccountProfile(
+                                RecipientNewAccountScreen(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,

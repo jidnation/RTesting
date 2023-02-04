@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:like_button/like_button.dart';
 import 'package:reach_me/features/moment/moment_videoplayer_item.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
 
@@ -171,20 +172,28 @@ class _MomentFeedState extends State<MomentFeed> {
                                                       ]),
                                                       const SizedBox(
                                                           height: 10),
-                                                      MomentTabs(
-                                                        icon: momentFeed.isLiked
-                                                            ? Icons.favorite
-                                                            : Icons
-                                                                .favorite_outline_outlined,
-                                                        color:
-                                                            momentFeed.isLiked
-                                                                ? Colors.red
-                                                                : null,
-                                                        value: momentFeedStore
-                                                            .getCountValue(
-                                                                value: momentFeed
-                                                                    .nLikes),
-                                                        onClick: () {
+                                                      ///////////////////
+                                                      LikeButton(
+                                                        size: 30,
+                                                        countBuilder: (count,
+                                                            isLiked, text) {
+                                                          return CustomText(
+                                                            text: count
+                                                                .toString(),
+                                                            weight:
+                                                                FontWeight.w500,
+                                                            color: Colors.white,
+                                                            size: 13.28,
+                                                          );
+                                                        },
+                                                        likeCountPadding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        isLiked:
+                                                            momentFeed.isLiked,
+                                                        countPostion:
+                                                            CountPostion.bottom,
+                                                        onTap: (isLiked) async {
                                                           momentFeedStore
                                                               .likingMoment(
                                                                   momentId:
@@ -192,7 +201,48 @@ class _MomentFeedState extends State<MomentFeed> {
                                                                           .momentId,
                                                                   id: momentFeed
                                                                       .id);
+                                                          return !isLiked;
                                                         },
+                                                        circleColor: CircleColor(
+                                                            start: AppColors
+                                                                .primaryColor,
+                                                            end: AppColors
+                                                                .primaryColor
+                                                                .withOpacity(
+                                                                    0.5)),
+                                                        bubblesColor:
+                                                            BubblesColor(
+                                                          dotPrimaryColor:
+                                                              Colors.red,
+                                                          dotSecondaryColor:
+                                                              Colors.red
+                                                                  .withOpacity(
+                                                                      0.6),
+                                                        ),
+                                                        likeBuilder:
+                                                            (bool isLiked) {
+                                                          return Icon(
+                                                            size: 30,
+                                                            isLiked
+                                                                ? Icons.favorite
+                                                                : Icons
+                                                                    .favorite_outline_outlined,
+                                                            color: isLiked
+                                                                ? Colors.red
+                                                                : Colors.white,
+                                                          );
+
+                                                          //   Icon(
+                                                          //   Icons.home,
+                                                          //   color: isLiked
+                                                          //       ? Colors
+                                                          //           .deepPurpleAccent
+                                                          //       : Colors.grey,
+                                                          //   size: buttonSize,
+                                                          // );
+                                                        },
+                                                        likeCount:
+                                                            momentFeed.nLikes,
                                                       ),
                                                       const SizedBox(
                                                           height: 15),
@@ -250,11 +300,13 @@ class _MomentFeedState extends State<MomentFeed> {
                                                                     .caption !=
                                                                 'No Caption'
                                                             ? momentFeed.caption
-                                                            : '',
+                                                            : 'No Caption',
                                                         color: Colors.white,
+                                                        isItalic:
+                                                            FontStyle.italic,
                                                         weight: FontWeight.w600,
                                                         // overflow: TextOverflow.ellipsis,
-                                                        size: 16.28,
+                                                        size: 14,
                                                       ),
                                                     ),
                                                     const SizedBox(height: 15),
@@ -322,7 +374,7 @@ class _MomentFeedState extends State<MomentFeed> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const CustomText(
-                                    text: 'No Moment Available yet.....',
+                                    text: 'No Streak Available yet.....',
                                     color: Colors.white,
                                     weight: FontWeight.w500,
                                   ),
@@ -351,7 +403,7 @@ class _MomentFeedState extends State<MomentFeed> {
                                         // color: Colors.white,
                                       ),
                                       child: const CustomText(
-                                        text: 'Create Moment',
+                                        text: 'Create Streak',
                                         color: AppColors.white,
                                         size: 14,
                                       ),

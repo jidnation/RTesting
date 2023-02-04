@@ -8,7 +8,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/home/presentation/views/full_post.dart';
-import 'package:reach_me/features/home/presentation/views/status/view.status.dart';
+import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble(
@@ -159,7 +159,7 @@ class MsgBubble extends StatelessWidget {
                             )));
                   } else {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => ViewUserStatus(
+                        builder: (builder) => StatusViewPage(
                               status: [chat.quotedStatus!],
                               isMuted: false,
                             )));
@@ -253,6 +253,10 @@ class MsgBubble extends StatelessWidget {
         ),
       );
     } else if (label.contains('aac')) {
+      // return MomentAudioPlayer(
+      //   audioPath: label,
+      //   id: chat.id,
+      // );
       return Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -272,6 +276,7 @@ class MsgBubble extends StatelessWidget {
                 audioFile: label,
                 isMe: isMe,
                 timeStamp: timeStamp,
+                id: chat.id,
               )));
     }
     return Column(

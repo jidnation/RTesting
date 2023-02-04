@@ -79,12 +79,13 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
               bool _isLoading = state is ChatLoading;
               return BlocConsumer<UserBloc, UserState>(
                 bloc: globals.userBloc,
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is RecipientUserData) {
-                    RouteNavigators.route(
+                    final res = await RouteNavigators.route(
                       context,
                       MsgChatInterface(recipientUser: state.user),
                     );
+                    globals.userChat = [];
                   }
                   if (state is UserError) {
                     Snackbars.error(context, message: state.error);
