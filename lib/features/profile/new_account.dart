@@ -1,3 +1,5 @@
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -37,6 +39,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
     super.initState();
   }
 
+  final CarouselController topCarouselController = CarouselController();
+  final CarouselController bodyCarouselController = CarouselController();
   @override
   Widget build(BuildContext context) {
     List<String> pageTab = [
@@ -57,15 +61,25 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
       'quote': const QuotedTab(),
       'comments': const CommentsTab(),
     };
+
+    List<Widget> profileTabs = [
+      const ReachTab(),
+      const LikedTab(),
+      const CommentsTab(),
+      const UpVotedTab(),
+      const DownVotedTab(),
+      const QuotedTab(),
+      const SavedTab(),
+    ];
     ValueNotifier<String> selectedTab = useState('Reaches');
     var size = MediaQuery.of(context).size;
     return Obx(() {
       bool foldMe = !timeLineController.isScrolling.value;
-      return SizedBox(
-        height: SizeConfig.screenHeight,
-        width: SizeConfig.screenWidth,
-        child: Scaffold(
-          body: Column(children: [
+      return Scaffold(
+        body: SizedBox(
+          height: SizeConfig.screenHeight,
+          width: SizeConfig.screenWidth,
+          child: Column(children: [
             Visibility(
               visible: foldMe,
               child: Stack(
@@ -470,26 +484,74 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
               ),
             ),
             Container(
-              height: 60,
-              width: SizeConfig.screenWidth,
-              color: AppColors.backgroundShade4,
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pageTab.length,
-                  physics: const ScrollPhysics(),
-                  padding: const EdgeInsets.only(left: 5),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    String value = pageTab[index];
-                    return ProfileTab(
-                        isSelected: selectedTab.value == value,
-                        value: value,
-                        onClick: () {
-                          selectedTab.value = value;
-                        });
-                  }),
+                height: 60,
+                width: SizeConfig.screenWidth,
+                color: AppColors.backgroundShade4,
+                child: CarouselSlider(
+                  carouselController: topCarouselController,
+                  options: CarouselOptions(
+                    padEnds: false,
+                    viewportFraction: 0.3,
+                    height: 60,
+                    // aspectRatio: 0.3,
+                    onPageChanged: (index, _) {
+                      bodyCarouselController.animateToPage(index);
+                      selectedTab.value = pageTab[index];
+                    },
+                    enableInfiniteScroll: false,
+                    scrollDirection: Axis.horizontal,
+                  ),
+                  items: List.generate(
+                      pageTab.length,
+                      (index) => ProfileTab(
+                          isSelected: selectedTab.value == pageTab[index],
+                          value: pageTab[index],
+                          onClick: () {
+                            bodyCarouselController.animateToPage(index);
+                            selectedTab.value = pageTab[index];
+                          })),
+                )
+
+                // ListView.builder(
+                //     shrinkWrap: true,
+                //     controller: _controller,
+                //     itemCount: pageTab.length,
+                //     physics: const ScrollPhysics(),
+                //     padding: const EdgeInsets.only(left: 5),
+                //     scrollDirection: Axis.horizontal,
+                //     itemBuilder: (context, index) {
+                //       String value = pageTab[index];
+                //       return ProfileTab(
+                //           isSelected: selectedTab.value == value,
+                //           value: value,
+                //           onClick: () {
+                //             selectedTab.value = value;
+                //           });
+                //     }),
+                ),
+            Expanded(
+              child: SizedBox(
+                child: CarouselSlider(
+                  carouselController: bodyCarouselController,
+                  options: CarouselOptions(
+                    viewportFraction: 1,
+                    height: 580,
+                    onPageChanged: (index, _) {
+                      // checkMeOut(index);
+                      topCarouselController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInToLinear,
+                      );
+                      selectedTab.value = pageTab[index];
+                    },
+                    enableInfiniteScroll: false,
+                    scrollDirection: Axis.horizontal,
+                  ),
+                  items: profileTabs,
+                ),
+              ),
             ),
-            profileTabMapping[selectedTab.value.toLowerCase()] ?? Container(),
           ]),
         ),
       );

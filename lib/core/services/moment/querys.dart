@@ -106,6 +106,38 @@ class MomentQuery {
     return queryResult.data?['likeMoment']['authId'] != null;
   }
 
+  replyPostComment(
+      {required String postId,
+      required commentId,
+      required String content}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'postId': postId,
+      'commentId': commentId,
+      'content': content,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.replyPostComment,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my post comment reply::::: $queryResult');
+    // return queryResult.data?['likeMoment']['authId'] != null;
+  }
+
   Future<bool> likeMomentComment(
       {required String momentId, required String commentId}) async {
     HttpLink link = HttpLink(
@@ -133,6 +165,35 @@ class MomentQuery {
     ));
     log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeMomentComment']['authId'] != null;
+  }
+
+  Future<bool> likePostComment(
+      {required String postId, required String commentId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'postId': postId,
+      'commentId': commentId,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.likePostComment,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my moment-Liking-query::::: $queryResult');
+    return queryResult.data?['likeCommentOnPost']['authId'] != null;
   }
 
   createMomentComment({
@@ -289,6 +350,34 @@ class MomentQuery {
     ));
     log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMomentComment'] ?? false;
+  }
+
+  unlikeCommentPost({required String commentId, required String likeId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'commentId': commentId,
+      'likeId': likeId
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.unlikePostComment,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my comment-post-unLiking-query::::: $queryResult');
+    return queryResult.data?['unlikeCommentOnPost'] != 'false' ?? false;
   }
 
   Future<MomentFeedModel?>? getAllFeeds(

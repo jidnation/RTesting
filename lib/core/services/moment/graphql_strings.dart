@@ -42,6 +42,30 @@ mutation($momentId: String!, $commentId: String!, $replyId: String!) {
   }
 ''';
 
+const replyPostComment = r'''
+mutation($postId: String!, $commentId: String!, $content: String!) {
+    replyCommentOnPost(replyInput: {commentId: $commentId, postId: $postId, content: $content}){
+    authId,
+    commentId,
+    isLiked,
+    replySlug,
+    replyId,
+    postId,
+    nLikes,
+    replyOwnerProfile{
+    authId
+    },
+    postOwnerProfile{
+    authId
+    },
+    commentOwnerProfile{
+    authId
+    },
+    created_at,
+  }
+  }
+''';
+
 const likeMomentComment = r'''
 mutation($momentId: String!, $commentId: String!) {
     likeMomentComment (momentId: $momentId, commentId: $commentId){
@@ -50,9 +74,23 @@ mutation($momentId: String!, $commentId: String!) {
   }
 ''';
 
+const likePostComment = r'''
+mutation($postId: String!, $commentId: String!) {
+    likeCommentOnPost (postId: $postId, commentId: $commentId){
+    authId
+  }
+  }
+''';
+
 const unlikeMomentComment = r'''
 mutation($commentId: String!, $likeId: String!) {
     unlikeMomentComment (commentId: $commentId, likeId: $likeId)
+    }
+''';
+
+const unlikePostComment = r'''
+mutation($commentId: String!, $likeId: String!) {
+    unlikeCommentOnPost (commentId: $commentId, likeId: $likeId)
     }
 ''';
 

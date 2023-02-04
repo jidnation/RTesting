@@ -190,25 +190,28 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   likePost(String id, {required String type}) async {
-    List<TimeLineModel> currentData = getExactValue(type);
-    TimeLineModel actualModel =
-        currentData.firstWhere((element) => element.id == id);
-    Post post = actualModel.getPostFeed.post!;
-    if (!post.isLiked!) {
-      post.isLiked = true;
-      post.nLikes = post.nLikes! + 1;
-      // notifyListeners();
-      bool response = await timeLineQuery.likePost(postId: post.postId!);
-      if (response) {
-        // updateTimeLine(id);
-      }
+    if (type == 'comment') {
     } else {
-      post.isLiked = false;
-      post.nLikes = post.nLikes! - 1;
-      // notifyListeners();
-      bool response = await timeLineQuery.unlikePost(postId: post.postId!);
-      if (response) {
-        // updateTimeLine(id);
+      List<TimeLineModel> currentData = getExactValue(type);
+      TimeLineModel actualModel =
+          currentData.firstWhere((element) => element.id == id);
+      Post post = actualModel.getPostFeed.post!;
+      if (!post.isLiked!) {
+        post.isLiked = true;
+        post.nLikes = post.nLikes! + 1;
+        // notifyListeners();
+        bool response = await timeLineQuery.likePost(postId: post.postId!);
+        if (response) {
+          // updateTimeLine(id);
+        }
+      } else {
+        post.isLiked = false;
+        post.nLikes = post.nLikes! - 1;
+        // notifyListeners();
+        bool response = await timeLineQuery.unlikePost(postId: post.postId!);
+        if (response) {
+          // updateTimeLine(id);
+        }
       }
     }
   }
@@ -809,7 +812,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
 
-
   fetchAll() {
     fetchMyPost(isRefresh: false);
     fetchMyLikedPosts(isRefresh: false);
@@ -824,7 +826,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       int? pageLimit,
       required bool isRefresh,
       RefreshController? refreshController}) async {
-
     if (_myPosts.isEmpty || isRefresh) {
       List<Post>? response =
           await timeLineQuery.getAllPosts(authIdToGet: globals.userId);
@@ -907,7 +908,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
-
   fetchMyComments(
       {int? pageNumber,
       int? pageLimit,
@@ -925,11 +925,28 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           refreshController.refreshCompleted();
         }
       }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myPersonalComments.isNotEmpty) {
+        timeLineController.likeCommentBox([]);
+        for (GetPersonalComment element in _myPersonalComments) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.commentId!,
+              data: LikeModel(
+                nLikes: element.nLikes ?? 0,
+                isLiked: element.isLiked != "false",
+              )));
+        }
+        timeLineController.likeCommentBox(likeBoxInfo);
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
       notifyListeners();
     }
   }
 
-  ErProfile getPostModelMiniProfile({required CommentOwnerProfile? tPostOwnerInfo}) {
+  ErProfile getPostModelMiniProfile(
+      {required CommentOwnerProfile? tPostOwnerInfo}) {
     return ErProfile(
         firstName: tPostOwnerInfo?.firstName,
         lastName: tPostOwnerInfo?.lastName,
@@ -939,10 +956,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         verified: tPostOwnerInfo?.verified,
         location: tPostOwnerInfo?.location,
         bio: tPostOwnerInfo?.bio,
-        authId: tPostOwnerInfo?.authId
-    );
+        authId: tPostOwnerInfo?.authId);
   }
-
 
   fetchMySavedPosts(
       {int? pageNumber,

@@ -41,63 +41,61 @@ class _SavedTabState extends State<SavedTab> {
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
           List<TimeLineModel> data = timeLineFeedStore.mySavedPosts;
-          return Expanded(
-            child: SmartRefresher(
-              physics: const BouncingScrollPhysics(),
-              onRefresh: () {
-                timeLineFeedStore.fetchMySavedPosts(
-                  isRefresh: true,
-                  refreshController: _refreshController,
-                );
-              },
-              controller: _refreshController,
-              child: data.isEmpty
-                  ? ListView(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      children: const [
-                        EmptyTabWidget(
-                          title: "No saved posts",
-                          subtitle: "",
-                        )
-                      ],
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      controller: _controller,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      physics: const ScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        GlobalKey<State<StatefulWidget>> src = GlobalKey();
-                        TimeLineModel post = data[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 15),
-                          child: RepaintBoundary(
-                            key: src,
-                            child: Stack(children: [
-                              TimeLineBox(
-                                timeLineModel: post,
-                                takeScreenShot: () {
-                                  timeLineController.takeScreenShot(
-                                      context, src);
-                                },
-                              ),
-                              Positioned(
-                                  bottom: 10,
-                                  left: 30,
-                                  right: 30,
-                                  child: TimeLineBoxActionRow(
-                                    timeLineId: post.id,
-                                    type: 'save',
-                                    post: post.getPostFeed.post!,
-                                  )),
-                            ]),
-                          ),
-                        );
-                      },
-                      itemCount: data.length,
-                    ),
-            ),
+          return SmartRefresher(
+            physics: const BouncingScrollPhysics(),
+            onRefresh: () {
+              timeLineFeedStore.fetchMySavedPosts(
+                isRefresh: true,
+                refreshController: _refreshController,
+              );
+            },
+            controller: _refreshController,
+            child: data.isEmpty
+                ? ListView(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    children: const [
+                      EmptyTabWidget(
+                        title: "No saved posts",
+                        subtitle: "",
+                      )
+                    ],
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    controller: _controller,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    physics: const ScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      GlobalKey<State<StatefulWidget>> src = GlobalKey();
+                      TimeLineModel post = data[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: RepaintBoundary(
+                          key: src,
+                          child: Stack(children: [
+                            TimeLineBox(
+                              timeLineModel: post,
+                              takeScreenShot: () {
+                                timeLineController.takeScreenShot(
+                                    context, src);
+                              },
+                            ),
+                            Positioned(
+                                bottom: 10,
+                                left: 30,
+                                right: 30,
+                                child: TimeLineBoxActionRow(
+                                  timeLineId: post.id,
+                                  type: 'save',
+                                  post: post.getPostFeed.post!,
+                                )),
+                          ]),
+                        ),
+                      );
+                    },
+                    itemCount: data.length,
+                  ),
           );
         });
   }

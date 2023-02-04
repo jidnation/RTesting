@@ -19,10 +19,11 @@ import '../timeline/models/profile_comment_model.dart';
 
 class CommentBoxActionRow extends StatefulWidget {
   final GetPersonalComment getPersonalComment;
+  final String type;
   const CommentBoxActionRow({
     Key? key,
     required this.getPersonalComment,
-    // required this.post,
+    required this.type,
     // required this.timeLineId,
   }) : super(key: key);
 
@@ -43,75 +44,50 @@ class _CommentBoxActionRowState extends State<CommentBoxActionRow> {
 
   @override
   Widget build(BuildContext routeContext) {
-    // return
-    //   Obx(() {
-    // LikeModel likeModelInfo = timeLineController.getLikeValues(
-    //     id: widget.timeLineId, type: widget.type);
+    return Obx(() {
+      LikeModel likeModelInfo = timeLineController.getLikeValues(
+          id: widget.getPersonalComment.commentId!, type: widget.type);
 
-    bool isLiked = widget.getPersonalComment.isLiked != "false";
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Container(
-        height: 40,
-        // width: getScreenWidth(160),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xfff5f5f5),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            GestureDetector(
-              onLongPress: () {
-                //   if ((widget.post.nLikes ?? 0) > 0) {
-                //     showPostReactors(routeContext,
-                //         postId: widget.post.postId!, reactionType: 'Like');
-                //   }
-              },
-              onTap: () {
-                // timeLineController.likePost(
-                //     id: widget.timeLineId, type: widget.type);
-                // timeLineFeedStore.likePost(widget.timeLineId,
-                //     type: widget.type);
-              },
-              child: SvgPicture.asset(
-                // widget.post.isLiked!
-                isLiked
-                    ? 'assets/svgs/like-active.svg'
-                    : 'assets/svgs/like.svg',
-              ),
-            ),
-            const SizedBox(width: 3),
-            CustomText(
-              text: momentFeedStore.getCountValue(
-                // value: widget.post.nLikes!,
-                value: widget.getPersonalComment.nLikes!,
-              ),
-              size: 15,
-              isCenter: true,
-              weight: FontWeight.w600,
-              color: const Color(0xff001824),
-            )
-          ]),
-          const SizedBox(width: 12),
-          InkWell(
-            onTap: () {
-              // RouteNavigators.route(
-              //     routeContext,
-              //     CommentReach(
-              //         postFeedModel: timeLineFeedStore.getPostModelById(
-              //             widget.timeLineId,
-              //             type: widget.type)));
-            },
-            child:
-                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              SvgPicture.asset(
-                'assets/svgs/comment.svg',
+      // bool isLiked = widget.getPersonalComment.isLiked != "false";
+      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Container(
+          height: 40,
+          // width: getScreenWidth(160),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xfff5f5f5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              GestureDetector(
+                onLongPress: () {
+                  if ((widget.getPersonalComment.nLikes ?? 0) > 0) {
+                    showPostReactors(routeContext,
+                        postId: widget.getPersonalComment.postId!,
+                        reactionType: 'Like');
+                  }
+                },
+                onTap: () {
+                  timeLineController.likePost(
+                      id: widget.getPersonalComment.commentId!,
+                      isLikes: widget.getPersonalComment.isLiked,
+                      postId: widget.getPersonalComment.postId,
+                      type: widget.type);
+                },
+                child: SvgPicture.asset(
+                  // widget.post.isLiked!
+                  likeModelInfo.isLiked
+                      ? 'assets/svgs/like-active.svg'
+                      : 'assets/svgs/like.svg',
+                ),
               ),
               const SizedBox(width: 3),
               CustomText(
                 text: momentFeedStore.getCountValue(
-                  value: widget.getPersonalComment.nReplies!,
+                  // value: widget.post.nLikes!,
+                  value: likeModelInfo.nLikes,
                 ),
                 size: 15,
                 isCenter: true,
@@ -119,11 +95,39 @@ class _CommentBoxActionRowState extends State<CommentBoxActionRow> {
                 color: const Color(0xff001824),
               )
             ]),
-          ),
-        ]),
-      ),
-      const SizedBox(),
-    ]);
-    // });
+            const SizedBox(width: 12),
+            InkWell(
+              onTap: () {
+                print(
+                    ":::::::::::::::commentId ${widget.getPersonalComment.commentId}");
+                print(
+                    ":::::::::::::::postId ${widget.getPersonalComment.postId}");
+                timeLineController.replyComment(
+                  postId: widget.getPersonalComment.postId,
+                  commentId: widget.getPersonalComment.commentId,
+                );
+              },
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                SvgPicture.asset(
+                  'assets/svgs/comment.svg',
+                ),
+                const SizedBox(width: 3),
+                CustomText(
+                  text: momentFeedStore.getCountValue(
+                    value: widget.getPersonalComment.nReplies!,
+                  ),
+                  size: 15,
+                  isCenter: true,
+                  weight: FontWeight.w600,
+                  color: const Color(0xff001824),
+                )
+              ]),
+            ),
+          ]),
+        ),
+        const SizedBox(),
+      ]);
+    });
   }
 }
