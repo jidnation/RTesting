@@ -1074,7 +1074,7 @@ class _RepostReachState extends State<RepostReach> {
                                                 leading: SvgPicture.asset(
                                                     'assets/svgs/people-you-follow.svg'),
                                                 title: Text(
-                                                  'People you follow',
+                                                  'People reaching you',
                                                   style: TextStyle(
                                                     fontSize: getScreenHeight(16),
                                                     color: AppColors.black,

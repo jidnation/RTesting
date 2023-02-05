@@ -746,7 +746,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                                 leading: SvgPicture.asset(
                                                     'assets/svgs/people-you-follow.svg'),
                                                 title: Text(
-                                                  'People you follow',
+                                                  'People reaching you',
                                                   style: TextStyle(
                                                     fontSize:
                                                         getScreenHeight(16),
