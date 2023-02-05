@@ -17,6 +17,10 @@ import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
+import '../../../profile/new_account.dart';
+import '../../../moment/user_posting.dart';
+import '../../../timeline/timeline_feed.dart';
+
 class AppDrawer extends HookWidget {
   const AppDrawer({Key? key}) : super(key: key);
 
@@ -41,7 +45,7 @@ class AppDrawer extends HookWidget {
                         borderRadius: BorderRadius.circular(30),
                         splashColor: AppColors.backgroundShade4,
                         onTap: () {
-                          RouteNavigators.route(context, const AccountScreen());
+                          RouteNavigators.route(context, const NewAccountScreen());
                         },
                         child: const Padding(
                             padding: EdgeInsets.all(8.0),
@@ -53,7 +57,7 @@ class AppDrawer extends HookWidget {
                         borderRadius: BorderRadius.circular(25),
                         splashColor: AppColors.backgroundShade4,
                         onTap: () {
-                          RouteNavigators.route(context, const AccountScreen());
+                          RouteNavigators.route(context, const NewAccountScreen());
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(left: 10),
@@ -85,20 +89,20 @@ class AppDrawer extends HookWidget {
                                   ),
                                 ],
                               ),
-                              GestureDetector(
-                                onTap: () =>
-                                    showOtherItem.value = !showOtherItem.value,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    showOtherItem.value
-                                        ? Icons.keyboard_arrow_down
-                                        : Icons.keyboard_arrow_up,
-                                    color: AppColors.textColor2,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
+                              // GestureDetector(
+                              //   onTap: () =>
+                              //       showOtherItem.value = !showOtherItem.value,
+                              //   child: Padding(
+                              //     padding: const EdgeInsets.all(8.0),
+                              //     child: Icon(
+                              //       showOtherItem.value
+                              //           ? Icons.keyboard_arrow_down
+                              //           : Icons.keyboard_arrow_up,
+                              //       color: AppColors.textColor2,
+                              //       size: 20,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -186,15 +190,15 @@ class AppDrawer extends HookWidget {
                                             color: AppColors.greyShade2,
                                             fontWeight: FontWeight.w400),
                                       ),
-                                    ],
+                                    ]
                                   ),
-                                ],
+                                ]
                               ),
                             ),
                           )
                         ],
                       ),
-                    ],
+                    ]
                   ),
                 ),
               ),
@@ -241,13 +245,18 @@ class AppDrawer extends HookWidget {
                         action: 'Profile',
                         icon: 'assets/svgs/profile.svg',
                         onPressed: () {
-                          RouteNavigators.route(context, const AccountScreen());
+                          momentCtrl.userBar.value?.currentState!.closeDrawer();
+                          timeLineController.isScrolling(false);
+                          RouteNavigators.route(context, const NewAccountScreen());
+
+                          // RouteNavigators.route(context, const AccountScreen());
                         }),
                     DrawerItem(
                       action: 'Reaches',
                       icon: 'assets/svgs/reaches.svg',
                       onPressed: () {
-                        RouteNavigators.route(context, const AccountScreen());
+                        momentCtrl.userBar.value?.currentState!.closeDrawer();
+                        RouteNavigators.route(context, const NewAccountScreen());
                       },
                     ),
                     DrawerItem(
@@ -259,9 +268,11 @@ class AppDrawer extends HookWidget {
                     DrawerItem(
                       action: 'Dictionary',
                       icon: 'assets/svgs/dictionary.svg',
-                      onPressed: () => RouteNavigators.route(
-                          context, const DictionaryView()),
-                    ),
+                      onPressed: () {
+                      momentCtrl.userBar.value?.currentState!.closeDrawer();
+                        RouteNavigators.route(
+                          context, const DictionaryView());
+                    },),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                     DrawerItem(
                       action: 'Settings',
@@ -287,6 +298,7 @@ class AppDrawer extends HookWidget {
               action: 'Scan QR Code',
               icon: 'assets/svgs/qrcode.svg',
               onPressed: () {
+                momentCtrl.userBar.value?.currentState!.closeDrawer();
                 RouteNavigators.route(context, const ScanQRCodeScreen());
               },
             ),

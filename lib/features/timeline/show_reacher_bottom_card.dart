@@ -19,7 +19,7 @@ import '../home/presentation/views/post_reach.dart';
 import '../home/presentation/views/repost_reach.dart';
 
 Future showReacherTimeLineCardBottomSheet(BuildContext context,
-    {required TimeLineModel timeLineModel, void Function()? downloadPost}) {
+    {required TimeLineModel timeLineModel, void Function()? downloadPost, required String type}) {
   return showModalBottomSheet(
     backgroundColor: Colors.transparent,
     context: context,
@@ -181,6 +181,7 @@ Future showReacherTimeLineCardBottomSheet(BuildContext context,
                                 RouteNavigators.pop(context);
                                 timeLineFeedStore.removePost(
                                     context, timeLineModel.id,
+                                    type: type,
                                     isDelete: true);
                               }),
                           KebabBottomTextButton(

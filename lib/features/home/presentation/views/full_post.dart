@@ -40,6 +40,8 @@ import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../moment/comment_media.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/comment_box_bottom_sheet.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
@@ -161,7 +163,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
           var userInfo = state.users!;
           RouteNavigators.route(
               context,
-              RecipientAccountProfile(
+              RecipientNewAccountScreen(
                 recipientCoverImageUrl: userInfo.user.first.coverPicture,
                 recipientEmail: userInfo.user.first.email,
                 recipientId: userInfo.user.first.id,
@@ -435,10 +437,10 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         globals.user!.id
                                                     ? RouteNavigators.route(
                                                         context,
-                                                        const AccountScreen())
+                                                        const NewAccountScreen())
                                                     : RouteNavigators.route(
                                                         context,
-                                                        RecipientAccountProfile(
+                                                    RecipientNewAccountScreen(
                                                           recipientEmail:
                                                               'email',
                                                           recipientImageUrl: widget
@@ -1519,7 +1521,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 Flexible(
                   child: CustomRoundTextField(
                     onTap: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context,
                           CommentReach(
                             postFeedModel: postFeedModel,
@@ -1547,7 +1549,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                         return;
                       } else {
                         for (var e in image) {
-                          RouteNavigators.route(
+                          RouteNavigators.routeReplace(
                               context,
                               CommentReach(
                                 postFeedModel: postFeedModel,
@@ -1588,7 +1590,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   Flexible(
                     child: CustomRoundTextField(
                       onTap: () {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                             CommentReach(
                               postFeedModel: postFeedModel!,
@@ -1630,7 +1632,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   Flexible(
                     child: CustomRoundTextField(
                       onTap: () {
-                        RouteNavigators.route(
+                        RouteNavigators.routeReplace(
                             context,
                             CommentReach(
                               postFeedModel: postFeedModel!,
@@ -1673,7 +1675,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                 Flexible(
                   child: CustomRoundTextField(
                     onTap: () {
-                      RouteNavigators.route(
+                      RouteNavigators.routeReplace(
                           context,
                           CommentReach(
                             postFeedModel: postFeedModel!,
@@ -1772,7 +1774,7 @@ class CommentsTile extends StatelessWidget {
                               context, const AccountScreen())
                           : RouteNavigators.route(
                               context,
-                              RecipientAccountProfile(
+                          RecipientNewAccountScreen(
                                 recipientEmail: 'email',
                                 recipientImageUrl:
                                     comment.commentOwnerProfile!.profilePicture,
@@ -1857,6 +1859,7 @@ class CommentsTile extends StatelessWidget {
                           Expanded(
                               child: CommentAudioMedia(
                             path: comment.audioMediaItem ?? '',
+                            id: comment.commentId,
                           )),
                         ],
                       ))

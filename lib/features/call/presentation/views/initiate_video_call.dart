@@ -12,6 +12,9 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:wakelock/wakelock.dart';
 
+import '../../../../core/components/profile_picture.dart';
+import '../../../../core/utils/dimensions.dart';
+import '../../../account/presentation/widgets/image_placeholder.dart';
 import '../bloc/call_bloc.dart';
 
 enum CallStatus {
@@ -42,6 +45,7 @@ class _CallScreenState extends State<InitiateVideoCall> {
   String? channelName;
   late RtcEngine _engine;
   bool remoteUserJoined = false;
+  bool callSwitched = false;
 
   CallStatus status = CallStatus.calling;
 
@@ -89,6 +93,20 @@ class _CallScreenState extends State<InitiateVideoCall> {
         setState(() {
           _localUserJoined = true;
         });
+      },
+      onRemoteVideoStateChanged:
+          (connection, remoteUid, state, reason, elapsed) {
+        Console.log('remote video state', state);
+        if (state == RemoteVideoState.remoteVideoStateStopped) {
+          setState(() {
+            callSwitched = true;
+          });
+        } else if (state == RemoteVideoState.remoteVideoStateStarting &&
+            callSwitched == true) {
+          setState(() {
+            callSwitched = false;
+          });
+        }
       },
       onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
         debugPrint("remote user $remoteUid joined");
@@ -203,45 +221,122 @@ class _CallScreenState extends State<InitiateVideoCall> {
                 width: size.width,
                 height: size.height,
                 child: Center(
-                  child: _localUserJoined
-                      ? !remoteUserJoined
-                          ? _localPreview(
-                              _localUserJoined,
-                              0,
-                            )
-                          : Stack(
-                              children: [
-                                SizedBox(
-                                  width: size.width,
-                                  height: size.height,
-                                  child: _remoteVideo(channelName!),
-                                ),
-                                Visibility(
-                                  visible: remoteUserJoined,
-                                  child: Positioned(
-                                    bottom: 110,
-                                    right: 20,
-                                    child: SizedBox(
-                                      width: size.width * 0.3,
-                                      height: size.height * 0.2,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: _localPreview(
-                                          _localUserJoined,
-                                          0,
+                  child: callSwitched
+                      ? Stack(
+                          children: [
+                            Image.asset(
+                              'assets/images/incoming_call.png',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                            widget.recipient!.profilePicture == null
+                                ? Positioned(
+                                    top: 100,
+                                    left: 1,
+                                    right: 1,
+                                    child: Column(
+                                      children: [
+                                        ImagePlaceholder(
+                                          width: getScreenWidth(100),
+                                          height: getScreenHeight(100),
+                                        ),
+                                        Text(
+                                          widget.recipient!.firstName ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Positioned(
+                                    top: 100,
+                                    left: 1,
+                                    right: 1,
+                                    child: Column(
+                                      children: [
+                                        RecipientProfilePicture(
+                                          width: getScreenWidth(100),
+                                          height: getScreenHeight(100),
+                                          imageUrl:
+                                              widget.recipient!.profilePicture,
+                                        ),
+                                        Text(
+                                          widget.recipient!.firstName ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                          ],
+                        )
+                      : _localUserJoined
+                          ? !remoteUserJoined
+                              ? _localPreview(
+                                  _localUserJoined,
+                                  0,
+                                )
+                              : Stack(
+                                  children: [
+                                    SizedBox(
+                                      width: size.width,
+                                      height: size.height,
+                                      child: _remoteVideo(channelName!),
+                                    ),
+                                    Visibility(
+                                      visible: remoteUserJoined,
+                                      child: Positioned(
+                                        bottom: 110,
+                                        right: 20,
+                                        child: SizedBox(
+                                          width: size.width * 0.25,
+                                          height: size.height * 0.15,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            child: _localPreview(
+                                              _localUserJoined,
+                                              0,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ],
-                            )
-                      : const SizedBox(),
+                                  ],
+                                )
+                          : const SizedBox(),
                 ),
               ),
               Positioned(
                 top: 50,
                 right: 30,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      callSwitched = !callSwitched;
+                    });
+                    if (callSwitched) {
+                      _engine.disableVideo();
+                    } else {
+                      _engine.enableVideo();
+                    }
+                  },
+                  child: const Icon(
+                    Icons.videocam_off_outlined,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 50,
+                left: 30,
                 child: StreamBuilder<int>(
                   stream: stopWatchTimer.rawTime,
                   initialData: 0,

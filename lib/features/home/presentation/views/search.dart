@@ -21,6 +21,9 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
+
 class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -62,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen>
         ).paddingOnly(t: 10, l: 10),
         title: CustomRoundTextField(
           hintText: 'Search ReachMe',
-          fillColor: AppColors.white,
+          fillColor: const Color.fromARGB(255, 240, 240, 243),
           controller: _searchController,
           maxLines: 1,
           onChanged: (val) {
@@ -218,10 +221,10 @@ class SearchResultCard extends StatelessWidget {
           onTap: () {
             globals.userBloc!.add(GetRecipientProfileEvent(email: id));
             id == globals.user!.id
-                ? RouteNavigators.route(context, const AccountScreen())
+                ? RouteNavigators.route(context, const NewAccountScreen())
                 : RouteNavigators.route(
                     context,
-                    RecipientAccountProfile(
+                    RecipientNewAccountScreen(
                       recipientEmail: 'email',
                       recipientImageUrl: imageUrl,
                       recipientId: id,

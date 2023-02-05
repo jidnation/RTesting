@@ -327,6 +327,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         url: response["data"]['signedUrl'],
         file: file,
       );
+      print(":::::::::>>><<< ${uploadResponse.toString()}");
       if (uploadResponse.toString() == 'Right(Upload successful)') {
         return response["data"]["link"];
       }
@@ -360,11 +361,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
             ]));
 
     ///compressing done here
-    if (videoPath != null) {
+
       MediaInfo? mediaInfo = await VideoCompress.compressVideo(
         videoPath,
         quality: VideoQuality.MediumQuality,
-        deleteOrigin: true, // It's false by default
+        deleteOrigin: false, // It's false by default
       );
       print("::::::::after compression file size::: ${mediaInfo!.filesize}");
 
@@ -396,7 +397,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         // _postingMoment = false;
         Get.close(2);
       }
-    }
+
   }
 
   reachUser({required String toReachId, required String id}) async {

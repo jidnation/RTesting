@@ -23,9 +23,9 @@ import '../../core/utils/dimensions.dart';
 import '../../core/utils/file_utils.dart';
 import '../home/presentation/views/status/create.status.dart';
 import '../home/presentation/views/status/widgets/create_posting.dart';
+import 'momentControlRoom/moment_recording_control_room.dart';
 import 'moment_posting.dart';
 import 'moment_posting_timer.dart';
-import 'moment_recording_control_room.dart';
 
 class UserPosting extends StatefulHookWidget {
   final List<CameraDescription> phoneCameras;
@@ -204,7 +204,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                   ),
                                   const SizedBox(width: 20),
                                   PosingType(
-                                    label: 'Streaks',
+                                    label: 'Streak',
                                     isSelected: index == 1,
                                     onClick: () {
                                       sliderController.jumpToPage(1);
@@ -600,7 +600,6 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
       videoController: controller,
     );
     momentCtrl.endTime(time);
-    momentCtrl.getAudioUrl();
     File videoFile = File(rawVideo!.path);
 
     int currentUnix = DateTime.now().millisecondsSinceEpoch;

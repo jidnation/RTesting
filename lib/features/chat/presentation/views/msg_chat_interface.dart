@@ -11,6 +11,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/components/custom_button.dart';
@@ -29,7 +31,11 @@ import 'package:reach_me/features/call/presentation/views/initiate_audio_call.da
 import 'package:reach_me/features/call/presentation/views/initiate_video_call.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
+
+import '../../../../core/components/snackbar.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -52,6 +58,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   FlutterSoundRecorder? _soundRecorder;
   bool isRecordingInit = false;
   bool isRecording = false;
+  bool isPaused = false;
+  TimerController timerController = TimerController();
 
   //AUDIO_WAVEFORM RECORDER
   RecorderController? recorderController;
@@ -62,7 +70,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
-
     openAudio();
 
     focusNode.addListener(() {
@@ -106,7 +113,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     }
     await _soundRecorder!.openRecorder();
     await _soundRecorder!
-        .setSubscriptionDuration(const Duration(milliseconds: 500));
+        .setSubscriptionDuration(const Duration(milliseconds: 100));
     isRecordingInit = true;
   }
 
@@ -135,14 +142,13 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     var size = MediaQuery.of(context).size;
     final isTyping = useState<bool>(false);
     final isSending = useState<bool>(false);
+    final isUploading = useState<bool>(false);
     final showIsSending = useState<bool>(false);
     final controller = useTextEditingController();
     final _quotedData = useState(widget.quotedData);
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
-      // globals.chatBloc!.add(GetThreadMessagesEvent(
-      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
@@ -170,7 +176,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           onTap: () {
             RouteNavigators.route(
                 context,
-                RecipientAccountProfile(
+                RecipientNewAccountScreen(
                   recipientEmail: widget.recipientUser!.email,
                   recipientImageUrl: widget.recipientUser!.profilePicture,
                   recipientId: widget.recipientUser!.id,
@@ -278,6 +284,15 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               showIsSending.value = false;
               _quotedData.value = null;
               // _controller.jumpTo(_controller.position.maxScrollExtent);
+
+            }
+            if (state is UserUploadingImage) {
+              toast('Uploading media...',
+                  duration: const Duration(milliseconds: 1000));
+            }
+
+            if (state is ChatUploadError) {
+              Snackbars.error(context, message: 'Media Upload Error');
             }
 
             if (state is ChatUploadSuccess) {
@@ -288,7 +303,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   curve: Curves.easeOut,
                 );
               });
-
+              toast('Uploading media...',
+                  duration: const Duration(milliseconds: 300));
               globals.chatBloc!.add(SendChatMessageEvent(
                   senderId: globals.user!.id,
                   receiverId: widget.recipientUser!.id,
@@ -299,7 +315,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   messageMode: _quotedData.value == null
                       ? MessageMode.direct.name
                       : MessageMode.quoted.name));
-
               isSending.value = true;
               showIsSending.value = true;
             }
@@ -420,7 +435,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             onPressed: () {
                                               RouteNavigators.route(
                                                   context,
-                                                  RecipientAccountProfile(
+                                                  RecipientNewAccountScreen(
                                                     recipientEmail: widget
                                                         .recipientUser!.email,
                                                     recipientImageUrl: widget
@@ -464,7 +479,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                       ''),
                                               chat: globals.userChat![i],
                                             ),
-                                        separatorBuilder: (c, i) => SizedBox(
+                                        separatorBuilder: (c, i) =>
+                                            const SizedBox(
                                               height: 10,
                                             ),
                                         itemCount: globals.userChat!.length)
@@ -498,7 +514,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   Text(
                                     'Sending',
                                     style: TextStyle(
-                                      fontSize: getScreenHeight(11),
+                                      fontSize: getScreenHeight(8),
                                       color: AppColors.grey,
                                     ),
                                   ),
@@ -713,10 +729,11 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     onTap: () {
                                                       _soundRecorder!
                                                           .stopRecorder();
-                                                      // _soundRecorder
-                                                      //     ?.closeRecorder();
+
                                                       setState(() {
                                                         isRecording = false;
+                                                        timerController
+                                                            .resetTimer();
                                                       });
                                                     },
                                                     child: const Icon(
@@ -726,43 +743,87 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                           .primaryColor,
                                                     ),
                                                   ),
-                                                  Align(
-                                                    child: StreamBuilder<
-                                                        RecordingDisposition>(
-                                                      stream: _soundRecorder!
-                                                          .onProgress,
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        final duration =
-                                                            snapshot.hasData
-                                                                ? snapshot.data!
-                                                                    .duration
-                                                                : Duration.zero;
+                                                  TimerWidget(
+                                                      controller:
+                                                          timerController),
+                                                  // Align(
+                                                  //   child: StreamBuilder<
+                                                  //       RecordingDisposition>(
+                                                  //     stream: _soundRecorder!
+                                                  //         .onProgress,
+                                                  //     builder:
+                                                  //         (context, snapshot) {
+                                                  //       final duration =
+                                                  //           snapshot.hasData
+                                                  //               ? snapshot.data!
+                                                  //                   .duration
+                                                  //               : Duration.zero;
 
-                                                        String twoDigits(
-                                                                int n) =>
-                                                            n
-                                                                .toString()
-                                                                .padLeft(
-                                                                    2, '0');
-                                                        final twoDigitMinutes =
-                                                            twoDigits(duration
-                                                                .inMinutes
-                                                                .remainder(60));
-                                                        final twoDigitSeconds =
-                                                            twoDigits(duration
-                                                                .inSeconds
-                                                                .remainder(60));
-                                                        return Text(
-                                                          '$twoDigitMinutes: $twoDigitSeconds',
-                                                          style: const TextStyle(
-                                                              fontSize: 20,
-                                                              color: AppColors
-                                                                  .primaryColor),
-                                                        );
+                                                  //       print(duration
+                                                  //           .inMilliseconds);
+
+                                                  //       String twoDigits(
+                                                  //               int n) =>
+                                                  //           n
+                                                  //               .toString()
+                                                  //               .padLeft(
+                                                  //                   2, '0');
+                                                  //       final twoDigitMinutes =
+                                                  //           twoDigits(duration
+                                                  //               .inMinutes
+                                                  //               .remainder(60));
+                                                  //       final twoDigitSeconds =
+                                                  //           twoDigits(duration
+                                                  //               .inSeconds
+                                                  //               .remainder(60));
+                                                  //       return Text(
+                                                  //         '$twoDigitMinutes: $twoDigitSeconds',
+                                                  //         style: const TextStyle(
+                                                  //             fontSize: 20,
+                                                  //             color: AppColors
+                                                  //                 .primaryColor),
+                                                  //       );
+                                                  //     },
+                                                  //   ),
+                                                  // ),
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        if (!isPaused) {
+                                                          _soundRecorder!
+                                                              .pauseRecorder();
+
+                                                          setState(() {
+                                                            timerController
+                                                                .startTimer();
+                                                            isPaused =
+                                                                !isPaused;
+                                                          });
+                                                        } else {
+                                                          _soundRecorder!
+                                                              .resumeRecorder();
+
+                                                          setState(() {
+                                                            isPaused =
+                                                                !isPaused;
+
+                                                            timerController
+                                                                .pauseTimer();
+                                                          });
+                                                        }
                                                       },
-                                                    ),
-                                                  ),
+                                                      child: isPaused
+                                                          ? const Icon(
+                                                              Icons.mic,
+                                                              size: 30,
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )
+                                                          : const Icon(
+                                                              Icons.pause,
+                                                              size: 30,
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )),
                                                 ],
                                               ),
                                             ),
@@ -856,6 +917,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 globals.chatBloc!.add(
                                                     UploadImageFileEvent(
                                                         file: audioMessage));
+
+                                                setState(() {
+                                                  timerController.resetTimer();
+                                                });
                                               } else {
                                                 await _soundRecorder!
                                                     .startRecorder(
@@ -863,6 +928,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 );
                                               }
                                               setState(() {
+                                                timerController.startTimer();
                                                 isRecording = !isRecording;
                                               });
                                             },
@@ -902,33 +968,47 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   Offstage(
                                     offstage: !emojiShowing,
                                     child: SizedBox(
-                                        height: 230,
-                                        child: EmojiPicker(
-                                          textEditingController: controller,
-                                          config: const Config(
+                                      height: 227,
+                                      child: EmojiPicker(
+                                        textEditingController: controller,
+                                        config: Config(
                                             columns: 7,
-                                          ),
-                                          onEmojiSelected: (category, emoji) {
-                                            controller
-                                              ..text += emoji.emoji
-                                              ..selection =
-                                                  TextSelection.fromPosition(
-                                                      TextPosition(
-                                                          offset: controller
-                                                              .text.length));
-                                            if (!isTyping.value) {
-                                              setState(() {
-                                                isTyping.value =
-                                                    !isTyping.value;
-                                              });
-                                            }
+                                            emojiSizeMax: 28 *
+                                                (Platform.isIOS ? 1.30 : 1.0),
+                                            verticalSpacing: 0,
+                                            horizontalSpacing: 0,
+                                            gridPadding: EdgeInsets.zero,
+                                            initCategory: Category.RECENT,
+                                            bgColor: Colors.white,
+                                            indicatorColor:
+                                                Theme.of(context).primaryColor,
+                                            iconColor: Colors.grey,
+                                            iconColorSelected:
+                                                Theme.of(context).primaryColor,
+                                            backspaceColor:
+                                                Theme.of(context).primaryColor,
+                                            skinToneDialogBgColor: Colors.white,
+                                            skinToneIndicatorColor: Colors.grey,
+                                            enableSkinTones: true,
+                                            showRecentsTab: true,
+                                            recentsLimit: 32,
+                                            noRecents: const Text(
+                                              'Pas d\'émojis récents',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.black26),
+                                              textAlign: TextAlign.center,
+                                            )),
+                                        onEmojiSelected: (category, emoji) {
+                                          if (!isTyping.value) {
                                             setState(() {
-                                              controller.text = controller.text;
+                                              isTyping.value = !isTyping.value;
                                             });
-                                          },
-                                        )),
-                                  )
-                                  //const Spacer(),
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                               //  ),
@@ -951,53 +1031,4 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           }),
     );
   }
-
-  /*Widget showemoji() {
-    return SizedBox(
-      height: 250,
-      child: EmojiPicker(
-        onBackspacePressed: () {
-          RouteNavigators.pop(context);
-        },
-        textEditingController: controller,
-        config: Config(
-          columns: 7,
-          emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-          verticalSpacing: 0,
-          horizontalSpacing: 0,
-          gridPadding: EdgeInsets.zero,
-          initCategory: Category.RECENT,
-          bgColor: const Color(0xFFF2F2F2),
-          indicatorColor: Colors.blue,
-          iconColor: Colors.grey,
-          iconColorSelected: Colors.blue,
-          backspaceColor: Colors.blue,
-          skinToneDialogBgColor: Colors.white,
-          skinToneIndicatorColor: Colors.grey,
-          enableSkinTones: true,
-          showRecentsTab: true,
-          recentsLimit: 28,
-          noRecents: const Text(
-            'No Recents',
-            style: TextStyle(fontSize: 20, color: Colors.black26),
-            textAlign: TextAlign.center,
-          ), // Needs to be const Widget
-          loadingIndicator: const SizedBox.shrink(), // Needs to be const Widget
-          tabIndicatorAnimDuration: kTabScrollDuration,
-          categoryIcons: const CategoryIcons(),
-          buttonMode: ButtonMode.MATERIAL,
-        ),
-        onEmojiSelected: (category, emoji) {
-          setState(() {
-            controller.text = controller.text;
-          });
-          if (!isTyping) {
-            setState(() {
-              isTyping = !isTyping;
-            });
-          }
-        },
-      ),
-    );
-  }*/
 }

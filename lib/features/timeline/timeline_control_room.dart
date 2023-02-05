@@ -25,7 +25,9 @@ import '../home/data/models/status.model.dart';
 import '../home/data/repositories/social_service_repository.dart';
 import '../home/data/repositories/user_repository.dart';
 import '../home/presentation/views/post_reach.dart';
+import '../profile/recipientNewAccountProfile.dart';
 import 'models/post_feed.dart';
+import 'models/profile_comment_model.dart';
 
 class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   //creating a singleton class
@@ -188,33 +190,38 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
-  likePost(String id) async {
-    List<TimeLineModel> currentData = value;
-    TimeLineModel actualModel =
-        currentData.firstWhere((element) => element.id == id);
-    Post post = actualModel.getPostFeed.post!;
-    if (!post.isLiked!) {
-      post.isLiked = true;
-      post.nLikes = post.nLikes! + 1;
-      // notifyListeners();
-      bool response = await timeLineQuery.likePost(postId: post.postId!);
-      if (response) {
-        // updateTimeLine(id);
-      }
+  likePost(String id, {required String type}) async {
+    if (type == 'comment') {
     } else {
-      post.isLiked = false;
-      post.nLikes = post.nLikes! - 1;
-      // notifyListeners();
-      bool response = await timeLineQuery.unlikePost(postId: post.postId!);
-      if (response) {
-        // updateTimeLine(id);
+      List<TimeLineModel> currentData = getExactValue(type);
+      TimeLineModel actualModel =
+          currentData.firstWhere((element) => element.id == id);
+      Post post = actualModel.getPostFeed.post!;
+      if (!post.isLiked!) {
+        post.isLiked = true;
+        post.nLikes = post.nLikes! + 1;
+        // notifyListeners();
+        bool response = await timeLineQuery.likePost(postId: post.postId!);
+        if (response) {
+          // updateTimeLine(id);
+        }
+      } else {
+        post.isLiked = false;
+        post.nLikes = post.nLikes! - 1;
+        // notifyListeners();
+        bool response = await timeLineQuery.unlikePost(postId: post.postId!);
+        if (response) {
+          // updateTimeLine(id);
+        }
       }
     }
   }
 
   votePost(BuildContext context,
-      {required String id, required String voteType}) async {
-    List<TimeLineModel> currentData = value;
+      {required String id,
+      required String voteType,
+      required String type}) async {
+    List<TimeLineModel> currentData = getExactValue(type);
     TimeLineModel actualModel =
         currentData.firstWhere((element) => element.id == id);
     Post post = actualModel.getPostFeed.post!;
@@ -243,7 +250,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
                 );
         }
         if (voteType.toLowerCase() == 'downvote') {
-          timeLineFeedStore.removePost(context, id);
+          timeLineFeedStore.removePost(context, id, type: type);
         }
       } else {
         Snackbars.error(
@@ -260,6 +267,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         );
         if (response) {
           initialize(isUpvoting: true);
+          fetchMyPost(isRefresh: true);
           Snackbars.success(
             context,
             message:
@@ -268,31 +276,31 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           );
         }
       } else {
-        deleteVotedPost(postId: post.postId!, id: id);
+        deleteVotedPost(postId: post.postId!, id: id, type: type);
       }
       if (voteType.toLowerCase() == 'downvote') {
-        timeLineFeedStore.removePost(context, id);
+        timeLineFeedStore.removePost(context, id, type: type);
       }
     }
   }
 
-  updateTimeLine(String id) async {
-    List<TimeLineModel> currentData = value;
-    TimeLineModel actualModel =
-        currentData.firstWhere((element) => element.id == id);
-    Post post = actualModel.getPostFeed.post!;
-    Post? response = await timeLineQuery.getPost(postId: post.postId!);
-    if (response != null) {
-      post.isLiked = response.isLiked!;
-      post.nLikes = response.nLikes!;
-      post.nUpvotes = response.nUpvotes!;
-      post.nDownvotes = response.nDownvotes!;
-      post.isVoted = response.isVoted!;
-      post.nComments = response.nComments!;
-    } else {
-      notifyListeners();
-    }
-  }
+  // updateTimeLine(String id) async {
+  //   List<TimeLineModel> currentData = value;
+  //   TimeLineModel actualModel =
+  //       currentData.firstWhere((element) => element.id == id);
+  //   Post post = actualModel.getPostFeed.post!;
+  //   Post? response = await timeLineQuery.getPost(postId: post.postId!);
+  //   if (response != null) {
+  //     post.isLiked = response.isLiked!;
+  //     post.nLikes = response.nLikes!;
+  //     post.nUpvotes = response.nUpvotes!;
+  //     post.nDownvotes = response.nDownvotes!;
+  //     post.isVoted = response.isVoted!;
+  //     post.nComments = response.nComments!;
+  //   } else {
+  //     notifyListeners();
+  //   }
+  // }
 
   Future<bool?> getReachRelationship(
       {required String usersId, required String type}) async {
@@ -303,132 +311,153 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     return response;
   }
 
-  pt.PostFeedModel getPostModel({required TimeLineModel timeLineModel}) {
+  pt.PostFeedModel? getPostModel({required TimeLineModel timeLineModel}) {
     ErProfile? postOwner = timeLineModel.getPostFeed.post?.postOwnerProfile;
     ErProfile? feedOwner = timeLineModel.getPostFeed.feedOwnerProfile;
     Post? postD = timeLineModel.getPostFeed.post;
     ErProfile? voterProfile = timeLineModel.getPostFeed.voterProfile;
-    pt.PostFeedModel postFeedModel = pt.PostFeedModel(
-      firstName: postOwner!.firstName,
-      lastName: postOwner.lastName,
-      username: postOwner.username,
-      postId: postD!.postId,
-      feedOwnerId: feedOwner!.authId,
-      location: postOwner.location,
-      postOwnerId: postOwner.authId,
-      profilePicture: postOwner.profilePicture,
-      verified: postOwner.verified,
-      post: pt.PostModel(
-        repostedPost: timeLineModel.getPostFeed.post!.repostedPost != null
-            ? pt.PostModel(
-                authId: postD.repostedPost?.authId,
-                repostedPostOwnerId: postD.repostedPost?.repostedPostOwnerId,
-                repostedPostId: postD.repostedPost?.repostedPostId,
-                postRating: postD.repostedPost?.postRating,
-                createdAt: postD.repostedPost?.createdAt,
-                isVoted: postD.repostedPost?.isVoted,
-                isLiked: postD.repostedPost?.isLiked,
-                isRepost: postD.repostedPost?.isRepost,
-                videoMediaItem: postD.repostedPost?.videoMediaItem,
-                audioMediaItem: postD.repostedPost?.audioMediaItem,
-                commentOption: postD.repostedPost?.commentOption,
-                content: postD.repostedPost?.content,
-                edited: postD.repostedPost?.edited,
-                hashTags: postD.repostedPost?.hashTags,
-                imageMediaItems: postD.repostedPost?.imageMediaItems,
-                location: postD.repostedPost?.location,
-                mentionList: postD.repostedPost?.mentionList,
-                nComments: postD.repostedPost?.nComments,
-                nDownvotes: postD.repostedPost?.nDownvotes,
-                nUpvotes: postD.repostedPost?.nUpvotes,
-                nLikes: postD.repostedPost?.nLikes,
-                postSlug: postD.repostedPost?.postSlug,
-                postOwnerProfile: postD.repostedPost!.postOwnerProfile != null
-                    ? pt.PostProfileModel(
-                        authId: postD.repostedPost!.postOwnerProfile!.authId,
-                        firstName:
-                            postD.repostedPost!.postOwnerProfile!.firstName,
-                        lastName:
-                            postD.repostedPost!.postOwnerProfile!.lastName,
-                        username:
-                            postD.repostedPost!.postOwnerProfile!.username,
-                        location:
-                            postD.repostedPost!.postOwnerProfile!.location,
-                        profilePicture: postD
-                            .repostedPost!.postOwnerProfile!.profilePicture,
-                        verified:
-                            postD.repostedPost!.postOwnerProfile!.verified,
-                        profileSlug:
-                            postD.repostedPost!.postOwnerProfile!.profileSlug)
-                    : null,
-              )
-            : null,
-        postId: timeLineModel.getPostFeed.post!.postId,
-        authId: postD.authId,
-        repostedPostOwnerId: postD.repostedPostOwnerId,
-        repostedPostId: postD.repostedPostId,
-        postRating: postD.postRating,
-        createdAt: postD.createdAt,
-        isVoted: postD.isVoted,
-        isLiked: postD.isLiked,
-        isRepost: postD.isRepost,
-        videoMediaItem: postD.videoMediaItem,
-        audioMediaItem: postD.audioMediaItem,
-        commentOption: postD.commentOption,
-        content: postD.content,
-        edited: postD.edited,
-        hashTags: postD.hashTags,
-        imageMediaItems: postD.imageMediaItems,
-        location: postD.location,
-        mentionList: postD.mentionList,
-        nComments: postD.nComments,
-        nDownvotes: postD.nDownvotes,
-        nUpvotes: postD.nUpvotes,
-        nLikes: postD.nLikes,
-        postSlug: postD.postSlug,
-        postOwnerProfile: postD.postOwnerProfile != null
-            ? pt.PostProfileModel(
-                authId: postD.postOwnerProfile!.authId,
-                firstName: postD.postOwnerProfile!.firstName,
-                lastName: postD.postOwnerProfile!.lastName,
-                username: postD.postOwnerProfile!.username,
-                location: postD.postOwnerProfile!.location,
-                profilePicture: postD.postOwnerProfile!.profilePicture,
-                verified: postD.postOwnerProfile!.verified,
-                profileSlug: postD.postOwnerProfile!.profileSlug)
-            : null,
-        repostedPostOwnerProfile: postD.repostedPostOwnerProfile != null
-            ? pt.PostProfileModel(
-                authId: postD.repostedPostOwnerProfile!.authId,
-                firstName: postD.repostedPostOwnerProfile!.firstName,
-                lastName: postD.repostedPostOwnerProfile!.lastName,
-                username: postD.repostedPostOwnerProfile!.username,
-                location: postD.repostedPostOwnerProfile!.location,
-                profilePicture: postD.repostedPostOwnerProfile!.profilePicture,
-                verified: postD.repostedPostOwnerProfile!.verified,
-                profileSlug: postD.repostedPostOwnerProfile!.profileSlug)
-            : null,
-      ),
-      reachingRelationship: timeLineModel.getPostFeed.reachingRelationship,
-      createdAt: timeLineModel.getPostFeed.createdAt,
-      updatedAt: timeLineModel.getPostFeed.updatedAt,
-      voterProfile: voterProfile != null
-          ? pt.PostProfileModel(
-              authId: voterProfile.authId,
-              firstName: voterProfile.firstName,
-              lastName: voterProfile.lastName,
-              username: voterProfile.username,
-              location: voterProfile.location,
-              profilePicture: voterProfile.profilePicture,
-              verified: voterProfile.verified,
-              profileSlug: voterProfile.profileSlug)
-          : null,
-    );
+    pt.PostFeedModel? postFeedModel = postOwner != null
+        ? pt.PostFeedModel(
+            firstName: postOwner.firstName,
+            lastName: postOwner.lastName,
+            username: postOwner.username,
+            postId: postD!.postId,
+            feedOwnerId: feedOwner?.authId,
+            location: postOwner.location,
+            postOwnerId: postOwner.authId,
+            profilePicture: postOwner.profilePicture,
+            verified: postOwner.verified,
+            post: pt.PostModel(
+              repostedPost: timeLineModel.getPostFeed.post!.repostedPost != null
+                  ? pt.PostModel(
+                      authId: postD.repostedPost?.authId,
+                      repostedPostOwnerId:
+                          postD.repostedPost?.repostedPostOwnerId,
+                      repostedPostId: postD.repostedPost?.repostedPostId,
+                      postRating: postD.repostedPost?.postRating,
+                      createdAt: postD.repostedPost?.createdAt,
+                      isVoted: postD.repostedPost?.isVoted,
+                      isLiked: postD.repostedPost?.isLiked,
+                      isRepost: postD.repostedPost?.isRepost,
+                      videoMediaItem: postD.repostedPost?.videoMediaItem,
+                      audioMediaItem: postD.repostedPost?.audioMediaItem,
+                      commentOption: postD.repostedPost?.commentOption,
+                      content: postD.repostedPost?.content,
+                      edited: postD.repostedPost?.edited,
+                      hashTags: postD.repostedPost?.hashTags,
+                      imageMediaItems: postD.repostedPost?.imageMediaItems,
+                      location: postD.repostedPost?.location,
+                      mentionList: postD.repostedPost?.mentionList,
+                      nComments: postD.repostedPost?.nComments,
+                      nDownvotes: postD.repostedPost?.nDownvotes,
+                      nUpvotes: postD.repostedPost?.nUpvotes,
+                      nLikes: postD.repostedPost?.nLikes,
+                      postSlug: postD.repostedPost?.postSlug,
+                      postOwnerProfile: postD.repostedPost!.postOwnerProfile !=
+                              null
+                          ? pt.PostProfileModel(
+                              authId:
+                                  postD.repostedPost!.postOwnerProfile!.authId,
+                              firstName: postD
+                                  .repostedPost!.postOwnerProfile!.firstName,
+                              lastName: postD
+                                  .repostedPost!.postOwnerProfile!.lastName,
+                              username: postD
+                                  .repostedPost!.postOwnerProfile!.username,
+                              location: postD
+                                  .repostedPost!.postOwnerProfile!.location,
+                              profilePicture: postD.repostedPost!
+                                  .postOwnerProfile!.profilePicture,
+                              verified: postD
+                                  .repostedPost!.postOwnerProfile!.verified,
+                              profileSlug: postD
+                                  .repostedPost!.postOwnerProfile!.profileSlug)
+                          : null,
+                    )
+                  : null,
+              postId: timeLineModel.getPostFeed.post!.postId,
+              authId: postD.authId,
+              repostedPostOwnerId: postD.repostedPostOwnerId,
+              repostedPostId: postD.repostedPostId,
+              postRating: postD.postRating,
+              createdAt: postD.createdAt,
+              isVoted: postD.isVoted,
+              isLiked: postD.isLiked,
+              isRepost: postD.isRepost,
+              videoMediaItem: postD.videoMediaItem,
+              audioMediaItem: postD.audioMediaItem,
+              commentOption: postD.commentOption,
+              content: postD.content,
+              edited: postD.edited,
+              hashTags: postD.hashTags,
+              imageMediaItems: postD.imageMediaItems,
+              location: postD.location,
+              mentionList: postD.mentionList,
+              nComments: postD.nComments,
+              nDownvotes: postD.nDownvotes,
+              nUpvotes: postD.nUpvotes,
+              nLikes: postD.nLikes,
+              postSlug: postD.postSlug,
+              postOwnerProfile: postD.postOwnerProfile != null
+                  ? pt.PostProfileModel(
+                      authId: postD.postOwnerProfile!.authId,
+                      firstName: postD.postOwnerProfile!.firstName,
+                      lastName: postD.postOwnerProfile!.lastName,
+                      username: postD.postOwnerProfile!.username,
+                      location: postD.postOwnerProfile!.location,
+                      profilePicture: postD.postOwnerProfile!.profilePicture,
+                      verified: postD.postOwnerProfile!.verified,
+                      profileSlug: postD.postOwnerProfile!.profileSlug)
+                  : null,
+              repostedPostOwnerProfile: postD.repostedPostOwnerProfile != null
+                  ? pt.PostProfileModel(
+                      authId: postD.repostedPostOwnerProfile!.authId,
+                      firstName: postD.repostedPostOwnerProfile!.firstName,
+                      lastName: postD.repostedPostOwnerProfile!.lastName,
+                      username: postD.repostedPostOwnerProfile!.username,
+                      location: postD.repostedPostOwnerProfile!.location,
+                      profilePicture:
+                          postD.repostedPostOwnerProfile!.profilePicture,
+                      verified: postD.repostedPostOwnerProfile!.verified,
+                      profileSlug: postD.repostedPostOwnerProfile!.profileSlug)
+                  : null,
+            ),
+            reachingRelationship:
+                timeLineModel.getPostFeed.reachingRelationship,
+            createdAt: timeLineModel.getPostFeed.createdAt,
+            updatedAt: timeLineModel.getPostFeed.updatedAt,
+            voterProfile: voterProfile != null
+                ? pt.PostProfileModel(
+                    authId: voterProfile.authId,
+                    firstName: voterProfile.firstName,
+                    lastName: voterProfile.lastName,
+                    username: voterProfile.username,
+                    location: voterProfile.location,
+                    profilePicture: voterProfile.profilePicture,
+                    verified: voterProfile.verified,
+                    profileSlug: voterProfile.profileSlug)
+                : null,
+          )
+        : null;
     return postFeedModel;
   }
 
-  removePost(BuildContext context, String id, {bool? isDelete}) {
-    List<TimeLineModel> currentPosts = value;
+  List<TimeLineModel> getExactValue(String type) {
+    Map<String, dynamic> mapper = {
+      'profile': _myPosts,
+      'post': value,
+      'likes': _myLikedPosts,
+      'upvote': _myUpVotedPosts,
+      'downvote': _myDownVotedPosts,
+      'save': _mySavedPosts,
+    };
+
+    return mapper[type];
+  }
+
+  removePost(BuildContext context, String id,
+      {bool? isDelete, required String type}) {
+    List<TimeLineModel> currentPosts = getExactValue(type);
     currentPosts.removeWhere((element) => element.id == id);
     if (isDelete ?? false) {
       Snackbars.success(
@@ -440,27 +469,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
-  // updateTimeLine() async {
-  //   List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
-  //   if (response != null) {
-  //     for (GetPostFeed postFeed in response) {
-  //       Post post = postFeed.post!;
-  //       if (!_availablePostIds.contains(post.postId)) {
-  //         value.insert(
-  //             0,
-  //             TimeLineModel(
-  //               getPostFeed: postFeed,
-  //               isShowing: post.isVoted!.toLowerCase().trim() != 'downvote',
-  //             ));
-  //         postStore.updatePostList(value[0].id, post: post);
-  //       }
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
-
-  pt.PostFeedModel getPostModelById(String timeLineId) {
-    List<TimeLineModel> currentPosts = value;
+  pt.PostFeedModel? getPostModelById(String timeLineId,
+      {required String type}) {
+    print(":::::::::::::::::: type ::: $type");
+    List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
     return getPostModel(timeLineModel: actualModel);
@@ -550,49 +562,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     return currentData.firstWhere((element) => element.id == id);
   }
 
-  // refreshFeed(RefreshController refreshController) async {
-  //   List<GetPostFeed>? posts = await timeLineQuery.getAllPostFeeds();
-  //   getUserStatus();
-  //   getMyStatus();
-  //   if (posts != null) {
-  //     length > 0 ? value.clear() : null;
-  //     List<TimeLineModel> latest = <TimeLineModel>[];
-  //     for (GetPostFeed element in posts) {
-  //       latest.add(TimeLineModel(
-  //         getPostFeed: element,
-  //         isShowing: element.post!.isVoted!.toLowerCase().trim() != 'downvote',
-  //       ));
-  //     }
-  //     value = latest;
-  //     postStore.initialize(latest);
-  //
-  //   }
-  //   notifyListeners();
-  // }
-  //
-  // refreshFeed2(BuildContext context,
-  //     {bool? isTextEditing, bool? isPostEditing}) async {
-  //   List<GetPostFeed>? posts = await timeLineQuery.getAllPostFeeds();
-  //   getUserStatus();
-  //   getMyStatus();
-  //   if (posts != null) {
-  //     value.clear();
-  //     for (GetPostFeed element in posts) {
-  //       value.add(TimeLineModel(
-  //         getPostFeed: element,
-  //         isShowing: element.post!.isVoted!.toLowerCase().trim() != 'downvote',
-  //       ));
-  //     }
-  //     postStore.initialize(value);
-  //
-  //   }
-  //   notifyListeners();
-  // }
-
-  ///
-  /// for post reach page
-  ///
-  /// {"status":"success","message":"done","data":{"key":"9b6e0b5e-9f82-4377-a47d-f7fb2bcee899.jpg","signedUrl":"https://reachme-09128734.s3.eu-west-2.amazonaws.com/9b6e0b5e-9f82-4377-a47d-f7fb2bcee899.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA3DPQXB5JOXEIZCG3%2F20230107%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230107T165816Z&X-Amz-Expires=300&X-Amz-Signature=e1ef146688a91e0f9126d72fc028441b1a4441a046d7463600a113f8ab63dee9&X-Amz-SignedHeaders=host","link":"https://reachme-09128734.s3.eu-west-2.amazonaws.com/9b6e0b5e-9f82-4377-a47d-f7fb2bcee899.jpg"}}
   createMediaPost(BuildContext context,
       {required List<UploadFileDto> mediaList}) async {
     CustomDialog.openDialogBox(
@@ -657,9 +626,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
-  // Snackbars.success(context,
-  // message: 'Your reach has been posted');
-
   messageUser(BuildContext context,
       {required String id, String? quoteData}) async {
     Either<String, User> response =
@@ -694,7 +660,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
-          RecipientAccountProfile(
+          RecipientNewAccountScreen(
             recipientCoverImageUrl: userInfo?.coverPicture,
             recipientEmail: userInfo?.email,
             recipientId: userInfo?.id,
@@ -810,12 +776,318 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     notifyListeners();
   }
 
-  deleteVotedPost({required String postId, required String id}) async {
+  deleteVotedPost(
+      {required String postId,
+      required String id,
+      required String type}) async {
     bool response = await timeLineQuery.deleteVotedPost(postId: postId);
     if (response) {
-      List<TimeLineModel> currentPosts = value;
+      List<TimeLineModel> currentPosts = getExactValue(type);
       currentPosts.removeWhere((element) => element.id == id);
+      fetchMyPost(isRefresh: true);
       initialize(isUpvoting: true);
+    }
+  }
+
+  ///
+  /// Profile page Data
+  ///
+  List<TimeLineModel> _myPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myPosts => _myPosts;
+
+  List<TimeLineModel> _myQuotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myQuotedPosts => _myQuotedPosts;
+
+  List<TimeLineModel> _myLikedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myLikedPosts => _myLikedPosts;
+
+  List<TimeLineModel> _myUpVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myUpVotedPosts => _myUpVotedPosts;
+
+  List<TimeLineModel> _myDownVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myDownVotedPosts => _myDownVotedPosts;
+
+  List<TimeLineModel> _mySavedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get mySavedPosts => _mySavedPosts;
+
+  List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
+  List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
+
+  fetchAll({String? userId, bool? isFirst}) {
+    fetchMyPost(isRefresh: isFirst ?? false, userId: userId);
+    fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
+    fetchMySavedPosts(isRefresh: isFirst ?? false);
+    fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
+    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
+    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
+  }
+
+  fetchMyPost(
+      {int? pageNumber,
+      int? pageLimit,
+        String? userId,
+      required bool isRefresh,
+      RefreshController? refreshController}) async {
+    if (_myPosts.isEmpty || isRefresh) {
+      List<Post>? response =
+          await timeLineQuery.getAllPosts(authIdToGet: userId ?? globals.userId);
+      if (response != null) {
+        _myPosts = [];
+        for (Post post in response) {
+          _myPosts.add(TimeLineModel(
+              getPostFeed: GetPostFeed(post: post), isShowing: true));
+        }
+        getQuotedPost();
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myPosts.isNotEmpty) {
+        timeLineController.likeBox2([]);
+        for (TimeLineModel element in _myPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeBox2(likeBoxInfo);
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  getQuotedPost() {
+    _myQuotedPosts = [];
+    if (_myPosts.isNotEmpty) {
+      for (TimeLineModel timeLineModel in _myPosts) {
+        if (timeLineModel.getPostFeed.post!.repostedPost != null) {
+          _myQuotedPosts.add(timeLineModel);
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  fetchMyLikedPosts(
+      {int? pageNumber,
+      int? pageLimit,
+        String? userId,
+      required bool isRefresh,
+      RefreshController? refreshController}) async {
+    if (_myLikedPosts.isEmpty || isRefresh) {
+      List<GetPostFeed>? response =
+          await timeLineQuery.getLikedPosts(authIdToGet: userId ?? globals.userId);
+      if (response != null) {
+        _myLikedPosts = [];
+        for (GetPostFeed postFeed in response) {
+          Post post = postFeed.post!;
+          _availablePostIds.add(post.postId!);
+          _myLikedPosts.add(TimeLineModel(
+            getPostFeed: postFeed,
+            isShowing: true,
+          ));
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myLikedPosts.isNotEmpty) {
+        timeLineController.likeBox3([]);
+        for (TimeLineModel element in _myLikedPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeBox3(likeBoxInfo);
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  fetchMyComments(
+      {int? pageNumber,
+      int? pageLimit,
+        String? userId,
+      required bool isRefresh,
+      RefreshController? refreshController}) async {
+    if (_myLikedPosts.isEmpty || isRefresh) {
+      List<GetPersonalComment>? response =
+          await timeLineQuery.getAllComments(authIdToGet: userId ?? globals.userId!);
+      if (response != null) {
+        _myPersonalComments = [];
+        for (GetPersonalComment commentFeed in response) {
+          _myPersonalComments.add(commentFeed);
+        }
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_myPersonalComments.isNotEmpty) {
+        timeLineController.likeCommentBox([]);
+        for (GetPersonalComment element in _myPersonalComments) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.commentId!,
+              data: LikeModel(
+                nLikes: element.nLikes ?? 0,
+                isLiked: element.isLiked != "false",
+              )));
+        }
+        timeLineController.likeCommentBox(likeBoxInfo);
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  ErProfile getPostModelMiniProfile(
+      {required CommentOwnerProfile? tPostOwnerInfo}) {
+    return ErProfile(
+        firstName: tPostOwnerInfo?.firstName,
+        lastName: tPostOwnerInfo?.lastName,
+        username: tPostOwnerInfo?.username,
+        profilePicture: tPostOwnerInfo?.profilePicture,
+        profileSlug: tPostOwnerInfo?.profilePicture,
+        verified: tPostOwnerInfo?.verified,
+        location: tPostOwnerInfo?.location,
+        bio: tPostOwnerInfo?.bio,
+        authId: tPostOwnerInfo?.authId);
+  }
+
+  fetchMySavedPosts(
+      {int? pageNumber,
+      int? pageLimit,
+      required bool isRefresh,
+      RefreshController? refreshController}) async {
+    if (_mySavedPosts.isEmpty || isRefresh) {
+      List<GetAllSavedPost>? response = await timeLineQuery.getAllSavedPosts();
+      if (response != null) {
+        _mySavedPosts = [];
+        for (GetAllSavedPost savedPost in response) {
+          Post post = savedPost.post!;
+          _availablePostIds.add(post.postId!);
+          _mySavedPosts.add(TimeLineModel(
+            getPostFeed: GetPostFeed(
+                post: savedPost.post,
+                updatedAt: savedPost.updatedAt,
+                createdAt: savedPost.createdAt),
+            isShowing: true,
+          ));
+        }
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (_mySavedPosts.isNotEmpty) {
+        timeLineController.likeSavedBox([]);
+        for (TimeLineModel element in _mySavedPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        timeLineController.likeSavedBox(likeBoxInfo);
+        if (refreshController != null) {
+          refreshController.refreshCompleted();
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  fetchMyVotedPosts(
+      {int? pageNumber,
+      int? pageLimit,
+        String? userId,
+      required bool isRefresh,
+      RefreshController? refreshController,
+      required String type}) async {
+    List<TimeLineModel> data = [];
+    if ((type.toLowerCase() == 'upvote'
+            ? _myUpVotedPosts.isEmpty
+            : _myDownVotedPosts.isEmpty) ||
+        isRefresh) {
+      print("::::::::::: am in here boss 0");
+      List<GetPostFeed>? response = await timeLineQuery.getVotedPosts(
+          authIdToGet: userId ?? globals.userId, votingType: type);
+      if (response != null) {
+        type.toLowerCase() == 'upvote'
+            ? _myUpVotedPosts = []
+            : _myDownVotedPosts = [];
+        type.toLowerCase() == 'upvote'
+            ? timeLineController.likeUpBox([])
+            : timeLineController.likeDownBox([]);
+        for (GetPostFeed postFeed in response) {
+          Post post = postFeed.post!;
+          _availablePostIds.add(post.postId!);
+          data.add(TimeLineModel(
+            getPostFeed: postFeed,
+            isShowing: true,
+          ));
+        }
+        type.toLowerCase() == 'upvote'
+            ? _myUpVotedPosts = data
+            : _myDownVotedPosts = data;
+      }
+      List<CustomCounter> likeBoxInfo = [];
+      if (type.toLowerCase() == 'upvote'
+          ? _myUpVotedPosts.isNotEmpty
+          : _myDownVotedPosts.isNotEmpty) {
+        for (TimeLineModel element in type.toLowerCase() == 'upvote'
+            ? _myUpVotedPosts
+            : _myDownVotedPosts) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+        type.toLowerCase() == 'upvote'
+            ? timeLineController.likeUpBox(likeBoxInfo)
+            : timeLineController.likeDownBox(likeBoxInfo);
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
+      }
+      notifyListeners();
+    }
+  }
+
+  fetchMorePosts({required int index}) async {
+    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
+    List<CustomCounter> likeBoxInfo = [];
+    if (response != null) {
+      for (GetPostFeed postFeed in response) {
+        Post post = postFeed.post!;
+        _availablePostIds.add(post.postId!);
+        value.add(TimeLineModel(
+          getPostFeed: postFeed,
+          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' &&
+              post.postOwnerProfile != null,
+        ));
+      }
+      if (value.isNotEmpty) {
+        for (TimeLineModel element in value) {
+          likeBoxInfo.add(CustomCounter(
+              id: element.id,
+              data: LikeModel(
+                nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                isLiked: element.getPostFeed.post?.isLiked ?? false,
+              )));
+        }
+      }
+      timeLineController.likeBox(likeBoxInfo);
+      notifyListeners();
     }
   }
 }

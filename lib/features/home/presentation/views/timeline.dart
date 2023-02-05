@@ -50,6 +50,8 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../chat/presentation/views/msg_chat_interface.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/suggestion_widget.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
@@ -209,10 +211,10 @@ class _TimelineScreenState extends State<TimelineScreen>
                   ProgressHUD.of(context)?.dismiss();
                   globals.recipientUser = state.user;
                   state.user!.id == globals.user!.id
-                      ? RouteNavigators.route(context, const AccountScreen())
+                      ? RouteNavigators.route(context, const NewAccountScreen())
                       : RouteNavigators.route(
                           context,
-                          RecipientAccountProfile(
+                      RecipientNewAccountScreen(
                             recipientEmail: 'email',
                             recipientImageUrl: state.user!.profilePicture,
                             recipientId: state.user!.id,
@@ -1066,10 +1068,10 @@ class PostFeedReacherCard extends HookWidget {
                                     email: postFeedModel!.postOwnerId));
                                 postFeedModel!.postOwnerId == globals.user!.id
                                     ? RouteNavigators.route(
-                                        context, const AccountScreen())
+                                        context, const NewAccountScreen())
                                     : RouteNavigators.route(
                                         context,
-                                        RecipientAccountProfile(
+                                    RecipientNewAccountScreen(
                                           recipientEmail: 'email',
                                           recipientImageUrl:
                                               postFeedModel!.profilePicture,
