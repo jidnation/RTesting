@@ -8,20 +8,25 @@ import 'package:reach_me/features/call/presentation/bloc/call_bloc.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:wakelock/wakelock.dart';
 
+import '../../../../core/components/profile_picture.dart';
 import '../../../../core/helper/logger.dart';
 import '../../../../core/utils/app_globals.dart';
 import '../../../../core/utils/constants.dart';
+import '../../../../core/utils/dimensions.dart';
 import 'initiate_video_call.dart';
 
 class ReceiveVideoCall extends StatefulWidget {
-  const ReceiveVideoCall({
-    super.key,
-    required this.channelName,
-    required this.token,
-  });
+  const ReceiveVideoCall(
+      {super.key,
+      required this.channelName,
+      required this.token,
+      required this.firstName,
+      required this.profilePicture});
 
   final String channelName;
   final String token;
+  final String firstName;
+  final String profilePicture;
 
   @override
   State<ReceiveVideoCall> createState() => _ReceiveVideoCallState();
@@ -35,6 +40,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
   late RtcEngine _engine;
   final StopWatchTimer stopWatchTimer =
       StopWatchTimer(mode: StopWatchMode.countUp);
+  bool callSwitched = false;
 
   @override
   void initState() {
@@ -60,7 +66,7 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
         },
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
           debugPrint("local user ${connection.localUid} joined");
-
+          stopWatchTimer.onStartTimer();
           setState(() {
             _localUserJoined = true;
             _localuid = connection.localUid;
@@ -72,6 +78,20 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
           setState(() {
             _remoteUid = remoteUid;
           });
+        },
+        onRemoteVideoStateChanged:
+            (connection, remoteUid, state, reason, elapsed) {
+          Console.log('remote video state', state);
+          if (state == RemoteVideoState.remoteVideoStateStopped) {
+            setState(() {
+              callSwitched = true;
+            });
+          } else if (state == RemoteVideoState.remoteVideoStateStarting &&
+              callSwitched == true) {
+            setState(() {
+              callSwitched = false;
+            });
+          }
         },
         onUserOffline: (RtcConnection connection, int remoteUid,
             UserOfflineReasonType reason) {
@@ -154,44 +174,97 @@ class _ReceiveVideoCallState extends State<ReceiveVideoCall> {
                 width: size.width,
                 height: size.height,
                 child: Center(
-                  child: _localUserJoined
+                  child: callSwitched
                       ? Stack(
                           children: [
-                            SizedBox(
-                              width: size.width,
-                              height: size.height,
-                              child: _remoteVideo(
-                                widget.channelName,
-                              ),
+                            Image.asset(
+                              'assets/images/incoming_call.png',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
                             ),
                             Positioned(
-                              bottom: 110,
-                              right: 20,
-                              child: SizedBox(
-                                width: size.width * 0.3,
-                                height: size.height * 0.2,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: _localPreview(
-                                    _localUserJoined,
-                                    0,
+                              top: 100,
+                              left: 1,
+                              right: 1,
+                              child: Column(
+                                children: [
+                                  RecipientProfilePicture(
+                                    width: getScreenWidth(100),
+                                    height: getScreenHeight(100),
+                                    imageUrl: widget.profilePicture,
                                   ),
-                                ),
+                                  Text(
+                                    widget.firstName,
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         )
-                      : Image.asset(
-                          'assets/images/incoming_call.png',
-                          fit: BoxFit.fill,
-                          height: size.height,
-                          width: size.width,
-                        ),
+                      : _localUserJoined
+                          ? Stack(
+                              children: [
+                                SizedBox(
+                                  width: size.width,
+                                  height: size.height,
+                                  child: _remoteVideo(
+                                    widget.channelName,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 110,
+                                  right: 20,
+                                  child: SizedBox(
+                                    width: size.width * 0.25,
+                                    height: size.height * 0.15,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(5),
+                                      child: _localPreview(
+                                        _localUserJoined,
+                                        0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Image.asset(
+                              'assets/images/incoming_call.png',
+                              fit: BoxFit.fill,
+                              height: size.height,
+                              width: size.width,
+                            ),
                 ),
               ),
               Positioned(
                 top: 50,
                 right: 30,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      callSwitched = !callSwitched;
+                    });
+                    if (callSwitched) {
+                      _engine.disableVideo();
+                    } else {
+                      _engine.enableVideo();
+                    }
+                  },
+                  child: const Icon(
+                    Icons.videocam_off_outlined,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 50,
+                left: 30,
                 child: StreamBuilder<int>(
                   stream: stopWatchTimer.rawTime,
                   initialData: 0,

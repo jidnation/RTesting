@@ -11,6 +11,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,6 +31,7 @@ import 'package:reach_me/features/call/presentation/views/initiate_audio_call.da
 import 'package:reach_me/features/call/presentation/views/initiate_video_call.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 
 import '../../../../core/components/snackbar.dart';
@@ -57,6 +59,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   bool isRecordingInit = false;
   bool isRecording = false;
   bool isPaused = false;
+  TimerController timerController = TimerController();
 
   //AUDIO_WAVEFORM RECORDER
   RecorderController? recorderController;
@@ -67,7 +70,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
-
     openAudio();
 
     focusNode.addListener(() {
@@ -111,7 +113,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     }
     await _soundRecorder!.openRecorder();
     await _soundRecorder!
-        .setSubscriptionDuration(const Duration(milliseconds: 500));
+        .setSubscriptionDuration(const Duration(milliseconds: 100));
     isRecordingInit = true;
   }
 
@@ -147,8 +149,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     useEffect(() {
       globals.chatBloc!.add(GetThreadMessagesEvent(
           threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
-      // globals.chatBloc!.add(GetThreadMessagesEvent(
-      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       return null;
     }, [globals.recipientUser!.id]);
     return Scaffold(
@@ -284,7 +284,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               showIsSending.value = false;
               _quotedData.value = null;
               // _controller.jumpTo(_controller.position.maxScrollExtent);
-              
+
             }
             if (state is UserUploadingImage) {
               toast('Uploading media...',
@@ -732,6 +732,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                       setState(() {
                                                         isRecording = false;
+                                                        timerController
+                                                            .resetTimer();
                                                       });
                                                     },
                                                     child: const Icon(
@@ -741,43 +743,49 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                           .primaryColor,
                                                     ),
                                                   ),
-                                                  Align(
-                                                    child: StreamBuilder<
-                                                        RecordingDisposition>(
-                                                      stream: _soundRecorder!
-                                                          .onProgress,
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        final duration =
-                                                            snapshot.hasData
-                                                                ? snapshot.data!
-                                                                    .duration
-                                                                : Duration.zero;
+                                                  TimerWidget(
+                                                      controller:
+                                                          timerController),
+                                                  // Align(
+                                                  //   child: StreamBuilder<
+                                                  //       RecordingDisposition>(
+                                                  //     stream: _soundRecorder!
+                                                  //         .onProgress,
+                                                  //     builder:
+                                                  //         (context, snapshot) {
+                                                  //       final duration =
+                                                  //           snapshot.hasData
+                                                  //               ? snapshot.data!
+                                                  //                   .duration
+                                                  //               : Duration.zero;
 
-                                                        String twoDigits(
-                                                                int n) =>
-                                                            n
-                                                                .toString()
-                                                                .padLeft(
-                                                                    2, '0');
-                                                        final twoDigitMinutes =
-                                                            twoDigits(duration
-                                                                .inMinutes
-                                                                .remainder(60));
-                                                        final twoDigitSeconds =
-                                                            twoDigits(duration
-                                                                .inSeconds
-                                                                .remainder(60));
-                                                        return Text(
-                                                          '$twoDigitMinutes: $twoDigitSeconds',
-                                                          style: const TextStyle(
-                                                              fontSize: 20,
-                                                              color: AppColors
-                                                                  .primaryColor),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
+                                                  //       print(duration
+                                                  //           .inMilliseconds);
+
+                                                  //       String twoDigits(
+                                                  //               int n) =>
+                                                  //           n
+                                                  //               .toString()
+                                                  //               .padLeft(
+                                                  //                   2, '0');
+                                                  //       final twoDigitMinutes =
+                                                  //           twoDigits(duration
+                                                  //               .inMinutes
+                                                  //               .remainder(60));
+                                                  //       final twoDigitSeconds =
+                                                  //           twoDigits(duration
+                                                  //               .inSeconds
+                                                  //               .remainder(60));
+                                                  //       return Text(
+                                                  //         '$twoDigitMinutes: $twoDigitSeconds',
+                                                  //         style: const TextStyle(
+                                                  //             fontSize: 20,
+                                                  //             color: AppColors
+                                                  //                 .primaryColor),
+                                                  //       );
+                                                  //     },
+                                                  //   ),
+                                                  // ),
                                                   GestureDetector(
                                                       onTap: () {
                                                         if (!isPaused) {
@@ -785,13 +793,21 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                               .pauseRecorder();
 
                                                           setState(() {
-                                                            isPaused = true;
+                                                            timerController
+                                                                .startTimer();
+                                                            isPaused =
+                                                                !isPaused;
                                                           });
                                                         } else {
                                                           _soundRecorder!
                                                               .resumeRecorder();
+
                                                           setState(() {
-                                                            isPaused = false;
+                                                            isPaused =
+                                                                !isPaused;
+
+                                                            timerController
+                                                                .pauseTimer();
                                                           });
                                                         }
                                                       },
@@ -901,6 +917,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 globals.chatBloc!.add(
                                                     UploadImageFileEvent(
                                                         file: audioMessage));
+
+                                                setState(() {
+                                                  timerController.resetTimer();
+                                                });
                                               } else {
                                                 await _soundRecorder!
                                                     .startRecorder(
@@ -908,6 +928,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 );
                                               }
                                               setState(() {
+                                                timerController.startTimer();
                                                 isRecording = !isRecording;
                                               });
                                             },

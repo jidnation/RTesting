@@ -1859,6 +1859,7 @@ class CommentsTile extends StatelessWidget {
                           Expanded(
                               child: CommentAudioMedia(
                             path: comment.audioMediaItem ?? '',
+                            id: comment.commentId,
                           )),
                         ],
                       ))

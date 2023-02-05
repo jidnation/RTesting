@@ -17,9 +17,10 @@ import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
-
 import 'core/services/moment/controller.dart';
 import 'features/timeline/timeline_controller.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

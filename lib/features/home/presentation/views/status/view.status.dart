@@ -371,7 +371,10 @@ class _ViewUserStatusState extends State<ViewUserStatus> {
     useEffect(() {
       keyboardController.onChange.listen((event) {
         if (event) {
-        } else {}
+          
+        } else {
+
+        }
       });
       // Timer t = Timer.periodic(Duration(seconds: 30), (timer) {
       //   _timerCount.value = timer.tick;

@@ -54,13 +54,25 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
     super.initState();
   }
 
-    muteMicrophone() async {
+  muteMicrophone() async {
     muteMic = !muteMic;
     await _engine.muteLocalAudioStream(muteMic);
     Fluttertoast.showToast(msg: muteMic ? 'muted' : 'unmuted');
     setState(() {});
   }
 
+  bool isSwitched = false;
+
+  void changeAudioRoute() {
+    if (!isSwitched) {
+      _engine.setEnableSpeakerphone(false);
+      isSwitched = !isSwitched;
+    } else {
+      _engine.setEnableSpeakerphone(true);
+      isSwitched = !isSwitched;
+    }
+    setState(() {});
+  }
 
   @override
   dispose() {
@@ -233,9 +245,39 @@ class _ReceiveAudioCallState extends State<ReceiveAudioCall> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const SizedBox(
-                          width: 26,
-                          height: 26,
+                        GestureDetector(
+                          onTap: null,
+                          child: Stack(
+                            children: [
+                              const Opacity(
+                                opacity: 0.5,
+                                child: Visibility(
+                                  visible: true,
+                                  child: CircleAvatar(
+                                    backgroundColor: Color(0xff000000),
+                                    radius: 23,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 10,
+                                left: 10,
+                                right: 10,
+                                bottom: 10,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    changeAudioRoute();
+                                  },
+                                  child: Icon(
+                                    isSwitched
+                                        ? Icons.phone_bluetooth_speaker
+                                        : Icons.volume_up_outlined,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         FloatingActionButton(
                           onPressed: () => endCall(),
