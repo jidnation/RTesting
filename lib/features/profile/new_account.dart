@@ -457,7 +457,45 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                               splashRadius: 20,
                             )
                           ]),
-                      const ProfilePicture(height: 90),
+                      GestureDetector(
+                          onTap: () {
+                            RouteNavigators.route(
+                                context,
+                                FullScreenWidget(
+                                  child: Stack(children: <Widget>[
+                                    Container(
+                                      color: AppColors
+                                          .black, // Your screen background color
+                                    ),
+                                    Column(children: <Widget>[
+                                      Container(height: getScreenHeight(100)),
+                                      Image.network(
+                                        globals.user!.profilePicture!,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ]),
+                                    Positioned(
+                                      top: 0.0,
+                                      left: 0.0,
+                                      right: 0.0,
+                                      child: AppBar(
+                                        title: const Text(
+                                            'Profile Picture'), // You can add title here
+                                        leading: IconButton(
+                                          icon: const Icon(Icons.arrow_back,
+                                              color: AppColors.white),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
+                                        backgroundColor: AppColors
+                                            .black, //You can make this transparent
+                                        elevation: 0.0, //No shadow
+                                      ),
+                                    ),
+                                  ]),
+                                ));
+                          },
+                          child: const ProfilePicture(height: 90)),
                       Column(children: [
                         Text(
                             ('${globals.user!.firstName} ${globals.user!.lastName}')

@@ -163,7 +163,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
           var userInfo = state.users!;
           RouteNavigators.route(
               context,
-              RecipientNewAccountScreen(
+              RecipientAccountProfile(
                 recipientCoverImageUrl: userInfo.user.first.coverPicture,
                 recipientEmail: userInfo.user.first.email,
                 recipientId: userInfo.user.first.id,
@@ -188,7 +188,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
               // debugPrint("Shoutdown success");
               // Snackbars.success(context,
               //     message: 'You shouted down on this user\'s posts');
-
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
@@ -440,7 +439,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         const NewAccountScreen())
                                                     : RouteNavigators.route(
                                                         context,
-                                                    RecipientNewAccountScreen(
+                                                        RecipientAccountProfile(
                                                           recipientEmail:
                                                               'email',
                                                           recipientImageUrl: widget
@@ -1774,7 +1773,7 @@ class CommentsTile extends StatelessWidget {
                               context, const AccountScreen())
                           : RouteNavigators.route(
                               context,
-                          RecipientNewAccountScreen(
+                              RecipientAccountProfile(
                                 recipientEmail: 'email',
                                 recipientImageUrl:
                                     comment.commentOwnerProfile!.profilePicture,

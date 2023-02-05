@@ -78,23 +78,36 @@ class _MomentAudioPlayerState extends State<MomentAudioPlayer> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool status = timeLineController.currentStatus.value;
-      timeLineController.currentId.value == widget.id
-          ? status
-              ? playerController.startPlayer(finishMode: FinishMode.loop)
-              : playerController.pausePlayer()
-          : playerController.pausePlayer();
+      // bool status = timeLineController.currentStatus.value;
+      String currentId = timeLineController.currentId.value;
+      if (currentId.isNotEmpty) {
+        print(":::::::::::::::::: calling me again like this, PLEASE STOP!!!");
+        currentId == widget.id
+            // ? status
+            ? playerController.startPlayer(finishMode: FinishMode.loop)
+            : playerController.pausePlayer();
+        // : playerController.pausePlayer();
+      } else {
+        playerController.pausePlayer();
+      }
       return Row(children: [
         InkWell(
           onTap: () {
-            if (timeLineController.currentId.value == widget.id) {
-              timeLineController.currentStatus(!status);
+            if (currentId == widget.id) {
+              print(":::::::::::: 1");
+              // timeLineController.currentStatus(!status);
+              timeLineController.currentId('');
             } else {
+              print(":::::::::::: 2");
+
               timeLineController.currentId(widget.id);
+              // timeLineController.currentStatus(!status);
             }
           },
           child: Icon(
-            isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+            currentId == widget.id
+                ? Icons.pause_rounded
+                : Icons.play_arrow_rounded,
             size: 32,
             color: const Color(0xff0077B6),
           ),

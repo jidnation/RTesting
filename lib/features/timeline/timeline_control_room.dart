@@ -197,13 +197,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       TimeLineModel actualModel =
           currentData.firstWhere((element) => element.id == id);
       Post post = actualModel.getPostFeed.post!;
+      if (type == 'likes') {
+        currentData.remove(actualModel);
+        notifyListeners();
+      }
       if (!post.isLiked!) {
         post.isLiked = true;
         post.nLikes = post.nLikes! + 1;
         // notifyListeners();
         bool response = await timeLineQuery.likePost(postId: post.postId!);
         if (response) {
-          // updateTimeLine(id);
+          fetchMyLikedPosts(isRefresh: true);
         }
       } else {
         post.isLiked = false;
@@ -211,7 +215,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         // notifyListeners();
         bool response = await timeLineQuery.unlikePost(postId: post.postId!);
         if (response) {
-          // updateTimeLine(id);
+          fetchMyLikedPosts(isRefresh: true);
         }
       }
     }
@@ -660,7 +664,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
-          RecipientNewAccountScreen(
+          RecipientAccountProfile(
             recipientCoverImageUrl: userInfo?.coverPicture,
             recipientEmail: userInfo?.email,
             recipientId: userInfo?.id,
@@ -818,19 +822,21 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
     fetchMySavedPosts(isRefresh: isFirst ?? false);
     fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
-    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
-    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
+    fetchMyVotedPosts(
+        isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
+    fetchMyVotedPosts(
+        isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
   }
 
   fetchMyPost(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myPosts.isEmpty || isRefresh) {
-      List<Post>? response =
-          await timeLineQuery.getAllPosts(authIdToGet: userId ?? globals.userId);
+      List<Post>? response = await timeLineQuery.getAllPosts(
+          authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myPosts = [];
         for (Post post in response) {
@@ -874,12 +880,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyLikedPosts(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
-      List<GetPostFeed>? response =
-          await timeLineQuery.getLikedPosts(authIdToGet: userId ?? globals.userId);
+      List<GetPostFeed>? response = await timeLineQuery.getLikedPosts(
+          authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myLikedPosts = [];
         for (GetPostFeed postFeed in response) {
@@ -903,9 +909,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeBox3(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -914,19 +920,16 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyComments(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
-      List<GetPersonalComment>? response =
-          await timeLineQuery.getAllComments(authIdToGet: userId ?? globals.userId!);
+      List<GetPersonalComment>? response = await timeLineQuery.getAllComments(
+          authIdToGet: userId ?? globals.userId!);
       if (response != null) {
         _myPersonalComments = [];
         for (GetPersonalComment commentFeed in response) {
           _myPersonalComments.add(commentFeed);
-        }
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
         }
       }
       List<CustomCounter> likeBoxInfo = [];
@@ -941,9 +944,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeCommentBox(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -996,9 +999,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeSavedBox(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -1007,7 +1010,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyVotedPosts(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController,
       required String type}) async {
@@ -1064,7 +1067,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   fetchMorePosts({required int index}) async {
-    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
+    List<GetPostFeed>? response =
+        await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
     List<CustomCounter> likeBoxInfo = [];
     if (response != null) {
       for (GetPostFeed postFeed in response) {

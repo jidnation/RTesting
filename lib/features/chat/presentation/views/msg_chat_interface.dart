@@ -176,7 +176,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           onTap: () {
             RouteNavigators.route(
                 context,
-                RecipientNewAccountScreen(
+                RecipientAccountProfile(
                   recipientEmail: widget.recipientUser!.email,
                   recipientImageUrl: widget.recipientUser!.profilePicture,
                   recipientId: widget.recipientUser!.id,
@@ -284,7 +284,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               showIsSending.value = false;
               _quotedData.value = null;
               // _controller.jumpTo(_controller.position.maxScrollExtent);
-
             }
             if (state is UserUploadingImage) {
               toast('Uploading media...',
@@ -435,7 +434,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             onPressed: () {
                                               RouteNavigators.route(
                                                   context,
-                                                  RecipientNewAccountScreen(
+                                                  RecipientAccountProfile(
                                                     recipientEmail: widget
                                                         .recipientUser!.email,
                                                     recipientImageUrl: widget

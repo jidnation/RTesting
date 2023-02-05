@@ -52,6 +52,9 @@ class TimeLineController extends GetxController {
         getExactBox(type).firstWhere((element) => element.id == id);
     int index = getExactBox(type).indexOf(actualModel);
 
+    if (type == 'likes') {
+      likeBox3.remove(actualModel);
+    }
     if (actualModel.data.isLiked) {
       likeModel.isLiked = false;
       likeModel.nLikes = actualModel.data.nLikes - 1;
@@ -87,7 +90,11 @@ class TimeLineController extends GetxController {
     await [Permission.storage].request();
     String time = DateTime.now().microsecondsSinceEpoch.toString();
     final name = 'screenshot_${time}_reachme';
-    final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+    final result = await ImageGallerySaver.saveImage(
+      bytes!,
+      name: name,
+      quality: 100,
+    );
     debugPrint("Result ${result['filePath']}");
     Snackbars.success(context, message: 'Image saved to Gallery');
     RouteNavigators.pop(context);
@@ -97,7 +104,7 @@ class TimeLineController extends GetxController {
   void takeScreenShot(context, GlobalKey<State<StatefulWidget>> src) async {
     RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
         as RenderRepaintBoundary; // the key provided
-    ui.Image image = await boundary.toImage();
+    ui.Image image = await boundary.toImage(pixelRatio: 0.1);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     debugPrint("Byte Data: $byteData");
     await saveImage(context, byteData!.buffer.asUint8List());

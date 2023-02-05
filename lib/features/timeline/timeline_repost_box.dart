@@ -80,7 +80,7 @@ class TimelineRepostedPost extends StatelessWidget {
                                 context, const NewAccountScreen())
                             : RouteNavigators.route(
                                 context,
-                            RecipientNewAccountScreen(
+                                RecipientAccountProfile(
                                   recipientEmail: 'email',
                                   recipientImageUrl:
                                       tPostOwnerInfo.profilePicture,
