@@ -7,7 +7,6 @@ import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:get/get.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-
 import '../../core/components/custom_button.dart';
 import '../../core/components/profile_picture.dart';
 import '../../core/services/navigation/navigation_service.dart';
@@ -23,12 +22,19 @@ import 'tabs.dart';
 class RecipientNewAccountScreen extends StatefulHookWidget {
   final String? recipientEmail;
   final String? recipientImageUrl;
-  final String?  recipientId;
-  final String?   recipientCoverImageUrl;
-  const RecipientNewAccountScreen({this.recipientEmail, this.recipientImageUrl, this.recipientId, this.recipientCoverImageUrl, Key? key}) : super(key: key);
+  final String? recipientId;
+  final String? recipientCoverImageUrl;
+  const RecipientNewAccountScreen(
+      {this.recipientEmail,
+      this.recipientImageUrl,
+      this.recipientId,
+      this.recipientCoverImageUrl,
+      Key? key})
+      : super(key: key);
 
   @override
-  State<RecipientNewAccountScreen> createState() => _RecipientNewAccountScreenState();
+  State<RecipientNewAccountScreen> createState() =>
+      _RecipientNewAccountScreenState();
 }
 
 class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
@@ -37,12 +43,14 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
     timeLineFeedStore.fetchAll(userId: widget.recipientId, isFirst: true);
     getRelationship();
     super.initState();
-
   }
+
   late bool? reachingUser;
   getRelationship() async {
-    reachingUser = await timeLineFeedStore.getReachRelationship(usersId: widget.recipientId ?? "", type: 'reaching');
+    reachingUser = await timeLineFeedStore.getReachRelationship(
+        usersId: widget.recipientId ?? "", type: 'reaching');
   }
+
   final CarouselController topCarouselController = CarouselController();
   final CarouselController bodyCarouselController = CarouselController();
   @override
@@ -95,7 +103,8 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                       height: getScreenHeight(200),
                       width: size.width,
                       child: GestureDetector(
-                        child: CoverPicture(imageUrl: widget.recipientCoverImageUrl),
+                        child: CoverPicture(
+                            imageUrl: widget.recipientCoverImageUrl),
                         onTap: () {
                           RouteNavigators.route(
                               context,
@@ -107,7 +116,9 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                                   ),
                                   Column(children: <Widget>[
                                     Container(height: getScreenHeight(100)),
-                                     CoverPicture(imageUrl: widget.recipientCoverImageUrl),
+                                    CoverPicture(
+                                        imageUrl:
+                                            widget.recipientCoverImageUrl),
                                   ]),
                                   Positioned(
                                     top: 0.0,
@@ -184,10 +195,10 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                     Positioned(
                       top: size.height * 0.2 - 20,
                       child: AnimatedContainer(
-                        // width:
-                        // isGoingDown ? width : getScreenWidth(100),
-                        // height:
-                        // isGoingDown ? height : getScreenHeight(100),
+                          // width:
+                          // isGoingDown ? width : getScreenWidth(100),
+                          // height:
+                          // isGoingDown ? height : getScreenHeight(100),
                           duration: const Duration(seconds: 1),
                           child: GestureDetector(
                             child: const ProfilePicture(height: 90),
@@ -401,7 +412,7 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                         ),
                         textColor: AppColors.textColor2,
                         borderSide:
-                        const BorderSide(color: AppColors.greyShade5),
+                            const BorderSide(color: AppColors.greyShade5),
                       )),
                   SizedBox(height: getScreenHeight(15)),
                 ]),
@@ -412,7 +423,7 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
               child: Container(
                 height: 240,
                 padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                 width: SizeConfig.screenWidth,
                 color: AppColors.textColor,
                 child: Column(
@@ -508,7 +519,7 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                     ),
                     items: List.generate(
                         pageTab.length,
-                            (index) => ProfileTab(
+                        (index) => ProfileTab(
                             isSelected: selectedTab.value == pageTab[index],
                             value: pageTab[index],
                             onClick: () {
@@ -517,23 +528,23 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                             })),
                   )
 
-                // ListView.builder(
-                //     shrinkWrap: true,
-                //     controller: _controller,
-                //     itemCount: pageTab.length,
-                //     physics: const ScrollPhysics(),
-                //     padding: const EdgeInsets.only(left: 5),
-                //     scrollDirection: Axis.horizontal,
-                //     itemBuilder: (context, index) {
-                //       String value = pageTab[index];
-                //       return ProfileTab(
-                //           isSelected: selectedTab.value == value,
-                //           value: value,
-                //           onClick: () {
-                //             selectedTab.value = value;
-                //           });
-                //     }),
-              ),
+                  // ListView.builder(
+                  //     shrinkWrap: true,
+                  //     controller: _controller,
+                  //     itemCount: pageTab.length,
+                  //     physics: const ScrollPhysics(),
+                  //     padding: const EdgeInsets.only(left: 5),
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemBuilder: (context, index) {
+                  //       String value = pageTab[index];
+                  //       return ProfileTab(
+                  //           isSelected: selectedTab.value == value,
+                  //           value: value,
+                  //           onClick: () {
+                  //             selectedTab.value = value;
+                  //           });
+                  //     }),
+                  ),
             ),
             Visibility(
               visible: reachingUser ?? false,
