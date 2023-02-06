@@ -11,6 +11,7 @@ import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dia
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/timeline/post_media.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:reach_me/features/timeline/video_player.dart';
 
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -186,7 +187,10 @@ class TimelineRepostedPost extends StatelessWidget {
                         );
                       });
                 },
-                onMentionTap: (value) {},
+                onMentionTap: (value) {
+                   timeLineFeedStore.getUserByUsername(context,
+                        username: value);
+                },
                 mentionStyle: const TextStyle(
                     decoration: TextDecoration.underline, color: Colors.blue),
                 hashtagStyle: const TextStyle(
