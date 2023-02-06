@@ -570,7 +570,7 @@ Future showUserStoryBottomSheet(BuildContext context,
                                   reportReason: res as String,
                                   statusId: status.status?.statusId ?? ''));
                               await Future.delayed(const Duration(seconds: 4));
-                              timeLineFeedStore.initialize();
+                              timeLineFeedStore.initialize(isRefreshing: true);
                             },
                             color: const Color(0xFFE50101),
                           ),

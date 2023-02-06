@@ -180,7 +180,7 @@ class _RepostReachState extends State<RepostReach> {
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is CreateRepostSuccess) {
-            timeLineFeedStore.initialize(isQuoting: true);
+            timeLineFeedStore.initialize(isQuoting: true, isRefreshing: true);
             // globals.socialServiceBloc!
             //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
             // Navigator.pop(context);

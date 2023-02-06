@@ -418,7 +418,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                           timeLineFeedStore.initialize(
                                             refreshController:
                                                 _refreshController,
-                                            // isRefresh: true,
+                                            isRefreshing: true,
                                           );
                                           // await Future.delayed(const Duration(seconds: 10));
                                           // _refreshController.refreshCompleted();

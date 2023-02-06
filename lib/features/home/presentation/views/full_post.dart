@@ -267,7 +267,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
             // }
 
             if (state is CommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
                   scrollController.position.minScrollExtent,
@@ -286,7 +286,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is VotePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
               if (!(state.isVoted!)) {
                 Snackbars.success(context,
                     message: 'The post you shouted down has been removed!');
@@ -300,7 +300,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
             }
             if (state is LikePostSuccess || state is UnlikePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
@@ -325,13 +325,13 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is LikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
                   commentId: state.commentLikeModel!.commentId));
             }
 
             if (state is UnlikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(
                   GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
             }

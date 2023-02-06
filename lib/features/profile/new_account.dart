@@ -43,7 +43,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
       'Likes',
       'Comments',
       'Shoutouts',
-      'shoutdown',
+      'Shoutdown',
       'Quote',
       "Saved"
     ];
