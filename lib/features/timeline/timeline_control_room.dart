@@ -286,6 +286,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         timeLineFeedStore.removePost(context, id, type: type);
       }
     }
+
+    fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
 
   // updateTimeLine(String id) async {

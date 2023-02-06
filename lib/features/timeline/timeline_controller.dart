@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'dart:ui' as ui;
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
@@ -110,7 +111,8 @@ class TimeLineController extends GetxController {
     await saveImage(context, byteData!.buffer.asUint8List());
   }
 
-  replyComment({String? postId, String? commentId}) async {
+  replyComment(BuildContext context,
+      {String? postId, String? commentId}) async {
     String userInput = '';
     CustomDialog.openDialogBox(
         height: 250,
@@ -164,11 +166,18 @@ class TimeLineController extends GetxController {
                 ),
                 InkWell(
                   onTap: () async {
-                    var response = await MomentQuery().replyPostComment(
+                    bool response = await MomentQuery().replyPostComment(
                       postId: postId!,
                       commentId: commentId,
                       content: userInput,
                     );
+                    if (response) {
+                      Snackbars.success(context,
+                          message:
+                              'You have successfully reply to your comment');
+                      Get.back();
+                      timeLineFeedStore.fetchMyComments(isRefresh: true);
+                    }
                   },
                   child: Container(
                     height: 30,

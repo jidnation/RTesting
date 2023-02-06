@@ -676,33 +676,7 @@ query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
 const String getVotedPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String, $votingType: String!)  {
   getVotedPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId, vote_type: $votingType){
-    reachingRelationship,
-    created_at,
-    updated_at,
-    feedOwnerProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        verified,
-        profileSlug,
-        location,
-        profilePicture,
-        location
-    },
-    voterProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        profileSlug,
-        verified,
-        location,
-        profilePicture,
-        location
-    },
+    created_at,    
     post{
      repostedPost{
         authId,
