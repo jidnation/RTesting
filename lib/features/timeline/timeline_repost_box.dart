@@ -11,6 +11,7 @@ import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dia
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/timeline/post_media.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:reach_me/features/timeline/video_player.dart';
 
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -18,6 +19,8 @@ import '../../../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../account/presentation/views/account.dart';
 import '../moment/moment_audio_player.dart';
+import '../profile/new_account.dart';
+import '../profile/recipientNewAccountProfile.dart';
 
 class TimelineRepostedPost extends StatelessWidget {
   final PostModel tPostInfo;
@@ -75,10 +78,10 @@ class TimelineRepostedPost extends StatelessWidget {
                             email: tPostOwnerInfo.authId));
                         tPostOwnerInfo.authId == globals.user!.id
                             ? RouteNavigators.route(
-                                context, const AccountScreen())
+                                context, const NewAccountScreen())
                             : RouteNavigators.route(
                                 context,
-                                RecipientAccountProfile(
+                            RecipientNewAccountScreen(
                                   recipientEmail: 'email',
                                   recipientImageUrl:
                                       tPostOwnerInfo.profilePicture,
@@ -184,7 +187,10 @@ class TimelineRepostedPost extends StatelessWidget {
                         );
                       });
                 },
-                onMentionTap: (value) {},
+                onMentionTap: (value) {
+                   timeLineFeedStore.getUserByUsername(context,
+                        username: value);
+                },
                 mentionStyle: const TextStyle(
                     decoration: TextDecoration.underline, color: Colors.blue),
                 hashtagStyle: const TextStyle(

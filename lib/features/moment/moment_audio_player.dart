@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:reach_me/core/utils/extensions.dart';
-
 import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';

@@ -45,30 +45,54 @@ class _StatusViewPageState extends State<StatusViewPage> {
   List<bool> _watched = [];
   int _currentIndex = 0;
   final audioPlayer = AudioPlayer();
-  bool isPlaying = true;
+  bool _audioPaused = false;
   StatusFeedModel get story => widget.status[_currentIndex];
-  // BetterPlayerController? _videoController;
+  final _keyboardController = KeyboardVisibilityController();
+  final _replyTEC = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _startTimer(7000);
     _watched = List.generate(widget.status.length, (index) => false);
+    _initStatus();
+    _initialiseKeyboardListener();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    if (mounted) _timer.cancel();
     audioPlayer.stop();
     audioPlayer.dispose();
     globals.statusVideoController?.dispose();
-    // _videoController?.dispose();
     super.dispose();
+  }
+
+  void _initialiseKeyboardListener() {
+    _keyboardController.onChange.listen((event) {
+      if (event) {
+        _pauseTimer();
+      } else {
+        _resumeTimer();
+      }
+    });
+    audioPlayer.onPlayerStateChanged.listen((event) {
+      if (event == PlayerState.playing) {}
+    });
+  }
+
+  int get statusMillisec {
+    if (story.status?.statusData?.audioMedia != null ||
+        story.status?.statusData?.videoMedia != null) {
+      return 30000;
+    } else {
+      return 7000;
+    }
   }
 
   void _startTimer(int milliSec, {double? percent}) {
     _remTime = milliSec;
-    double _factor = (50 / milliSec);
+    double _factor = (50 / statusMillisec);
     _percent = percent ?? 0;
     _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (_percent + _factor < 1) {
@@ -82,7 +106,9 @@ class _StatusViewPageState extends State<StatusViewPage> {
         _watched[_currentIndex] = true;
         if (_currentIndex < widget.status.length - 1) {
           _currentIndex++;
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
           _changeStatus();
         } else {
           // Navigator.pop(context);
@@ -98,29 +124,67 @@ class _StatusViewPageState extends State<StatusViewPage> {
     _startTimer(milliSecs);
   }
 
-  void _changeStatus() {
+  void _initStatus() {
+    if (story.status?.type == 'text') {
+      _startTimer(7000);
+    } else if (story.status?.statusData?.audioMedia != null) {
+      debugPrint("audio Player file: ${story.status!.statusData!.audioMedia}");
+      audioPlayer.play(UrlSource("${story.status!.statusData!.audioMedia}"));
+      _startTimer(30000);
+    } else if (story.status?.statusData?.videoMedia != null) {
+      _percent = 0;
+      setState(() {});
+    } else if (story.status?.statusData?.imageMedia != null) {
+      _startTimer(7000);
+    }
+  }
+
+  Future<void> _changeStatus() async {
+    _focusNode.unfocus();
+    _replyTEC.clear();
     if (audioPlayer.state == PlayerState.playing) {
       audioPlayer.stop();
+      audioPlayer.dispose();
     }
-    if (story.status?.type == 'text' || story.status?.type == 'image') {
+    if (story.status?.type == 'text') {
       _restartTimer(7000);
-    } else {
-      if (story.status?.type == 'audio') {
-        debugPrint(
-            "audio Player file: ${story.status!.statusData!.audioMedia}");
-        audioPlayer.play(UrlSource("${story.status!.statusData!.audioMedia}"));
-        _restartTimer(30000);
-      }
-      if (story.status?.type == 'video') {
-        _timer.cancel();
-        _percent = 0;
-        setState(() {});
-      }
+    } else if (story.status?.statusData?.audioMedia != null) {
+      debugPrint("audio Player file: ${story.status!.statusData!.audioMedia}");
+      await audioPlayer
+          .play(UrlSource("${story.status!.statusData!.audioMedia}"));
+      audioPlayer.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.playing && !_audioPaused) {
+          _restartTimer(30000);
+          _audioPaused = false;
+        } else if (state == PlayerState.completed) {}
+      });
+    } else if (story.status?.statusData?.videoMedia != null) {
+      _timer.cancel();
+      _percent = 0;
+      setState(() {});
+    } else if (story.status?.statusData?.imageMedia != null) {
+      _restartTimer(7000);
     }
   }
 
   void _resumeTimer() {
     _startTimer(_remTime, percent: _percent);
+    globals.statusVideoController?.play();
+    if (audioPlayer.state == PlayerState.paused) {
+      _audioPaused = false;
+      audioPlayer.resume();
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _pauseTimer() {
+    _timer.cancel();
+    if (mounted) setState(() {});
+    globals.statusVideoController?.pause();
+    if (audioPlayer.state == PlayerState.playing) {
+      _audioPaused = true;
+      audioPlayer.pause();
+    }
   }
 
   void _previousStatus() {
@@ -155,7 +219,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
     // if user is on the last story, finish this story
     else {
       _watched[_currentIndex] = true;
-      Navigator.of(context, rootNavigator: true).pop(context);
+      if (mounted) Navigator.of(context, rootNavigator: true).pop(context);
     }
   }
 
@@ -176,21 +240,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _replyTEC = useTextEditingController();
-    final _focusNode = useFocusNode();
-    final _keyboardController = KeyboardVisibilityController();
     final size = MediaQuery.of(context).size;
-    useEffect(() {
-      _keyboardController.onChange.listen((event) {
-        if (event) {
-          _timer.cancel();
-          globals.statusVideoController?.pause();
-        } else {
-          _resumeTimer();
-          globals.statusVideoController?.play();
-        }
-      });
-    }, []);
     return Scaffold(
       appBar: null,
       backgroundColor: AppColors.black,
@@ -219,24 +269,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
                               height: size.height,
                               width: size.width,
                               color: AppColors.black,
-                              child:
-                                  // _videoController == null
-                                  //     ? VideoPreview(
-                                  //         key:
-                                  //             Key(story.status!.statusId! + 'temp'),
-                                  //         isLocalVideo: false,
-                                  //         onInitialised: (controller) {
-                                  //           _startTimer(30000);
-                                  //           _videoController = controller;
-                                  //           setState(() {});
-                                  //         },
-                                  //         loop: true,
-                                  //         showControls: false,
-                                  //         path:
-                                  //             story.status!.statusData!.videoMedia!,
-                                  //       )
-                                  //     :
-                                  VideoPreview(
+                              child: VideoPreview(
                                 key: Key(story.status!.statusId!),
                                 isLocalVideo: false,
                                 onInitialised: (controller) {
@@ -256,9 +289,29 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                     imageUrl:
                                         story.status!.statusData!.imageMedia!,
                                     fit: BoxFit.fitWidth,
+                                    // imageBuilder: (c, r){
+                                    //
+                                    // },
+                                    // imageBuilder: (c, ip) {
+                                    //   Console.log(
+                                    //       'taaaggggg::1::', ip.toString());
+                                    //   return Image.network(story
+                                    //       .status!.statusData!.imageMedia!);
+                                    // },
                                     // progressIndicatorBuilder: (c, s, p) {
-                                    //   return CupertinoActivityIndicator(
-                                    //       color: AppColors.white);
+                                    //   // Console.log(
+                                    //   //     'taaaggggg::2::',
+                                    //   //     'd=' +
+                                    //   //         p.downloaded.toString() +
+                                    //   //         '|| p=' +
+                                    //   //         p.progress.toString());
+                                    //   if (((p.progress ?? 1.0) == 1.0) &&
+                                    //       (_percent == 0)) {
+                                    //     _startTimer(7000);
+                                    //   }
+                                    //   return const CupertinoActivityIndicator(
+                                    //     color: AppColors.white,
+                                    //   );
                                     // },
                                     placeholder: (context, url) =>
                                         const CupertinoActivityIndicator(
@@ -382,14 +435,20 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                   IconButton(
                                       onPressed: () async {
                                         if (widget.isMe) {
-                                          showStoryBottomSheet(context,
-                                              status: story.status!);
+                                          _pauseTimer();
+                                          final res =
+                                              await showStoryBottomSheet(
+                                                  context,
+                                                  status: story.status!);
+                                          _resumeTimer();
                                         } else {
+                                          _pauseTimer();
                                           final res =
                                               await showUserStoryBottomSheet(
                                                   context,
                                                   isMuted: widget.isMuted,
                                                   status: story);
+                                          _resumeTimer();
                                           if (res == null) return;
                                           if (res is MuteResult) {
                                             Navigator.pop(context, res);
@@ -413,12 +472,10 @@ class _StatusViewPageState extends State<StatusViewPage> {
                               behavior: HitTestBehavior.opaque,
                               onTapUp: (details) => _onTapDown(details),
                               onLongPress: () {
-                                _timer.cancel();
-                                globals.statusVideoController?.pause();
+                                _pauseTimer();
                               },
                               onLongPressUp: () {
                                 _resumeTimer();
-                                globals.statusVideoController?.play();
                               },
                               child: Container()),
                         ),
@@ -426,7 +483,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
                         //   height: 4,
                         // ),
                         Visibility(
-                          visible: !(widget.isMe ?? false),
+                          visible: !(widget.isMe),
                           child: CustomRoundTextField(
                             hintText: 'Reach out to...',
                             focusNode: _focusNode,
@@ -451,7 +508,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
                               color: AppColors.white,
                             ),
                             onTap: () {
-                              _timer.cancel();
+                              // _timer.cancel();
                             },
                             suffixIcon: GestureDetector(
                               onTap: () {

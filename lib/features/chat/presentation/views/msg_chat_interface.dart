@@ -35,6 +35,7 @@ import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 
 import '../../../../core/components/snackbar.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
@@ -184,7 +185,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           onTap: () {
             RouteNavigators.route(
                 context,
-                RecipientAccountProfile(
+                RecipientNewAccountScreen(
                   recipientEmail: widget.recipientUser!.email,
                   recipientImageUrl: widget.recipientUser!.profilePicture,
                   recipientId: widget.recipientUser!.id,
@@ -443,7 +444,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             onPressed: () {
                                               RouteNavigators.route(
                                                   context,
-                                                  RecipientAccountProfile(
+                                                  RecipientNewAccountScreen(
                                                     recipientEmail: widget
                                                         .recipientUser!.email,
                                                     recipientImageUrl: widget
