@@ -180,8 +180,8 @@ class _PlayAudioState extends State<PlayAudio> {
 
   void _initaliseController() async {
     late String filePath;
-     playerController = PlayerController();
-     File? audioFile = await momentFeedStore.videoControllerService
+    playerController = PlayerController();
+    File? audioFile = await momentFeedStore.videoControllerService
         .getAudioFile(widget.audioFile!);
     if (audioFile == null) {
       var result = await _mediaService.downloadFile(url: widget.audioFile!);
@@ -189,7 +189,7 @@ class _PlayAudioState extends State<PlayAudio> {
     } else {
       filePath = audioFile.path;
     }
-    
+
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
@@ -200,7 +200,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
       if (playerController.playerState == PlayerState.initialized) {
         isInitialised = true;
-        if(mounted)setState(() {});
+        if (mounted) setState(() {});
       } else if (playerController.playerState == PlayerState.playing) {
         isPlaying = true;
         if (mounted) setState(() {});
@@ -439,11 +439,14 @@ class _TimerWidgetState extends State<TimerWidget> {
   void startTimer({bool resets = true}) {
     if (!mounted) return;
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+    print('....................object...............');
   }
 
   void stopTimer() {
     if (!mounted) return;
     setState(() => timer?.cancel());
+    print(
+        '........................iiiiiiiiiiiiiiiiiiiiiiiiiiiii...............');
   }
 
   @override
