@@ -786,7 +786,7 @@ Future showProfilePictureOrViewStatus(BuildContext context,
                           ViewUserStatus(
                               status: userStatus!
                                   .firstWhere(
-                                      (e) => e.id == tPostOwnerInfo!.username)
+                                      (e) => e.username == tPostOwnerInfo!.username)
                                   .status!));
                     },
                   )
@@ -841,7 +841,7 @@ Future showProfilePictureOrViewStatus2(BuildContext context,
                           context,
                           ViewUserStatus(
                               status: userStatus!
-                                  .firstWhere((e) => e.id == user!.username)
+                                  .firstWhere((e) => e.username == user!.username)
                                   .status!));
                     },
                   )

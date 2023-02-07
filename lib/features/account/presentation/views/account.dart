@@ -2908,7 +2908,7 @@ class _RecipientAccountProfileState extends State<RecipientAccountProfile>
                                     ),
                                     onTap: () {
                                       if (_userStatus.value.any((e) =>
-                                          e.id ==
+                                          e.username ==
                                           globals.recipientUser!.username)) {
                                         showProfilePictureOrViewStatus2(
                                           context,

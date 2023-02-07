@@ -129,7 +129,7 @@ class TimeLineBox extends StatelessWidget {
                   onTap: userStatusFeed != null
                       ? () async {
                           if (userStatusFeed!
-                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                              .any((e) => e.username == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
                                 tPostOwnerInfo: tPostOwnerInfo!,
                                 userStatus: userStatusFeed!);
