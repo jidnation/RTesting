@@ -70,7 +70,9 @@ class _MomentAudioPlayerState extends State<MomentAudioPlayer> {
         if (mounted) setState(() {});
       }
     });
-    await playerController.preparePlayer(filePath);
+    playerController.playerKey.isNotEmpty
+        ? await playerController.preparePlayer(filePath)
+        : null;
     // await playerController.startPlayer();
     if (mounted) setState(() {});
   }

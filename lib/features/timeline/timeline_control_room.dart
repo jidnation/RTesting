@@ -64,10 +64,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<CustomUser> _suggestedUsers = <CustomUser>[];
   List<CustomUser> get suggestedUser => _suggestedUsers;
 
-  //
-  // List<CustomCounter> _likedBox = <CustomCounter>[];
-  // List<CustomCounter> get likedBox => _likedBox;
-
   initialize(
       {bool? isTextEditing,
       bool? isPosting,
@@ -236,7 +232,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (voteType.toLowerCase() == 'downvote') {
       bool? res = await getReachRelationship(
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
-      // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
       if (res != null && res) {
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
@@ -269,6 +264,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     } else {
       if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
         actualModel.getPostFeed.post?.isVoted = 'Upvote';
+        actualModel.getPostFeed.post!.nUpvotes =
+            actualModel.getPostFeed.post!.nUpvotes! + 1;
         notifyListeners();
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
@@ -291,27 +288,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         timeLineFeedStore.removePost(context, id, type: type);
       }
     }
-
     fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
-
-  // updateTimeLine(String id) async {
-  //   List<TimeLineModel> currentData = value;
-  //   TimeLineModel actualModel =
-  //       currentData.firstWhere((element) => element.id == id);
-  //   Post post = actualModel.getPostFeed.post!;
-  //   Post? response = await timeLineQuery.getPost(postId: post.postId!);
-  //   if (response != null) {
-  //     post.isLiked = response.isLiked!;
-  //     post.nLikes = response.nLikes!;
-  //     post.nUpvotes = response.nUpvotes!;
-  //     post.nDownvotes = response.nDownvotes!;
-  //     post.isVoted = response.isVoted!;
-  //     post.nComments = response.nComments!;
-  //   } else {
-  //     notifyListeners();
-  //   }
-  // }
 
   Future<bool?> getReachRelationship(
       {required String usersId, required String type}) async {
@@ -482,7 +460,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   pt.PostFeedModel? getPostModelById(String timeLineId,
       {required String type}) {
-    print(":::::::::::::::::: type ::: $type");
     List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
@@ -617,7 +594,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           }
         }
       }
-      print(">>>>>>>>>> from media upload ::::: ${response["data"]["link"]}");
     }
 
     Either<String, pt.PostModel> response = await SocialServiceRepository()
@@ -695,7 +671,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   shoutDown(BuildContext context,
       {required String postId, required String authId}) async {
     bool? res = await getReachRelationship(usersId: authId, type: 'reacher');
-    // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
     if (res != null && res) {
       bool response = await timeLineQuery.votePost(
         postId: postId,
@@ -801,6 +776,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
+  /////////////////////////////////////////////////////////////////
   ///
   /// Profile page Data
   ///

@@ -393,12 +393,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                             .unMuteStatus(
                                                                 index);
                                                       }
-
-                                                      // Navigator.push(
-                                                      //     context,
-                                                      //     MaterialPageRoute(
-                                                      //         builder: (c) =>
-                                                      //             const StoryPage()));
                                                     },
                                                   ),
                                               itemCount: _mutedStatus.length),
@@ -410,8 +404,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                             Expanded(
                                 child: value.isEmpty
                                     ? const UserSuggestionWidget()
-                                    // ? EmptyTimelineWidget(
-                                    //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
                                         physics: const BouncingScrollPhysics(),
                                         onRefresh: () {
@@ -419,9 +411,8 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                             refreshController:
                                                 _refreshController,
                                             isRefreshing: true,
+                                            isRefresh: true,
                                           );
-                                          // await Future.delayed(const Duration(seconds: 10));
-                                          // _refreshController.refreshCompleted();
                                         },
                                         controller: _refreshController,
                                         child: ListView.builder(

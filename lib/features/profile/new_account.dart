@@ -467,13 +467,17 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                                       color: AppColors
                                           .black, // Your screen background color
                                     ),
-                                    Column(children: <Widget>[
-                                      Container(height: getScreenHeight(100)),
-                                      Image.network(
-                                        globals.user!.profilePicture!,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ]),
+                                    Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                              height: getScreenHeight(100)),
+                                          Image.network(
+                                            globals.user!.profilePicture!,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ]),
                                     Positioned(
                                       top: 0.0,
                                       left: 0.0,
@@ -517,51 +521,33 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
               ),
             ),
             Container(
-                height: 60,
-                width: SizeConfig.screenWidth,
-                color: AppColors.backgroundShade4,
-                child: CarouselSlider(
-                  carouselController: topCarouselController,
-                  options: CarouselOptions(
-                    padEnds: false,
-                    viewportFraction: 0.3,
-                    height: 60,
-                    // aspectRatio: 0.3,
-                    onPageChanged: (index, _) {
-                      bodyCarouselController.animateToPage(index);
-                      selectedTab.value = pageTab[index];
-                    },
-                    enableInfiniteScroll: false,
-                    scrollDirection: Axis.horizontal,
-                  ),
-                  items: List.generate(
-                      pageTab.length,
-                      (index) => ProfileTab(
-                          isSelected: selectedTab.value == pageTab[index],
-                          value: pageTab[index],
-                          onClick: () {
-                            bodyCarouselController.animateToPage(index);
-                            selectedTab.value = pageTab[index];
-                          })),
-                )
-
-                // ListView.builder(
-                //     shrinkWrap: true,
-                //     controller: _controller,
-                //     itemCount: pageTab.length,
-                //     physics: const ScrollPhysics(),
-                //     padding: const EdgeInsets.only(left: 5),
-                //     scrollDirection: Axis.horizontal,
-                //     itemBuilder: (context, index) {
-                //       String value = pageTab[index];
-                //       return ProfileTab(
-                //           isSelected: selectedTab.value == value,
-                //           value: value,
-                //           onClick: () {
-                //             selectedTab.value = value;
-                //           });
-                //     }),
+              height: 60,
+              width: SizeConfig.screenWidth,
+              color: AppColors.backgroundShade4,
+              child: CarouselSlider(
+                carouselController: topCarouselController,
+                options: CarouselOptions(
+                  padEnds: false,
+                  viewportFraction: 0.3,
+                  height: 60,
+                  onPageChanged: (index, _) {
+                    bodyCarouselController.animateToPage(index);
+                    selectedTab.value = pageTab[index];
+                  },
+                  enableInfiniteScroll: false,
+                  scrollDirection: Axis.horizontal,
                 ),
+                items: List.generate(
+                    pageTab.length,
+                    (index) => ProfileTab(
+                        isSelected: selectedTab.value == pageTab[index],
+                        value: pageTab[index],
+                        onClick: () {
+                          bodyCarouselController.animateToPage(index);
+                          selectedTab.value = pageTab[index];
+                        })),
+              ),
+            ),
             Expanded(
               child: SizedBox(
                 child: CarouselSlider(

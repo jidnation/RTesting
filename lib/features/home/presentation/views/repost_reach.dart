@@ -181,9 +181,6 @@ class _RepostReachState extends State<RepostReach> {
         listener: (context, state) {
           if (state is CreateRepostSuccess) {
             timeLineFeedStore.initialize(isQuoting: true, isRefreshing: true);
-            // globals.socialServiceBloc!
-            //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-            // Navigator.pop(context);
           }
           if (state is CreateRepostError) {
             Snackbars.error(context, message: state.error);
