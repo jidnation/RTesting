@@ -50,10 +50,7 @@ class _MomentFeedState extends State<MomentFeed> {
             ValueListenableBuilder(
               valueListenable: MomentFeedStore(),
               builder: (context, List<MomentModel> value, child) {
-                print('from the feed room.........??? $value }');
                 final List<MomentModel> momentFeeds = value;
-                // print(
-                //     'from the feed roomImage.........??? ${momentFeeds.first.profilePicture} }');
                 return momentFeedStore.gettingMoments
                     ? const VideoLoader()
                     : momentFeeds.isNotEmpty
@@ -420,7 +417,6 @@ class _MomentFeedState extends State<MomentFeed> {
   }
 
   void checkMeOut(int index) {
-    print('....check Me out is running>>>>>>>>>>>>>>>>');
     int currentSaved = momentFeedStore.currentSaveIndex;
     if (index == (currentSaved - 2)) {
       momentFeedStore.cacheNextFive(currentSaved);
@@ -444,16 +440,12 @@ String? result;
 class _AudioImageLoaderState extends State<AudioImageLoader> {
   @override
   void initState() {
-    convertUrl();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return
-        // widget.audioUrl != null
-        //   ?
-        Container(
+    return Container(
       height: 50,
       width: 50,
       alignment: Alignment.center,
@@ -472,41 +464,5 @@ class _AudioImageLoaderState extends State<AudioImageLoader> {
                 color: Colors.white, borderRadius: BorderRadius.circular(10)))
       ]),
     );
-    // : AudioEffects(
-    //     height: 50,
-    //     width: 50,
-    //     color: Colors.black,
-    //     artworkWidth: 40,
-    //     artworkHeight: 40,
-    //     artworkBorder: BorderRadius.circular(30),
-    //     isLocal: false,
-    //     isPlaying: true,
-    //     url: widget.audioUrl,
-    //     type: ArtworkType.AUDIO,
-    //     id: "Audio ID",
-    //   );
-  }
-
-  convertUrl() async {
-    if (widget.audioUrl != null) {
-      // FileResult? file = await MediaService().downloadFile(
-      //   url: widget.audioUrl!,
-      // );
-      // try {
-      //   final thumbnailPath = await getTemporaryDirectory();
-      //   result = await MediaThumbnail.videoThumbnail(
-      //       "widget.audioUrl!", "${thumbnailPath.path}/xx.jpg");
-      //   print(":::::::::::::::::::::::::: ${thumbnailPath.path}");
-      //
-      //   // result = await MetadataRetriever.fromFile(
-      //   //   File(file.path),
-      //   // );
-      //   if (result != null) {
-      //     setState(() {});
-      //   }
-      // } catch (ex) {
-      //   debugPrint(ex.toString());
-      // }
-    }
   }
 }

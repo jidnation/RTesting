@@ -77,85 +77,82 @@ class _MomentAudioPlayerState extends State<MomentAudioPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      // bool status = timeLineController.currentStatus.value;
-      String currentId = timeLineController.currentId.value;
-      if (currentId.isNotEmpty) {
-        print(":::::::::::::::::: calling me again like this, PLEASE STOP!!!");
-        currentId == widget.id
-            // ? status
-            ? playerController.startPlayer(finishMode: FinishMode.loop)
-            : playerController.pausePlayer();
-        // : playerController.pausePlayer();
-      } else {
-        playerController.pausePlayer();
-      }
-      return Row(children: [
-        InkWell(
-          onTap: () {
-            if (currentId == widget.id) {
-              print(":::::::::::: 1");
-              // timeLineController.currentStatus(!status);
-              timeLineController.currentId('');
-            } else {
-              print(":::::::::::: 2");
+    String currentId = timeLineController.currentId.value;
+    if (currentId.isNotEmpty) {
+      print(":::::::::::::::::: calling me again like this, PLEASE STOP!!!");
+      currentId == widget.id
+          // ? status
+          ? playerController.startPlayer(finishMode: FinishMode.loop)
+          : playerController.pausePlayer();
+      // : playerController.pausePlayer();
+    } else {
+      playerController.pausePlayer();
+    }
+    return Row(children: [
+      InkWell(
+        onTap: () {
+          if (currentId == widget.id) {
+            print(":::::::::::: 1");
+            // timeLineController.currentStatus(!status);
+            timeLineController.currentId('');
+          } else {
+            print(":::::::::::: 2");
 
-              timeLineController.currentId(widget.id);
-              // timeLineController.currentStatus(!status);
-            }
-          },
-          child: Icon(
-            currentId == widget.id
-                ? Icons.pause_rounded
-                : Icons.play_arrow_rounded,
-            size: 32,
-            color: const Color(0xff0077B6),
-          ),
+            timeLineController.currentId(widget.id);
+            // timeLineController.currentStatus(!status);
+          }
+        },
+        child: Icon(
+          currentId == widget.id
+              ? Icons.pause_rounded
+              : Icons.play_arrow_rounded,
+          size: 32,
+          color: const Color(0xff0077B6),
         ),
-        SizedBox(
-          width: getScreenWidth(3),
-        ),
-        isInitialised
-            ? Expanded(
-                child: LayoutBuilder(builder: (context, constraint) {
-                  return AudioFileWaveforms(
-                    size: Size(constraint.maxWidth < 250 ? 230 : 260, 24),
-                    playerController: playerController,
-                    density: 2,
-                    enableSeekGesture: true,
-                    playerWaveStyle: const PlayerWaveStyle(
-                      scaleFactor: 0.2,
-                      waveThickness: 3,
-                      fixedWaveColor: Colors.white,
-                      liveWaveColor: Color(0xff0077B6),
-                      waveCap: StrokeCap.round,
-                    ),
-                  );
-                }),
-              )
-            : const Expanded(
-                // width: MediaQuery.of(context).size.width / 1.7,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: LinearProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                    color: AppColors.greyShade1,
-                    backgroundColor: AppColors.greyShade1,
+      ),
+      SizedBox(
+        width: getScreenWidth(3),
+      ),
+      isInitialised
+          ? Expanded(
+              child: LayoutBuilder(builder: (context, constraint) {
+                return AudioFileWaveforms(
+                  size: Size(constraint.maxWidth < 250 ? 230 : 260, 24),
+                  playerController: playerController,
+                  density: 2,
+                  enableSeekGesture: true,
+                  playerWaveStyle: const PlayerWaveStyle(
+                    scaleFactor: 0.2,
+                    waveThickness: 3,
+                    fixedWaveColor: Colors.white,
+                    liveWaveColor: Color(0xff0077B6),
+                    waveCap: StrokeCap.round,
                   ),
+                );
+              }),
+            )
+          : const Expanded(
+              // width: MediaQuery.of(context).size.width / 1.7,
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                  color: AppColors.greyShade1,
+                  backgroundColor: AppColors.greyShade1,
                 ),
               ),
-        CustomText(
-          text: StringUtil.formatDuration(
-              Duration(milliseconds: currentDuration)),
-          color: const Color(0xff0077B6),
-          weight: FontWeight.w700,
-          size: 14,
-        ),
-        SizedBox(
-          width: getScreenWidth(12),
-        ),
-      ]);
-    });
+            ),
+      CustomText(
+        text:
+            StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
+        color: const Color(0xff0077B6),
+        weight: FontWeight.w700,
+        size: 14,
+      ),
+      SizedBox(
+        width: getScreenWidth(12),
+      ),
+    ]);
   }
 
   @override
