@@ -103,6 +103,7 @@ class _CommentBoxActionRowState extends State<CommentBoxActionRow> {
                 print(
                     ":::::::::::::::postId ${widget.getPersonalComment.postId}");
                 timeLineController.replyComment(
+                  context,
                   postId: widget.getPersonalComment.postId,
                   commentId: widget.getPersonalComment.commentId,
                 );

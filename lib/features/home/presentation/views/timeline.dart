@@ -214,7 +214,7 @@ class _TimelineScreenState extends State<TimelineScreen>
                       ? RouteNavigators.route(context, const NewAccountScreen())
                       : RouteNavigators.route(
                           context,
-                      RecipientNewAccountScreen(
+                          RecipientAccountProfile(
                             recipientEmail: 'email',
                             recipientImageUrl: state.user!.profilePicture,
                             recipientId: state.user!.id,
@@ -596,11 +596,11 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                             .greyShade3),
                                                   ),
                                                   childrenPadding:
-                                                     const EdgeInsets.fromLTRB(
+                                                      const EdgeInsets.fromLTRB(
                                                           16, 0, 16, 16),
-                                                  tilePadding:
-                                                     const EdgeInsets.symmetric(
-                                                          horizontal: 16),
+                                                  tilePadding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 16),
                                                   children: [
                                                     Row(
                                                       children: [
@@ -1071,7 +1071,7 @@ class PostFeedReacherCard extends HookWidget {
                                         context, const NewAccountScreen())
                                     : RouteNavigators.route(
                                         context,
-                                    RecipientNewAccountScreen(
+                                        RecipientAccountProfile(
                                           recipientEmail: 'email',
                                           recipientImageUrl:
                                               postFeedModel!.profilePicture,

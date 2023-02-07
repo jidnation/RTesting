@@ -73,10 +73,11 @@ class RepostedPost extends StatelessWidget {
                     globals.userBloc!.add(GetRecipientProfileEvent(
                         email: post.repostedPostOwnerProfile!.authId));
                     post.repostedPostOwnerProfile!.authId == globals.user!.id
-                        ? RouteNavigators.route(context, const NewAccountScreen())
+                        ? RouteNavigators.route(
+                            context, const NewAccountScreen())
                         : RouteNavigators.route(
                             context,
-                        RecipientNewAccountScreen(
+                            RecipientAccountProfile(
                               recipientEmail: 'email',
                               recipientImageUrl:
                                   post.repostedPostOwnerProfile!.profilePicture,

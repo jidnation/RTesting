@@ -463,11 +463,11 @@ class _CommentReachState extends State<CommentReach> {
                                                     .postOwnerId));
                                         widget.postFeedModel!.postOwnerId ==
                                                 globals.user!.id
-                                            ? RouteNavigators.route(
-                                                context, const NewAccountScreen())
+                                            ? RouteNavigators.route(context,
+                                                const NewAccountScreen())
                                             : RouteNavigators.route(
                                                 context,
-                                            RecipientNewAccountScreen(
+                                                RecipientAccountProfile(
                                                   recipientEmail: 'email',
                                                   recipientImageUrl: widget
                                                       .postFeedModel!
@@ -1537,9 +1537,7 @@ class _CommentReachState extends State<CommentReach> {
             }
             return Future.value(false);
           },
-        )
-        
-        );
+        ));
   }
 
   Widget replyWidget(String replyFeature) {

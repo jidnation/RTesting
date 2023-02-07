@@ -64,129 +64,128 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<CustomUser> _suggestedUsers = <CustomUser>[];
   List<CustomUser> get suggestedUser => _suggestedUsers;
 
-  //
-  // List<CustomCounter> _likedBox = <CustomCounter>[];
-  // List<CustomCounter> get likedBox => _likedBox;
-
   initialize(
       {bool? isTextEditing,
       bool? isPosting,
       bool? isUpvoting,
       bool? isQuoting,
       bool? isRefresh,
+      bool? isRefreshing,
       RefreshController? refreshController}) async {
-    if ((isPosting ?? false) ||
-        (isTextEditing ?? false) ||
-        (isQuoting ?? false)) {
-      // Get.to(() => const TimeLineFeed());
-      Get.back();
-      _isPosting = true;
-    } else {
-      ((isUpvoting ?? false) || (isRefresh ?? false))
-          ? _isPosting = true
-          : _gettingPosts = true;
-      // (noReload ?? false) ? _isPosting = true : _gettingPosts = true;
-    }
-    notifyListeners();
-    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
-    List<CustomCounter> likeBoxInfo = [];
-    if (response != null) {
-      length > 0 ? value.clear() : null;
-      if (isTextEditing ?? false) {
-        Get.snackbar(
-          '',
-          '',
-          titleText: const SizedBox.shrink(),
-          messageText: CustomText(
-            text: 'You have successfully edit your post',
-            color: const Color(0xFF1C8B43),
-            size: getScreenHeight(16),
-          ),
-          borderWidth: 0.5,
-          icon: SvgPicture.asset(
-            'assets/svgs/like.svg',
-            color: const Color(0xFF1C8B43),
-          ),
-          backgroundColor: const Color(0xFFE0FFDD),
-          borderColor: const Color(0xFF1C8B43),
-          borderRadius: 16,
-          duration: const Duration(milliseconds: 1500),
-        );
+    if (value.isEmpty || (isRefreshing ?? false)) {
+      if ((isPosting ?? false) ||
+          (isTextEditing ?? false) ||
+          (isQuoting ?? false)) {
+        // Get.to(() => const TimeLineFeed());
+        Get.back();
+        _isPosting = true;
+      } else {
+        ((isUpvoting ?? false) || (isRefresh ?? false))
+            ? _isPosting = true
+            : _gettingPosts = true;
+        // (noReload ?? false) ? _isPosting = true : _gettingPosts = true;
       }
-      if (isQuoting ?? false) {
-        Get.snackbar(
-          '',
-          '',
-          titleText: const SizedBox.shrink(),
-          messageText: CustomText(
-            text: 'Reach has been quoted on your timeline',
-            color: const Color(0xFF1C8B43),
-            size: getScreenHeight(16),
-          ),
-          borderWidth: 0.5,
-          icon: SvgPicture.asset(
-            'assets/svgs/like.svg',
-            color: const Color(0xFF1C8B43),
-          ),
-          backgroundColor: const Color(0xFFE0FFDD),
-          borderColor: const Color(0xFF1C8B43),
-          borderRadius: 16,
-          duration: const Duration(milliseconds: 1500),
-        );
-      }
-      if (isPosting ?? false) {
-        Get.snackbar(
-          '',
-          '',
-          titleText: const SizedBox.shrink(),
-          messageText: CustomText(
-            text: 'Your reach has been Posted.',
-            color: const Color(0xFF1C8B43),
-            size: getScreenHeight(16),
-          ),
-          borderWidth: 0.5,
-          icon: SvgPicture.asset(
-            'assets/svgs/like.svg',
-            color: const Color(0xFF1C8B43),
-          ),
-          backgroundColor: const Color(0xFFE0FFDD),
-          borderColor: const Color(0xFF1C8B43),
-          borderRadius: 16,
-          duration: const Duration(milliseconds: 1500),
-        );
-      }
-      if (response.isEmpty) {
-        getSuggestedUsers();
-      }
-      for (GetPostFeed postFeed in response) {
-        Post post = postFeed.post!;
-        _availablePostIds.add(post.postId!);
-        value.add(TimeLineModel(
-          getPostFeed: postFeed,
-          isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' &&
-              post.postOwnerProfile != null,
-        ));
-      }
-      if (value.isNotEmpty) {
-        for (TimeLineModel element in value) {
-          likeBoxInfo.add(CustomCounter(
-              id: element.id,
-              data: LikeModel(
-                nLikes: element.getPostFeed.post?.nLikes ?? 0,
-                isLiked: element.getPostFeed.post?.isLiked ?? false,
-              )));
-        }
-      }
-      timeLineController.likeBox(likeBoxInfo);
-      _isPosting = false;
-      _gettingPosts = false;
       notifyListeners();
-    }
-    await getUserStatus();
-    await getMyStatus();
+      List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds();
+      List<CustomCounter> likeBoxInfo = [];
+      if (response != null) {
+        length > 0 ? value.clear() : null;
+        if (isTextEditing ?? false) {
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text: 'You have successfully edit your post',
+              color: const Color(0xFF1C8B43),
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: SvgPicture.asset(
+              'assets/svgs/like.svg',
+              color: const Color(0xFF1C8B43),
+            ),
+            backgroundColor: const Color(0xFFE0FFDD),
+            borderColor: const Color(0xFF1C8B43),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
+          );
+        }
+        if (isQuoting ?? false) {
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text: 'Reach has been quoted on your timeline',
+              color: const Color(0xFF1C8B43),
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: SvgPicture.asset(
+              'assets/svgs/like.svg',
+              color: const Color(0xFF1C8B43),
+            ),
+            backgroundColor: const Color(0xFFE0FFDD),
+            borderColor: const Color(0xFF1C8B43),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
+          );
+        }
+        if (isPosting ?? false) {
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text: 'Your reach has been Posted.',
+              color: const Color(0xFF1C8B43),
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: SvgPicture.asset(
+              'assets/svgs/like.svg',
+              color: const Color(0xFF1C8B43),
+            ),
+            backgroundColor: const Color(0xFFE0FFDD),
+            borderColor: const Color(0xFF1C8B43),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
+          );
+        }
+        if (response.isEmpty) {
+          getSuggestedUsers();
+        }
+        for (GetPostFeed postFeed in response) {
+          Post post = postFeed.post!;
+          _availablePostIds.add(post.postId!);
+          value.add(TimeLineModel(
+            getPostFeed: postFeed,
+            isShowing: post.isVoted!.toLowerCase().trim() != 'downvote' &&
+                post.postOwnerProfile != null,
+          ));
+        }
+        if (value.isNotEmpty) {
+          for (TimeLineModel element in value) {
+            likeBoxInfo.add(CustomCounter(
+                id: element.id,
+                data: LikeModel(
+                  nLikes: element.getPostFeed.post?.nLikes ?? 0,
+                  isLiked: element.getPostFeed.post?.isLiked ?? false,
+                )));
+          }
+        }
+        timeLineController.likeBox(likeBoxInfo);
+        _isPosting = false;
+        _gettingPosts = false;
+        notifyListeners();
+      }
+      await getUserStatus();
+      await getMyStatus();
 
-    if (isRefresh ?? false) {
-      refreshController!.refreshCompleted();
+      if (isRefresh ?? false) {
+        refreshController!.refreshCompleted();
+      }
     }
   }
 
@@ -197,13 +196,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       TimeLineModel actualModel =
           currentData.firstWhere((element) => element.id == id);
       Post post = actualModel.getPostFeed.post!;
+      if (type == 'likes') {
+        currentData.remove(actualModel);
+        notifyListeners();
+      }
       if (!post.isLiked!) {
         post.isLiked = true;
         post.nLikes = post.nLikes! + 1;
         // notifyListeners();
         bool response = await timeLineQuery.likePost(postId: post.postId!);
         if (response) {
-          // updateTimeLine(id);
+          fetchAll(isFirst: true);
         }
       } else {
         post.isLiked = false;
@@ -211,7 +214,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         // notifyListeners();
         bool response = await timeLineQuery.unlikePost(postId: post.postId!);
         if (response) {
-          // updateTimeLine(id);
+          fetchAll(isFirst: true);
         }
       }
     }
@@ -229,14 +232,13 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (voteType.toLowerCase() == 'downvote') {
       bool? res = await getReachRelationship(
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
-      // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
       if (res != null && res) {
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
         if (response) {
-          timeLineFeedStore.initialize();
+          timeLineFeedStore.initialize(isRefreshing: true);
           voteType.toLowerCase() == 'upvote'
               ? Snackbars.success(
                   context,
@@ -261,12 +263,16 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       }
     } else {
       if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
+        actualModel.getPostFeed.post?.isVoted = 'Upvote';
+        actualModel.getPostFeed.post!.nUpvotes =
+            actualModel.getPostFeed.post!.nUpvotes! + 1;
+        notifyListeners();
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
         if (response) {
-          initialize(isUpvoting: true);
+          initialize(isUpvoting: true, isRefreshing: true);
           fetchMyPost(isRefresh: true);
           Snackbars.success(
             context,
@@ -282,25 +288,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         timeLineFeedStore.removePost(context, id, type: type);
       }
     }
+    fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
-
-  // updateTimeLine(String id) async {
-  //   List<TimeLineModel> currentData = value;
-  //   TimeLineModel actualModel =
-  //       currentData.firstWhere((element) => element.id == id);
-  //   Post post = actualModel.getPostFeed.post!;
-  //   Post? response = await timeLineQuery.getPost(postId: post.postId!);
-  //   if (response != null) {
-  //     post.isLiked = response.isLiked!;
-  //     post.nLikes = response.nLikes!;
-  //     post.nUpvotes = response.nUpvotes!;
-  //     post.nDownvotes = response.nDownvotes!;
-  //     post.isVoted = response.isVoted!;
-  //     post.nComments = response.nComments!;
-  //   } else {
-  //     notifyListeners();
-  //   }
-  // }
 
   Future<bool?> getReachRelationship(
       {required String usersId, required String type}) async {
@@ -471,7 +460,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   pt.PostFeedModel? getPostModelById(String timeLineId,
       {required String type}) {
-    print(":::::::::::::::::: type ::: $type");
     List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
@@ -606,7 +594,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           }
         }
       }
-      print(">>>>>>>>>> from media upload ::::: ${response["data"]["link"]}");
     }
 
     Either<String, pt.PostModel> response = await SocialServiceRepository()
@@ -620,7 +607,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             mentionList: globals.mentionList,
             postRating: globals.postRating);
     if (response.isRight()) {
-      initialize();
+      initialize(isRefreshing: true);
       Snackbars.success(context, message: 'Your reach has been posted');
       Get.close(2);
     }
@@ -660,7 +647,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
-          RecipientNewAccountScreen(
+          RecipientAccountProfile(
             recipientCoverImageUrl: userInfo?.coverPicture,
             recipientEmail: userInfo?.email,
             recipientId: userInfo?.id,
@@ -677,21 +664,20 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       postId: postId,
     );
     if (response.isRight()) {
-      initialize(isTextEditing: true);
+      initialize(isTextEditing: true, isRefreshing: true);
     }
   }
 
   shoutDown(BuildContext context,
       {required String postId, required String authId}) async {
     bool? res = await getReachRelationship(usersId: authId, type: 'reacher');
-    // TimeLineModel timeLineModel = timeLineFeedStore.getModel(id);
     if (res != null && res) {
       bool response = await timeLineQuery.votePost(
         postId: postId,
         voteType: 'Downvote',
       );
       if (response) {
-        timeLineFeedStore.initialize(isUpvoting: true);
+        timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
         Snackbars.success(
           context,
           message: 'You have successfully shouted down this post.',
@@ -780,15 +766,17 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       {required String postId,
       required String id,
       required String type}) async {
+    List<TimeLineModel> currentPosts = getExactValue(type);
+    currentPosts.removeWhere((element) => element.id == id);
+    notifyListeners();
     bool response = await timeLineQuery.deleteVotedPost(postId: postId);
     if (response) {
-      List<TimeLineModel> currentPosts = getExactValue(type);
-      currentPosts.removeWhere((element) => element.id == id);
       fetchMyPost(isRefresh: true);
-      initialize(isUpvoting: true);
+      initialize(isUpvoting: true, isRefreshing: true);
     }
   }
 
+  /////////////////////////////////////////////////////////////////
   ///
   /// Profile page Data
   ///
@@ -813,24 +801,28 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
 
-  fetchAll({String? userId, bool? isFirst}) {
+  fetchAll({String? userId, bool? isFirst, bool? removeLike}) {
     fetchMyPost(isRefresh: isFirst ?? false, userId: userId);
-    fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
+    removeLike ?? false
+        ? null
+        : fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
     fetchMySavedPosts(isRefresh: isFirst ?? false);
     fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
-    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
-    fetchMyVotedPosts(isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
+    fetchMyVotedPosts(
+        isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
+    fetchMyVotedPosts(
+        isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
   }
 
   fetchMyPost(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myPosts.isEmpty || isRefresh) {
-      List<Post>? response =
-          await timeLineQuery.getAllPosts(authIdToGet: userId ?? globals.userId);
+      List<Post>? response = await timeLineQuery.getAllPosts(
+          authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myPosts = [];
         for (Post post in response) {
@@ -874,12 +866,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyLikedPosts(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
-      List<GetPostFeed>? response =
-          await timeLineQuery.getLikedPosts(authIdToGet: userId ?? globals.userId);
+      List<GetPostFeed>? response = await timeLineQuery.getLikedPosts(
+          authIdToGet: userId ?? globals.userId);
       if (response != null) {
         _myLikedPosts = [];
         for (GetPostFeed postFeed in response) {
@@ -903,9 +895,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeBox3(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -914,19 +906,16 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyComments(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
     if (_myLikedPosts.isEmpty || isRefresh) {
-      List<GetPersonalComment>? response =
-          await timeLineQuery.getAllComments(authIdToGet: userId ?? globals.userId!);
+      List<GetPersonalComment>? response = await timeLineQuery.getAllComments(
+          authIdToGet: userId ?? globals.userId!);
       if (response != null) {
         _myPersonalComments = [];
         for (GetPersonalComment commentFeed in response) {
           _myPersonalComments.add(commentFeed);
-        }
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
         }
       }
       List<CustomCounter> likeBoxInfo = [];
@@ -941,9 +930,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeCommentBox(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -996,9 +985,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
               )));
         }
         timeLineController.likeSavedBox(likeBoxInfo);
-        if (refreshController != null) {
-          refreshController.refreshCompleted();
-        }
+      }
+      if (refreshController != null) {
+        refreshController.refreshCompleted();
       }
       notifyListeners();
     }
@@ -1007,7 +996,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   fetchMyVotedPosts(
       {int? pageNumber,
       int? pageLimit,
-        String? userId,
+      String? userId,
       required bool isRefresh,
       RefreshController? refreshController,
       required String type}) async {
@@ -1064,7 +1053,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   fetchMorePosts({required int index}) async {
-    List<GetPostFeed>? response = await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
+    List<GetPostFeed>? response =
+        await timeLineQuery.getAllPostFeeds(pageNumber: index, pageLimit: 10);
     List<CustomCounter> likeBoxInfo = [];
     if (response != null) {
       for (GetPostFeed postFeed in response) {

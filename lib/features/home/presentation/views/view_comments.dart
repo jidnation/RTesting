@@ -1169,7 +1169,7 @@ class CommentsTile extends StatelessWidget {
                       ? RouteNavigators.route(context, const NewAccountScreen())
                       : RouteNavigators.route(
                           context,
-                      RecipientNewAccountScreen(
+                          RecipientAccountProfile(
                             recipientEmail: 'email',
                             recipientImageUrl:
                                 comment.commentOwnerProfile!.profilePicture,
@@ -1218,7 +1218,7 @@ class CommentsTile extends StatelessWidget {
                   Expanded(
                     child: CommentAudioMedia(
                       path: comment.audioMediaItem!,
-                              ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                    ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
                   ),
                 ],
               )

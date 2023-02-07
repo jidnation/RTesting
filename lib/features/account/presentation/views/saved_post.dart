@@ -138,7 +138,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                     ? RouteNavigators.route(context, const AccountScreen())
                     : RouteNavigators.route(
                         context,
-                    RecipientNewAccountScreen(
+                        RecipientAccountProfile(
                           recipientEmail: 'email',
                           recipientImageUrl: state.user!.profilePicture,
                           recipientId: state.user!.id,
@@ -806,7 +806,7 @@ class SavedPostReacherCard extends HookWidget {
                                     context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientNewAccountScreen(
+                                    RecipientAccountProfile(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -1308,7 +1308,7 @@ class TextOnlySavedPostReacherCard extends HookWidget {
                                     context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientNewAccountScreen(
+                                    RecipientAccountProfile(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -1773,7 +1773,7 @@ class VideoOnlySavedPostReacherCard extends HookWidget {
                                     context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                    RecipientNewAccountScreen(
+                                    RecipientAccountProfile(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
@@ -2205,7 +2205,7 @@ class AudioOnlySavedPostReacherCard extends HookWidget {
                                     context, const NewAccountScreen())
                                 : RouteNavigators.route(
                                     context,
-                                RecipientNewAccountScreen(
+                                    RecipientAccountProfile(
                                       recipientEmail: 'email',
                                       recipientImageUrl: savedPostModel!.post
                                           .postOwnerProfile!.profilePicture,
