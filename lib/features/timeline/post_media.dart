@@ -102,20 +102,6 @@ class _TimeLineVideoMediaState extends State<TimeLineVideoMedia> {
           ),
         ),
         TimeLineVideoPreview(path: widget.url)
-        // VideoPreview(
-        //   path: widget.url,
-        //   isLocalVideo: false,
-        // ),
-        // widget.allMediaUrls != null
-        //     ? Positioned.fill(child: GestureDetector(onTap: () {
-        //   RouteNavigators.route(
-        //       context,
-        //       AppGalleryView(
-        //         mediaPaths: widget.allMediaUrls!,
-        //         initialPage: widget.index,
-        //       ));
-        // }))
-        //     : Container(),
       ]),
     );
   }
@@ -137,8 +123,6 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
   Widget build(BuildContext context) {
     List<String> imageVideoList = [];
     int nImages = (widget.post.imageMediaItems ?? []).length;
-    bool hasVideo = (widget.post.videoMediaItem ?? '').isNotEmpty;
-    bool hasAudio = (widget.post.audioMediaItem ?? '').isNotEmpty;
 
     if (nImages > 0) imageVideoList.addAll(widget.post.imageMediaItems ?? []);
     int imageVideoTotal = imageVideoList.length;
@@ -148,19 +132,12 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
           widget.post.postRating == "Graphic Violence" ||
           widget.post.postRating == "Nudity") {
         if (show == true) {
-          // return FileUtils.isImagePath(imageVideoList.first)
-          //     ?
           return PostImageMedia(
             imageUrl: imageVideoList.first,
             allMediaUrls: imageVideoList,
             postModel: widget.post,
             index: 0,
           );
-          //     : PostVideoMedia(
-          //   url: imageVideoList.first,
-          //   allMediaUrls: imageVideoList,
-          //   index: 0,
-          // );
         } else {
           return ImageBlur(
               widget.post,
@@ -176,20 +153,12 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
           });
         }
       } else {
-        return
-            // FileUtils.isImagePath(imageVideoList.first)
-            //   ?
-            PostImageMedia(
+        return PostImageMedia(
           imageUrl: imageVideoList.first,
           allMediaUrls: imageVideoList,
           postModel: widget.post,
           index: 0,
         );
-        //     : PostVideoMedia(
-        //   url: imageVideoList.first,
-        //   allMediaUrls: imageVideoList,
-        //   index: 0,
-        // );
       }
     } else if (imageVideoTotal == 3) {
       if (widget.post.postRating == "Sensitive" ||
@@ -197,91 +166,68 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
           widget.post.postRating == "Nudity") {
         if (show == true) {
           return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                  child: PostImageMedia(
-                postModel: widget.post,
-                imageUrl: imageVideoList[0],
-                allMediaUrls: imageVideoList,
-                index: 0,
-              )),
-              SizedBox(width: getScreenWidth(5)),
-              Expanded(
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  PostImageMedia(
-                    postModel: widget.post,
-                    imageUrl: imageVideoList[1],
-                    height: 150,
-                    allMediaUrls: imageVideoList,
-                    index: 1,
-                  ),
-                  SizedBox(height: getScreenHeight(5)),
-                  // FileUtils.isImagePath(imageVideoList[2])
-                  //     ?
-                  PostImageMedia(
-                    postModel: widget.post,
-                    imageUrl: imageVideoList[2],
-                    height: 150,
-                    allMediaUrls: imageVideoList,
-                    index: 2,
-                  )
-                  //     : PostVideoMedia(
-                  //   url: imageVideoList[2],
-                  //   height: 150,
-                  //   allMediaUrls: imageVideoList,
-                  //   index: 2,
-                  // )
-                ]),
-              )
-            ],
-          );
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: PostImageMedia(
+                  postModel: widget.post,
+                  imageUrl: imageVideoList[0],
+                  allMediaUrls: imageVideoList,
+                  index: 0,
+                )),
+                SizedBox(width: getScreenWidth(5)),
+                Expanded(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    PostImageMedia(
+                      postModel: widget.post,
+                      imageUrl: imageVideoList[1],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                      index: 1,
+                    ),
+                    SizedBox(height: getScreenHeight(5)),
+                    PostImageMedia(
+                      postModel: widget.post,
+                      imageUrl: imageVideoList[2],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                      index: 2,
+                    )
+                  ]),
+                )
+              ]);
         } else {
           return ImageBlur(
               widget.post,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: PostImageMedia(
-                    postModel: widget.post,
-                    imageUrl: imageVideoList[0],
-                    allMediaUrls: imageVideoList,
-                    index: 0,
-                  )),
-                  SizedBox(width: getScreenWidth(5)),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PostImageMedia(
-                          postModel: widget.post,
-                          imageUrl: imageVideoList[1],
-                          height: 150,
-                          allMediaUrls: imageVideoList,
-                          index: 1,
-                        ),
-                        SizedBox(height: getScreenHeight(5)),
-                        // FileUtils.isImagePath(imageVideoList[2])
-                        //     ?
-                        PostImageMedia(
-                          postModel: widget.post,
-                          imageUrl: imageVideoList[2],
-                          height: 150,
-                          allMediaUrls: imageVideoList,
-                          index: 2,
-                        )
-                        //     : PostVideoMedia(
-                        //   url: imageVideoList[2],
-                        //   height: 150,
-                        //   allMediaUrls: imageVideoList,
-                        //   index: 2,
-                        // )
-                      ],
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Expanded(
+                    child: PostImageMedia(
+                  postModel: widget.post,
+                  imageUrl: imageVideoList[0],
+                  allMediaUrls: imageVideoList,
+                  index: 0,
+                )),
+                SizedBox(width: getScreenWidth(5)),
+                Expanded(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    PostImageMedia(
+                      postModel: widget.post,
+                      imageUrl: imageVideoList[1],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                      index: 1,
                     ),
-                  )
-                ],
-              ), () {
+                    SizedBox(height: getScreenHeight(5)),
+                    PostImageMedia(
+                      postModel: widget.post,
+                      imageUrl: imageVideoList[2],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                      index: 2,
+                    )
+                  ]),
+                )
+              ]), () {
             setState(() {
               show = true;
             });
@@ -309,8 +255,6 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                   index: 1,
                 ),
                 SizedBox(height: getScreenHeight(5)),
-                // FileUtils.isImagePath(imageVideoList[2])
-                //     ?
                 PostImageMedia(
                   postModel: widget.post,
                   imageUrl: imageVideoList[2],
@@ -318,12 +262,6 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                   allMediaUrls: imageVideoList,
                   index: 2,
                 )
-                //     : PostVideoMedia(
-                //   url: imageVideoList[2],
-                //   height: 150,
-                //   allMediaUrls: imageVideoList,
-                //   index: 2,
-                // )
               ]),
             )
           ],
@@ -337,6 +275,124 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
           widget.post.postRating == "Nudity") {
         if (show == true) {
           return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PostImageMedia(
+                        postModel: widget.post,
+                        imageUrl: imageVideoList[0],
+                        height: 150,
+                        allMediaUrls: imageVideoList,
+                        index: 0,
+                      ),
+                      SizedBox(height: getScreenHeight(5)),
+                      PostImageMedia(
+                        postModel: widget.post,
+                        index: 1,
+                        imageUrl: imageVideoList[1],
+                        height: 150,
+                        allMediaUrls: imageVideoList,
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(width: getScreenWidth(5)),
+                Expanded(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    PostImageMedia(
+                      postModel: widget.post,
+                      index: 2,
+                      imageUrl: imageVideoList[2],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                    ),
+                    SizedBox(height: getScreenHeight(5)),
+                    GestureDetector(
+                      onTap: () => RouteNavigators.route(
+                          context,
+                          AppGalleryView(
+                            mediaPaths: imageVideoList,
+                            initialPage: 3,
+                          )),
+                      child: MediaWithCounter(
+                        count: remMedia,
+                        child: PostImageMedia(
+                          postModel: widget.post,
+                          imageUrl: imageVideoList[3],
+                          height: 150,
+                        ),
+                      ),
+                    )
+                  ]),
+                )
+              ]);
+        } else {
+          return ImageBlur(
+              widget.post,
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PostImageMedia(
+                        postModel: widget.post,
+                        imageUrl: imageVideoList[0],
+                        height: 150,
+                        allMediaUrls: imageVideoList,
+                        index: 0,
+                      ),
+                      SizedBox(height: getScreenHeight(5)),
+                      PostImageMedia(
+                        postModel: widget.post,
+                        index: 1,
+                        imageUrl: imageVideoList[1],
+                        height: 150,
+                        allMediaUrls: imageVideoList,
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(width: getScreenWidth(5)),
+                Expanded(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    PostImageMedia(
+                      postModel: widget.post,
+                      index: 2,
+                      imageUrl: imageVideoList[2],
+                      height: 150,
+                      allMediaUrls: imageVideoList,
+                    ),
+                    SizedBox(height: getScreenHeight(5)),
+                    GestureDetector(
+                      onTap: () => RouteNavigators.route(
+                          context,
+                          AppGalleryView(
+                            mediaPaths: imageVideoList,
+                            initialPage: 3,
+                          )),
+                      child: MediaWithCounter(
+                        count: remMedia,
+                        child: PostImageMedia(
+                          postModel: widget.post,
+                          imageUrl: imageVideoList[3],
+                          height: 150,
+                        ),
+                      ),
+                    )
+                  ]),
+                )
+              ]), () {
+            setState(() {
+              show = true;
+            });
+            debugPrint("Show $show");
+          });
+        }
+      } else {
+        return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
@@ -363,137 +419,7 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
               ),
               SizedBox(width: getScreenWidth(5)),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PostImageMedia(
-                      postModel: widget.post,
-                      index: 2,
-                      imageUrl: imageVideoList[2],
-                      height: 150,
-                      allMediaUrls: imageVideoList,
-                    ),
-                    SizedBox(height: getScreenHeight(5)),
-                    GestureDetector(
-                      onTap: () => RouteNavigators.route(
-                          context,
-                          AppGalleryView(
-                            mediaPaths: imageVideoList,
-                            initialPage: 3,
-                          )),
-                      child: MediaWithCounter(
-                        count: remMedia,
-                        child: PostImageMedia(
-                          postModel: widget.post,
-                          imageUrl: imageVideoList[3],
-                          height: 150,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          );
-        } else {
-          return ImageBlur(
-              widget.post,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PostImageMedia(
-                          postModel: widget.post,
-                          imageUrl: imageVideoList[0],
-                          height: 150,
-                          allMediaUrls: imageVideoList,
-                          index: 0,
-                        ),
-                        SizedBox(height: getScreenHeight(5)),
-                        PostImageMedia(
-                          postModel: widget.post,
-                          index: 1,
-                          imageUrl: imageVideoList[1],
-                          height: 150,
-                          allMediaUrls: imageVideoList,
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: getScreenWidth(5)),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PostImageMedia(
-                          postModel: widget.post,
-                          index: 2,
-                          imageUrl: imageVideoList[2],
-                          height: 150,
-                          allMediaUrls: imageVideoList,
-                        ),
-                        SizedBox(height: getScreenHeight(5)),
-                        GestureDetector(
-                          onTap: () => RouteNavigators.route(
-                              context,
-                              AppGalleryView(
-                                mediaPaths: imageVideoList,
-                                initialPage: 3,
-                              )),
-                          child: MediaWithCounter(
-                            count: remMedia,
-                            child: PostImageMedia(
-                              postModel: widget.post,
-                              imageUrl: imageVideoList[3],
-                              height: 150,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ), () {
-            setState(() {
-              show = true;
-            });
-            debugPrint("Show $show");
-          });
-        }
-      } else {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PostImageMedia(
-                    postModel: widget.post,
-                    imageUrl: imageVideoList[0],
-                    height: 150,
-                    allMediaUrls: imageVideoList,
-                    index: 0,
-                  ),
-                  SizedBox(height: getScreenHeight(5)),
-                  PostImageMedia(
-                    postModel: widget.post,
-                    index: 1,
-                    imageUrl: imageVideoList[1],
-                    height: 150,
-                    allMediaUrls: imageVideoList,
-                  )
-                ],
-              ),
-            ),
-            SizedBox(width: getScreenWidth(5)),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
                   PostImageMedia(
                     postModel: widget.post,
                     index: 2,
@@ -518,11 +444,9 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                       ),
                     ),
                   )
-                ],
-              ),
-            )
-          ],
-        );
+                ]),
+              )
+            ]);
       }
     } else {
       // return const Text('media display under construction');
@@ -555,15 +479,7 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                       imageUrl: path,
                       allMediaUrls: imageVideoList,
                       index: index,
-                    )
-                    //     : PostVideoMedia(
-                    //   url: path,
-                    //   scaleIcon: 0.7,
-                    //   allMediaUrls: imageVideoList,
-                    //   index: index,
-                    // )
-
-                    );
+                    ));
               } else {
                 return ImageBlur(
                   widget.post,
@@ -580,14 +496,7 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                         imageUrl: path,
                         allMediaUrls: imageVideoList,
                         index: index,
-                      )
-                      //     : PostVideoMedia(
-                      //   url: path,
-                      //   scaleIcon: 0.7,
-                      //   allMediaUrls: imageVideoList,
-                      //   index: index,
-                      // )
-                      ),
+                      )),
                   () {
                     setState(() {
                       show = true;
@@ -609,14 +518,7 @@ class _TimeLinePostMediaState extends State<TimeLinePostMedia> {
                     imageUrl: path,
                     allMediaUrls: imageVideoList,
                     index: index,
-                  )
-                  //     : PostVideoMedia(
-                  //   url: path,
-                  //   scaleIcon: 0.7,
-                  //   allMediaUrls: imageVideoList,
-                  //   index: index,
-                  // ),
-                  );
+                  ));
             }
           });
     }

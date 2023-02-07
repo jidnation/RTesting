@@ -30,7 +30,16 @@ class TimeLineController extends GetxController {
   RxBool currentStatus = false.obs;
   RxString currentId = "".obs;
 
-  RxList<CustomCounter> getExactBox(String type) {
+  ///
+  /// test 4
+  /// on both likePost and getLikeValues functions there is a map with
+  /// equal parameters, find a way of removing the repeating variable
+  ///
+  likePost(
+      {required String id,
+      required String type,
+      String? postId,
+      String? isLikes}) async {
     Map<String, dynamic> mapper = {
       'profile': likeBox2,
       'post': likeBox,
@@ -40,18 +49,10 @@ class TimeLineController extends GetxController {
       'comment': likeCommentBox,
       'save': likeSavedBox,
     };
-    return mapper[type];
-  }
-
-  likePost(
-      {required String id,
-      required String type,
-      String? postId,
-      String? isLikes}) async {
     LikeModel likeModel = LikeModel(nLikes: 0, isLiked: false);
     CustomCounter actualModel =
-        getExactBox(type).firstWhere((element) => element.id == id);
-    int index = getExactBox(type).indexOf(actualModel);
+        mapper[type].firstWhere((element) => element.id == id);
+    int index = mapper[type].indexOf(actualModel);
 
     if (type == 'likes') {
       likeBox3.remove(actualModel);
@@ -69,16 +70,21 @@ class TimeLineController extends GetxController {
         await MomentQuery().likePostComment(commentId: id, postId: postId);
       }
     }
-    getExactBox(type)[index] = CustomCounter(id: id, data: likeModel);
-    // }
-    //   likeBox[key] = likeModel;
-    // });
-    // }
+    mapper[type][index] = CustomCounter(id: id, data: likeModel);
   }
 
   LikeModel getLikeValues({required String id, required String type}) {
+    Map<String, dynamic> mapper = {
+      'profile': likeBox2,
+      'post': likeBox,
+      'likes': likeBox3,
+      'upvote': likeUpBox,
+      'downvote': likeDownBox,
+      'comment': likeCommentBox,
+      'save': likeSavedBox,
+    };
     late LikeModel likeValue;
-    for (CustomCounter customCounter in getExactBox(type)) {
+    for (CustomCounter customCounter in mapper[type]) {
       if (customCounter.id == id) {
         likeValue = customCounter.data;
         return likeValue;
@@ -196,13 +202,6 @@ class TimeLineController extends GetxController {
                   ),
                 ),
               ])
-              // Container(
-              //   height: 50,
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(10),
-              //     borde
-              //   ),
-              // )
             ]));
   }
 }

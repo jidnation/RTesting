@@ -52,7 +52,6 @@ class MomentQuery {
       // (\$caption: String, \$hashTags: [String], \$mentionList: [String], \$sound: String, \$videoMediaItem: String)
       variables: momentVariables,
     ));
-    log('from my first-query::::: ${queryResult}');
     return queryResult.data?['createMoment']['authId'] != null;
   }
 
@@ -77,7 +76,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my first-query::::: ${queryResult}');
     // return queryResult.data?['createMoment']['authId'] != null;
   }
 
@@ -102,7 +100,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeMoment']['authId'] != null;
   }
 
@@ -134,7 +131,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my post comment reply::::: $queryResult');
     return queryResult.data?['replyCommentOnPost']['authId'] != null;
   }
 
@@ -163,7 +159,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeMomentComment']['authId'] != null;
   }
 
@@ -192,7 +187,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeCommentOnPost']['authId'] != null;
   }
 
@@ -235,7 +229,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['createMomentComment']['authId'] != null;
   }
 
@@ -269,7 +262,6 @@ class MomentQuery {
       ),
       variables: commentBody,
     ));
-    log('from my reply comment-query::::: $queryResult');
     return queryResult.data?['replyMomentComment']['authId'] != null;
   }
 
@@ -294,7 +286,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from the reaching user end::::: $queryResult');
     // return queryResult.data?['likeMoment']['authId'] != null;
   }
 
@@ -319,7 +310,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMoment'] ?? false;
   }
 
@@ -348,7 +338,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMomentComment'] ?? false;
   }
 
@@ -376,7 +365,6 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my comment-post-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeCommentOnPost'] != 'false' ?? false;
   }
 
@@ -414,7 +402,6 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from my feed-query::::: $queryResult');
     if (queryResult.data != null) {
       return MomentFeedModel.fromJson(queryResult.data!);
     } else {
@@ -444,7 +431,6 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from my moment-query::::: $queryResult');
     if (queryResult.data != null) {
       return Moment.fromJson(queryResult.data!['getMoment']);
     } else {
@@ -475,7 +461,6 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from getting commentInfo-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetMomentComment.fromJson(queryResult.data!['getMomentComment']);
     } else {
@@ -506,7 +491,6 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from my moment-query::::: ${queryResult.data?['getMomentLikes']}');
     if (queryResult.data != null) {
       // return GetMomentFeed.fromJson(queryResult.data!);
     } else {
@@ -536,7 +520,6 @@ class MomentQuery {
       'pageLimit': pageLimit ?? 30,
     };
 
-    print(':::::::::::::from checking plug::::: $queryVariables');
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
@@ -546,7 +529,6 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from my moment-comments-query::::: $queryResult');
     if (queryResult.data != null) {
       return MomentCommentModel.fromJson(queryResult.data!).getMomentComments;
     } else {

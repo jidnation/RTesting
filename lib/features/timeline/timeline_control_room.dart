@@ -64,10 +64,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<CustomUser> _suggestedUsers = <CustomUser>[];
   List<CustomUser> get suggestedUser => _suggestedUsers;
 
-  //
-  // List<CustomCounter> _likedBox = <CustomCounter>[];
-  // List<CustomCounter> get likedBox => _likedBox;
-
   initialize(
       {bool? isTextEditing,
       bool? isPosting,
@@ -269,6 +265,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     } else {
       if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
         actualModel.getPostFeed.post?.isVoted = 'Upvote';
+        actualModel.getPostFeed.post?.nUpvotes =
+            actualModel.getPostFeed.post!.nUpvotes! + 1;
         notifyListeners();
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
@@ -276,7 +274,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         );
         if (response) {
           initialize(isUpvoting: true, isRefreshing: true);
-          fetchMyPost(isRefresh: true);
+          fetchAll(isFirst: true);
           Snackbars.success(
             context,
             message:
@@ -294,24 +292,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
     fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
-
-  // updateTimeLine(String id) async {
-  //   List<TimeLineModel> currentData = value;
-  //   TimeLineModel actualModel =
-  //       currentData.firstWhere((element) => element.id == id);
-  //   Post post = actualModel.getPostFeed.post!;
-  //   Post? response = await timeLineQuery.getPost(postId: post.postId!);
-  //   if (response != null) {
-  //     post.isLiked = response.isLiked!;
-  //     post.nLikes = response.nLikes!;
-  //     post.nUpvotes = response.nUpvotes!;
-  //     post.nDownvotes = response.nDownvotes!;
-  //     post.isVoted = response.isVoted!;
-  //     post.nComments = response.nComments!;
-  //   } else {
-  //     notifyListeners();
-  //   }
-  // }
 
   Future<bool?> getReachRelationship(
       {required String usersId, required String type}) async {
@@ -482,7 +462,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   pt.PostFeedModel? getPostModelById(String timeLineId,
       {required String type}) {
-    print(":::::::::::::::::: type ::: $type");
     List<TimeLineModel> currentPosts = getExactValue(type);
     TimeLineModel actualModel =
         currentPosts.firstWhere((element) => element.id == timeLineId);
@@ -536,7 +515,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (response.isRight()) {
       response.forEach((r) {
         _userStatus = r;
-        print("::::::::: am here boss :::::ddddddd::  $_userStatus");
       });
       getMutedStatus();
       notifyListeners();
@@ -617,7 +595,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           }
         }
       }
-      print(">>>>>>>>>> from media upload ::::: ${response["data"]["link"]}");
     }
 
     Either<String, pt.PostModel> response = await SocialServiceRepository()
@@ -662,13 +639,12 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         await UserRepository().getUserProfileByUsername(username: username);
     UserList? userInformation;
     User? userInfo;
-    debugPrint("User info 1: ${userInformation?.user.first.username}");
+
     if (response.isRight()) {
       response.map(
         (r) => userInformation = r,
       );
       userInfo = userInformation?.user.first;
-      debugPrint("User info: ${userInfo?.username}");
       RouteNavigators.route(
           context,
           RecipientAccountProfile(
@@ -725,11 +701,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         await SocialServiceRepository().suggestUser();
     if (response.isRight()) {
       response.forEach((userList) {
-        print(
-            "<<<<<<<<<<<>>>>>>>>>>>>>>>> ::::::::: ${userList.first.reaching}");
-        for (var element in userList) {
-          print(">>>>>>>>>>>>>>>>>>>>${element.reaching?.reacherId}");
-        }
+        for (var element in userList) {}
         for (User user in userList) {
           _suggestedUsers.add(CustomUser(user: user));
         }
@@ -1029,7 +1001,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             ? _myUpVotedPosts.isEmpty
             : _myDownVotedPosts.isEmpty) ||
         isRefresh) {
-      print("::::::::::: am in here boss 0");
       List<GetPostFeed>? response = await timeLineQuery.getVotedPosts(
           authIdToGet: userId ?? globals.userId, votingType: type);
       if (response != null) {

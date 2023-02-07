@@ -157,7 +157,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
-                    print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
                     List<StatusFeedResponseModel> _userStatus =
@@ -236,11 +235,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   statusCount: _myStatus.length,
                                                   username: 'Your Status',
                                                   onTap: () {
-                                                    // RouteNavigators.route(
-                                                    //     context,
-                                                    //     ViewMyStatus(
-                                                    //         status: _myStatus));
-
                                                     RouteNavigators.route(
                                                         context,
                                                         StatusViewPage(
@@ -310,12 +304,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                 .muteStatus(
                                                                     index);
                                                           }
-
-                                                          // Navigator.push(
-                                                          //     context,
-                                                          //     MaterialPageRoute(
-                                                          //         builder: (c) =>
-                                                          //             const StoryPage()));
                                                         },
                                                       ),
                                                   itemCount:
@@ -393,12 +381,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                             .unMuteStatus(
                                                                 index);
                                                       }
-
-                                                      // Navigator.push(
-                                                      //     context,
-                                                      //     MaterialPageRoute(
-                                                      //         builder: (c) =>
-                                                      //             const StoryPage()));
                                                     },
                                                   ),
                                               itemCount: _mutedStatus.length),
@@ -410,8 +392,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                             Expanded(
                                 child: value.isEmpty
                                     ? const UserSuggestionWidget()
-                                    // ? EmptyTimelineWidget(
-                                    //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
                                         physics: const BouncingScrollPhysics(),
                                         onRefresh: () {
@@ -420,8 +400,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                 _refreshController,
                                             isRefreshing: true,
                                           );
-                                          // await Future.delayed(const Duration(seconds: 10));
-                                          // _refreshController.refreshCompleted();
                                         },
                                         controller: _refreshController,
                                         child: ListView.builder(
@@ -445,8 +423,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   await image.toByteData(
                                                       format: ui
                                                           .ImageByteFormat.png);
-                                              debugPrint(
-                                                  "Byte Data: $byteData");
                                               await timeLineController
                                                   .saveImage(
                                                       context,
@@ -464,6 +440,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                     bottom: 15),
                                                 child: RepaintBoundary(
                                                   key: src,
+
+                                                  ///
+                                                  /// test 3
+                                                  /// convert this stack widget to its column equivalent
                                                   child: Stack(children: [
                                                     TimeLineBox(
                                                       userStatusFeed:

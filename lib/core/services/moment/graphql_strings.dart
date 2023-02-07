@@ -404,7 +404,6 @@ query ($replyId: String!) {
 const String getPostFeeds = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! ) {
   getPostFeed(page_limit: $pageLimit, page_number: $pageNumber){
-    reachingRelationship,
     created_at,
     updated_at,
     feedOwnerProfile{

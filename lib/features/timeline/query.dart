@@ -45,7 +45,6 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
-    log('from my timeline-query::::: $queryResult');
     if (queryResult.data != null) {
       return PostFeedModel.fromJson(queryResult.data!).getPostFeed;
     } else {
@@ -76,7 +75,6 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
-    log('from my timeline-post-getting-query::::: $queryResult');
     if (queryResult.data != null) {
       return Post.fromJson(queryResult.data!['getPost']);
     } else {
@@ -108,7 +106,6 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
-    log('from my reach-getting-query::::: $queryResult');
     if (queryResult.data != null) {
       return queryResult.data!['getReachRelationship'] ?? false;
     } else {
@@ -137,7 +134,6 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
-    log('from my post-Liking-query::::: $queryResult');
     return queryResult.data?['likePost']['authId'] != null;
   }
 
@@ -166,7 +162,6 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
-    log('from my post-voting-query::::: $queryResult');
     return queryResult.data?['votePost'] ?? false;
   }
 
@@ -191,7 +186,6 @@ class TimeLineQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my post-unLiking-query::::: $queryResult');
     return queryResult.data?['deletePostVote'] ?? false;
   }
 
@@ -216,7 +210,6 @@ class TimeLineQuery {
       ),
       variables: momentVariables,
     ));
-    log('from my post-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikePost'] ?? false;
   }
 
@@ -229,7 +222,6 @@ class TimeLineQuery {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
-      print('::::::::::::::::::::::::::::from status:: $posts');
       return posts;
     } on GraphQLError catch (e) {
       return null;
@@ -245,7 +237,6 @@ class TimeLineQuery {
         pageLimit: pageLimit,
         pageNumber: pageNumber,
       );
-      print('::::::::::::::::::::::::::::from status:: $posts');
       return posts;
     } on GraphQLError catch (e) {
       return null;
@@ -282,7 +273,6 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
-    log('from my-my-timeline-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetAllPostsModel.fromJson(queryResult.data!).getAllPosts;
     } else {
@@ -320,7 +310,6 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
-    log('from my-my-timeline-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetMyCommentsModel.fromJson(queryResult.data!).getPersonalComments;
     } else {
@@ -348,8 +337,6 @@ class TimeLineQuery {
     };
 
     authIdToGet != null ? queryVariables.addAll({'authId': authIdToGet}) : null;
-
-    print(":::::::::::::::::::::::::::::::::::::: $authIdToGet ");
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
@@ -360,7 +347,6 @@ class TimeLineQuery {
         variables: queryVariables,
       ),
     );
-    log('from my-liked-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetLikedPosts.fromJson(queryResult.data!).getLikedPosts;
     } else {
@@ -397,7 +383,6 @@ class TimeLineQuery {
         variables: queryVariables,
       ),
     );
-    log('from my-saved-posts-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetAllSavedPosts.fromJson(queryResult.data!).getAllSavedPosts;
     } else {
@@ -440,7 +425,6 @@ class TimeLineQuery {
         variables: queryVariables,
       ),
     );
-    log('from my-liked-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetVotedPosts.fromJson(queryResult.data!).getVotedPosts;
     } else {

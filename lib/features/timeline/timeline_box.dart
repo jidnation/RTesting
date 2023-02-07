@@ -57,7 +57,6 @@ class _TimeLineBoxState extends State<TimeLineBox> {
     Post? tPostInfo = widget.timeLineModel.getPostFeed.post;
     ErProfile? tPostOwnerInfo = tPostInfo?.postOwnerProfile;
 
-    //working on the images
     List<String> images = tPostInfo?.imageMediaItems ?? [];
 
     Future<String> saveImage(Uint8List? bytes) async {
@@ -370,12 +369,20 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                     'This reach was edited ${Helper.parseUserLastSeen(tPostInfo.updatedAt.toString())}',
               ),
               SizedBox(height: tPostInfo.content!.isNotEmpty ? 8 : 0),
+
+              ///
+              /// image section
+              ///
               Visibility(
                   visible: images.isNotEmpty,
                   child: TimeLinePostMedia(
                       post: timeLineFeedStore
                           .getPostModel(timeLineModel: widget.timeLineModel)!
                           .post!)),
+
+              ///
+              /// video section
+              ///
               SizedBox(height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
               widget.timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
                   ? Container(
@@ -399,6 +406,10 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                     )
                   : const SizedBox.shrink(),
               SizedBox(height: tPostInfo.audioMediaItem!.isNotEmpty ? 10 : 0),
+
+              ///
+              /// audio section
+              ///
               Visibility(
                 visible: tPostInfo.audioMediaItem!.isNotEmpty,
                 child: Container(
@@ -417,12 +428,17 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                   ]),
                 ),
               ),
+
               SizedBox(
                   height: (tPostInfo.audioMediaItem!.isNotEmpty ||
                           tPostInfo.videoMediaItem!.isNotEmpty ||
                           tPostInfo.content!.isNotEmpty)
                       ? 8
                       : 0),
+
+              ///
+              /// reported post section
+              ///
               (widget.timeLineModel.getPostFeed.post!.repostedPost != null)
                   ? TimelineRepostedPost(
                       tPostInfo: timeLineFeedStore

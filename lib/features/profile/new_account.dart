@@ -75,6 +75,9 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
           height: SizeConfig.screenHeight,
           width: SizeConfig.screenWidth,
           child: Column(children: [
+            ///
+            /// test 1
+            /// fix the image issue
             Visibility(
               visible: foldMe,
               child: Stack(
@@ -82,12 +85,14 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                   fit: StackFit.passthrough,
                   clipBehavior: Clip.none,
                   children: <Widget>[
+                    ///
                     /// Banner image
+                    ///
                     SizedBox(
                       height: getScreenHeight(200),
                       width: size.width,
                       child: GestureDetector(
-                        child: const CoverPicture(),
+                        child: Image.asset(globals.user!.coverPicture!),
                         onTap: () {
                           RouteNavigators.route(
                               context,
@@ -399,6 +404,10 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                 ]),
               ),
             ),
+
+            ///
+            /// test 2
+            ///center the image
             Visibility(
               visible: !foldMe,
               child: Container(

@@ -55,7 +55,6 @@ class MomentVideoControl {
       // });
       return file;
     } on CameraException catch (e) {
-      print('Error stopping video recording: $e');
       return null;
     }
   }
@@ -69,9 +68,7 @@ class MomentVideoControl {
     }
     try {
       await videoController.pauseVideoRecording();
-    } on CameraException catch (e) {
-      print('Error pausing video recording: $e');
-    }
+    } on CameraException catch (e) {}
   }
 
   Future<void> resumeVideoRecording({
@@ -83,9 +80,7 @@ class MomentVideoControl {
     }
     try {
       await videoController.resumeVideoRecording();
-    } on CameraException catch (e) {
-      print('Error resuming video recording: $e');
-    }
+    } on CameraException catch (e) {}
   }
 
   Future<void> startVideoPlayer(BuildContext context,
@@ -237,18 +232,13 @@ class MomentVideoControl {
           timeLimit = '00:' '0$min:' + sec.toString();
         }
       }
-      print(
-          "::::::::::::::::::::::::::::::::::::::::::::::: the time:  $timeLimit");
       String commandToExecute =
           '-r 15 -f mp4 -i $videoPath -f mp3 -i $audioPath -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -t $timeLimit -y $outputPath';
-      print(":::::::::::::::::::::: MERGING STARTED :::::::::::::::");
+
       File(outputPath).delete();
       await FFmpegKit.executeAsync(commandToExecute, (session) async {
         final ReturnCode? returnCode = await session.getReturnCode();
         if (ReturnCode.isSuccess(returnCode)) {
-          print(":::::::::::::::::::::: MERGING SUCCESS :::::::::::::::");
-          // String file = await MediaService()
-          //     .compressMomentVideo(filePath: outputPath);
           momentCtrl.mergedVideoPath(outputPath);
           videoController = VideoPlayerController.file(File(outputPath));
           await videoController!.initialize().then((_) {
@@ -264,7 +254,6 @@ class MomentVideoControl {
         } else if (ReturnCode.isCancel(returnCode)) {
           // CANCEL
         } else {
-          print(":::::::::::::::::::::: MERGING FAIL :::::::::::::::");
           Snackbars.error(context, message: 'Operation Fail, Try Again.');
           Get.back();
           // ERROR

@@ -51,14 +51,8 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   bool _gettingUserComment = false;
   bool get gettingUserComment => _gettingUserComment;
 
-  // bool _postingMoment = false;
-  // bool get postingMoment => _postingMoment;
-
   int _currentSaveIndex = 0;
   int get currentSaveIndex => _currentSaveIndex;
-
-  // List<CustomMomentCommentModel> _momentComments = <CustomMomentCommentModel>[];
-  // List<CustomMomentCommentModel> get momentComments => _momentComments;
 
   final VideoControllerService _videoControllerService =
       CachedVideoControllerService(DefaultCacheManager());
@@ -96,10 +90,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         ));
       }
     }
-    // _combinedMomentList = value;
-    print('................. IT IS DONE..................... $value..   ..');
-    // print(
-    //     '................. IT IS DONE2........n ${value.first.momentId}........');
     _gettingMoments = false;
     cacheValues();
     notifyListeners();
@@ -157,7 +147,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         // if (momentCount > 5) {
         count = 0;
         for (MomentModel momentFeed in value) {
-          print('....caching started......>>>>>>>>>>>:::::::::::::::::::>>>>>');
           await videoControllerService
               .getControllerForVideo(momentFeed.videoUrl);
           ++count;
@@ -169,8 +158,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         }
       } else {
         for (MomentModel momentFeed in value) {
-          print(
-              ":::::::::::::::::::::::::::::::::::::::::::::the else is running");
           await videoControllerService
               .getControllerForVideo(momentFeed.videoUrl);
           _currentSaveIndex = momentCount;
@@ -187,12 +174,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       currentVideoController.pause();
     }
   }
-
-  // updateMerger(bool value, {bool? isDone}) {
-  //   _stillMerging = value;
-  //   _mergingDone = isDone ?? false;
-  //   notifyListeners();
-  // }
 
   cacheNextFive(int currentCount) async {
     late int counter;
@@ -234,9 +215,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         }
       }
     }
-    print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called :::::: $momentId');
-
-    print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called2 :::::: $response');
     if (response) {
       getMoment(momentId: momentId, id: id);
     }
@@ -251,8 +229,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     CustomMomentCommentModel commentModel = actualMomentModel.momentComments
         .firstWhere((element) => commentId == element.id);
     if (commentModel.getMomentComment.isLiked != 'false') {
-      // momentModel.isLiked = false;
-      // momentModel.nLikes -= 1;
       response = await momentQuery.unlikeMomentComment(
           commentId: commentModel.getMomentComment.commentId!,
           likeId: commentModel.getMomentComment.isLiked!);
@@ -263,10 +239,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           momentId: actualMomentModel.momentId,
           commentId: commentModel.getMomentComment.commentId!);
     }
-    print(
-        'isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called :::::: ${actualMomentModel.momentId}');
 
-    print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called2 :::::: $response');
     if (response) {
       getMomentComment(id: id, commentId: commentId);
     }
@@ -275,7 +248,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
 
   //updating only the consider moment
   getMoment({required String momentId, required String id}) async {
-    print('getting moment called::::::: $value');
     List<MomentModel> currentList = value;
     Moment? response = await momentQuery.getMoment(momentId: momentId);
 
@@ -293,10 +265,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   }
 
   getMomentComment({required String id, required String commentId}) async {
-    print('getting moment comment called::::::: $id');
-    // List<MomentModel> currentCommentList = value;
-    // CustomMomentCommentModel commentModel =
-    //     currentCommentList.firstWhere((element) => element.id == id);
     List<MomentModel> currentList = value;
     MomentModel actualMomentModel =
         currentList.firstWhere((element) => element.id == id);
@@ -307,15 +275,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         commentId: commentModel.getMomentComment.commentId!);
 
     if (response != null) {
-      // for (CustomMomentCommentModel momentComment in currentCommentList) {
-      //   if (momentComment.id == id) {
       commentModel.getMomentComment.isLiked = response.isLiked!;
       commentModel.getMomentComment.nReplies = response.nReplies!;
       commentModel.getMomentComment.nLikes = response.nLikes;
       notifyListeners();
       return;
-      //   }
-      // }
     }
   }
 
@@ -327,18 +291,14 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         url: response["data"]['signedUrl'],
         file: file,
       );
-      print(":::::::::>>><<< ${uploadResponse.toString()}");
       if (uploadResponse.toString() == 'Right(Upload successful)') {
         return response["data"]["link"];
       }
     }
-    print(">>>>>>>>>> from media upload ::::: ${response["data"]["link"]}");
     return null;
   }
 
   postMoment(BuildContext context, {required String? videoPath}) async {
-    print(
-        "file size Before compressing::::::::  ${await File(videoPath!).stat().then((value) => value.size)}");
     CustomDialog.openDialogBox(
         height: SizeConfig.screenHeight * 0.9,
         width: SizeConfig.screenWidth,
@@ -362,47 +322,43 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
 
     ///compressing done here
 
-      MediaInfo? mediaInfo = await VideoCompress.compressVideo(
-        videoPath,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false, // It's false by default
-      );
-      print("::::::::after compression file size::: ${mediaInfo!.filesize}");
+    MediaInfo? mediaInfo = await VideoCompress.compressVideo(
+      videoPath!,
+      quality: VideoQuality.MediumQuality,
+      deleteOrigin: false, // It's false by default
+    );
 
-      ///url converting done here
-      if (mediaInfo.file != null) {
-        String? videoUrl = await uploadMediaFile(file: mediaInfo.file!);
+    ///url converting done here
+    if (mediaInfo!.file != null) {
+      String? videoUrl = await uploadMediaFile(file: mediaInfo.file!);
 
-        print(":::::::::::::::::::::::::::n printing starrted :::::");
-        if (videoUrl != null) {
-          var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
-          if (res) {
-            fetchMoment();
-            momentCtrl.clearPostingData();
-            Snackbars.success(
-              context,
-              message: 'Moment successfully created',
-              milliseconds: 1300,
-            );
-            momentCtrl.clearPostingData();
-            RouteNavigators.pop(context);
-          } else {
-            Snackbars.error(
-              context,
-              message: 'Operation Failed, Try again.',
-              milliseconds: 1400,
-            );
-          }
+      if (videoUrl != null) {
+        var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+        if (res) {
+          fetchMoment();
+          momentCtrl.clearPostingData();
+          Snackbars.success(
+            context,
+            message: 'Moment successfully created',
+            milliseconds: 1300,
+          );
+          momentCtrl.clearPostingData();
+          RouteNavigators.pop(context);
+        } else {
+          Snackbars.error(
+            context,
+            message: 'Operation Failed, Try again.',
+            milliseconds: 1400,
+          );
         }
-        // _postingMoment = false;
-        Get.close(2);
       }
-
+      // _postingMoment = false;
+      Get.close(2);
+    }
   }
 
   reachUser({required String toReachId, required String id}) async {
     var response = await momentQuery.reachUser(reachingId: toReachId);
-    print('from the reaching end this is us>>>>>>>>>>>>> $response');
   }
 
 //  Commenting on user moment
@@ -441,25 +397,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
     return response;
   }
-  //
-  // getMomentComments(
-  //     {required String momentId, int? pageLimit, int? pageNumber}) async {
-  //   _gettingUserComment = true;
-  //   List<GetMomentComment>? response =
-  //       await momentQuery.getMomentComments(momentId: momentId);
-  //   if (response != null) {
-  //     print(
-  //         "::::::::::::::::::::::::::::;; getting momment Comments done::::::::::::::::");
-  //     // _momentComments.clear();
-  //     for (GetMomentComment element in response) {
-  //       // _momentComments.add(CustomMomentCommentModel(element));
-  //     }
-  //   }
-  //   _gettingUserComment = false;
-  //   notifyListeners();
-  // }
 
-  //TODO: making it flexible with the previous comment length
   updateMomentComments({required String id}) async {
     _gettingUserComment = true;
     List<MomentModel> currentList = value;
@@ -474,15 +412,12 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         updateCommentList.add(CustomMomentCommentModel(element));
       }
       actualMomentModel.momentComments = updateCommentList;
-      print(
-          "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
       notifyListeners();
     }
     _gettingUserComment = false;
     notifyListeners();
   }
 
-  // ($momentId: String!, $commentId: String!, $content: String!)
   Future<bool> replyCommentOnMoment(BuildContext context,
       {required String id,
       required String commentId,
@@ -514,47 +449,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
     return response;
   }
-  //
-  // getMomentComments(
-  //     {required String momentId, int? pageLimit, int? pageNumber}) async {
-  //   _gettingUserComment = true;
-  //   List<GetMomentComment>? response =
-  //       await momentQuery.getMomentComments(momentId: momentId);
-  //   if (response != null) {
-  //     print(
-  //         "::::::::::::::::::::::::::::;; getting momment Comments done::::::::::::::::");
-  //     // _momentComments.clear();
-  //     for (GetMomentComment element in response) {
-  //       // _momentComments.add(CustomMomentCommentModel(element));
-  //     }
-  //   }
-  //   _gettingUserComment = false;
-  //   notifyListeners();
-  // }
-
-  //TODO: making it flexible with the previous comment length
-  // updateMomentComments({required String id}) async {
-  //   _gettingUserComment = true;
-  //   List<MomentModel> currentList = value;
-  //   MomentModel actualMomentModel =
-  //       currentList.firstWhere((element) => element.id == id);
-
-  //   List<GetMomentComment>? response = await momentQuery.getMomentComments(
-  //       momentId: actualMomentModel.momentId);
-  //   if (response != null) {
-  //     List<CustomMomentCommentModel> updateCommentList = [];
-  //     for (GetMomentComment element in response) {
-  //       updateCommentList.add(CustomMomentCommentModel(element));
-  //     }
-  //     updateCommentList = updateCommentList.reversed.toList();
-  //     actualMomentModel.momentComments = updateCommentList;
-  //     print(
-  //         "::::::::::::::::::;; getting moment Comments done::::::::::::::::");
-  //     notifyListeners();
-  //   }
-  //   _gettingUserComment = false;
-  //   notifyListeners();
-  // }
 
   Future<List<CustomMomentCommentModel>> getMyMomentComments(
       {required String momentId, int? pageLimit, int? pageNumber}) async {
@@ -571,11 +465,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       return [];
     }
   }
-
-  // void startReading() {
-  //   _postingMoment = true;
-  //   notifyListeners();
-  // }
 }
 
 class MomentModel {
