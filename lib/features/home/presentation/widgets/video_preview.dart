@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
@@ -64,6 +66,7 @@ class _VideoPreviewState extends State<VideoPreview> {
             ? BetterPlayerDataSourceType.file
             : BetterPlayerDataSourceType.network,
         widget.path,
+        // videoFormat: Platform.isIOS? BetterPlayerVideoFormat.hls:BetterPlayerVideoFormat.dash,
         cacheConfiguration: BetterPlayerCacheConfiguration(
           useCache: true,
           // preCacheSize: 10 * 1024 * 1024,
@@ -72,7 +75,8 @@ class _VideoPreviewState extends State<VideoPreview> {
 
           ///Android only option to use cached video between app sessions
           key: widget.path,
-        ));
+        )
+        );
 
     _betterPlayerController = BetterPlayerController(
       betterPlayerConfiguration,

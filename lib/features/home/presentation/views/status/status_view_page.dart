@@ -11,6 +11,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
@@ -40,6 +41,7 @@ class StatusViewPage extends StatefulHookWidget {
 
 class _StatusViewPageState extends State<StatusViewPage> {
   int _remTime = 5;
+  int _statusDur = 0;
   double _percent = 0;
   late Timer _timer;
   List<bool> _watched = [];
@@ -90,12 +92,13 @@ class _StatusViewPageState extends State<StatusViewPage> {
     }
   }
 
-  void _startTimer(int milliSec, {double? percent}) {
+  void _startTimer(int milliSec, {double? percent, bool? useCustomTime}) {
     _remTime = milliSec;
-    double _factor = (50 / statusMillisec);
+    double _factor =
+        (useCustomTime ?? false) ? (50 / _statusDur) : (50 / statusMillisec);
     _percent = percent ?? 0;
     _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (_percent + _factor < 1) {
+      if ((_percent + _factor) < 1) {
         _percent += _factor;
         _remTime -= 50;
         if (mounted) {
@@ -105,11 +108,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
         _percent = 1;
         _watched[_currentIndex] = true;
         if (_currentIndex < widget.status.length - 1) {
-          _currentIndex++;
-          if (mounted) {
-            setState(() {});
-          }
-          _changeStatus();
+          _nextStatus();
         } else {
           // Navigator.pop(context);
           _timer.cancel();
@@ -119,9 +118,9 @@ class _StatusViewPageState extends State<StatusViewPage> {
     });
   }
 
-  void _restartTimer(int milliSecs) {
+  void _restartTimer(int milliSecs, {bool? useCustomTime}) {
     _timer.cancel();
-    _startTimer(milliSecs);
+    _startTimer(milliSecs, useCustomTime: useCustomTime);
   }
 
   void _initStatus() {
@@ -130,7 +129,13 @@ class _StatusViewPageState extends State<StatusViewPage> {
     } else if (story.status?.statusData?.audioMedia != null) {
       debugPrint("audio Player file: ${story.status!.statusData!.audioMedia}");
       audioPlayer.play(UrlSource("${story.status!.statusData!.audioMedia}"));
-      _startTimer(30000);
+      audioPlayer.getDuration().then((value) {
+        _statusDur = (value?.inMilliseconds ?? 30000) > 30000
+            ? 30000
+            : (value?.inMilliseconds ?? 30000);
+        setState(() {});
+        _startTimer(_statusDur, useCustomTime: true);
+      });
     } else if (story.status?.statusData?.videoMedia != null) {
       _percent = 0;
       setState(() {});
@@ -149,14 +154,19 @@ class _StatusViewPageState extends State<StatusViewPage> {
     if (story.status?.type == 'text') {
       _restartTimer(7000);
     } else if (story.status?.statusData?.audioMedia != null) {
+      _timer.cancel();
+      _percent = 0;
+      setState(() {});
       debugPrint("audio Player file: ${story.status!.statusData!.audioMedia}");
       await audioPlayer
           .play(UrlSource("${story.status!.statusData!.audioMedia}"));
-      audioPlayer.onPlayerStateChanged.listen((state) {
-        if (state == PlayerState.playing && !_audioPaused) {
-          _restartTimer(30000);
-          _audioPaused = false;
-        } else if (state == PlayerState.completed) {}
+      // final duration = await
+      audioPlayer.getDuration().then((value) {
+        _statusDur = (value?.inMilliseconds ?? 30000) > 30000
+            ? 30000
+            : (value?.inMilliseconds ?? 30000);
+        setState(() {});
+        _restartTimer(_statusDur, useCustomTime: true);
       });
     } else if (story.status?.statusData?.videoMedia != null) {
       _timer.cancel();
@@ -168,11 +178,15 @@ class _StatusViewPageState extends State<StatusViewPage> {
   }
 
   void _resumeTimer() {
-    _startTimer(_remTime, percent: _percent);
+    _startTimer(_remTime,
+        percent: _percent,
+        useCustomTime: story.status?.statusData?.audioMedia != null ||
+            story.status?.statusData?.videoMedia != null);
     globals.statusVideoController?.play();
     if (audioPlayer.state == PlayerState.paused) {
       _audioPaused = false;
       audioPlayer.resume();
+      setState(() {});
     }
     if (mounted) setState(() {});
   }
@@ -184,10 +198,11 @@ class _StatusViewPageState extends State<StatusViewPage> {
     if (audioPlayer.state == PlayerState.playing) {
       _audioPaused = true;
       audioPlayer.pause();
+      setState(() {});
     }
   }
 
-  void _previousStatus() {
+  Future<void> _previousStatus() async {
     // as long as this isnt the first story
     if (_currentIndex > 0) {
       // set previous and curent story watched percentage back to 0
@@ -196,17 +211,17 @@ class _StatusViewPageState extends State<StatusViewPage> {
       // go to previous story
       _currentIndex--;
       setState(() {});
-      _changeStatus();
+      await _changeStatus();
     } else if (_currentIndex == 0) {
       // set previous and curent story watched percentage back to 0
       _watched[_currentIndex] = false;
       // go to previous story
       setState(() {});
-      _changeStatus();
+      await _changeStatus();
     }
   }
 
-  void _nextStatus() {
+  Future<void> _nextStatus() async {
     // if there are more stories left
     if (_currentIndex < widget.status.length - 1) {
       // finish current story
@@ -214,7 +229,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
       // move to next story
       _currentIndex++;
       setState(() {});
-      _changeStatus();
+      await _changeStatus();
     }
     // if user is on the last story, finish this story
     else {
@@ -273,9 +288,15 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                 key: Key(story.status!.statusId!),
                                 isLocalVideo: false,
                                 onInitialised: (controller) {
-                                  _startTimer(30000);
+                                  _statusDur = controller.videoPlayerController
+                                          ?.value.duration?.inMilliseconds ??
+                                      30000;
+                                  setState(() {});
+                                  _startTimer(
+                                      _statusDur > 30000 ? 30000 : _statusDur,
+                                      useCustomTime: true);
                                 },
-                                loop: true,
+                                loop: false,
                                 showControls: false,
                                 path: story.status!.statusData!.videoMedia!,
                               ),

@@ -25,24 +25,24 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Enable camera permission to take photos</string>
+	<string>Take a photo for display</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ReachMe needs access to your location</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Enable camera permission to use Mic</string>
+	<string>Take a video for display</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Grant access to view phone's library</string>
+	<string>Read your photos for display</string>
 	<key>NSAppTransportSecurity</key>
-    <dict>
-    	<key>NSAllowsArbitraryLoads</key>
-    	<true/>
-    </dict>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Read your photos for display</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Take a photo for display</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Take a video for display</string>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

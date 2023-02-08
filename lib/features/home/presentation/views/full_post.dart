@@ -2250,8 +2250,8 @@ class CommentReplyItem extends StatelessWidget {
                                       () {
                                     globals.userBloc!.add(
                                         GetRecipientProfileEvent(
-                                            email: comment.authId));
-                                    comment.authId == globals.user!.id
+                                            email: comment.replyOwnerProfile?.authId ));
+                                    comment.replyOwnerProfile?.authId == globals.user!.id
                                         ? RouteNavigators.route(
                                             context, const AccountScreen())
                                         : RouteNavigators.route(
@@ -2259,16 +2259,16 @@ class CommentReplyItem extends StatelessWidget {
                                             RecipientNewAccountScreen(
                                               recipientEmail: 'email',
                                               recipientImageUrl: comment
-                                                  .commentOwnerProfile!
+                                                  .replyOwnerProfile!
                                                   .profilePicture,
-                                              recipientId: comment.authId,
+                                              recipientId: comment.replyOwnerProfile?.authId ,
                                             ));
                                     progress?.dismiss();
                                   });
                                 },
                                 child: Row(children: [
                                   Helper.renderProfilePicture(
-                                    comment.commentOwnerProfile?.profilePicture,
+                                    comment.replyOwnerProfile?.profilePicture,
                                     size: 30,
                                   ),
                                   const SizedBox(width: 10),
@@ -2278,7 +2278,7 @@ class CommentReplyItem extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '@${comment.commentOwnerProfile?.username ?? 'no-username'}',
+                                        '@${comment.replyOwnerProfile?.username ?? 'no-username'}',
                                         style: TextStyle(
                                           fontSize: getScreenHeight(15),
                                           fontFamily: 'Poppins',

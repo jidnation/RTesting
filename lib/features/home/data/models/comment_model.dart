@@ -164,8 +164,8 @@ class CommentReplyModel {
         postOwnerProfile: json["postOwnerProfile"] != null
             ? CommentProfileModel.fromJson(json["postOwnerProfile"])
             : null,
-        replyOwnerProfile: json["postOwnerProfile"] != null
-            ? CommentProfileModel.fromJson(json["postOwnerProfile"])
+        replyOwnerProfile: json["replyOwnerProfile"] != null
+            ? CommentProfileModel.fromJson(json["replyOwnerProfile"])
             : null,
       );
   Map<String, dynamic> toJson() => {
@@ -188,7 +188,7 @@ class CommentReplyModel {
         "postOwnerProfile":
             postOwnerProfile == null ? null : postOwnerProfile!.toJson(),
         "replyOwnerProfile":
-            postOwnerProfile == null ? null : postOwnerProfile!.toJson(),
+            postOwnerProfile == null ? null : replyOwnerProfile!.toJson(),
       };
 
   CommentModel toCommentModel() => CommentModel(
