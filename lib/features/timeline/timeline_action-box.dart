@@ -38,13 +38,13 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
   bool isReaching = false;
   @override
   void initState() {
-    usersReaching();
     super.initState();
   }
 
-  usersReaching() {
-    setState(() async {
-      isReaching = await timeLineFeedStore.usersReaching(context);
+  usersReaching() async {
+    bool isReachingUser = await timeLineFeedStore.usersReaching();
+    setState(() {
+      isReaching = isReachingUser;
     });
   }
 
@@ -232,6 +232,7 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
   }
 
   Widget commentIcon(BuildContext routeContext) {
+    usersReaching();
     switch (widget.post.commentOption) {
       case "everyone":
         return InkWell(
@@ -293,7 +294,8 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
           return const SizedBox.shrink();
         }
       case "only_people_you_mention":
-        if (widget.post.mentionList!.contains(globals.user!.username)) {
+        if (widget.post.mentionList!.contains(globals.user!.username) ||
+            (widget.post.postOwnerProfile!.authId == globals.userId)) {
           return InkWell(
             onTap: () {
               RouteNavigators.route(

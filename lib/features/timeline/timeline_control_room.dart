@@ -655,7 +655,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
-  Future<bool> usersReaching(BuildContext context) async {
+  Future<bool> usersReaching() async {
     Either<String, bool> response = await UserRepository().getReachRelationship(
         userId: globals.userId!, type: ReachRelationshipType.reacher);
 
