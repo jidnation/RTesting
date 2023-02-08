@@ -82,6 +82,7 @@ class _MomentAudioPlayerState extends State<MomentAudioPlayer> {
     return Obx(() {
       // bool status = timeLineController.currentStatus.value;
       String currentId = timeLineController.currentId.value;
+      print("current Id:::::: $currentId");
       if (currentId.isNotEmpty) {
         print(":::::::::::::::::: calling me again like this, PLEASE STOP!!!");
         currentId == widget.id
