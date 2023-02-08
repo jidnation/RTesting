@@ -77,8 +77,7 @@ class _SavedTabState extends State<SavedTab> {
                             TimeLineBox(
                               timeLineModel: post,
                               takeScreenShot: () {
-                                timeLineController.takeScreenShot(
-                                    context, src);
+                                timeLineController.takeScreenShot(context, src);
                               },
                             ),
                             Positioned(

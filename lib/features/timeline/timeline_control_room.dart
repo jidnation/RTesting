@@ -273,11 +273,25 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         if (response) {
           initialize(isUpvoting: true, isRefreshing: true);
           fetchMyPost(isRefresh: true);
-          Snackbars.success(
-            context,
-            message:
-                'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
-            milliseconds: 1300,
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text:
+                  'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'out' : 'down'} this post.',
+              color: const Color(0xFF1C8B43),
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: SvgPicture.asset(
+              'assets/svgs/like.svg',
+              color: const Color(0xFF1C8B43),
+            ),
+            backgroundColor: const Color(0xFFE0FFDD),
+            borderColor: const Color(0xFF1C8B43),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
           );
         }
       } else {
@@ -446,7 +460,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   removePost(BuildContext context, String id,
       {bool? isDelete, required String type}) {
     List<TimeLineModel> currentPosts = getExactValue(type);
-    currentPosts.removeWhere((element) => element.id == id);
+    type == 'post'
+        ? currentPosts.removeWhere((element) => element.id == id)
+        : null;
     if (isDelete ?? false) {
       Snackbars.success(
         context,
@@ -785,6 +801,25 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     if (response) {
       fetchMyPost(isRefresh: true);
       initialize(isUpvoting: true, isRefreshing: true);
+      Get.snackbar(
+        '',
+        '',
+        titleText: const SizedBox.shrink(),
+        messageText: CustomText(
+          text: 'You have successfully unShouted your shouted post.',
+          color: const Color(0xFF1C8B43),
+          size: getScreenHeight(16),
+        ),
+        borderWidth: 0.5,
+        icon: SvgPicture.asset(
+          'assets/svgs/like.svg',
+          color: const Color(0xFF1C8B43),
+        ),
+        backgroundColor: const Color(0xFFE0FFDD),
+        borderColor: const Color(0xFF1C8B43),
+        borderRadius: 16,
+        duration: const Duration(milliseconds: 1500),
+      );
     }
   }
 

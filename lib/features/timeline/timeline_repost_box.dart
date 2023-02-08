@@ -237,6 +237,7 @@ class TimelineRepostedPost extends StatelessWidget {
                 child: Row(children: [
                   Expanded(
                       child: MomentAudioPlayer(
+                    id: tPostInfo.repostedPost!.repostedPostId,
                     audioPath: tPostInfo.repostedPost!.audioMediaItem!,
                   )),
                 ]),
