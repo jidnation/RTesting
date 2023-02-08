@@ -756,6 +756,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     children: [
                                                       Center(
                                                         child: isRecording
+                                                        
                                                             ? isPaused
                                                                 ? const Text(
                                                                     'Paused')
