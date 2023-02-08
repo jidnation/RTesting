@@ -37,7 +37,6 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../profile/new_account.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
@@ -222,12 +221,12 @@ class _CommentReachState extends State<CommentReach> {
             }
 
             RouteNavigators.routeReplace(
-                                context,
-                                FullPostScreen(
-                                    postFeedModel: widget.replyingComment
-                                        ? widget.commentPostFeedModel
-                                        : widget.postFeedModel));
-                            controllerKey.currentState!.controller!.clear();
+                context,
+                FullPostScreen(
+                    postFeedModel: widget.replyingComment
+                        ? widget.commentPostFeedModel
+                        : widget.postFeedModel));
+            controllerKey.currentState!.controller!.clear();
           }
 
           //

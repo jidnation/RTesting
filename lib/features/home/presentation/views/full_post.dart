@@ -42,7 +42,6 @@ import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../moment/comment_media.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../profile/new_account.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/comment_box_bottom_sheet.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
@@ -1883,7 +1882,7 @@ class _CommentsTileState extends State<CommentsTile> {
                                                   const AccountScreen())
                                               : RouteNavigators.route(
                                                   context,
-                                                  RecipientNewAccountScreen(
+                                                  RecipientAccountProfile(
                                                     recipientEmail: 'email',
                                                     recipientImageUrl: widget
                                                         .comment
@@ -2256,18 +2255,21 @@ class CommentReplyItem extends StatelessWidget {
                                       () {
                                     globals.userBloc!.add(
                                         GetRecipientProfileEvent(
-                                            email: comment.replyOwnerProfile?.authId ));
-                                    comment.replyOwnerProfile?.authId == globals.user!.id
+                                            email: comment
+                                                .replyOwnerProfile?.authId));
+                                    comment.replyOwnerProfile?.authId ==
+                                            globals.user!.id
                                         ? RouteNavigators.route(
                                             context, const AccountScreen())
                                         : RouteNavigators.route(
                                             context,
-                                            RecipientNewAccountScreen(
+                                            RecipientAccountProfile(
                                               recipientEmail: 'email',
                                               recipientImageUrl: comment
                                                   .replyOwnerProfile!
                                                   .profilePicture,
-                                              recipientId: comment.replyOwnerProfile?.authId ,
+                                              recipientId: comment
+                                                  .replyOwnerProfile?.authId,
                                             ));
                                     progress?.dismiss();
                                   });

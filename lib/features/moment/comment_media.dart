@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/utils.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -25,7 +23,6 @@ import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
-import '../../core/utils/custom_text.dart';
 import '../timeline/loading_widget.dart';
 import '../timeline/timeline_feed.dart';
 
