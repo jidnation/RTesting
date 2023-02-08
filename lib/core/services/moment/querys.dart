@@ -377,7 +377,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my comment-post-unLiking-query::::: $queryResult');
-    return queryResult.data?['unlikeCommentOnPost'] != 'false' ?? false;
+    return queryResult.data?['unlikeCommentOnPost'] != 'false';
   }
 
   Future<MomentFeedModel?>? getAllFeeds(

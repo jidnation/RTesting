@@ -247,11 +247,10 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
 class CommentAudioMedia extends StatefulWidget {
   final String path;
   final String? id;
-  const CommentAudioMedia({
-    Key? key,
-    required this.path,
-    this.id,
-  }) : super(key: key);
+  final bool? isCommentReply;
+  const CommentAudioMedia(
+      {Key? key, required this.path, this.id, this.isCommentReply})
+      : super(key: key);
 
   @override
   State<CommentAudioMedia> createState() => _CommentAudioMediaState();
@@ -321,7 +320,7 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-       bool status = timeLineController.currentStatus.value;
+      bool status = timeLineController.currentStatus.value;
       timeLineController.currentId.value == widget.id
           ? status
               ? playerController.startPlayer(finishMode: FinishMode.loop)
@@ -332,10 +331,10 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
           child: GestureDetector(
             onTap: () async {
               if (timeLineController.currentId.value == widget.id) {
-              timeLineController.currentStatus(!status);
-            } else {
-              timeLineController.currentId(widget.id);
-            }
+                timeLineController.currentStatus(!status);
+              } else {
+                timeLineController.currentId(widget.id);
+              }
             },
             child: Icon(
               isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
@@ -349,7 +348,9 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
         ),
         playerController.playerState != PlayerState.stopped
             ? AudioFileWaveforms(
-                size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+                size: (widget.isCommentReply ?? false)
+                    ? Size(MediaQuery.of(context).size.width / 2.5, 18)
+                    : Size(MediaQuery.of(context).size.width / 2.0, 24),
                 playerController: playerController,
                 density: 2,
                 enableSeekGesture: true,
@@ -362,7 +363,9 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
                 ),
               )
             : SizedBox(
-                width: MediaQuery.of(context).size.width / 2.0,
+                width: (widget.isCommentReply ?? false)
+                    ? MediaQuery.of(context).size.width / 2.5
+                    : MediaQuery.of(context).size.width / 2.0,
                 child: const LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Color(0xff0077B6),
