@@ -180,8 +180,8 @@ class _PlayAudioState extends State<PlayAudio> {
 
   void _initaliseController() async {
     late String filePath;
-     playerController = PlayerController();
-     File? audioFile = await momentFeedStore.videoControllerService
+    playerController = PlayerController();
+    File? audioFile = await momentFeedStore.videoControllerService
         .getAudioFile(widget.audioFile!);
     if (audioFile == null) {
       var result = await _mediaService.downloadFile(url: widget.audioFile!);
@@ -189,29 +189,32 @@ class _PlayAudioState extends State<PlayAudio> {
     } else {
       filePath = audioFile.path;
     }
-    
+
     playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
     });
 
-    playerController.addListener(() {
-      Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
-
-      if (playerController.playerState == PlayerState.initialized) {
+    playerController.onPlayerStateChanged.listen((event) {
+      if (event == PlayerState.initialized) {
         isInitialised = true;
-        if(mounted)setState(() {});
-      } else if (playerController.playerState == PlayerState.playing) {
+        if (mounted) setState(() {});
+      } else if (event == PlayerState.playing) {
         isPlaying = true;
         if (mounted) setState(() {});
-      } else if (playerController.playerState == PlayerState.paused ||
-          playerController.playerState == PlayerState.stopped) {
+      } else if (event == PlayerState.paused) {
         isPlaying = false;
         // playerController.seekTo(10);
         if (mounted) setState(() {});
+      } else if (event == PlayerState.stopped) {
+        isPlaying = false;
+        playerController.seekTo(10);
+        if (mounted) setState(() {});
       }
     });
-    await playerController.preparePlayer(filePath);
+    playerController.playerKey.isNotEmpty
+        ? await playerController.preparePlayer(filePath)
+        : null;
     if (mounted) setState(() {});
 
     position = await playerController.getDuration(DurationType.max);
@@ -227,12 +230,14 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool status = timeLineController.currentStatus.value;
-      timeLineController.currentId.value == widget.id
-          ? status
-              ? playerController.startPlayer(finishMode: FinishMode.loop)
-              : playerController.pausePlayer()
-          : playerController.pausePlayer();
+      String currentId = timeLineController.currentId.value;
+      if (currentId.isNotEmpty) {
+        currentId == widget.id
+            ? playerController.startPlayer(finishMode: FinishMode.loop)
+            : playerController.pausePlayer();
+      } else {
+        playerController.pausePlayer();
+      }
       return Column(
         children: [
           Expanded(
@@ -243,22 +248,22 @@ class _PlayAudioState extends State<PlayAudio> {
                   alignment: Alignment.topLeft,
                   child: IconButton(
                     onPressed: () {
-                      if (timeLineController.currentId.value == widget.id) {
-                        timeLineController.currentStatus(!status);
+                      if (currentId == widget.id) {
+                        timeLineController.currentId('');
                       } else {
                         timeLineController.currentId(widget.id);
                       }
                     },
-                    icon: !isPlaying
+                    icon: currentId == widget.id
                         ? Icon(
-                            Icons.play_arrow,
+                            Icons.pause_circle,
                             size: 30,
                             color: widget.isMe
                                 ? Colors.white
                                 : AppColors.textColor2,
                           )
                         : Icon(
-                            Icons.pause_circle,
+                            Icons.play_arrow,
                             size: 30,
                             color: widget.isMe
                                 ? Colors.white
@@ -439,11 +444,14 @@ class _TimerWidgetState extends State<TimerWidget> {
   void startTimer({bool resets = true}) {
     if (!mounted) return;
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+    print('....................object...............');
   }
 
   void stopTimer() {
     if (!mounted) return;
     setState(() => timer?.cancel());
+    print(
+        '........................iiiiiiiiiiiiiiiiiiiiiiiiiiiii...............');
   }
 
   @override
@@ -457,9 +465,40 @@ class _TimerWidgetState extends State<TimerWidget> {
     return Text(
       '$twoDigitMinutes:$twoDigitSeconds',
       style: const TextStyle(
-        fontSize: 7,
+        fontSize: 12,
         fontWeight: FontWeight.bold,
       ),
     );
   }
+}
+
+class BlinkText extends StatefulWidget {
+  final String _target;
+  const BlinkText(this._target, {Key? key}) : super(key: key);
+
+  @override
+  State<BlinkText> createState() => _BlinkTextState();
+}
+
+class _BlinkTextState extends State<BlinkText> {
+  bool _show = true;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      setState(() {
+        setState(() {
+          _show = !_show;
+        });
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(widget._target,
+      style: _show
+          ? const TextStyle(fontSize: 50, fontWeight: FontWeight.bold)
+          : const TextStyle(color: Colors.transparent));
 }

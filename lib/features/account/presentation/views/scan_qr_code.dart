@@ -86,7 +86,7 @@ class ScanQRCode extends State<ScanQRCodeScreen> {
                                       context, const NewAccountScreen())
                                   : RouteNavigators.route(
                                       context,
-                                      RecipientNewAccountScreen(
+                                      RecipientAccountProfile(
                                         recipientEmail: 'email',
                                         //recipientImageUrl: imageUrl,
                                         recipientId: str,
@@ -137,7 +137,7 @@ class ScanQRCode extends State<ScanQRCodeScreen> {
                                                 const NewAccountScreen())
                                             : RouteNavigators.route(
                                                 context,
-                                                RecipientNewAccountScreen(
+                                                RecipientAccountProfile(
                                                   recipientEmail: 'email',
                                                   //recipientImageUrl: imageUrl,
                                                   recipientId: id,

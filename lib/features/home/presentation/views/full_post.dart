@@ -166,7 +166,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
           var userInfo = state.users!;
           RouteNavigators.route(
               context,
-              RecipientNewAccountScreen(
+              RecipientAccountProfile(
                 recipientCoverImageUrl: userInfo.user.first.coverPicture,
                 recipientEmail: userInfo.user.first.email,
                 recipientId: userInfo.user.first.id,
@@ -191,7 +191,6 @@ class _FullPostScreenState extends State<FullPostScreen> {
               // debugPrint("Shoutdown success");
               // Snackbars.success(context,
               //     message: 'You shouted down on this user\'s posts');
-
             } else {
               Snackbars.error(context,
                   message: 'You cannot shout down on this user\'s posts');
@@ -271,7 +270,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
             // }
 
             if (state is CommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
                   scrollController.position.minScrollExtent,
@@ -312,7 +312,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is VotePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               if (!(state.isVoted!)) {
                 Snackbars.success(context,
                     message: 'The post you shouted down has been removed!');
@@ -326,7 +327,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
             }
             if (state is LikePostSuccess || state is UnlikePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
@@ -351,13 +353,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is LikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
                   commentId: state.commentLikeModel!.commentId));
             }
 
             if (state is UnlikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(
                   GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
             }
@@ -465,7 +469,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         const NewAccountScreen())
                                                     : RouteNavigators.route(
                                                         context,
-                                                        RecipientNewAccountScreen(
+                                                        RecipientAccountProfile(
                                                           recipientEmail:
                                                               'email',
                                                           recipientImageUrl: widget
@@ -1657,7 +1661,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
       case "only_people_you_mention":
         if (widget.postFeedModel!.post!.mentionList!
-            .contains(globals.user!.username)) {
+                .contains(globals.user!.username) ||
+            (widget.postFeedModel!.post!.postOwnerProfile!.authId ==
+                globals.userId)) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0),
             child: SizedBox(

@@ -313,7 +313,8 @@ class GraphQLNotificationClient {
       document: document,
       variables: variables,
     );
-    final Stream<QueryResult> result = notificationClientFor().value.subscribe(options);
+    final Stream<QueryResult> result =
+        notificationClientFor().value.subscribe(options);
     return result;
   }
 }

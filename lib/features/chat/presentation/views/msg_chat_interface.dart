@@ -59,7 +59,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   bool isRecordingInit = false;
   bool isRecording = false;
   bool isPaused = false;
-  TimerController timerController = TimerController();
+  TimerController? timerController;
+  var pathy;
+  bool showBox = false;
 
   //AUDIO_WAVEFORM RECORDER
   RecorderController? recorderController;
@@ -70,6 +72,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
+    timerController = TimerController();
     openAudio();
 
     focusNode.addListener(() {
@@ -87,8 +90,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
       );
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // globals.chatBloc!.add(GetThreadMessagesEvent(
-      //     id: '${globals.user!.id}--${widget.recipientUser!.id}'));
       globals.chatBloc!.add(GetThreadMessagesEvent(
           threadId: widget.thread?.id, receiverId: widget.recipientUser?.id));
     });
@@ -115,6 +116,14 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     await _soundRecorder!
         .setSubscriptionDuration(const Duration(milliseconds: 100));
     isRecordingInit = true;
+  }
+
+  Future<String> getaudiodirectory() async {
+    var tempDir = await getTemporaryDirectory();
+
+    var pathos = '${tempDir.path}/flutter_sound.aac';
+
+    return pathos;
   }
 
   Future<File?> getImage(ImageSource source) async {
@@ -176,7 +185,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
           onTap: () {
             RouteNavigators.route(
                 context,
-                RecipientNewAccountScreen(
+                RecipientAccountProfile(
                   recipientEmail: widget.recipientUser!.email,
                   recipientImageUrl: widget.recipientUser!.profilePicture,
                   recipientId: widget.recipientUser!.id,
@@ -284,7 +293,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
               showIsSending.value = false;
               _quotedData.value = null;
               // _controller.jumpTo(_controller.position.maxScrollExtent);
-
             }
             if (state is UserUploadingImage) {
               toast('Uploading media...',
@@ -435,7 +443,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             onPressed: () {
                                               RouteNavigators.route(
                                                   context,
-                                                  RecipientNewAccountScreen(
+                                                  RecipientAccountProfile(
                                                     recipientEmail: widget
                                                         .recipientUser!.email,
                                                     recipientImageUrl: widget
@@ -592,7 +600,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                   ),
                                   Row(children: [
                                     Flexible(
-                                      child: !isRecording
+                                      child: !showBox
                                           ? CustomRoundTextField(
                                               focusNode: focusNode,
                                               controller: controller,
@@ -732,7 +740,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
 
                                                       setState(() {
                                                         isRecording = false;
-                                                        timerController
+                                                        showBox = false;
+                                                        timerController!
                                                             .resetTimer();
                                                       });
                                                     },
@@ -743,87 +752,88 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                           .primaryColor,
                                                     ),
                                                   ),
-                                                  TimerWidget(
-                                                      controller:
-                                                          timerController),
-                                                  // Align(
-                                                  //   child: StreamBuilder<
-                                                  //       RecordingDisposition>(
-                                                  //     stream: _soundRecorder!
-                                                  //         .onProgress,
-                                                  //     builder:
-                                                  //         (context, snapshot) {
-                                                  //       final duration =
-                                                  //           snapshot.hasData
-                                                  //               ? snapshot.data!
-                                                  //                   .duration
-                                                  //               : Duration.zero;
-
-                                                  //       print(duration
-                                                  //           .inMilliseconds);
-
-                                                  //       String twoDigits(
-                                                  //               int n) =>
-                                                  //           n
-                                                  //               .toString()
-                                                  //               .padLeft(
-                                                  //                   2, '0');
-                                                  //       final twoDigitMinutes =
-                                                  //           twoDigits(duration
-                                                  //               .inMinutes
-                                                  //               .remainder(60));
-                                                  //       final twoDigitSeconds =
-                                                  //           twoDigits(duration
-                                                  //               .inSeconds
-                                                  //               .remainder(60));
-                                                  //       return Text(
-                                                  //         '$twoDigitMinutes: $twoDigitSeconds',
-                                                  //         style: const TextStyle(
-                                                  //             fontSize: 20,
-                                                  //             color: AppColors
-                                                  //                 .primaryColor),
-                                                  //       );
-                                                  //     },
-                                                  //   ),
-                                                  // ),
+                                                  Column(
+                                                    children: [
+                                                      Center(
+                                                        child: isRecording
+                                                        
+                                                            ? isPaused
+                                                                ? const Text(
+                                                                    'Paused')
+                                                                : const Text(
+                                                                    'Recording')
+                                                            : const Text(
+                                                                'Start Recording'),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 4,
+                                                      ),
+                                                      TimerWidget(
+                                                          controller:
+                                                              timerController!),
+                                                    ],
+                                                  ),
                                                   GestureDetector(
-                                                      onTap: () {
-                                                        if (!isPaused) {
-                                                          _soundRecorder!
-                                                              .pauseRecorder();
+                                                    onTap: () async {
+                                                      if (!isRecording) {
+                                                        pathy =
+                                                            await getaudiodirectory();
 
-                                                          setState(() {
-                                                            timerController
-                                                                .startTimer();
-                                                            isPaused =
-                                                                !isPaused;
-                                                          });
-                                                        } else {
-                                                          _soundRecorder!
-                                                              .resumeRecorder();
+                                                        await _soundRecorder!
+                                                            .startRecorder(
+                                                                toFile: pathy);
+                                                        timerController!
+                                                            .startTimer();
 
-                                                          setState(() {
-                                                            isPaused =
-                                                                !isPaused;
+                                                        setState(() {
+                                                          isRecording =
+                                                              !isRecording;
+                                                        });
+                                                      } else if (!isPaused &&
+                                                          isRecording) {
+                                                        await _soundRecorder!
+                                                            .pauseRecorder();
 
-                                                            timerController
-                                                                .pauseTimer();
-                                                          });
-                                                        }
-                                                      },
-                                                      child: isPaused
-                                                          ? const Icon(
-                                                              Icons.mic,
-                                                              size: 30,
-                                                              color: AppColors
-                                                                  .primaryColor,
-                                                            )
-                                                          : const Icon(
-                                                              Icons.pause,
-                                                              size: 30,
-                                                              color: AppColors
-                                                                  .primaryColor,
-                                                            )),
+                                                        timerController!
+                                                            .pauseTimer();
+
+                                                        setState(() {
+                                                          isPaused = !isPaused;
+                                                        });
+                                                      } else if (isPaused &&
+                                                          isRecording) {
+                                                        await _soundRecorder!
+                                                            .resumeRecorder();
+
+                                                        timerController!
+                                                            .startTimer();
+
+                                                        setState(() {
+                                                          isPaused = !isPaused;
+                                                        });
+                                                      }
+                                                    },
+                                                    child: isRecording
+                                                        ? !isPaused
+                                                            ? const Icon(
+                                                                Icons.pause,
+                                                                size: 30,
+                                                                color: AppColors
+                                                                    .primaryColor,
+                                                              )
+                                                            : const Icon(
+                                                                Icons.mic,
+                                                                size: 30,
+                                                                color: AppColors
+                                                                    .primaryColor,
+                                                              )
+                                                        : const Icon(
+                                                            Icons.mic,
+                                                            size: 30,
+                                                            color: AppColors
+                                                                .primaryColor,
+                                                          ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -881,6 +891,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 );
                                                 isSending.value = true;
                                                 showIsSending.value = true;
+                                                setState(() {
+                                                  isTyping.value = false;
+                                                });
                                               } else {
                                                 controller.clear();
                                               }
@@ -901,35 +914,43 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                           )
                                         : GestureDetector(
                                             onTap: () async {
-                                              var tempDir =
-                                                  await getTemporaryDirectory();
-                                              var path =
-                                                  '${tempDir.path}/flutter_sound.aac';
+                                              // var tempDir =
+                                              //     await getTemporaryDirectory();
+                                              // var path =
+                                              //     '${tempDir.path}/flutter_sound.aac';
                                               if (!isRecordingInit) {
                                                 return;
                                               }
-                                              if (isRecording) {
-                                                await _soundRecorder!
-                                                    .stopRecorder();
-                                                print(path);
-                                                File audioMessage = File(path);
+                                              if (showBox) {
+                                                if (isRecording) {
+                                                  await _soundRecorder!
+                                                      .stopRecorder();
+                                                  print(pathy);
+                                                  File audioMessage =
+                                                      File(pathy);
 
-                                                globals.chatBloc!.add(
-                                                    UploadImageFileEvent(
-                                                        file: audioMessage));
+                                                  globals.chatBloc!.add(
+                                                      UploadImageFileEvent(
+                                                          file: audioMessage));
 
-                                                setState(() {
-                                                  timerController.resetTimer();
-                                                });
+                                                  timerController!.resetTimer();
+
+                                                  setState(() {
+                                                    isRecording = !isRecording;
+                                                  });
+                                                }
                                               } else {
-                                                await _soundRecorder!
-                                                    .startRecorder(
-                                                  toFile: path,
-                                                );
+                                                // timerController!.startTimer();
+                                                // print(
+                                                //     'testing tesying...............................');
+                                                // await _soundRecorder!
+                                                //     .startRecorder(
+                                                //   toFile: path,
+                                                // );
                                               }
                                               setState(() {
-                                                timerController.startTimer();
-                                                isRecording = !isRecording;
+                                                showBox = !showBox;
+                                                // isRecording = !isRecording;
                                               });
                                             },
                                             child: !isRecording

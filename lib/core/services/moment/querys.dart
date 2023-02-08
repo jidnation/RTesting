@@ -135,7 +135,7 @@ class MomentQuery {
       variables: momentVariables,
     ));
     log('from my post comment reply::::: $queryResult');
-    // return queryResult.data?['likeMoment']['authId'] != null;
+    return queryResult.data?['replyCommentOnPost']['authId'] != null;
   }
 
   Future<bool> likeMomentComment(

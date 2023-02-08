@@ -35,7 +35,7 @@ import '../moment/moment_audio_player.dart';
 import '../profile/new_account.dart';
 import '../profile/recipientNewAccountProfile.dart';
 
-class TimeLineBox extends StatelessWidget {
+class TimeLineBox extends StatefulWidget {
   final TimeLineModel timeLineModel;
   final Function()? takeScreenShot;
   final List<StatusFeedResponseModel>? userStatusFeed;
@@ -47,9 +47,14 @@ class TimeLineBox extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TimeLineBox> createState() => _TimeLineBoxState();
+}
+
+class _TimeLineBoxState extends State<TimeLineBox> {
+  @override
   Widget build(BuildContext context) {
-    ErProfile? tVoterInfo = timeLineModel.getPostFeed.voterProfile;
-    Post? tPostInfo = timeLineModel.getPostFeed.post;
+    ErProfile? tVoterInfo = widget.timeLineModel.getPostFeed.voterProfile;
+    Post? tPostInfo = widget.timeLineModel.getPostFeed.post;
     ErProfile? tPostOwnerInfo = tPostInfo?.postOwnerProfile;
 
     //working on the images
@@ -72,7 +77,7 @@ class TimeLineBox extends StatelessWidget {
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (builder) => FullPostScreen(
                 postFeedModel: timeLineFeedStore.getPostModel(
-                    timeLineModel: timeLineModel),
+                    timeLineModel: widget.timeLineModel),
               ))),
       child: Container(
         width: SizeConfig.screenWidth,
@@ -126,13 +131,13 @@ class TimeLineBox extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 GestureDetector(
-                  onTap: userStatusFeed != null
+                  onTap: widget.userStatusFeed != null
                       ? () async {
-                          if (userStatusFeed!
-                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                          if (widget.userStatusFeed!
+                              .any((e) => e.username == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
                                 tPostOwnerInfo: tPostOwnerInfo!,
-                                userStatus: userStatusFeed!);
+                                userStatus: widget.userStatusFeed!);
                           } else if (tPostOwnerInfo!
                               .profilePicture!.isNotEmpty) {
                             RouteNavigators.route(
@@ -157,7 +162,8 @@ class TimeLineBox extends StatelessWidget {
                         image: tPostOwnerInfo.profilePicture!.isNotEmpty
                             ? DecorationImage(
                                 image: NetworkImage(
-                                    tPostOwnerInfo.profilePicture!),
+                                  tPostOwnerInfo.profilePicture!,
+                                ),
                                 fit: BoxFit.cover,
                               )
                             : null),
@@ -189,26 +195,29 @@ class TimeLineBox extends StatelessWidget {
                                         () {
                                       globals.userBloc!.add(
                                           GetRecipientProfileEvent(
-                                              email: timeLineModel
+                                              email: widget
+                                                  .timeLineModel
                                                   .getPostFeed
                                                   .post!
                                                   .postOwnerProfile!
                                                   .authId));
-                                      timeLineModel.getPostFeed.post!
+                                      widget.timeLineModel.getPostFeed.post!
                                                   .postOwnerProfile!.authId ==
                                               globals.user!.id
                                           ? RouteNavigators.route(
                                               context, const NewAccountScreen())
                                           : RouteNavigators.route(
                                               context,
-                                          RecipientNewAccountScreen(
+                                              RecipientAccountProfile(
                                                 recipientEmail: 'email',
-                                                recipientImageUrl: timeLineModel
+                                                recipientImageUrl: widget
+                                                    .timeLineModel
                                                     .getPostFeed
                                                     .post!
                                                     .postOwnerProfile!
                                                     .profilePicture,
-                                                recipientId: timeLineModel
+                                                recipientId: widget
+                                                    .timeLineModel
                                                     .getPostFeed
                                                     .post!
                                                     .postOwnerProfile!
@@ -286,9 +295,11 @@ class TimeLineBox extends StatelessWidget {
                           onTap: () async {
                             await showReacherTimeLineCardBottomSheet(
                               context,
-                              type: userStatusFeed == null ? 'profile' : 'post',
-                              downloadPost: takeScreenShot,
-                              timeLineModel: timeLineModel,
+                              type: widget.userStatusFeed == null
+                                  ? 'profile'
+                                  : 'post',
+                              downloadPost: widget.takeScreenShot,
+                              timeLineModel: widget.timeLineModel,
                             );
                           },
                           child: SizedBox(
@@ -363,10 +374,10 @@ class TimeLineBox extends StatelessWidget {
                   visible: images.isNotEmpty,
                   child: TimeLinePostMedia(
                       post: timeLineFeedStore
-                          .getPostModel(timeLineModel: timeLineModel)!
+                          .getPostModel(timeLineModel: widget.timeLineModel)!
                           .post!)),
               SizedBox(height: tPostInfo.videoMediaItem!.isNotEmpty ? 10 : 0),
-              timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
+              widget.timeLineModel.getPostFeed.post!.videoMediaItem!.isNotEmpty
                   ? Container(
                       height: 310,
                       width: SizeConfig.screenWidth,
@@ -374,14 +385,17 @@ class TimeLineBox extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.green,
                       ),
-                      child: TimeLineVideoPlayer(
-                        post: timeLineFeedStore
-                            .getPostModel(timeLineModel: timeLineModel)!
-                            .post!,
-                        videoUrl:
-                            timeLineModel.getPostFeed.post!.videoMediaItem!,
-                        // ),
-                      ),
+                      child: mounted
+                          ? TimeLineVideoPlayer(
+                              post: timeLineFeedStore
+                                  .getPostModel(
+                                      timeLineModel: widget.timeLineModel)!
+                                  .post!,
+                              videoUrl: widget.timeLineModel.getPostFeed.post!
+                                  .videoMediaItem!,
+                              // ),
+                            )
+                          : const SizedBox.shrink(),
                     )
                   : const SizedBox.shrink(),
               SizedBox(height: tPostInfo.audioMediaItem!.isNotEmpty ? 10 : 0),
@@ -397,7 +411,7 @@ class TimeLineBox extends StatelessWidget {
                   child: Row(children: [
                     Expanded(
                         child: MomentAudioPlayer(
-                      id: timeLineModel.id,
+                      id: widget.timeLineModel.id,
                       audioPath: tPostInfo.audioMediaItem!,
                     )),
                   ]),
@@ -409,10 +423,10 @@ class TimeLineBox extends StatelessWidget {
                           tPostInfo.content!.isNotEmpty)
                       ? 8
                       : 0),
-              (timeLineModel.getPostFeed.post!.repostedPost != null)
+              (widget.timeLineModel.getPostFeed.post!.repostedPost != null)
                   ? TimelineRepostedPost(
                       tPostInfo: timeLineFeedStore
-                          .getPostModel(timeLineModel: timeLineModel)!
+                          .getPostModel(timeLineModel: widget.timeLineModel)!
                           .post!,
                     ).paddingOnly(l: 0, r: 0, b: 10, t: 0)
                   : const SizedBox.shrink(),

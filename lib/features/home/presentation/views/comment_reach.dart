@@ -490,7 +490,7 @@ class _CommentReachState extends State<CommentReach> {
                                                 const NewAccountScreen())
                                             : RouteNavigators.route(
                                                 context,
-                                                RecipientNewAccountScreen(
+                                                RecipientAccountProfile(
                                                   recipientEmail: 'email',
                                                   recipientImageUrl: widget
                                                       .postFeedModel!
@@ -1187,7 +1187,7 @@ class _CommentReachState extends State<CommentReach> {
                                                 leading: SvgPicture.asset(
                                                     'assets/svgs/people-you-follow.svg'),
                                                 title: Text(
-                                                  'People you follow',
+                                                  'People reaching you',
                                                   style: TextStyle(
                                                     fontSize:
                                                         getScreenHeight(16),

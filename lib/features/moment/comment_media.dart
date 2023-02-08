@@ -311,7 +311,9 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       }
     });
 
-    await playerController.preparePlayer(filePath);
+    playerController.playerKey.isNotEmpty
+        ? await playerController.preparePlayer(filePath)
+        : null;
 
     // await playerController.startPlayer();
     if (mounted) setState(() {});
@@ -320,24 +322,29 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool status = timeLineController.currentStatus.value;
-      timeLineController.currentId.value == widget.id
-          ? status
-              ? playerController.startPlayer(finishMode: FinishMode.loop)
-              : playerController.pausePlayer()
-          : playerController.pausePlayer();
+      String currentId = timeLineController.currentId.value;
+      if (currentId.isNotEmpty) {
+        currentId == widget.id
+            ? playerController.startPlayer(finishMode: FinishMode.loop)
+            : playerController.pausePlayer();
+      } else {
+        playerController.pausePlayer();
+      }
+
       return Row(children: [
         Expanded(
           child: GestureDetector(
             onTap: () async {
-              if (timeLineController.currentId.value == widget.id) {
-                timeLineController.currentStatus(!status);
+              if (currentId == widget.id) {
+                timeLineController.currentId('');
               } else {
                 timeLineController.currentId(widget.id);
               }
             },
             child: Icon(
-              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              currentId == widget.id
+                  ? Icons.pause_rounded
+                  : Icons.play_arrow_rounded,
               size: 32,
               color: const Color(0xff0077B6),
             ),
