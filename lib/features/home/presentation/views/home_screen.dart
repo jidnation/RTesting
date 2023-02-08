@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     momentFeedStore.initialize();
-    timeLineFeedStore.initialize();
+    timeLineFeedStore.initialize(isRefreshing: true);
     super.initState();
   }
 
@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 // }
 
 class BottomNavBar extends StatelessWidget {
-   BottomNavBar({
+  BottomNavBar({
     Key? key,
     required ValueNotifier<int> currentIndex,
     required this.pageController,
@@ -131,7 +131,7 @@ class BottomNavBar extends StatelessWidget {
   final ValueNotifier<int> _currentIndex;
   final PageController pageController;
   final RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
@@ -144,13 +144,13 @@ class BottomNavBar extends StatelessWidget {
         //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
 
-        if(_currentIndex.value == 0){
-          timeLineFeedStore.initialize(
-            refreshController:
-            _refreshController,
-            // isRefresh: true,
-          );
-        }
+        // if(_currentIndex.value == 0){
+        //   timeLineFeedStore.initialize(
+        //     refreshController:
+        //     _refreshController,
+        //     // isRefresh: true,
+        //   );
+        // }
       },
       selectedItemColor: AppColors.primaryColor,
       unselectedItemColor: AppColors.blackShade3,

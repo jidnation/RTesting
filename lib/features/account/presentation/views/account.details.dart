@@ -502,7 +502,7 @@ class SeeMyReachingsList extends StatelessWidget {
                     ? RouteNavigators.route(context, const NewAccountScreen())
                     : RouteNavigators.route(
                         context,
-                        RecipientNewAccountScreen(
+                        RecipientAccountProfile(
                           recipientEmail: data!.reaching!.email,
                           recipientImageUrl: data!.reaching!.profilePicture,
                           recipientId: data!.reaching!.id,

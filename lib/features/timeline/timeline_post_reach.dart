@@ -270,136 +270,136 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                   ),
                                 ]).paddingSymmetric(h: 16),
                             const SizedBox(height: 20),
-                              Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Helper.renderProfilePicture(
-                                    globals.user!.profilePicture,
-                                    size: 33,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        (globals.user!.firstName! +
-                                                ' ' +
-                                                globals.user!.lastName!)
-                                            .toTitleCase(),
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.textColor2,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${getUserLocation().toLowerCase().trim().toString() == 'nil' ? '' : globals.location}',
-                                        style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.greyShade1),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  // GestureDetector(
-                                  //   onTap: () => RouteNavigators.route(
-                                  //       context, const TagLocation()),
-                                  //   child: Container(
-                                  //     padding: const EdgeInsets.all(3),
-                                  //     decoration: BoxDecoration(
-                                  //       color: const Color(0xFFF5F5F5),
-                                  //       borderRadius: BorderRadius.circular(10),
-                                  //     ),
-                                  //     child: Row(
-                                  //       children: [
-                                  //         SvgPicture.asset(
-                                  //             'assets/svgs/location.svg'),
-                                  //         const Text(
-                                  //           '   Location',
-                                  //           style: TextStyle(
-                                  //             fontSize: 12,
-                                  //             fontWeight: FontWeight.w500,
-                                  //             color: AppColors.textColor2,
-                                  //           ),
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  const SizedBox(width: 20),
-                                  Text(
-                                    counter.value.toString() + '/' + '200',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: counter.value == 200
-                                          ? Colors.red
-                                          : AppColors.textColor2,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Helper.renderProfilePicture(
+                                      globals.user!.profilePicture,
+                                      size: 33,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ).paddingSymmetric(h: 16),
-                          const SizedBox(height: 20),
-                          const Divider(
-                              color: Color(0xFFEBEBEB), thickness: 0.5),
-                          BlocListener<UserBloc, UserState>(
-                            bloc: globals.userBloc,
-                            listener: (context, userState) {
-                              if (userState is FetchUserReachingsSuccess) {
-                                if (userState.reachings != null) {
-                                  _mentionUsers.value = userState.reachings!
-                                      .map((reachings) => {
-                                            "id": reachings.reachingId,
-                                            "display":
-                                                reachings.reaching!.username
-                                          })
-                                      .toList();
-                                }
-
-                                _isLoading.value = false;
-                              }
-                            },
-                            child:
-                                BlocConsumer<DictionaryBloc, DictionaryState>(
-                              bloc: globals.dictionaryBloc,
-                              listener: (context, state) {
-                                if (state is GetWordToMentionsSuccess) {
-                                  _recentWords.value = state.mentionsData
-                                      .map((item) => {
-                                            "id": item["authId"],
-                                            "display": item["abbr"],
-                                            "meaning": item["meaning"],
-                                          })
-                                      .toList();
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          (globals.user!.firstName! +
+                                                  ' ' +
+                                                  globals.user!.lastName!)
+                                              .toTitleCase(),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.textColor2,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${getUserLocation().toLowerCase().trim().toString() == 'nil' ? '' : globals.location}',
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                              color: AppColors.greyShade1),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    // GestureDetector(
+                                    //   onTap: () => RouteNavigators.route(
+                                    //       context, const TagLocation()),
+                                    //   child: Container(
+                                    //     padding: const EdgeInsets.all(3),
+                                    //     decoration: BoxDecoration(
+                                    //       color: const Color(0xFFF5F5F5),
+                                    //       borderRadius: BorderRadius.circular(10),
+                                    //     ),
+                                    //     child: Row(
+                                    //       children: [
+                                    //         SvgPicture.asset(
+                                    //             'assets/svgs/location.svg'),
+                                    //         const Text(
+                                    //           '   Location',
+                                    //           style: TextStyle(
+                                    //             fontSize: 12,
+                                    //             fontWeight: FontWeight.w500,
+                                    //             color: AppColors.textColor2,
+                                    //           ),
+                                    //         ),
+                                    //       ],
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    const SizedBox(width: 20),
+                                    Text(
+                                      counter.value.toString() + '/' + '200',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: counter.value == 200
+                                            ? Colors.red
+                                            : AppColors.textColor2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ).paddingSymmetric(h: 16),
+                            const SizedBox(height: 20),
+                            const Divider(
+                                color: Color(0xFFEBEBEB), thickness: 0.5),
+                            BlocListener<UserBloc, UserState>(
+                              bloc: globals.userBloc,
+                              listener: (context, userState) {
+                                if (userState is FetchUserReachingsSuccess) {
+                                  if (userState.reachings != null) {
+                                    _mentionUsers.value = userState.reachings!
+                                        .map((reachings) => {
+                                              "id": reachings.reachingId,
+                                              "display":
+                                                  reachings.reaching!.username
+                                            })
+                                        .toList();
+                                  }
 
                                   _isLoading.value = false;
                                 }
-                              // },
-                              // // child:
-                              // //     BlocConsumer<DictionaryBloc, DictionaryState>(
-                              // //   bloc: globals.dictionaryBloc,
-                              // //   listener: (context, state) {
-                              // //     if (state is GetWordToMentionsSuccess) {
-                              // //       _recentWords.value = state.mentionsData
-                              // //           .map((item) => {
-                              // //                 "id": item["authId"],
-                              // //                 "display": item["abbr"],
-                              // //                 "meaning": item["meaning"],
-                              // //               })
-                              // //           .toList();
+                              },
+                              child:
+                                  BlocConsumer<DictionaryBloc, DictionaryState>(
+                                bloc: globals.dictionaryBloc,
+                                listener: (context, state) {
+                                  if (state is GetWordToMentionsSuccess) {
+                                    _recentWords.value = state.mentionsData
+                                        .map((item) => {
+                                              "id": item["authId"],
+                                              "display": item["abbr"],
+                                              "meaning": item["meaning"],
+                                            })
+                                        .toList();
 
-                              // //       _isLoading.value = false;
-                              // //     }
+                                    _isLoading.value = false;
+                                  }
+                                  // },
+                                  // // child:
+                                  // //     BlocConsumer<DictionaryBloc, DictionaryState>(
+                                  // //   bloc: globals.dictionaryBloc,
+                                  // //   listener: (context, state) {
+                                  // //     if (state is GetWordToMentionsSuccess) {
+                                  // //       _recentWords.value = state.mentionsData
+                                  // //           .map((item) => {
+                                  // //                 "id": item["authId"],
+                                  // //                 "display": item["abbr"],
+                                  // //                 "meaning": item["meaning"],
+                                  // //               })
+                                  // //           .toList();
+
+                                  // //       _isLoading.value = false;
+                                  // //     }
 
                                   if (state is LoadingWordsToMentions) {
                                     _isLoading.value = true;
@@ -646,7 +646,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                          horizontal: 10,
                           vertical: 15,
                         ),
                         color: const Color(0xFFF5F5F5),
@@ -1232,7 +1232,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
             ),
             const SizedBox(width: 9),
             const Text(
-              'People you follow',
+              'People reaching you',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,

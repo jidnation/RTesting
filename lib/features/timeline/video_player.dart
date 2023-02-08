@@ -49,8 +49,8 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
-      // aspectRatio: _videoPlayerController.value.aspectRatio,
-      aspectRatio: 0.9,
+      aspectRatio: _videoPlayerController.value.aspectRatio,
+      // aspectRatio: 0.9,
       allowFullScreen: false,
       looping: true,
       autoInitialize: true,
@@ -100,7 +100,15 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                         visibilityInfo.visibleFraction * 100;
                     show && visiblePercentage > 60
                         ? _chewieController!.videoPlayerController.play()
-                        : _chewieController!.videoPlayerController.pause();
+                        : _chewieController!
+                                .videoPlayerController.value.isPlaying
+                            ? _chewieController!.videoPlayerController.pause()
+                            : null;
+                    if (visiblePercentage < 30 &&
+                        _chewieController!
+                            .videoPlayerController.value.isPlaying) {
+                      _videoPlayerController.dispose();
+                    }
                   },
                   child: AspectRatio(
                       aspectRatio: 1,
@@ -156,8 +164,14 @@ class _TimeLineVideoPlayerState extends State<TimeLineVideoPlayer> {
                     double visiblePercentage =
                         visibilityInfo.visibleFraction * 100;
                     visiblePercentage > 60
-                        ? _chewieController!.videoPlayerController.play()
-                        : _chewieController!.videoPlayerController.pause();
+                        ? _videoPlayerController.play()
+                        : _videoPlayerController.value.isPlaying
+                            ? _videoPlayerController.pause()
+                            : null;
+                    // if(visiblePercentage < 30 && _chewieController!
+                    //     .videoPlayerController.value.isPlaying){
+                    //   _videoPlayerController.dispose();
+                    // }
                   },
                   child: AspectRatio(
                       aspectRatio: 1,

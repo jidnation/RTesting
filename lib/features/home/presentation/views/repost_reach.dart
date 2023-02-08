@@ -180,10 +180,7 @@ class _RepostReachState extends State<RepostReach> {
         bloc: globals.socialServiceBloc,
         listener: (context, state) {
           if (state is CreateRepostSuccess) {
-            timeLineFeedStore.initialize(isQuoting: true);
-            // globals.socialServiceBloc!
-            //     .add(GetPostFeedEvent(pageLimit: 50, pageNumber: 1));
-            // Navigator.pop(context);
+            timeLineFeedStore.initialize(isQuoting: true, isRefreshing: true);
           }
           if (state is CreateRepostError) {
             Snackbars.error(context, message: state.error);
@@ -269,19 +266,20 @@ class _RepostReachState extends State<RepostReach> {
                               _mediaList.value.isNotEmpty) {
                             if (_mediaList.value.isNotEmpty) {
                               globals.socialServiceBloc!.add(
-                                  UploadPostMediaEvent(media: _mediaList.value));
-          
+                                  UploadPostMediaEvent(
+                                      media: _mediaList.value));
+
                               setState(() {
                                 _mentionList.value = controllerKey
                                     .currentState!.controller!.text.mentions;
                               });
-          
+
                               // globals.mentionList!.add(controllerKey
                               //     .currentState!.controller!.markupText);
-          
+
                               debugPrint(
                                   "Mention: ${controllerKey.currentState!.controller!.markupText}");
-          
+
                               setState(() {});
                             } else {
                               setState(() {
@@ -365,12 +363,14 @@ class _RepostReachState extends State<RepostReach> {
                                         ],
                                       ),
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width *
-                                            0.03,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                       ),
                                       Container(
-                                        width: MediaQuery.of(context).size.width *
-                                            0.2,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
                                         height:
                                             MediaQuery.of(context).size.width *
                                                 0.08,
@@ -415,7 +415,7 @@ class _RepostReachState extends State<RepostReach> {
                                     height: MediaQuery.of(context).size.height *
                                         0.028,
                                   ),
-          
+
                                   Container(
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 24),
@@ -426,7 +426,8 @@ class _RepostReachState extends State<RepostReach> {
                                         border: Border.all(
                                             color: AppColors.greyShade10)),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.stretch,
                                       mainAxisSize: MainAxisSize.min,
@@ -461,7 +462,7 @@ class _RepostReachState extends State<RepostReach> {
                                                           const NewAccountScreen())
                                                       : RouteNavigators.route(
                                                           context,
-                                                      RecipientNewAccountScreen(
+                                                          RecipientAccountProfile(
                                                             recipientEmail:
                                                                 'email',
                                                             recipientImageUrl: widget
@@ -487,7 +488,8 @@ class _RepostReachState extends State<RepostReach> {
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.start,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
@@ -502,7 +504,8 @@ class _RepostReachState extends State<RepostReach> {
                                                               fontFamily:
                                                                   'Poppins',
                                                               fontWeight:
-                                                                  FontWeight.w500,
+                                                                  FontWeight
+                                                                      .w500,
                                                               color: AppColors
                                                                   .textColor2,
                                                             ),
@@ -520,14 +523,8 @@ class _RepostReachState extends State<RepostReach> {
                                                       Row(
                                                         children: [
                                                           Text(
-                                                            widget
-                                                                            .postFeedModel!
-                                                                            .post!
-                                                                            .location! ==
-                                                                        'nil' ||
-                                                                    widget
-                                                                            .postFeedModel!
-                                                                            .post!
+                                                            widget.postFeedModel!.post!.location! == 'nil' ||
+                                                                    widget.postFeedModel!.post!
                                                                             .location! ==
                                                                         'NIL' ||
                                                                     widget
@@ -547,7 +544,8 @@ class _RepostReachState extends State<RepostReach> {
                                                                         .post!
                                                                         .location!
                                                                         .substring(
-                                                                            0, 23)
+                                                                            0,
+                                                                            23)
                                                                     : widget
                                                                         .postFeedModel!
                                                                         .post!
@@ -558,9 +556,11 @@ class _RepostReachState extends State<RepostReach> {
                                                                       10),
                                                               fontFamily:
                                                                   'Poppins',
-                                                              letterSpacing: 0.4,
+                                                              letterSpacing:
+                                                                  0.4,
                                                               fontWeight:
-                                                                  FontWeight.w400,
+                                                                  FontWeight
+                                                                      .w400,
                                                               color: AppColors
                                                                   .textColor2,
                                                             ),
@@ -573,9 +573,11 @@ class _RepostReachState extends State<RepostReach> {
                                                                       10),
                                                               fontFamily:
                                                                   'Poppins',
-                                                              letterSpacing: 0.4,
+                                                              letterSpacing:
+                                                                  0.4,
                                                               fontWeight:
-                                                                  FontWeight.w400,
+                                                                  FontWeight
+                                                                      .w400,
                                                               color: AppColors
                                                                   .textColor2,
                                                             ),
@@ -594,12 +596,15 @@ class _RepostReachState extends State<RepostReach> {
                                             ? const SizedBox.shrink()
                                             : ExpandableText(
                                                 "${widget.postFeedModel!.post!.content}",
-                                                prefixText: widget.postFeedModel!
-                                                        .post!.edited!
+                                                prefixText: widget
+                                                        .postFeedModel!
+                                                        .post!
+                                                        .edited!
                                                     ? "(Reach Edited ${Helper.parseUserLastSeen(widget.postFeedModel!.post!.updatedAt.toString())})"
                                                     : null,
                                                 prefixStyle: TextStyle(
-                                                    fontSize: getScreenHeight(12),
+                                                    fontSize:
+                                                        getScreenHeight(12),
                                                     fontFamily: 'Poppins',
                                                     fontWeight: FontWeight.w400,
                                                     color:
@@ -617,8 +622,8 @@ class _RepostReachState extends State<RepostReach> {
                                                 onHashtagTap: (value) {
                                                   showDialog(
                                                       context: context,
-                                                      builder:
-                                                          (BuildContext context) {
+                                                      builder: (BuildContext
+                                                          context) {
                                                         return DictionaryDialog(
                                                           abbr: value,
                                                           meaning: '',
@@ -628,18 +633,19 @@ class _RepostReachState extends State<RepostReach> {
                                                 },
                                                 onMentionTap: (value) {
                                                   timeLineFeedStore
-                                                      .getUserByUsername(context,
+                                                      .getUserByUsername(
+                                                          context,
                                                           username: value);
-          
+
                                                   debugPrint("Value $value");
                                                 },
                                                 mentionStyle: const TextStyle(
-                                                    decoration:
-                                                        TextDecoration.underline,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                     color: Colors.blue),
                                                 hashtagStyle: const TextStyle(
-                                                    decoration:
-                                                        TextDecoration.underline,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                     color: Colors.blue),
                                               ).paddingSymmetric(h: 16, v: 10),
                                         if ((widget.postFeedModel?.post
@@ -647,8 +653,8 @@ class _RepostReachState extends State<RepostReach> {
                                                 [])
                                             .isNotEmpty)
                                           PostMedia(
-                                                  post:
-                                                      widget.postFeedModel!.post!)
+                                                  post: widget
+                                                      .postFeedModel!.post!)
                                               .paddingOnly(
                                                   r: 16, l: 16, b: 16, t: 10)
                                         else
@@ -663,7 +669,8 @@ class _RepostReachState extends State<RepostReach> {
                                                     .height /
                                                 2,
                                             child: TimeLineVideoPlayer(
-                                                post: widget.postFeedModel!.post!,
+                                                post:
+                                                    widget.postFeedModel!.post!,
                                                 videoUrl: widget.postFeedModel!
                                                     .post!.videoMediaItem!),
                                           )
@@ -680,9 +687,10 @@ class _RepostReachState extends State<RepostReach> {
                                                 width: SizeConfig.screenWidth,
                                                 decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(10),
-                                                    color:
-                                                        const Color(0xfff5f5f5)),
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: const Color(
+                                                        0xfff5f5f5)),
                                                 child: Row(children: [
                                                   Expanded(
                                                       child: MomentAudioPlayer(
@@ -697,14 +705,14 @@ class _RepostReachState extends State<RepostReach> {
                                       ],
                                     ),
                                   ),
-          
+
                                   SizedBox(
-                                    height:
-                                        MediaQuery.of(context).size.height * 0.02,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.02,
                                   ),
                                   const Divider(
                                       color: Color(0xFFEBEBEB), thickness: 0.5),
-          
+
                                   BlocConsumer<DictionaryBloc, DictionaryState>(
                                     bloc: globals.dictionaryBloc,
                                     listener: (context, state) {
@@ -716,10 +724,10 @@ class _RepostReachState extends State<RepostReach> {
                                                   "meaning": item["meaning"],
                                                 })
                                             .toList();
-          
+
                                         _isLoading.value = false;
                                       }
-          
+
                                       if (state is LoadingWordsToMentions) {
                                         _isLoading.value = true;
                                       }
@@ -738,7 +746,7 @@ class _RepostReachState extends State<RepostReach> {
                                           maxLength: 1100,
                                           // minLines: null,
                                           focusNode: focusNode,
-          
+
                                           suggestionPosition:
                                               SuggestionPosition.Bottom,
                                           onChanged: (val) {
@@ -765,7 +773,8 @@ class _RepostReachState extends State<RepostReach> {
                                               color: AppColors.greyShade1,
                                             ),
                                             border: InputBorder.none,
-                                            contentPadding: EdgeInsets.symmetric(
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
                                               horizontal: 16,
                                               vertical: 10,
                                             ),
@@ -780,8 +789,9 @@ class _RepostReachState extends State<RepostReach> {
                                                 matchAll: false,
                                                 suggestionBuilder: (data) {
                                                   return Container(
-                                                    padding: const EdgeInsets.all(
-                                                        10.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
                                                     child: _isLoading.value
                                                         ? const CircularProgressIndicator()
                                                         : _recentWords
@@ -820,11 +830,9 @@ class _RepostReachState extends State<RepostReach> {
                                                                         data[
                                                                             'meaning'],
                                                                         textAlign:
-                                                                            TextAlign
-                                                                                .left,
+                                                                            TextAlign.left,
                                                                         overflow:
-                                                                            TextOverflow
-                                                                                .ellipsis,
+                                                                            TextOverflow.ellipsis,
                                                                         style: const TextStyle(
                                                                             fontSize:
                                                                                 10,
@@ -850,8 +858,9 @@ class _RepostReachState extends State<RepostReach> {
                                                 matchAll: false,
                                                 suggestionBuilder: (data) {
                                                   return Container(
-                                                    padding: const EdgeInsets.all(
-                                                        10.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
                                                     child: _isLoading.value
                                                         ? const CircularProgressIndicator()
                                                         : _mentionUsers
@@ -926,7 +935,7 @@ class _RepostReachState extends State<RepostReach> {
                                       );
                                     },
                                   ),
-          
+
                                   const SizedBox(height: 10),
                                   if (_mediaList.value.isNotEmpty)
                                     PostReachMediaGrid(
@@ -1016,7 +1025,8 @@ class _RepostReachState extends State<RepostReach> {
                                               ),
                                             ).paddingSymmetric(
                                                 h: size.width / 2.7),
-                                            SizedBox(height: getScreenHeight(21)),
+                                            SizedBox(
+                                                height: getScreenHeight(21)),
                                             Center(
                                               child: Text(
                                                 'Who can reply',
@@ -1027,7 +1037,8 @@ class _RepostReachState extends State<RepostReach> {
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(5)),
+                                            SizedBox(
+                                                height: getScreenHeight(5)),
                                             Center(
                                               child: Text(
                                                 'Identify who can reply to this reach.',
@@ -1037,11 +1048,13 @@ class _RepostReachState extends State<RepostReach> {
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(20)),
+                                            SizedBox(
+                                                height: getScreenHeight(20)),
                                             InkWell(
                                               onTap: () {
                                                 setState(() {
-                                                  replyFeature.value = 'everyone';
+                                                  replyFeature.value =
+                                                      'everyone';
                                                   RouteNavigators.pop(context);
                                                 });
                                               },
@@ -1053,13 +1066,15 @@ class _RepostReachState extends State<RepostReach> {
                                                 title: Text(
                                                   'Everyone can reply',
                                                   style: TextStyle(
-                                                    fontSize: getScreenHeight(16),
+                                                    fontSize:
+                                                        getScreenHeight(16),
                                                     color: AppColors.black,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(10)),
+                                            SizedBox(
+                                                height: getScreenHeight(10)),
                                             InkWell(
                                               onTap: () {
                                                 setState(() {
@@ -1076,13 +1091,15 @@ class _RepostReachState extends State<RepostReach> {
                                                 title: Text(
                                                   'People reaching you',
                                                   style: TextStyle(
-                                                    fontSize: getScreenHeight(16),
+                                                    fontSize:
+                                                        getScreenHeight(16),
                                                     color: AppColors.black,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(10)),
+                                            SizedBox(
+                                                height: getScreenHeight(10)),
                                             InkWell(
                                               onTap: () {
                                                 setState(() {
@@ -1099,13 +1116,15 @@ class _RepostReachState extends State<RepostReach> {
                                                 title: Text(
                                                   'Only people you mention',
                                                   style: TextStyle(
-                                                    fontSize: getScreenHeight(16),
+                                                    fontSize:
+                                                        getScreenHeight(16),
                                                     color: AppColors.black,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(height: getScreenHeight(10)),
+                                            SizedBox(
+                                                height: getScreenHeight(10)),
                                             InkWell(
                                               onTap: () {
                                                 setState(() {
@@ -1121,7 +1140,8 @@ class _RepostReachState extends State<RepostReach> {
                                                 title: Text(
                                                   'None',
                                                   style: TextStyle(
-                                                    fontSize: getScreenHeight(16),
+                                                    fontSize:
+                                                        getScreenHeight(16),
                                                     color: AppColors.black,
                                                   ),
                                                 ),
@@ -1145,12 +1165,13 @@ class _RepostReachState extends State<RepostReach> {
                                     });
                                   },
                                   padding: EdgeInsets.zero,
-                                  icon: SvgPicture.asset('assets/svgs/emoji.svg'),
+                                  icon:
+                                      SvgPicture.asset('assets/svgs/emoji.svg'),
                                   splashColor: Colors.transparent,
                                   splashRadius: 20,
                                   constraints: const BoxConstraints(),
                                 ),
-          
+
                                 IconButton(
                                     onPressed: () {
                                       showModalBottomSheet(
@@ -1175,7 +1196,8 @@ class _RepostReachState extends State<RepostReach> {
                                                     children: [
                                                       Container(
                                                         height: 4,
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           color: AppColors
                                                               .greyShade5
                                                               .withOpacity(0.5),
@@ -1186,8 +1208,9 @@ class _RepostReachState extends State<RepostReach> {
                                                       ).paddingSymmetric(
                                                           h: size.width / 2.7),
                                                       SizedBox(
-                                                          height: getScreenHeight(
-                                                              21)),
+                                                          height:
+                                                              getScreenHeight(
+                                                                  21)),
                                                       Center(
                                                         child: Text(
                                                           'Content warning',
@@ -1204,7 +1227,8 @@ class _RepostReachState extends State<RepostReach> {
                                                       ),
                                                       SizedBox(
                                                           height:
-                                                              getScreenHeight(5)),
+                                                              getScreenHeight(
+                                                                  5)),
                                                       Center(
                                                         child: Text(
                                                           "Select a category and we'll put a content warning. This helps people avoid content they don't want to see",
@@ -1218,8 +1242,8 @@ class _RepostReachState extends State<RepostReach> {
                                                         ),
                                                       ),
                                                       RadioListTile(
-                                                        title:
-                                                            const Text('Nudity'),
+                                                        title: const Text(
+                                                            'Nudity'),
                                                         value: 'Nudity',
                                                         groupValue: postRating,
                                                         activeColor: AppColors
@@ -1234,7 +1258,8 @@ class _RepostReachState extends State<RepostReach> {
                                                       RadioListTile(
                                                         title: const Text(
                                                             'Graphic Violence'),
-                                                        value: 'Graphic Violence',
+                                                        value:
+                                                            'Graphic Violence',
                                                         activeColor: AppColors
                                                             .primaryColor,
                                                         groupValue: postRating,
@@ -1265,7 +1290,7 @@ class _RepostReachState extends State<RepostReach> {
                                           });
                                     },
                                     icon: const Icon(Icons.flag)),
-          
+
                                 IconButton(
                                   onPressed: () async {
                                     final res = await showMediaUploadOption(
@@ -1287,7 +1312,7 @@ class _RepostReachState extends State<RepostReach> {
                                           .pickFromGallery(
                                               context: context, maxAssets: 15);
                                     }
-          
+
                                     if (media == null) return;
                                     int total = media.length;
                                     // int noOfVideos = media
@@ -1296,14 +1321,15 @@ class _RepostReachState extends State<RepostReach> {
                                     // int noOfImages = media
                                     //     .where((e) => FileUtils.isImage(e.file))
                                     //     .length;
-          
-                                    if ((_mediaList.value.length + total) > 15) {
+
+                                    if ((_mediaList.value.length + total) >
+                                        15) {
                                       Snackbars.error(context,
                                           message:
                                               'Sorry, you cannot add more than 15 media');
                                       return;
                                     }
-          
+
                                     if (nVideos > 0) {
                                       Snackbars.error(context,
                                           message:
@@ -1314,15 +1340,17 @@ class _RepostReachState extends State<RepostReach> {
                                       _mediaList.value.add(UploadFileDto(
                                           file: e.file,
                                           fileResult: e,
-                                          id: Random().nextInt(100).toString()));
+                                          id: Random()
+                                              .nextInt(100)
+                                              .toString()));
                                     }
                                     setState(() {});
                                   },
                                   splashColor: Colors.transparent,
                                   splashRadius: 20,
                                   padding: EdgeInsets.zero,
-                                  icon:
-                                      SvgPicture.asset('assets/svgs/gallery.svg'),
+                                  icon: SvgPicture.asset(
+                                      'assets/svgs/gallery.svg'),
                                   constraints: const BoxConstraints(),
                                 ),
                                 const SizedBox(width: 20),
@@ -1335,7 +1363,7 @@ class _RepostReachState extends State<RepostReach> {
                                 //     });
                                 //     var tempDir = await getTemporaryDirectory();
                                 //     var path = '${tempDir.path}/flutter_sound.aac';
-          
+
                                 //     if (!isRecordingInit) {
                                 //       return;
                                 //     }
@@ -1343,7 +1371,7 @@ class _RepostReachState extends State<RepostReach> {
                                 //       await _soundRecorder!.stopRecorder();
                                 //       print(path);
                                 //       File audioMessage = File(path);
-          
+
                                 //       /*globals.chatBloc!.add(
                                 //                                 UploadImageFileEvent(
                                 //                                     file: audioMessage));*/
@@ -1368,7 +1396,7 @@ class _RepostReachState extends State<RepostReach> {
                                 //         ),
                                 //   constraints: const BoxConstraints(),
                                 // ),
-          
+
                                 PopupMenuButton(
                                   onSelected: (value) async {
                                     if ((_mediaList.value.length + 1) > 15) {
@@ -1398,7 +1426,9 @@ class _RepostReachState extends State<RepostReach> {
                                       _mediaList.value.add(UploadFileDto(
                                           file: media.file,
                                           fileResult: media,
-                                          id: Random().nextInt(100).toString()));
+                                          id: Random()
+                                              .nextInt(100)
+                                              .toString()));
                                       setState(() {});
                                     } else if (value == 2) {
                                       _recordingService.record(
@@ -1421,7 +1451,8 @@ class _RepostReachState extends State<RepostReach> {
                                               TextStyle(color: AppColors.black),
                                         )),
                                   ],
-                                  child: SvgPicture.asset('assets/svgs/mic.svg'),
+                                  child:
+                                      SvgPicture.asset('assets/svgs/mic.svg'),
                                 ),
                               ],
                             ),
@@ -1429,70 +1460,69 @@ class _RepostReachState extends State<RepostReach> {
                         ),
                       ),
                       Offstage(
-                            offstage: !emojiShowing,
-                            child: SizedBox(
-                              height: 227,
-                              child: EmojiPicker(
-                                textEditingController: controller,
-                                config: Config(
-                                    columns: 7,
-                                    emojiSizeMax:
-                                        28 * (Platform.isIOS ? 1.30 : 1.0),
-                                    verticalSpacing: 0,
-                                    horizontalSpacing: 0,
-                                    gridPadding: EdgeInsets.zero,
-                                    initCategory: Category.RECENT,
-                                    bgColor: Colors.white,
-                                    indicatorColor:
-                                        Theme.of(context).primaryColor,
-                                    iconColor: Colors.grey,
-                                    iconColorSelected:
-                                        Theme.of(context).primaryColor,
-                                    backspaceColor:
-                                        Theme.of(context).primaryColor,
-                                    skinToneDialogBgColor: Colors.white,
-                                    skinToneIndicatorColor: Colors.grey,
-                                    enableSkinTones: true,
-                                    showRecentsTab: true,
-                                    recentsLimit: 32,
-                                    noRecents: const Text(
-                                      'Pas d\'émojis récents',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.black26),
-                                      textAlign: TextAlign.center,
-                                    )),
-                                onEmojiSelected: (category, emoji) {
-                                  controllerKey.currentState!.controller!.text +=
-                                      emoji.emoji;
+                          offstage: !emojiShowing,
+                          child: SizedBox(
+                            height: 227,
+                            child: EmojiPicker(
+                              textEditingController: controller,
+                              config: Config(
+                                  columns: 7,
+                                  emojiSizeMax:
+                                      28 * (Platform.isIOS ? 1.30 : 1.0),
+                                  verticalSpacing: 0,
+                                  horizontalSpacing: 0,
+                                  gridPadding: EdgeInsets.zero,
+                                  initCategory: Category.RECENT,
+                                  bgColor: Colors.white,
+                                  indicatorColor:
+                                      Theme.of(context).primaryColor,
+                                  iconColor: Colors.grey,
+                                  iconColorSelected:
+                                      Theme.of(context).primaryColor,
+                                  backspaceColor:
+                                      Theme.of(context).primaryColor,
+                                  skinToneDialogBgColor: Colors.white,
+                                  skinToneIndicatorColor: Colors.grey,
+                                  enableSkinTones: true,
+                                  showRecentsTab: true,
+                                  recentsLimit: 32,
+                                  noRecents: const Text(
+                                    'Pas d\'émojis récents',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.black26),
+                                    textAlign: TextAlign.center,
+                                  )),
+                              onEmojiSelected: (category, emoji) {
+                                controllerKey.currentState!.controller!.text +=
+                                    emoji.emoji;
+                                setState(() {
+                                  controllerKey.currentState!.controller!.text =
+                                      controllerKey
+                                          .currentState!.controller!.text;
+                                });
+                                if (!isTyping.value) {
                                   setState(() {
-                                    controllerKey.currentState!.controller!.text =
-                                        controllerKey
-                                            .currentState!.controller!.text;
+                                    isTyping.value = !isTyping.value;
                                   });
-                                  if (!isTyping.value) {
-                                    setState(() {
-                                      isTyping.value = !isTyping.value;
-                                    });
-                                  }
-                                },
-                              ),
-                      )
-                      )
+                                }
+                              },
+                            ),
+                          ))
                     ],
                   ),
                 ),
               ],
             )),
             onWillPop: () {
-            if (emojiShowing) {
-              setState(() {
-                emojiShowing = false;
-              });
-            } else {
-              RouteNavigators.pop(context);
-            }
-            return Future.value(false);
-          },
+              if (emojiShowing) {
+                setState(() {
+                  emojiShowing = false;
+                });
+              } else {
+                RouteNavigators.pop(context);
+              }
+              return Future.value(false);
+            },
           ),
         ));
   }

@@ -41,7 +41,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         response.fold(
           (error) => emit(CreatePostError(error: error)),
           (post) {
-            timeLineFeedStore.initialize(isPosting: true);
+            timeLineFeedStore.initialize(isPosting: true, isRefreshing: true);
             Console.log('post data bloc', post.toJson());
             // emit(CreatePostSuccess(post: post));
           },

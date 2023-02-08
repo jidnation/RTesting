@@ -73,7 +73,7 @@ class ApiClient {
 
     try {
       final response = await _dio.get(
-        '${Endpoints.graphQLBaseUrl}/utility/get-signed-url/$fileName',
+        '${Endpoints.graphQLBaseUrl2}/utility/get-signed-url/$fileName',
       );
       Console.log('responseee', response);
       return response.data;

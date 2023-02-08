@@ -81,7 +81,7 @@ class TimelineRepostedPost extends StatelessWidget {
                                 context, const NewAccountScreen())
                             : RouteNavigators.route(
                                 context,
-                            RecipientNewAccountScreen(
+                                RecipientAccountProfile(
                                   recipientEmail: 'email',
                                   recipientImageUrl:
                                       tPostOwnerInfo.profilePicture,
@@ -188,8 +188,7 @@ class TimelineRepostedPost extends StatelessWidget {
                       });
                 },
                 onMentionTap: (value) {
-                   timeLineFeedStore.getUserByUsername(context,
-                        username: value);
+                  timeLineFeedStore.getUserByUsername(context, username: value);
                 },
                 mentionStyle: const TextStyle(
                     decoration: TextDecoration.underline, color: Colors.blue),
@@ -208,7 +207,7 @@ class TimelineRepostedPost extends StatelessWidget {
                     : 0),
             tPostInfo.repostedPost!.videoMediaItem!.isNotEmpty
                 ? Container(
-                    height: 550,
+                    height: 310,
                     width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),

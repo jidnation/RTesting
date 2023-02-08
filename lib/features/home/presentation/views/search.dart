@@ -224,7 +224,7 @@ class SearchResultCard extends StatelessWidget {
                 ? RouteNavigators.route(context, const NewAccountScreen())
                 : RouteNavigators.route(
                     context,
-                    RecipientNewAccountScreen(
+                    RecipientAccountProfile(
                       recipientEmail: 'email',
                       recipientImageUrl: imageUrl,
                       recipientId: id,
