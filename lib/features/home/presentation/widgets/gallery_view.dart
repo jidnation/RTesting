@@ -21,33 +21,33 @@ class AppGalleryView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final pageController = usePageController(initialPage: initialPage ?? 0);
-    return Scaffold(
-      // backgroundColor: Colors.black.withOpacity(0.015),
-      body: SafeArea(
-        child: PageView.builder(
-            itemCount: mediaPaths.length,
-            scrollDirection: Axis.horizontal,
-            pageSnapping: true,
-            controller: pageController,
-            itemBuilder: (context, index) {
-              String path = mediaPaths[index];
-              if (FileUtils.isImagePath(path)) {
-                return Stack(children: [
-                  PhotoView(
-                      imageProvider: NetworkImage(path),
-                      loadingBuilder: (context, event) => const Center(
-                            child: CupertinoActivityIndicator(
-                              color: Colors.white,
-                            ),
-                          )),
-                  Positioned(
-                    top: 20,
-                    left: 20,
-                    right: 20,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          InkWell(
+    return SafeArea(
+      child: PageView.builder(
+          itemCount: mediaPaths.length,
+          scrollDirection: Axis.horizontal,
+          pageSnapping: true,
+          controller: pageController,
+          itemBuilder: (context, index) {
+            String path = mediaPaths[index];
+            if (FileUtils.isImagePath(path)) {
+              return Stack(children: [
+                PhotoView(
+                    imageProvider: NetworkImage(path),
+                    loadingBuilder: (context, event) => const Center(
+                          child: CupertinoActivityIndicator(
+                            color: Colors.white,
+                          ),
+                        )),
+                Positioned(
+                  top: 20,
+                  left: 20,
+                  right: 20,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Card(
+                          color: Colors.transparent,
+                          child: InkWell(
                             onTap: () {
                               Get.back();
                             },
@@ -59,18 +59,18 @@ class AppGalleryView extends HookWidget {
                                 color: Colors.white,
                               ),
                             ),
-                          )
-                        ]),
-                  )
-                ]);
-              } else {
-                return VideoPreview(
-                  path: path,
-                  isLocalVideo: false,
-                );
-              }
-            }),
-      ),
+                          ),
+                        )
+                      ]),
+                )
+              ]);
+            } else {
+              return VideoPreview(
+                path: path,
+                isLocalVideo: false,
+              );
+            }
+          }),
     );
   }
 }
