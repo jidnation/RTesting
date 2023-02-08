@@ -40,7 +40,6 @@ class _StatusBubbleState extends State<StatusBubble> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.preview.type == 'video') initVideo();
   }
@@ -157,7 +156,7 @@ class _StatusBubbleState extends State<StatusBubble> {
               style: TextStyle(
                   fontSize: getScreenHeight(11),
                   fontWeight: FontWeight.w400,
-                  color: false ?? false ? AppColors.greyShade3 : null,
+                  color:  false ? AppColors.greyShade3 : null,
                   overflow: TextOverflow.ellipsis))
         ],
       ),

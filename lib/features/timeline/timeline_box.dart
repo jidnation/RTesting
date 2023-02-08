@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,6 @@ import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
 import '../moment/moment_audio_player.dart';
 import '../profile/new_account.dart';
-import '../profile/recipientNewAccountProfile.dart';
 
 class TimeLineBox extends StatefulWidget {
   final TimeLineModel timeLineModel;
@@ -133,8 +131,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                 GestureDetector(
                   onTap: widget.userStatusFeed != null
                       ? () async {
-                          if (widget.userStatusFeed!
-                              .any((e) => e.username == tPostOwnerInfo!.username)) {
+                          if (widget.userStatusFeed!.any(
+                              (e) => e.username == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
                                 tPostOwnerInfo: tPostOwnerInfo!,
                                 userStatus: widget.userStatusFeed!);
@@ -402,7 +400,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
               Visibility(
                 visible: tPostInfo.audioMediaItem!.isNotEmpty,
                 child: Container(
-                  height: 59,
+                  height: 48,
                   margin: const EdgeInsets.only(bottom: 10),
                   width: SizeConfig.screenWidth,
                   decoration: BoxDecoration(
