@@ -25,7 +25,6 @@ import '../home/data/models/status.model.dart';
 import '../home/data/repositories/social_service_repository.dart';
 import '../home/data/repositories/user_repository.dart';
 import '../home/presentation/views/post_reach.dart';
-import '../profile/recipientNewAccountProfile.dart';
 import 'models/post_feed.dart';
 import 'models/profile_comment_model.dart';
 
@@ -653,6 +652,19 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             recipientId: userInfo?.id,
             recipientImageUrl: userInfo?.profilePicture,
           ));
+    }
+  }
+
+  Future<bool> usersReaching() async {
+    Either<String, bool> response = await UserRepository().getReachRelationship(
+        userId: globals.userId!, type: ReachRelationshipType.reacher);
+
+    bool isReaching = false;
+    if (response.isRight()) {
+      response.map((r) => isReaching = r);
+      return isReaching;
+    } else {
+      return false;
     }
   }
 

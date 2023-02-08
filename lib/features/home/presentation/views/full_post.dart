@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
@@ -41,7 +40,6 @@ import '../../../dictionary/presentation/widgets/view_words_dialog.dart';
 import '../../../moment/comment_media.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../profile/new_account.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/comment_box_bottom_sheet.dart';
 import '../../../timeline/timeline_feed.dart';
 import '../../../timeline/video_player.dart';
@@ -267,7 +265,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
             // }
 
             if (state is CommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 scrollController.animateTo(
                   scrollController.position.minScrollExtent,
@@ -286,7 +285,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is VotePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               if (!(state.isVoted!)) {
                 Snackbars.success(context,
                     message: 'The post you shouted down has been removed!');
@@ -300,7 +300,8 @@ class _FullPostScreenState extends State<FullPostScreen> {
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
             }
             if (state is LikePostSuccess || state is UnlikePostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               debugPrint("Like Post Success");
               globals.socialServiceBloc!
                   .add(GetPostEvent(postId: widget.postFeedModel!.postId));
@@ -325,13 +326,15 @@ class _FullPostScreenState extends State<FullPostScreen> {
             }
 
             if (state is LikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(GetSingleCommentOnPostEvent(
                   commentId: state.commentLikeModel!.commentId));
             }
 
             if (state is UnlikeCommentOnPostSuccess) {
-              timeLineFeedStore.initialize(isUpvoting: true, isRefreshing: true);
+              timeLineFeedStore.initialize(
+                  isUpvoting: true, isRefreshing: true);
               globals.socialServiceBloc!.add(
                   GetSingleCommentOnPostEvent(commentId: state.unlikeComment));
             }
@@ -1620,7 +1623,9 @@ class _FullPostScreenState extends State<FullPostScreen> {
 
       case "only_people_you_mention":
         if (widget.postFeedModel!.post!.mentionList!
-            .contains(globals.user!.username)) {
+                .contains(globals.user!.username) ||
+            (widget.postFeedModel!.post!.postOwnerProfile!.authId ==
+                globals.userId)) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0),
             child: SizedBox(

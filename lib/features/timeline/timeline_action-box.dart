@@ -35,9 +35,17 @@ class TimeLineBoxActionRow extends StatefulWidget {
 
 class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
   LikeModel likeModelInfo = LikeModel(nLikes: 0, isLiked: false);
+  bool isReaching = false;
   @override
   void initState() {
     super.initState();
+  }
+
+  usersReaching() async {
+    bool isReachingUser = await timeLineFeedStore.usersReaching();
+    setState(() {
+      isReaching = isReachingUser;
+    });
   }
 
   @override
@@ -91,32 +99,7 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
               )
             ]),
             const SizedBox(width: 12),
-            InkWell(
-              onTap: () {
-                RouteNavigators.route(
-                    routeContext,
-                    CommentReach(
-                        postFeedModel: timeLineFeedStore.getPostModelById(
-                            widget.timeLineId,
-                            type: widget.type)));
-              },
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                SvgPicture.asset(
-                  'assets/svgs/comment.svg',
-                ),
-                const SizedBox(width: 3),
-                CustomText(
-                  text: momentFeedStore.getCountValue(
-                    value: widget.post.nComments!,
-                  ),
-                  size: 15,
-                  isCenter: true,
-                  weight: FontWeight.w600,
-                  color: const Color(0xff001824),
-                )
-              ]),
-            ),
+            commentIcon(context),
             !(widget.type == 'profile' || widget.post.postOwnerProfile != null)
                 ? Visibility(
                     visible: timeLineFeedStore
@@ -246,5 +229,128 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
             ])),
       ]);
     });
+  }
+
+  Widget commentIcon(BuildContext routeContext) {
+    usersReaching();
+    switch (widget.post.commentOption) {
+      case "everyone":
+        return InkWell(
+          onTap: () {
+            RouteNavigators.route(
+                routeContext,
+                CommentReach(
+                    postFeedModel: timeLineFeedStore.getPostModelById(
+                        widget.timeLineId,
+                        type: widget.type)));
+          },
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            SvgPicture.asset(
+              'assets/svgs/comment.svg',
+            ),
+            const SizedBox(width: 3),
+            CustomText(
+              text: momentFeedStore.getCountValue(
+                value: widget.post.nComments!,
+              ),
+              size: 15,
+              isCenter: true,
+              weight: FontWeight.w600,
+              color: const Color(0xff001824),
+            )
+          ]),
+        );
+
+      case "people_you_follow":
+        if (widget.post.postOwnerProfile!.authId == globals.userId ||
+            isReaching) {
+          return InkWell(
+            onTap: () {
+              RouteNavigators.route(
+                  routeContext,
+                  CommentReach(
+                      postFeedModel: timeLineFeedStore.getPostModelById(
+                          widget.timeLineId,
+                          type: widget.type)));
+            },
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              SvgPicture.asset(
+                'assets/svgs/comment.svg',
+              ),
+              const SizedBox(width: 3),
+              CustomText(
+                text: momentFeedStore.getCountValue(
+                  value: widget.post.nComments!,
+                ),
+                size: 15,
+                isCenter: true,
+                weight: FontWeight.w600,
+                color: const Color(0xff001824),
+              )
+            ]),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      case "only_people_you_mention":
+        if (widget.post.mentionList!.contains(globals.user!.username) ||
+            (widget.post.postOwnerProfile!.authId == globals.userId)) {
+          return InkWell(
+            onTap: () {
+              RouteNavigators.route(
+                  routeContext,
+                  CommentReach(
+                      postFeedModel: timeLineFeedStore.getPostModelById(
+                          widget.timeLineId,
+                          type: widget.type)));
+            },
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              SvgPicture.asset(
+                'assets/svgs/comment.svg',
+              ),
+              const SizedBox(width: 3),
+              CustomText(
+                text: momentFeedStore.getCountValue(
+                  value: widget.post.nComments!,
+                ),
+                size: 15,
+                isCenter: true,
+                weight: FontWeight.w600,
+                color: const Color(0xff001824),
+              )
+            ]),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      default:
+        return InkWell(
+          onTap: () {
+            RouteNavigators.route(
+                routeContext,
+                CommentReach(
+                    postFeedModel: timeLineFeedStore.getPostModelById(
+                        widget.timeLineId,
+                        type: widget.type)));
+          },
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            SvgPicture.asset(
+              'assets/svgs/comment.svg',
+            ),
+            const SizedBox(width: 3),
+            CustomText(
+              text: momentFeedStore.getCountValue(
+                value: widget.post.nComments!,
+              ),
+              size: 15,
+              isCenter: true,
+              weight: FontWeight.w600,
+              color: const Color(0xff001824),
+            )
+          ]),
+        );
+    }
   }
 }

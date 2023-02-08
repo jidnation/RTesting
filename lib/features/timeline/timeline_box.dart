@@ -134,7 +134,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                   onTap: widget.userStatusFeed != null
                       ? () async {
                           if (widget.userStatusFeed!
-                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                              .any((e) => e.username == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
                                 tPostOwnerInfo: tPostOwnerInfo!,
                                 userStatus: widget.userStatusFeed!);
