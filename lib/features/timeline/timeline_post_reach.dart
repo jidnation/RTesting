@@ -1232,7 +1232,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
             ),
             const SizedBox(width: 9),
             const Text(
-              'People you follow',
+              'People reaching you',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
