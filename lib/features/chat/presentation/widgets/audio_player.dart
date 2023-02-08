@@ -195,23 +195,26 @@ class _PlayAudioState extends State<PlayAudio> {
       if (mounted) setState(() {});
     });
 
-    playerController.addListener(() {
-      Console.log('<<AUDIO-LISTENER>>', playerController.playerState.name);
-
-      if (playerController.playerState == PlayerState.initialized) {
+    playerController.onPlayerStateChanged.listen((event) {
+      if (event == PlayerState.initialized) {
         isInitialised = true;
         if (mounted) setState(() {});
-      } else if (playerController.playerState == PlayerState.playing) {
+      } else if (event == PlayerState.playing) {
         isPlaying = true;
         if (mounted) setState(() {});
-      } else if (playerController.playerState == PlayerState.paused ||
-          playerController.playerState == PlayerState.stopped) {
+      } else if (event == PlayerState.paused) {
         isPlaying = false;
         // playerController.seekTo(10);
         if (mounted) setState(() {});
+      } else if (event == PlayerState.stopped) {
+        isPlaying = false;
+        playerController.seekTo(10);
+        if (mounted) setState(() {});
       }
     });
-    await playerController.preparePlayer(filePath);
+    playerController.playerKey.isNotEmpty
+        ? await playerController.preparePlayer(filePath)
+        : null;
     if (mounted) setState(() {});
 
     position = await playerController.getDuration(DurationType.max);
@@ -227,12 +230,14 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      bool status = timeLineController.currentStatus.value;
-      timeLineController.currentId.value == widget.id
-          ? status
-              ? playerController.startPlayer(finishMode: FinishMode.loop)
-              : playerController.pausePlayer()
-          : playerController.pausePlayer();
+      String currentId = timeLineController.currentId.value;
+      if (currentId.isNotEmpty) {
+        currentId == widget.id
+            ? playerController.startPlayer(finishMode: FinishMode.loop)
+            : playerController.pausePlayer();
+      } else {
+        playerController.pausePlayer();
+      }
       return Column(
         children: [
           Expanded(
@@ -243,22 +248,22 @@ class _PlayAudioState extends State<PlayAudio> {
                   alignment: Alignment.topLeft,
                   child: IconButton(
                     onPressed: () {
-                      if (timeLineController.currentId.value == widget.id) {
-                        timeLineController.currentStatus(!status);
+                      if (currentId == widget.id) {
+                        timeLineController.currentId('');
                       } else {
                         timeLineController.currentId(widget.id);
                       }
                     },
-                    icon: !isPlaying
+                    icon: currentId == widget.id
                         ? Icon(
-                            Icons.play_arrow,
+                            Icons.pause_circle,
                             size: 30,
                             color: widget.isMe
                                 ? Colors.white
                                 : AppColors.textColor2,
                           )
                         : Icon(
-                            Icons.pause_circle,
+                            Icons.play_arrow,
                             size: 30,
                             color: widget.isMe
                                 ? Colors.white
