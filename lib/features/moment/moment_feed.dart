@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:like_button/like_button.dart';
@@ -10,7 +11,9 @@ import 'package:reach_me/features/moment/user_posting.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dimensions.dart';
+import '../../core/utils/app_globals.dart';
 import '../home/presentation/widgets/video_loader.dart';
+import '../timeline/timeline_feed.dart';
 import 'momentControlRoom/control_room.dart';
 import 'moment_appbar.dart';
 import 'moment_feed_comment.dart';
@@ -26,14 +29,9 @@ class MomentFeed extends StatefulWidget {
 final MomentFeedStore momentFeedStore = MomentFeedStore();
 
 CarouselController carouselController = CarouselController();
-// const colors = [Colors.green, Colors.blue, Colors.red, Colors.yellow];
 
 class _MomentFeedState extends State<MomentFeed> {
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
-
+  double rightValue = (SizeConfig.screenHeight > 782) ? 16 : 14.435;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -41,7 +39,7 @@ class _MomentFeedState extends State<MomentFeed> {
       child: Scaffold(
         backgroundColor: const Color(0xff001824),
         body: SizedBox(
-          height: size.height,
+          // height: size.height ,
           width: size.width,
           child: Column(children: [
             MomentsAppBar(
@@ -50,323 +48,293 @@ class _MomentFeedState extends State<MomentFeed> {
             ValueListenableBuilder(
               valueListenable: MomentFeedStore(),
               builder: (context, List<MomentModel> value, child) {
-                print('from the feed room.........??? $value }');
                 final List<MomentModel> momentFeeds = value;
-                // print(
-                //     'from the feed roomImage.........??? ${momentFeeds.first.profilePicture} }');
                 return momentFeedStore.gettingMoments
                     ? const VideoLoader()
                     : momentFeeds.isNotEmpty
-                        ? Column(children: [
-                            CarouselSlider(
-                                options: CarouselOptions(
-                                  viewportFraction:
-                                      widget.pageController.viewportFraction,
-                                  aspectRatio: 9 / 16,
-                                  onPageChanged: (index, _) {
-                                    checkMeOut(index);
-                                  },
-                                  enableInfiniteScroll: false,
-                                  scrollDirection: Axis.vertical,
-                                ),
-                                items: List<Widget>.generate(
-                                    momentFeedStore.momentCount,
-                                    (index) => Builder(builder: (context) {
-                                          final MomentModel momentFeed =
-                                              value[index];
-                                          return Stack(children: [
-                                            VideoPlayerItem(
-                                              videoUrl: momentFeed.videoUrl,
-                                              // ),
-                                            ),
-                                            Positioned(
-                                              top: getScreenHeight(300),
-                                              right: 20,
-                                              child: Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Stack(children: [
-                                                        InkWell(
-                                                          onTap: () {
-                                                            momentFeedStore
-                                                                .reachUser(
-                                                              toReachId: momentFeed
-                                                                  .momentOwnerId,
-                                                              id: momentFeed.id,
-                                                            );
-                                                          },
-                                                          child: SizedBox(
-                                                            height: 70,
-                                                            child: Column(
-                                                                children: [
-                                                                  Container(
-                                                                    height: 50,
-                                                                    width: 50,
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            12),
-                                                                    decoration: BoxDecoration(
-                                                                        color: AppColors.primaryColor,
-                                                                        borderRadius: BorderRadius.circular(30),
-                                                                        image: momentFeed.profilePicture.isNotEmpty
-                                                                            ? DecorationImage(
-                                                                                image: NetworkImage(momentFeed.profilePicture),
-                                                                                fit: BoxFit.cover,
-                                                                              )
-                                                                            : null),
-                                                                    child: momentFeed
-                                                                            .profilePicture
-                                                                            .isEmpty
-                                                                        ? Image.asset(
-                                                                            "assets/images/app-logo.png")
-                                                                        : null,
-                                                                  ),
-                                                                ]),
-                                                          ),
-                                                        ),
-                                                        Positioned(
-                                                            bottom: 10,
-                                                            right: 14,
-                                                            child: Container(
-                                                              height: 20,
-                                                              width: 20,
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: momentFeed
-                                                                        .reachingUser
-                                                                    ? Colors
-                                                                        .green
-                                                                    : AppColors
-                                                                        .primaryColor,
-                                                                border:
-                                                                    Border.all(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  width: 1.4,
-                                                                ),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            30),
+                        ? CarouselSlider(
+                            options: CarouselOptions(
+                              // height: SizeConfig.screenHeight - 151.5,
+                              viewportFraction:
+                                  (SizeConfig.screenHeight > 782) ? 1 : 1.25,
+                              aspectRatio: 9 / rightValue,
+                              onPageChanged: (index, _) {
+                                checkMeOut(index);
+                              },
+                              enableInfiniteScroll: false,
+                              scrollDirection: Axis.vertical,
+                            ),
+                            items: List<Widget>.generate(
+                                momentFeedStore.momentCount,
+                                (index) => Builder(builder: (context) {
+                                      final MomentModel momentFeed =
+                                          value[index];
+                                      return Stack(children: [
+                                        VideoPlayerItem(
+                                          videoUrl: momentFeed.videoUrl,
+                                        ),
+                                        Positioned(
+                                          top: getScreenHeight(300),
+                                          right: 20,
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Stack(children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        momentFeedStore
+                                                            .reachUser(
+                                                          toReachId: momentFeed
+                                                              .momentOwnerId,
+                                                          id: momentFeed.id,
+                                                        );
+                                                      },
+                                                      child: SizedBox(
+                                                        height: 70,
+                                                        child: Column(
+                                                            children: [
+                                                              Container(
+                                                                height: 50,
+                                                                width: 50,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(12),
+                                                                decoration: BoxDecoration(
+                                                                    color: AppColors.primaryColor,
+                                                                    borderRadius: BorderRadius.circular(30),
+                                                                    image: momentFeed.profilePicture.isNotEmpty
+                                                                        ? DecorationImage(
+                                                                            image:
+                                                                                NetworkImage(momentFeed.profilePicture),
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          )
+                                                                        : null),
+                                                                child: momentFeed
+                                                                        .profilePicture
+                                                                        .isEmpty
+                                                                    ? Image.asset(
+                                                                        "assets/images/app-logo.png")
+                                                                    : null,
                                                               ),
-                                                              child: Center(
-                                                                  child: Icon(
-                                                                momentFeed
-                                                                        .reachingUser
-                                                                    ? Icons
-                                                                        .check
-                                                                    : Icons.add,
-                                                                size: 13,
-                                                                color: Colors
-                                                                    .white,
-                                                              )),
-                                                            ))
-                                                      ]),
-                                                      const SizedBox(
-                                                          height: 10),
-                                                      ///////////////////
-                                                      LikeButton(
-                                                        size: 30,
-                                                        countBuilder: (count,
-                                                            isLiked, text) {
-                                                          return CustomText(
-                                                            text: count
-                                                                .toString(),
-                                                            weight:
-                                                                FontWeight.w500,
-                                                            color: Colors.white,
-                                                            size: 13.28,
-                                                          );
-                                                        },
-                                                        likeCountPadding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        isLiked:
-                                                            momentFeed.isLiked,
-                                                        countPostion:
-                                                            CountPostion.bottom,
-                                                        onTap: (isLiked) async {
-                                                          momentFeedStore
-                                                              .likingMoment(
-                                                                  momentId:
-                                                                      momentFeed
-                                                                          .momentId,
-                                                                  id: momentFeed
-                                                                      .id);
-                                                          return !isLiked;
-                                                        },
-                                                        circleColor: CircleColor(
-                                                            start: AppColors
-                                                                .primaryColor,
-                                                            end: AppColors
-                                                                .primaryColor
-                                                                .withOpacity(
-                                                                    0.5)),
-                                                        bubblesColor:
-                                                            BubblesColor(
-                                                          dotPrimaryColor:
-                                                              Colors.red,
-                                                          dotSecondaryColor:
-                                                              Colors.red
-                                                                  .withOpacity(
-                                                                      0.6),
-                                                        ),
-                                                        likeBuilder:
-                                                            (bool isLiked) {
-                                                          return Icon(
-                                                            size: 30,
-                                                            isLiked
-                                                                ? Icons.favorite
-                                                                : Icons
-                                                                    .favorite_outline_outlined,
-                                                            color: isLiked
-                                                                ? Colors.red
-                                                                : Colors.white,
-                                                          );
-
-                                                          //   Icon(
-                                                          //   Icons.home,
-                                                          //   color: isLiked
-                                                          //       ? Colors
-                                                          //           .deepPurpleAccent
-                                                          //       : Colors.grey,
-                                                          //   size: buttonSize,
-                                                          // );
-                                                        },
-                                                        likeCount:
-                                                            momentFeed.nLikes,
-                                                      ),
-                                                      const SizedBox(
-                                                          height: 15),
-                                                      MomentFeedComment(
-                                                          momentFeed:
-                                                              momentFeed),
-                                                      const SizedBox(
-                                                          height: 15),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          // RouteNavigators.route(
-                                                          //     context,
-                                                          //     MsgChatInterface(
-                                                          //       recipientUser:
-                                                          //           User(gf),
-                                                          //     ));
-                                                        },
-                                                        child: SvgPicture.asset(
-                                                          'assets/svgs/message.svg',
-                                                          color: Colors.white,
-                                                          width: 24.44,
-                                                          height: 22,
-                                                        ),
-                                                      ),
-                                                    ]),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              bottom: getScreenHeight(
-                                                  momentFeed.caption !=
-                                                          'No Caption'
-                                                      ? 30
-                                                      : 15),
-                                              left: 20,
-                                              right: 20,
-                                              child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    FittedBox(
-                                                      child: CustomText(
-                                                        text:
-                                                            '@${momentFeed.momentOwnerUserName}',
-                                                        color: Colors.white,
-                                                        weight: FontWeight.w600,
-                                                        size: 16.28,
+                                                            ]),
                                                       ),
                                                     ),
-                                                    const SizedBox(height: 5),
-                                                    SizedBox(
-                                                      width:
-                                                          getScreenWidth(300),
-                                                      child: CustomText(
-                                                        text: momentFeed
-                                                                    .caption !=
-                                                                'No Caption'
-                                                            ? momentFeed.caption
-                                                            : 'No Caption',
-                                                        color: Colors.white,
-                                                        isItalic:
-                                                            FontStyle.italic,
-                                                        weight: FontWeight.w600,
-                                                        // overflow: TextOverflow.ellipsis,
-                                                        size: 14,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 15),
-                                                    Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Row(children: [
-                                                            SvgPicture.asset(
-                                                                'assets/svgs/music.svg'),
-                                                            const SizedBox(
-                                                                width: 10),
-                                                            CustomText(
-                                                              text: momentFeed
-                                                                          .soundUrl ==
-                                                                      'Original Audio'
-                                                                  ? 'Original Audio'
-                                                                  : '',
+                                                    Positioned(
+                                                        bottom: 10,
+                                                        right: 14,
+                                                        child: Container(
+                                                          height: 20,
+                                                          width: 20,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: momentFeed
+                                                                    .reachingUser
+                                                                ? Colors.green
+                                                                : AppColors
+                                                                    .primaryColor,
+                                                            border: Border.all(
                                                               color:
                                                                   Colors.white,
-                                                              weight: FontWeight
-                                                                  .w600,
-                                                              size: 15.28,
-                                                            )
-                                                          ]),
-                                                          AudioImageLoader(
-                                                            audioUrl: momentFeed
-                                                                .soundUrl,
-                                                          )
-                                                        ])
+                                                              width: 1.4,
+                                                            ),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                          child: Center(
+                                                              child: Icon(
+                                                            momentFeed
+                                                                    .reachingUser
+                                                                ? Icons.check
+                                                                : Icons.add,
+                                                            size: 13,
+                                                            color: Colors.white,
+                                                          )),
+                                                        ))
                                                   ]),
-                                            ),
-                                            Positioned(
-                                              top: 2,
-                                              right: 0,
-                                              left: 0,
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Visibility(
-                                                  visible: momentFeedStore
-                                                      .postingUserComment,
-                                                  child: const CustomText(
-                                                    text: 'Posting Comment...',
-                                                    color: Colors.green,
-                                                    size: 18,
+                                                  const SizedBox(height: 10),
+                                                  ///////////////////
+                                                  LikeButton(
+                                                    size: 30,
+                                                    countBuilder:
+                                                        (count, isLiked, text) {
+                                                      return CustomText(
+                                                        text: count.toString(),
+                                                        weight: FontWeight.w500,
+                                                        color: Colors.white,
+                                                        size: 13.28,
+                                                      );
+                                                    },
+                                                    likeCountPadding:
+                                                        const EdgeInsets.all(0),
+                                                    isLiked: momentFeed.isLiked,
+                                                    countPostion:
+                                                        CountPostion.bottom,
+                                                    onTap: (isLiked) async {
+                                                      momentFeedStore
+                                                          .likingMoment(
+                                                              momentId:
+                                                                  momentFeed
+                                                                      .momentId,
+                                                              id: momentFeed
+                                                                  .id);
+                                                      return !isLiked;
+                                                    },
+                                                    circleColor: CircleColor(
+                                                        start: AppColors
+                                                            .primaryColor,
+                                                        end: AppColors
+                                                            .primaryColor
+                                                            .withOpacity(0.5)),
+                                                    bubblesColor: BubblesColor(
+                                                      dotPrimaryColor:
+                                                          Colors.red,
+                                                      dotSecondaryColor: Colors
+                                                          .red
+                                                          .withOpacity(0.6),
+                                                    ),
+                                                    likeBuilder:
+                                                        (bool isLiked) {
+                                                      return Icon(
+                                                        size: 30,
+                                                        isLiked
+                                                            ? Icons.favorite
+                                                            : Icons
+                                                                .favorite_outline_outlined,
+                                                        color: isLiked
+                                                            ? Colors.red
+                                                            : Colors.white,
+                                                      );
+                                                    },
+                                                    likeCount:
+                                                        momentFeed.nLikes,
+                                                  ),
+                                                  const SizedBox(height: 15),
+                                                  MomentFeedComment(
+                                                      momentFeed: momentFeed),
+                                                  const SizedBox(height: 15),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      if (momentFeed
+                                                              .momentOwnerId !=
+                                                          globals.userId) {
+                                                        HapticFeedback
+                                                            .mediumImpact();
+
+                                                        timeLineFeedStore
+                                                            .messageUser(
+                                                                context,
+                                                                id: momentFeed
+                                                                    .momentOwnerId);
+                                                      }
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/svgs/message.svg',
+                                                      color: Colors.white,
+                                                      width: 24.44,
+                                                      height: 22,
+                                                    ),
+                                                  ),
+                                                ]),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: getScreenHeight(
+                                              momentFeed.caption != 'No Caption'
+                                                  ? 30
+                                                  : 15),
+                                          left: 20,
+                                          right: 20,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                FittedBox(
+                                                  child: CustomText(
+                                                    text:
+                                                        '@${momentFeed.momentOwnerUserName}',
+                                                    color: Colors.white,
                                                     weight: FontWeight.w600,
+                                                    size: 16.28,
                                                   ),
                                                 ),
+                                                const SizedBox(height: 5),
+                                                SizedBox(
+                                                  width: getScreenWidth(300),
+                                                  child: CustomText(
+                                                    text: momentFeed.caption !=
+                                                            'No Caption'
+                                                        ? momentFeed.caption
+                                                        : 'No Caption',
+                                                    color: Colors.white,
+                                                    isItalic: FontStyle.italic,
+                                                    weight: FontWeight.w600,
+                                                    // overflow: TextOverflow.ellipsis,
+                                                    size: 14,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15),
+                                                Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Row(children: [
+                                                        SvgPicture.asset(
+                                                            'assets/svgs/music.svg'),
+                                                        const SizedBox(
+                                                            width: 10),
+                                                        CustomText(
+                                                          text: momentFeed
+                                                                      .soundUrl ==
+                                                                  'Original Audio'
+                                                              ? 'Original Audio'
+                                                              : '',
+                                                          color: Colors.white,
+                                                          weight:
+                                                              FontWeight.w600,
+                                                          size: 15.28,
+                                                        )
+                                                      ]),
+                                                      AudioImageLoader(
+                                                        audioUrl:
+                                                            momentFeed.soundUrl,
+                                                      )
+                                                    ])
+                                              ]),
+                                        ),
+                                        Positioned(
+                                          top: 2,
+                                          right: 0,
+                                          left: 0,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Visibility(
+                                              visible: momentFeedStore
+                                                  .postingUserComment,
+                                              child: const CustomText(
+                                                text: 'Posting Comment...',
+                                                color: Colors.green,
+                                                size: 18,
+                                                weight: FontWeight.w600,
                                               ),
-                                            )
-                                          ])
+                                            ),
+                                          ),
+                                        )
+                                      ])
 
-                                              ////////////
-                                              ;
-                                        }))),
-                          ])
+                                          ////////////
+                                          ;
+                                    })))
                         : SizedBox(
                             height: SizeConfig.screenHeight - 200,
                             width: SizeConfig.screenWidth,
