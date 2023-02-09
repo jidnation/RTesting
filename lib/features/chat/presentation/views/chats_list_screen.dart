@@ -19,6 +19,8 @@ import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:reach_me/features/chat/presentation/views/msg_chat_interface.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
+import 'users_list_bottom_sheet.dart';
+
 class ChatsListScreen extends StatefulHookWidget {
   static const String id = 'chats_list_screen';
   const ChatsListScreen({Key? key}) : super(key: key);
@@ -44,6 +46,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     final _tabController = useTabController(initialLength: 2, initialIndex: 0);
     final usersList = useState<List<ChatUser>>([]);
     final threads = useState<List<ChatsThread>>([]);
+    final filteredThreads = useState<List<ChatsThread>>([]);
     final tailMessage = useState<List<Chat>>([]);
     final recipientUsers = useState<List<User>>([]);
 
@@ -64,13 +67,15 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                 threads.value.clear();
                 tailMessage.value.clear();
                 recipientUsers.value.clear();
+                filteredThreads.value.clear();
+                threads.value = state.userThreads ?? [];
+                filteredThreads.value = threads.value;
                 for (var thread in state.userThreads!) {
                   for (var participant in thread.participantsInfo!) {
                     if (participant.authId != globals.user!.id) {
                       usersList.value.add(participant);
                     }
                   }
-                  threads.value = state.userThreads ?? [];
                   tailMessage.value.add(thread.tailMessage!);
                 }
               }
@@ -86,6 +91,8 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                       MsgChatInterface(recipientUser: state.user),
                     );
                     globals.userChat = [];
+                    globals.chatBloc!.add(GetUserThreadsEvent(
+                        id: globals.user!.id, pageNumber: 1, pageLimit: 20));
                   }
                   if (state is UserError) {
                     Snackbars.error(context, message: state.error);
@@ -117,27 +124,102 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                                   width: 23,
                                   height: 23,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final res = await showModalBottomSheet(
+                                      enableDrag: true,
+                                      context: context,
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(24),
+                                              topRight: Radius.circular(24))),
+                                      builder: (context) {
+                                        return const UsersListBottomSheet();
+                                      });
+                                  if (res == null) return;
+                                  if (res is User) {
+                                    final chatRes = await RouteNavigators.route(
+                                      context,
+                                      MsgChatInterface(recipientUser: res),
+                                    );
+                                    globals.userChat = [];
+                                    globals.chatBloc!.add(GetUserThreadsEvent(
+                                        id: globals.user!.id,
+                                        pageNumber: 1,
+                                        pageLimit: 20));
+                                  }
+                                },
                               ),
-                              IconButton(
-                                icon: SvgPicture.asset(
-                                  'assets/svgs/Setting.svg',
-                                  width: 23,
-                                  height: 23,
-                                  color: AppColors.textColor2,
-                                ),
-                                onPressed: () {},
-                              ),
+                              // IconButton(
+                              //   icon: SvgPicture.asset(
+                              //     'assets/svgs/Setting.svg',
+                              //     width: 23,
+                              //     height: 23,
+                              //     color: AppColors.textColor2,
+                              //   ),
+                              //   onPressed: () {},
+                              // ),
                             ],
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      const SizedBox(
+                      SizedBox(
                         height: 48,
                         child: CustomRoundTextField(
                           hintText: 'Search general reachout',
-                          textCapitalization: TextCapitalization.characters,
+                          // textCapitalization: TextCapitalization.characters,
+                          onChanged: (value) {
+                            usersList.value = [];
+                            tailMessage.value = [];
+                            filteredThreads.value = [];
+                            for (var thread in threads.value) {
+                              for (var participant
+                                  in thread.participantsInfo!) {
+                                if ((participant.authId != globals.user!.id) &&
+                                    value.isNotEmpty) {
+                                  if (participant.username!
+                                          .toLowerCase()
+                                          .contains(
+                                              value.trim().toLowerCase()) ||
+                                      participant.firstName!
+                                          .toLowerCase()
+                                          .contains(
+                                              value.trim().toLowerCase()) ||
+                                      participant.lastName!
+                                          .toLowerCase()
+                                          .contains(
+                                              value.trim().toLowerCase())) {
+                                    usersList.value = [
+                                      ...usersList.value,
+                                      participant
+                                    ];
+                                    tailMessage.value = [
+                                      ...tailMessage.value,
+                                      thread.tailMessage!
+                                    ];
+                                    filteredThreads.value = [
+                                      ...filteredThreads.value,
+                                      thread
+                                    ];
+                                  }
+                                } else if (participant.authId !=
+                                    globals.user!.id) {
+                                  usersList.value = [
+                                    ...usersList.value,
+                                    participant
+                                  ];
+                                  tailMessage.value = [
+                                    ...tailMessage.value,
+                                    thread.tailMessage!
+                                  ];
+                                  filteredThreads.value = [
+                                    ...filteredThreads.value,
+                                    thread
+                                  ];
+                                }
+                              }
+                            }
+                          },
                         ),
                       ).paddingSymmetric(h: 20),
                       const SizedBox(height: 25),
@@ -148,7 +230,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                           TabBar(
                             isScrollable: false,
                             indicatorWeight: 1.5,
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             indicatorColor: Colors.transparent,
                             unselectedLabelColor: AppColors.textColor2,
                             labelColor: AppColors.white,
@@ -214,14 +296,14 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                               child: TabBarView(
                                 controller: _tabController,
                                 children: [
-                                  threads.value.isNotEmpty
+                                  filteredThreads.value.isNotEmpty
                                       ? ListView.builder(
-                                          itemCount: threads.value.length,
+                                          itemCount:
+                                              filteredThreads.value.length,
                                           itemBuilder: (context, index) {
                                             return ChatItem(
                                               onTap: () {
                                                 handleTap(index);
-
                                                 if (active.contains(index)) {
                                                   globals.userBloc!.add(
                                                       GetRecipientProfileEvent(
