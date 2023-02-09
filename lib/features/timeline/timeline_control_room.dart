@@ -255,29 +255,26 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
 
       if (res != null && res) {
-        actualModel.getPostFeed.post?.isVoted = 'Downvote';
-        actualModel.getPostFeed.post!.nDownvotes =
-            actualModel.getPostFeed.post!.nDownvotes! + 1;
-        notifyListeners();
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
 
         if (response) {
+          type == 'post'
+              ? timeLineFeedStore.removePost(context, id, type: type)
+              : null;
+          actualModel.getPostFeed.post?.isVoted = 'Downvote';
+          actualModel.getPostFeed.post!.nDownvotes =
+              actualModel.getPostFeed.post!.nDownvotes! + 1;
+          notifyListeners();
           initialize(isRefreshing: true);
           fetchAll(isFirst: true);
-          voteType.toLowerCase() == 'upvote'
-              ? Snackbars.success(
-                  context,
-                  message: 'You have successfully shouted up this post.',
-                  milliseconds: 1300,
-                )
-              : Snackbars.success(
-                  context,
-                  message: 'You have successfully shouted down this post.',
-                  milliseconds: 1300,
-                );
+          Snackbars.success(
+            context,
+            message: 'You have successfully shouted down this post.',
+            milliseconds: 1300,
+          );
         } else {
           Get.snackbar(
             '',
@@ -299,9 +296,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             borderRadius: 16,
             duration: const Duration(milliseconds: 1500),
           );
-        }
-        if (voteType.toLowerCase() == 'downvote') {
-          timeLineFeedStore.removePost(context, id, type: type);
         }
       } else {
         Snackbars.error(

@@ -9,6 +9,7 @@ import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
@@ -30,6 +31,10 @@ class TimeLineController extends GetxController {
   RxBool isScrolling = false.obs;
   RxBool currentStatus = false.obs;
   RxString currentId = "".obs;
+  RxString userFullName = "".obs;
+  RxString userEmail = "".obs;
+  RxString userPhoneNumber = "".obs;
+  RxString userMessage = "".obs;
 
   RxList<CustomCounter> getExactBox(String type) {
     Map<String, dynamic> mapper = {
@@ -205,5 +210,38 @@ class TimeLineController extends GetxController {
               //   ),
               // )
             ]));
+  }
+
+  sendMail(BuildContext context) async {
+    String? encodeQueryParameters(Map<String, String> params) {
+      return params.entries
+          .map((MapEntry<String, String> e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+    }
+
+    final Uri _emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'televerseapps@gmail.com',
+        query: encodeQueryParameters({
+          'subject': "User Compliant",
+          'body':
+              "Name: ${userFullName.value}\nPhone Number: ${userPhoneNumber.value}\ncompliant: ${userMessage.value}",
+        }));
+
+    if (await canLaunchUrl(_emailLaunchUri)) {
+      bool res = await launchUrl(_emailLaunchUri);
+      if (res) {
+        Get.back();
+        Snackbars.success(context,
+            message:
+                'You have successfully submit your compliant, we will contact you soon.');
+        userFullName("");
+        userPhoneNumber("");
+        userMessage("");
+      }
+    } else {
+      throw 'Could not Launch $_emailLaunchUri.toString()';
+    }
   }
 }
