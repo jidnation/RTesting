@@ -80,6 +80,70 @@ class DeletePostCommentEvent extends SocialServiceEvent {
   DeletePostCommentEvent({required this.commentId});
 }
 
+class ReplyCommentOnPostEvent extends SocialServiceEvent {
+  final String postId;
+  final String? content;
+  final String commentId;
+  final String commentOwnerId;
+  final String postOwnerId;
+  final String? audioMediaItem;
+  final String? videoMediaItem;
+  final List<String>? imageMediaItems;
+
+  ReplyCommentOnPostEvent({
+    required this.postId,
+    this.content,
+    required this.commentId,
+    required this.postOwnerId,
+    required this.commentOwnerId,
+    this.audioMediaItem,
+    this.videoMediaItem,
+    this.imageMediaItems,
+  });
+}
+
+class GetCommentRepliesEvent extends SocialServiceEvent {
+  final String postId;
+  final String commentId;
+  final int? pageNumber, pageLimit;
+
+  GetCommentRepliesEvent(
+      {required this.postId,
+      required this.commentId,
+      this.pageNumber,
+      this.pageLimit});
+}
+
+class DeleteCommentReplyEvent extends SocialServiceEvent {
+  final String postId;
+  final String replyId;
+
+  DeleteCommentReplyEvent({
+    required this.postId,
+    required this.replyId,
+  });
+}
+
+class LikeCommentReplyEvent extends SocialServiceEvent {
+  final String postId;
+  final String replyId;
+  final String commentId;
+
+  LikeCommentReplyEvent({
+    required this.postId,
+    required this.replyId,
+    required this.commentId,
+  });
+}
+
+class UnlikeCommentReplyEvent extends SocialServiceEvent {
+  final String replyId;
+
+  UnlikeCommentReplyEvent({
+    required this.replyId,
+  });
+}
+
 class VotePostEvent extends SocialServiceEvent {
   final String? voteType;
   final String? postId;

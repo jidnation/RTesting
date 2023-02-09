@@ -20,7 +20,6 @@ import '../../core/utils/custom_text.dart';
 import '../account/presentation/views/account.dart';
 import '../moment/moment_audio_player.dart';
 import '../profile/new_account.dart';
-import '../profile/recipientNewAccountProfile.dart';
 
 class TimelineRepostedPost extends StatelessWidget {
   final PostModel tPostInfo;
@@ -228,7 +227,7 @@ class TimelineRepostedPost extends StatelessWidget {
               visible: tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty,
               child: Container(
                 height:
-                    tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty ? 59 : 0,
+                    tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty ? 48 : 0,
                 margin: const EdgeInsets.only(bottom: 10),
                 width: SizeConfig.screenWidth,
                 decoration: BoxDecoration(

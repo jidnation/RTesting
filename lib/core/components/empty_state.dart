@@ -13,7 +13,6 @@ import 'package:reach_me/core/utils/helpers.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
-import 'package:skeletons/skeletons.dart';
 
 class EmptyTimelineWidget extends StatefulHookWidget {
   const EmptyTimelineWidget({Key? key, required this.loading})

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/utils.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -25,7 +23,6 @@ import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
-import '../../core/utils/custom_text.dart';
 import '../timeline/loading_widget.dart';
 import '../timeline/timeline_feed.dart';
 
@@ -247,11 +244,10 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
 class CommentAudioMedia extends StatefulWidget {
   final String path;
   final String? id;
-  const CommentAudioMedia({
-    Key? key,
-    required this.path,
-    this.id,
-  }) : super(key: key);
+  final bool? isCommentReply;
+  const CommentAudioMedia(
+      {Key? key, required this.path, this.id, this.isCommentReply})
+      : super(key: key);
 
   @override
   State<CommentAudioMedia> createState() => _CommentAudioMediaState();
@@ -356,7 +352,9 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
         ),
         playerController.playerState != PlayerState.stopped
             ? AudioFileWaveforms(
-                size: Size(MediaQuery.of(context).size.width / 2.0, 24),
+                size: (widget.isCommentReply ?? false)
+                    ? Size(MediaQuery.of(context).size.width / 2.5, 18)
+                    : Size(MediaQuery.of(context).size.width / 2.0, 24),
                 playerController: playerController,
                 density: 2,
                 enableSeekGesture: true,
@@ -369,7 +367,9 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
                 ),
               )
             : SizedBox(
-                width: MediaQuery.of(context).size.width / 2.0,
+                width: (widget.isCommentReply ?? false)
+                    ? MediaQuery.of(context).size.width / 2.5
+                    : MediaQuery.of(context).size.width / 2.0,
                 child: const LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Color(0xff0077B6),

@@ -844,6 +844,9 @@ class _PostReachState extends State<PostReach> {
                                       enableRecording: true, context: context);
                               media = cMedia != null ? [cMedia] : null;
                             } else {
+                              Console.log(
+                                  "::::::>>>>>> am hereeeee brooo ::::::::",
+                                  '');
                               media = await MediaService().pickFromGallery(
                                   context: context, maxAssets: 15);
                             }
