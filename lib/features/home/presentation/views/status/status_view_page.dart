@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,8 +12,8 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
-import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
+import 'package:reach_me/core/utils/assets.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
@@ -123,13 +124,14 @@ class _StatusViewPageState extends State<StatusViewPage> {
     _startTimer(milliSecs, useCustomTime: useCustomTime);
   }
 
-  void _initStatus() {
+  Future<void> _initStatus() async {
     if (story.status?.type == 'text') {
       _startTimer(7000);
     } else if (story.status?.statusData?.audioMedia != null) {
       debugPrint("audio Player file: ${story.status!.statusData!.audioMedia}");
-      audioPlayer.play(UrlSource("${story.status!.statusData!.audioMedia}"));
-      audioPlayer.getDuration().then((value) {
+      await audioPlayer
+          .play(UrlSource("${story.status!.statusData!.audioMedia}"));
+      await audioPlayer.getDuration().then((value) {
         _statusDur = (value?.inMilliseconds ?? 30000) > 30000
             ? 30000
             : (value?.inMilliseconds ?? 30000);
@@ -346,10 +348,23 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                       height: size.height,
                                       width: size.width,
                                       child: Center(
-                                        child: Helper.renderProfilePicture(
-                                            story.statusOwnerProfile
-                                                ?.profilePicture,
-                                            size: 100),
+                                        child: Stack(
+                                          children: [
+                                            Image.asset(
+                                              AppAssets.audioRipple,
+                                              height: getScreenHeight(250),
+                                            ),
+                                            Positioned(
+                                              top: 45,
+                                              left: 72,
+                                              child:
+                                                  Helper.renderProfilePicture(
+                                                      story.statusOwnerProfile
+                                                          ?.profilePicture,
+                                                      size: 135),
+                                            ),
+                                          ],
+                                        ),
                                       ))
                                   : Container(
                                       height: size.height,
@@ -406,6 +421,13 @@ class _StatusViewPageState extends State<StatusViewPage> {
                             children: [
                               Row(
                                 children: [
+                                  if (Platform.isIOS)
+                                    GestureDetector(
+                                        child: Icon(
+                                          Icons.chevron_left,
+                                          color: AppColors.white,
+                                        ),
+                                        onTap: () => Navigator.pop(context)),
                                   Helper.renderProfilePicture(
                                       story.statusOwnerProfile!.profilePicture),
                                   SizedBox(width: getScreenWidth(12)),

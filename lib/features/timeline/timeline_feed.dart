@@ -134,9 +134,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                   height: getScreenHeight(25),
                 ),
                 onPressed: () => RouteNavigators.route(
-                  context,
-                  const ChatsListScreen(),
-                ),
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut))),
               ).paddingOnly(right: 16),
             ],
           ),
@@ -144,6 +145,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
             onHorizontalDragEnd: (dragEndDetails) {
               if (dragEndDetails.primaryVelocity! < 0) {
                 // Swipe Right
+                RouteNavigators.route(
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut)));
               } else if (dragEndDetails.primaryVelocity! > 0) {
                 // Swipe Left
                 widget.scaffoldKey!.currentState!.openDrawer();
