@@ -46,6 +46,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from timeLineQuery:::: ${queryResult.data}");
       return PostFeedModel.fromJson(queryResult.data!).getPostFeed;
     } else {
       return null;
@@ -76,6 +77,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getPost:::: ${queryResult.data}");
       return Post.fromJson(queryResult.data!['getPost']);
     } else {
       return null;
@@ -135,6 +137,7 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
+    log(":::::: from likePost:::: ${queryResult.data}");
     return queryResult.data?['likePost']['authId'] != null;
   }
 
@@ -163,6 +166,7 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
+    log(":::::: from votePost:::: ${queryResult.data}");
     return queryResult.data?['votePost'] ?? false;
   }
 
@@ -187,6 +191,7 @@ class TimeLineQuery {
       ),
       variables: momentVariables,
     ));
+    log(":::::: from deleteVotedPost:::: ${queryResult.data}");
     return queryResult.data?['deletePostVote'] ?? false;
   }
 
@@ -275,6 +280,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getAllPost:::: ${queryResult.data}");
       return GetAllPostsModel.fromJson(queryResult.data!).getAllPosts;
     } else {
       return null;
@@ -312,6 +318,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getAllComments:::: ${queryResult.data}");
       return GetMyCommentsModel.fromJson(queryResult.data!).getPersonalComments;
     } else {
       return null;
@@ -348,8 +355,10 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from getLikedPosts:::: ${queryResult.data}");
       return GetLikedPosts.fromJson(queryResult.data!).getLikedPosts;
     } else {
+      log("::::::2 from getLikedPosts:::: ${queryResult.data}");
       return null;
     }
   }
@@ -384,6 +393,7 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from savedPost:::: ${queryResult.data}");
       return GetAllSavedPosts.fromJson(queryResult.data!).getAllSavedPosts;
     } else {
       return null;
@@ -426,6 +436,7 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from VotedPost:::: ${queryResult.data}");
       return GetVotedPosts.fromJson(queryResult.data!).getVotedPosts;
     } else {
       return null;

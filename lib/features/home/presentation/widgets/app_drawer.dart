@@ -17,6 +17,8 @@ import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
+import '../../../account/presentation/views/edit_profile_screen.dart';
+import '../../../profile/contact_us.dart';
 import '../../../profile/new_account.dart';
 import '../../../moment/user_posting.dart';
 import '../../../timeline/timeline_feed.dart';
@@ -282,7 +284,13 @@ class AppDrawer extends HookWidget {
                     DrawerItem(
                       action: 'Settings',
                       icon: 'assets/svgs/Setting.svg',
-                      onPressed: () {},
+                      onPressed: () {
+                        momentCtrl.userBar.value?.currentState!.closeDrawer();
+                        RouteNavigators.route(
+                          context,
+                          const EditProfileScreen(),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
@@ -294,7 +302,10 @@ class AppDrawer extends HookWidget {
             child: DrawerItem(
               action: 'Help Center',
               icon: 'assets/svgs/help.svg',
-              onPressed: () {},
+              onPressed: () {
+                momentCtrl.userBar.value?.currentState!.closeDrawer();
+                RouteNavigators.route(context, const ContactUs());
+              },
             ),
           ),
           Visibility(

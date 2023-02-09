@@ -140,17 +140,16 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: _currentIndex.value,
       onTap: (index) {
         _currentIndex.value = index;
+        timeLineController.currentPageIndex(index);
         pageController.jumpToPage(_currentIndex.value);
         //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
 
-        // if(_currentIndex.value == 0){
-        //   timeLineFeedStore.initialize(
-        //     refreshController:
-        //     _refreshController,
-        //     // isRefresh: true,
-        //   );
-        // }
+        if (_currentIndex.value == 0) {
+          timeLineFeedStore.initialize(
+            isRefreshing: true,
+          );
+        }
       },
       selectedItemColor: AppColors.primaryColor,
       unselectedItemColor: AppColors.blackShade3,

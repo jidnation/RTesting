@@ -190,30 +190,51 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   likePost(String id, {required String type}) async {
     if (type == 'comment') {
-    } else {
+    }
+
+    //////////////////////////
+    else {
       List<TimeLineModel> currentData = getExactValue(type);
       TimeLineModel actualModel =
           currentData.firstWhere((element) => element.id == id);
       Post post = actualModel.getPostFeed.post!;
+
+      ////////////////////
       if (type == 'likes') {
         currentData.remove(actualModel);
         notifyListeners();
       }
+
       if (!post.isLiked!) {
-        post.isLiked = true;
-        post.nLikes = post.nLikes! + 1;
-        // notifyListeners();
+        actualModel.getPostFeed.post?.isLiked = true;
+        actualModel.getPostFeed.post?.nLikes = post.nLikes! + 1;
+        notifyListeners();
+        //////
         bool response = await timeLineQuery.likePost(postId: post.postId!);
         if (response) {
-          fetchAll(isFirst: true);
+          fetchAll(
+            isFirst: true,
+            isLike: type == 'likes',
+            isPost: type == 'profile',
+            isUpVoted: type == 'Upvote',
+            isDownVoted: type == 'Downvote',
+            isSaved: type == 'saved',
+          );
         }
       } else {
-        post.isLiked = false;
-        post.nLikes = post.nLikes! - 1;
-        // notifyListeners();
+        actualModel.getPostFeed.post?.isLiked = false;
+        actualModel.getPostFeed.post?.nLikes = post.nLikes! - 1;
+        notifyListeners();
         bool response = await timeLineQuery.unlikePost(postId: post.postId!);
         if (response) {
-          fetchAll(isFirst: true);
+          fetchAll(
+            isFirst: true,
+            isLike: type == 'likes',
+            isPost: type == 'profile',
+            isUpVoted: type == 'Upvote',
+            isDownVoted: type == 'Downvote',
+            isSaved: type == 'saved',
+          );
         }
       }
     }
@@ -228,30 +249,53 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         currentData.firstWhere((element) => element.id == id);
     Post post = actualModel.getPostFeed.post!;
 
+    ////downvote
     if (voteType.toLowerCase() == 'downvote') {
       bool? res = await getReachRelationship(
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
+
       if (res != null && res) {
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
+
         if (response) {
-          timeLineFeedStore.initialize(isRefreshing: true);
-          voteType.toLowerCase() == 'upvote'
-              ? Snackbars.success(
-                  context,
-                  message: 'You have successfully shouted up this post.',
-                  milliseconds: 1300,
-                )
-              : Snackbars.success(
-                  context,
-                  message: 'You have successfully shouted down this post.',
-                  milliseconds: 1300,
-                );
-        }
-        if (voteType.toLowerCase() == 'downvote') {
-          timeLineFeedStore.removePost(context, id, type: type);
+          type == 'post'
+              ? timeLineFeedStore.removePost(context, id, type: type)
+              : null;
+          actualModel.getPostFeed.post?.isVoted = 'Downvote';
+          actualModel.getPostFeed.post!.nDownvotes =
+              actualModel.getPostFeed.post!.nDownvotes! + 1;
+          notifyListeners();
+          initialize(isRefreshing: true);
+          fetchAll(isFirst: true);
+          Snackbars.success(
+            context,
+            message: 'You have successfully shouted down this post.',
+            milliseconds: 1300,
+          );
+        } else {
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text: 'Unshoutout this post to be able to Shoutdown',
+              color: Colors.white,
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: Icon(
+              Icons.not_interested_rounded,
+              color: Colors.white,
+              size: getScreenHeight(24),
+            ),
+            backgroundColor: const Color(0xFFD83333),
+            borderColor: const Color(0xFFD83333).withOpacity(0.7),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
+          );
         }
       } else {
         Snackbars.error(
@@ -260,24 +304,42 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           milliseconds: 1300,
         );
       }
-    } else {
+    }
+
+    ////upvote
+    else {
       if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
         actualModel.getPostFeed.post?.isVoted = 'Upvote';
         actualModel.getPostFeed.post!.nUpvotes =
             actualModel.getPostFeed.post!.nUpvotes! + 1;
         notifyListeners();
+
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
         if (response) {
           initialize(isUpvoting: true, isRefreshing: true);
-          fetchMyPost(isRefresh: true);
-          Snackbars.success(
-            context,
-            message:
-                'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'up' : 'down'} this post.',
-            milliseconds: 1300,
+          fetchAll(isFirst: true);
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text:
+                  'You have successfully shouted ${voteType.toLowerCase() == 'upvote' ? 'out' : 'down'} this post.',
+              color: const Color(0xFF1C8B43),
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: SvgPicture.asset(
+              'assets/svgs/like.svg',
+              color: const Color(0xFF1C8B43),
+            ),
+            backgroundColor: const Color(0xFFE0FFDD),
+            borderColor: const Color(0xFF1C8B43),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
           );
         }
       } else {
@@ -287,7 +349,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         timeLineFeedStore.removePost(context, id, type: type);
       }
     }
-    fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
 
   Future<bool?> getReachRelationship(
@@ -446,7 +507,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   removePost(BuildContext context, String id,
       {bool? isDelete, required String type}) {
     List<TimeLineModel> currentPosts = getExactValue(type);
-    currentPosts.removeWhere((element) => element.id == id);
+    type == 'post'
+        ? currentPosts.removeWhere((element) => element.id == id)
+        : null;
     if (isDelete ?? false) {
       Snackbars.success(
         context,
@@ -779,12 +842,34 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       required String id,
       required String type}) async {
     List<TimeLineModel> currentPosts = getExactValue(type);
-    currentPosts.removeWhere((element) => element.id == id);
-    notifyListeners();
+
+    if (type == 'upvote' || type == 'post') {
+      currentPosts.removeWhere((element) => element.id == id);
+      notifyListeners();
+    }
     bool response = await timeLineQuery.deleteVotedPost(postId: postId);
     if (response) {
-      fetchMyPost(isRefresh: true);
+      fetchAll(isFirst: true);
       initialize(isUpvoting: true, isRefreshing: true);
+      Get.snackbar(
+        '',
+        '',
+        titleText: const SizedBox.shrink(),
+        messageText: CustomText(
+          text: 'You have successfully unShouted your shouted post.',
+          color: const Color(0xFF1C8B43),
+          size: getScreenHeight(16),
+        ),
+        borderWidth: 0.5,
+        icon: SvgPicture.asset(
+          'assets/svgs/like.svg',
+          color: const Color(0xFF1C8B43),
+        ),
+        backgroundColor: const Color(0xFFE0FFDD),
+        borderColor: const Color(0xFF1C8B43),
+        borderRadius: 16,
+        duration: const Duration(milliseconds: 1500),
+      );
     }
   }
 
@@ -813,17 +898,31 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
 
-  fetchAll({String? userId, bool? isFirst, bool? removeLike}) {
-    fetchMyPost(isRefresh: isFirst ?? false, userId: userId);
-    removeLike ?? false
-        ? null
-        : fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
-    fetchMySavedPosts(isRefresh: isFirst ?? false);
+  fetchAll(
+      {String? userId,
+      bool? isFirst,
+      bool? isLike,
+      bool? isPost,
+      bool? isSaved,
+      bool? isUpVoted,
+      bool? isDownVoted}) {
+    print("::::::::::::::::: <<<< ::: isLike ::: $isLike");
+    !(isPost ?? false)
+        ? fetchMyPost(isRefresh: isFirst ?? false, userId: userId)
+        : null;
+    !(isLike ?? false)
+        ? fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId)
+        : null;
+    !(isSaved ?? false) ? fetchMySavedPosts(isRefresh: isFirst ?? false) : null;
     fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
-    fetchMyVotedPosts(
-        isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
-    fetchMyVotedPosts(
-        isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
+    !(isUpVoted ?? false)
+        ? fetchMyVotedPosts(
+            isRefresh: isFirst ?? false, type: 'Upvote', userId: userId)
+        : null;
+    !(isDownVoted ?? false)
+        ? fetchMyVotedPosts(
+            isRefresh: isFirst ?? false, type: 'Downvote', userId: userId)
+        : null;
   }
 
   fetchMyPost(
@@ -881,7 +980,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
+    print("::::::::::::>>>>>>>>>>>>> am called");
     if (_myLikedPosts.isEmpty || isRefresh) {
+      print("::::::::::::>>>>>>>>>>>>>1 am called ${globals.userId}");
       List<GetPostFeed>? response = await timeLineQuery.getLikedPosts(
           authIdToGet: userId ?? globals.userId);
       if (response != null) {
