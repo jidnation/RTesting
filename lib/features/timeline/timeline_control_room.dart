@@ -190,30 +190,51 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   likePost(String id, {required String type}) async {
     if (type == 'comment') {
-    } else {
+    }
+
+    //////////////////////////
+    else {
       List<TimeLineModel> currentData = getExactValue(type);
       TimeLineModel actualModel =
           currentData.firstWhere((element) => element.id == id);
       Post post = actualModel.getPostFeed.post!;
+
+      ////////////////////
       if (type == 'likes') {
         currentData.remove(actualModel);
         notifyListeners();
       }
+
       if (!post.isLiked!) {
-        post.isLiked = true;
-        post.nLikes = post.nLikes! + 1;
-        // notifyListeners();
+        actualModel.getPostFeed.post?.isLiked = true;
+        actualModel.getPostFeed.post?.nLikes = post.nLikes! + 1;
+        notifyListeners();
+        //////
         bool response = await timeLineQuery.likePost(postId: post.postId!);
         if (response) {
-          fetchAll(isFirst: true);
+          fetchAll(
+            isFirst: true,
+            isLike: type == 'likes',
+            isPost: type == 'profile',
+            isUpVoted: type == 'Upvote',
+            isDownVoted: type == 'Downvote',
+            isSaved: type == 'saved',
+          );
         }
       } else {
-        post.isLiked = false;
-        post.nLikes = post.nLikes! - 1;
-        // notifyListeners();
+        actualModel.getPostFeed.post?.isLiked = false;
+        actualModel.getPostFeed.post?.nLikes = post.nLikes! - 1;
+        notifyListeners();
         bool response = await timeLineQuery.unlikePost(postId: post.postId!);
         if (response) {
-          fetchAll(isFirst: true);
+          fetchAll(
+            isFirst: true,
+            isLike: type == 'likes',
+            isPost: type == 'profile',
+            isUpVoted: type == 'Upvote',
+            isDownVoted: type == 'Downvote',
+            isSaved: type == 'saved',
+          );
         }
       }
     }
@@ -228,16 +249,20 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         currentData.firstWhere((element) => element.id == id);
     Post post = actualModel.getPostFeed.post!;
 
+    ////downvote
     if (voteType.toLowerCase() == 'downvote') {
       bool? res = await getReachRelationship(
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
+
       if (res != null && res) {
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
+
         if (response) {
-          timeLineFeedStore.initialize(isRefreshing: true);
+          initialize(isRefreshing: true);
+          fetchAll(isFirst: true);
           voteType.toLowerCase() == 'upvote'
               ? Snackbars.success(
                   context,
@@ -260,19 +285,23 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           milliseconds: 1300,
         );
       }
-    } else {
+    }
+
+    ////upvote
+    else {
       if (!(post.isVoted.toString().toLowerCase() == 'upvote')) {
         actualModel.getPostFeed.post?.isVoted = 'Upvote';
         actualModel.getPostFeed.post!.nUpvotes =
             actualModel.getPostFeed.post!.nUpvotes! + 1;
         notifyListeners();
+
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
         );
         if (response) {
           initialize(isUpvoting: true, isRefreshing: true);
-          fetchMyPost(isRefresh: true);
+          fetchAll(isFirst: true);
           Get.snackbar(
             '',
             '',
@@ -301,7 +330,6 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         timeLineFeedStore.removePost(context, id, type: type);
       }
     }
-    fetchMyVotedPosts(isRefresh: true, type: 'Upvote');
   }
 
   Future<bool?> getReachRelationship(
@@ -795,11 +823,14 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       required String id,
       required String type}) async {
     List<TimeLineModel> currentPosts = getExactValue(type);
-    currentPosts.removeWhere((element) => element.id == id);
-    notifyListeners();
+
+    if (type == 'upvote' || type == 'post') {
+      currentPosts.removeWhere((element) => element.id == id);
+      notifyListeners();
+    }
     bool response = await timeLineQuery.deleteVotedPost(postId: postId);
     if (response) {
-      fetchMyPost(isRefresh: true);
+      fetchAll(isFirst: true);
       initialize(isUpvoting: true, isRefreshing: true);
       Get.snackbar(
         '',
@@ -848,17 +879,31 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
 
-  fetchAll({String? userId, bool? isFirst, bool? removeLike}) {
-    fetchMyPost(isRefresh: isFirst ?? false, userId: userId);
-    removeLike ?? false
-        ? null
-        : fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId);
-    fetchMySavedPosts(isRefresh: isFirst ?? false);
+  fetchAll(
+      {String? userId,
+      bool? isFirst,
+      bool? isLike,
+      bool? isPost,
+      bool? isSaved,
+      bool? isUpVoted,
+      bool? isDownVoted}) {
+    print("::::::::::::::::: <<<< ::: isLike ::: $isLike");
+    !(isPost ?? false)
+        ? fetchMyPost(isRefresh: isFirst ?? false, userId: userId)
+        : null;
+    !(isLike ?? false)
+        ? fetchMyLikedPosts(isRefresh: isFirst ?? false, userId: userId)
+        : null;
+    !(isSaved ?? false) ? fetchMySavedPosts(isRefresh: isFirst ?? false) : null;
     fetchMyComments(isRefresh: isFirst ?? false, userId: userId);
-    fetchMyVotedPosts(
-        isRefresh: isFirst ?? false, type: 'Upvote', userId: userId);
-    fetchMyVotedPosts(
-        isRefresh: isFirst ?? false, type: 'Downvote', userId: userId);
+    !(isUpVoted ?? false)
+        ? fetchMyVotedPosts(
+            isRefresh: isFirst ?? false, type: 'Upvote', userId: userId)
+        : null;
+    !(isDownVoted ?? false)
+        ? fetchMyVotedPosts(
+            isRefresh: isFirst ?? false, type: 'Downvote', userId: userId)
+        : null;
   }
 
   fetchMyPost(
@@ -916,7 +961,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
+    print("::::::::::::>>>>>>>>>>>>> am called");
     if (_myLikedPosts.isEmpty || isRefresh) {
+      print("::::::::::::>>>>>>>>>>>>>1 am called ${globals.userId}");
       List<GetPostFeed>? response = await timeLineQuery.getLikedPosts(
           authIdToGet: userId ?? globals.userId);
       if (response != null) {

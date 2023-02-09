@@ -150,8 +150,7 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                           postId: widget.post.postId!, reactionType: 'Upvote');
                     }
                   },
-                  onTap: (widget.type.toLowerCase() != 'upvote' &&
-                          widget.type.toLowerCase() != 'downvote')
+                  onTap: (widget.type.toLowerCase() != 'downvote')
                       ? () {
                           timeLineFeedStore.votePost(routeContext,
                               id: widget.timeLineId,
@@ -195,8 +194,7 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                                 reactionType: 'Downvote');
                           }
                         },
-                        onTap: (widget.type.toLowerCase() != 'upvote' &&
-                                widget.type.toLowerCase() != 'downvote')
+                        onTap: (widget.type.toLowerCase() != 'downvote')
                             ? () {
                                 timeLineFeedStore.votePost(routeContext,
                                     id: widget.timeLineId,
