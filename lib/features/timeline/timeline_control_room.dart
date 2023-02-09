@@ -274,6 +274,27 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
                   message: 'You have successfully shouted down this post.',
                   milliseconds: 1300,
                 );
+        } else {
+          Get.snackbar(
+            '',
+            '',
+            titleText: const SizedBox.shrink(),
+            messageText: CustomText(
+              text: 'Unshoutout this post to be able Shoutdown',
+              color: Colors.white,
+              size: getScreenHeight(16),
+            ),
+            borderWidth: 0.5,
+            icon: Icon(
+              Icons.not_interested_rounded,
+              color: Colors.white,
+              size: getScreenHeight(24),
+            ),
+            backgroundColor: const Color(0xFFD83333),
+            borderColor: const Color(0xFFD83333).withOpacity(0.7),
+            borderRadius: 16,
+            duration: const Duration(milliseconds: 1500),
+          );
         }
         if (voteType.toLowerCase() == 'downvote') {
           timeLineFeedStore.removePost(context, id, type: type);
