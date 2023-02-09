@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
+
+import '../../../../core/utils/custom_text.dart';
 
 class AppGalleryView extends HookWidget {
   final List<String> mediaPaths;
@@ -27,13 +30,40 @@ class AppGalleryView extends HookWidget {
           itemBuilder: (context, index) {
             String path = mediaPaths[index];
             if (FileUtils.isImagePath(path)) {
-              return PhotoView(
-                  imageProvider: NetworkImage(path),
-                  loadingBuilder: (context, event) => const Center(
-                        child: CupertinoActivityIndicator(
-                          color: Colors.white,
-                        ),
-                      ));
+              return Stack(children: [
+                PhotoView(
+                    imageProvider: NetworkImage(path),
+                    loadingBuilder: (context, event) => const Center(
+                          child: CupertinoActivityIndicator(
+                            color: Colors.white,
+                          ),
+                        )),
+                Positioned(
+                  top: 20,
+                  left: 20,
+                  right: 20,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Card(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: const SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      ]),
+                )
+              ]);
             } else {
               return VideoPreview(
                 path: path,

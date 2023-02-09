@@ -540,33 +540,9 @@ query ($pageNumber: Int!, $pageLimit: Int! ) {
 const String getLikedPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
   getLikedPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
-    reachingRelationship,
     created_at,
-    updated_at,
-    feedOwnerProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        verified,
-        profileSlug,
-        location,
-        profilePicture,
-        location
-    },
-    voterProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        profileSlug,
-        verified,
-        location,
-        profilePicture,
-        location
-    },
+    authId,
+    postId,
     post{
      repostedPost{
         authId,
@@ -668,7 +644,7 @@ query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
       created_at,
       updated_at
     }
-  }
+    }
   }
 
 ''';

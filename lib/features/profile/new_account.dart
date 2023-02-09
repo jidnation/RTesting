@@ -129,24 +129,30 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
+                            Visibility(
+                              visible:
+                                  timeLineController.currentPageIndex.value !=
+                                      4,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
+                                onPressed: () => Navigator.pop(context),
                               ),
-                              onPressed: () => Navigator.pop(context),
                             ),
                             IconButton(
                               padding: EdgeInsets.zero,
@@ -414,24 +420,30 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
+                            Visibility(
+                              visible:
+                                  timeLineController.currentPageIndex.value !=
+                                      4,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/back.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
                                 ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
+                                onPressed: () => RouteNavigators.pop(context),
                               ),
-                              onPressed: () => RouteNavigators.pop(context),
                             ),
                             IconButton(
                               padding: EdgeInsets.zero,

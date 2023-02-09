@@ -43,9 +43,9 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
 
   usersReaching() async {
     bool isReachingUser = await timeLineFeedStore.usersReaching();
-    setState(() {
-      isReaching = isReachingUser;
-    });
+    // setState(() {
+    isReaching = isReachingUser;
+    // });
   }
 
   @override
@@ -100,40 +100,35 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
             ]),
             const SizedBox(width: 12),
             commentIcon(context),
-            !(widget.type == 'profile' || widget.post.postOwnerProfile != null)
+            !(widget.type == 'profile')
                 ? Visibility(
-                    visible: timeLineFeedStore
-                            .getPostModelById(widget.timeLineId,
-                                type: widget.type)
-                            ?.postOwnerId !=
-                        globals.userId,
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        CupertinoButton(
-                          minSize: 0,
-                          onPressed: () {
-                            pt.PostFeedModel _postModel = timeLineFeedStore
-                                .getPostModelById(widget.timeLineId,
-                                    type: widget.type)!;
-                            if (_postModel.postOwnerId != globals.userId) {
-                              HapticFeedback.mediumImpact();
+                    visible:
+                        widget.post.postOwnerProfile?.authId != globals.userId,
+                    child: Row(children: [
+                      const SizedBox(width: 12),
+                      CupertinoButton(
+                        minSize: 0,
+                        onPressed: () {
+                          pt.PostFeedModel _postModel = timeLineFeedStore
+                              .getPostModelById(widget.timeLineId,
+                                  type: widget.type)!;
+                          if (_postModel.postOwnerId != globals.userId) {
+                            HapticFeedback.mediumImpact();
 
-                              timeLineFeedStore.messageUser(routeContext,
-                                  id: _postModel.postOwnerId!,
-                                  quoteData: jsonEncode(_postModel.toJson()));
-                            }
-                          },
-                          padding: EdgeInsets.zero,
-                          child: SvgPicture.asset(
-                            'assets/svgs/message.svg',
-                            color: Colors.black,
-                            width: 24.44,
-                            height: 22,
-                          ),
+                            timeLineFeedStore.messageUser(routeContext,
+                                id: _postModel.postOwnerId!,
+                                quoteData: jsonEncode(_postModel.toJson()));
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                        child: SvgPicture.asset(
+                          'assets/svgs/message.svg',
+                          color: Colors.black,
+                          width: 24.44,
+                          height: 22,
                         ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   )
                 : const SizedBox.shrink(),
           ]),
@@ -155,12 +150,14 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                           postId: widget.post.postId!, reactionType: 'Upvote');
                     }
                   },
-                  onTap: () {
-                    timeLineFeedStore.votePost(routeContext,
-                        id: widget.timeLineId,
-                        voteType: 'Upvote',
-                        type: widget.type);
-                  },
+                  onTap: (widget.type.toLowerCase() != 'downvote')
+                      ? () {
+                          timeLineFeedStore.votePost(routeContext,
+                              id: widget.timeLineId,
+                              voteType: 'Upvote',
+                              type: widget.type);
+                        }
+                      : null,
                   child: SizedBox(
                     width: 30,
                     child: SvgPicture.asset(
@@ -197,12 +194,14 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                                 reactionType: 'Downvote');
                           }
                         },
-                        onTap: () {
-                          timeLineFeedStore.votePost(routeContext,
-                              id: widget.timeLineId,
-                              voteType: 'Downvote',
-                              type: widget.type);
-                        },
+                        onTap: (widget.type.toLowerCase() != 'downvote')
+                            ? () {
+                                timeLineFeedStore.votePost(routeContext,
+                                    id: widget.timeLineId,
+                                    voteType: 'Downvote',
+                                    type: widget.type);
+                              }
+                            : null,
                         child: SizedBox(
                           width: 30,
                           child: SvgPicture.asset(
