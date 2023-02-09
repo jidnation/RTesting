@@ -255,6 +255,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
           usersId: post.postOwnerProfile!.authId!, type: 'reacher');
 
       if (res != null && res) {
+        actualModel.getPostFeed.post?.isVoted = 'Downvote';
+        actualModel.getPostFeed.post!.nDownvotes =
+            actualModel.getPostFeed.post!.nDownvotes! + 1;
+        notifyListeners();
         bool response = await timeLineQuery.votePost(
           postId: post.postId!,
           voteType: voteType,
@@ -280,7 +284,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             '',
             titleText: const SizedBox.shrink(),
             messageText: CustomText(
-              text: 'Unshoutout this post to be able Shoutdown',
+              text: 'Unshoutout this post to be able to Shoutdown',
               color: Colors.white,
               size: getScreenHeight(16),
             ),
