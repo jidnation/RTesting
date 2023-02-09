@@ -64,10 +64,11 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
             listener: (context, state) {
               if (state is GetUserThreadsSuccess) {
                 // usersList.value.clear();
-                threads.value.clear();
-                tailMessage.value.clear();
-                recipientUsers.value.clear();
-                filteredThreads.value.clear();
+                threads.value = [];
+                tailMessage.value = [];
+                usersList.value = [];
+                recipientUsers.value = [];
+                filteredThreads.value = [];
                 threads.value = state.userThreads ?? [];
                 filteredThreads.value = threads.value;
                 for (var thread in state.userThreads!) {
