@@ -61,7 +61,7 @@ class RouteNavigators {
     );
   }
 
-  static Future route(BuildContext context, [Widget? route]) {
+  static Future route(BuildContext context, [Widget? route, Animatable<Offset>? tw]) {
     return Navigator.of(context).push(
       Platform.isIOS
           ? CupertinoPageRoute(
@@ -81,7 +81,7 @@ class RouteNavigators {
                 final tween = Tween(begin: begin, end: end)
                     .chain(CurveTween(curve: curve));
                 return SlideTransition(
-                  position: animation.drive(tween),
+                  position: animation.drive(tw??tween),
                   child: child,
                 );
               },
