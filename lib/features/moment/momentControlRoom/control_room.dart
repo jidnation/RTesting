@@ -244,14 +244,18 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     CustomMomentCommentModel commentModel = actualMomentModel.momentComments
         .firstWhere((element) => commentId == element.id);
     if (commentModel.getMomentComment.isLiked != 'false') {
-      // momentModel.isLiked = false;
-      // momentModel.nLikes -= 1;
+      String likeId = commentModel.getMomentComment.isLiked!;
+      commentModel.getMomentComment.isLiked = 'false';
+      commentModel.getMomentComment.nLikes =
+          commentModel.getMomentComment.nLikes! - 1;
+      notifyListeners();
       response = await momentQuery.unlikeMomentComment(
-          commentId: commentModel.getMomentComment.commentId!,
-          likeId: commentModel.getMomentComment.isLiked!);
+          commentId: commentModel.getMomentComment.commentId!, likeId: likeId);
     } else {
-      // momentModel.isLiked = true;
-      // momentModel.nLikes += 1;
+      commentModel.getMomentComment.isLiked = 'just';
+      commentModel.getMomentComment.nLikes =
+          commentModel.getMomentComment.nLikes! + 1;
+      notifyListeners();
       response = await momentQuery.likeMomentComment(
           momentId: actualMomentModel.momentId,
           commentId: commentModel.getMomentComment.commentId!);
@@ -263,7 +267,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response) {
       getMomentComment(id: id, commentId: commentId);
     }
-    notifyListeners();
   }
 
   //updating only the consider moment

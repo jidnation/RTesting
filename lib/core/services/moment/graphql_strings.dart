@@ -282,6 +282,7 @@ query ($momentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
       username,
       firstName,
       lastName,
+      authId,
       location,
       profilePicture
     },

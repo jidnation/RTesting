@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:reach_me/core/utils/extensions.dart';
@@ -10,6 +11,11 @@ import '../../../../core/utils/custom_text.dart';
 import '../../../../core/utils/dialog_box.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/app_globals.dart';
+import '../account/presentation/views/account.dart';
+import '../home/presentation/bloc/user-bloc/user_bloc.dart';
+import '../profile/new_account.dart';
 import 'momentControlRoom/control_room.dart';
 import 'momentControlRoom/models/get_comments_model.dart';
 import 'moment_audio_player.dart';
@@ -60,39 +66,66 @@ class MomentCommentBox extends HookWidget {
                 : null,
           ),
           const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            CustomText(
-              text:
-                  '${cInfo.firstName.toString().toCapitalized()} ${cInfo.lastName.toString().toCapitalized()}',
-              color: Colors.black,
-              size: 14.28,
-              weight: FontWeight.w600,
-            ),
-            const SizedBox(height: 1.5),
-            Row(children: [
-              Visibility(
-                visible: cInfo.location!.isNotEmpty,
-                child: Row(children: [
-                  CustomText(
-                    text: cInfo.location.toString().toCapitalized(),
-                    color: const Color(0xff252525).withOpacity(0.5),
-                    size: 10.44,
-                    weight: FontWeight.w600,
-                  ),
-                  const SizedBox(width: 5),
-                ]),
-              ),
+          GestureDetector(
+            onTap: () {
+              final progress = ProgressHUD.of(context);
+              progress?.showWithText('Viewing Reacher...');
+              Future.delayed(const Duration(seconds: 3), () {
+                globals.userBloc!.add(GetRecipientProfileEvent(
+                    email: commentInfo
+                        .getMomentComment.commentOwnerProfile?.authId));
+                commentInfo.getMomentComment.commentOwnerProfile?.authId ==
+                        globals.user!.id
+                    ? RouteNavigators.route(context, const NewAccountScreen())
+                    : RouteNavigators.route(
+                        context,
+                        RecipientAccountProfile(
+                          recipientEmail: 'email',
+                          recipientImageUrl:
+                              momentFeed.momentOwnerInfo.profilePicture,
+                          recipientId: momentFeed.momentOwnerInfo.authId,
+                        ));
+                progress?.dismiss();
+              });
+            },
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               CustomText(
-                text: Helper.parseUserLastSeen(
-                    commentInfo.getMomentComment.createdAt!),
-                color: const Color(0xff252525).withOpacity(0.5),
-                size: 11.44,
+                text:
+                    '${cInfo.firstName.toString().toCapitalized()} ${cInfo.lastName.toString().toCapitalized()}',
+                color: Colors.black,
+                size: 14.28,
                 weight: FontWeight.w600,
               ),
+              const SizedBox(height: 1.5),
+              Row(children: [
+                Visibility(
+                  visible: cInfo.location!.isNotEmpty,
+                  child: Row(children: [
+                    CustomText(
+                      text: cInfo.location.toString().toCapitalized(),
+                      color: const Color(0xff252525).withOpacity(0.5),
+                      size: 10.44,
+                      weight: FontWeight.w600,
+                    ),
+                    const SizedBox(width: 5),
+                  ]),
+                ),
+                CustomText(
+                  text: Helper.parseUserLastSeen(
+                      commentInfo.getMomentComment.createdAt!),
+                  color: const Color(0xff252525).withOpacity(0.5),
+                  size: 11.44,
+                  weight: FontWeight.w600,
+                ),
+              ]),
             ]),
-          ])
+          )
         ]),
-        const SizedBox(height: 10),
+        Visibility(
+            visible: commentInfo.getMomentComment.audioMediaItem!.isNotEmpty ||
+                commentInfo.getMomentComment.content!.isNotEmpty,
+            child: const SizedBox(height: 10)),
         Visibility(
           visible: commentInfo.getMomentComment.audioMediaItem!.isNotEmpty,
           child: Container(
@@ -106,8 +139,6 @@ class MomentCommentBox extends HookWidget {
               Expanded(
                   child: MomentAudioPlayer(
                 audioPath: commentInfo.getMomentComment.audioMediaItem!,
-                // audioPath:
-                //     'https://res.cloudinary.com/dwj7naozp/video/upload/v1671552267/2-03_Thursday_zrklln.mp3',
               )),
             ]),
           ),
@@ -126,8 +157,7 @@ class MomentCommentBox extends HookWidget {
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Container(
             height: 40,
-            width: getScreenWidth(160),
-            padding: const EdgeInsets.symmetric(horizontal: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: const Color(0xfff5f5f5),
               borderRadius: BorderRadius.circular(8),
@@ -160,6 +190,7 @@ class MomentCommentBox extends HookWidget {
                       color: const Color(0xff001824),
                     )
                   ]),
+                  const SizedBox(width: 12),
                   InkWell(
                     onTap: () {
                       replyMomentComment(context, userCommentTextCtrl);
@@ -182,12 +213,12 @@ class MomentCommentBox extends HookWidget {
                           )
                         ]),
                   ),
-                  SvgPicture.asset(
-                    'assets/svgs/message.svg',
-                    color: Colors.black,
-                    width: 24.44,
-                    height: 22,
-                  ),
+                  // SvgPicture.asset(
+                  //   'assets/svgs/message.svg',
+                  //   color: Colors.black,
+                  //   width: 24.44,
+                  //   height: 22,
+                  // ),
                 ]),
           ),
           Row(children: [
