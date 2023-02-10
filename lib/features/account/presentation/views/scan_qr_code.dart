@@ -14,6 +14,9 @@ import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/qr_code.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
+
 class ScanQRCodeScreen extends StatefulWidget {
   static const String id = 'scan_qr_code_screen';
   const ScanQRCodeScreen({Key? key}) : super(key: key);
@@ -80,7 +83,7 @@ class ScanQRCode extends State<ScanQRCodeScreen> {
                                   .add(GetRecipientProfileEvent(email: str));
                               str == globals.user!.id
                                   ? RouteNavigators.route(
-                                      context, const AccountScreen())
+                                      context, const NewAccountScreen())
                                   : RouteNavigators.route(
                                       context,
                                       RecipientAccountProfile(
@@ -130,8 +133,8 @@ class ScanQRCode extends State<ScanQRCodeScreen> {
                                             GetRecipientProfileEvent(
                                                 email: id));
                                         id == globals.user!.id
-                                            ? RouteNavigators.route(
-                                                context, const AccountScreen())
+                                            ? RouteNavigators.route(context,
+                                                const NewAccountScreen())
                                             : RouteNavigators.route(
                                                 context,
                                                 RecipientAccountProfile(

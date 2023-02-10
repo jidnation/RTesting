@@ -14,6 +14,7 @@ import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
 import '../../../moment/moment_feed.dart';
 import '../../../moment/user_posting.dart';
+import '../../../profile/new_account.dart';
 import '../../../timeline/timeline_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     momentFeedStore.initialize();
-    timeLineFeedStore.initialize();
+    timeLineFeedStore.initialize(isRefreshing: true);
     super.initState();
   }
 
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // TestingScreen(),
       MomentFeed(pageController: _pageController),
       const NotificationsScreen(),
-      const AccountScreen(),
+      const NewAccountScreen(),
     ];
     useEffect(() {
       globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
@@ -120,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
 // }
 
 class BottomNavBar extends StatelessWidget {
-   BottomNavBar({
+  BottomNavBar({
     Key? key,
     required ValueNotifier<int> currentIndex,
     required this.pageController,
@@ -130,7 +131,7 @@ class BottomNavBar extends StatelessWidget {
   final ValueNotifier<int> _currentIndex;
   final PageController pageController;
   final RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   @override
   Widget build(BuildContext context) {
@@ -139,15 +140,14 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: _currentIndex.value,
       onTap: (index) {
         _currentIndex.value = index;
+        timeLineController.currentPageIndex(index);
         pageController.jumpToPage(_currentIndex.value);
         //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
 
-        if(_currentIndex.value == 0){
+        if (_currentIndex.value == 0) {
           timeLineFeedStore.initialize(
-            refreshController:
-            _refreshController,
-            // isRefresh: true,
+            isRefreshing: true,
           );
         }
       },

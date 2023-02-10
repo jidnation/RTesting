@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
@@ -41,14 +43,27 @@ class TimeLineFeed extends StatefulWidget {
 final TimeLineFeedStore timeLineFeedStore = TimeLineFeedStore();
 TimeLineController timeLineController = TimeLineController();
 
+late ScrollController _controller;
+
 class _TimeLineFeedState extends State<TimeLineFeed>
     with AutomaticKeepAliveClientMixin<TimeLineFeed> {
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
     globals.userBloc!.add(GetUserProfileEvent(email: globals.userId!));
     timeLineFeedStore.getMyStatus();
     timeLineFeedStore.getUserStatus();
+  }
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      int index = timeLineController.currentIndex.value;
+      timeLineController.currentIndex(index + 1);
+      timeLineFeedStore.fetchMorePosts(index: index + 1);
+    }
   }
 
   @override
@@ -119,9 +134,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                   height: getScreenHeight(25),
                 ),
                 onPressed: () => RouteNavigators.route(
-                  context,
-                  const ChatsListScreen(),
-                ),
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut))),
               ).paddingOnly(right: 16),
             ],
           ),
@@ -129,6 +145,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
             onHorizontalDragEnd: (dragEndDetails) {
               if (dragEndDetails.primaryVelocity! < 0) {
                 // Swipe Right
+                RouteNavigators.route(
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut)));
               } else if (dragEndDetails.primaryVelocity! > 0) {
                 // Swipe Left
                 widget.scaffoldKey!.currentState!.openDrawer();
@@ -320,98 +341,115 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                 child: ListTileTheme(
                                   dense: true,
                                   child: ExpansionTile(
-                                    collapsedIconColor: AppColors.greyShade4,
-                                    iconColor: AppColors.greyShade4,
-                                    title: const Text(
-                                      'Muted Statuses',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.greyShade3),
-                                    ),
-                                    childrenPadding: const EdgeInsets.fromLTRB(
-                                        16, 0, 16, 16),
-                                    tilePadding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    children: [
-                                      SizedBox(
-                                        height: getScreenHeight(100),
-                                        child: ListView.separated(
-                                            scrollDirection: Axis.horizontal,
-                                            separatorBuilder:
-                                                (context, index) => const SizedBox(
-                                                      width: 16,
-                                                    ),
-                                            itemBuilder: (context, index) =>
-                                                StatusBubble(
-                                                  isMuted: true,
-                                                  statusCount:
-                                                      _mutedStatus[index]
-                                                          .status!
-                                                          .length,
-                                                  preview: _mutedStatus[index]
-                                                      .status!
-                                                      .last
-                                                      .status!,
-                                                  isMe: false,
-                                                  isLive: false,
-                                                  username: _mutedStatus[index]
-                                                      .status![0]
-                                                      .statusOwnerProfile!
-                                                      .username!,
-                                                  onTap: () async {
-                                                    final res = await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (c) =>
-                                                                StatusViewPage(
-                                                                    isMuted:
-                                                                        true,
-                                                                    status: _mutedStatus[
-                                                                            index]
-                                                                        .status!)));
-                                                    if (res == null) return;
-                                                    if (res is MuteResult) {
-                                                      timeLineFeedStore
-                                                          .unMuteStatus(index);
-                                                    }
-
-                                                    // Navigator.push(
-                                                    //     context,
-                                                    //     MaterialPageRoute(
-                                                    //         builder: (c) =>
-                                                    //             const StoryPage()));
-                                                  },
-                                                ),
-                                            itemCount: _mutedStatus.length),
-                                      )
-                                    ],
-                                  ),
+                                      collapsedIconColor: AppColors.greyShade4,
+                                      iconColor: AppColors.greyShade4,
+                                      title: const Text(
+                                        'Muted Statuses',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors.greyShade3),
+                                      ),
+                                      childrenPadding:
+                                          const EdgeInsets.fromLTRB(
+                                              16, 0, 16, 16),
+                                      tilePadding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      children: [
+                                        SizedBox(
+                                          height: getScreenHeight(100),
+                                          child: ListView.separated(
+                                              scrollDirection: Axis.horizontal,
+                                              separatorBuilder:
+                                                  (context, index) =>
+                                                      const SizedBox(
+                                                        width: 16,
+                                                      ),
+                                              itemBuilder: (context, index) =>
+                                                  StatusBubble(
+                                                    isMuted: true,
+                                                    statusCount:
+                                                        _mutedStatus[index]
+                                                            .status!
+                                                            .length,
+                                                    preview: _mutedStatus[index]
+                                                        .status!
+                                                        .last
+                                                        .status!,
+                                                    isMe: false,
+                                                    isLive: false,
+                                                    username:
+                                                        _mutedStatus[index]
+                                                            .status![0]
+                                                            .statusOwnerProfile!
+                                                            .username!,
+                                                    onTap: () async {
+                                                      final res = await Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (c) => StatusViewPage(
+                                                                  isMuted: true,
+                                                                  status: _mutedStatus[
+                                                                          index]
+                                                                      .status!)));
+                                                      if (res == null) return;
+                                                      if (res is MuteResult) {
+                                                        timeLineFeedStore
+                                                            .unMuteStatus(
+                                                                index);
+                                                      }
+                                                    },
+                                                  ),
+                                              itemCount: _mutedStatus.length),
+                                        )
+                                      ]),
                                 ),
                               ),
                             ),
                             Expanded(
                                 child: value.isEmpty
                                     ? const UserSuggestionWidget()
-                                    // ? EmptyTimelineWidget(
-                                    //     loading: timeLineFeedStore.gettingPosts)
                                     : SmartRefresher(
                                         physics: const BouncingScrollPhysics(),
                                         onRefresh: () {
                                           timeLineFeedStore.initialize(
                                             refreshController:
                                                 _refreshController,
-                                            // isRefresh: true,
+                                            isRefreshing: true,
+                                            isRefresh: true,
                                           );
-                                          // await Future.delayed(const Duration(seconds: 10));
-                                          // _refreshController.refreshCompleted();
                                         },
                                         controller: _refreshController,
                                         child: ListView.builder(
                                           shrinkWrap: true,
+                                          controller: _controller,
                                           physics: const ScrollPhysics(),
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 10),
                                           itemBuilder: (context, index) {
+                                            /////
+                                            var src = GlobalKey();
+
+                                            void takeScreenShot() async {
+                                              RenderRepaintBoundary boundary = src
+                                                      .currentContext!
+                                                      .findRenderObject()
+                                                  as RenderRepaintBoundary; // the key provided
+                                              ui.Image image =
+                                                  await boundary.toImage();
+                                              ByteData? byteData =
+                                                  await image.toByteData(
+                                                      format: ui
+                                                          .ImageByteFormat.png);
+                                              debugPrint(
+                                                  "Byte Data: $byteData");
+                                              await timeLineController
+                                                  .saveImage(
+                                                      context,
+                                                      byteData!.buffer
+                                                          .asUint8List());
+                                            }
+
+                                            //////
                                             TimeLineModel post =
                                                 timeLinePosts[index];
                                             return Visibility(
@@ -419,22 +457,29 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                               child: Padding(
                                                 padding: const EdgeInsets.only(
                                                     bottom: 15),
-                                                child: Stack(children: [
-                                                  TimeLineBox(
-                                                    userStatusFeed: _userStatus,
-                                                    timeLineModel: post,
-                                                  ),
-                                                  Positioned(
-                                                      bottom: 10,
-                                                      left: 30,
-                                                      right: 30,
-                                                      child:
-                                                          TimeLineBoxActionRow(
-                                                        timeLineId: post.id,
-                                                        post: post
-                                                            .getPostFeed.post!,
-                                                      )),
-                                                ]),
+                                                child: RepaintBoundary(
+                                                  key: src,
+                                                  child: Stack(children: [
+                                                    TimeLineBox(
+                                                      userStatusFeed:
+                                                          _userStatus,
+                                                      timeLineModel: post,
+                                                      takeScreenShot:
+                                                          takeScreenShot,
+                                                    ),
+                                                    Positioned(
+                                                        bottom: 10,
+                                                        left: 30,
+                                                        right: 30,
+                                                        child:
+                                                            TimeLineBoxActionRow(
+                                                          timeLineId: post.id,
+                                                          type: 'post',
+                                                          post: post.getPostFeed
+                                                              .post!,
+                                                        )),
+                                                  ]),
+                                                ),
                                               ),
                                             );
                                           },

@@ -20,14 +20,14 @@ import 'models/post_feed.dart';
 class TimeLineBoxActionRow extends StatefulWidget {
   const TimeLineBoxActionRow({
     Key? key,
+    required this.type,
     required this.post,
-    this.isProfile,
     required this.timeLineId,
   }) : super(key: key);
 
   final Post post;
-  final bool? isProfile;
   final String timeLineId;
+  final String type;
 
   @override
   State<TimeLineBoxActionRow> createState() => _TimeLineBoxActionRowState();
@@ -35,16 +35,24 @@ class TimeLineBoxActionRow extends StatefulWidget {
 
 class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
   LikeModel likeModelInfo = LikeModel(nLikes: 0, isLiked: false);
+  bool isReaching = false;
   @override
   void initState() {
     super.initState();
   }
 
+  usersReaching() async {
+    bool isReachingUser = await timeLineFeedStore.usersReaching();
+    // setState(() {
+    isReaching = isReachingUser;
+    // });
+  }
+
   @override
   Widget build(BuildContext routeContext) {
     return Obx(() {
-      LikeModel likeModelInfo =
-          timeLineController.getLikeValues(id: widget.timeLineId, isProfile : widget.isProfile ?? false);
+      LikeModel likeModelInfo = timeLineController.getLikeValues(
+          id: widget.timeLineId, type: widget.type);
 
       return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Container(
@@ -66,8 +74,10 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                   }
                 },
                 onTap: () {
-                  timeLineController.likePost(id: widget.timeLineId, isProfile: widget.isProfile ?? false);
-                  timeLineFeedStore.likePost(widget.timeLineId, isProfile: widget.isProfile ?? false);
+                  timeLineController.likePost(
+                      id: widget.timeLineId, type: widget.type);
+                  timeLineFeedStore.likePost(widget.timeLineId,
+                      type: widget.type);
                 },
                 child: SvgPicture.asset(
                   // widget.post.isLiked!
@@ -89,63 +99,38 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
               )
             ]),
             const SizedBox(width: 12),
-            InkWell(
-              onTap: () {
-                RouteNavigators.route(
-                    routeContext,
-                    CommentReach(
-                        postFeedModel: timeLineFeedStore
-                            .getPostModelById(widget.timeLineId, isProfile: widget.isProfile ?? false)));
-              },
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                SvgPicture.asset(
-                  'assets/svgs/comment.svg',
-                ),
-                const SizedBox(width: 3),
-                CustomText(
-                  text: momentFeedStore.getCountValue(
-                    value: widget.post.nComments!,
-                  ),
-                  size: 15,
-                  isCenter: true,
-                  weight: FontWeight.w600,
-                  color: const Color(0xff001824),
-                )
-              ]),
-            ),
-                !(widget.isProfile ?? false) ? Visibility(
-              visible: timeLineFeedStore
-                      .getPostModelById(widget.timeLineId,  isProfile: widget.isProfile ?? false)
-                      ?.postOwnerId !=
-                  globals.userId,
-              child: Row(
-                children: [
-                  const SizedBox(width: 12),
-                  CupertinoButton(
-                    minSize: 0,
-                    onPressed: () {
-                      pt.PostFeedModel _postModel =
-                          timeLineFeedStore.getPostModelById(widget.timeLineId,  isProfile: widget.isProfile ?? false)!;
-                      if (_postModel.postOwnerId != globals.userId) {
-                        HapticFeedback.mediumImpact();
+            commentIcon(context),
+            !(widget.type == 'profile')
+                ? Visibility(
+                    visible:
+                        widget.post.postOwnerProfile?.authId != globals.userId,
+                    child: Row(children: [
+                      const SizedBox(width: 12),
+                      CupertinoButton(
+                        minSize: 0,
+                        onPressed: () {
+                          pt.PostFeedModel _postModel = timeLineFeedStore
+                              .getPostModelById(widget.timeLineId,
+                                  type: widget.type)!;
+                          if (_postModel.postOwnerId != globals.userId) {
+                            HapticFeedback.mediumImpact();
 
-                        timeLineFeedStore.messageUser(routeContext,
-                            id: _postModel.postOwnerId!,
-                            quoteData: jsonEncode(_postModel.toJson()));
-                      }
-                    },
-                    padding: EdgeInsets.zero,
-                    child: SvgPicture.asset(
-                      'assets/svgs/message.svg',
-                      color: Colors.black,
-                      width: 24.44,
-                      height: 22,
-                    ),
-                  ),
-                ],
-              ),
-            ) : const SizedBox.shrink(),
+                            timeLineFeedStore.messageUser(routeContext,
+                                id: _postModel.postOwnerId!,
+                                quoteData: jsonEncode(_postModel.toJson()));
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                        child: SvgPicture.asset(
+                          'assets/svgs/message.svg',
+                          color: Colors.black,
+                          width: 24.44,
+                          height: 22,
+                        ),
+                      ),
+                    ]),
+                  )
+                : const SizedBox.shrink(),
           ]),
         ),
         Container(
@@ -165,14 +150,14 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
                           postId: widget.post.postId!, reactionType: 'Upvote');
                     }
                   },
-                  onTap: () {
-                    timeLineFeedStore.votePost(
-                      routeContext,
-                      id: widget.timeLineId,
-                      voteType: 'Upvote',
-                        isProfile: widget.isProfile ?? false
-                    );
-                  },
+                  onTap: (widget.type.toLowerCase() != 'downvote')
+                      ? () {
+                          timeLineFeedStore.votePost(routeContext,
+                              id: widget.timeLineId,
+                              voteType: 'Upvote',
+                              type: widget.type);
+                        }
+                      : null,
                   child: SizedBox(
                     width: 30,
                     child: SvgPicture.asset(
@@ -196,49 +181,175 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
               ]),
               const SizedBox(width: 12),
               Visibility(
-                visible: !(widget.isProfile ?? false),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  GestureDetector(
-                    onLongPress: () {
-                      if ((widget.post.nDownvotes ?? 0) > 0 &&
-                          (widget.post.authId == globals.user!.id!)) {
-                        showPostReactors(routeContext,
-                            postId: widget.post.postId!,
-                            reactionType: 'Downvote');
-                      }
-                    },
-                    onTap: () {
-                      timeLineFeedStore.votePost(
-                        routeContext,
-                        id: widget.timeLineId,
-                        voteType: 'Downvote',
-                          isProfile: widget.isProfile ?? false
-                      );
-                    },
-                    child: SizedBox(
-                      width: 30,
-                      child: SvgPicture.asset(
-                        widget.post.isVoted != 'false' &&
-                                widget.post.isVoted!.toLowerCase() == 'downvote'
-                            ? 'assets/svgs/shoutdown-active.svg'
-                            : 'assets/svgs/shoutdown.svg',
+                visible: !(widget.post.authId == globals.user!.id!),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onLongPress: () {
+                          if ((widget.post.nDownvotes ?? 0) > 0 &&
+                              (widget.post.authId == globals.user!.id!)) {
+                            showPostReactors(routeContext,
+                                postId: widget.post.postId!,
+                                reactionType: 'Downvote');
+                          }
+                        },
+                        onTap: (widget.type.toLowerCase() != 'downvote')
+                            ? () {
+                                timeLineFeedStore.votePost(routeContext,
+                                    id: widget.timeLineId,
+                                    voteType: 'Downvote',
+                                    type: widget.type);
+                              }
+                            : null,
+                        child: SizedBox(
+                          width: 30,
+                          child: SvgPicture.asset(
+                            widget.post.isVoted != 'false' &&
+                                    widget.post.isVoted!.toLowerCase() ==
+                                        'downvote'
+                                ? 'assets/svgs/shoutdown-active.svg'
+                                : 'assets/svgs/shoutdown.svg',
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 3),
-                  CustomText(
-                    text: momentFeedStore.getCountValue(
-                      value: widget.post.nDownvotes!,
-                    ),
-                    size: 15,
-                    isCenter: true,
-                    weight: FontWeight.w600,
-                    color: const Color(0xff001824),
-                  )
-                ]),
+                      const SizedBox(width: 3),
+                      CustomText(
+                        text: momentFeedStore.getCountValue(
+                          value: widget.post.nDownvotes!,
+                        ),
+                        size: 15,
+                        isCenter: true,
+                        weight: FontWeight.w600,
+                        color: const Color(0xff001824),
+                      )
+                    ]),
               ),
             ])),
       ]);
     });
+  }
+
+  Widget commentIcon(BuildContext routeContext) {
+    usersReaching();
+    switch (widget.post.commentOption) {
+      case "everyone":
+        return InkWell(
+          onTap: () {
+            RouteNavigators.route(
+                routeContext,
+                CommentReach(
+                    postFeedModel: timeLineFeedStore.getPostModelById(
+                        widget.timeLineId,
+                        type: widget.type)));
+          },
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            SvgPicture.asset(
+              'assets/svgs/comment.svg',
+            ),
+            const SizedBox(width: 3),
+            CustomText(
+              text: momentFeedStore.getCountValue(
+                value: widget.post.nComments!,
+              ),
+              size: 15,
+              isCenter: true,
+              weight: FontWeight.w600,
+              color: const Color(0xff001824),
+            )
+          ]),
+        );
+
+      case "people_you_follow":
+        if (widget.post.postOwnerProfile!.authId == globals.userId ||
+            isReaching) {
+          return InkWell(
+            onTap: () {
+              RouteNavigators.route(
+                  routeContext,
+                  CommentReach(
+                      postFeedModel: timeLineFeedStore.getPostModelById(
+                          widget.timeLineId,
+                          type: widget.type)));
+            },
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              SvgPicture.asset(
+                'assets/svgs/comment.svg',
+              ),
+              const SizedBox(width: 3),
+              CustomText(
+                text: momentFeedStore.getCountValue(
+                  value: widget.post.nComments!,
+                ),
+                size: 15,
+                isCenter: true,
+                weight: FontWeight.w600,
+                color: const Color(0xff001824),
+              )
+            ]),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      case "only_people_you_mention":
+        if (widget.post.mentionList!.contains(globals.user!.username) ||
+            (widget.post.postOwnerProfile!.authId == globals.userId)) {
+          return InkWell(
+            onTap: () {
+              RouteNavigators.route(
+                  routeContext,
+                  CommentReach(
+                      postFeedModel: timeLineFeedStore.getPostModelById(
+                          widget.timeLineId,
+                          type: widget.type)));
+            },
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              SvgPicture.asset(
+                'assets/svgs/comment.svg',
+              ),
+              const SizedBox(width: 3),
+              CustomText(
+                text: momentFeedStore.getCountValue(
+                  value: widget.post.nComments!,
+                ),
+                size: 15,
+                isCenter: true,
+                weight: FontWeight.w600,
+                color: const Color(0xff001824),
+              )
+            ]),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      default:
+        return InkWell(
+          onTap: () {
+            RouteNavigators.route(
+                routeContext,
+                CommentReach(
+                    postFeedModel: timeLineFeedStore.getPostModelById(
+                        widget.timeLineId,
+                        type: widget.type)));
+          },
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            SvgPicture.asset(
+              'assets/svgs/comment.svg',
+            ),
+            const SizedBox(width: 3),
+            CustomText(
+              text: momentFeedStore.getCountValue(
+                value: widget.post.nComments!,
+              ),
+              size: 15,
+              isCenter: true,
+              weight: FontWeight.w600,
+              color: const Color(0xff001824),
+            )
+          ]),
+        );
+    }
   }
 }

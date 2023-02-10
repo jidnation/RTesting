@@ -11,6 +11,7 @@ import 'package:reach_me/features/dictionary/presentation/widgets/view_words_dia
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/timeline/post_media.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:reach_me/features/timeline/video_player.dart';
 
 import '../../../../core/services/navigation/navigation_service.dart';
@@ -18,6 +19,7 @@ import '../../../../core/utils/app_globals.dart';
 import '../../core/utils/custom_text.dart';
 import '../account/presentation/views/account.dart';
 import '../moment/moment_audio_player.dart';
+import '../profile/new_account.dart';
 
 class TimelineRepostedPost extends StatelessWidget {
   final PostModel tPostInfo;
@@ -75,7 +77,7 @@ class TimelineRepostedPost extends StatelessWidget {
                             email: tPostOwnerInfo.authId));
                         tPostOwnerInfo.authId == globals.user!.id
                             ? RouteNavigators.route(
-                                context, const AccountScreen())
+                                context, const NewAccountScreen())
                             : RouteNavigators.route(
                                 context,
                                 RecipientAccountProfile(
@@ -184,7 +186,9 @@ class TimelineRepostedPost extends StatelessWidget {
                         );
                       });
                 },
-                onMentionTap: (value) {},
+                onMentionTap: (value) {
+                  timeLineFeedStore.getUserByUsername(context, username: value);
+                },
                 mentionStyle: const TextStyle(
                     decoration: TextDecoration.underline, color: Colors.blue),
                 hashtagStyle: const TextStyle(
@@ -202,7 +206,7 @@ class TimelineRepostedPost extends StatelessWidget {
                     : 0),
             tPostInfo.repostedPost!.videoMediaItem!.isNotEmpty
                 ? Container(
-                    height: 550,
+                    height: 310,
                     width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -223,7 +227,7 @@ class TimelineRepostedPost extends StatelessWidget {
               visible: tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty,
               child: Container(
                 height:
-                    tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty ? 59 : 0,
+                    tPostInfo.repostedPost!.audioMediaItem!.isNotEmpty ? 48 : 0,
                 margin: const EdgeInsets.only(bottom: 10),
                 width: SizeConfig.screenWidth,
                 decoration: BoxDecoration(
@@ -232,6 +236,7 @@ class TimelineRepostedPost extends StatelessWidget {
                 child: Row(children: [
                   Expanded(
                       child: MomentAudioPlayer(
+                    id: "${tPostInfo.postSlug}${tPostInfo.repostedPost!.audioMediaItem}",
                     audioPath: tPostInfo.repostedPost!.audioMediaItem!,
                   )),
                 ]),

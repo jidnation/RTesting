@@ -129,6 +129,93 @@ class SocialServiceRepository {
     }
   }
 
+  Future<Either<String, CommentReplyModel>> replyCommentOnPost({
+    required String postId,
+    required String postOwnerId,
+    required String commentOwnerId,
+    required String commentId,
+    String? content,
+    List<String>? imageMediaItems,
+    String? audioMediaItem,
+    String? videoMediaItem,
+  }) async {
+    try {
+      final reply = await _homeRemoteDataSource.replyCommentOnPost(
+        postId: postId,
+        content: content,
+        commentId: commentId,
+        commentOwnerId: commentOwnerId,
+        postOwnerId: postOwnerId,
+        imageMediaItems: imageMediaItems,
+        audioMediaItem: audioMediaItem,
+        videoMediaItem: videoMediaItem
+      );
+      return Right(reply);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+    Future<Either<String, List<CommentReplyModel>>> getCommentReplies({
+    required String postId,
+    required String commentId,
+    int? pageNumber, int? pageLimit
+  }) async {
+    try {
+      final replies = await _homeRemoteDataSource.getCommentReplies(
+        postId: postId,
+        commentId: commentId,
+        pageNumber: pageNumber,
+        pageLimit: pageLimit
+      );
+      return Right(replies);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> deleteCommentReply({
+    required String postId,
+    required String replyId,
+  }) async {
+    try {
+      final reply = await _homeRemoteDataSource.deleteCommentReply(
+        postId: postId,
+        replyId: replyId,
+      );
+      return Right(reply);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, CommentReplyLikeModel>> likeCommentReply({
+    required String postId,
+    required String replyId,
+    required String commentId,
+  }) async {
+    try {
+      final reply = await _homeRemoteDataSource.likeCommentReply(
+          postId: postId, replyId: replyId, commentId: commentId);
+      return Right(reply);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, bool>> unlikeCommentReply({
+    required String replyId,
+  }) async {
+    try {
+      final reply = await _homeRemoteDataSource.unlikeCommentReply(
+        replyId: replyId,
+      );
+      return Right(reply);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
   Future<Either<String, CommentModel>> deletePostComment(
       {required String commentId}) async {
     try {

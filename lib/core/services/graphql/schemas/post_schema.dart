@@ -137,6 +137,41 @@ class CommentSchema {
   }
 }
 
+class CommentReplySchema {
+  CommentReplySchema._();
+  static String get schema {
+    return r'''
+            commentId
+            replyId
+            authId
+            replySlug
+            content
+            created_at
+            nLikes
+            postId
+            imageMediaItems
+            audioMediaItem
+            videoMediaItem
+            isLiked
+            postOwnerProfile {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
+            commentOwnerProfile {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
+            replyOwnerProfile {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
+
 class PostProfileSchema {
   PostProfileSchema._();
 
@@ -261,6 +296,25 @@ class CommentLikeSchema {
   }
 }
 
+class CommentReplyLikeSchema {
+  CommentReplyLikeSchema._();
+
+  static String get schema {
+    return r'''
+            replyId
+            authId
+            created_at
+            postId
+            commentId
+            profile {
+              ''' +
+        CommentProfileSchema.schema +
+        '''
+            }
+        ''';
+  }
+}
+
 class PostVoteSchema {
   PostVoteSchema._();
 
@@ -273,4 +327,3 @@ class PostVoteSchema {
         ''';
   }
 }
-

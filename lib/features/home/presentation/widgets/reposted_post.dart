@@ -17,6 +17,8 @@ import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/app_globals.dart';
 import '../../../account/presentation/views/account.dart';
 import '../../../moment/moment_audio_player.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/video_player.dart';
 
 class RepostedPost extends StatelessWidget {
@@ -71,7 +73,8 @@ class RepostedPost extends StatelessWidget {
                     globals.userBloc!.add(GetRecipientProfileEvent(
                         email: post.repostedPostOwnerProfile!.authId));
                     post.repostedPostOwnerProfile!.authId == globals.user!.id
-                        ? RouteNavigators.route(context, const AccountScreen())
+                        ? RouteNavigators.route(
+                            context, const NewAccountScreen())
                         : RouteNavigators.route(
                             context,
                             RecipientAccountProfile(

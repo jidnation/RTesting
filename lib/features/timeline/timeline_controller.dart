@@ -1,80 +1,247 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:reach_me/core/components/custom_button.dart';
+import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
+import 'package:reach_me/features/timeline/timeline_feed.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:ui' as ui;
+import '../../core/components/snackbar.dart';
+import '../../core/services/moment/querys.dart';
+import '../../core/services/navigation/navigation_service.dart';
+import '../../core/utils/custom_text.dart';
+import '../../core/utils/dimensions.dart';
+import '../moment/moment_feed.dart';
 
 class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBox3 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeUpBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeSavedBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeDownBox = <CustomCounter>[].obs;
+  RxInt currentIndex = 1.obs;
+  RxInt currentPageIndex = 0.obs;
+  RxList<CustomCounter> likeCommentBox = <CustomCounter>[].obs;
   RxBool isScrolling = false.obs;
+  RxBool currentStatus = false.obs;
+  RxString currentId = "".obs;
+  RxString userFullName = "".obs;
+  RxString userEmail = "".obs;
+  RxString userPhoneNumber = "".obs;
+  RxString userMessage = "".obs;
 
-  likePost({required String id, required bool isProfile}) {
+  RxList<CustomCounter> getExactBox(String type) {
+    Map<String, dynamic> mapper = {
+      'profile': likeBox2,
+      'post': likeBox,
+      'likes': likeBox3,
+      'upvote': likeUpBox,
+      'downvote': likeDownBox,
+      'comment': likeCommentBox,
+      'save': likeSavedBox,
+    };
+    return mapper[type];
+  }
+
+  likePost(
+      {required String id,
+      required String type,
+      String? postId,
+      String? isLikes}) async {
     LikeModel likeModel = LikeModel(nLikes: 0, isLiked: false);
-    CustomCounter actualModel = isProfile ?
-        likeBox2.firstWhere((element) => element.id == id) : likeBox.firstWhere((element) => element.id == id);
-    int index = isProfile ? likeBox2.indexOf(actualModel) : likeBox.indexOf(actualModel);
-    // int index2 = likeBox.indexWhere((element) => element.id == id);
+    CustomCounter actualModel =
+        getExactBox(type).firstWhere((element) => element.id == id);
+    int index = getExactBox(type).indexOf(actualModel);
 
-    // likeBox.forEach((key, value) {
-    //   if (key == id) {
+    if (type == 'likes') {
+      likeBox3.remove(actualModel);
+    }
     if (actualModel.data.isLiked) {
       likeModel.isLiked = false;
       likeModel.nLikes = actualModel.data.nLikes - 1;
+      if (postId != null) {
+        await MomentQuery().unlikeCommentPost(commentId: id, likeId: isLikes!);
+      }
     } else {
       likeModel.isLiked = true;
       likeModel.nLikes = actualModel.data.nLikes + 1;
+      if (postId != null) {
+        await MomentQuery().likePostComment(commentId: id, postId: postId);
+      }
     }
-    isProfile ? likeBox2[index] = CustomCounter(id: id, data: likeModel) : likeBox[index] = CustomCounter(id: id, data: likeModel);
+    getExactBox(type)[index] = CustomCounter(id: id, data: likeModel);
     // }
     //   likeBox[key] = likeModel;
     // });
+    // }
   }
 
-  LikeModel getLikeValues({required String id, required bool isProfile}) {
+  LikeModel getLikeValues({required String id, required String type}) {
     late LikeModel likeValue;
-    if(isProfile) {
-      for (CustomCounter customCounter in likeBox2) {
-        if (customCounter.id == id) {
-          likeValue = customCounter.data;
-          return likeValue;
-        }
-      }
-    }else{
-      for (CustomCounter customCounter in likeBox) {
-        if (customCounter.id == id) {
-          likeValue = customCounter.data;
-          return likeValue;
-        }
+    for (CustomCounter customCounter in getExactBox(type)) {
+      if (customCounter.id == id) {
+        likeValue = customCounter.data;
+        return likeValue;
       }
     }
-    print("::::::::::>>>><<<< still returning empty}");
     return LikeModel(nLikes: 0, isLiked: false);
   }
 
-  //
-  // if (likeBox.isNotEmpty) {
-  //   likeValue = likeBox[id] ?? LikeModel(nLikes: 0, isLiked: false);
-  //   return likeValue;
-  // } else {
-  //   return LikeModel(nLikes: 0, isLiked: false);
-  // }
-  // }
+  Future<String> saveImage(BuildContext context, Uint8List? bytes) async {
+    await [Permission.storage].request();
+    String time = DateTime.now().microsecondsSinceEpoch.toString();
+    final name = 'screenshot_${time}_reachme';
+    final result = await ImageGallerySaver.saveImage(
+      bytes!,
+      name: name,
+      quality: 100,
+    );
+    debugPrint("Result ${result['filePath']}");
+    Snackbars.success(context, message: 'Image saved to Gallery');
+    RouteNavigators.pop(context);
+    return result['filePath'];
+  }
 
-  // add({required Post post, required String id}) {
-  //   if (likeBox.isNotEmpty) {
-  //     if (likeBox[id] != null) {
-  //       likeBox.update(
-  //           id,
-  //           (value) => LikeModel(
-  //               nLikes: post.nLikes ?? 0, isLiked: post.isLiked ?? false));
-  //     } else {
-  //       likeBox.addAll({
-  //         id: LikeModel(
-  //             nLikes: post.nLikes ?? 0, isLiked: post.isLiked ?? false)
-  //       });
-  //     }
-  //   } else {
-  //     likeBox({
-  //       id: LikeModel(nLikes: post.nLikes ?? 0, isLiked: post.isLiked ?? false)
-  //     });
-  //   }
-  // }
+  void takeScreenShot(context, GlobalKey<State<StatefulWidget>> src) async {
+    RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
+        as RenderRepaintBoundary; // the key provided
+    ui.Image image = await boundary.toImage(pixelRatio: 0.1);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    debugPrint("Byte Data: $byteData");
+    await saveImage(context, byteData!.buffer.asUint8List());
+  }
+
+  replyComment(BuildContext context,
+      {String? postId, String? commentId}) async {
+    String userInput = '';
+    CustomDialog.openDialogBox(
+        height: 250,
+        barrierD: false,
+        width: SizeConfig.screenWidth * 0.9,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CustomText(
+                text: 'Enter your comment:',
+                size: 15,
+                weight: FontWeight.w500,
+              ),
+              const SizedBox(height: 15),
+              TextFormField(
+                maxLines: 5,
+                onChanged: (val) {
+                  userInput = val;
+                },
+                decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Colors.grey.withOpacity(0.3),
+                        ))),
+              ),
+              const SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                InkWell(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 100,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.red,
+                    ),
+                    child: const CustomText(
+                      text: 'cancel',
+                      weight: FontWeight.w600,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () async {
+                    bool response = await MomentQuery().replyPostComment(
+                      postId: postId!,
+                      commentId: commentId,
+                      content: userInput,
+                    );
+                    if (response) {
+                      Snackbars.success(context,
+                          message:
+                              'You have successfully reply to your comment');
+                      Get.back();
+                      timeLineFeedStore.fetchMyComments(isRefresh: true);
+                    }
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 100,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.green,
+                    ),
+                    child: const CustomText(
+                      text: 'Send',
+                      weight: FontWeight.w600,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ])
+              // Container(
+              //   height: 50,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(10),
+              //     borde
+              //   ),
+              // )
+            ]));
+  }
+
+  sendMail(BuildContext context) async {
+    String? encodeQueryParameters(Map<String, String> params) {
+      return params.entries
+          .map((MapEntry<String, String> e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+    }
+
+    final Uri _emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'televerseapps@gmail.com',
+        query: encodeQueryParameters({
+          'subject': "User Compliant",
+          'body':
+              "Name: ${userFullName.value}\nPhone Number: ${userPhoneNumber.value}\ncompliant: ${userMessage.value}",
+        }));
+
+    if (await canLaunchUrl(_emailLaunchUri)) {
+      bool res = await launchUrl(_emailLaunchUri);
+      if (res) {
+        Get.back();
+        Snackbars.success(context,
+            message:
+                'You have successfully submit your compliant, we will contact you soon.');
+        userFullName("");
+        userPhoneNumber("");
+        userMessage("");
+      }
+    } else {
+      throw 'Could not Launch $_emailLaunchUri.toString()';
+    }
+  }
 }

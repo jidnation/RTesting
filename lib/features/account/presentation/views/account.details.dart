@@ -16,6 +16,8 @@ import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 import '../../../../core/components/refresher.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 
 class AccountStatsInfo extends StatefulHookWidget {
   const AccountStatsInfo({Key? key, this.index}) : super(key: key);
@@ -382,7 +384,7 @@ class SeeMyReachersList extends StatelessWidget {
                   globals.userBloc!
                       .add(GetRecipientProfileEvent(email: data!.reacher!.id));
                   data!.reacher!.id == globals.user!.id
-                      ? RouteNavigators.route(context, const AccountScreen())
+                      ? RouteNavigators.route(context, const NewAccountScreen())
                       : RouteNavigators.route(
                           context,
                           RecipientAccountProfile(
@@ -497,7 +499,7 @@ class SeeMyReachingsList extends StatelessWidget {
                 globals.userBloc!
                     .add(GetRecipientProfileEvent(email: data!.reaching!.id));
                 data!.reaching!.id == globals.user!.id
-                    ? RouteNavigators.route(context, const AccountScreen())
+                    ? RouteNavigators.route(context, const NewAccountScreen())
                     : RouteNavigators.route(
                         context,
                         RecipientAccountProfile(
@@ -992,7 +994,7 @@ class _RecipientAccountStatsInfoState extends State<RecipientAccountStatsInfo>
                                     );
                                   },
                                 ),
-                                ],
+                              ],
                             ).paddingSymmetric(h: 13),
                     ),
                   ],

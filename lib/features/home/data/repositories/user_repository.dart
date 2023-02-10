@@ -139,6 +139,7 @@ class UserRepository {
   Future<Either<String, dynamic>> getSignedURl({required File file}) async {
     try {
       final res = await _apiClient.getSignedURL(file);
+      print(res);
       final imageUrl = res['data']['link'] as String;
       final signedUrl = res['data']['signedUrl'] as String;
       return Right({

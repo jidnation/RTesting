@@ -43,7 +43,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         response.fold(
           (error) => emit(CreatePostError(error: error)),
           (post) {
-            timeLineFeedStore.initialize(isPosting: true);
+            timeLineFeedStore.initialize(isPosting: true, isRefreshing: true);
             Console.log('post data bloc', post.toJson());
             // emit(CreatePostSuccess(post: post));
           },
@@ -363,6 +363,83 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         emit(GetSingleCommentOnPostError(error: e.message));
       }
     });
+    on<ReplyCommentOnPostEvent>((event, emit) async {
+      emit(ReplyCommentOnPostLoading());
+      try {
+        final response = await socialServiceRepository.replyCommentOnPost(
+            commentId: event.commentId,
+            content: event.content,
+            postId: event.postId,
+            commentOwnerId: event.commentOwnerId,
+            postOwnerId: event.postOwnerId,
+            audioMediaItem: event.audioMediaItem,
+            videoMediaItem: event.videoMediaItem,
+            imageMediaItems: event.imageMediaItems);
+        response.fold(
+          (error) => emit(ReplyCommentOnPostError(error: error)),
+          (data) => emit(ReplyCommentOnPostSuccess(commentReply: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(ReplyCommentOnPostError(error: e.message));
+      }
+    });
+    on<GetCommentRepliesEvent>((event, emit) async {
+      emit(GetCommentRepliesLoading());
+      try {
+        final response = await socialServiceRepository.getCommentReplies(
+            commentId: event.commentId,
+            postId: event.postId,
+            pageLimit: event.pageLimit,
+            pageNumber: event.pageNumber);
+        response.fold(
+          (error) => emit(GetCommentRepliesError(error: error)),
+          (data) => emit(GetCommentRepliesSuccess(replies: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(GetCommentRepliesError(error: e.message));
+      }
+    });
+    on<DeleteCommentReplyEvent>((event, emit) async {
+      emit(DeleteCommentReplyLoading());
+      try {
+        final response = await socialServiceRepository.deleteCommentReply(
+            replyId: event.replyId, postId: event.postId);
+        response.fold(
+          (error) => emit(DeleteCommentReplyError(error: error)),
+          (data) => emit(DeleteCommentReplySuccess()),
+        );
+      } on GraphQLError catch (e) {
+        emit(DeleteCommentReplyError(error: e.message));
+      }
+    });
+    on<LikeCommentReplyEvent>((event, emit) async {
+      emit(LikeCommentReplyLoading());
+      try {
+        final response = await socialServiceRepository.likeCommentReply(
+            replyId: event.replyId,
+            postId: event.postId,
+            commentId: event.commentId);
+        response.fold(
+          (error) => emit(LikeCommentReplyError(error: error)),
+          (data) => emit(LikeCommentReplySuccess(like: data)),
+        );
+      } on GraphQLError catch (e) {
+        emit(LikeCommentReplyError(error: e.message));
+      }
+    });
+    on<UnlikeCommentReplyEvent>((event, emit) async {
+      emit(UnlikeCommentReplyLoading());
+      try {
+        final response = await socialServiceRepository.unlikeCommentReply(
+            replyId: event.replyId);
+        response.fold(
+          (error) => emit(UnlikeCommentReplyError(error: error)),
+          (data) => emit(UnlikeCommentReplySuccess()),
+        );
+      } on GraphQLError catch (e) {
+        emit(LikeCommentReplyError(error: e.message));
+      }
+    });
     on<GetPostFeedEvent>((event, emit) async {
       emit(GetPostFeedLoading());
       try {
@@ -610,9 +687,6 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
     on<GetVotedPostsEvent>((event, emit) async {
       emit(GetVotedPostsLoading());
       try {
-        print("pageLimit ${event.pageLimit}");
-        print("pageNumber ${event.pageNumber}");
-        print("vote tyoe ${event.voteType}");
         final response = await socialServiceRepository.getVotedPosts(
             pageLimit: event.pageLimit!,
             pageNumber: event.pageNumber!,

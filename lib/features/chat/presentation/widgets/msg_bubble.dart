@@ -253,6 +253,10 @@ class MsgBubble extends StatelessWidget {
         ),
       );
     } else if (label.contains('aac')) {
+      // return MomentAudioPlayer(
+      //   audioPath: label,
+      //   id: chat.id,
+      // );
       return Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -272,6 +276,7 @@ class MsgBubble extends StatelessWidget {
                 audioFile: label,
                 isMe: isMe,
                 timeStamp: timeStamp,
+                id: chat.id,
               )));
     }
     return Column(

@@ -31,6 +31,8 @@ import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dar
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 
 import '../../../moment/comment_media.dart';
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
 
 class ViewCommentsScreen extends StatefulHookWidget {
   static String id = 'view_comments_screen';
@@ -1164,7 +1166,7 @@ class CommentsTile extends StatelessWidget {
                   globals.userBloc!
                       .add(GetRecipientProfileEvent(email: comment.authId));
                   comment.authId == globals.user!.id
-                      ? RouteNavigators.route(context, const AccountScreen())
+                      ? RouteNavigators.route(context, const NewAccountScreen())
                       : RouteNavigators.route(
                           context,
                           RecipientAccountProfile(
@@ -1216,7 +1218,7 @@ class CommentsTile extends StatelessWidget {
                   Expanded(
                     child: CommentAudioMedia(
                       path: comment.audioMediaItem!,
-                              ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
+                    ).paddingOnly(r: 0, l: 0, b: 10, t: 0),
                   ),
                 ],
               )

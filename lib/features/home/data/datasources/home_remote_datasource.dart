@@ -829,6 +829,204 @@ class HomeRemoteDataSource {
     }
   }
 
+  Future<CommentReplyModel> replyCommentOnPost({
+    required String postId,
+    required String postOwnerId,
+    required String commentOwnerId,
+    required String commentId,
+    String? content,
+    List<String>? imageMediaItems,
+    String? audioMediaItem,
+    String? videoMediaItem,
+  }) async {
+    String q = r'''
+        mutation replyCommentOnPost(
+          $postId: String!
+          $postOwnerId: String!
+          $commentOwnerId: String!
+          $content: String
+          $commentId: String!
+          $imageMediaItems:[String]
+          $audioMediaItem:String
+          $videoMediaItem:String
+          ) {
+          replyCommentOnPost(
+            replyInput: {
+              postId: $postId
+              content: $content
+              commentId: $commentId
+              postOwnerId: $postOwnerId
+              commentOwnerId: $commentOwnerId
+              imageMediaItems:$imageMediaItems
+              audioMediaItem:$audioMediaItem
+              videoMediaItem:$videoMediaItem
+          }) {
+            ''' +
+        CommentReplySchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'commentId': commentId,
+        'postOwnerId': postOwnerId,
+        'commentOwnerId': commentOwnerId
+      };
+      if (content != null && content.isNotEmpty) {
+        variables.putIfAbsent('content', () => content);
+      }
+      if (audioMediaItem != null) {
+        variables.putIfAbsent('audioMediaItem', () => audioMediaItem);
+      }
+      if (imageMediaItems != null) {
+        variables.putIfAbsent('imageMediaItems', () => imageMediaItems);
+      }
+
+      if (videoMediaItem != null) {
+        variables.putIfAbsent('videoMediaItem', () => videoMediaItem);
+      }
+      final result = await _client.mutate(gql(q), variables: variables);
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return CommentReplyModel.fromJson(result.data!['replyCommentOnPost']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<CommentReplyModel>> getCommentReplies(
+      {required String postId,
+      required String commentId,
+      int? pageLimit,
+      int? pageNumber}) async {
+    String q = r'''
+        query getCommentReplies(
+          $postId: String!
+          $commentId: String!
+          $page_limit: Int!
+          $page_number: Int!
+          ) {
+          getCommentReplies(
+              postId: $postId
+              commentId: $commentId
+              page_limit: $page_limit
+              page_number: $page_number
+              ) {
+            ''' +
+        CommentReplySchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'commentId': commentId,
+        'page_limit': pageLimit,
+        'page_number': pageNumber
+      };
+      final result = await _client.mutate(gql(q), variables: variables);
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return (result.data!['getCommentReplies'] as List)
+          .map((e) => CommentReplyModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteCommentReply({
+    required String postId,
+    required String replyId,
+  }) async {
+    String q = r'''
+        mutation deleteCommentReply(
+          $postId: String!
+          $replyId: String!
+          ) {
+          deleteCommentReply(
+              postId: $postId
+              replyId: $replyId
+          ) 
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'replyId': replyId,
+      };
+      final result = await _client.mutate(gql(q), variables: variables);
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return result.data!['deleteCommentReply'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<CommentReplyLikeModel> likeCommentReply({
+    required String postId,
+    required String commentId,
+    required String replyId,
+  }) async {
+    String q = r'''
+        mutation likePostCommentReply(
+          $postId: String!
+          $replyId: String!
+          $commentId: String!
+          ) {
+          likePostCommentReply(
+              postId: $postId
+              replyId: $replyId
+              commentId: $commentId
+          ) {
+            ''' +
+        CommentReplyLikeSchema.schema +
+        '''
+          }
+        }''';
+    try {
+      Map<String, dynamic> variables = {
+        'postId': postId,
+        'commentId': commentId,
+        'replyId': replyId
+      };
+      final result = await _client.mutate(gql(q), variables: variables);
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return CommentReplyLikeModel.fromJson(result.data!['likeReply']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> unlikeCommentReply({
+    required String replyId,
+  }) async {
+    String q = r'''
+        mutation unlikePostCommentReply(
+          $replyId: String!
+          ) {
+          unlikePostCommentReply(
+              replyId: $replyId
+          ) 
+        }''';
+    try {
+      Map<String, dynamic> variables = {'replyId': replyId};
+      final result = await _client.mutate(gql(q), variables: variables);
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      }
+      return result.data!['unlikeReply'] as bool;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<CommentModel> deletePostComment({required String commentId}) async {
     String q = r'''
         mutation deletePostComment($commentId: String!) {

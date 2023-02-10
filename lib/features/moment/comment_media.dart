@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:get/utils.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
@@ -24,8 +23,8 @@ import '../../../../core/services/media_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/file_utils.dart';
 import '../../../../core/utils/string_util.dart';
-import '../../core/utils/custom_text.dart';
 import '../timeline/loading_widget.dart';
+import '../timeline/timeline_feed.dart';
 
 class CommentMedia extends StatelessWidget {
   final CommentModel comment;
@@ -244,10 +243,11 @@ class _CommentImageMediaState extends State<CommentImageMedia> {
 
 class CommentAudioMedia extends StatefulWidget {
   final String path;
-  const CommentAudioMedia({
-    Key? key,
-    required this.path,
-  }) : super(key: key);
+  final String? id;
+  final bool? isCommentReply;
+  const CommentAudioMedia(
+      {Key? key, required this.path, this.id, this.isCommentReply})
+      : super(key: key);
 
   @override
   State<CommentAudioMedia> createState() => _CommentAudioMediaState();
@@ -255,7 +255,7 @@ class CommentAudioMedia extends StatefulWidget {
 
 class _CommentAudioMediaState extends State<CommentAudioMedia> {
   bool isPlaying = false;
-  late PlayerController? playerController;
+  late PlayerController playerController;
   bool isInitialised = false;
   // bool isPlaying = false;
   bool isReadingCompleted = false;
@@ -284,13 +284,13 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
       filePath = audioFile.path;
     }
     // if(playerController == null) return;
-    playerController!.onCurrentDurationChanged.listen((event) {
+    playerController.onCurrentDurationChanged.listen((event) {
       currentDuration = event;
       if (mounted) setState(() {});
     });
 
-    playerController!.onPlayerStateChanged.listen((event) {
-      print('<<<<<AUDIO-LISTENER>>>>>>> ${playerController!.playerState.name}');
+    playerController.onPlayerStateChanged.listen((event) {
+      print('<<<<<AUDIO-LISTENER>>>>>>> ${playerController.playerState.name}');
 
       if (event == PlayerState.initialized) {
         isInitialised = true;
@@ -303,12 +303,14 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
         if (mounted) setState(() {});
       } else if (event == PlayerState.stopped) {
         isPlaying = false;
-        playerController!.seekTo(10);
+        playerController.seekTo(10);
         if (mounted) setState(() {});
       }
     });
 
-    await playerController!.preparePlayer(filePath);
+    playerController.playerKey.isNotEmpty
+        ? await playerController.preparePlayer(filePath)
+        : null;
 
     // await playerController.startPlayer();
     if (mounted) setState(() {});
@@ -316,71 +318,87 @@ class _CommentAudioMediaState extends State<CommentAudioMedia> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Expanded(
-        child: GestureDetector(
-          onTap: () async {
-            if (isPlaying) {
-              playerController!.pausePlayer();
-            } else {
-              // playerController!.stopAllPlayers();
-              playerController!.startPlayer(finishMode: FinishMode.pause);
-            }
-          },
-          child: Icon(
-            isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-            size: 32,
-            color: const Color(0xff0077B6),
+    return Obx(() {
+      String currentId = timeLineController.currentId.value;
+      if (currentId.isNotEmpty) {
+        currentId == widget.id
+            ? playerController.startPlayer(finishMode: FinishMode.loop)
+            : playerController.pausePlayer();
+      } else {
+        playerController.pausePlayer();
+      }
+
+      return Row(children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              if (currentId == widget.id) {
+                timeLineController.currentId('');
+              } else {
+                timeLineController.currentId(widget.id);
+              }
+            },
+            child: Icon(
+              currentId == widget.id
+                  ? Icons.pause_rounded
+                  : Icons.play_arrow_rounded,
+              size: 32,
+              color: const Color(0xff0077B6),
+            ),
           ),
         ),
-      ),
-      SizedBox(
-        width: getScreenWidth(8),
-      ),
-      isInitialised
-          ? AudioFileWaveforms(
-              size: Size(MediaQuery.of(context).size.width / 2.0, 24),
-              playerController: playerController!,
-              density: 2,
-              enableSeekGesture: true,
-              playerWaveStyle: const PlayerWaveStyle(
-                scaleFactor: 0.2,
-                waveThickness: 3,
-                fixedWaveColor: AppColors.white,
-                liveWaveColor: Color(0xff0077B6),
-                waveCap: StrokeCap.round,
-              ),
-            )
-          : SizedBox(
-              width: MediaQuery.of(context).size.width / 2.0,
-              child: const LinearProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(0xff0077B6),
-                ),
-                color: AppColors.greyShade1,
-                backgroundColor: AppColors.greyShade1,
-              ),
-            ),
-      const Spacer(
-        flex: 1,
-      ),
-      Text(
-        StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          color: Color(0xff0077B6),
+        SizedBox(
+          width: getScreenWidth(8),
         ),
-      ),
-      SizedBox(
-        width: getScreenWidth(12),
-      ),
-    ]);
+        playerController.playerState != PlayerState.stopped
+            ? AudioFileWaveforms(
+                size: (widget.isCommentReply ?? false)
+                    ? Size(MediaQuery.of(context).size.width / 2.5, 18)
+                    : Size(MediaQuery.of(context).size.width / 2.0, 24),
+                playerController: playerController,
+                density: 2,
+                enableSeekGesture: true,
+                playerWaveStyle: const PlayerWaveStyle(
+                  scaleFactor: 0.2,
+                  waveThickness: 3,
+                  fixedWaveColor: AppColors.white,
+                  liveWaveColor: Color(0xff0077B6),
+                  waveCap: StrokeCap.round,
+                ),
+              )
+            : SizedBox(
+                width: (widget.isCommentReply ?? false)
+                    ? MediaQuery.of(context).size.width / 2.5
+                    : MediaQuery.of(context).size.width / 2.0,
+                child: const LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xff0077B6),
+                  ),
+                  color: AppColors.greyShade1,
+                  backgroundColor: AppColors.greyShade1,
+                ),
+              ),
+        const Spacer(
+          flex: 1,
+        ),
+        Text(
+          StringUtil.formatDuration(Duration(milliseconds: currentDuration)),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xff0077B6),
+          ),
+        ),
+        SizedBox(
+          width: getScreenWidth(12),
+        ),
+      ]);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    playerController?.dispose();
+    playerController.dispose();
   }
 }
 
@@ -534,135 +552,3 @@ class _CommentVideoMediaState extends State<CommentVideoMedia> {
     );
   }
 }
-
-// class VoiceMessageAudioController {
-
-//   PlayerController? _currentPlayer;
-//   Map<String, PlayerController> playerControllers = {};
-
-//   void startOrStopPlayer(String path) async {
-//     _currentPlayer?.pausePlayer();
-
-//     _currentPlayer = await getPlayerController(path);
-//     _currentPlayer!.startPlayer(finishMode: FinishMode.pause);
-//   }
-
-//   Future<PlayerController> getPlayerController(String path) async {
-//     if (playerControllers.containsKey(path)) {
-//       return playerControllers[path]!;
-//     }
-//     final playerController = PlayerController();
-//     await playerController.preparePlayer(path);
-//     playerControllers[path] = playerController;
-//     return playerController;
-//   }
-
-//   dispose() {
-//     playerControllers.forEach((key, value) {
-//       value.dispose();
-//     });
-//   }
-// }
-
-
-
-// class AudioWavePlayer extends StatefulWidget {
-//   AudioWavePlayer({this.playerController, super.key});
-//   PlayerController? playerController;
-
-//   @override
-//   State<AudioWavePlayer> createState() => _AudioWavePlayerState();
-// }
-
-// class _AudioWavePlayerState extends State<AudioWavePlayer> {
-//   PlayerController? current;
-
-//   final MediaService _mediaService = MediaService();
-
-//   VoiceMessageAudioController controller = VoiceMessageAudioController();
-  
-
-//   @override
-//   void initState() {
-//     super.initState();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: [
-//         InkWell(
-//           onTap: () {
-//             // controller.startOrStopPlayer(path);
-//           },
-//           child: Icon(
-//             controller._currentPlayer!.playerState == PlayerState.playing
-//                 ? Icons.pause_rounded
-//                 : Icons.play_arrow_rounded,
-//             size: 32,
-//             color: const Color(0xff0077B6),
-//           ),
-//         ),
-//         SizedBox(
-//           width: getScreenWidth(3),
-//         ),
-//         widget.playerController!.playerState != PlayerState.stopped
-//             ? Expanded(child: LayoutBuilder(
-//                 builder: (p0, p1) {
-//                   return AudioFileWaveforms(
-//                     size: Size(p1.maxWidth < 250 ? 230 : 260, 24),
-//                     playerController: widget.playerController!,
-//                     density: 2,
-//                     enableSeekGesture: true,
-//                     playerWaveStyle: const PlayerWaveStyle(
-//                       scaleFactor: 0.2,
-//                       waveThickness: 3,
-//                       fixedWaveColor: Colors.white,
-//                       liveWaveColor: Color(0xff0077B6),
-//                       waveCap: StrokeCap.round,
-//                     ),
-//                   );
-//                 },
-//               ))
-//             : Expanded(
-//                 child: const LinearProgressIndicator(
-//                   valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-//                   color: AppColors.greyShade1,
-//                   backgroundColor: AppColors.greyShade1,
-//                 ).paddingOnly(right: 5),
-//               ),
-//         // CustomText(
-//         //   text: StringUtil.formatDuration(
-//         //       Duration(milliseconds: currentDuration)),
-//         //   color: const Color(0xff0077B6),
-//         //   weight: FontWeight.w700,
-//         //   size: 14,
-//         // ),
-//         SizedBox(
-//           width: getScreenWidth(12),
-//         )
-//       ],
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     // playerController.dispose();
-//   }
-// }
-
-
-// class AudioPathFile extends StatefulWidget {
-//   const AudioPathFile({super.key});
-
-//   @override
-//   State<AudioPathFile> createState() => _AudioPathFileState();
-// }
-
-// class _AudioPathFileState extends State<AudioPathFile> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container();
-//   }
-// }

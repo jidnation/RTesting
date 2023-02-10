@@ -21,6 +21,9 @@ import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
+import '../../../profile/new_account.dart';
+import '../../../profile/recipientNewAccountProfile.dart';
+
 class SearchScreen extends StatefulHookWidget {
   static const String id = "search_screen";
   final GlobalKey<ScaffoldState>? scaffoldKey;
@@ -218,7 +221,7 @@ class SearchResultCard extends StatelessWidget {
           onTap: () {
             globals.userBloc!.add(GetRecipientProfileEvent(email: id));
             id == globals.user!.id
-                ? RouteNavigators.route(context, const AccountScreen())
+                ? RouteNavigators.route(context, const NewAccountScreen())
                 : RouteNavigators.route(
                     context,
                     RecipientAccountProfile(
