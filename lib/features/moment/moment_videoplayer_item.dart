@@ -4,6 +4,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/utils/custom_text.dart';
+import '../timeline/loading_widget.dart';
 import 'moment_feed.dart';
 
 class VideoPlayerItem extends StatefulWidget {
@@ -41,23 +42,11 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      // aspectRatio: _videoPlayerController.value.aspectRatio,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
       allowFullScreen: true,
-      // fullScreenByDefault: true,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
+      showOptions: false,
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -73,7 +62,6 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       placeholder: Container(
         color: const Color(0xff001824),
       ),
-      // autoInitialize: true,
     );
     momentFeedStore.videoCtrl(true, vController: _videoPlayerController);
   }
@@ -108,13 +96,9 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
               child: Chewie(
                 controller: _chewieController!,
               ))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
+          : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
     );
   }
 }
@@ -158,20 +142,9 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
       aspectRatio: 16 / 9,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
+      showOptions: false,
       allowFullScreen: true,
-      // fullScreenByDefault: true,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -221,13 +194,9 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
               child: Chewie(
                 controller: _chewieController!,
               ))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
+          : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
     );
   }
 }

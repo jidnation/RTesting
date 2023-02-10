@@ -234,15 +234,20 @@ class MomentCommentStation2 extends StatelessWidget {
                                             borderRadius:
                                                 BorderRadius.circular(30),
                                             image: momentFeed
-                                                    .profilePicture.isNotEmpty
+                                                        .momentOwnerInfo
+                                                        .profilePicture
+                                                        ?.isNotEmpty ??
+                                                    false
                                                 ? DecorationImage(
                                                     image: NetworkImage(
                                                         momentFeed
-                                                            .profilePicture),
+                                                            .momentOwnerInfo
+                                                            .profilePicture!),
                                                     fit: BoxFit.cover,
                                                   )
                                                 : null),
-                                        child: momentFeed.profilePicture.isEmpty
+                                        child: momentFeed.momentOwnerInfo
+                                                .profilePicture!.isEmpty
                                             ? Image.asset(
                                                 "assets/images/app-logo.png")
                                             : null,
@@ -254,7 +259,7 @@ class MomentCommentStation2 extends StatelessWidget {
                                           children: [
                                             CustomText(
                                               text: momentFeed
-                                                  .momentOwnerUserName,
+                                                  .momentOwnerInfo.username!,
                                               color: Colors.black,
                                               size: 16.28,
                                               weight: FontWeight.w600,

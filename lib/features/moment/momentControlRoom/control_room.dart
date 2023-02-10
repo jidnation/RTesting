@@ -79,14 +79,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         value.add(MomentModel(
           videoUrl: momentFeed.moment!.videoMediaItem!,
           isLiked: momentFeed.moment!.isLiked!,
+          feedOwnerInfo: momentFeed.feedOwnerProfile!,
           nLikes: momentFeed.moment!.nLikes!,
           soundUrl: momentFeed.moment!.sound,
-          momentOwnerId: momentFeed.moment!.momentOwnerProfile!.authId!,
-          momentOwnerUserName: momentFeed.moment!.momentOwnerProfile!.username!,
-          feedOwnerUserName: momentFeed.feedOwnerProfile!.username!,
+          momentOwnerInfo: momentFeed.moment!.momentOwnerProfile!,
           reachingUser: momentFeed.reachingRelationship!,
-          profilePicture:
-              momentFeed.moment!.momentOwnerProfile!.profilePicture ?? "",
           nComment: momentFeed.moment!.nComments!,
           momentId: momentFeed.moment!.momentId!,
           caption: momentFeed.moment!.caption!,
@@ -115,17 +112,13 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         if (!(_momentIdList.contains(momentFeed.moment!.momentId))) {
           _momentIdList.add(momentFeed.moment!.momentId!);
           value.add(MomentModel(
+            feedOwnerInfo: momentFeed.feedOwnerProfile!,
             videoUrl: momentFeed.moment!.videoMediaItem!,
             isLiked: momentFeed.moment!.isLiked!,
             nLikes: momentFeed.moment!.nLikes!,
             soundUrl: momentFeed.moment!.sound,
-            momentOwnerId: momentFeed.moment!.momentOwnerProfile!.authId!,
-            momentOwnerUserName:
-                momentFeed.moment!.momentOwnerProfile!.username!,
-            feedOwnerUserName: momentFeed.feedOwnerProfile!.username!,
+            momentOwnerInfo: momentFeed.moment!.momentOwnerProfile!,
             reachingUser: momentFeed.reachingRelationship!,
-            profilePicture:
-                momentFeed.moment!.momentOwnerProfile!.profilePicture ?? "",
             nComment: momentFeed.moment!.nComments!,
             momentId: momentFeed.moment!.momentId!,
             caption: momentFeed.moment!.caption!,
@@ -362,42 +355,41 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
 
     ///compressing done here
 
-      MediaInfo? mediaInfo = await VideoCompress.compressVideo(
-        videoPath,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false, // It's false by default
-      );
-      print("::::::::after compression file size::: ${mediaInfo!.filesize}");
+    MediaInfo? mediaInfo = await VideoCompress.compressVideo(
+      videoPath,
+      quality: VideoQuality.MediumQuality,
+      deleteOrigin: false, // It's false by default
+    );
+    print("::::::::after compression file size::: ${mediaInfo!.filesize}");
 
-      ///url converting done here
-      if (mediaInfo.file != null) {
-        String? videoUrl = await uploadMediaFile(file: mediaInfo.file!);
+    ///url converting done here
+    if (mediaInfo.file != null) {
+      String? videoUrl = await uploadMediaFile(file: mediaInfo.file!);
 
-        print(":::::::::::::::::::::::::::n printing starrted :::::");
-        if (videoUrl != null) {
-          var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
-          if (res) {
-            fetchMoment();
-            momentCtrl.clearPostingData();
-            Snackbars.success(
-              context,
-              message: 'Moment successfully created',
-              milliseconds: 1300,
-            );
-            momentCtrl.clearPostingData();
-            RouteNavigators.pop(context);
-          } else {
-            Snackbars.error(
-              context,
-              message: 'Operation Failed, Try again.',
-              milliseconds: 1400,
-            );
-          }
+      print(":::::::::::::::::::::::::::n printing starrted :::::");
+      if (videoUrl != null) {
+        var res = await MomentQuery.postMoment(videoMediaItem: videoUrl);
+        if (res) {
+          fetchMoment();
+          momentCtrl.clearPostingData();
+          Snackbars.success(
+            context,
+            message: 'Streak successfully created',
+            milliseconds: 1300,
+          );
+          momentCtrl.clearPostingData();
+          RouteNavigators.pop(context);
+        } else {
+          Snackbars.error(
+            context,
+            message: 'Operation Failed, Try again.',
+            milliseconds: 1400,
+          );
         }
-        // _postingMoment = false;
-        Get.close(2);
       }
-
+      // _postingMoment = false;
+      Get.close(2);
+    }
   }
 
   reachUser({required String toReachId, required String id}) async {
@@ -417,7 +409,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     MomentModel momentModel = value.firstWhere((element) => element.id == id);
     bool response = await momentQuery.createMomentComment(
         momentId: momentModel.momentId,
-        momentOwnerId: momentModel.momentOwnerId,
+        momentOwnerId: momentModel.momentOwnerInfo.authId!,
         userComment: userComment,
         images: images,
         audioUrl: audioUrl,
@@ -425,7 +417,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response) {
       Snackbars.success(
         context,
-        message: 'Moment successfully created',
+        message: 'Streak successfully created',
         milliseconds: 1300,
       );
       updateMomentComments(id: momentModel.id);
@@ -498,7 +490,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     if (response) {
       Snackbars.success(
         context,
-        message: 'Moment successfully created',
+        message: 'Streak successfully created',
         milliseconds: 1300,
       );
       updateMomentComments(id: momentModel.id);
@@ -588,11 +580,16 @@ class MomentModel {
   int nComment;
   bool isLiked;
   final String momentId;
-  final String profilePicture;
-  final String momentOwnerId;
+  final OwnerProfile feedOwnerInfo;
+  final OwnerProfile momentOwnerInfo;
+
+  // final String profilePicture;
+  // final String momentOwnerId;
   List<CustomMomentCommentModel> momentComments;
-  final String momentOwnerUserName;
-  final String feedOwnerUserName;
+  // final String momentOwnerUserName;
+  // final String feedOwnerUserName;
+  // final String feedOwnerPicture;
+  // final String feedOwnerId;
   final String caption;
 
   MomentModel(
@@ -602,13 +599,11 @@ class MomentModel {
       required this.reachingUser,
       required this.momentCreatedTime,
       required this.isLiked,
-      required this.momentOwnerId,
-      required this.momentOwnerUserName,
-      required this.feedOwnerUserName,
+      required this.momentOwnerInfo,
       required this.nLikes,
       required this.nComment,
       required this.momentId,
-      required this.profilePicture,
+      required this.feedOwnerInfo,
       required this.caption})
       : id = const Uuid().v4();
 }

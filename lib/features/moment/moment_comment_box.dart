@@ -55,7 +55,7 @@ class MomentCommentBox extends HookWidget {
                         fit: BoxFit.cover,
                       )
                     : null),
-            child: momentFeed.profilePicture.isEmpty
+            child: momentFeed.momentOwnerInfo.profilePicture?.isEmpty ?? false
                 ? Image.asset("assets/images/app-logo.png")
                 : null,
           ),

@@ -31,13 +31,13 @@ class UserCommentBox extends HookWidget {
           decoration: BoxDecoration(
               color: AppColors.primaryColor,
               borderRadius: BorderRadius.circular(30),
-              image: momentFeed.profilePicture.isNotEmpty
+              image: momentFeed.feedOwnerInfo.profilePicture?.isNotEmpty ?? false
                   ? DecorationImage(
-                      image: NetworkImage(momentFeed.profilePicture),
+                      image: NetworkImage(momentFeed.feedOwnerInfo.profilePicture!),
                       fit: BoxFit.cover,
                     )
                   : null),
-          child: momentFeed.profilePicture.isEmpty
+          child: momentFeed.feedOwnerInfo.profilePicture?.isEmpty ?? false
               ? Image.asset("assets/images/app-logo.png")
               : null,
         ),
@@ -49,7 +49,7 @@ class UserCommentBox extends HookWidget {
             controller: inputController,
             decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: 'comment as ${momentFeed.feedOwnerUserName}',
+                hintText: 'comment as ${momentFeed.feedOwnerInfo.username}',
                 hintStyle: TextStyle(
                   color: const Color(0xff252525).withOpacity(0.5),
                   fontSize: 11.44,
