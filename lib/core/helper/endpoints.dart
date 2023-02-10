@@ -13,5 +13,5 @@ class Endpoints {
   //calls api
   // static const String graphQLNotificationUrl = 'live.myreach.me/interaction';
   static const String graphQLNotificationUrl =
-      'http://185.3.95.146:4500/graphql';
+      "http://185.3.95.146:4500/graphql";
 }

@@ -311,4 +311,5 @@ class GetVotedPostsEvent extends SocialServiceEvent {
 
 class SuggestUserEvent extends SocialServiceEvent {}
 
+
 // class ReachUserEvent extends

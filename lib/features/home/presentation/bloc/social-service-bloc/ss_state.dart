@@ -609,3 +609,4 @@ class DownloadPostError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
+

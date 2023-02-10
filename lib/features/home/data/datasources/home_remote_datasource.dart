@@ -8,6 +8,7 @@ import 'package:reach_me/core/services/graphql/schemas/user_schema.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
+import 'package:reach_me/features/home/data/models/notifications.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/star_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
@@ -67,7 +68,7 @@ class HomeRemoteDataSource {
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }
-      print("User data ${result}");
+      print("User data $result");
       print(
           "User data 2 ${UserList.fromJson(result.data!['getUserByUsername'])}");
       //print("User data 2 ${UserList.fromJson(result)}");
@@ -1923,6 +1924,35 @@ class HomeRemoteDataSource {
       }
       Console.log('Initiate LiveStreaming', result.data);
       return StreamResponse.fromJson(result.data!['initiateLiveStream']);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<NotificationsModel>> getNotifications() async {
+    String q = r'''
+              query{
+  getNotificationFeed{
+    id
+    title
+    authId
+    message
+    data
+    isRead
+  }
+}
+              ''';
+    try {
+      final result = await _client.query(gql(q), variables: {});
+      if (result is GraphQLError) {
+        throw GraphQLError(message: result.message);
+      } else if (result is QueryResult) {
+        Console.log(
+            'notifications result', result.data!['getNotificationFeed']);
+        List feed = result.data!['getNotificationFeed'] as List;
+        return feed.map((e) => NotificationsModel.fromJson(e)).toList();
+      }
+      return [];
     } catch (e) {
       rethrow;
     }

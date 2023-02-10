@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:get/get.dart';
@@ -17,10 +19,9 @@ import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
+
 import 'core/services/moment/controller.dart';
 import 'features/timeline/timeline_controller.dart';
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

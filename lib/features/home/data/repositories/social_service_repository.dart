@@ -6,6 +6,7 @@ import 'package:reach_me/features/home/data/datasources/home_remote_datasource.d
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
+import 'package:reach_me/features/home/data/models/notifications.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
@@ -564,6 +565,15 @@ class SocialServiceRepository {
     try {
       final users = await _homeRemoteDataSource.suggestUser();
       return Right(users);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<NotificationsModel>>> getNotifications() async {
+    try {
+      final notifications = await _homeRemoteDataSource.getNotifications();
+      return Right(notifications);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
