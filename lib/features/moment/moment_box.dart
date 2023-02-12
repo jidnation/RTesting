@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:like_button/like_button.dart';
+import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart' as pt;
 import '../../core/utils/app_globals.dart';
 import '../../core/utils/constants.dart';
@@ -157,6 +158,7 @@ class MomentBox extends StatelessWidget {
                   HapticFeedback.mediumImpact();
 
                   timeLineFeedStore.messageUser(context,
+                      isStreak: true,
                       quoteData: jsonEncode(_postModel.toJson()),
                       id: momentFeed.momentOwnerInfo.authId!);
                   // }
@@ -173,11 +175,7 @@ class MomentBox extends StatelessWidget {
         ),
       ),
       Positioned(
-        bottom: getScreenHeight(momentFeed.caption != 'No Caption'
-            ? 30
-            : (SizeConfig.screenHeight > 782)
-                ? 30
-                : 100),
+        bottom: 0,
         left: 20,
         right: 20,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -223,7 +221,16 @@ class MomentBox extends StatelessWidget {
                 AudioImageLoader(
                   audioUrl: momentFeed.soundUrl,
                 )
-              ])
+              ]),
+          SizedBox(
+            height: getScreenHeight(momentFeed.caption != 'No Caption'
+                ? (SizeConfig.screenHeight > 782)
+                    ? 30
+                    : 100
+                : (SizeConfig.screenHeight > 782)
+                    ? 30
+                    : 100),
+          )
         ]),
       ),
       Positioned(

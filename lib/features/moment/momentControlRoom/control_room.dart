@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
+import 'package:reach_me/core/services/moment/graphql_strings.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
@@ -17,6 +18,7 @@ import '../../../core/utils/dialog_box.dart';
 import '../../../core/utils/dimensions.dart';
 import '../../../core/utils/loader.dart';
 import '../../home/data/repositories/user_repository.dart';
+import '../../timeline/timeline_feed.dart';
 import '../moment_feed.dart';
 import '../user_posting.dart';
 import 'models/get_comments_model.dart';
@@ -83,7 +85,10 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           nLikes: momentFeed.moment!.nLikes!,
           soundUrl: momentFeed.moment!.sound,
           momentOwnerInfo: momentFeed.moment!.momentOwnerProfile!,
-          reachingUser: momentFeed.reachingRelationship!,
+          reachingUser: await timeLineFeedStore.getReachRelationship(
+                  type: 'reaching',
+                  usersId: momentFeed.moment!.momentOwnerProfile!.authId!) ??
+              false,
           nComment: momentFeed.moment!.nComments!,
           momentId: momentFeed.moment!.momentId!,
           caption: momentFeed.moment!.caption!,

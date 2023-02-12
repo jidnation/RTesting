@@ -40,9 +40,10 @@ import '../../../profile/recipientNewAccountProfile.dart';
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
   const MsgChatInterface(
-      {Key? key, this.recipientUser, this.thread, this.quotedData})
+      {Key? key, this.recipientUser, this.thread, this.quotedData, this.isStreak})
       : super(key: key);
   final User? recipientUser;
+  final bool? isStreak;
   final ChatsThread? thread;
   final String? quotedData;
 
@@ -559,10 +560,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 8, 8, 8, 0),
                                             child: Row(
                                               children: [
-                                                const Expanded(
+                                                 Expanded(
                                                   child: Text(
-                                                    'Reaching out to a post...',
-                                                    style: TextStyle(
+                                                    'Reaching out to a ${widget.isStreak ?? false ? 'streak' : 'post'}...',
+                                                    style: const TextStyle(
                                                         color: AppColors.black),
                                                   ),
                                                 ),

@@ -46,7 +46,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       autoPlay: true,
       allowFullScreen: true,
       looping: true,
-      showOptions: false,
+      // showOptions: false,
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -143,7 +143,7 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
       // aspectRatio: 1,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
-      showOptions: false,
+      // showOptions: false,
       allowFullScreen: true,
       looping: true,
 
