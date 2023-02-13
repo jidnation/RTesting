@@ -421,13 +421,18 @@ class _StatusViewPageState extends State<StatusViewPage> {
                             children: [
                               Row(
                                 children: [
-                                  if (Platform.isIOS)
-                                    GestureDetector(
+                                  GestureDetector(
+                                      child: Container(
+                                        padding: EdgeInsets.all(
+                                            Platform.isIOS ? 4 : 8),
                                         child: Icon(
-                                          Icons.chevron_left,
+                                          Platform.isIOS
+                                              ? Icons.chevron_left
+                                              : Icons.keyboard_backspace,
                                           color: AppColors.white,
                                         ),
-                                        onTap: () => Navigator.pop(context)),
+                                      ),
+                                      onTap: () => Navigator.pop(context)),
                                   Helper.renderProfilePicture(
                                       story.statusOwnerProfile!.profilePicture),
                                   SizedBox(width: getScreenWidth(12)),

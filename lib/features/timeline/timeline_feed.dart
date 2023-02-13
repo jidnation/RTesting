@@ -310,9 +310,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                             return;
                                                           if (res
                                                               is MuteResult) {
-                                                            timeLineFeedStore
-                                                                .muteStatus(
-                                                                    index);
+                                                            // timeLineFeedStore
+                                                            //     .muteStatus(
+                                                            //         index);
+                                                            await timeLineFeedStore
+                                                                .getUserStatus();
                                                           }
 
                                                           // Navigator.push(
@@ -393,9 +395,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                       .status!)));
                                                       if (res == null) return;
                                                       if (res is MuteResult) {
-                                                        timeLineFeedStore
-                                                            .unMuteStatus(
-                                                                index);
+                                                        // timeLineFeedStore
+                                                        //     .unMuteStatus(
+                                                        //         index);
+                                                        await timeLineFeedStore
+                                                            .getUserStatus();
                                                       }
                                                     },
                                                   ),

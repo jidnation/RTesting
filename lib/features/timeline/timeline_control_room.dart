@@ -584,14 +584,14 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   getMutedStatus() {
     _mutedStatus = [];
-    for (StatusFeedResponseModel actualStatus in _userStatus) {
+    for (final actualStatus in _userStatus) {
       if (actualStatus.isMuted ??
           false ||
               (actualStatus.status ?? [])
                   .where((e) => e.status?.isMuted ?? false)
                   .isNotEmpty) {
-        _mutedStatus.add(actualStatus);
-        _userStatus.remove(actualStatus);
+        _mutedStatus = [..._mutedStatus, actualStatus];
+        _userStatus = [..._userStatus]..remove(actualStatus);
       }
 
       // List<StatusFeedModel> statusList = actualStatus.status!;

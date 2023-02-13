@@ -101,13 +101,11 @@ class HomeRemoteDataSource {
 
   Future<bool> updateLastSeen({required String? userId}) async {
     String q = r'''
-        mutation updateLastSeen($userId: String!) {
-          updateLastSeen(userId: $userId) 
+        mutation {
+          updateLastSeen
         }''';
     try {
-      final result = await _client.mutate(gql(q), variables: {
-        'userId': userId,
-      });
+      final result = await _client.mutate(gql(q), variables: {});
       if (result is GraphQLError) {
         throw GraphQLError(message: result.message);
       }

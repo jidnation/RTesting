@@ -10,8 +10,6 @@ import 'package:reach_me/core/utils/file_utils.dart';
 import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
-import '../../../../core/utils/custom_text.dart';
-
 class AppGalleryView extends HookWidget {
   final List<String> mediaPaths;
   final int? initialPage;
