@@ -322,7 +322,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                 visible: tPostInfo.content!.isNotEmpty,
                 child: ExpandableText(
                   "${tPostInfo.content}",
-                  prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                  prefixText: tPostInfo.edited! ? "(edited)" : null,
                   prefixStyle: TextStyle(
                       fontSize: getScreenHeight(12),
                       fontFamily: 'Poppins',

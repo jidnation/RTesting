@@ -631,7 +631,7 @@ class _FullPostScreenState extends State<FullPostScreen> {
                                                         .postFeedModel!
                                                         .post!
                                                         .edited!
-                                                    ? "(Reach Edited)"
+                                                    ? "(edited)"
                                                     : null,
                                                 prefixStyle: TextStyle(
                                                     fontSize:
