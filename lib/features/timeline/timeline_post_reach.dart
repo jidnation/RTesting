@@ -686,7 +686,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                                 height: getScreenHeight(21)),
                                             Center(
                                               child: Text(
-                                                'Who can reply',
+                                                'Who can comment',
                                                 style: TextStyle(
                                                   fontSize: getScreenHeight(16),
                                                   color: AppColors.black,
@@ -698,7 +698,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                                 height: getScreenHeight(5)),
                                             Center(
                                               child: Text(
-                                                'Identify who can reply to this reach.',
+                                                'Identify who can comment on this reach.',
                                                 style: TextStyle(
                                                   fontSize: getScreenHeight(14),
                                                   color: AppColors.greyShade3,
@@ -721,7 +721,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
                                                 leading: SvgPicture.asset(
                                                     'assets/svgs/world.svg'),
                                                 title: Text(
-                                                  'Everyone can reply',
+                                                  'Everyone can comment',
                                                   style: TextStyle(
                                                     fontSize:
                                                         getScreenHeight(16),
@@ -1213,7 +1213,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
             SvgPicture.asset('assets/svgs/world.svg', height: 30),
             const SizedBox(width: 9),
             const Text(
-              'Everyone can reply',
+              'Everyone can comment',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
@@ -1280,7 +1280,7 @@ class _TimeLinePostReachState extends State<TimeLinePostReach> {
             SvgPicture.asset('assets/svgs/world.svg', height: 30),
             const SizedBox(width: 9),
             const Text(
-              'Everyone can reply',
+              'Everyone can comment',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
