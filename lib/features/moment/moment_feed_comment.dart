@@ -38,7 +38,7 @@ class _MomentFeedCommentState extends State<MomentFeedComment> {
         //   StatefulBuilder(
         //       builder: (BuildContext context, StateSetter setCommentState) {
         //     momentFeedStore.gettingUserComment ? setCommentState(() {}) : null;
-        //     return MomentCommentStation(momentFeed: widget.momentFeed);
+        //     return MomentCommentStation2(momentFeed: widget.momentFeed);
         //   }),
         //   isScrollControlled: true,
         // );
