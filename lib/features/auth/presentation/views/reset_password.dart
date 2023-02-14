@@ -53,104 +53,108 @@ class ResetPasswordScreen extends HookWidget {
               width: size.width,
               child: Form(
                 key: _formKey.value,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Center(
-                      child: SvgPicture.asset(
-                        'assets/svgs/reset.svg',
-                        height: 186,
-                        width: 290,
-                      ),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Center(
+                          child: SvgPicture.asset(
+                            'assets/svgs/reset.svg',
+                            height: 186,
+                            width: 290,
+                          ),
+                        ),
+                        const SizedBox(height: 60.0),
+                        const Text(
+                          'Reset Password',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textColor2,
+                            fontSize: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        CustomTextField(
+                          hintText: 'Enter new password',
+                          obscureText: _obscureText.value,
+                          keyboardType: TextInputType.text,
+                          controller: _passwordController,
+                          textCapitalization: TextCapitalization.none,
+                          validator: (value) =>
+                              Validator.validatePassword(value ?? ""),
+                          suffixIcon: CupertinoButton(
+                            minSize: 0,
+                            padding: EdgeInsets.zero,
+                            onPressed: () =>
+                                _obscureText.value = !_obscureText.value,
+                            child: _obscureText.value
+                                ? const Icon(
+                                    Icons.visibility_off_outlined,
+                                    color: AppColors.textFieldLabelColor,
+                                  )
+                                : const Icon(
+                                    Icons.visibility,
+                                    color: AppColors.primaryColor,
+                                  ),
+                          ),
+                        ).paddingSymmetric(h: 45.0),
+                        const SizedBox(height: 30),
+                        CustomTextField(
+                          hintText: 'Confirm new password',
+                          obscureText: _obscureConfirmText.value,
+                          keyboardType: TextInputType.text,
+                          controller: _confirmPasswordController,
+                          textCapitalization: TextCapitalization.none,
+                          validator: (value) =>
+                              Validator.validatePassword(value ?? ""),
+                          suffixIcon: CupertinoButton(
+                            minSize: 0,
+                            padding: EdgeInsets.zero,
+                            onPressed: () => _obscureConfirmText.value =
+                                !_obscureConfirmText.value,
+                            child: _obscureText.value
+                                ? const Icon(
+                                    Icons.visibility_off_outlined,
+                                    color: AppColors.textFieldLabelColor,
+                                  )
+                                : const Icon(
+                                    Icons.visibility,
+                                    color: AppColors.primaryColor,
+                                  ),
+                          ),
+                        ).paddingSymmetric(h: 45.0),
+                        const SizedBox(height: 40),
+                        CustomButton(
+                          label: 'Reset',
+                          color: AppColors.textColor2,
+                          onPressed: () {
+                            if (_formKey.value.currentState!.validate()) {
+                              if (_passwordController.text ==
+                                  _confirmPasswordController.text) {
+                                globals.authBloc!.add(
+                                  ResetPasswordEvent(
+                                    token: token,
+                                    password: _passwordController.text,
+                                  ),
+                                );
+                              } else {
+                                Snackbars.error(
+                                  context,
+                                  message: 'Passwords do not match',
+                                );
+                              }
+                            }
+                          },
+                          size: size,
+                          textColor: AppColors.white,
+                          borderSide: BorderSide.none,
+                        ).paddingSymmetric(h: 45.0),
+                      ],
                     ),
-                    const SizedBox(height: 60.0),
-                    const Text(
-                      'Reset Password',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textColor2,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    CustomTextField(
-                      hintText: 'Enter new password',
-                      obscureText: _obscureText.value,
-                      keyboardType: TextInputType.text,
-                      controller: _passwordController,
-                      textCapitalization: TextCapitalization.none,
-                      validator: (value) =>
-                          Validator.validatePassword(value ?? ""),
-                      suffixIcon: CupertinoButton(
-                        minSize: 0,
-                        padding: EdgeInsets.zero,
-                        onPressed: () =>
-                            _obscureText.value = !_obscureText.value,
-                        child: _obscureText.value
-                            ? const Icon(
-                                Icons.visibility_off_outlined,
-                                color: AppColors.textFieldLabelColor,
-                              )
-                            : const Icon(
-                                Icons.visibility,
-                                color: AppColors.primaryColor,
-                              ),
-                      ),
-                    ).paddingSymmetric(h: 45.0),
-                    const SizedBox(height: 30),
-                    CustomTextField(
-                      hintText: 'Confirm new password',
-                      obscureText: _obscureConfirmText.value,
-                      keyboardType: TextInputType.text,
-                      controller: _confirmPasswordController,
-                      textCapitalization: TextCapitalization.none,
-                      validator: (value) =>
-                          Validator.validatePassword(value ?? ""),
-                      suffixIcon: CupertinoButton(
-                        minSize: 0,
-                        padding: EdgeInsets.zero,
-                        onPressed: () => _obscureConfirmText.value =
-                            !_obscureConfirmText.value,
-                        child: _obscureText.value
-                            ? const Icon(
-                                Icons.visibility_off_outlined,
-                                color: AppColors.textFieldLabelColor,
-                              )
-                            : const Icon(
-                                Icons.visibility,
-                                color: AppColors.primaryColor,
-                              ),
-                      ),
-                    ).paddingSymmetric(h: 45.0),
-                    const SizedBox(height: 40),
-                    CustomButton(
-                      label: 'Reset',
-                      color: AppColors.textColor2,
-                      onPressed: () {
-                        if (_formKey.value.currentState!.validate()) {
-                          if (_passwordController.text ==
-                              _confirmPasswordController.text) {
-                            globals.authBloc!.add(
-                              ResetPasswordEvent(
-                                token: token,
-                                password: _passwordController.text,
-                              ),
-                            );
-                          } else {
-                            Snackbars.error(
-                              context,
-                              message: 'Passwords do not match',
-                            );
-                          }
-                        }
-                      },
-                      size: size,
-                      textColor: AppColors.white,
-                      borderSide: BorderSide.none,
-                    ).paddingSymmetric(h: 45.0),
-                  ],
+                  ),
                 ),
               ),
             ),
