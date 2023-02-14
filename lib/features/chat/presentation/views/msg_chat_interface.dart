@@ -11,7 +11,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,12 +34,15 @@ import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/chat/presentation/widgets/msg_bubble.dart';
 
 import '../../../../core/components/snackbar.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 
 class MsgChatInterface extends StatefulHookWidget {
   static const String id = 'msg_chat_interface';
   const MsgChatInterface(
-      {Key? key, this.recipientUser, this.thread, this.quotedData, this.isStreak})
+      {Key? key,
+      this.recipientUser,
+      this.thread,
+      this.quotedData,
+      this.isStreak})
       : super(key: key);
   final User? recipientUser;
   final bool? isStreak;
@@ -223,7 +225,9 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                   ),
                   FittedBox(
                     child: Text(
-                      'Active ${Helper.parseUserLastSeen(widget.recipientUser!.lastSeen ?? '50')}',
+                      widget.recipientUser!.lastSeen == null
+                          ? 'Inactive'
+                          : 'Active ${Helper.parseUserLastSeen(widget.recipientUser!.lastSeen!)}',
                       style: TextStyle(
                         fontSize: getScreenHeight(11),
                         fontWeight: FontWeight.w400,
@@ -560,7 +564,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                 8, 8, 8, 0),
                                             child: Row(
                                               children: [
-                                                 Expanded(
+                                                Expanded(
                                                   child: Text(
                                                     'Reaching out to a ${widget.isStreak ?? false ? 'streak' : 'post'}...',
                                                     style: const TextStyle(
@@ -757,7 +761,6 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                     children: [
                                                       Center(
                                                         child: isRecording
-                                                        
                                                             ? isPaused
                                                                 ? const Text(
                                                                     'Paused')
