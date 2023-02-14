@@ -1210,7 +1210,7 @@ class PostFeedReacherCard extends HookWidget {
                         : ExpandableText(
                             "${postFeedModel!.post!.content}",
                             prefixText: postFeedModel!.post!.edited!
-                                ? "(Reach Edited)"
+                                ? "(edited)"
                                 : null,
                             prefixStyle: TextStyle(
                                 fontSize: getScreenHeight(12),

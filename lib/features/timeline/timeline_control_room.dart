@@ -676,7 +676,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   }
 
   messageUser(BuildContext context,
-      {required String id, String? quoteData}) async {
+      {required String id, String? quoteData, bool? isStreak}) async {
     Either<String, User> response =
         await UserRepository().getUserProfile(email: id);
     User? userInfo;
@@ -688,6 +688,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
         RouteNavigators.route(
             context,
             MsgChatInterface(
+              isStreak: isStreak,
               recipientUser: userInfo,
               quotedData: quoteData,
             ));

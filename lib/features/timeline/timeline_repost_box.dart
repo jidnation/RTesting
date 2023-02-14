@@ -160,7 +160,7 @@ class TimelineRepostedPost extends StatelessWidget {
               child: ExpandableText(
                 "${tPostInfo.repostedPost!.content}",
                 prefixText:
-                    tPostInfo.repostedPost!.edited! ? "(Reach Edited)" : null,
+                    tPostInfo.repostedPost!.edited! ? "(edited)" : null,
                 prefixStyle: TextStyle(
                     fontSize: getScreenHeight(12),
                     fontFamily: 'Poppins',

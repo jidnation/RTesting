@@ -932,7 +932,7 @@ class SavedPostReacherCard extends HookWidget {
                   : ExpandableText(
                       "${savedPostModel!.post.content}",
                       prefixText: savedPostModel!.post.edited!
-                          ? "(Reach Edited)"
+                          ? "(edited)"
                           : null,
                       prefixStyle: TextStyle(
                           fontSize: getScreenHeight(12),
@@ -1427,7 +1427,7 @@ class TextOnlySavedPostReacherCard extends HookWidget {
                   : ExpandableText(
                       "${savedPostModel!.post.content}",
                       prefixText: savedPostModel!.post.edited!
-                          ? "(Reach Edited)"
+                          ? "(edited)"
                           : null,
                       prefixStyle: TextStyle(
                           fontSize: getScreenHeight(12),
