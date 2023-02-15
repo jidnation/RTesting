@@ -30,6 +30,7 @@ import '../chat/presentation/views/chats_list_screen.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/status/view.status.dart';
 import '../moment/user_posting.dart';
+import '../moment/video_effect.dart';
 
 class TimeLineFeed extends StatefulWidget {
   static const String id = "timeline_screen";
@@ -217,14 +218,15 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   var cameras =
                                                       await availableCameras();
                                                   final res =
-                                                      await RouteNavigators
-                                                          .route(
-                                                              context,
-                                                              UserPosting(
-                                                                phoneCameras:
-                                                                    cameras,
-                                                                initialIndex: 0,
-                                                              ));
+                                                      await RouteNavigators.route(
+                                                          context,
+                                                          const VideoEffectRoom()
+                                                          // UserPosting(
+                                                          //   phoneCameras:
+                                                          //       cameras,
+                                                          //   initialIndex: 0,
+                                                          // )
+                                                          );
                                                   if (res == null) return;
                                                   timeLineFeedStore
                                                       .addNewStatus(

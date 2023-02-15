@@ -231,6 +231,7 @@ class _MomentPostingState extends State<MomentPosting> {
                                     label: 'Filters',
                                     svgUrl: 'assets/svgs/filter-n.svg',
                                     onClick: () {
+                                      widget.controller?.dispose();
                                       RouteNavigators.route(
                                         context,
                                         const VideoEffectRoom(),

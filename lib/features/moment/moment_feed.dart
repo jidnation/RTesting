@@ -65,9 +65,13 @@ class _MomentFeedState extends State<MomentFeed> {
                           ? CarouselSlider(
                               options: CarouselOptions(
                                 // height: SizeConfig.screenHeight - 151.5,
-                                viewportFraction:
-                                    (SizeConfig.screenHeight > 782) ? 1 : 1.25,
-                                aspectRatio: 9 / rightValue,
+                                viewportFraction: 1,
+                                // (SizeConfig.screenHeight > 782)
+                                //     ? 1
+                                //     : (SizeConfig.screenWidth > 360)
+                                //         ? 1.3
+                                //         : 1.25,
+                                // aspectRatio: 9 / rightValue,
                                 onPageChanged: (index, _) {
                                   checkMeOut(index);
                                 },

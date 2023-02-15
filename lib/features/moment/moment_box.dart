@@ -222,15 +222,7 @@ class MomentBox extends StatelessWidget {
                   audioUrl: momentFeed.soundUrl,
                 )
               ]),
-          SizedBox(
-            height: getScreenHeight(momentFeed.caption != 'No Caption'
-                ? (SizeConfig.screenHeight > 782)
-                    ? 30
-                    : 100
-                : (SizeConfig.screenHeight > 782)
-                    ? 30
-                    : 100),
-          )
+          SizedBox(height: 20)
         ]),
       ),
       Positioned(

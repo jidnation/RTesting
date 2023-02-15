@@ -4,6 +4,7 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/utils/custom_text.dart';
+import '../../core/utils/dimensions.dart';
 import '../timeline/loading_widget.dart';
 import 'moment_feed.dart';
 
@@ -81,18 +82,22 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final deviceRatio = size.width / size.height;
     return
         // Stack(children: [
         Container(
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(
-        color: AppColors.audioPlayerBg,
+        color: AppColors.white,
       ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
-          ? AspectRatio(
-              aspectRatio: _videoPlayerController.value.aspectRatio,
+          ? Transform.scale(
+              scaleX: (!(SizeConfig.screenHeight > 782) ? 0.55 : 0.46) /
+                  deviceRatio,
+              scaleY: (!(SizeConfig.screenHeight > 782) ? 0.505 : 0.45) /
+                  deviceRatio,
               child: Chewie(
                 controller: _chewieController!,
               ))
