@@ -79,7 +79,7 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
 
   @override
   void didChangeDependencies() {
-    _initEffects();
+    // _initEffects();
     super.didChangeDependencies();
   }
 
@@ -135,11 +135,14 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
           IconButton(
             onPressed: () async {
               _isFaceMask = !_isFaceMask;
-              if (_isFaceMask) {
-                _controller.switchFaceMask(_maskList[_maskIndex]);
-              } else {
-                _controller.switchFaceMask("null");
-              }
+              // if (_isFaceMask) {
+              _controller.switchEffect(
+                'assets/effects/viking_helmet.deepar',
+              );
+              // _controller.switchFaceMask(_maskList[_maskIndex]);
+              // } else {
+              //   _controller.switchFaceMask("null");
+              // }
 
               setState(() {});
             },
@@ -195,16 +198,16 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
             IconButton(
                 iconSize: 60,
                 onPressed: () {
-                  if (_isFaceMask) {
-                    String prevMask = _getPrevMask();
-                    _controller.switchFaceMask(prevMask);
-                  } else if (_isFilter) {
-                    String prevFilter = _getPrevFilter();
-                    _controller.switchFilter(prevFilter);
-                  } else {
-                    String prevEffect = _getPrevEffect();
-                    _controller.switchEffect(prevEffect);
-                  }
+                  // if (_isFaceMask) {
+                  //   String prevMask = _getPrevMask();
+                  //   _controller.switchFaceMask(prevMask);
+                  // } else if (_isFilter) {
+                  //   String prevFilter = _getPrevFilter();
+                  //   _controller.switchFilter(prevFilter);
+                  // } else {
+                  //   String prevEffect = _getPrevEffect();
+                  //   _controller.switchEffect(prevEffect);
+                  // }
                 },
                 icon: const Icon(
                   Icons.arrow_back_ios,
@@ -247,16 +250,16 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
             IconButton(
                 iconSize: 60,
                 onPressed: () {
-                  if (_isFaceMask) {
-                    String nextMask = _getNextMask();
-                    _controller.switchFaceMask(nextMask);
-                  } else if (_isFilter) {
-                    String nextFilter = _getNextFilter();
-                    _controller.switchFilter(nextFilter);
-                  } else {
-                    String nextEffect = _getNextEffect();
-                    _controller.switchEffect(nextEffect);
-                  }
+                  // if (_isFaceMask) {
+                  //   String nextMask = _getNextMask();
+                  //   _controller.switchFaceMask(nextMask);
+                  // } else if (_isFilter) {
+                  //   String nextFilter = _getNextFilter();
+                  //   _controller.switchFilter(nextFilter);
+                  // } else {
+                  //   String nextEffect = _getNextEffect();
+                  //   _controller.switchEffect(nextEffect);
+                  // }
                 },
                 icon: const Icon(
                   Icons.arrow_forward_ios,
@@ -269,79 +272,79 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
   }
 
   /// Add effects which are rendered via DeepAR sdk
-  void _initEffects() {
-    // Either get all effects
-    _getEffectsFromAssets(context).then((values) {
-      _effectsList.clear();
-      _effectsList.addAll(values);
-
-      _maskList.clear();
-      _maskList.add(_assetEffectsPath + 'flower_face.deepar');
-      _maskList.add(_assetEffectsPath + 'viking_helmet.deepar');
-
-      _filterList.clear();
-      _filterList.add(_assetEffectsPath + 'burning_effect.deepar');
-      _filterList.add(_assetEffectsPath + 'Hope.deepar');
-
-      _effectsList.removeWhere((element) => _maskList.contains(element));
-
-      _effectsList.removeWhere((element) => _filterList.contains(element));
-    });
-
-    // OR
-
-    // Only add specific effects
-    // _effectsList.add(_assetEffectsPath+'burning_effect.deepar');
-    // _effectsList.add(_assetEffectsPath+'flower_face.deepar');
-    // _effectsList.add(_assetEffectsPath+'Hope.deepar');
-    // _effectsList.add(_assetEffectsPath+'viking_helmet.deepar');
-  }
+  // void _initEffects() {
+  //   // Either get all effects
+  //   _getEffectsFromAssets(context).then((values) {
+  //     _effectsList.clear();
+  //     _effectsList.addAll(values);
+  //
+  //     _maskList.clear();
+  //     _maskList.add(_assetEffectsPath + 'flower_face.deepar');
+  //     _maskList.add(_assetEffectsPath + 'viking_helmet.deepar');
+  //
+  //     _filterList.clear();
+  //     _filterList.add(_assetEffectsPath + 'burning_effect.deepar');
+  //     _filterList.add(_assetEffectsPath + 'Hope.deepar');
+  //
+  //     _effectsList.removeWhere((element) => _maskList.contains(element));
+  //
+  //     _effectsList.removeWhere((element) => _filterList.contains(element));
+  //   });
+  //
+  //   // OR
+  //
+  //   // Only add specific effects
+  //   // _effectsList.add(_assetEffectsPath+'burning_effect.deepar');
+  //   // _effectsList.add(_assetEffectsPath+'flower_face.deepar');
+  //   // _effectsList.add(_assetEffectsPath+'Hope.deepar');
+  //   // _effectsList.add(_assetEffectsPath+'viking_helmet.deepar');
+  // }
 
   /// Get all deepar effects from assets
   ///
-  Future<List<String>> _getEffectsFromAssets(BuildContext context) async {
-    final manifestContent =
-        await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-    final filePaths = manifestMap.keys
-        .where((path) => path.startsWith(_assetEffectsPath))
-        .toList();
-    return filePaths;
-  }
+  // Future<List<String>> _getEffectsFromAssets(BuildContext context) async {
+  //   final manifestContent =
+  //       await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
+  //   final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+  //   final filePaths = manifestMap.keys
+  //       .where((path) => path.startsWith(_assetEffectsPath))
+  //       .toList();
+  //   return filePaths;
+  // }
 
   /// Get next effect
-  String _getNextEffect() {
-    _effectIndex < _effectsList.length ? _effectIndex++ : _effectIndex = 0;
-    return _effectsList[_effectIndex];
-  }
-
-  /// Get previous effect
-  String _getPrevEffect() {
-    _effectIndex > 0 ? _effectIndex-- : _effectIndex = _effectsList.length;
-    return _effectsList[_effectIndex];
-  }
-
-  /// Get next mask
-  String _getNextMask() {
-    _maskIndex < _maskList.length ? _maskIndex++ : _maskIndex = 0;
-    return _maskList[_maskIndex];
-  }
-
-  /// Get previous mask
-  String _getPrevMask() {
-    _maskIndex > 0 ? _maskIndex-- : _maskIndex = _maskList.length;
-    return _maskList[_maskIndex];
-  }
-
-  /// Get next filter
-  String _getNextFilter() {
-    _filterIndex < _filterList.length ? _filterIndex++ : _filterIndex = 0;
-    return _filterList[_filterIndex];
-  }
-
-  /// Get previous filter
-  String _getPrevFilter() {
-    _filterIndex > 0 ? _filterIndex-- : _filterIndex = _filterList.length;
-    return _filterList[_filterIndex];
-  }
+  // String _getNextEffect() {
+  //   _effectIndex < _effectsList.length ? _effectIndex++ : _effectIndex = 0;
+  //   return _effectsList[_effectIndex];
+  // }
+  //
+  // /// Get previous effect
+  // String _getPrevEffect() {
+  //   _effectIndex > 0 ? _effectIndex-- : _effectIndex = _effectsList.length;
+  //   return _effectsList[_effectIndex];
+  // }
+  //
+  // /// Get next mask
+  // String _getNextMask() {
+  //   _maskIndex < _maskList.length ? _maskIndex++ : _maskIndex = 0;
+  //   return _maskList[_maskIndex];
+  // }
+  //
+  // /// Get previous mask
+  // String _getPrevMask() {
+  //   _maskIndex > 0 ? _maskIndex-- : _maskIndex = _maskList.length;
+  //   return _maskList[_maskIndex];
+  // }
+  //
+  // /// Get next filter
+  // String _getNextFilter() {
+  //   _filterIndex < _filterList.length ? _filterIndex++ : _filterIndex = 0;
+  //   return _filterList[_filterIndex];
+  // }
+  //
+  // /// Get previous filter
+  // String _getPrevFilter() {
+  //   _filterIndex > 0 ? _filterIndex-- : _filterIndex = _filterList.length;
+  //   return _filterList[_filterIndex];
+  // }
 }
