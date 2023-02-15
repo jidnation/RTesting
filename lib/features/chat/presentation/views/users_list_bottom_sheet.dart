@@ -112,7 +112,9 @@ class _UsersListBottomSheetState extends State<UsersListBottomSheet> {
                                     _user.profilePicture,
                                     size: 40),
                                 subtitle: Text(
-                                  'Active ${Helper.parseUserLastSeen(_user.lastSeen ?? '50')}',
+                                  _user.lastSeen == null
+                                      ? 'Inactive'
+                                      : 'Active ${Helper.parseUserLastSeen(_user.lastSeen!)}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(

@@ -13,7 +13,6 @@ import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
 import '../../../../core/helper/logger.dart';
-import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
@@ -240,19 +239,20 @@ class PostReachMedia extends StatelessWidget {
               )
             : Container(),
         Positioned.fill(child: GestureDetector(onTap: () {
-          RouteNavigators.route(
+          Navigator.push(
               context,
-              (isVideo)
-                  ? VideoPreview(
-                      path: fileResult.file.path,
-                      isLocalVideo: true,
-                      aspectRatio: fileResult.width! / fileResult.height!,
-                    )
-                  : PhotoView(
-                      imageProvider: FileImage(
-                        fileResult.file,
-                      ),
-                    ));
+              MaterialPageRoute(
+                  builder: (c) => (isVideo)
+                      ? VideoPreview(
+                          path: fileResult.file.path,
+                          isLocalVideo: true,
+                          aspectRatio: fileResult.width! / fileResult.height!,
+                        )
+                      : PhotoView(
+                          imageProvider: FileImage(
+                            fileResult.file,
+                          ),
+                        )));
         })),
         onClose != null
             ? Positioned(

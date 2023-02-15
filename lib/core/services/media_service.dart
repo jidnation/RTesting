@@ -315,6 +315,9 @@ class MediaService {
     if (requestType == null) {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
+            // pickerTheme: ThemeData(
+            //   navigationBarTheme:
+            // ),
             maxAssets: maxAssets ?? 1,
             specialPickerType: SpecialPickerType.noPreview,
           ));

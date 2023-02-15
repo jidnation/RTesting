@@ -17,13 +17,13 @@ import 'package:reach_me/core/utils/app_lifecycle_manager.dart';
 import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
+
 import 'core/services/moment/controller.dart';
 import 'features/timeline/timeline_controller.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
   initSingletons();
   OneSignal.shared.setLogLevel(OSLogLevel.none, OSLogLevel.none);
   await OneSignal.shared.setAppId("4f584eee-135c-46bc-8986-8dfd980f4d3c");
