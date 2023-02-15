@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
 import 'package:reach_me/features/moment/streak_audio_preview_player.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
+import 'package:reach_me/features/moment/video_effect.dart';
 
 import '../../core/components/snackbar.dart';
 import '../../core/services/media_service.dart';
@@ -226,9 +227,15 @@ class _MomentPostingState extends State<MomentPosting> {
                                   //   svgUrl: 'assets/svgs/speeding.svg',
                                   // ),
                                   // const SizedBox(height: 20),
-                                  const MomentActions(
+                                  MomentActions(
                                     label: 'Filters',
                                     svgUrl: 'assets/svgs/filter-n.svg',
+                                    onClick: () {
+                                      RouteNavigators.route(
+                                        context,
+                                        const VideoEffectRoom(),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(height: 20),
                                   const MomentActions(
