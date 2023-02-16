@@ -218,15 +218,15 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   var cameras =
                                                       await availableCameras();
                                                   final res =
-                                                      await RouteNavigators.route(
-                                                          context,
-                                                          const VideoEffectRoom()
-                                                          // UserPosting(
-                                                          //   phoneCameras:
-                                                          //       cameras,
-                                                          //   initialIndex: 0,
-                                                          // )
-                                                          );
+                                                      await RouteNavigators
+                                                          .route(
+                                                    context,
+                                                    // const VideoEffectRoom()
+                                                    UserPosting(
+                                                      phoneCameras: cameras,
+                                                      initialIndex: 0,
+                                                    ),
+                                                  );
                                                   if (res == null) return;
                                                   timeLineFeedStore
                                                       .addNewStatus(

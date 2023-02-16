@@ -1791,7 +1791,7 @@ class _ReacherCard extends HookWidget {
                             Row(
                               children: [
                                 Helper.renderProfilePicture(
-                                  globals.user!.profilePicture,
+                                  postModel!.postOwnerProfile!.profilePicture,
                                   size: 33,
                                 ).paddingOnly(l: 13, t: 10),
                                 SizedBox(width: getScreenWidth(9)),
@@ -2294,7 +2294,7 @@ class _CommentReachCard extends HookWidget {
                     children: [
                       Row(children: [
                         Helper.renderProfilePicture(
-                          globals.user!.profilePicture,
+                          commentModel!.commentOwnerProfile!.profilePicture,
                           size: 33,
                         ).paddingOnly(l: 13, t: 10),
                         SizedBox(width: getScreenWidth(9)),

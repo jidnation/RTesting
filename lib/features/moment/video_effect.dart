@@ -107,169 +107,169 @@ class _VideoEffectRoomState extends State<VideoEffectRoom> {
             // },
           ),
         ),
-        _topMediaOptions(),
-        _bottomMediaOptions(),
+        // _topMediaOptions(),
+        // _bottomMediaOptions(),
       ],
     ));
   }
 
   // flip, face mask, filter, flash
-  Positioned _topMediaOptions() {
-    return Positioned(
-      top: 10,
-      left: 0,
-      right: 0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () async {
-              await _controller.toggleFlash();
-              setState(() {});
-            },
-            color: Colors.white70,
-            iconSize: 40,
-            icon:
-                Icon(_controller.flashState ? Icons.flash_on : Icons.flash_off),
-          ),
-          IconButton(
-            onPressed: () async {
-              _isFaceMask = !_isFaceMask;
-              // if (_isFaceMask) {
-              _controller.switchEffect(
-                'assets/effects/viking_helmet.deepar',
-              );
-              // _controller.switchFaceMask(_maskList[_maskIndex]);
-              // } else {
-              //   _controller.switchFaceMask("null");
-              // }
-
-              setState(() {});
-            },
-            color: Colors.white70,
-            iconSize: 40,
-            icon: Icon(
-              _isFaceMask
-                  ? Icons.face_retouching_natural_rounded
-                  : Icons.face_retouching_off,
-            ),
-          ),
-          IconButton(
-            onPressed: () async {
-              _isFilter = !_isFilter;
-              if (_isFilter) {
-                _controller.switchFilter(_filterList[_filterIndex]);
-              } else {
-                _controller.switchFilter("null");
-              }
-              setState(() {});
-            },
-            color: Colors.white70,
-            iconSize: 40,
-            icon: Icon(
-              _isFilter ? Icons.filter_hdr : Icons.filter_hdr_outlined,
-            ),
-          ),
-          IconButton(
-              onPressed: () {
-                _controller.flipCamera();
-              },
-              iconSize: 50,
-              color: Colors.white70,
-              icon: const Icon(Icons.cameraswitch))
-        ],
-      ),
-    );
-  }
+  // Positioned _topMediaOptions() {
+  //   return Positioned(
+  //     top: 10,
+  //     left: 0,
+  //     right: 0,
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         IconButton(
+  //           onPressed: () async {
+  //             await _controller.toggleFlash();
+  //             setState(() {});
+  //           },
+  //           color: Colors.white70,
+  //           iconSize: 40,
+  //           icon:
+  //               Icon(_controller.flashState ? Icons.flash_on : Icons.flash_off),
+  //         ),
+  //         IconButton(
+  //           onPressed: () async {
+  //             _isFaceMask = !_isFaceMask;
+  //             // if (_isFaceMask) {
+  //             _controller.switchEffect(
+  //               'assets/effects/MakeupLook.deepar',
+  //             );
+  //             // _controller.switchFaceMask(_maskList[_maskIndex]);
+  //             // } else {
+  //             //   _controller.switchFaceMask("null");
+  //             // }
+  //
+  //             setState(() {});
+  //           },
+  //           color: Colors.white70,
+  //           iconSize: 40,
+  //           icon: Icon(
+  //             _isFaceMask
+  //                 ? Icons.face_retouching_natural_rounded
+  //                 : Icons.face_retouching_off,
+  //           ),
+  //         ),
+  //         IconButton(
+  //           onPressed: () async {
+  //             _isFilter = !_isFilter;
+  //             if (_isFilter) {
+  //               _controller.switchFilter(_filterList[_filterIndex]);
+  //             } else {
+  //               _controller.switchFilter("null");
+  //             }
+  //             setState(() {});
+  //           },
+  //           color: Colors.white70,
+  //           iconSize: 40,
+  //           icon: Icon(
+  //             _isFilter ? Icons.filter_hdr : Icons.filter_hdr_outlined,
+  //           ),
+  //         ),
+  //         IconButton(
+  //             onPressed: () {
+  //               _controller.flipCamera();
+  //             },
+  //             iconSize: 50,
+  //             color: Colors.white70,
+  //             icon: const Icon(Icons.cameraswitch))
+  //       ],
+  //     ),
+  //   );
+  // }
 
   // prev, record, screenshot, next
   /// Sample option which can be performed
-  Positioned _bottomMediaOptions() {
-    return Positioned(
-      bottom: 0,
-      right: 0,
-      left: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-                iconSize: 60,
-                onPressed: () {
-                  // if (_isFaceMask) {
-                  //   String prevMask = _getPrevMask();
-                  //   _controller.switchFaceMask(prevMask);
-                  // } else if (_isFilter) {
-                  //   String prevFilter = _getPrevFilter();
-                  //   _controller.switchFilter(prevFilter);
-                  // } else {
-                  //   String prevEffect = _getPrevEffect();
-                  //   _controller.switchEffect(prevEffect);
-                  // }
-                },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white70,
-                )),
-            IconButton(
-                onPressed: () async {
-                  if (_controller.isRecording) {
-                    File? file = await _controller.stopVideoRecording();
-                    // OpenFile.open(file.path);
-                  } else {
-                    await _controller.startVideoRecording();
-                  }
-
-                  setState(() {});
-                },
-                iconSize: 50,
-                color: Colors.white70,
-                icon: Icon(_controller.isRecording
-                    ? Icons.videocam_sharp
-                    : Icons.videocam_outlined)),
-            const SizedBox(width: 20),
-            IconButton(
-                onPressed: () {
-                  try {
-                    _controller.takeScreenshot().then((file) {
-                      // OpenAppFile.open(file.path);
-                    });
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Photo Capture Failed',
-                          style: TextStyle(color: Colors.white)),
-                      backgroundColor: Colors.red,
-                    ));
-                  }
-                },
-                color: Colors.white70,
-                iconSize: 40,
-                icon: const Icon(Icons.photo_camera)),
-            IconButton(
-                iconSize: 60,
-                onPressed: () {
-                  // if (_isFaceMask) {
-                  //   String nextMask = _getNextMask();
-                  //   _controller.switchFaceMask(nextMask);
-                  // } else if (_isFilter) {
-                  //   String nextFilter = _getNextFilter();
-                  //   _controller.switchFilter(nextFilter);
-                  // } else {
-                  //   String nextEffect = _getNextEffect();
-                  //   _controller.switchEffect(nextEffect);
-                  // }
-                },
-                icon: const Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white70,
-                )),
-          ],
-        ),
-      ),
-    );
-  }
+  // Positioned _bottomMediaOptions() {
+  //   return Positioned(
+  //     bottom: 0,
+  //     right: 0,
+  //     left: 0,
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         crossAxisAlignment: CrossAxisAlignment.center,
+  //         mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //         children: [
+  //           IconButton(
+  //               iconSize: 60,
+  //               onPressed: () {
+  //                 // if (_isFaceMask) {
+  //                 //   String prevMask = _getPrevMask();
+  //                 //   _controller.switchFaceMask(prevMask);
+  //                 // } else if (_isFilter) {
+  //                 //   String prevFilter = _getPrevFilter();
+  //                 //   _controller.switchFilter(prevFilter);
+  //                 // } else {
+  //                 //   String prevEffect = _getPrevEffect();
+  //                 //   _controller.switchEffect(prevEffect);
+  //                 // }
+  //               },
+  //               icon: const Icon(
+  //                 Icons.arrow_back_ios,
+  //                 color: Colors.white70,
+  //               )),
+  //           IconButton(
+  //               onPressed: () async {
+  //                 if (_controller.isRecording) {
+  //                   File? file = await _controller.stopVideoRecording();
+  //                   // OpenFile.open(file.path);
+  //                 } else {
+  //                   await _controller.startVideoRecording();
+  //                 }
+  //
+  //                 setState(() {});
+  //               },
+  //               iconSize: 50,
+  //               color: Colors.white70,
+  //               icon: Icon(_controller.isRecording
+  //                   ? Icons.videocam_sharp
+  //                   : Icons.videocam_outlined)),
+  //           const SizedBox(width: 20),
+  //           IconButton(
+  //               onPressed: () {
+  //                 try {
+  //                   _controller.takeScreenshot().then((file) {
+  //                     // OpenAppFile.open(file.path);
+  //                   });
+  //                 } catch (e) {
+  //                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //                     content: Text('Photo Capture Failed',
+  //                         style: TextStyle(color: Colors.white)),
+  //                     backgroundColor: Colors.red,
+  //                   ));
+  //                 }
+  //               },
+  //               color: Colors.white70,
+  //               iconSize: 40,
+  //               icon: const Icon(Icons.photo_camera)),
+  //           IconButton(
+  //               iconSize: 60,
+  //               onPressed: () {
+  //                 // if (_isFaceMask) {
+  //                 //   String nextMask = _getNextMask();
+  //                 //   _controller.switchFaceMask(nextMask);
+  //                 // } else if (_isFilter) {
+  //                 //   String nextFilter = _getNextFilter();
+  //                 //   _controller.switchFilter(nextFilter);
+  //                 // } else {
+  //                 //   String nextEffect = _getNextEffect();
+  //                 //   _controller.switchEffect(nextEffect);
+  //                 // }
+  //               },
+  //               icon: const Icon(
+  //                 Icons.arrow_forward_ios,
+  //                 color: Colors.white70,
+  //               )),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   /// Add effects which are rendered via DeepAR sdk
   // void _initEffects() {

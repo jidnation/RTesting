@@ -162,86 +162,138 @@ class MomentCommentBox extends HookWidget {
               color: const Color(0xfff5f5f5),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                    InkWell(
-                      onTap: () {
-                        momentFeedStore.likingMomentComment(
-                          commentId: commentInfo.id,
-                          id: momentFeed.id,
-                        );
-                      },
-                      child: SvgPicture.asset(
-                        commentInfo.getMomentComment.isLiked != "false"
-                            ? 'assets/svgs/like-active.svg'
-                            : 'assets/svgs/like.svg',
-                      ),
-                    ),
-                    const SizedBox(width: 3),
-                    CustomText(
-                      text: momentFeedStore.getCountValue(
-                        value: commentInfo.getMomentComment.nLikes!,
-                      ),
-                      size: 15,
-                      isCenter: true,
-                      weight: FontWeight.w600,
-                      color: const Color(0xff001824),
-                    )
-                  ]),
-                  const SizedBox(width: 12),
-                  InkWell(
-                    onTap: () {
-                      replyMomentComment(context, userCommentTextCtrl);
-                    },
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/svgs/comment.svg',
-                          ),
-                          const SizedBox(width: 3),
-                          CustomText(
-                            text: momentFeedStore.getCountValue(
-                              value: commentInfo.getMomentComment.nReplies!,
-                            ),
-                            size: 15,
-                            isCenter: true,
-                            weight: FontWeight.w600,
-                            color: const Color(0xff001824),
-                          )
-                        ]),
+            child: Row(children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                InkWell(
+                  onTap: () {
+                    momentFeedStore.likingMomentComment(
+                      commentId: commentInfo.id,
+                      id: momentFeed.id,
+                    );
+                  },
+                  child: SvgPicture.asset(
+                    commentInfo.getMomentComment.isLiked != "false"
+                        ? 'assets/svgs/like-active.svg'
+                        : 'assets/svgs/like.svg',
                   ),
-                  // SvgPicture.asset(
-                  //   'assets/svgs/message.svg',
-                  //   color: Colors.black,
-                  //   width: 24.44,
-                  //   height: 22,
-                  // ),
-                ]),
+                ),
+                const SizedBox(width: 3),
+                CustomText(
+                  text: momentFeedStore.getCountValue(
+                    value: commentInfo.getMomentComment.nLikes!,
+                  ),
+                  size: 15,
+                  isCenter: true,
+                  weight: FontWeight.w600,
+                  color: const Color(0xff001824),
+                )
+              ]),
+              const SizedBox(width: 12),
+              InkWell(
+                onTap: () {
+                  replyMomentComment(context, userCommentTextCtrl);
+                },
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/svgs/comment.svg',
+                      ),
+                      const SizedBox(width: 3),
+                      CustomText(
+                        text: momentFeedStore.getCountValue(
+                          value: commentInfo.getMomentComment.nReplies!,
+                        ),
+                        size: 15,
+                        isCenter: true,
+                        weight: FontWeight.w600,
+                        color: const Color(0xff001824),
+                      )
+                    ]),
+              ),
+              // SvgPicture.asset(
+              //   'assets/svgs/message.svg',
+              //   color: Colors.black,
+              //   width: 24.44,
+              //   height: 22,
+              // ),
+            ]),
           ),
-          Row(children: [
-            // Container(
-            //   height: 41,
-            //   width: 25.7,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(10),
-            //     color: const Color(0xfff5f5f5),
-            //   ),
-            //   child: SvgPicture.asset('assets/svgs/upvote.svg'),
-            // ),
-            // const SizedBox(width: 12),
-            // Container(
-            //   height: 41,
-            //   width: 25.7,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(10),
-            //     color: const Color(0xfff5f5f5),
-            //   ),
-            //   child: SvgPicture.asset('assets/svgs/downvote.svg'),
-            // ),
-          ])
+          Visibility(
+            visible: commentInfo.getMomentComment.nReplies! > 0,
+            child: GestureDetector(
+              onTap: () {
+                Get.bottomSheet(
+                    Container(
+                      height: SizeConfig.screenHeight * 0.65,
+                      width: SizeConfig.screenWidth,
+                      padding:
+                          const EdgeInsets.only(top: 5, left: 10, right: 10),
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          )),
+                      child: Column(children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 4,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.withOpacity(0.5),
+                                ),
+                              )
+                            ])
+                      ]),
+                    ),
+                    isScrollControlled: true);
+              },
+              child: Container(
+                padding: const EdgeInsets.only(
+                  right: 3,
+                  left: 3,
+                  top: 20,
+                  bottom: 3,
+                ),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            width: 0.5, color: Colors.blue.withOpacity(0.5)))),
+                child: const CustomText(
+                  text: 'view replies',
+                  color: Colors.blue,
+                  weight: FontWeight.w300,
+                  size: 14,
+                ),
+              ),
+            ),
+          )
+          // Row(children: [
+          //   // Container(
+          //   //   height: 41,
+          //   //   width: 25.7,
+          //   //   decoration: BoxDecoration(
+          //   //     borderRadius: BorderRadius.circular(10),
+          //   //     color: const Color(0xfff5f5f5),
+          //   //   ),
+          //   //   child: SvgPicture.asset('assets/svgs/upvote.svg'),
+          //   // ),
+          //   // const SizedBox(width: 12),
+          //   // Container(
+          //   //   height: 41,
+          //   //   width: 25.7,
+          //   //   decoration: BoxDecoration(
+          //   //     borderRadius: BorderRadius.circular(10),
+          //   //     color: const Color(0xfff5f5f5),
+          //   //   ),
+          //   //   child: SvgPicture.asset('assets/svgs/downvote.svg'),
+          //   // ),
+          // ])
         ])
       ]),
     );
