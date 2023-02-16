@@ -12,7 +12,7 @@ class LiveScreen extends StatefulWidget {
   final CarouselController slidingController;
   const LiveScreen({
     Key? key,
-    required this.controller,
+    this.controller,
     required this.slidingController,
   }) : super(key: key);
 

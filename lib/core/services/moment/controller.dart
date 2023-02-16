@@ -13,8 +13,9 @@ class MomentController extends GetxController {
   final RxString audioFilePath = ''.obs;
   final RxString caption = ''.obs;
   final RxBool playSound = false.obs;
+  final RxBool isRecording = false.obs;
   final RxString mergedVideoPath = ''.obs;
-  final Rx<GlobalKey<ScaffoldState>?> userBar =   GlobalKey<ScaffoldState>().obs;
+  final Rx<GlobalKey<ScaffoldState>?> userBar = GlobalKey<ScaffoldState>().obs;
   final Rx<PlayerController> previewerAudioController = PlayerController().obs;
   final RxInt endTime = 0.obs;
   final RxInt momentCounter = 0.obs;

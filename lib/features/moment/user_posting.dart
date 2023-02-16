@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 
-import 'package:camera/camera.dart';
+// import 'package:camera/camera.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:deepar_flutter/deepar_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,11 +30,9 @@ import 'moment_posting.dart';
 import 'moment_posting_timer.dart';
 
 class UserPosting extends StatefulHookWidget {
-  final List<CameraDescription> phoneCameras;
   final int initialIndex;
   const UserPosting({
     Key? key,
-    required this.phoneCameras,
     required this.initialIndex,
   }) : super(key: key);
 
@@ -48,56 +48,32 @@ final MomentVideoControl momentVideoControl = MomentVideoControl();
 int index = 0;
 
 class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
-  CameraController? controller;
-  bool _isCameraInitialized = false;
+  late final DeepArController _controller;
+  // CameraController? controller;
   bool _isRearCameraSelected = true;
   bool _isRecordingInProgress = false;
   String selectedTime = '15s';
   int time = 15;
 
-  void onNewCameraSelected(CameraDescription cameraDescription) async {
-    final previousCameraController = controller;
-    // Instantiating the camera controller
-    final CameraController cameraController = CameraController(
-      cameraDescription,
-      ResolutionPreset.high,
-      imageFormatGroup: ImageFormatGroup.jpeg,
-    );
+  initializeCamera() {
+    _controller = DeepArController();
 
-    // Dispose the previous controller
-    await previousCameraController?.dispose();
-
-    // Replace with the new controller
-    if (mounted) {
-      setState(() {
-        controller = cameraController;
-      });
-    }
-
-    // Update UI if controller updated
-    cameraController.addListener(() {
-      if (mounted) setState(() {});
-    });
-
-    // Initialize controller
-    try {
-      await cameraController.initialize();
-    } on CameraException catch (e) {
-      print('Error initializing camera: $e');
-    }
-
-    // Update the Boolean
-    if (mounted) {
-      setState(() {
-        _isCameraInitialized = controller!.value.isInitialized;
-      });
-    }
+    _controller
+        .initialize(
+          androidLicenseKey:
+              "6e7cd1ebcba56dff5932332ac4d7fe04875670529ace3d6d0094fff59f7478db4fbd56b9bc668306",
+          iosLicenseKey:
+              "30e5dc9f3efcf7aa4dca4c35690ed20deaf3f2d6c4573019f5cd65a08b8c07c4e2647ab0d1c30182",
+          resolution: Resolution.high,
+        )
+        .then((value) => setState(() {}));
+    super.initState();
   }
 
   @override
   void initState() {
     super.initState();
-    onNewCameraSelected(widget.phoneCameras[0]);
+    initializeCamera();
     setState(() {
       index = widget.initialIndex;
     });
@@ -105,31 +81,32 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    controller?.dispose();
+    _controller.destroy();
+    // controller?.dispose();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = controller;
+    // final CameraController? cameraController = controller;
 
     // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
+    // if (cameraController == null || !cameraController.value.isInitialized) {
+    //   return;
+    // }
 
     if (state == AppLifecycleState.inactive) {
       // Free up memory when camera not active
-      cameraController.dispose();
+      // cameraController.dispose();
     } else if (state == AppLifecycleState.resumed) {
       // Reinitialize the camera with same properties
-      onNewCameraSelected(cameraController.description);
+      // onNewCameraSelected(cameraController.description);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool _isRecording = controller!.value.isRecordingVideo;
+    // log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< $isRecording");
     final size = MediaQuery.of(context).size;
 
     ///
@@ -137,20 +114,21 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
     ///
     List<Widget> postings = [
       CreatePosting(
-        controller: controller,
+        controller: _controller,
         context: context,
       ),
       MomentPosting(
-          controller: controller, slidingController: sliderController),
+          controller: _controller, slidingController: sliderController),
       LiveScreen(
-        controller: controller,
+        // controller: controller,
         slidingController: sliderController,
       ),
     ];
-    return Scaffold(
-      backgroundColor: const Color(0xFF001824),
-      body: _isCameraInitialized
-          ? SizedBox(
+    return Obx(() {
+      bool isRecording = momentCtrl.isRecording.value;
+      return Scaffold(
+          backgroundColor: const Color(0xFF001824),
+          body: SizedBox(
               height: size.height,
               width: size.width,
               child: Column(children: [
@@ -230,50 +208,53 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                             bottom: 70,
                             right: 0,
                             left: 0,
-                            child: controller!.value.isRecordingVideo
-                                ? CountDownTimer(
-                                    time: time,
-                                    timeController: timeController,
-                                    onFinish: () {
-                                      stopRecording(context);
-                                    },
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                        MomentPostingTimer(
-                                          time: '3m',
-                                          isSelected: selectedTime == '3m',
-                                          onClick: () {
-                                            setState(() {
-                                              selectedTime = '3m';
-                                              time = 3 * 60;
-                                            });
-                                          },
-                                        ),
-                                        const SizedBox(width: 5),
-                                        MomentPostingTimer(
-                                          time: '60s',
-                                          isSelected: selectedTime == '60s',
-                                          onClick: () {
-                                            setState(() {
-                                              selectedTime = '60s';
-                                              time = 60;
-                                            });
-                                          },
-                                        ),
-                                        const SizedBox(width: 5),
-                                        MomentPostingTimer(
-                                          time: '15s',
-                                          isSelected: selectedTime == '15s',
-                                          onClick: () {
-                                            setState(() {
-                                              selectedTime = '15s';
-                                              time = 15;
-                                            });
-                                          },
-                                        )
-                                      ]),
+                            child:
+                                // controller!.value.isRecordingVideo
+                                isRecording
+                                    ? CountDownTimer(
+                                        time: time,
+                                        timeController: timeController,
+                                        onFinish: () {
+                                          stopRecording(context);
+                                        },
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                            MomentPostingTimer(
+                                              time: '3m',
+                                              isSelected: selectedTime == '3m',
+                                              onClick: () {
+                                                setState(() {
+                                                  selectedTime = '3m';
+                                                  time = 3 * 60;
+                                                });
+                                              },
+                                            ),
+                                            const SizedBox(width: 5),
+                                            MomentPostingTimer(
+                                              time: '60s',
+                                              isSelected: selectedTime == '60s',
+                                              onClick: () {
+                                                setState(() {
+                                                  selectedTime = '60s';
+                                                  time = 60;
+                                                });
+                                              },
+                                            ),
+                                            const SizedBox(width: 5),
+                                            MomentPostingTimer(
+                                              time: '15s',
+                                              isSelected: selectedTime == '15s',
+                                              onClick: () {
+                                                setState(() {
+                                                  selectedTime = '15s';
+                                                  time = 15;
+                                                });
+                                              },
+                                            )
+                                          ]),
                           ),
                         )
                       : Container()
@@ -284,7 +265,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Visibility(
-                        visible: !_isRecording,
+                        visible: index != 1,
                         child: MomentCameraBtn(
                           svgUrl: 'assets/svgs/check-gallery.svg',
                           onClick: () async {
@@ -304,48 +285,41 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                         ),
                       ),
                       Visibility(
-                        visible: _isRecording,
+                        visible: isRecording,
                         child: MomentCameraBtn(
                           svgUrl: 'assets/svgs/reverse.svg',
                           padding: 8,
-                          onClick: () async {
-                            // final res = await MediaService()
-                            //     .pickFromGallery(context: context);
-                            // if (res != null) {
-                            //   RouteNavigators.route(
-                            //       context,
-                            //       BuildMediaPreview(
-                            //         path: res.first.path,
-                            //         isVideo: FileUtils.isVideo(res.first.file),
-                            //       ));
-                            // }
-                          },
+                          onClick: () async {},
                         ),
                       ),
-                      SizedBox(width: _isRecording ? getScreenWidth(26) : 0),
+                      SizedBox(width: isRecording ? getScreenWidth(26) : 0),
                       SizedBox(width: getScreenWidth(30)),
                       InkWell(
                         onTap: index == 0
                             ? () async {
-                                await controller!.takePicture().then(
+                                await _controller.takeScreenshot().then(
                                       (value) => RouteNavigators.route(
                                         context,
                                         BuildMediaPreview(
-                                            path: value.path, isVideo: false),
+                                          path: value.path,
+                                          isVideo: false,
+                                        ),
                                       ),
                                     );
                               }
                             : index == 1
                                 ? () async {
-                                    if (_isRecording) {
+                                    if (isRecording) {
                                       await stopRecording(context);
+                                      setState(() {});
                                       // _startVideoPlayer();
                                     } else {
                                       print('..........stopped recording');
                                       await momentVideoControl
                                           .startVideoRecording(
-                                        videoController: controller,
+                                        videoController: _controller,
                                       );
+                                      setState(() {});
                                     }
                                   }
                                 : () async {
@@ -369,7 +343,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(70),
-                            color: _isRecording
+                            color: isRecording
                                 ? Colors.red
                                 : Colors.black.withOpacity(0.5),
                           ),
@@ -387,7 +361,7 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                                     color: AppColors.black,
                                   )
                                 : index == 1
-                                    ? _isRecording
+                                    ? isRecording
                                         ? const Icon(
                                             Icons.stop,
                                             color: Colors.red,
@@ -406,26 +380,16 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                       SizedBox(width: getScreenWidth(30)),
                       Row(mainAxisSize: MainAxisSize.min, children: [
                         Visibility(
-                          // visible: _isRecording,
                           child: MomentCameraBtn(
                             svgUrl: 'assets/svgs/flip-camera.svg',
                             onClick: () async {
-                              setState(() {
-                                _isCameraInitialized = false;
-                              });
-                              onNewCameraSelected(
-                                widget.phoneCameras[
-                                    _isRearCameraSelected ? 0 : 1],
-                              );
-                              setState(() {
-                                _isRearCameraSelected = !_isRearCameraSelected;
-                              });
+                              _controller.flipCamera();
                             },
                           ),
                         ),
                         const SizedBox(width: 10),
                         Visibility(
-                          visible: _isRecording,
+                          visible: isRecording,
                           child: Container(
                             height: 40,
                             width: 40,
@@ -442,170 +406,23 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
                         ),
                       ]),
                     ])
-                // Container(
-                //   width: size.width,
-                //   decoration: const BoxDecoration(),
-                //   child: Column(
-                //       mainAxisAlignment: MainAxisAlignment.end,
-                //       mainAxisSize: MainAxisSize.min,
-                //       children: [
-                //         SizedBox(height: getScreenHeight(44)),
-                //         // Row(
-                //         //     mainAxisAlignment: MainAxisAlignment.center,
-                //         //     children: [
-                //         //       Flexible(
-                //         //         child: IconButton(
-                //         //           onPressed: () async {
-                //         //             // final image =
-                //         //             //     await getImage(ImageSource.gallery);
-                //         //             final res = await MediaService()
-                //         //                 .pickFromGallery(context: context);
-                //         //             if (res != null) {
-                //         //               RouteNavigators.route(
-                //         //                   context,
-                //         //                   BuildMediaPreview(
-                //         //                     path: res.first.path,
-                //         //                     isVideo: FileUtils.isVideo(
-                //         //                         res.first.file),
-                //         //                   ));
-                //         //             }
-                //         //           },
-                //         //           icon: Transform.scale(
-                //         //             scale: 1.8,
-                //         //             child: SvgPicture.asset(
-                //         //               'assets/svgs/check-gallery.svg',
-                //         //               height: getScreenHeight(71),
-                //         //             ),
-                //         //           ),
-                //         //           padding: EdgeInsets.zero,
-                //         //           constraints: const BoxConstraints(),
-                //         //         ),
-                //         //       ),
-                //         //       SizedBox(width: getScreenWidth(70)),
-                //         //       Flexible(
-                //         //         child: InkWell(
-                //         //           onTap: () async {
-                //         //             await controller!.takePicture().then(
-                //         //                 (value) => RouteNavigators.route(
-                //         //                     context,
-                //         //                     BuildMediaPreview(
-                //         //                         path: value.path,
-                //         //                         isVideo: false)));
-                //         //           },
-                //         //           child: Container(
-                //         //             decoration: const BoxDecoration(
-                //         //               shape: BoxShape.circle,
-                //         //               color: AppColors.white,
-                //         //             ),
-                //         //             padding: const EdgeInsets.all(20),
-                //         //             child: SvgPicture.asset(
-                //         //               'assets/svgs/Camera.svg',
-                //         //               color: AppColors.black,
-                //         //             ),
-                //         //           ),
-                //         //         ),
-                //         //       ),
-                //         //       SizedBox(width: getScreenWidth(70)),
-                //         //       Flexible(
-                //         //         child: IconButton(
-                //         //           onPressed: () {
-                //         //             // if (availableCameras.isNotEmpty &&
-                //         //             //     availableCameras.length > 1) {
-                //         //             //   if (availableCameras.length == 2) {
-                //         //             //     if (controller!
-                //         //             //             .description.lensDirection ==
-                //         //             //         CameraLensDirection.front) {
-                //         //             //       initializeCamera(_cameras[0]);
-                //         //             //     } else {
-                //         //             //       initializeCamera(_cameras[1]);
-                //         //             //     }
-                //         //             //   } else {
-                //         //             //     initializeCamera(_cameras[1]);
-                //         //             //   }
-                //         //             // }
-                //         //             // setState(() {});
-                //         //           },
-                //         //           // icon: Transform.scale(
-                //         //           //   scale: 1.8,
-                //         //           //   child: SvgPicture.asset(
-                //         //           //     'assets/svgs/flip-camera.svg',
-                //         //           //     height: getScreenHeight(71),
-                //         //           //   ),
-                //         //           // ),
-                //         //           padding: EdgeInsets.zero,
-                //         //           constraints: const BoxConstraints(),
-                //         //         ),
-                //         //       ),
-                //         //     ]),
-                //         SizedBox(height: getScreenHeight(10))
-                //       ]),
-                // ),
-              ])
-              // Swiper(
-              //   itemBuilder: (BuildContext context, int index) {
-              //     return Column(children: [
-              //       Stack(children: [
-              //         postings[index],
-              //         Positioned(
-              //           bottom: 0,
-              //           right: 0,
-              //           left: 0,
-              //           child: Container(
-              //             height: 50,
-              //             decoration: BoxDecoration(
-              //                 color: const Color(0xff7e8587).withOpacity(0.5),
-              //                 borderRadius: const BorderRadius.vertical(
-              //                   bottom: Radius.circular(8),
-              //                 )),
-              //             child: Column(
-              //                 mainAxisAlignment: MainAxisAlignment.end,
-              //                 children: [
-              //                   Row(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         PosingType(
-              //                           label: 'Status',
-              //                           isSelected: index == 0,
-              //                         ),
-              //                         const SizedBox(width: 20),
-              //                         PosingType(
-              //                           label: 'Moments',
-              //                           isSelected: index == 1,
-              //                         ),
-              //                         const SizedBox(width: 20),
-              //                         PosingType(
-              //                           label: 'Live',
-              //                           isSelected: index == 2,
-              //                         ),
-              //                       ]),
-              //                   const SizedBox(height: 2),
-              //                 ]),
-              //           ),
-              //         )
-              //       ]),
-              //       const SizedBox(height: 200),
-              //       const SizedBox(height: 10),
-              //     ]);
-              //   },
-              //   itemCount: 3,
-              // ),
-              )
-          : Container(),
-    );
+              ]))
+          // : Container(),
+          );
+    });
   }
 
   Future<void> stopRecording(BuildContext context) async {
     print('..........is recording');
-    XFile? rawVideo = await momentVideoControl.stopVideoRecording(
-      videoController: controller,
+    File? videoFile = await momentVideoControl.stopVideoRecording(
+      videoController: _controller,
     );
     momentCtrl.endTime(time);
-    File videoFile = File(rawVideo!.path);
 
     int currentUnix = DateTime.now().millisecondsSinceEpoch;
 
     final directory = await getApplicationDocumentsDirectory();
-    String fileFormat = videoFile.path.split('.').last;
+    String fileFormat = videoFile!.path.split('.').last;
 
     File _videoFile = await videoFile.copy(
       '${directory.path}/$currentUnix.$fileFormat',

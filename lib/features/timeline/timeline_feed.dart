@@ -215,15 +215,15 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                 hasWatched: false,
                                                 username: 'Add Status',
                                                 isMeOnTap: () async {
-                                                  var cameras =
-                                                      await availableCameras();
+                                                  // var cameras =
+                                                  //     await availableCameras();
                                                   final res =
                                                       await RouteNavigators
                                                           .route(
                                                     context,
                                                     // const VideoEffectRoom()
                                                     UserPosting(
-                                                      phoneCameras: cameras,
+                                                      // phoneCameras: cameras,
                                                       initialIndex: 0,
                                                     ),
                                                   );

@@ -461,15 +461,15 @@ class _TimelineScreenState extends State<TimelineScreen>
                                                                   () async {
                                                                 var cameras =
                                                                     await availableCameras();
-                                                                RouteNavigators
-                                                                    .route(
-                                                                        context,
-                                                                        UserPosting(
-                                                                          phoneCameras:
-                                                                              cameras,
-                                                                          initialIndex:
-                                                                              0,
-                                                                        ));
+                                                                // RouteNavigators
+                                                                //     .route(
+                                                                //         context,
+                                                                //         UserPosting(
+                                                                //           phoneCameras:
+                                                                //               cameras,
+                                                                //           initialIndex:
+                                                                //               0,
+                                                                //         ));
                                                                 return;
                                                               },
                                                             ),

@@ -386,7 +386,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
             milliseconds: 1300,
           );
           momentCtrl.clearPostingData();
-          RouteNavigators.pop(context);
+          // RouteNavigators.pop(context);
         } else {
           Snackbars.error(
             context,

@@ -101,13 +101,10 @@ class _MomentFeedState extends State<MomentFeed> {
                                     ),
                                     const SizedBox(height: 20),
                                     InkWell(
-                                      onTap: () async {
-                                        var cameras = await availableCameras();
+                                      onTap: () {
                                         Get.to(
-                                          () => UserPosting(
-                                            initialIndex: 1,
-                                            phoneCameras: cameras,
-                                          ),
+                                          () => const UserPosting(
+                                              initialIndex: 1),
                                           transition: Transition.fadeIn,
                                         );
                                       },
