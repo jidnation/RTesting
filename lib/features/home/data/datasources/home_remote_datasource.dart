@@ -2148,11 +2148,12 @@ class HomeRemoteDataSource {
         Console.log(
             'notifications result', result.data!['getNotificationFeed']);
         List feed = result.data!['getNotificationFeed'] as List;
+        Console.log('notifications first', feed.first);
         return feed.map((e) => NotificationsModel.fromJson(e)).toList();
       }
       return [];
     } catch (e) {
-      rethrow;
+      rethrow;  
     }
   }
 

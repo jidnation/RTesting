@@ -11,16 +11,15 @@ part 'notifications_state.dart';
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final socialServiceRepository = SocialServiceRepository();
 
-  NotificationsBloc() : super(NotificationsInitial()){
- on<GetNotificationsEvent>((event, emit) async {
+  NotificationsBloc() : super(NotificationsInitial()) {
+    on<GetNotificationsEvent>((event, emit) async {
       emit(GetNotificationsLoading());
       final response = await socialServiceRepository.getNotifications();
       Console.log('notifications response', response);
-      response.fold((l) => emit(GetNotificationsError(error: l)),
-          (r) => emit(GetNotificationsSuccess(notifications: r)));
+      response.fold(
+        (l) => emit(GetNotificationsError(error: l)),
+        (r) => emit(GetNotificationsSuccess(notifications: r)),
+      );
     });
-
   }
-
-  
 }

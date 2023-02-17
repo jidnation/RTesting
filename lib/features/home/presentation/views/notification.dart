@@ -30,6 +30,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var size = MediaQuery.of(context).size;
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -52,7 +53,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                   bloc: globals.notificationsBloc,
                   builder: (context, state) {
                     if (state is GetNotificationsLoading) {
-                      return const CircularProgressIndicator.adaptive();
+                      return Column(
+                        children: const [
+                          SizedBox(height: 100),
+                          CircularProgressIndicator.adaptive(),
+                        ],
+                      );
                     }
                     if (state is GetNotificationsSuccess) {
                       return SizedBox(

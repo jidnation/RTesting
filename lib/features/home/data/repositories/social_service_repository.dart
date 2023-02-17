@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
@@ -141,33 +142,31 @@ class SocialServiceRepository {
   }) async {
     try {
       final reply = await _homeRemoteDataSource.replyCommentOnPost(
-        postId: postId,
-        content: content,
-        commentId: commentId,
-        commentOwnerId: commentOwnerId,
-        postOwnerId: postOwnerId,
-        imageMediaItems: imageMediaItems,
-        audioMediaItem: audioMediaItem,
-        videoMediaItem: videoMediaItem
-      );
+          postId: postId,
+          content: content,
+          commentId: commentId,
+          commentOwnerId: commentOwnerId,
+          postOwnerId: postOwnerId,
+          imageMediaItems: imageMediaItems,
+          audioMediaItem: audioMediaItem,
+          videoMediaItem: videoMediaItem);
       return Right(reply);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
   }
 
-    Future<Either<String, List<CommentReplyModel>>> getCommentReplies({
-    required String postId,
-    required String commentId,
-    int? pageNumber, int? pageLimit
-  }) async {
+  Future<Either<String, List<CommentReplyModel>>> getCommentReplies(
+      {required String postId,
+      required String commentId,
+      int? pageNumber,
+      int? pageLimit}) async {
     try {
       final replies = await _homeRemoteDataSource.getCommentReplies(
-        postId: postId,
-        commentId: commentId,
-        pageNumber: pageNumber,
-        pageLimit: pageLimit
-      );
+          postId: postId,
+          commentId: commentId,
+          pageNumber: pageNumber,
+          pageLimit: pageLimit);
       return Right(replies);
     } on GraphQLError catch (e) {
       return Left(e.message);
