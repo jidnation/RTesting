@@ -188,10 +188,25 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
     }
   }
 
+  likeTimeLinePost(String id, {required String type}) async {
+    List<TimeLineModel> currentData = getExactValue(type);
+    TimeLineModel actualModel =
+        currentData.firstWhere((element) => element.id == id);
+    Post post = actualModel.getPostFeed.post!;
+    if (!post.isLiked!) {
+      actualModel.getPostFeed.post?.isLiked = true;
+      actualModel.getPostFeed.post?.nLikes = post.nLikes! + 1;
+      await timeLineQuery.likePost(postId: post.postId!);
+    } else {
+      actualModel.getPostFeed.post?.isLiked = false;
+      actualModel.getPostFeed.post?.nLikes = post.nLikes! - 1;
+      await timeLineQuery.unlikePost(postId: post.postId!);
+    }
+  }
+
   likePost(String id, {required String type}) async {
     if (type == 'comment') {
     }
-
     //////////////////////////
     else {
       List<TimeLineModel> currentData = getExactValue(type);
@@ -208,14 +223,13 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       if (!post.isLiked!) {
         actualModel.getPostFeed.post?.isLiked = true;
         actualModel.getPostFeed.post?.nLikes = post.nLikes! + 1;
-        notifyListeners();
+        // notifyListeners();
         //////
         bool response = await timeLineQuery.likePost(postId: post.postId!);
         if (response) {
           fetchAll(
-            isFirst: true,
+            isFirst: false,
             isLike: type == 'likes',
-            isPost: type == 'profile',
             isUpVoted: type == 'Upvote',
             isDownVoted: type == 'Downvote',
             isSaved: type == 'saved',
@@ -224,7 +238,7 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       } else {
         actualModel.getPostFeed.post?.isLiked = false;
         actualModel.getPostFeed.post?.nLikes = post.nLikes! - 1;
-        notifyListeners();
+        // notifyListeners();
         bool response = await timeLineQuery.unlikePost(postId: post.postId!);
         if (response) {
           fetchAll(

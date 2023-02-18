@@ -222,8 +222,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                           .route(
                                                     context,
                                                     // const VideoEffectRoom()
-                                                    UserPosting(
-                                                      // phoneCameras: cameras,
+                                                    const UserPosting(
                                                       initialIndex: 0,
                                                     ),
                                                   );
@@ -270,12 +269,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                       Axis.horizontal,
                                                   shrinkWrap: true,
                                                   physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          SizedBox(
-                                                            width: 16,
-                                                          ),
+                                                      const NeverScrollableScrollPhysics(),
+                                                  separatorBuilder: (context,
+                                                          index) =>
+                                                      const SizedBox(width: 16),
                                                   itemBuilder: (context,
                                                           index) =>
                                                       StatusBubble(
