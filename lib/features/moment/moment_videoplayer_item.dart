@@ -94,9 +94,9 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
           ? Transform.scale(
-              scaleX: (!(SizeConfig.screenHeight > 782) ? 0.55 : 0.46) /
-                  deviceRatio,
-              scaleY: (!(SizeConfig.screenHeight > 782) ? 0.505 : 0.45) /
+              scale: (0.8 *
+                      _chewieController!
+                          .videoPlayerController.value.aspectRatio) /
                   deviceRatio,
               child: Chewie(
                 controller: _chewieController!,

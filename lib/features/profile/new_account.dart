@@ -412,7 +412,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
               Visibility(
                 visible: !foldMe,
                 child: Container(
-                  height: getScreenHeight(200),
+                  height: getScreenHeight(170),
                   width: SizeConfig.screenWidth,
                   color: AppColors.textColor,
                   child: Stack(children: [
