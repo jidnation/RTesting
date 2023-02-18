@@ -3,15 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:reach_me/core/components/custom_textfield.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/assets.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -54,6 +56,7 @@ class _StatusViewPageState extends State<StatusViewPage> {
   final _keyboardController = KeyboardVisibilityController();
   final _replyTEC = TextEditingController();
   final _focusNode = FocusNode();
+  final DefaultCacheManager _cacheManager = DefaultCacheManager();
 
   @override
   void initState() {
@@ -143,7 +146,26 @@ class _StatusViewPageState extends State<StatusViewPage> {
       _percent = 0;
       setState(() {});
     } else if (story.status?.statusData?.imageMedia != null) {
-      _startTimer(7000);
+      /// USING FAST-CACHED-IMAGE
+      if (FastCachedImageConfig.isCached(
+          imageUrl: story.status!.statusData!.imageMedia!)) {
+        _startTimer(7000);
+      } else {
+        _percent = 0;
+        setState(() {});
+      }
+
+      // ///USING CACHED-NETWORK-IMAGE
+      // await _cacheManager
+      //     .getFileFromCache(story.status!.statusId!)
+      //     .then((value) {
+      //   if (value != null) {
+      //     _startTimer(7000);
+      //   } else {
+      //     _percent = 0;
+      //     setState(() {});
+      //   }
+      // });
     }
   }
 
@@ -176,7 +198,28 @@ class _StatusViewPageState extends State<StatusViewPage> {
       _percent = 0;
       setState(() {});
     } else if (story.status?.statusData?.imageMedia != null) {
-      _restartTimer(7000);
+      ///USING FAST-CACHE-IMAGE
+      if (FastCachedImageConfig.isCached(
+          imageUrl: story.status!.statusData!.imageMedia!)) {
+        _restartTimer(7000);
+      } else {
+        _timer.cancel();
+        _percent = 0;
+        setState(() {});
+      }
+
+      // ///USING CACHED-NETWORK-IMAGE
+      // await _cacheManager
+      //     .getFileFromCache(story.status!.statusId!)
+      //     .then((value) {
+      //   if (value != null) {
+      //     _restartTimer(7000);
+      //   } else {
+      //     _timer.cancel();
+      //     _percent = 0;
+      //     setState(() {});
+      //   }
+      // });
     }
   }
 
@@ -317,40 +360,70 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                 ? SizedBox(
                                     height: size.height,
                                     width: size.width,
-                                    child: CachedNetworkImage(
-                                      imageUrl:
-                                          story.status!.statusData!.imageMedia!,
-                                      fit: BoxFit.fitWidth,
-                                      // imageBuilder: (c, r){
-                                      //
-                                      // },
-                                      // imageBuilder: (c, ip) {
-                                      //   Console.log(
-                                      //       'taaaggggg::1::', ip.toString());
-                                      //   return Image.network(story
-                                      //       .status!.statusData!.imageMedia!);
-                                      // },
-                                      // progressIndicatorBuilder: (c, s, p) {
-                                      //   // Console.log(
-                                      //   //     'taaaggggg::2::',
-                                      //   //     'd=' +
-                                      //   //         p.downloaded.toString() +
-                                      //   //         '|| p=' +
-                                      //   //         p.progress.toString());
-                                      //   if (((p.progress ?? 1.0) == 1.0) &&
-                                      //       (_percent == 0)) {
-                                      //     _startTimer(7000);
-                                      //   }
-                                      //   return const CupertinoActivityIndicator(
-                                      //     color: AppColors.white,
-                                      //   );
-                                      // },
-                                      placeholder: (context, url) =>
-                                          const CupertinoActivityIndicator(
-                                        color: AppColors.white,
-                                      ),
-                                    ),
+                                    child: FastCachedImage(
+                                        url: Uri.parse(story.status?.statusData
+                                                    ?.imageMedia ??
+                                                '')
+                                            .toString(),
+                                        fit: BoxFit.fitWidth,
+                                        gaplessPlayback: true,
+                                        filterQuality: FilterQuality.low,
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 500),
+                                        loadingBuilder: (context, data) {
+                                          Console.log('fast-network_image',
+                                              'Progress: ${data.isDownloading} ${data.downloadedBytes} / ${data.totalBytes}');
+                                          if (data.isDownloading &&
+                                              (data.downloadedBytes ==
+                                                  data.totalBytes)) {
+                                            _startTimer(7000);
+                                          }
+                                          return Center(
+                                            child: SizedBox(
+                                              height: getScreenHeight(32),
+                                              width: getScreenWidth(32),
+                                              child:
+                                                  const CircularProgressIndicator(
+                                                color: AppColors.white,
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                   )
+                                // ? SizedBox(
+                                //     height: size.height,
+                                //     width: size.width,
+                                //     child: CachedNetworkImage(
+                                //       cacheKey: story.status?.statusId,
+                                //       imageUrl: Uri.parse(story.status
+                                //                   ?.statusData?.imageMedia ??
+                                //               '')
+                                //           .toString(),
+                                //       fit: BoxFit.fitWidth,
+                                //       progressIndicatorBuilder: (c, s, p) {
+                                //         Console.log(
+                                //             'taaaggggg::2::',
+                                //             'd=' +
+                                //                 p.downloaded.toString() +
+                                //                 '|| p=' +
+                                //                 p.progress.toString());
+                                //         if (((p.progress ?? 1.0) == 1.0) &&
+                                //             (_percent == 0)) {
+                                //           _startTimer(7000);
+                                //         }
+                                //         return Center(
+                                //           child: SizedBox(
+                                //             height: getScreenHeight(32),
+                                //             width: getScreenWidth(32),
+                                //             child:
+                                //                 const CircularProgressIndicator(
+                                //               color: AppColors.white,
+                                //             ),
+                                //           ),
+                                //         );
+                                //       },
+                                //     ),
+                                //   )
                                 : ((story.status?.statusData!.audioMedia ?? '')
                                         .isNotEmpty)
                                     ? SizedBox(
@@ -361,16 +434,16 @@ class _StatusViewPageState extends State<StatusViewPage> {
                                             children: [
                                               Image.asset(
                                                 AppAssets.audioRipple,
-                                                height: getScreenHeight(250),
+                                                height: getScreenHeight(245),
                                               ),
                                               Positioned(
-                                                top: 45,
-                                                left: 72,
+                                                top: size.height * 0.0530,
+                                                left: size.width * 0.185,
                                                 child:
                                                     Helper.renderProfilePicture(
                                                         story.statusOwnerProfile
                                                             ?.profilePicture,
-                                                        size: 135),
+                                                        size: 130),
                                               ),
                                             ],
                                           ),

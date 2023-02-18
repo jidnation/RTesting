@@ -446,6 +446,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+  fast_cached_network_image:
+    dependency: "direct main"
+    description:
+      name: fast_cached_network_image
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
   ffi:
     dependency: transitive
     description:
@@ -925,6 +932,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.3"
+  hive_flutter:
+    dependency: transitive
+    description:
+      name: hive_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   html:
     dependency: transitive
     description:
