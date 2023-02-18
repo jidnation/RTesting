@@ -49,9 +49,6 @@ int index = 0;
 
 class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
   late final DeepArController _controller;
-  // CameraController? controller;
-  bool _isRearCameraSelected = true;
-  bool _isRecordingInProgress = false;
   String selectedTime = '15s';
   int time = 15;
 
@@ -81,32 +78,27 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    _controller.destroy();
-    // controller?.dispose();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // final CameraController? cameraController = controller;
-
     // App state changed before we got the chance to initialize.
-    // if (cameraController == null || !cameraController.value.isInitialized) {
-    //   return;
-    // }
+    if (!_controller.isInitialized) {
+      return;
+    }
 
     if (state == AppLifecycleState.inactive) {
       // Free up memory when camera not active
-      // cameraController.dispose();
+      _controller.destroy();
     } else if (state == AppLifecycleState.resumed) {
       // Reinitialize the camera with same properties
-      // onNewCameraSelected(cameraController.description);
+      initializeCamera();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< $isRecording");
     final size = MediaQuery.of(context).size;
 
     ///
@@ -120,295 +112,305 @@ class _UserPostingState extends State<UserPosting> with WidgetsBindingObserver {
       MomentPosting(
           controller: _controller, slidingController: sliderController),
       LiveScreen(
-        // controller: controller,
+        controller: _controller,
         slidingController: sliderController,
       ),
     ];
     return Obx(() {
       bool isRecording = momentCtrl.isRecording.value;
-      return Scaffold(
-          backgroundColor: const Color(0xFF001824),
-          body: SizedBox(
-              height: size.height,
-              width: size.width,
-              child: Column(children: [
-                Stack(children: [
-                  CarouselSlider(
-                      carouselController: sliderController,
-                      items: postings
-                          .map((posting) => Builder(
-                                builder: (BuildContext context) {
-                                  return posting;
-                                },
-                              ))
-                          .toList(),
-                      options: CarouselOptions(
-                        initialPage: widget.initialIndex,
-                        height: getScreenHeight(700),
-                        viewportFraction: 1,
-                        enableInfiniteScroll: false,
-                        autoPlayCurve: Curves.easeInToLinear,
-                        enlargeCenterPage: true,
-                        onPageChanged: (val, _) {
-                          setState(() {
-                            index = val;
-                          });
-                        },
-                        scrollDirection: Axis.horizontal,
-                      )),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                          color: const Color(0xff7e8587).withOpacity(0.5),
-                          borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(8),
-                          )),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  PosingType(
-                                    label: 'Status',
-                                    isSelected: index == 0,
-                                    onClick: () {
-                                      sliderController.jumpToPage(0);
-                                    },
-                                  ),
-                                  const SizedBox(width: 20),
-                                  PosingType(
-                                    label: 'Streak',
-                                    isSelected: index == 1,
-                                    onClick: () {
-                                      sliderController.jumpToPage(1);
-                                    },
-                                  ),
-                                  const SizedBox(width: 20),
-                                  PosingType(
-                                    label: 'Live',
-                                    isSelected: index == 2,
-                                    onClick: () {
-                                      sliderController.jumpToPage(2);
-                                    },
-                                  ),
-                                ]),
-                            const SizedBox(height: 2),
-                          ]),
-                    ),
-                  ),
-                  index != 2
-                      ? Visibility(
-                          visible: index == 1,
-                          child: Positioned(
-                            bottom: 70,
-                            right: 0,
-                            left: 0,
-                            child:
-                                // controller!.value.isRecordingVideo
-                                isRecording
-                                    ? CountDownTimer(
-                                        time: time,
-                                        timeController: timeController,
-                                        onFinish: () {
-                                          stopRecording(context);
-                                        },
-                                      )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                            MomentPostingTimer(
-                                              time: '3m',
-                                              isSelected: selectedTime == '3m',
-                                              onClick: () {
-                                                setState(() {
-                                                  selectedTime = '3m';
-                                                  time = 3 * 60;
-                                                });
-                                              },
-                                            ),
-                                            const SizedBox(width: 5),
-                                            MomentPostingTimer(
-                                              time: '60s',
-                                              isSelected: selectedTime == '60s',
-                                              onClick: () {
-                                                setState(() {
-                                                  selectedTime = '60s';
-                                                  time = 60;
-                                                });
-                                              },
-                                            ),
-                                            const SizedBox(width: 5),
-                                            MomentPostingTimer(
-                                              time: '15s',
-                                              isSelected: selectedTime == '15s',
-                                              onClick: () {
-                                                setState(() {
-                                                  selectedTime = '15s';
-                                                  time = 15;
-                                                });
-                                              },
-                                            )
-                                          ]),
-                          ),
-                        )
-                      : Container()
-                ]),
-                const SizedBox(height: 20),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Visibility(
-                        visible: index != 1,
-                        child: MomentCameraBtn(
-                          svgUrl: 'assets/svgs/check-gallery.svg',
-                          onClick: () async {
-                            final res = await MediaService()
-                                .pickFromGallery(context: context);
-                            if (res != null) {
-                              final status = await RouteNavigators.route(
-                                  context,
-                                  BuildMediaPreview(
-                                    path: res.first.path,
-                                    isVideo: FileUtils.isVideo(res.first.file),
-                                  ));
-                              if (status == null) return;
-                              RouteNavigators.pop(context, status);
-                            }
-                          },
-                        ),
-                      ),
-                      Visibility(
-                        visible: isRecording,
-                        child: MomentCameraBtn(
-                          svgUrl: 'assets/svgs/reverse.svg',
-                          padding: 8,
-                          onClick: () async {},
-                        ),
-                      ),
-                      SizedBox(width: isRecording ? getScreenWidth(26) : 0),
-                      SizedBox(width: getScreenWidth(30)),
-                      InkWell(
-                        onTap: index == 0
-                            ? () async {
-                                await _controller.takeScreenshot().then(
-                                      (value) => RouteNavigators.route(
-                                        context,
-                                        BuildMediaPreview(
-                                          path: value.path,
-                                          isVideo: false,
-                                        ),
-                                      ),
-                                    );
-                              }
-                            : index == 1
-                                ? () async {
-                                    if (isRecording) {
-                                      await stopRecording(context);
-                                      setState(() {});
-                                      // _startVideoPlayer();
-                                    } else {
-                                      print('..........stopped recording');
-                                      await momentVideoControl
-                                          .startVideoRecording(
-                                        videoController: _controller,
-                                      );
-                                      setState(() {});
-                                    }
-                                  }
-                                : () async {
-                                    globals.chatBloc!.add(
-                                        InitiateLiveStreamEvent(
-                                            startedAt: '12/31/2022'));
-                                    print(
-                                        "org ${globals.streamLive!.channelName}");
-                                    print("org ${globals.streamLive!.token}");
-                                    RouteNavigators.route(
-                                        context,
-                                        const HostPost(
-                                          isHost: true,
-                                        ));
-                                    // globals.chatBloc!.add(JoinStreamEvent(channelName: globals.streamLive!.channelName));
-                                    // RouteNavigators.route(context, const HostPost(isHost: true,));
+      return WillPopScope(
+        onWillPop: () async {
+          _controller.destroy();
+          return true;
+        },
+        child: Scaffold(
+            backgroundColor: const Color(0xFF001824),
+            body: SizedBox(
+                height: size.height,
+                width: size.width,
+                child: Column(children: [
+                  Stack(children: [
+                    CarouselSlider(
+                        carouselController: sliderController,
+                        items: postings
+                            .map((posting) => Builder(
+                                  builder: (BuildContext context) {
+                                    return posting;
                                   },
-                        child: Container(
-                          height: 80,
-                          width: 80,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(70),
-                            color: isRecording
-                                ? Colors.red
-                                : Colors.black.withOpacity(0.5),
-                          ),
-                          child: Container(
-                            height: 70,
-                            width: 70,
-                            padding: const EdgeInsets.all(22),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(70),
-                            ),
-                            child: index == 0
-                                ? SvgPicture.asset(
-                                    'assets/svgs/Camera.svg',
-                                    color: AppColors.black,
-                                  )
-                                : index == 1
-                                    ? isRecording
-                                        ? const Icon(
-                                            Icons.stop,
-                                            color: Colors.red,
-                                          )
-                                        : Image.asset(
-                                            'assets/images/play-btn.png',
-                                            fit: BoxFit.contain,
-                                          )
-                                    : SvgPicture.asset(
-                                        'assets/svgs/fluent_live-24-regular.svg',
-                                        color: AppColors.black,
-                                      ),
-                          ),
-                        ),
+                                ))
+                            .toList(),
+                        options: CarouselOptions(
+                          initialPage: widget.initialIndex,
+                          height: getScreenHeight(700),
+                          viewportFraction: 1,
+                          enableInfiniteScroll: false,
+                          autoPlayCurve: Curves.easeInToLinear,
+                          enlargeCenterPage: true,
+                          onPageChanged: (val, _) {
+                            setState(() {
+                              index = val;
+                            });
+                          },
+                          scrollDirection: Axis.horizontal,
+                        )),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: const Color(0xff7e8587).withOpacity(0.5),
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(8),
+                            )),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    PosingType(
+                                      label: 'Status',
+                                      isSelected: index == 0,
+                                      onClick: () {
+                                        sliderController.jumpToPage(0);
+                                      },
+                                    ),
+                                    const SizedBox(width: 20),
+                                    PosingType(
+                                      label: 'Streak',
+                                      isSelected: index == 1,
+                                      onClick: () {
+                                        sliderController.jumpToPage(1);
+                                      },
+                                    ),
+                                    const SizedBox(width: 20),
+                                    PosingType(
+                                      label: 'Live',
+                                      isSelected: index == 2,
+                                      onClick: () {
+                                        sliderController.jumpToPage(2);
+                                      },
+                                    ),
+                                  ]),
+                              const SizedBox(height: 2),
+                            ]),
                       ),
-                      SizedBox(width: getScreenWidth(30)),
-                      Row(mainAxisSize: MainAxisSize.min, children: [
+                    ),
+                    index != 2
+                        ? Visibility(
+                            visible: index == 1,
+                            child: Positioned(
+                              bottom: 70,
+                              right: 0,
+                              left: 0,
+                              child:
+                                  // controller!.value.isRecordingVideo
+                                  isRecording
+                                      ? CountDownTimer(
+                                          time: time,
+                                          timeController: timeController,
+                                          onFinish: () {
+                                            stopRecording(context);
+                                          },
+                                        )
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                              MomentPostingTimer(
+                                                time: '3m',
+                                                isSelected:
+                                                    selectedTime == '3m',
+                                                onClick: () {
+                                                  setState(() {
+                                                    selectedTime = '3m';
+                                                    time = 3 * 60;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(width: 5),
+                                              MomentPostingTimer(
+                                                time: '60s',
+                                                isSelected:
+                                                    selectedTime == '60s',
+                                                onClick: () {
+                                                  setState(() {
+                                                    selectedTime = '60s';
+                                                    time = 60;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(width: 5),
+                                              MomentPostingTimer(
+                                                time: '15s',
+                                                isSelected:
+                                                    selectedTime == '15s',
+                                                onClick: () {
+                                                  setState(() {
+                                                    selectedTime = '15s';
+                                                    time = 15;
+                                                  });
+                                                },
+                                              )
+                                            ]),
+                            ),
+                          )
+                        : Container()
+                  ]),
+                  const SizedBox(height: 20),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                         Visibility(
+                          visible: index != 1,
                           child: MomentCameraBtn(
-                            svgUrl: 'assets/svgs/flip-camera.svg',
+                            svgUrl: 'assets/svgs/check-gallery.svg',
                             onClick: () async {
-                              _controller.flipCamera();
+                              final res = await MediaService()
+                                  .pickFromGallery(context: context);
+                              if (res != null) {
+                                final status = await RouteNavigators.route(
+                                    context,
+                                    BuildMediaPreview(
+                                      path: res.first.path,
+                                      isVideo:
+                                          FileUtils.isVideo(res.first.file),
+                                    ));
+                                if (status == null) return;
+                                RouteNavigators.pop(context, status);
+                              }
                             },
                           ),
                         ),
-                        const SizedBox(width: 10),
                         Visibility(
                           visible: isRecording,
+                          child: MomentCameraBtn(
+                            svgUrl: 'assets/svgs/reverse.svg',
+                            padding: 8,
+                            onClick: () async {},
+                          ),
+                        ),
+                        SizedBox(width: isRecording ? getScreenWidth(26) : 0),
+                        SizedBox(width: getScreenWidth(30)),
+                        InkWell(
+                          onTap: index == 0
+                              ? () async {
+                                  await _controller.takeScreenshot().then(
+                                        (value) => RouteNavigators.route(
+                                          context,
+                                          BuildMediaPreview(
+                                            path: value.path,
+                                            isVideo: false,
+                                          ),
+                                        ),
+                                      );
+                                }
+                              : index == 1
+                                  ? () async {
+                                      if (isRecording) {
+                                        await stopRecording(context);
+                                        setState(() {});
+                                        // _startVideoPlayer();
+                                      } else {
+                                        print('..........stopped recording');
+                                        await momentVideoControl
+                                            .startVideoRecording(
+                                          videoController: _controller,
+                                        );
+                                        setState(() {});
+                                      }
+                                    }
+                                  : () async {
+                                      globals.chatBloc!.add(
+                                          InitiateLiveStreamEvent(
+                                              startedAt: '12/31/2022'));
+                                      print(
+                                          "org ${globals.streamLive!.channelName}");
+                                      print("org ${globals.streamLive!.token}");
+                                      RouteNavigators.route(
+                                          context,
+                                          const HostPost(
+                                            isHost: true,
+                                          ));
+                                      // globals.chatBloc!.add(JoinStreamEvent(channelName: globals.streamLive!.channelName));
+                                      // RouteNavigators.route(context, const HostPost(isHost: true,));
+                                    },
                           child: Container(
-                            height: 40,
-                            width: 40,
-                            alignment: Alignment.center,
+                            height: 80,
+                            width: 80,
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(70),
+                              color: isRecording
+                                  ? Colors.red
+                                  : Colors.black.withOpacity(0.5),
                             ),
-                            child: const Icon(
-                              Icons.check,
-                              color: Colors.white,
+                            child: Container(
+                              height: 70,
+                              width: 70,
+                              padding: const EdgeInsets.all(22),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(70),
+                              ),
+                              child: index == 0
+                                  ? SvgPicture.asset(
+                                      'assets/svgs/Camera.svg',
+                                      color: AppColors.black,
+                                    )
+                                  : index == 1
+                                      ? isRecording
+                                          ? const Icon(
+                                              Icons.stop,
+                                              color: Colors.red,
+                                            )
+                                          : Image.asset(
+                                              'assets/images/play-btn.png',
+                                              fit: BoxFit.contain,
+                                            )
+                                      : SvgPicture.asset(
+                                          'assets/svgs/fluent_live-24-regular.svg',
+                                          color: AppColors.black,
+                                        ),
                             ),
                           ),
                         ),
-                      ]),
-                    ])
-              ]))
-          // : Container(),
-          );
+                        SizedBox(width: getScreenWidth(30)),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Visibility(
+                            child: MomentCameraBtn(
+                              svgUrl: 'assets/svgs/flip-camera.svg',
+                              onClick: () async {
+                                _controller.flipCamera();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Visibility(
+                            visible: isRecording,
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ]),
+                      ])
+                ]))
+            // : Container(),
+            ),
+      );
     });
   }
 

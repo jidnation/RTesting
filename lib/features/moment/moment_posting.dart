@@ -39,9 +39,34 @@ class MomentPosting extends StatefulHookWidget {
 int countDownTime = 0;
 bool showTimer = false;
 int filterIndex = 0;
-List<String> filters = ["galaxy_filter.deepar", "split_filter.deepar"];
+String normalPath = 'assets/effects/normal.deepar';
+List<String> filters = [
+  "normal.deepar",
+  "blur_filter.deepar",
+  "elephant_filter.deepar",
+  "hope_filter.deepar",
+  "humanoid_filter.deepar",
+  "fire_filter.deepar",
+  "pixel_hearts_filter.deepar",
+  "galaxy_filter.deepar",
+  "split_filter.deepar"
+];
+List<String> beus = [
+  "normal.deepar",
+  "burning_beu.deepar",
+  "devil_horn_beu.deepar",
+  "emotion_beu.deepar",
+  "snail_beu.deepar",
+  "viking_helmet_beu.deepar",
+  "vendetta_beu.deepar",
+  "stallone_beu.deepar",
+  "Ping_Pong_beu.deepar",
+  "makeup_beu.deepar",
+  "flower_face_beu.deepar"
+];
 
 class _MomentPostingState extends State<MomentPosting> {
+  final CarouselController? _carouselController = CarouselController();
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
@@ -68,8 +93,7 @@ class _MomentPostingState extends State<MomentPosting> {
             // height: size.height * 0.8,
             child: Stack(children: [
               Transform.scale(
-                scaleX: (!(SizeConfig.screenHeight > 782) ? 0.515 : 0.46) /
-                    deviceRatio,
+                scale: (1 / widget.controller!.aspectRatio) / deviceRatio,
                 child: DeepArPreview(
                   widget.controller!,
                 ),
@@ -93,6 +117,7 @@ class _MomentPostingState extends State<MomentPosting> {
                             IconButton(
                               onPressed: () {
                                 widget.slidingController.jumpToPage(0);
+                                widget.controller!.destroy();
                                 RouteNavigators.pop(context);
                               },
                               icon: Transform.scale(
@@ -186,7 +211,7 @@ class _MomentPostingState extends State<MomentPosting> {
                                         onTap: () {
                                           momentCtrl.playSound(true);
                                         },
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.play_arrow,
                                           color: Colors.white,
                                         ),
@@ -215,7 +240,6 @@ class _MomentPostingState extends State<MomentPosting> {
                                       ? Colors.white
                                       : Colors.black,
                                   width: 10,
-                                  // fit: BoxFit.contain,
                                 ),
                               ),
                             ),
@@ -243,15 +267,32 @@ class _MomentPostingState extends State<MomentPosting> {
                                       label: 'Filters',
                                       svgUrl: 'assets/svgs/filter-n.svg',
                                       onClick: () {
-                                        type.value == 'filter'
-                                            ? type.value = ''
-                                            : type.value = 'filter';
+                                        if (type.value == 'filter') {
+                                          _carouselController!.jumpToPage(0);
+                                          type.value = '';
+                                        } else {
+                                          type.value = 'filter';
+                                          _carouselController!.animateToPage(0);
+                                          widget.controller!
+                                              .switchEffect(normalPath);
+                                        }
                                       },
                                     ),
                                     const SizedBox(height: 20),
-                                    const MomentActions(
+                                    MomentActions(
                                       label: 'Beautify',
                                       svgUrl: 'assets/svgs/beautify-n.svg',
+                                      onClick: () {
+                                        if (type.value == 'beautify') {
+                                          _carouselController!.jumpToPage(0);
+                                          type.value = '';
+                                        } else {
+                                          type.value = 'beautify';
+                                          _carouselController!.animateToPage(0);
+                                          widget.controller!
+                                              .switchEffect(normalPath);
+                                        }
+                                      },
                                     ),
                                     const SizedBox(height: 20),
                                     MomentActions(
@@ -343,7 +384,7 @@ class _MomentPostingState extends State<MomentPosting> {
                 ),
               ),
               Visibility(
-                visible: type.value == 'filter',
+                visible: type.value == 'filter' || type.value == 'beautify',
                 child: Positioned(
                     top: 0,
                     bottom: 0,
@@ -355,23 +396,28 @@ class _MomentPostingState extends State<MomentPosting> {
                             width: 40,
                             // height: 0,
                             child: CarouselSlider(
+                              carouselController: _carouselController,
                               options: CarouselOptions(
                                 viewportFraction: 0.7,
                                 height: 60,
                                 padEnds: false,
                                 enlargeCenterPage: true,
                                 onPageChanged: (index, _) {
+                                  // widget.controller!.switchEffect(
+                                  // 'assets/effects/normal.deepar');
                                   widget.controller!.switchEffect(
-                                      "assets/effects/${filters[index]}");
+                                      "assets/effects/${type.value == 'filter' ? filters[index] : beus[index]}");
                                 },
                                 enableInfiniteScroll: false,
                                 scrollDirection: Axis.vertical,
                               ),
                               items: List<Widget>.generate(
-                                  filters.length,
+                                  type.value == 'filter'
+                                      ? filters.length
+                                      : beus.length,
                                   (index) => FilterBox(
                                         imageUrl:
-                                            "assets/images/${filters[index].replaceFirst('.deepar', 'p.jpg')}",
+                                            "assets/images/${(type.value == 'filter' ? filters[index] : beus[index]).replaceFirst('.deepar', 'p.jpg')}",
                                       )),
                             ),
                           )

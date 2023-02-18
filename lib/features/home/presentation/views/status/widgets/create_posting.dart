@@ -39,8 +39,7 @@ class _CreatePostingState extends State<CreatePosting> {
           ),
           child: Stack(children: [
             Transform.scale(
-              scaleX: (!(SizeConfig.screenHeight > 782) ? 0.52 : 0.46) /
-                  deviceRatio,
+              scale: (1 / widget.controller!.aspectRatio) / deviceRatio,
               child: DeepArPreview(
                 widget.controller!,
               ),
@@ -57,6 +56,7 @@ class _CreatePostingState extends State<CreatePosting> {
                           IconButton(
                             onPressed: () {
                               RouteNavigators.pop(context);
+                              widget.controller!.destroy();
                             },
                             icon: Transform.scale(
                               scale: 1.8,
