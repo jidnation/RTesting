@@ -241,6 +241,25 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
     notifyListeners();
   }
 
+  likeCommentReply(
+      {required String streakId,
+      required String commentId,
+      required String replyId,
+      required bool isLiking}) async {
+    if (isLiking) {
+      await momentQuery.likeCommentReply(
+        momentId: streakId,
+        commentId: commentId,
+        replyId: replyId,
+      );
+    } else {
+      await momentQuery.unlikeMomentCommentReply(
+        commentId: commentId,
+        replyId: replyId,
+      );
+    }
+  }
+
   likingMomentComment({required String commentId, required String id}) async {
     List<MomentModel> currentList = value;
     MomentModel actualMomentModel =
@@ -265,10 +284,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           momentId: actualMomentModel.momentId,
           commentId: commentModel.getMomentComment.commentId!);
     }
-    print(
-        'isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called :::::: ${actualMomentModel.momentId}');
-
-    print('isLiked>>>>>>>>>>>>>>>>>>>>>>>>>>> called2 :::::: $response');
     if (response) {
       getMomentComment(id: id, commentId: commentId);
     }

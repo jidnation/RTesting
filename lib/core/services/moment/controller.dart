@@ -45,26 +45,85 @@ class MomentController extends GetxController {
       <String, List<GetMomentCommentReply>>{}.obs;
 
   Future<List<GetMomentCommentReply>> fetchReplies(
-      {required String commentId, required String streakId}) async {
-    print("We are called to fetch >>>>>>>>>>>>>>>>>>>>>>>>>>");
+      {required String commentId,
+      required String streakId,
+      bool? isUpdate}) async {
+    print(
+        "We are called to fetch >>>>>>>>>>> $commentId >>>>>>>>>$streakId >>>>>>");
     if (repliesBox.isNotEmpty) {
+      print(":::::::::::::::::::::::::::::::::::::::::::::: 0");
       if (repliesBox.keys.contains(commentId)) {
-        return repliesBox[commentId] ?? [];
+        print(":::::::::::::::::::::::::::::::::::::::::::::: 1");
+        if (isUpdate ?? false) {
+          print(":::::::::::::::::::::::::::::::::::::::::::::: 2");
+
+          List<GetMomentCommentReply>? response = await MomentQuery()
+              .getStreakCommentReplies(
+                  momentId: streakId, commentId: commentId);
+          if (response != null) {
+            print(":::::::::::::::::::::::::::::::::::::::::::::: 3");
+
+            repliesBox[commentId] = response;
+          }
+          print(":::::::::::::::::::::::::::::::::::::::::::::: 4");
+
+          return response ?? [];
+        } else {
+          print(":::::::::::::::::::::::::::::::::::::::::::::: 5");
+
+          return repliesBox[commentId] ?? [];
+        }
       } else {
+        print(":::::::::::::::::::::::::::::::::::::::::::::: 6");
+
         List<GetMomentCommentReply>? response = await MomentQuery()
             .getStreakCommentReplies(momentId: streakId, commentId: commentId);
         if (response != null) {
+          print(":::::::::::::::::::::::::::::::::::::::::::::: 7");
+
           repliesBox.addAll({commentId: response});
         }
+        print(":::::::::::::::::::::::::::::::::::::::::::::: 8");
+
         return response ?? [];
       }
     } else {
+      print(":::::::::::::::::::::::::::::::::::::::::::::: 9");
+
       List<GetMomentCommentReply>? response = await MomentQuery()
           .getStreakCommentReplies(momentId: streakId, commentId: commentId);
       if (response != null) {
+        print(":::::::::::::::::::::::::::::::::::::::::::::: 10");
+
         repliesBox.addAll({commentId: response});
       }
+      print(":::::::::::::::::::::::::::::::::::::::::::::: 11");
+
       return response ?? [];
     }
+  }
+
+  deleteReply(
+      {required String replyId,
+      required String momentId,
+      required String id,
+      required String commentId}) async {
+    // repliesBox.forEach((key, value) {
+    //   if (key == commentId) {
+    //     for (GetMomentCommentReply element in value) {
+    //       if (element.replyId == replyId) {
+    //         value.remove(element);
+    //         return;
+    //       }
+    //     }
+    //   }
+    // });
+    Get.back();
+    await MomentQuery().deleteMomentCommentReply(
+      commentId: commentId,
+      replyId: replyId,
+    );
+    fetchReplies(commentId: commentId, streakId: momentId, isUpdate: true);
+    momentFeedStore.updateMomentComments(id: id);
   }
 }

@@ -82,6 +82,35 @@ class MomentQuery {
     // return queryResult.data?['createMoment']['authId'] != null;
   }
 
+  deleteMomentCommentReply(
+      {required String commentId, required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'replyId': replyId,
+      'commentId': commentId,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.deleteMomentCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my delete-moment comment-reply query::::: ${queryResult}');
+    return queryResult.data?['deleteMomentCommentReply'];
+  }
+
   likeMoment({required String momentId}) async {
     HttpLink link = HttpLink(
       hostUrl,
@@ -197,6 +226,39 @@ class MomentQuery {
     return queryResult.data?['likeCommentOnPost']['authId'] != null;
   }
 
+  Future<bool> likeCommentReply(
+      {required String momentId,
+      required String commentId,
+      required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'replyId': replyId,
+      'momentId': momentId,
+      'commentId': commentId,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.likeStreakCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my moment-Liking-query::::: $queryResult');
+    // return false;
+    return queryResult.data?['likeMomentReply']['authId'] != null;
+  }
+
   createMomentComment({
     required String momentId,
     required String momentOwnerId,
@@ -305,8 +367,7 @@ class MomentQuery {
     );
     if (queryResult.data != null) {
       log(":::::: from getCommentReplies:::: ${queryResult.data}");
-      return CommentReplyModel.fromJson(
-              queryResult.data!['getMomentCommentReplies'])
+      return CommentReplyModel.fromJson(queryResult.data!)
           .getMomentCommentReplies;
     } else {
       log(":::::: from getCommentReplies:: e:: ${queryResult.exception}");
@@ -391,6 +452,35 @@ class MomentQuery {
     ));
     log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMomentComment'] ?? false;
+  }
+
+  unlikeMomentCommentReply(
+      {required String commentId, required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'commentId': commentId,
+      'replyId': replyId
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.unlikeMomentCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my moment-comment-reply-unLiking-query::::: $queryResult');
+    return queryResult.data?['unlikeMomentReply'] ?? false;
   }
 
   unlikeCommentPost({required String commentId, required String likeId}) async {

@@ -15,17 +15,18 @@ mutation($momentId: String!) {
   }
 ''';
 
+const deleteMomentCommentReply = r'''
+mutation($replyId: String!, $commentId: String!) {
+    deleteMomentCommentReply (commentId: $commentId,replyId: $replyId)
+  }
+''';
+
 const deleteMomentComment = r'''
 mutation($commentId: String!) {
     deleteMomentComment (commentId: $commentId)
   }
 ''';
 
-const deleteMomentCommentReply = r'''
-mutation($momentId: String!, $replyId: String!) {
-    deleteMomentCommentReply(momentId: $momentId, replyId: $replyId)
-  }
-''';
 
 const likeMoment = r'''
 mutation($momentId: String!) {
@@ -82,9 +83,23 @@ mutation($postId: String!, $commentId: String!) {
   }
 ''';
 
+const likeStreakCommentReply = r'''
+mutation($momentId: String!,$replyId: String!, $commentId: String!) {
+    likeMomentReply(replyId: $replyId, momentId: $momentId, commentId: $commentId){
+    authId
+  }
+  }
+''';
+
 const unlikeMomentComment = r'''
 mutation($commentId: String!, $likeId: String!) {
     unlikeMomentComment (commentId: $commentId, likeId: $likeId)
+    }
+''';
+
+const unlikeMomentCommentReply = r'''
+mutation($commentId: String!, $replyId: String!) {
+    unlikeMomentReply (commentId: $commentId, replyId: $replyId)
     }
 ''';
 

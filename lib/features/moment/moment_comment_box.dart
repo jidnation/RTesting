@@ -231,6 +231,7 @@ class MomentCommentBox extends HookWidget {
                 );
                 Get.bottomSheet(
                     StreakCommentReplies(
+                      id: momentFeed.id,
                       commentId: commentInfo.getMomentComment.commentId!,
                       streakId: momentFeed.momentId,
                     ),
@@ -324,7 +325,15 @@ class MomentCommentBox extends HookWidget {
                         id: momentFeed.id,
                         commentId: commentInfo.getMomentComment.commentId!,
                         userInput: userCommentTextCtrl.text);
-                    isDone ? userCommentTextCtrl.clear() : null;
+                    if (isDone) {
+                      momentCtrl.fetchReplies(
+                        commentId: commentInfo.getMomentComment.commentId!,
+                        streakId: momentFeed.momentId,
+                        isUpdate: true,
+                      );
+                      userCommentTextCtrl.clear();
+                    }
+
                     Get.back();
                   } else {
                     Snackbars.error(
