@@ -43,6 +43,9 @@ class MomentQuery {
     momentCtrl.audioUrl.value.isNotEmpty
         ? momentVariables.addAll({'sound': momentCtrl.audioUrl.value})
         : null;
+    momentCtrl.audioName.value.isNotEmpty
+        ? momentVariables.addAll({'musicName': momentCtrl.audioName.value})
+        : null;
 
     ///
     QueryResult queryResult = await qlClient.mutate(MutationOptions(

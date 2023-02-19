@@ -1,7 +1,7 @@
 //used
 const createMoment = r'''
-mutation($caption: String!, $hashTags: [String], $mentionList: [String], $sound: String, $videoMediaItem: String!) {
-    createMoment (momentBody: {caption : $caption, videoMediaItem: $videoMediaItem, sound: $sound, mentionList: $mentionList, hashTags: $hashTags}){
+mutation($caption: String!,$musicName: String, $hashTags: [String], $mentionList: [String], $sound: String, $videoMediaItem: String!) {
+    createMoment (momentBody: {caption : $caption, videoMediaItem: $videoMediaItem, sound: $sound, musicName: $musicName, mentionList: $mentionList, hashTags: $hashTags}){
     authId
     }
   }
@@ -26,7 +26,6 @@ mutation($commentId: String!) {
     deleteMomentComment (commentId: $commentId)
   }
 ''';
-
 
 const likeMoment = r'''
 mutation($momentId: String!) {
@@ -177,7 +176,7 @@ created_at,
       mentionList,
       hashTags,
       created_at,
-      
+      musicName,
     isLiked,
       nLikes,
       nComments,

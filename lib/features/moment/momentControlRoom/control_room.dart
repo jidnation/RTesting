@@ -84,6 +84,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
           feedOwnerInfo: momentFeed.feedOwnerProfile!,
           nLikes: momentFeed.moment!.nLikes!,
           soundUrl: momentFeed.moment!.sound,
+          musicName: momentFeed.moment!.musicName,
           momentOwnerInfo: momentFeed.moment!.momentOwnerProfile!,
           reachingUser: await timeLineFeedStore.getReachRelationship(
                   type: 'reaching',
@@ -597,6 +598,7 @@ class MomentModel {
   final String id;
   final String videoUrl;
   final String? soundUrl;
+  final String? musicName;
   final String momentCreatedTime;
   bool reachingUser;
   int nLikes;
@@ -619,6 +621,7 @@ class MomentModel {
       {required this.videoUrl,
       required this.momentComments,
       this.soundUrl,
+      this.musicName,
       required this.reachingUser,
       required this.momentCreatedTime,
       required this.isLiked,

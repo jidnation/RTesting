@@ -13,6 +13,7 @@ class MomentController extends GetxController {
   final RxString audioUrl = ''.obs;
   final Rx<PlatformFile> audioFile = PlatformFile(name: "", size: 0).obs;
   final RxString audioFilePath = ''.obs;
+  final RxString audioName = ''.obs;
   final RxString caption = ''.obs;
   final RxBool playSound = false.obs;
   final RxBool isRecording = false.obs;

@@ -190,9 +190,7 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return
-        // Stack(children: [
-        Container(
+    return Container(
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(

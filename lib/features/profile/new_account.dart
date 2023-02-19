@@ -430,10 +430,12 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                                     color: AppColors
                                         .black, // Your screen background color
                                   ),
-                                  Column(children: <Widget>[
-                                    Container(height: getScreenHeight(100)),
-                                    const CoverPicture(),
-                                  ]),
+                                  Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        const CoverPicture(),
+                                      ]),
                                   Positioned(
                                     top: 0.0,
                                     left: 0.0,

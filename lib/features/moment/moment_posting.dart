@@ -151,9 +151,10 @@ class _MomentPostingState extends State<MomentPosting> {
                                           );
                                           momentCtrl
                                               .audioFilePath(audioFile.path);
+                                          momentCtrl.audioName(audioFile.name);
                                           momentCtrl.audioFile(audioFile);
                                           print(
-                                              '..... file picked: $audioFile');
+                                              '..... file picked name>>: ${audioFile.name}');
                                         }
                                       },
                                       child: Container(

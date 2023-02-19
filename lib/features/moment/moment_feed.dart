@@ -149,25 +149,10 @@ class _MomentFeedState extends State<MomentFeed> {
   }
 }
 
-class AudioImageLoader extends StatefulWidget {
-  final String? audioUrl;
+class AudioImageLoader extends StatelessWidget {
   const AudioImageLoader({
     Key? key,
-    required this.audioUrl,
   }) : super(key: key);
-
-  @override
-  State<AudioImageLoader> createState() => _AudioImageLoaderState();
-}
-
-String? result;
-
-class _AudioImageLoaderState extends State<AudioImageLoader> {
-  @override
-  void initState() {
-    convertUrl();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,8 +160,8 @@ class _AudioImageLoaderState extends State<AudioImageLoader> {
         // widget.audioUrl != null
         //   ?
         Container(
-      height: 50,
-      width: 50,
+      height: 40,
+      width: 40,
       alignment: Alignment.center,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
@@ -206,28 +191,5 @@ class _AudioImageLoaderState extends State<AudioImageLoader> {
     //     type: ArtworkType.AUDIO,
     //     id: "Audio ID",
     //   );
-  }
-
-  convertUrl() async {
-    if (widget.audioUrl != null) {
-      // FileResult? file = await MediaService().downloadFile(
-      //   url: widget.audioUrl!,
-      // );
-      // try {
-      //   final thumbnailPath = await getTemporaryDirectory();
-      //   result = await MediaThumbnail.videoThumbnail(
-      //       "widget.audioUrl!", "${thumbnailPath.path}/xx.jpg");
-      //   print(":::::::::::::::::::::::::: ${thumbnailPath.path}");
-      //
-      //   // result = await MetadataRetriever.fromFile(
-      //   //   File(file.path),
-      //   // );
-      //   if (result != null) {
-      //     setState(() {});
-      //   }
-      // } catch (ex) {
-      //   debugPrint(ex.toString());
-      // }
-    }
   }
 }

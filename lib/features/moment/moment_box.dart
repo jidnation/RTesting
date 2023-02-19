@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:like_button/like_button.dart';
+import 'package:marquee/marquee.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart' as pt;
 import '../../core/utils/app_globals.dart';
@@ -209,18 +210,36 @@ class MomentBox extends StatelessWidget {
                 Row(children: [
                   SvgPicture.asset('assets/svgs/music.svg'),
                   const SizedBox(width: 10),
-                  CustomText(
-                    text: momentFeed.soundUrl == 'Original Audio'
-                        ? 'Original Audio'
-                        : '',
-                    color: Colors.white,
-                    weight: FontWeight.w600,
-                    size: 15.28,
-                  )
+                  momentFeed.soundUrl != 'Original Audio'
+                      ? SizedBox(
+                          height: 30,
+                          width: 200,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                // height: 20,
+                                // width: 130,
+                                child: Marquee(
+                                  text: momentFeed.musicName.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 12.44,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                  pauseAfterRound: const Duration(seconds: 2),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const CustomText(
+                          text: 'Original Audio',
+                          color: Colors.white,
+                          weight: FontWeight.w600,
+                          size: 15.28,
+                        )
                 ]),
-                AudioImageLoader(
-                  audioUrl: momentFeed.soundUrl,
-                )
+                const AudioImageLoader()
               ]),
           const SizedBox(height: 20)
         ]),
