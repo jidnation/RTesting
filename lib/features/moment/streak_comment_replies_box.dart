@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:reach_me/core/utils/extensions.dart';
 import 'package:reach_me/features/moment/streak_comment_replies.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
+import 'package:reach_me/features/timeline/models/post_feed.dart';
 
 import '../../../../core/components/snackbar.dart';
 import '../../../../core/utils/constants.dart';
@@ -19,24 +20,27 @@ import '../account/presentation/views/account.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../profile/new_account.dart';
 import 'momentControlRoom/control_room.dart';
+import 'momentControlRoom/models/comment_reply.dart';
 import 'momentControlRoom/models/get_comments_model.dart';
 import 'moment_audio_player.dart';
 import 'moment_feed.dart';
 
-class MomentCommentBox extends HookWidget {
-  final MomentModel momentFeed;
-  final CustomMomentCommentModel commentInfo;
-  const MomentCommentBox({
+class StreakCommentRepliesBox extends HookWidget {
+  final String momentId;
+  final String commentId;
+  final GetMomentCommentReply replyInfo;
+
+  const StreakCommentRepliesBox({
     Key? key,
-    required this.momentFeed,
-    required this.commentInfo,
+    required this.momentId,
+    required this.commentId,
+    required this.replyInfo,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController userCommentTextCtrl = useTextEditingController();
-    CommentOwnerProfile cInfo =
-        commentInfo.getMomentComment.commentOwnerProfile!;
+    // TextEditingController userCommentTextCtrl = useTextEditingController();
+    ErProfile cInfo = replyInfo.replyOwnerProfile!;
     return Container(
       width: SizeConfig.screenWidth,
       padding: const EdgeInsets.symmetric(
@@ -63,7 +67,7 @@ class MomentCommentBox extends HookWidget {
                         fit: BoxFit.cover,
                       )
                     : null),
-            child: momentFeed.momentOwnerInfo.profilePicture?.isEmpty ?? false
+            child: cInfo.profilePicture?.isEmpty ?? false
                 ? Image.asset("assets/images/app-logo.png")
                 : null,
           ),
@@ -73,19 +77,16 @@ class MomentCommentBox extends HookWidget {
               final progress = ProgressHUD.of(context);
               progress?.showWithText('Viewing Reacher...');
               Future.delayed(const Duration(seconds: 3), () {
-                globals.userBloc!.add(GetRecipientProfileEvent(
-                    email: commentInfo
-                        .getMomentComment.commentOwnerProfile?.authId));
-                commentInfo.getMomentComment.commentOwnerProfile?.authId ==
-                        globals.user!.id
+                globals.userBloc!
+                    .add(GetRecipientProfileEvent(email: cInfo.authId));
+                cInfo.authId == globals.user!.id
                     ? RouteNavigators.route(context, const NewAccountScreen())
                     : RouteNavigators.route(
                         context,
                         RecipientAccountProfile(
                           recipientEmail: 'email',
-                          recipientImageUrl:
-                              momentFeed.momentOwnerInfo.profilePicture,
-                          recipientId: momentFeed.momentOwnerInfo.authId,
+                          recipientImageUrl: cInfo.profilePicture,
+                          recipientId: cInfo.authId,
                         ));
                 progress?.dismiss();
               });
@@ -114,8 +115,8 @@ class MomentCommentBox extends HookWidget {
                   ]),
                 ),
                 CustomText(
-                  text: Helper.parseUserLastSeen(
-                      commentInfo.getMomentComment.createdAt!),
+                  text:
+                      Helper.parseUserLastSeen(replyInfo.createdAt.toString()),
                   color: const Color(0xff252525).withOpacity(0.5),
                   size: 11.44,
                   weight: FontWeight.w600,
@@ -125,11 +126,11 @@ class MomentCommentBox extends HookWidget {
           )
         ]),
         Visibility(
-            visible: commentInfo.getMomentComment.audioMediaItem!.isNotEmpty ||
-                commentInfo.getMomentComment.content!.isNotEmpty,
+            visible: replyInfo.audioMediaItem!.isNotEmpty ||
+                replyInfo.content!.isNotEmpty,
             child: const SizedBox(height: 10)),
         Visibility(
-          visible: commentInfo.getMomentComment.audioMediaItem!.isNotEmpty,
+          visible: replyInfo.audioMediaItem!.isNotEmpty,
           child: Container(
             height: 59,
             margin: const EdgeInsets.only(bottom: 10),
@@ -140,18 +141,18 @@ class MomentCommentBox extends HookWidget {
             child: Row(children: [
               Expanded(
                   child: MomentAudioPlayer(
-                audioPath: commentInfo.getMomentComment.audioMediaItem!,
+                audioPath: replyInfo.audioMediaItem!,
               )),
             ]),
           ),
         ),
         Visibility(
-          visible: commentInfo.getMomentComment.content!.isNotEmpty,
+          visible: replyInfo.content!.isNotEmpty,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
             width: SizeConfig.screenWidth,
             child: CustomText(
-              text: commentInfo.getMomentComment.content.toString(),
+              text: replyInfo.content.toString(),
               size: 14,
             ),
           ),
@@ -168,13 +169,13 @@ class MomentCommentBox extends HookWidget {
               Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 InkWell(
                   onTap: () {
-                    momentFeedStore.likingMomentComment(
-                      commentId: commentInfo.id,
-                      id: momentFeed.id,
-                    );
+                    // momentFeedStore.likingMomentComment(
+                    //   commentId: commentInfo.id,
+                    //   id: momentFeed.id,
+                    // );
                   },
                   child: SvgPicture.asset(
-                    commentInfo.getMomentComment.isLiked != "false"
+                    replyInfo.isLiked != "false"
                         ? 'assets/svgs/like-active.svg'
                         : 'assets/svgs/like.svg',
                   ),
@@ -182,7 +183,7 @@ class MomentCommentBox extends HookWidget {
                 const SizedBox(width: 3),
                 CustomText(
                   text: momentFeedStore.getCountValue(
-                    value: commentInfo.getMomentComment.nLikes!,
+                    value: replyInfo.nLikes!,
                   ),
                   size: 15,
                   isCenter: true,
@@ -193,7 +194,7 @@ class MomentCommentBox extends HookWidget {
               const SizedBox(width: 12),
               InkWell(
                 onTap: () {
-                  replyMomentComment(context, userCommentTextCtrl);
+                  // replyMomentComment(context, userCommentTextCtrl);
                 },
                 child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -204,7 +205,7 @@ class MomentCommentBox extends HookWidget {
                       const SizedBox(width: 3),
                       CustomText(
                         text: momentFeedStore.getCountValue(
-                          value: commentInfo.getMomentComment.nReplies!,
+                          value: replyInfo.nLikes!,
                         ),
                         size: 15,
                         isCenter: true,
@@ -221,42 +222,43 @@ class MomentCommentBox extends HookWidget {
               // ),
             ]),
           ),
-          Visibility(
-            visible: commentInfo.getMomentComment.nReplies! > 0,
-            child: GestureDetector(
-              onTap: () {
-                momentCtrl.fetchReplies(
-                  commentId: commentInfo.getMomentComment.commentId!,
-                  streakId: momentFeed.momentId,
-                );
-                Get.bottomSheet(
-                    StreakCommentReplies(
-                      commentId: commentInfo.getMomentComment.commentId!,
-                      streakId: momentFeed.momentId,
-                    ),
-                    isScrollControlled: true);
-              },
-              child: Container(
-                padding: const EdgeInsets.only(
-                  right: 3,
-                  left: 3,
-                  top: 20,
-                  bottom: 3,
-                ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            width: 0.5, color: Colors.blue.withOpacity(0.5)))),
-                child: const CustomText(
-                  text: 'view replies',
-                  color: Colors.blue,
-                  weight: FontWeight.w300,
-                  size: 14,
-                ),
-              ),
-            ),
-          )
+          // Visibility(
+          //   visible: replyInfo.nReplies! > 0,
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       momentCtrl.fetchReplies(
+          //         commentId: replyInfo.commentId!,
+          //         streakId: momentFeed.momentId,
+          //       );
+          //       Get.bottomSheet(
+          //           StreakCommentReplies(
+          //             commentId: replyInfo.commentId!,
+          //             streakId: momentFeed.momentId,
+          //           ),
+          //           isScrollControlled: true);
+          //     },
+          //     child: Container(
+          //       padding: const EdgeInsets.only(
+          //         right: 3,
+          //         left: 3,
+          //         top: 20,
+          //         bottom: 3,
+          //       ),
+          //       alignment: Alignment.center,
+          //       decoration: BoxDecoration(
+          //           border: Border(
+          //               bottom: BorderSide(
+          //                   width: 0.5, color: Colors.blue.withOpacity(0.5)))),
+          //       child: const CustomText(
+          //         text: 'view replies',
+          //         color: Colors.blue,
+          //         weight: FontWeight.w300,
+          //         size: 14,
+          //       ),
+          //     ),
+          //   ),
+          // )
+          /////////////////////////////////////////
           // Row(children: [
           //   // Container(
           //   //   height: 41,
@@ -281,62 +283,5 @@ class MomentCommentBox extends HookWidget {
         ])
       ]),
     );
-  }
-
-  void replyMomentComment(
-      BuildContext context, TextEditingController userCommentTextCtrl) {
-    CustomDialog.openDialogBox(
-        height: 200,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const CustomText(
-            text: 'Enter your comments',
-            size: 15,
-            weight: FontWeight.w600,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 30),
-          Row(children: [
-            Expanded(
-              child: Container(
-                height: 50,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xfff5f5f5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: TextFormField(
-                  controller: userCommentTextCtrl,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            InkWell(
-                onTap: () async {
-                  if (userCommentTextCtrl.text.isNotEmpty) {
-                    FocusScope.of(context).unfocus();
-                    bool isDone = await momentFeedStore.replyCommentOnMoment(
-                        context,
-                        id: momentFeed.id,
-                        commentId: commentInfo.getMomentComment.commentId!,
-                        userInput: userCommentTextCtrl.text);
-                    isDone ? userCommentTextCtrl.clear() : null;
-                    Get.back();
-                  } else {
-                    Snackbars.error(
-                      context,
-                      message: 'Input Field can not be empty',
-                      milliseconds: 1400,
-                    );
-                    // FocusScope.of(context).f(replyCommentFocus);
-                  }
-                },
-                child: SvgPicture.asset('assets/svgs/send.svg'))
-          ]),
-        ]));
   }
 }

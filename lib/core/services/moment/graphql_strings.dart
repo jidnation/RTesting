@@ -317,17 +317,51 @@ query ($authIdToGet: String, $pageNumber: Int!, $pageLimit: Int!) {
 
 const String getMomentCommentReplies = r''' 
 query ($momentId: String!,$commentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
-  getMomentComments(momentId: $momentId,commentId: $commentId, page_limit: $pageLimit, page_number: $pageNumber){
-     authId,
-    commentId,
-    replyId,
+  getMomentCommentReplies(momentId: $momentId,commentId: $commentId, page_limit: $pageLimit, page_number: $pageNumber){
+     replyId,
+    content,
+    authId,
+    audioMediaItem,
     momentId,
-    profile{
-      username,
+    commentId,
+    imageMediaItems,
+    videoMediaItem,
+    nLikes,
+    isLiked,
+    created_at,
+    replySlug,
+    replyOwnerProfile{
+       firstName,
+      lastName,
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    momentOwnerProfile{
       firstName,
       lastName,
-      profilePicture
-    }
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    commentOwnerProfile{
+       firstName,
+      lastName,
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    isLiked,
+    created_at
     }
   }
 ''';

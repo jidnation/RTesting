@@ -42,7 +42,8 @@ class _MomentFeedState extends State<MomentFeed> {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0xff001824),
+        // backgroundColor: const Color(0xff001824),
+        backgroundColor: Colors.white,
         body: SizedBox(
           // height: size.height ,
           width: size.width,

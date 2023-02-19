@@ -3,6 +3,8 @@ import 'package:audio_waveforms/src/controllers/player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reach_me/core/services/moment/querys.dart';
+import 'package:reach_me/features/moment/momentControlRoom/models/comment_reply.dart';
 
 import '../../../features/moment/moment_feed.dart';
 import '../media_service.dart';
@@ -37,5 +39,32 @@ class MomentController extends GetxController {
     caption('');
     audioFilePath('');
     endTime(0);
+  }
+
+  RxMap<String, List<GetMomentCommentReply>> repliesBox =
+      <String, List<GetMomentCommentReply>>{}.obs;
+
+  Future<List<GetMomentCommentReply>> fetchReplies(
+      {required String commentId, required String streakId}) async {
+    print("We are called to fetch >>>>>>>>>>>>>>>>>>>>>>>>>>");
+    if (repliesBox.isNotEmpty) {
+      if (repliesBox.keys.contains(commentId)) {
+        return repliesBox[commentId] ?? [];
+      } else {
+        List<GetMomentCommentReply>? response = await MomentQuery()
+            .getStreakCommentReplies(momentId: streakId, commentId: commentId);
+        if (response != null) {
+          repliesBox.addAll({commentId: response});
+        }
+        return response ?? [];
+      }
+    } else {
+      List<GetMomentCommentReply>? response = await MomentQuery()
+          .getStreakCommentReplies(momentId: streakId, commentId: commentId);
+      if (response != null) {
+        repliesBox.addAll({commentId: response});
+      }
+      return response ?? [];
+    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
@@ -41,11 +43,15 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     setState(() {});
   }
 
+  final deviceRatio = SizeConfig.screenWidth / SizeConfig.screenHeight;
   void _createChewieController() {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
       allowFullScreen: true,
+      aspectRatio: 9 / 15.5,
+      maxScale: 5,
+      //     (0.9 * _videoPlayerController.value.aspectRatio) / deviceRatio,
       looping: true,
       // showOptions: false,
 
@@ -61,7 +67,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
         bufferedColor: Colors.lightGreen,
       ),
       placeholder: Container(
-        color: const Color(0xff001824),
+        color: Colors.white,
       ),
     );
     momentFeedStore.videoCtrl(true, vController: _videoPlayerController);
@@ -82,25 +88,24 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final deviceRatio = size.width / size.height;
+    log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> :::::: ${size.width}");
     return
         // Stack(children: [
         Container(
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(
-        color: AppColors.white,
+        color: Colors.white,
       ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
           ? Transform.scale(
-              scale: (0.8 *
-                      _chewieController!
-                          .videoPlayerController.value.aspectRatio) /
-                  deviceRatio,
+              scaleY: SizeConfig.screenHeight > 785 ? 1.055 : 1,
+              scaleX: SizeConfig.screenWidth > 385 ? 1.065 : 1,
               child: Chewie(
                 controller: _chewieController!,
-              ))
+              ),
+            )
           : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               loadingEffect2(),
             ]),
@@ -191,7 +196,7 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(
-        color: AppColors.audioPlayerBg,
+        color: Colors.white,
       ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized

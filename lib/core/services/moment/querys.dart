@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/endpoints.dart';
 
+import '../../../features/moment/momentControlRoom/models/comment_reply.dart';
 import '../../../features/moment/momentControlRoom/models/get_comments_model.dart';
 import '../../../features/moment/momentControlRoom/models/get_moment_feed.dart';
 import '../../../features/moment/user_posting.dart';
@@ -271,6 +272,46 @@ class MomentQuery {
     ));
     log('from my reply comment-query::::: $queryResult');
     return queryResult.data?['replyMomentComment']['authId'] != null;
+  }
+
+  Future<List<GetMomentCommentReply>?> getStreakCommentReplies(
+      {required String momentId, required String commentId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+
+    Map<String, dynamic> queryVariables = {
+      "commentId": commentId,
+      "momentId": momentId,
+      "pageLimit": 30,
+      "pageNumber": 1
+    };
+
+    QueryResult queryResult = await qlClient.query(
+      // here it's get type so using query method
+      QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(
+            gql_string.getMomentCommentReplies,
+          ),
+          variables: queryVariables),
+    );
+    if (queryResult.data != null) {
+      log(":::::: from getCommentReplies:::: ${queryResult.data}");
+      return CommentReplyModel.fromJson(
+              queryResult.data!['getMomentCommentReplies'])
+          .getMomentCommentReplies;
+    } else {
+      log(":::::: from getCommentReplies:: e:: ${queryResult.exception}");
+      return null;
+    }
   }
 
   reachUser({required String reachingId}) async {
