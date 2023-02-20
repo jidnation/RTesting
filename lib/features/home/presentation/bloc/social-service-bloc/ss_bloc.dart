@@ -18,6 +18,7 @@ import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 
 import '../../../../timeline/timeline_feed.dart';
 import '../../../data/dtos/create.repost.input.dart';
+import '../../../data/models/notifications.dart';
 
 part 'ss_event.dart';
 part 'ss_state.dart';
@@ -26,6 +27,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
   final socialServiceRepository = SocialServiceRepository();
   final userRepository = UserRepository();
   SocialServiceBloc() : super(SocialServiceInitial()) {
+   
     on<CreatePostEvent>((event, emit) async {
       emit(CreatePostLoading());
       try {
