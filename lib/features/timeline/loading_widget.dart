@@ -59,3 +59,22 @@ SizedBox loadingEffect2({double? width, double? height, Color? color}) {
         pathBackgroundColor: Colors.transparent),
   );
 }
+
+SizedBox loadingEffect3({double? width, double? height, Color? color}) {
+  return SizedBox(
+    height: 20,
+    width: 20,
+    child: LoadingIndicator(
+        indicatorType: Indicator.audioEqualizer,
+        colors: [
+          AppColors.black.withOpacity(0.9),
+          AppColors.black.withOpacity(0.6),
+          AppColors.black.withOpacity(0.8),
+          AppColors.black.withOpacity(0.5),
+          AppColors.black.withOpacity(0.4),
+        ],
+        // strokeWidth: 29,
+        backgroundColor: Colors.transparent,
+        pathBackgroundColor: Colors.transparent),
+  );
+}

@@ -125,6 +125,7 @@ dependencies:
   uuid: ^3.0.7
 #  light_compressor: ^2.0.1
   url_launcher: ^6.1.9
+  deepar_flutter: ^0.0.5
 
 
 

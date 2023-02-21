@@ -63,18 +63,9 @@
 //       'shoutdown',
 //       'Quote',
 //     ];
-//     Map<String, Widget> profileTabMapping = {
-//       "reaches": const ReachTab(),
-//       'likes': const LikedTab(),
-//       'shoutouts': const UpVotedTab(),
-//       'shoutdown': const DownVotedTab(),
-//       'saved': const SavedTab(),
-//       'quote': const QuotedTab(),
-//       'comments': const CommentsTab(),
-//     };
 //
 //     List<Widget> profileTabs = [
-//       const ReachTab(),
+//       ReachTab(authId: widget.recipientId),
 //       const LikedTab(),
 //       const CommentsTab(),
 //       const UpVotedTab(),

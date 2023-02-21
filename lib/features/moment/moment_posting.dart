@@ -11,8 +11,6 @@ import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
 import 'package:reach_me/features/moment/streak_audio_preview_player.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
-import 'package:reach_me/features/moment/video_effect.dart';
-
 import '../../core/components/snackbar.dart';
 import '../../core/services/media_service.dart';
 import '../../core/services/moment/controller.dart';

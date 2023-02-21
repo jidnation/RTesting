@@ -32,6 +32,7 @@ import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/full_post.dart';
 import '../moment/moment_audio_player.dart';
 import '../profile/new_account.dart';
+import '../profile/recipientNewAccountProfile.dart';
 
 class TimeLineBox extends StatefulWidget {
   final TimeLineModel timeLineModel;
@@ -62,7 +63,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
       final name = 'screenshot_${time}_reachme';
-      final result = await ImageGallerySaver.saveImage(bytes!, name: name, quality: 200);
+      final result =
+          await ImageGallerySaver.saveImage(bytes!, name: name, quality: 200);
       debugPrint("Result ${result['filePath']}");
       Snackbars.success(context, message: 'Image saved to Gallery');
       RouteNavigators.pop(context);
@@ -207,6 +209,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                                           : RouteNavigators.route(
                                               context,
                                               RecipientAccountProfile(
+                                                // RecipientNewAccountScreen(
                                                 recipientEmail: 'email',
                                                 recipientImageUrl: widget
                                                     .timeLineModel

@@ -20,6 +20,7 @@ import '../../core/utils/dimensions.dart';
 class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBoxR2 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox3 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeUpBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeSavedBox = <CustomCounter>[].obs;

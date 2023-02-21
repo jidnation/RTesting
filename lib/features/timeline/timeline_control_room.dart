@@ -900,23 +900,44 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
   List<TimeLineModel> _myPosts = <TimeLineModel>[];
   List<TimeLineModel> get myPosts => _myPosts;
 
+  List<TimeLineModel> _myRPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRPosts => _myRPosts;
+
   List<TimeLineModel> _myQuotedPosts = <TimeLineModel>[];
   List<TimeLineModel> get myQuotedPosts => _myQuotedPosts;
+
+  List<TimeLineModel> _myRQuotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRQuotedPosts => _myRQuotedPosts;
 
   List<TimeLineModel> _myLikedPosts = <TimeLineModel>[];
   List<TimeLineModel> get myLikedPosts => _myLikedPosts;
 
+  List<TimeLineModel> _myRLikedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRLikedPosts => _myRLikedPosts;
+
   List<TimeLineModel> _myUpVotedPosts = <TimeLineModel>[];
   List<TimeLineModel> get myUpVotedPosts => _myUpVotedPosts;
+
+  List<TimeLineModel> _myRUpVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRUpVotedPosts => _myRUpVotedPosts;
 
   List<TimeLineModel> _myDownVotedPosts = <TimeLineModel>[];
   List<TimeLineModel> get myDownVotedPosts => _myDownVotedPosts;
 
+  List<TimeLineModel> _myRDownVotedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRDownVotedPosts => _myRDownVotedPosts;
+
   List<TimeLineModel> _mySavedPosts = <TimeLineModel>[];
   List<TimeLineModel> get mySavedPosts => _mySavedPosts;
 
+  List<TimeLineModel> _myRSavedPosts = <TimeLineModel>[];
+  List<TimeLineModel> get myRSavedPosts => _myRSavedPosts;
+
   List<GetPersonalComment> _myPersonalComments = <GetPersonalComment>[];
   List<GetPersonalComment> get myPersonalComments => _myPersonalComments;
+
+  List<GetPersonalComment> _myRPersonalComments = <GetPersonalComment>[];
+  List<GetPersonalComment> get myRPersonalComments => _myRPersonalComments;
 
   fetchAll(
       {String? userId,
@@ -951,20 +972,23 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
       String? userId,
       required bool isRefresh,
       RefreshController? refreshController}) async {
-    if (_myPosts.isEmpty || isRefresh) {
+    print(":::::::::::: user id : $userId");
+    if (userId != null ? _myRPosts.isEmpty : _myPosts.isEmpty || isRefresh) {
       List<Post>? response = await timeLineQuery.getAllPosts(
           authIdToGet: userId ?? globals.userId);
       if (response != null) {
-        _myPosts = [];
+        userId != null ? _myRPosts : _myPosts = [];
         for (Post post in response) {
-          _myPosts.add(TimeLineModel(
+          (userId != null ? _myRPosts : _myPosts).add(TimeLineModel(
               getPostFeed: GetPostFeed(post: post), isShowing: true));
         }
         getQuotedPost();
       }
       List<CustomCounter> likeBoxInfo = [];
       if (_myPosts.isNotEmpty) {
-        timeLineController.likeBox2([]);
+        userId != null
+            ? timeLineController.likeBoxR2([])
+            : timeLineController.likeBox2([]);
         for (TimeLineModel element in _myPosts) {
           likeBoxInfo.add(CustomCounter(
               id: element.id,
@@ -973,7 +997,9 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
                 isLiked: element.getPostFeed.post?.isLiked ?? false,
               )));
         }
-        timeLineController.likeBox2(likeBoxInfo);
+        userId != null
+            ? timeLineController.likeBoxR2(likeBoxInfo)
+            : timeLineController.likeBox2(likeBoxInfo);
         if (refreshController != null) {
           refreshController.refreshCompleted();
         }

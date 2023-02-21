@@ -156,40 +156,19 @@ class AudioImageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // widget.audioUrl != null
-        //   ?
-        Container(
-      height: 40,
-      width: 40,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: AppColors.primaryColor,
-          image: const DecorationImage(
-            image: AssetImage('assets/images/app-logo.png'),
-            fit: BoxFit.contain,
-          )),
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Container(
-            height: 10,
-            width: 10,
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(10)))
-      ]),
-    );
-    // : AudioEffects(
-    //     height: 50,
-    //     width: 50,
-    //     color: Colors.black,
-    //     artworkWidth: 40,
-    //     artworkHeight: 40,
-    //     artworkBorder: BorderRadius.circular(30),
-    //     isLocal: false,
-    //     isPlaying: true,
-    //     url: widget.audioUrl,
-    //     type: ArtworkType.AUDIO,
-    //     id: "Audio ID",
-    //   );
+    return Stack(children: [
+      Container(
+        height: 40,
+        width: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/app-icon.jpg'),
+              fit: BoxFit.contain,
+            )),
+      ),
+      Positioned(bottom: 03, right: 5, child: loadingEffect3()),
+    ]);
   }
 }
