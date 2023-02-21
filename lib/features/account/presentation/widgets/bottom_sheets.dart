@@ -420,7 +420,17 @@ Future showStoryBottomSheet(BuildContext context,
     builder: (context) {
       return BlocConsumer<SocialServiceBloc, SocialServiceState>(
         bloc: globals.socialServiceBloc,
-        listener: (context, state) {},
+        listener: (context, state) {
+          if(state is DeleteStatusError){
+            Snackbars.error(context, message: state.error);
+          }
+          if(state is DeleteStatusSuccess){
+            RouteNavigators.pop(context);
+            Navigator.pop(
+                context, 'delete');
+            Snackbars.success(context, message: 'Status deleted successfully!');
+          }
+        },
         builder: (context, state) {
           return BlocConsumer<UserBloc, UserState>(
             bloc: globals.userBloc,
@@ -452,8 +462,12 @@ Future showStoryBottomSheet(BuildContext context,
                         //   color: const Color(0xFFE50101),
                         // ),
                         // KebabBottomTextButton(label: 'Reach', onPressed: () {}),
-                        // KebabBottomTextButton(
-                        //     label: 'Star user', onPressed: () {}),
+                        KebabBottomTextButton(
+                            label: 'Delete', onPressed: () {
+                          globals.showLoader(context);
+                          globals.socialServiceBloc!.add(DeleteStatusEvent(
+                              statusId: status.statusId!));
+                        }),
                         KebabBottomTextButton(
                             label: 'Copy link', onPressed: () {}),
                         KebabBottomTextButton(label: 'Share', onPressed: () {}),
@@ -785,8 +799,8 @@ Future showProfilePictureOrViewStatus(BuildContext context,
                           context,
                           ViewUserStatus(
                               status: userStatus!
-                                  .firstWhere(
-                                      (e) => e.username == tPostOwnerInfo!.username)
+                                  .firstWhere((e) =>
+                                      e.username == tPostOwnerInfo!.username)
                                   .status!));
                     },
                   )
@@ -841,7 +855,8 @@ Future showProfilePictureOrViewStatus2(BuildContext context,
                           context,
                           ViewUserStatus(
                               status: userStatus!
-                                  .firstWhere((e) => e.username == user!.username)
+                                  .firstWhere(
+                                      (e) => e.username == user!.username)
                                   .status!));
                     },
                   )

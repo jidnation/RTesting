@@ -44,6 +44,10 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
 
   List<StatusModel> _myStatus = <StatusModel>[];
   List<StatusModel> get myStatus => _myStatus;
+  void updateMyStatus(List<StatusModel> value) {
+    _myStatus = value;
+    notifyListeners();
+  }
 
   List<StatusFeedResponseModel> _userStatus = List.empty(growable: true);
   List<StatusFeedResponseModel> get userStatus => _userStatus;
@@ -679,7 +683,8 @@ class TimeLineFeedStore extends ValueNotifier<List<TimeLineModel>> {
             audioMediaItem: audioUrl.isNotEmpty ? audioUrl : null,
             commentOption: globals.postCommentOption,
             content: globals.postContent,
-            location: globals.location,
+            location:
+                globals.user!.showLocation == true ? globals.location! : 'NIL',
             mentionList: globals.mentionList,
             postRating: globals.postRating);
     if (response.isRight()) {

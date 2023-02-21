@@ -240,23 +240,34 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   preview: _myStatus.last,
                                                   statusCount: _myStatus.length,
                                                   username: 'Your Status',
-                                                  onTap: () {
+                                                  onTap: () async {
                                                     // RouteNavigators.route(
                                                     //     context,
                                                     //     ViewMyStatus(
                                                     //         status: _myStatus));
 
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        StatusViewPage(
-                                                          isMe: true,
-                                                          status: _myStatus
-                                                              .map((e) => StatusFeedModel(
-                                                                  status: e,
-                                                                  statusOwnerProfile:
-                                                                      e.profileModel))
-                                                              .toList(),
-                                                        ));
+                                                    final res =
+                                                        await RouteNavigators
+                                                            .route(
+                                                                context,
+                                                                StatusViewPage(
+                                                                  isMe: true,
+                                                                  status: _myStatus
+                                                                      .map((e) => StatusFeedModel(
+                                                                          status:
+                                                                              e,
+                                                                          statusOwnerProfile:
+                                                                              e.profileModel))
+                                                                      .toList(),
+                                                                ));
+                                                    if (res == null) return;
+                                                    timeLineFeedStore
+                                                        .updateMyStatus((res
+                                                                as List<
+                                                                    StatusFeedModel>)
+                                                            .map((e) =>
+                                                                e.status!)
+                                                            .toList());
                                                   },
                                                 ),
                                               SizedBox(
@@ -437,8 +448,8 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                       .currentContext!
                                                       .findRenderObject()
                                                   as RenderRepaintBoundary; // the key provided
-                                              ui.Image image =
-                                                  await boundary.toImage();
+                                              ui.Image image = await boundary
+                                                  .toImage(pixelRatio: 4);
                                               ByteData? byteData =
                                                   await image.toByteData(
                                                       format: ui

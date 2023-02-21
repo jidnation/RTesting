@@ -1,11 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:reach_me/core/helper/logger.dart';
 import 'package:reach_me/core/models/user.dart';
 import 'package:reach_me/core/services/api/api_client.dart';
 import 'package:reach_me/features/home/data/datasources/home_remote_datasource.dart';
 import 'package:reach_me/features/home/data/dtos/create.repost.input.dart';
 import 'package:reach_me/features/home/data/dtos/create.status.dto.dart';
 import 'package:reach_me/features/home/data/models/comment_model.dart';
+import 'package:reach_me/features/home/data/models/notifications.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
@@ -140,33 +142,31 @@ class SocialServiceRepository {
   }) async {
     try {
       final reply = await _homeRemoteDataSource.replyCommentOnPost(
-        postId: postId,
-        content: content,
-        commentId: commentId,
-        commentOwnerId: commentOwnerId,
-        postOwnerId: postOwnerId,
-        imageMediaItems: imageMediaItems,
-        audioMediaItem: audioMediaItem,
-        videoMediaItem: videoMediaItem
-      );
+          postId: postId,
+          content: content,
+          commentId: commentId,
+          commentOwnerId: commentOwnerId,
+          postOwnerId: postOwnerId,
+          imageMediaItems: imageMediaItems,
+          audioMediaItem: audioMediaItem,
+          videoMediaItem: videoMediaItem);
       return Right(reply);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }
   }
 
-    Future<Either<String, List<CommentReplyModel>>> getCommentReplies({
-    required String postId,
-    required String commentId,
-    int? pageNumber, int? pageLimit
-  }) async {
+  Future<Either<String, List<CommentReplyModel>>> getCommentReplies(
+      {required String postId,
+      required String commentId,
+      int? pageNumber,
+      int? pageLimit}) async {
     try {
       final replies = await _homeRemoteDataSource.getCommentReplies(
-        postId: postId,
-        commentId: commentId,
-        pageNumber: pageNumber,
-        pageLimit: pageLimit
-      );
+          postId: postId,
+          commentId: commentId,
+          pageNumber: pageNumber,
+          pageLimit: pageLimit);
       return Right(replies);
     } on GraphQLError catch (e) {
       return Left(e.message);
@@ -651,6 +651,15 @@ class SocialServiceRepository {
     try {
       final users = await _homeRemoteDataSource.suggestUser();
       return Right(users);
+    } on GraphQLError catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  Future<Either<String, List<NotificationsModel>>> getNotifications() async {
+    try {
+      final notifications = await _homeRemoteDataSource.getNotifications();
+      return Right(notifications);
     } on GraphQLError catch (e) {
       return Left(e.message);
     }

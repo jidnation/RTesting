@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:get/get.dart';
@@ -30,6 +33,7 @@ void main() async {
   OneSignal.shared
       .promptUserForPushNotificationPermission(fallbackToSettings: true);
   await NotifcationService.handleNotifications();
+  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 2));
   Bloc.observer = AppBlocObserver();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
