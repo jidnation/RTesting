@@ -1,22 +1,21 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:ui' as ui;
+
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
-import '../moment/moment_feed.dart';
 
 class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
@@ -111,7 +110,7 @@ class TimeLineController extends GetxController {
   void takeScreenShot(context, GlobalKey<State<StatefulWidget>> src) async {
     RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
         as RenderRepaintBoundary; // the key provided
-    ui.Image image = await boundary.toImage(pixelRatio: 0.1);
+    ui.Image image = await boundary.toImage(pixelRatio: 4);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     debugPrint("Byte Data: $byteData");
     await saveImage(context, byteData!.buffer.asUint8List());

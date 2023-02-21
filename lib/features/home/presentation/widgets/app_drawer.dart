@@ -1,4 +1,6 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
@@ -8,7 +10,6 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
@@ -18,9 +19,9 @@ import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
 import '../../../account/presentation/views/edit_profile_screen.dart';
+import '../../../moment/user_posting.dart';
 import '../../../profile/contact_us.dart';
 import '../../../profile/new_account.dart';
-import '../../../moment/user_posting.dart';
 import '../../../timeline/timeline_feed.dart';
 
 class AppDrawer extends HookWidget {
@@ -323,9 +324,11 @@ class AppDrawer extends HookWidget {
           DrawerItem(
             action: 'Logout',
             icon: 'assets/svgs/logout.svg',
-            onPressed: () {
+            onPressed: () async {
               globals.authBloc!.add(LogoutEvent());
-              SecureStorage.deleteSecureData();
+              await SecureStorage.deleteSecureData();
+              await FastCachedImageConfig.clearAllCachedImages();
+              await DefaultCacheManager().emptyCache();
               RouteNavigators.routeNoWayHome(context, const LoginScreen());
             },
           ),
