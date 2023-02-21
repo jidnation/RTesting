@@ -511,7 +511,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                         ]),
                     Positioned(
                       bottom: 10,
-                      left: 0,
+                      left: -10,
                       child: Row(children: [
                         GestureDetector(
                             onTap: () {

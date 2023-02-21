@@ -232,8 +232,8 @@ class MomentCommentBox extends HookWidget {
                 Get.bottomSheet(
                     StreakCommentReplies(
                       id: momentFeed.id,
-                      commentId: commentInfo.getMomentComment.commentId!,
-                      streakId: momentFeed.momentId,
+                      commentInfo: commentInfo,
+                      momentFeed: momentFeed,
                     ),
                     isScrollControlled: true);
               },

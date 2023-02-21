@@ -548,7 +548,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
-    log('from my feed-query::::: $queryResult');
+    log('from my feed-query::????????::: $queryResult');
     if (queryResult.data != null) {
       return MomentFeedModel.fromJson(queryResult.data!);
     } else {
