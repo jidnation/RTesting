@@ -19,6 +19,7 @@ import '../../../core/utils/dimensions.dart';
 import '../../../core/utils/loader.dart';
 import '../../home/data/repositories/user_repository.dart';
 import '../../timeline/timeline_feed.dart';
+import '../moment_box.dart';
 import '../moment_feed.dart';
 import '../user_posting.dart';
 import 'models/get_comments_model.dart';
@@ -585,6 +586,44 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       return data;
     } else {
       return [];
+    }
+  }
+
+  gotoFeed({required String momentId}) async {
+    Moment? response = await momentQuery.getMoment(momentId: momentId);
+    if (response != null) {
+      MomentModel momentModel = MomentModel(
+        videoUrl: response.videoMediaItem!,
+        isLiked: response.isLiked!,
+        feedOwnerInfo: value.first.feedOwnerInfo,
+        nLikes: response.nLikes!,
+        soundUrl: response.sound,
+        musicName: response.musicName,
+        momentOwnerInfo: response.momentOwnerProfile!,
+        reachingUser: await timeLineFeedStore.getReachRelationship(
+                type: 'reaching',
+                usersId: response.momentOwnerProfile!.authId!) ??
+            false,
+        nComment: response.nComments!,
+        momentId: response.momentId!,
+        caption: response.caption!,
+        momentCreatedTime: response.createdAt.toString(),
+        momentComments: await momentFeedStore.getMyMomentComments(
+            momentId: response.momentId!),
+      );
+      Get.to(
+        () => Card(
+            color: Colors.transparent,
+            shadowColor: Colors.transparent,
+            child: SafeArea(
+              child: MomentBox2(
+                momentFeed: momentModel,
+                pageController: momentCtrl.streakPageController.value,
+              ),
+            )),
+        transition: Transition.leftToRightWithFade,
+        duration: const Duration(milliseconds: 300),
+      );
     }
   }
 

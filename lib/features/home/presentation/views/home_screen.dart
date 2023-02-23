@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final ValueNotifier<GlobalKey<ScaffoldState>> scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
     momentCtrl.userBar(scaffoldKey.value);
+    momentCtrl.streakPageController(_pageController);
     ValueNotifier<GlobalKey<ScaffoldState>> data = scaffoldKey;
     final pages = [
       // TimelineScreen(scaffoldKey: scaffoldKey.value),

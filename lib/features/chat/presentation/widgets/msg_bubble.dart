@@ -10,6 +10,8 @@ import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
 import 'package:reach_me/features/home/presentation/views/full_post.dart';
 import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
 
+import '../../../moment/moment_feed.dart';
+
 class MsgBubble extends StatelessWidget {
   const MsgBubble(
       {Key? key,
@@ -153,10 +155,17 @@ class MsgBubble extends StatelessWidget {
                 onTap: () {
                   if (chat.quotedFromPost == null) return;
                   if (chat.quotedFromPost!) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => FullPostScreen(
-                              postFeedModel: chat.quotedPost,
-                            )));
+                    if (json.decode(chat.quotedData!)['username'] ==
+                        "isStreak") {
+                      momentFeedStore.gotoFeed(
+                          momentId: json.decode(chat.quotedData!)['post']
+                              ['postId']);
+                    } else {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (builder) => FullPostScreen(
+                                postFeedModel: chat.quotedPost,
+                              )));
+                    }
                   } else {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (builder) => StatusViewPage(

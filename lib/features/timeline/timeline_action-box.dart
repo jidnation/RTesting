@@ -68,77 +68,54 @@ class _TimeLineBoxActionRowState extends State<TimeLineBoxActionRow> {
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              LikeButton(
-                size: 23,
-                countBuilder: (count, isLiked, text) {
-                  return CustomText(
-                    text: count.toString(),
-                    weight: FontWeight.w600,
-                    color: Colors.black,
-                    size: 15,
-                  ).paddingOnly(left: 3);
+              GestureDetector(
+                onLongPress: () {
+                  if ((widget.post.nLikes ?? 0) > 0) {
+                    showPostReactors(routeContext,
+                        postId: widget.post.postId!, reactionType: 'Like');
+                  }
                 },
-                likeCountPadding: const EdgeInsets.all(0),
-                isLiked: widget.post.isLiked,
-                countPostion: CountPostion.right,
-                onTap: (isLiked) async {
-                  timeLineController.likePost(
-                    id: widget.timeLineId,
-                    type: widget.type,
-                  );
-                  timeLineFeedStore.likeTimeLinePost(
-                    widget.timeLineId,
-                    type: widget.type,
-                  );
-                  return !isLiked;
-                },
-                circleColor: CircleColor(
-                    start: AppColors.primaryColor,
-                    end: AppColors.primaryColor.withOpacity(0.5)),
-                bubblesColor: BubblesColor(
-                  dotPrimaryColor: AppColors.primaryColor,
-                  dotSecondaryColor: AppColors.primaryColor.withOpacity(0.6),
+                child: LikeButton(
+                  size: 23,
+                  countBuilder: (count, isLiked, text) {
+                    return CustomText(
+                      text: count.toString(),
+                      weight: FontWeight.w600,
+                      color: Colors.black,
+                      size: 15,
+                    ).paddingOnly(left: 3);
+                  },
+                  likeCountPadding: const EdgeInsets.all(0),
+                  isLiked: widget.post.isLiked,
+                  countPostion: CountPostion.right,
+                  onTap: (isLiked) async {
+                    timeLineController.likePost(
+                      id: widget.timeLineId,
+                      type: widget.type,
+                    );
+                    timeLineFeedStore.likeTimeLinePost(
+                      widget.timeLineId,
+                      type: widget.type,
+                    );
+                    return !isLiked;
+                  },
+                  circleColor: CircleColor(
+                      start: AppColors.primaryColor,
+                      end: AppColors.primaryColor.withOpacity(0.5)),
+                  bubblesColor: BubblesColor(
+                    dotPrimaryColor: AppColors.primaryColor,
+                    dotSecondaryColor: AppColors.primaryColor.withOpacity(0.6),
+                  ),
+                  likeBuilder: (bool isLiked) {
+                    return SvgPicture.asset(
+                      isLiked
+                          ? 'assets/svgs/like-active.svg'
+                          : 'assets/svgs/like.svg',
+                    );
+                  },
+                  likeCount: widget.post.nLikes!,
                 ),
-                likeBuilder: (bool isLiked) {
-                  return SvgPicture.asset(
-                    isLiked
-                        ? 'assets/svgs/like-active.svg'
-                        : 'assets/svgs/like.svg',
-                  );
-                },
-                likeCount: widget.post.nLikes!,
               ),
-              // GestureDetector(
-              //   onLongPress: () {
-              //     if ((widget.post.nLikes ?? 0) > 0) {
-              //       showPostReactors(routeContext,
-              //           postId: widget.post.postId!, reactionType: 'Like');
-              //     }
-              //   },
-              //   onTap: () {
-              //     timeLineController.likePost(
-              //         id: widget.timeLineId, type: widget.type);
-              //     timeLineFeedStore.likePost(widget.timeLineId,
-              //         type: widget.type);
-              //   },
-              //   child: SvgPicture.asset(
-              //     // widget.post.isLiked!
-              //     likeModelInfo.isLiked
-              //         ? 'assets/svgs/like-active.svg'
-              //         : 'assets/svgs/like.svg',
-              //   ),
-              // ),
-              // const SizedBox(width: 3),
-              // CustomText(
-              //   text: momentFeedStore.getCountValue(
-              //     // value: widget.post.nLikes!,
-              //     value: likeModelInfo.nLikes,
-              //   ),
-              //   size: 15,
-              //   isCenter: true,
-              //   weight: FontWeight.w600,
-              //   color: const Color(0xff001824),
-              // )
             ]),
             const SizedBox(width: 12),
             commentIcon(context),
