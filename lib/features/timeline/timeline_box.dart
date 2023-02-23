@@ -208,8 +208,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                                               context, const NewAccountScreen())
                                           : RouteNavigators.route(
                                               context,
-                                              RecipientAccountProfile(
-                                                // RecipientNewAccountScreen(
+                                              // RecipientAccountProfile(
+                                              RecipientNewAccountScreen(
                                                 recipientEmail: 'email',
                                                 recipientImageUrl: widget
                                                     .timeLineModel
