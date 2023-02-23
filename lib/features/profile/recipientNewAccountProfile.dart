@@ -51,6 +51,7 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
   @override
   void initState() {
     timeLineFeedStore.fetchAll(userId: widget.recipientId, isFirst: true);
+    timeLineController.isScrolling(false);
     globals.userBloc!.add(GetRecipientProfileEvent(email: widget.recipientId));
     globals.socialServiceBloc!
         .add(GetStatusFeedEvent(pageLimit: 15, pageNumber: 1));
@@ -661,9 +662,9 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                                   FullScreenWidget(
                                     child: Stack(children: <Widget>[
                                       Container(
-                                        color: AppColors
-                                            .black, // Your screen background color
-                                      ),
+                                          color: AppColors
+                                              .black // Your screen background color
+                                          ),
                                       Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -671,7 +672,8 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                                             Container(
                                                 height: getScreenHeight(100)),
                                             Image.network(
-                                              globals.user!.profilePicture!,
+                                              globals.recipientUser!
+                                                  .profilePicture!,
                                               fit: BoxFit.contain,
                                             ),
                                           ]),
@@ -696,7 +698,10 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
                                     ]),
                                   ));
                             },
-                            child: const ProfilePicture(height: 50)),
+                            child: RecipientProfilePicture(
+                              height: 50,
+                              imageUrl: globals.recipientUser?.profilePicture,
+                            )),
                         // Column(children: [
                         //   Text(
                         //       ('${globals.user!.firstName} ${globals.user!.lastName}')

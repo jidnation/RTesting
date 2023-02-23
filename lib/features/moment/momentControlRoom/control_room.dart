@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:reach_me/core/services/moment/graphql_strings.dart';
+import 'package:reach_me/features/timeline/loading_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
@@ -590,6 +591,12 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
   }
 
   gotoFeed({required String momentId}) async {
+    CustomDialog.openDialogBox(
+        height: 200,
+        width: SizeConfig.screenWidth * 0.7,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          loadingEffect2(height: 100, width: 100),
+        ]));
     Moment? response = await momentQuery.getMoment(momentId: momentId);
     if (response != null) {
       MomentModel momentModel = MomentModel(
@@ -612,15 +619,11 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
             momentId: response.momentId!),
       );
       Get.to(
-        () => Card(
-            color: Colors.transparent,
-            shadowColor: Colors.transparent,
-            child: SafeArea(
-              child: MomentBox2(
-                momentFeed: momentModel,
-                pageController: momentCtrl.streakPageController.value,
-              ),
-            )),
+        () => Scaffold(
+            body: MomentBox2(
+          momentFeed: momentModel,
+          pageController: momentCtrl.streakPageController.value,
+        )),
         transition: Transition.leftToRightWithFade,
         duration: const Duration(milliseconds: 300),
       );
