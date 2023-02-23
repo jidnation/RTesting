@@ -147,6 +147,7 @@ flutter:
   assets:
     - assets/images/
     - assets/svgs/
+    - assets/effects/
     - assets/sounds/
 
   fonts:
