@@ -93,7 +93,7 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
         // Stack(children: [
         Container(
       width: size.width,
-      height: size.height,
+      height: size.height - 110,
       decoration: const BoxDecoration(
         color: Colors.white,
       ),

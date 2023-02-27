@@ -596,6 +596,13 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         width: SizeConfig.screenWidth * 0.7,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           loadingEffect2(height: 100, width: 100),
+          const SizedBox(height: 4),
+          const CustomText(
+            text: 'Loading Streak...',
+            color: AppColors.primaryColor,
+            weight: FontWeight.w500,
+            size: 14,
+          ),
         ]));
     Moment? response = await momentQuery.getMoment(momentId: momentId);
     if (response != null) {
@@ -618,7 +625,7 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
         momentComments: await momentFeedStore.getMyMomentComments(
             momentId: response.momentId!),
       );
-      Get.to(
+      Get.off(
         () => Scaffold(
             body: MomentBox2(
           momentFeed: momentModel,
@@ -629,11 +636,6 @@ class MomentFeedStore extends ValueNotifier<List<MomentModel>> {
       );
     }
   }
-
-  // void startReading() {
-  //   _postingMoment = true;
-  //   notifyListeners();
-  // }
 }
 
 class MomentModel {

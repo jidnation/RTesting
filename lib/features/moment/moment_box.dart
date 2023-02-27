@@ -412,11 +412,11 @@ class MomentBox2 extends StatelessWidget {
           child: Container(
             color: Colors.white,
           ),
-        )
+        ),
         // Stack(children: [
-        //   VideoPlayerItem(
-        //     videoUrl: momentFeed.videoUrl,
-        //   ),
+        VideoPlayerItem(
+          videoUrl: momentFeed.videoUrl,
+        ),
         //   Positioned(
         //     top: getScreenHeight(300),
         //     right: 20,
