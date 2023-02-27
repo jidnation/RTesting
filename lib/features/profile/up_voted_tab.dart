@@ -9,8 +9,10 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class UpVotedTab extends StatefulWidget {
+  final String? authId;
   const UpVotedTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -40,7 +42,9 @@ class _UpVotedTabState extends State<UpVotedTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myUpVotedPosts;
+          List<TimeLineModel> data = widget.authId != null
+              ? timeLineFeedStore.myRUpVotedPosts
+              : timeLineFeedStore.myUpVotedPosts;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
@@ -48,6 +52,7 @@ class _UpVotedTabState extends State<UpVotedTab> {
                 isRefresh: true,
                 type: 'Upvote',
                 refreshController: _refreshController,
+                userId: widget.authId,
               );
             },
             controller: _refreshController,
@@ -79,8 +84,7 @@ class _UpVotedTabState extends State<UpVotedTab> {
                             TimeLineBox(
                               timeLineModel: post,
                               takeScreenShot: () {
-                                timeLineController.takeScreenShot(
-                                    context, src);
+                                timeLineController.takeScreenShot(context, src);
                               },
                             ),
                             Positioned(

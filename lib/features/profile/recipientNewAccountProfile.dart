@@ -84,11 +84,11 @@ class _RecipientNewAccountScreenState extends State<RecipientNewAccountScreen> {
 
     List<Widget> profileTabs = [
       ReachTab(authId: widget.recipientId),
-      const LikedTab(),
-      const CommentsTab(),
-      const UpVotedTab(),
-      const DownVotedTab(),
-      const QuotedTab(),
+      LikedTab(authId: widget.recipientId),
+      CommentsTab(authId: widget.recipientId),
+      UpVotedTab(authId: widget.recipientId),
+      DownVotedTab(authId: widget.recipientId),
+      QuotedTab(authId: widget.recipientId),
     ];
     ValueNotifier<String> selectedTab = useState('Reaches');
     var size = MediaQuery.of(context).size;

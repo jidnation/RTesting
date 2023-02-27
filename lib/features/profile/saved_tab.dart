@@ -9,8 +9,10 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class SavedTab extends StatefulWidget {
+  final String? authId;
   const SavedTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -40,13 +42,14 @@ class _SavedTabState extends State<SavedTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.mySavedPosts;
+          List<TimeLineModel> data = widget.authId != null ? timeLineFeedStore.myRSavedPosts : timeLineFeedStore.mySavedPosts;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
               timeLineFeedStore.fetchMySavedPosts(
                 isRefresh: true,
                 refreshController: _refreshController,
+                userId: widget.authId,
               );
             },
             controller: _refreshController,
@@ -59,7 +62,7 @@ class _SavedTabState extends State<SavedTab> {
                         title: "No saved posts",
                         subtitle: "",
                       )
-                    ],
+                    ]
                   )
                 : ListView.builder(
                     shrinkWrap: true,

@@ -24,12 +24,14 @@ class TimeLineBoxActionRow extends StatefulWidget {
     Key? key,
     required this.type,
     required this.post,
+    this.userId,
     required this.timeLineId,
   }) : super(key: key);
 
   final Post post;
   final String timeLineId;
   final String type;
+  final String? userId;
 
   @override
   State<TimeLineBoxActionRow> createState() => _TimeLineBoxActionRowState();

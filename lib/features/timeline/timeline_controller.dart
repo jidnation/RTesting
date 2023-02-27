@@ -22,12 +22,17 @@ class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBoxR2 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox3 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBoxR3 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeUpBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRUpBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeSavedBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRSavedBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeDownBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRDownBox = <CustomCounter>[].obs;
   RxInt currentIndex = 1.obs;
   RxInt currentPageIndex = 0.obs;
   RxList<CustomCounter> likeCommentBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRCommentBox = <CustomCounter>[].obs;
   RxBool isScrolling = false.obs;
   RxBool currentStatus = false.obs;
   RxString currentId = "".obs;
