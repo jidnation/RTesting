@@ -81,6 +81,7 @@ class CommentOwnerProfile {
     this.typename,
     this.username,
     this.firstName,
+    this.authId,
     this.location,
     this.lastName,
     this.profilePicture,
@@ -89,6 +90,7 @@ class CommentOwnerProfile {
   final String? typename;
   final String? username;
   final String? firstName;
+  final String? authId;
   final String? location;
   final String? lastName;
   final String? profilePicture;
@@ -97,6 +99,7 @@ class CommentOwnerProfile {
       CommentOwnerProfile(
         typename: json["__typename"] ?? "",
         username: json["username"] ?? "",
+        authId: json["authId"] ?? "",
         location: json["location"] ?? "",
         firstName: json["firstName"] ?? "",
         lastName: json["lastName"] ?? "",

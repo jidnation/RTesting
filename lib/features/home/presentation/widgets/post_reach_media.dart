@@ -13,13 +13,12 @@ import 'package:reach_me/features/home/presentation/widgets/post_media.dart';
 import 'package:reach_me/features/home/presentation/widgets/video_preview.dart';
 
 import '../../../../core/helper/logger.dart';
-import '../../../../core/services/navigation/navigation_service.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../../core/utils/dimensions.dart';
 import '../../../../core/utils/string_util.dart';
 import 'gallery_view.dart';
 
-class PostReachMediaGrid extends HookWidget { 
+class PostReachMediaGrid extends HookWidget {
   final List<UploadFileDto> mediaList;
   final Function(int)? onRemove;
   final Function(List<UploadFileDto>)? onUpdateList;
@@ -213,7 +212,8 @@ class PostReachMedia extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                     child: Center(
                         child: Text(
                       duration ?? '',
@@ -239,19 +239,20 @@ class PostReachMedia extends StatelessWidget {
               )
             : Container(),
         Positioned.fill(child: GestureDetector(onTap: () {
-          RouteNavigators.route(
+          Navigator.push(
               context,
-              (isVideo)
-                  ? VideoPreview(
-                      path: fileResult.file.path,
-                      isLocalVideo: true,
-                      aspectRatio: fileResult.width! / fileResult.height!,
-                    )
-                  : PhotoView(
-                      imageProvider: FileImage(
-                        fileResult.file,
-                      ),
-                    ));
+              MaterialPageRoute(
+                  builder: (c) => (isVideo)
+                      ? VideoPreview(
+                          path: fileResult.file.path,
+                          isLocalVideo: true,
+                          aspectRatio: fileResult.width! / fileResult.height!,
+                        )
+                      : PhotoView(
+                          imageProvider: FileImage(
+                            fileResult.file,
+                          ),
+                        )));
         })),
         onClose != null
             ? Positioned(
@@ -282,9 +283,6 @@ class PostReachMedia extends StatelessWidget {
     ).paddingOnly(r: 10);
   }
 }
-
-
-
 
 class PostReachAudioMedia extends StatefulWidget {
   final String path;
@@ -404,7 +402,7 @@ class _PostReachAudioMediaState extends State<PostReachAudioMedia> {
           ),
           GestureDetector(
             onTap: widget.onCancel,
-            child:  Container(
+            child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 padding: const EdgeInsets.all(4),
                 alignment: Alignment.center,
@@ -442,8 +440,8 @@ class AudioRecordWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:const EdgeInsets.all(16),
-      decoration:const BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
           border:
               Border(top: BorderSide(color: AppColors.primaryColor, width: 1))),
       child: Row(

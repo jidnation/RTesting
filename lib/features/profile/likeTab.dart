@@ -9,8 +9,10 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class LikedTab extends StatefulWidget {
+  final String? authId;
   const LikedTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -40,13 +42,14 @@ class _LikedTabState extends State<LikedTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myLikedPosts;
+          List<TimeLineModel> data = widget.authId != null ? timeLineFeedStore.myRLikedPosts : timeLineFeedStore.myLikedPosts;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
               timeLineFeedStore.fetchMyLikedPosts(
                 isRefresh: true,
                 refreshController: _refreshController,
+                userId: widget.authId,
               );
             },
             controller: _refreshController,

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:reach_me/core/helper/endpoints.dart';
 
+import '../../../features/moment/momentControlRoom/models/comment_reply.dart';
 import '../../../features/moment/momentControlRoom/models/get_comments_model.dart';
 import '../../../features/moment/momentControlRoom/models/get_moment_feed.dart';
 import '../../../features/moment/user_posting.dart';
@@ -42,6 +43,9 @@ class MomentQuery {
     momentCtrl.audioUrl.value.isNotEmpty
         ? momentVariables.addAll({'sound': momentCtrl.audioUrl.value})
         : null;
+    momentCtrl.audioName.value.isNotEmpty
+        ? momentVariables.addAll({'musicName': momentCtrl.audioName.value})
+        : null;
 
     ///
     QueryResult queryResult = await qlClient.mutate(MutationOptions(
@@ -52,6 +56,7 @@ class MomentQuery {
       // (\$caption: String, \$hashTags: [String], \$mentionList: [String], \$sound: String, \$videoMediaItem: String)
       variables: momentVariables,
     ));
+    log('from my first-query::::: ${queryResult}');
     return queryResult.data?['createMoment']['authId'] != null;
   }
 
@@ -76,7 +81,37 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my first-query::::: ${queryResult}');
     // return queryResult.data?['createMoment']['authId'] != null;
+  }
+
+  deleteMomentCommentReply(
+      {required String commentId, required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'replyId': replyId,
+      'commentId': commentId,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.deleteMomentCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my delete-moment comment-reply query::::: ${queryResult}');
+    return queryResult.data?['deleteMomentCommentReply'];
   }
 
   likeMoment({required String momentId}) async {
@@ -100,6 +135,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeMoment']['authId'] != null;
   }
 
@@ -131,6 +167,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my post comment reply::::: $queryResult');
     return queryResult.data?['replyCommentOnPost']['authId'] != null;
   }
 
@@ -159,6 +196,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeMomentComment']['authId'] != null;
   }
 
@@ -187,7 +225,41 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['likeCommentOnPost']['authId'] != null;
+  }
+
+  Future<bool> likeCommentReply(
+      {required String momentId,
+      required String commentId,
+      required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'replyId': replyId,
+      'momentId': momentId,
+      'commentId': commentId,
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.likeStreakCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my moment-Liking-query::::: $queryResult');
+    // return false;
+    return queryResult.data?['likeMomentReply']['authId'] != null;
   }
 
   createMomentComment({
@@ -229,6 +301,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-Liking-query::::: $queryResult');
     return queryResult.data?['createMomentComment']['authId'] != null;
   }
 
@@ -262,7 +335,47 @@ class MomentQuery {
       ),
       variables: commentBody,
     ));
+    log('from my reply comment-query::::: $queryResult');
     return queryResult.data?['replyMomentComment']['authId'] != null;
+  }
+
+  Future<List<GetMomentCommentReply>?> getStreakCommentReplies(
+      {required String momentId, required String commentId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+
+    Map<String, dynamic> queryVariables = {
+      "commentId": commentId,
+      "momentId": momentId,
+      "pageLimit": 30,
+      "pageNumber": 1
+    };
+
+    QueryResult queryResult = await qlClient.query(
+      // here it's get type so using query method
+      QueryOptions(
+          fetchPolicy: FetchPolicy.networkOnly,
+          document: gql(
+            gql_string.getMomentCommentReplies,
+          ),
+          variables: queryVariables),
+    );
+    if (queryResult.data != null) {
+      log(":::::: from getCommentReplies:::: ${queryResult.data}");
+      return CommentReplyModel.fromJson(queryResult.data!)
+          .getMomentCommentReplies;
+    } else {
+      log(":::::: from getCommentReplies:: e:: ${queryResult.exception}");
+      return null;
+    }
   }
 
   reachUser({required String reachingId}) async {
@@ -286,6 +399,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from the reaching user end::::: $queryResult');
     // return queryResult.data?['likeMoment']['authId'] != null;
   }
 
@@ -310,6 +424,7 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMoment'] ?? false;
   }
 
@@ -338,7 +453,37 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
+    log('from my moment-unLiking-query::::: $queryResult');
     return queryResult.data?['unlikeMomentComment'] ?? false;
+  }
+
+  unlikeMomentCommentReply(
+      {required String commentId, required String replyId}) async {
+    HttpLink link = HttpLink(
+      hostUrl,
+      defaultHeaders: <String, String>{
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    // final store = await HiveStore.open(path: 'my/cache/path');
+    GraphQLClient qlClient = GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+    Map<String, dynamic> momentVariables = {
+      'commentId': commentId,
+      'replyId': replyId
+    };
+
+    QueryResult queryResult = await qlClient.mutate(MutationOptions(
+      fetchPolicy: FetchPolicy.networkOnly,
+      document: gql(
+        gql_string.unlikeMomentCommentReply,
+      ),
+      variables: momentVariables,
+    ));
+    log('from my moment-comment-reply-unLiking-query::::: $queryResult');
+    return queryResult.data?['unlikeMomentReply'] ?? false;
   }
 
   unlikeCommentPost({required String commentId, required String likeId}) async {
@@ -365,7 +510,8 @@ class MomentQuery {
       ),
       variables: momentVariables,
     ));
-    return queryResult.data?['unlikeCommentOnPost'] != 'false' ?? false;
+    log('from my comment-post-unLiking-query::::: $queryResult');
+    return queryResult.data?['unlikeCommentOnPost'] != 'false';
   }
 
   Future<MomentFeedModel?>? getAllFeeds(
@@ -402,6 +548,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
+    log('from my feed-query::????????::: $queryResult');
     if (queryResult.data != null) {
       return MomentFeedModel.fromJson(queryResult.data!);
     } else {
@@ -431,6 +578,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
+    log('from my moment-query::::: $queryResult');
     if (queryResult.data != null) {
       return Moment.fromJson(queryResult.data!['getMoment']);
     } else {
@@ -461,6 +609,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
+    log('from getting commentInfo-query::::: $queryResult');
     if (queryResult.data != null) {
       return GetMomentComment.fromJson(queryResult.data!['getMomentComment']);
     } else {
@@ -491,6 +640,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
+    log('from my moment-query::::: ${queryResult.data?['getMomentLikes']}');
     if (queryResult.data != null) {
       // return GetMomentFeed.fromJson(queryResult.data!);
     } else {
@@ -520,6 +670,7 @@ class MomentQuery {
       'pageLimit': pageLimit ?? 30,
     };
 
+    print(':::::::::::::from checking plug::::: $queryVariables');
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
@@ -529,6 +680,7 @@ class MomentQuery {
           ),
           variables: queryVariables),
     );
+    log('from my moment-comments-query::::: $queryResult');
     if (queryResult.data != null) {
       return MomentCommentModel.fromJson(queryResult.data!).getMomentComments;
     } else {

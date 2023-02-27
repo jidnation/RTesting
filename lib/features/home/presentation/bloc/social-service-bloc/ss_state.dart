@@ -210,6 +210,74 @@ class UnlikeCommentOnPostError extends SocialServiceState {
   List<Object> get props => [error];
 }
 
+class ReplyCommentOnPostLoading extends SocialServiceState {}
+
+class ReplyCommentOnPostSuccess extends SocialServiceState {
+  final CommentReplyModel? commentReply;
+  ReplyCommentOnPostSuccess({this.commentReply});
+}
+
+class ReplyCommentOnPostError extends SocialServiceState {
+  final String error;
+  ReplyCommentOnPostError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class GetCommentRepliesLoading extends SocialServiceState {}
+
+class GetCommentRepliesSuccess extends SocialServiceState {
+  final List<CommentReplyModel>? replies;
+  GetCommentRepliesSuccess({this.replies});
+}
+
+class GetCommentRepliesError extends SocialServiceState {
+  final String error;
+  GetCommentRepliesError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class DeleteCommentReplyLoading extends SocialServiceState {}
+
+class DeleteCommentReplySuccess extends SocialServiceState {
+  DeleteCommentReplySuccess();
+}
+
+class DeleteCommentReplyError extends SocialServiceState {
+  final String error;
+  DeleteCommentReplyError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class LikeCommentReplyLoading extends SocialServiceState {}
+
+class LikeCommentReplySuccess extends SocialServiceState {
+  final CommentReplyLikeModel? like;
+  LikeCommentReplySuccess({this.like});
+}
+
+class LikeCommentReplyError extends SocialServiceState {
+  final String error;
+  LikeCommentReplyError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
+class UnlikeCommentReplyLoading extends SocialServiceState {}
+
+class UnlikeCommentReplySuccess extends SocialServiceState {
+  UnlikeCommentReplySuccess();
+}
+
+class UnlikeCommentReplyError extends SocialServiceState {
+  final String error;
+  UnlikeCommentReplyError({required this.error});
+  @override
+  List<Object> get props => [error];
+}
+
 class CheckCommentLikeLoading extends SocialServiceState {}
 
 class CheckCommentLikeSuccess extends SocialServiceState {
@@ -609,3 +677,4 @@ class DownloadPostError extends SocialServiceState {
   @override
   List<Object> get props => [error];
 }
+

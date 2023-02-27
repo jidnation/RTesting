@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -13,6 +14,7 @@ import 'package:reach_me/core/utils/validator.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/otp_screen.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SignUpScreen extends HookWidget {
   static const String id = 'signup_screen';
@@ -100,26 +102,32 @@ class SignUpScreen extends HookWidget {
                                   fontFamily: 'Poppins',
                                 ),
                                 children: [
-                                  TextSpan(
-                                    text: 'Agreement ',
-                                    style: TextStyle(
-                                      color: AppColors.primaryColor,
-                                      fontSize: getScreenHeight(16),
-                                      fontWeight: FontWeight.normal,
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'and ',
-                                    style: TextStyle(
-                                      color: AppColors.textColor,
-                                      fontSize: getScreenHeight(16),
-                                      fontWeight: FontWeight.normal,
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
+                                  // TextSpan(
+                                  //   text: 'Agreement ',
+                                  //   style: TextStyle(
+                                  //     color: AppColors.primaryColor,
+                                  //     fontSize: getScreenHeight(16),
+                                  //     fontWeight: FontWeight.normal,
+                                  //     fontFamily: 'Poppins',
+                                  //   ),
+                                  // ),
+                                  // TextSpan(
+                                  //   text: 'and ',
+                                  //   style: TextStyle(
+                                  //     color: AppColors.textColor,
+                                  //     fontSize: getScreenHeight(16),
+                                  //     fontWeight: FontWeight.normal,
+                                  //     fontFamily: 'Poppins',
+                                  //   ),
+                                  // ),
                                   TextSpan(
                                     text: 'Privacy Policy',
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        launchUrlString(
+                                            'https://chainconsults.com/reachme/',
+                                            mode: LaunchMode.platformDefault);
+                                      },
                                     style: TextStyle(
                                       color: AppColors.primaryColor,
                                       fontSize: getScreenHeight(16),

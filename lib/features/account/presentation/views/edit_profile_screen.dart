@@ -43,8 +43,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     File? result;
 
     if (imageFile != null) {
-      print("::::::::::::: ");
       result = File(imageFile.path);
+      print("image ::::::::::::: ${imageFile.path}");
       try {
         result = await _cropImage(imageFile: result);
         File? image = result;
@@ -103,6 +103,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
 
     if (croppedImage == null) return null;
+    print("cropped ::::::::::::: ${croppedImage.path}");
     return File(croppedImage.path);
   }
 

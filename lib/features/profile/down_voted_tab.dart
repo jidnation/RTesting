@@ -8,8 +8,10 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class DownVotedTab extends StatefulWidget {
+  final String? authId;
   const DownVotedTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,9 @@ class _DownVotedTabState extends State<DownVotedTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myDownVotedPosts;
+          List<TimeLineModel> data = widget.authId != null
+              ? timeLineFeedStore.myRDownVotedPosts
+              : timeLineFeedStore.myDownVotedPosts;
           return NotificationListener<ScrollNotification>(
             child: SmartRefresher(
               physics: const BouncingScrollPhysics(),
@@ -48,6 +52,7 @@ class _DownVotedTabState extends State<DownVotedTab> {
                   isRefresh: true,
                   type: 'Downvote',
                   refreshController: _refreshController,
+                  userId: widget.authId,
                 );
               },
               controller: _refreshController,

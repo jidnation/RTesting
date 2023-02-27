@@ -9,9 +9,8 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class ReachTab extends StatefulWidget {
-  const ReachTab({
-    Key? key,
-  }) : super(key: key);
+  final String? authId;
+  const ReachTab({Key? key, this.authId}) : super(key: key);
 
   @override
   State<ReachTab> createState() => _ReachTabState();
@@ -40,11 +39,14 @@ class _ReachTabState extends State<ReachTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myPosts;
+          List<TimeLineModel> data = widget.authId != null
+              ? timeLineFeedStore.myRPosts
+              : timeLineFeedStore.myPosts;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
               timeLineFeedStore.fetchMyPost(
+                userId: widget.authId,
                 isRefresh: true,
                 refreshController: _refreshController,
                 // isRefresh: true,

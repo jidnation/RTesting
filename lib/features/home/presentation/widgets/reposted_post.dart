@@ -196,7 +196,7 @@ class RepostedPost extends StatelessWidget {
                       waitDuration: const Duration(seconds: 1),
                       showDuration: const Duration(seconds: 2),
                       child: Text(
-                        post.repostedPost!.edited! ? "(Reach Edited)" : "",
+                        post.repostedPost!.edited! ? "(edited)" : "",
                         style: TextStyle(
                           fontSize: getScreenHeight(12),
                           fontFamily: 'Poppins',

@@ -274,86 +274,34 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
                           ]),
                     )
                   ]),
-                  Visibility(
-                    // visible: !isUploading || !momentFeedStore.postingMoment,
-                    child: InkWell(
-                      onTap: () {
-                        // setState(() {
-                        //   isUploading = true;
-                        // });
-                        if (momentCtrl.audioFilePath.value.isNotEmpty) {
-                          momentFeedStore.postMoment(
-                            context,
-                            videoPath: momentCtrl.mergedVideoPath.value,
-                          );
-
-                          ///needed converted video
-                          // if (videoUrl != null) {
-                          //   var res = await MomentQuery.postMoment(
-                          //       videoMediaItem: videoUrl);
-                          //   if (res) {
-                          //     Snackbars.success(
-                          //       context,
-                          //       message: 'Moment successfully created',
-                          //       milliseconds: 1300,
-                          //     );
-                          //     momentFeedStore.fetchMoment();
-                          //     momentCtrl.clearPostingData();
-                          //     RouteNavigators.pop(context);
-                          //   } else {
-                          //     Snackbars.error(
-                          //       context,
-                          //       message: 'Operation Failed, Try again.',
-                          //       milliseconds: 1400,
-                          //     );
-                          //   }
-                          // }
-                          // if (fileUrl != null) {
-                          //   momentFeedStore.postMoment(context,
-                          //       videoUrl: fileUrl);
-                          // }
-                          // await MediaService().videoAudioMerger(
-                          //   context,
-                          //   videoPath: widget.videoFile.path,
-                          //   audioPath: momentCtrl.audioFilePath.value,
-                          //   time: momentCtrl.endTime.value,
-                          // );
-                          // String? videoUrl =
-                          //     await FileConverter().convertMe(filePath: vFile);
-                        } else {
-                          momentFeedStore.postMoment(
-                            context,
-                            videoPath: widget.videoFile.path,
-                          );
-                        }
-                        // setState(() {
-                        //   isUploading = false;
-                        // });
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                        ),
+                  InkWell(
+                    onTap: () {
+                      if (momentCtrl.audioFilePath.value.isNotEmpty) {
+                        momentFeedStore.postMoment(
+                          context,
+                          videoPath: momentCtrl.mergedVideoPath.value,
+                        );
+                      } else {
+                        momentFeedStore.postMoment(
+                          context,
+                          videoPath: widget.videoFile.path,
+                        );
+                      }
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                  // if (isUploading || momentFeedStore.postingMoment)
-                  //   const SizedBox(
-                  //     height: 20,
-                  //     width: 20,
-                  //     child: CircularProgressIndicator(
-                  //       strokeWidth: 5,
-                  //       color: AppColors.primaryColor,
-                  //     ),
-                  //   )
                 ]),
           ),
           SizedBox(height: getScreenHeight(90)),

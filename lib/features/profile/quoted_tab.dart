@@ -7,8 +7,10 @@ import '../timeline/timeline_control_room.dart';
 import '../timeline/timeline_feed.dart';
 
 class QuotedTab extends StatefulWidget {
+  final String? authId;
   const QuotedTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -38,14 +40,14 @@ class _QuotedTabState extends State<QuotedTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<TimeLineModel> data = timeLineFeedStore.myQuotedPosts;
+          List<TimeLineModel> data = widget.authId != null ? timeLineFeedStore.myRQuotedPosts : timeLineFeedStore.myQuotedPosts;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
               timeLineFeedStore.fetchMyPost(
                 isRefresh: true,
+                userId: widget.authId,
                 refreshController: _refreshController,
-                // isRefresh: true,
               );
             },
             controller: _refreshController,

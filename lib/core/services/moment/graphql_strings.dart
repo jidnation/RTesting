@@ -1,7 +1,7 @@
 //used
 const createMoment = r'''
-mutation($caption: String!, $hashTags: [String], $mentionList: [String], $sound: String, $videoMediaItem: String!) {
-    createMoment (momentBody: {caption : $caption, videoMediaItem: $videoMediaItem, sound: $sound, mentionList: $mentionList, hashTags: $hashTags}){
+mutation($caption: String!,$musicName: String, $hashTags: [String], $mentionList: [String], $sound: String, $videoMediaItem: String!) {
+    createMoment (momentBody: {caption : $caption, videoMediaItem: $videoMediaItem, sound: $sound, musicName: $musicName, mentionList: $mentionList, hashTags: $hashTags}){
     authId
     }
   }
@@ -15,15 +15,15 @@ mutation($momentId: String!) {
   }
 ''';
 
-const deleteMomentComment = r'''
-mutation($commentId: String!) {
-    deleteMomentComment (commentId: $commentId)
+const deleteMomentCommentReply = r'''
+mutation($replyId: String!, $commentId: String!) {
+    deleteMomentCommentReply (commentId: $commentId,replyId: $replyId)
   }
 ''';
 
-const deleteMomentCommentReply = r'''
-mutation($momentId: String!, $replyId: String!) {
-    deleteMomentCommentReply(momentId: $momentId, replyId: $replyId)
+const deleteMomentComment = r'''
+mutation($commentId: String!) {
+    deleteMomentComment (commentId: $commentId)
   }
 ''';
 
@@ -82,9 +82,23 @@ mutation($postId: String!, $commentId: String!) {
   }
 ''';
 
+const likeStreakCommentReply = r'''
+mutation($momentId: String!,$replyId: String!, $commentId: String!) {
+    likeMomentReply(replyId: $replyId, momentId: $momentId, commentId: $commentId){
+    authId
+  }
+  }
+''';
+
 const unlikeMomentComment = r'''
 mutation($commentId: String!, $likeId: String!) {
     unlikeMomentComment (commentId: $commentId, likeId: $likeId)
+    }
+''';
+
+const unlikeMomentCommentReply = r'''
+mutation($commentId: String!, $replyId: String!) {
+    unlikeMomentReply (commentId: $commentId, replyId: $replyId)
     }
 ''';
 
@@ -162,7 +176,7 @@ created_at,
       mentionList,
       hashTags,
       created_at,
-      
+     musicName,
     isLiked,
       nLikes,
       nComments,
@@ -282,6 +296,7 @@ query ($momentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
       username,
       firstName,
       lastName,
+      authId,
       location,
       profilePicture
     },
@@ -316,17 +331,51 @@ query ($authIdToGet: String, $pageNumber: Int!, $pageLimit: Int!) {
 
 const String getMomentCommentReplies = r''' 
 query ($momentId: String!,$commentId: String!, $pageNumber: Int!, $pageLimit: Int!) {
-  getMomentComments(momentId: $momentId,commentId: $commentId, page_limit: $pageLimit, page_number: $pageNumber){
-     authId,
-    commentId,
-    replyId,
+  getMomentCommentReplies(momentId: $momentId,commentId: $commentId, page_limit: $pageLimit, page_number: $pageNumber){
+     replyId,
+    content,
+    authId,
+    audioMediaItem,
     momentId,
-    profile{
-      username,
+    commentId,
+    imageMediaItems,
+    videoMediaItem,
+    nLikes,
+    isLiked,
+    created_at,
+    replySlug,
+    replyOwnerProfile{
+       firstName,
+      lastName,
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    momentOwnerProfile{
       firstName,
       lastName,
-      profilePicture
-    }
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    commentOwnerProfile{
+       firstName,
+      lastName,
+      location,
+      profileSlug,
+      profilePicture,
+      authId,
+      bio,
+      username
+    },
+    isLiked,
+    created_at
     }
   }
 ''';
@@ -539,33 +588,9 @@ query ($pageNumber: Int!, $pageLimit: Int! ) {
 const String getLikedPosts = r''' 
 query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
   getLikedPosts(page_limit: $pageLimit, page_number: $pageNumber, authId: $authId){
-    reachingRelationship,
     created_at,
-    updated_at,
-    feedOwnerProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        verified,
-        profileSlug,
-        location,
-        profilePicture,
-        location
-    },
-    voterProfile{
-       authId,
-        firstName,
-        lastName,
-        username,
-        bio,
-        profileSlug,
-        verified,
-        location,
-        profilePicture,
-        location
-    },
+    authId,
+    postId,
     post{
      repostedPost{
         authId,
@@ -667,7 +692,7 @@ query ($pageNumber: Int!, $pageLimit: Int! , $authId: String)  {
       created_at,
       updated_at
     }
-  }
+    }
   }
 
 ''';

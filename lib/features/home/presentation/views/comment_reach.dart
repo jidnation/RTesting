@@ -37,7 +37,6 @@ import '../../../dictionary/dictionary_bloc/bloc/dictionary_state.dart';
 import '../../../dictionary/presentation/views/add_to_glossary.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../profile/new_account.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/video_player.dart';
 import '../../data/models/comment_model.dart';
 import '../bloc/social-service-bloc/ss_bloc.dart';
@@ -47,9 +46,15 @@ import 'comment_reach_media.dart';
 
 class CommentReach extends StatefulHookWidget {
   final PostFeedModel? postFeedModel;
+  final PostFeedModel? commentPostFeedModel;
   List<UploadFileDto> mediaList;
+  final bool replyingComment;
   CommentReach(
-      {required this.postFeedModel, List<UploadFileDto>? mediaList, Key? key})
+      {required this.postFeedModel,
+      this.commentPostFeedModel,
+      this.replyingComment = false,
+      List<UploadFileDto>? mediaList,
+      Key? key})
       : mediaList = mediaList ?? [],
         super(key: key);
 
@@ -194,17 +199,33 @@ class _CommentReachState extends State<CommentReach> {
               imageMediaItem = [];
               imageMediaItem.add(state.image!);
             }
-            globals.socialServiceBloc!.add(CommentOnPostEvent(
-                postId: widget.postFeedModel!.postId,
-                userId: globals.user!.id,
-                content: globals.postContent,
-                postOwnerId: widget.postFeedModel!.postOwnerId,
-                audioMediaItem: audioMediaItem,
-                videoMediaItem: videoMediaItem,
-                imageMediaItems: imageMediaItem ?? []));
+            if (widget.replyingComment) {
+              globals.socialServiceBloc!.add(ReplyCommentOnPostEvent(
+                  postId: widget.postFeedModel!.postId!,
+                  postOwnerId: widget.commentPostFeedModel!.postOwnerId!,
+                  commentOwnerId: widget.postFeedModel!.postOwnerId!,
+                  content: controllerKey.currentState!.controller!.text,
+                  commentId: widget.postFeedModel!.post!.postId!,
+                  imageMediaItems: imageMediaItem ?? [],
+                  audioMediaItem: audioMediaItem,
+                  videoMediaItem: videoMediaItem));
+            } else {
+              globals.socialServiceBloc!.add(CommentOnPostEvent(
+                  postId: widget.postFeedModel!.postId,
+                  userId: globals.user!.id,
+                  content: globals.postContent,
+                  postOwnerId: widget.postFeedModel!.postOwnerId,
+                  audioMediaItem: audioMediaItem,
+                  videoMediaItem: videoMediaItem,
+                  imageMediaItems: imageMediaItem ?? []));
+            }
 
             RouteNavigators.routeReplace(
-                context, FullPostScreen(postFeedModel: widget.postFeedModel));
+                context,
+                FullPostScreen(
+                    postFeedModel: widget.replyingComment
+                        ? widget.commentPostFeedModel
+                        : widget.postFeedModel));
             controllerKey.currentState!.controller!.clear();
           }
 
@@ -294,44 +315,45 @@ class _CommentReachState extends State<CommentReach> {
                                 .currentState!.controller!.text.isNotEmpty ||
                             media.value != null) {
                           if (media.value != null) {
+                            Snackbars.success(context,
+                                message: 'Uploading Media...');
                             globals.socialServiceBloc!.add(
                                 MediaUploadEvent(media: media.value!.file));
-                            // .add(UploadPostMediaEvent(media: _mediaList));
                             globals.postContent =
                                 controllerKey.currentState!.controller?.text ??
                                     '';
                           } else {
-                            globals.socialServiceBloc!.add(CommentOnPostEvent(
-                                postId: widget.postFeedModel!.post!.postId,
+                            if (widget.replyingComment) {
+                              globals.socialServiceBloc!
+                                  .add(ReplyCommentOnPostEvent(
+                                postId: widget.postFeedModel!.postId!,
+                                postOwnerId:
+                                    widget.commentPostFeedModel!.postOwnerId!,
+                                commentOwnerId:
+                                    widget.postFeedModel!.postOwnerId!,
                                 content: controllerKey
                                     .currentState!.controller!.text,
-                                //audioMediaItem: ' ',
-                                userId: globals.user!.id,
-                                postOwnerId: widget.postFeedModel!.post!
-                                    .postOwnerProfile!.authId));
+                                commentId: widget.postFeedModel!.post!.postId!,
+                              ));
+                            } else {
+                              globals.socialServiceBloc!.add(CommentOnPostEvent(
+                                  postId: widget.postFeedModel!.post!.postId,
+                                  content: controllerKey
+                                      .currentState!.controller!.text,
+                                  userId: globals.user!.id,
+                                  postOwnerId: widget.postFeedModel!.post!
+                                      .postOwnerProfile!.authId));
+                            }
 
                             RouteNavigators.routeReplace(
                                 context,
                                 FullPostScreen(
-                                    postFeedModel: widget.postFeedModel));
+                                    postFeedModel: widget.replyingComment
+                                        ? widget.commentPostFeedModel
+                                        : widget.postFeedModel));
                             controllerKey.currentState!.controller!.clear();
                           }
-                          // globals.socialServiceBloc!.add(CreateRepostEvent(
-                          //     input: CreateRepostInput(
-                          //         repostedPostId: widget.postFeedModel.postId,
-                          //         repostedPostOwnerId:
-                          //             widget.postFeedModel.postOwnerId,
-                          //         content: controller.text,
-                          //         location: globals.user!.showLocation!
-                          //             ? globals.location!
-                          //             : 'nil',
-                          //         postRating: 'normal',
-                          //         commentOption: 'everyone')));
                         }
-
-                        // RouteNavigators.route(context,
-                        //     FullPostScreen(postFeedModel: widget.postFeedModel));
-                        // controllerKey.currentState!.controller!.clear();
                       },
                     ),
                   ],
@@ -527,7 +549,12 @@ class _CommentReachState extends State<CommentReach> {
                                                                   .postFeedModel!
                                                                   .post!
                                                                   .location ==
-                                                              null
+                                                              null ||
+                                                          widget
+                                                              .postFeedModel!
+                                                              .post!
+                                                              .location!
+                                                              .isEmpty
                                                       ? ''
                                                       : widget
                                                                   .postFeedModel!
@@ -536,14 +563,17 @@ class _CommentReachState extends State<CommentReach> {
                                                                   .length >
                                                               23
                                                           ? widget
-                                                              .postFeedModel!
-                                                              .post!
-                                                              .location!
-                                                              .substring(0, 23)
+                                                                  .postFeedModel!
+                                                                  .post!
+                                                                  .location!
+                                                                  .substring(
+                                                                      0, 23) +
+                                                              "  "
                                                           : widget
-                                                              .postFeedModel!
-                                                              .post!
-                                                              .location!,
+                                                                  .postFeedModel!
+                                                                  .post!
+                                                                  .location! +
+                                                              "  ",
                                                   style: TextStyle(
                                                     fontSize:
                                                         getScreenHeight(10),
@@ -563,7 +593,7 @@ class _CommentReachState extends State<CommentReach> {
                                                     fontWeight: FontWeight.w400,
                                                     color: AppColors.textColor2,
                                                   ),
-                                                ).paddingOnly(l: 6),
+                                                ),
                                               ],
                                             )
                                           ],
@@ -708,16 +738,18 @@ class _CommentReachState extends State<CommentReach> {
                                 }
                               },
 
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 counterText: '',
-                                hintText: "Comment to this reach",
-                                hintStyle: TextStyle(
+                                hintText: widget.replyingComment
+                                    ? "Reply this comment"
+                                    : "Comment to this reach",
+                                hintStyle: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.greyShade1,
                                 ),
                                 border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 10,
                                 ),
@@ -1154,7 +1186,7 @@ class _CommentReachState extends State<CommentReach> {
                                                 leading: SvgPicture.asset(
                                                     'assets/svgs/people-you-follow.svg'),
                                                 title: Text(
-                                                  'People  reaching you',
+                                                  'People reaching you',
                                                   style: TextStyle(
                                                     fontSize:
                                                         getScreenHeight(16),

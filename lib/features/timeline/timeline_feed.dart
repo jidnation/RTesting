@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
@@ -20,10 +19,9 @@ import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_controller.dart';
 import 'package:reach_me/features/timeline/timeline_post_reach.dart';
 import 'package:reach_me/features/timeline/timeline_user_story.dart';
-import 'dart:ui' as ui;
+
 import '../../core/components/profile_picture.dart';
 import '../../core/components/rm_spinner.dart';
-import '../../core/components/snackbar.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/app_globals.dart';
 import '../../core/utils/constants.dart';
@@ -32,6 +30,7 @@ import '../chat/presentation/views/chats_list_screen.dart';
 import '../home/presentation/bloc/user-bloc/user_bloc.dart';
 import '../home/presentation/views/status/view.status.dart';
 import '../moment/user_posting.dart';
+import '../moment/video_effect.dart';
 
 class TimeLineFeed extends StatefulWidget {
   static const String id = "timeline_screen";
@@ -136,9 +135,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                   height: getScreenHeight(25),
                 ),
                 onPressed: () => RouteNavigators.route(
-                  context,
-                  const ChatsListScreen(),
-                ),
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut))),
               ).paddingOnly(right: 16),
             ],
           ),
@@ -146,6 +146,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
             onHorizontalDragEnd: (dragEndDetails) {
               if (dragEndDetails.primaryVelocity! < 0) {
                 // Swipe Right
+                RouteNavigators.route(
+                    context,
+                    const ChatsListScreen(),
+                    Tween(begin: const Offset(1, 0), end: Offset.zero)
+                      ..chain(CurveTween(curve: Curves.easeInOut)));
               } else if (dragEndDetails.primaryVelocity! > 0) {
                 // Swipe Left
                 widget.scaffoldKey!.currentState!.openDrawer();
@@ -157,6 +162,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
               child: ValueListenableBuilder(
                   valueListenable: TimeLineFeedStore(),
                   builder: (context, List<TimeLineModel> value, child) {
+                    print('from the timeLine room.........??? $value }');
                     final List<StatusModel> _myStatus =
                         timeLineFeedStore.myStatus;
                     List<StatusFeedResponseModel> _userStatus =
@@ -209,17 +215,17 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                 hasWatched: false,
                                                 username: 'Add Status',
                                                 isMeOnTap: () async {
-                                                  var cameras =
-                                                      await availableCameras();
+                                                  // var cameras =
+                                                  //     await availableCameras();
                                                   final res =
                                                       await RouteNavigators
                                                           .route(
-                                                              context,
-                                                              UserPosting(
-                                                                phoneCameras:
-                                                                    cameras,
-                                                                initialIndex: 0,
-                                                              ));
+                                                    context,
+                                                    // const VideoEffectRoom()
+                                                    const UserPosting(
+                                                      initialIndex: 0,
+                                                    ),
+                                                  );
                                                   if (res == null) return;
                                                   timeLineFeedStore
                                                       .addNewStatus(
@@ -234,18 +240,34 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                   preview: _myStatus.last,
                                                   statusCount: _myStatus.length,
                                                   username: 'Your Status',
-                                                  onTap: () {
-                                                    RouteNavigators.route(
-                                                        context,
-                                                        StatusViewPage(
-                                                          isMe: true,
-                                                          status: _myStatus
-                                                              .map((e) => StatusFeedModel(
-                                                                  status: e,
-                                                                  statusOwnerProfile:
-                                                                      e.profileModel))
-                                                              .toList(),
-                                                        ));
+                                                  onTap: () async {
+                                                    // RouteNavigators.route(
+                                                    //     context,
+                                                    //     ViewMyStatus(
+                                                    //         status: _myStatus));
+
+                                                    final res =
+                                                        await RouteNavigators
+                                                            .route(
+                                                                context,
+                                                                StatusViewPage(
+                                                                  isMe: true,
+                                                                  status: _myStatus
+                                                                      .map((e) => StatusFeedModel(
+                                                                          status:
+                                                                              e,
+                                                                          statusOwnerProfile:
+                                                                              e.profileModel))
+                                                                      .toList(),
+                                                                ));
+                                                    if (res == null) return;
+                                                    timeLineFeedStore
+                                                        .updateMyStatus((res
+                                                                as List<
+                                                                    StatusFeedModel>)
+                                                            .map((e) =>
+                                                                e.status!)
+                                                            .toList());
                                                   },
                                                 ),
                                               SizedBox(
@@ -258,12 +280,10 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                       Axis.horizontal,
                                                   shrinkWrap: true,
                                                   physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          SizedBox(
-                                                            width: 16,
-                                                          ),
+                                                      const NeverScrollableScrollPhysics(),
+                                                  separatorBuilder: (context,
+                                                          index) =>
+                                                      const SizedBox(width: 16),
                                                   itemBuilder: (context,
                                                           index) =>
                                                       StatusBubble(
@@ -300,10 +320,18 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                             return;
                                                           if (res
                                                               is MuteResult) {
-                                                            timeLineFeedStore
-                                                                .muteStatus(
-                                                                    index);
+                                                            // timeLineFeedStore
+                                                            //     .muteStatus(
+                                                            //         index);
+                                                            await timeLineFeedStore
+                                                                .getUserStatus();
                                                           }
+
+                                                          // Navigator.push(
+                                                          //     context,
+                                                          //     MaterialPageRoute(
+                                                          //         builder: (c) =>
+                                                          //             const StoryPage()));
                                                         },
                                                       ),
                                                   itemCount:
@@ -377,9 +405,11 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                                       .status!)));
                                                       if (res == null) return;
                                                       if (res is MuteResult) {
-                                                        timeLineFeedStore
-                                                            .unMuteStatus(
-                                                                index);
+                                                        // timeLineFeedStore
+                                                        //     .unMuteStatus(
+                                                        //         index);
+                                                        await timeLineFeedStore
+                                                            .getUserStatus();
                                                       }
                                                     },
                                                   ),
@@ -399,6 +429,7 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                             refreshController:
                                                 _refreshController,
                                             isRefreshing: true,
+                                            isRefresh: true,
                                           );
                                         },
                                         controller: _refreshController,
@@ -417,12 +448,14 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                       .currentContext!
                                                       .findRenderObject()
                                                   as RenderRepaintBoundary; // the key provided
-                                              ui.Image image =
-                                                  await boundary.toImage();
+                                              ui.Image image = await boundary
+                                                  .toImage(pixelRatio: 4);
                                               ByteData? byteData =
                                                   await image.toByteData(
                                                       format: ui
                                                           .ImageByteFormat.png);
+                                              debugPrint(
+                                                  "Byte Data: $byteData");
                                               await timeLineController
                                                   .saveImage(
                                                       context,
@@ -440,10 +473,6 @@ class _TimeLineFeedState extends State<TimeLineFeed>
                                                     bottom: 15),
                                                 child: RepaintBoundary(
                                                   key: src,
-
-                                                  ///
-                                                  /// test 3
-                                                  /// convert this stack widget to its column equivalent
                                                   child: Stack(children: [
                                                     TimeLineBox(
                                                       userStatusFeed:

@@ -15,6 +15,7 @@ import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 
 import '../../features/call/presentation/bloc/call_bloc.dart';
+import '../../features/home/presentation/bloc/notifications-bloc/bloc/notifications_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -31,6 +32,7 @@ class AppGlobals {
   CallBloc? callBloc;
 
   SocialServiceBloc? socialServiceBloc;
+  NotificationsBloc? notificationsBloc;
   DictionaryBloc? dictionaryBloc;
   String? token;
   String? email;
@@ -64,6 +66,7 @@ class AppGlobals {
     userBloc = UserBloc();
     chatBloc = ChatBloc();
     callBloc = CallBloc();
+    notificationsBloc = NotificationsBloc();
     socialServiceBloc = SocialServiceBloc();
     dictionaryBloc = DictionaryBloc();
     token = '';

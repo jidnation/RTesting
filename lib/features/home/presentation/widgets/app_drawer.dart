@@ -1,4 +1,6 @@
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reach_me/core/components/profile_picture.dart';
@@ -8,7 +10,6 @@ import 'package:reach_me/core/utils/app_globals.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/core/utils/extensions.dart';
-import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/account/presentation/views/account.details.dart';
 import 'package:reach_me/features/account/presentation/views/saved_post.dart';
 import 'package:reach_me/features/account/presentation/views/scan_qr_code.dart';
@@ -17,8 +18,10 @@ import 'package:reach_me/features/auth/presentation/views/login_screen.dart';
 import 'package:reach_me/features/auth/presentation/views/signup_screen.dart';
 import 'package:reach_me/features/dictionary/presentation/views/dictionary_view.dart';
 
-import '../../../profile/new_account.dart';
+import '../../../account/presentation/views/edit_profile_screen.dart';
 import '../../../moment/user_posting.dart';
+import '../../../profile/contact_us.dart';
+import '../../../profile/new_account.dart';
 import '../../../timeline/timeline_feed.dart';
 
 class AppDrawer extends HookWidget {
@@ -38,168 +41,171 @@ class AppDrawer extends HookWidget {
               child: Material(
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        borderRadius: BorderRadius.circular(30),
-                        splashColor: AppColors.backgroundShade4,
-                        onTap: () {
-                          RouteNavigators.route(context, const NewAccountScreen());
-                        },
-                        child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: ProfilePicture(
-                              height: 80,
-                            )),
-                      ),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(25),
-                        splashColor: AppColors.backgroundShade4,
-                        onTap: () {
-                          RouteNavigators.route(context, const NewAccountScreen());
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                        .toTitleCase(),
-                                    style: TextStyle(
-                                      color: AppColors.textColor2,
-                                      fontSize: getScreenHeight(16),
-                                      fontWeight: FontWeight.w600,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          borderRadius: BorderRadius.circular(30),
+                          splashColor: AppColors.backgroundShade4,
+                          onTap: () {
+                            RouteNavigators.route(
+                                context, const NewAccountScreen());
+                          },
+                          child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: ProfilePicture(
+                                height: 80,
+                              )),
+                        ),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(25),
+                          splashColor: AppColors.backgroundShade4,
+                          onTap: () {
+                            RouteNavigators.route(
+                                context, const NewAccountScreen());
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      ('${globals.user!.firstName} ${globals.user!.lastName}')
+                                          .toTitleCase(),
+                                      style: TextStyle(
+                                        color: AppColors.textColor2,
+                                        fontSize: getScreenHeight(16),
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '@${globals.user!.username!}',
-                                    style: TextStyle(
-                                      color: const Color(0xFF6C6A6A),
-                                      fontSize: getScreenHeight(15),
-                                      fontWeight: FontWeight.w400,
+                                    Text(
+                                      '@${globals.user?.username ?? ''}',
+                                      style: TextStyle(
+                                        color: const Color(0xFF6C6A6A),
+                                        fontSize: getScreenHeight(15),
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              // GestureDetector(
-                              //   onTap: () =>
-                              //       showOtherItem.value = !showOtherItem.value,
-                              //   child: Padding(
-                              //     padding: const EdgeInsets.all(8.0),
-                              //     child: Icon(
-                              //       showOtherItem.value
-                              //           ? Icons.keyboard_arrow_down
-                              //           : Icons.keyboard_arrow_up,
-                              //       color: AppColors.textColor2,
-                              //       size: 20,
-                              //     ),
-                              //   ),
-                              // ),
-                            ],
+                                  ],
+                                ),
+                                // GestureDetector(
+                                //   onTap: () =>
+                                //       showOtherItem.value = !showOtherItem.value,
+                                //   child: Padding(
+                                //     padding: const EdgeInsets.all(8.0),
+                                //     child: Icon(
+                                //       showOtherItem.value
+                                //           ? Icons.keyboard_arrow_down
+                                //           : Icons.keyboard_arrow_up,
+                                //       color: AppColors.textColor2,
+                                //       size: 20,
+                                //     ),
+                                //   ),
+                                // ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: getScreenHeight(5)),
-                      Row(
-                        children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(25),
-                            splashColor: AppColors.backgroundShade4,
-                            onTap: () {
-                              RouteNavigators.route(
-                                  context, const AccountStatsInfo());
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReachers.toString(),
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.textColor2,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Reachers',
-                                        style: TextStyle(
-                                          fontSize: getScreenHeight(16),
-                                          color: AppColors.greyShade2,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: getScreenWidth(20)),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(25),
-                            splashColor: AppColors.backgroundShade4,
-                            onTap: () {
-                              RouteNavigators.route(
-                                  context,
-                                  const AccountStatsInfo(
-                                    index: 1,
-                                  ));
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        globals.user!.nReaching.toString(),
-                                        style: TextStyle(
+                        SizedBox(height: getScreenHeight(5)),
+                        Row(
+                          children: [
+                            InkWell(
+                              borderRadius: BorderRadius.circular(25),
+                              splashColor: AppColors.backgroundShade4,
+                              onTap: () {
+                                RouteNavigators.route(
+                                    context, const AccountStatsInfo());
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          globals.user!.nReachers.toString(),
+                                          style: TextStyle(
                                             fontSize: getScreenHeight(16),
                                             color: AppColors.textColor2,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(width: getScreenWidth(5)),
-                                      Text(
-                                        'Reaching',
-                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(width: getScreenWidth(5)),
+                                        Text(
+                                          'Reachers',
+                                          style: TextStyle(
                                             fontSize: getScreenHeight(16),
                                             color: AppColors.greyShade2,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ]
-                                  ),
-                                ]
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                    ]
-                  ),
+                            SizedBox(width: getScreenWidth(20)),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(25),
+                              splashColor: AppColors.backgroundShade4,
+                              onTap: () {
+                                RouteNavigators.route(
+                                    context,
+                                    const AccountStatsInfo(
+                                      index: 1,
+                                    ));
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              globals.user!.nReaching
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(16),
+                                                  color: AppColors.textColor2,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            SizedBox(width: getScreenWidth(5)),
+                                            Text(
+                                              'Reaching',
+                                              style: TextStyle(
+                                                  fontSize: getScreenHeight(16),
+                                                  color: AppColors.greyShade2,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ]),
+                                    ]),
+                              ),
+                            )
+                          ],
+                        ),
+                      ]),
                 ),
               ),
             ),
@@ -247,7 +253,8 @@ class AppDrawer extends HookWidget {
                         onPressed: () {
                           momentCtrl.userBar.value?.currentState!.closeDrawer();
                           timeLineController.isScrolling(false);
-                          RouteNavigators.route(context, const NewAccountScreen());
+                          RouteNavigators.route(
+                              context, const NewAccountScreen());
 
                           // RouteNavigators.route(context, const AccountScreen());
                         }),
@@ -256,7 +263,8 @@ class AppDrawer extends HookWidget {
                       icon: 'assets/svgs/reaches.svg',
                       onPressed: () {
                         momentCtrl.userBar.value?.currentState!.closeDrawer();
-                        RouteNavigators.route(context, const NewAccountScreen());
+                        RouteNavigators.route(
+                            context, const NewAccountScreen());
                       },
                     ),
                     DrawerItem(
@@ -269,15 +277,21 @@ class AppDrawer extends HookWidget {
                       action: 'Dictionary',
                       icon: 'assets/svgs/dictionary.svg',
                       onPressed: () {
-                      momentCtrl.userBar.value?.currentState!.closeDrawer();
-                        RouteNavigators.route(
-                          context, const DictionaryView());
-                    },),
+                        momentCtrl.userBar.value?.currentState!.closeDrawer();
+                        RouteNavigators.route(context, const DictionaryView());
+                      },
+                    ),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
                     DrawerItem(
                       action: 'Settings',
                       icon: 'assets/svgs/Setting.svg',
-                      onPressed: () {},
+                      onPressed: () {
+                        momentCtrl.userBar.value?.currentState!.closeDrawer();
+                        RouteNavigators.route(
+                          context,
+                          const EditProfileScreen(),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     const Divider(color: Color(0xFFEBEBEB), thickness: 0.5),
@@ -289,7 +303,10 @@ class AppDrawer extends HookWidget {
             child: DrawerItem(
               action: 'Help Center',
               icon: 'assets/svgs/help.svg',
-              onPressed: () {},
+              onPressed: () {
+                momentCtrl.userBar.value?.currentState!.closeDrawer();
+                RouteNavigators.route(context, const ContactUs());
+              },
             ),
           ),
           Visibility(
@@ -307,9 +324,11 @@ class AppDrawer extends HookWidget {
           DrawerItem(
             action: 'Logout',
             icon: 'assets/svgs/logout.svg',
-            onPressed: () {
+            onPressed: () async {
               globals.authBloc!.add(LogoutEvent());
-              SecureStorage.deleteSecureData();
+              await SecureStorage.deleteSecureData();
+              await FastCachedImageConfig.clearAllCachedImages();
+              await DefaultCacheManager().emptyCache();
               RouteNavigators.routeNoWayHome(context, const LoginScreen());
             },
           ),

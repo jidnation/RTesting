@@ -18,7 +18,6 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../models/file_result.dart';
-import '../utils/file_url_converter.dart';
 import '../utils/file_utils.dart';
 
 class MediaService {
@@ -316,6 +315,9 @@ class MediaService {
     if (requestType == null) {
       res = await AssetPicker.pickAssets(context,
           pickerConfig: AssetPickerConfig(
+            // pickerTheme: ThemeData(
+            //   navigationBarTheme:
+            // ),
             maxAssets: maxAssets ?? 1,
             specialPickerType: SpecialPickerType.noPreview,
           ));
@@ -326,8 +328,8 @@ class MediaService {
               maxAssets: maxAssets ?? 1,
               requestType: requestType));
     }
+    print("::::::>>>>>> am here gallery ::::::::");
     if (res == null || res.isEmpty) return null;
-
     List<FileResult> results = [];
     for (var e in res) {
       final file = await e.originFile;
@@ -336,6 +338,7 @@ class MediaService {
       if (FileUtils.isVideo(file)) {
         thumbnail = (await getVideoThumbnail(videoPath: file.path))?.path;
       }
+
       results.add(FileResult(
           path: file.path,
           size: file.lengthSync() / 1024,

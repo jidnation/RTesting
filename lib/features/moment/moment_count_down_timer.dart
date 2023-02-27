@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:deepar_flutter/deepar_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:reach_me/features/moment/user_posting.dart';
@@ -28,7 +29,7 @@ class CountDown extends ValueNotifier<int> {
 
 class CountDownTimer extends HookWidget {
   final int from;
-  final CameraController vController;
+  final DeepArController vController;
   const CountDownTimer({
     required this.vController,
     required this.from,

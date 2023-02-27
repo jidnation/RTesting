@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:deepar_flutter/deepar_flutter.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:file_picker/file_picker.dart';
@@ -23,13 +24,14 @@ class MomentVideoControl {
   VideoPlayerController? videoController;
 
   Future<bool> startVideoRecording(
-      {required CameraController? videoController}) async {
-    if (videoController!.value.isRecordingVideo) {
+      {required DeepArController? videoController}) async {
+    if (videoController!.isRecording) {
       // A recording has already started, do nothing.
       return true;
     }
     try {
       await videoController.startVideoRecording();
+      momentCtrl.isRecording(true);
       return true;
       // setState(() {
       //   _isRecordingInProgress = true;
@@ -41,18 +43,19 @@ class MomentVideoControl {
     }
   }
 
-  Future<XFile?> stopVideoRecording({
-    required CameraController? videoController,
+  Future<File?> stopVideoRecording({
+    required DeepArController? videoController,
   }) async {
-    if (!videoController!.value.isRecordingVideo) {
+    if (!videoController!.isRecording) {
       return null;
     }
     try {
-      XFile file = await videoController.stopVideoRecording();
+      File file = await videoController.stopVideoRecording();
       // setState(() {
       //   _isRecordingInProgress = false;
       //   print(_isRecordingInProgress);
       // });
+      momentCtrl.isRecording(false);
       return file;
     } on CameraException catch (e) {
       return null;
@@ -67,6 +70,7 @@ class MomentVideoControl {
       return;
     }
     try {
+      momentCtrl.isRecording(false);
       await videoController.pauseVideoRecording();
     } on CameraException catch (e) {}
   }
@@ -214,6 +218,7 @@ class MomentVideoControl {
             ]));
 
     String timeLimit = '00:00:';
+    File('/storage/emulated/0/Download/viewer.mp4').delete();
     int time = momentCtrl.endTime.value;
     String videoPath = videoFile.path;
     String audioPath = momentCtrl.audioFilePath.value;

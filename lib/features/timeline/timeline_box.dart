@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +62,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
       await [Permission.storage].request();
       String time = DateTime.now().microsecondsSinceEpoch.toString();
       final name = 'screenshot_${time}_reachme';
-      final result = await ImageGallerySaver.saveImage(bytes!, name: name);
+      final result =
+          await ImageGallerySaver.saveImage(bytes!, name: name, quality: 200);
       debugPrint("Result ${result['filePath']}");
       Snackbars.success(context, message: 'Image saved to Gallery');
       RouteNavigators.pop(context);
@@ -132,8 +132,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                 GestureDetector(
                   onTap: widget.userStatusFeed != null
                       ? () async {
-                          if (widget.userStatusFeed!
-                              .any((e) => e.id == tPostOwnerInfo!.username)) {
+                          if (widget.userStatusFeed!.any(
+                              (e) => e.username == tPostOwnerInfo!.username)) {
                             showProfilePictureOrViewStatus(context,
                                 tPostOwnerInfo: tPostOwnerInfo!,
                                 userStatus: widget.userStatusFeed!);
@@ -207,7 +207,8 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                                               context, const NewAccountScreen())
                                           : RouteNavigators.route(
                                               context,
-                                              RecipientAccountProfile(
+                                              // RecipientAccountProfile(
+                                              RecipientNewAccountScreen(
                                                 recipientEmail: 'email',
                                                 recipientImageUrl: widget
                                                     .timeLineModel
@@ -323,7 +324,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
                 visible: tPostInfo.content!.isNotEmpty,
                 child: ExpandableText(
                   "${tPostInfo.content}",
-                  prefixText: tPostInfo.edited! ? "(Reach Edited)" : null,
+                  prefixText: tPostInfo.edited! ? "(edited)" : null,
                   prefixStyle: TextStyle(
                       fontSize: getScreenHeight(12),
                       fontFamily: 'Poppins',
@@ -413,7 +414,7 @@ class _TimeLineBoxState extends State<TimeLineBox> {
               Visibility(
                 visible: tPostInfo.audioMediaItem!.isNotEmpty,
                 child: Container(
-                  height: 59,
+                  height: 48,
                   margin: const EdgeInsets.only(bottom: 10),
                   width: SizeConfig.screenWidth,
                   decoration: BoxDecoration(

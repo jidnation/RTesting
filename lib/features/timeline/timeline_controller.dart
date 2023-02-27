@@ -1,34 +1,45 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:reach_me/core/components/custom_button.dart';
 import 'package:reach_me/core/utils/dialog_box.dart';
 import 'package:reach_me/features/timeline/timeline_control_room.dart';
 import 'package:reach_me/features/timeline/timeline_feed.dart';
-import 'dart:ui' as ui;
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../core/components/snackbar.dart';
 import '../../core/services/moment/querys.dart';
 import '../../core/services/navigation/navigation_service.dart';
 import '../../core/utils/custom_text.dart';
 import '../../core/utils/dimensions.dart';
-import '../moment/moment_feed.dart';
 
 class TimeLineController extends GetxController {
   RxList<CustomCounter> likeBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox2 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBoxR2 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeBox3 = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeBoxR3 = <CustomCounter>[].obs;
   RxList<CustomCounter> likeUpBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRUpBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeSavedBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRSavedBox = <CustomCounter>[].obs;
   RxList<CustomCounter> likeDownBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRDownBox = <CustomCounter>[].obs;
   RxInt currentIndex = 1.obs;
+  RxInt currentPageIndex = 0.obs;
   RxList<CustomCounter> likeCommentBox = <CustomCounter>[].obs;
+  RxList<CustomCounter> likeRCommentBox = <CustomCounter>[].obs;
   RxBool isScrolling = false.obs;
   RxBool currentStatus = false.obs;
   RxString currentId = "".obs;
+  RxString userFullName = "".obs;
+  RxString userEmail = "".obs;
+  RxString userPhoneNumber = "".obs;
+  RxString userMessage = "".obs;
 
   ///
   /// test 4
@@ -111,7 +122,7 @@ class TimeLineController extends GetxController {
   void takeScreenShot(context, GlobalKey<State<StatefulWidget>> src) async {
     RenderRepaintBoundary boundary = src.currentContext!.findRenderObject()
         as RenderRepaintBoundary; // the key provided
-    ui.Image image = await boundary.toImage(pixelRatio: 0.1);
+    ui.Image image = await boundary.toImage(pixelRatio: 4);
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     debugPrint("Byte Data: $byteData");
     await saveImage(context, byteData!.buffer.asUint8List());
@@ -203,5 +214,38 @@ class TimeLineController extends GetxController {
                 ),
               ])
             ]));
+  }
+
+  sendMail(BuildContext context) async {
+    String? encodeQueryParameters(Map<String, String> params) {
+      return params.entries
+          .map((MapEntry<String, String> e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+    }
+
+    final Uri _emailLaunchUri = Uri(
+        scheme: 'mailto',
+        path: 'televerseapps@gmail.com',
+        query: encodeQueryParameters({
+          'subject': "User Compliant",
+          'body':
+              "Name: ${userFullName.value}\nPhone Number: ${userPhoneNumber.value}\ncompliant: ${userMessage.value}",
+        }));
+
+    if (await canLaunchUrl(_emailLaunchUri)) {
+      bool res = await launchUrl(_emailLaunchUri);
+      if (res) {
+        Get.back();
+        Snackbars.success(context,
+            message:
+                'You have successfully submit your compliant, we will contact you soon.');
+        userFullName("");
+        userPhoneNumber("");
+        userMessage("");
+      }
+    } else {
+      throw 'Could not Launch $_emailLaunchUri.toString()';
+    }
   }
 }

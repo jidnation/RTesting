@@ -10,8 +10,10 @@ import 'comment_action_box.dart';
 import 'comment_box.dart';
 
 class CommentsTab extends StatefulWidget {
+  final String? authId;
   const CommentsTab({
     Key? key,
+    this.authId,
   }) : super(key: key);
 
   @override
@@ -41,14 +43,16 @@ class _CommentsTabState extends State<CommentsTab> {
     return ValueListenableBuilder(
         valueListenable: TimeLineFeedStore(),
         builder: (context, List<TimeLineModel> value, child) {
-          List<GetPersonalComment> data = timeLineFeedStore.myPersonalComments;
+          List<GetPersonalComment> data = widget.authId != null
+              ? timeLineFeedStore.myRPersonalComments
+              : timeLineFeedStore.myPersonalComments;
           return SmartRefresher(
             physics: const BouncingScrollPhysics(),
             onRefresh: () {
               timeLineFeedStore.fetchMyComments(
                 isRefresh: true,
                 refreshController: _refreshController,
-                // isRefresh: true,
+                userId: widget.authId,
               );
             },
             controller: _refreshController,

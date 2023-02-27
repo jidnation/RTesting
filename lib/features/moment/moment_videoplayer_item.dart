@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../core/utils/custom_text.dart';
+import '../../core/utils/dimensions.dart';
+import '../timeline/loading_widget.dart';
 import 'moment_feed.dart';
 
 class VideoPlayerItem extends StatefulWidget {
@@ -39,25 +43,17 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
     setState(() {});
   }
 
+  final deviceRatio = SizeConfig.screenWidth / SizeConfig.screenHeight;
   void _createChewieController() {
     _chewieController = ChewieController(
-      // aspectRatio: _videoPlayerController.value.aspectRatio,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
       allowFullScreen: true,
-      // fullScreenByDefault: true,
+      aspectRatio: 9 / 15.5,
+      maxScale: 5,
+      //     (0.9 * _videoPlayerController.value.aspectRatio) / deviceRatio,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
+      // showOptions: false,
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -71,9 +67,8 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
         bufferedColor: Colors.lightGreen,
       ),
       placeholder: Container(
-        color: const Color(0xff001824),
+        color: Colors.white,
       ),
-      // autoInitialize: true,
     );
     momentFeedStore.videoCtrl(true, vController: _videoPlayerController);
   }
@@ -93,28 +88,27 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> :::::: ${size.width}");
     return
         // Stack(children: [
         Container(
       width: size.width,
-      height: size.height,
+      height: size.height - 110,
       decoration: const BoxDecoration(
-        color: AppColors.audioPlayerBg,
+        color: Colors.white,
       ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
-          ? AspectRatio(
-              aspectRatio: _videoPlayerController.value.aspectRatio,
+          ? Transform.scale(
+              scaleY: SizeConfig.screenHeight > 785 ? 1.055 : 1,
+              scaleX: SizeConfig.screenWidth > 385 ? 1.065 : 1,
               child: Chewie(
                 controller: _chewieController!,
-              ))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
+              ),
+            )
+          : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
     );
   }
 }
@@ -154,23 +148,14 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      aspectRatio: 3.8 / 3.3,
+      // aspectRatio: 3.8 / 3.3,
+      aspectRatio: _videoPlayerController.value.aspectRatio,
+      // aspectRatio: 1,
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
+      // showOptions: false,
       allowFullScreen: true,
-      // fullScreenByDefault: true,
       looping: true,
-      // progressIndicatorDelay:
-      //     bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: toggleVideo,
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -205,13 +190,11 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return
-        // Stack(children: [
-        Container(
+    return Container(
       width: size.width,
       height: size.height,
       decoration: const BoxDecoration(
-        color: AppColors.audioPlayerBg,
+        color: Colors.white,
       ),
       child: _chewieController != null &&
               _chewieController!.videoPlayerController.value.isInitialized
@@ -220,13 +203,9 @@ class _VideoPlayerItem2State extends State<VideoPlayerItem2> {
               child: Chewie(
                 controller: _chewieController!,
               ))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Loading'),
-                ]),
+          : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              loadingEffect2(),
+            ]),
     );
   }
 }

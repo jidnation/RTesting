@@ -34,7 +34,6 @@ import '../../../home/presentation/widgets/post_media.dart';
 import '../../../home/presentation/widgets/reposted_post.dart';
 import '../../../moment/moment_audio_player.dart';
 import '../../../profile/new_account.dart';
-import '../../../profile/recipientNewAccountProfile.dart';
 import '../../../timeline/video_player.dart';
 
 class SavedPostScreen extends StatefulHookWidget {
@@ -73,12 +72,16 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
           Tab(child: Text('All Posts')),
           Tab(child: Text('Videos')),
           Tab(child: Text('Audios')),
+          Tab(child: Text('Mixed')),
         ],
       );
 
   @override
   Widget build(BuildContext context) {
     final _savedPosts = useState<List<SavePostModel>>([]);
+    final _videoSavedPosts = useState<List<SavePostModel>>([]);
+    final _audioSavedPosts = useState<List<SavePostModel>>([]);
+    final _mediaSavedPosts = useState<List<SavePostModel>>([]);
     final reachDM = useState(false);
     final viewProfile = useState(false);
     final shoutingDown = useState(false);
@@ -121,7 +124,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
         toolbarHeight: 50,
       ),
       body: DefaultTabController(
-        length: 3,
+        length: 4,
         child: BlocListener<UserBloc, UserState>(
           bloc: globals.userBloc,
           listener: (context, state) {
@@ -151,6 +154,21 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
             listener: (context, state) {
               if (state is GetAllSavedPostsSuccess) {
                 _savedPosts.value = state.data!;
+                _videoSavedPosts.value = state.data!
+                    .where((e) => ((e.post.videoMediaItem ?? '').isNotEmpty &&
+                        (e.post.audioMediaItem ?? '').isEmpty &&
+                        (e.post.imageMediaItems ?? []).isEmpty))
+                    .toList();
+                _audioSavedPosts.value = state.data!
+                    .where((e) => ((e.post.videoMediaItem ?? '').isEmpty &&
+                        (e.post.audioMediaItem ?? '').isNotEmpty &&
+                        (e.post.imageMediaItems ?? []).isEmpty))
+                    .toList();
+                _mediaSavedPosts.value = state.data!
+                    .where((e) => ((e.post.videoMediaItem ?? '').isNotEmpty &&
+                        (e.post.audioMediaItem ?? '').isNotEmpty &&
+                        (e.post.imageMediaItems ?? []).isEmpty))
+                    .toList();
               }
               if (state is GetAllSavedPostsError) {
                 Snackbars.error(context, message: state.error);
@@ -333,7 +351,7 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                       if (_isLoading)
                         const CircularLoader()
                       else
-                        _savedPosts.value.isEmpty
+                        _videoSavedPosts.value.isEmpty
                             ? ListView(
                                 padding: EdgeInsets.zero,
                                 shrinkWrap: true,
@@ -345,161 +363,151 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                 ],
                               )
                             : ListView.builder(
-                                itemCount: _savedPosts.value.length,
+                                itemCount: _videoSavedPosts.value.length,
                                 itemBuilder: (context, index) {
-                                  if ((_savedPosts.value[index].post
-                                              .videoMediaItem ??
-                                          '')
-                                      .isNotEmpty) {
-                                    return VideoOnlySavedPostReacherCard(
-                                      likingPost: false,
-                                      isLiked: (_savedPosts
-                                                  .value[index].post.isLiked ??
-                                              false)
-                                          ? true
-                                          : false,
-                                      isVoted: (_savedPosts
-                                                  .value[index].post.isVoted ??
-                                              '')
-                                          .isNotEmpty,
-                                      voteType:
-                                          _savedPosts.value[index].post.isVoted,
-                                      onViewProfile: () {
-                                        viewProfile.value = true;
-                                        ProgressHUD.of(context)
-                                            ?.showWithText('Viewing Profile');
+                                  return VideoOnlySavedPostReacherCard(
+                                    likingPost: false,
+                                    isLiked: (_videoSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false)
+                                        ? true
+                                        : false,
+                                    isVoted: (_videoSavedPosts
+                                                .value[index].post.isVoted ??
+                                            '')
+                                        .isNotEmpty,
+                                    voteType: _videoSavedPosts
+                                        .value[index].post.isVoted,
+                                    onViewProfile: () {
+                                      viewProfile.value = true;
+                                      ProgressHUD.of(context)
+                                          ?.showWithText('Viewing Profile');
+                                      globals.userBloc!.add(
+                                          GetRecipientProfileEvent(
+                                              email: _videoSavedPosts
+                                                  .value[index]
+                                                  .post
+                                                  .postOwnerProfile!
+                                                  .authId));
+                                    },
+                                    onMessage: () {
+                                      HapticFeedback.mediumImpact();
+                                      reachDM.value = true;
+
+                                      handleTap(index);
+                                      if (active.contains(index)) {
                                         globals.userBloc!.add(
                                             GetRecipientProfileEvent(
-                                                email: _savedPosts
+                                                email: _videoSavedPosts
                                                     .value[index]
                                                     .post
                                                     .postOwnerProfile!
                                                     .authId));
-                                      },
-                                      onMessage: () {
-                                        HapticFeedback.mediumImpact();
-                                        reachDM.value = true;
+                                      }
+                                    },
+                                    onUpvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
 
-                                        handleTap(index);
-                                        if (active.contains(index)) {
-                                          globals.userBloc!.add(
-                                              GetRecipientProfileEvent(
-                                                  email: _savedPosts
+                                      if (active.contains(index)) {
+                                        if ((_videoSavedPosts
+                                                    .value[index].post.vote ??
+                                                [])
+                                            .isEmpty) {
+                                          globals.socialServiceBloc!
+                                              .add(VotePostEvent(
+                                            voteType: 'Upvote',
+                                            postId: _videoSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          globals.socialServiceBloc!
+                                              .add(DeletePostVoteEvent(
+                                            voteId: _videoSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        }
+                                      }
+                                    },
+                                    onDownvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      _currentPost.value =
+                                          _videoSavedPosts.value[index];
+                                      if (active.contains(index)) {
+                                        shoutingDown.value = true;
+                                        globals.userBloc!.add(
+                                            GetReachRelationshipEvent(
+                                                userIdToReach: _videoSavedPosts
+                                                    .value[index]
+                                                    .post
+                                                    .postOwnerProfile!
+                                                    .authId,
+                                                type: ReachRelationshipType
+                                                    .reacher));
+                                      }
+                                    },
+                                    onLike: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      // Console.log(
+                                      //     'Like Data',
+                                      //     _posts.value[index]
+                                      //         .toJson());
+                                      if (active.contains(index)) {
+                                        if (_videoSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false) {
+                                          _videoSavedPosts.value[index].post
+                                              .isLiked = false;
+                                          _videoSavedPosts.value[index].post
+                                              .nLikes = (_videoSavedPosts
                                                       .value[index]
                                                       .post
-                                                      .postOwnerProfile!
-                                                      .authId));
-                                        }
-                                      },
-                                      onUpvote: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-
-                                        if (active.contains(index)) {
-                                          if ((_savedPosts
-                                                      .value[index].post.vote ??
-                                                  [])
-                                              .isEmpty) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Upvote',
-                                              postId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          } else {
-                                            globals.socialServiceBloc!
-                                                .add(DeletePostVoteEvent(
-                                              voteId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          }
-                                        }
-                                      },
-                                      onDownvote: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-                                        _currentPost.value =
-                                            _savedPosts.value[index];
-                                        if (active.contains(index)) {
-                                          shoutingDown.value = true;
-                                          globals.userBloc!.add(
-                                              GetReachRelationshipEvent(
-                                                  userIdToReach: _savedPosts
+                                                      .nLikes ??
+                                                  1) -
+                                              1;
+                                          globals.socialServiceBloc!
+                                              .add(UnlikePostEvent(
+                                            postId: _videoSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          _videoSavedPosts
+                                              .value[index].post.isLiked = true;
+                                          _videoSavedPosts.value[index].post
+                                              .nLikes = (_videoSavedPosts
                                                       .value[index]
                                                       .post
-                                                      .postOwnerProfile!
-                                                      .authId,
-                                                  type: ReachRelationshipType
-                                                      .reacher));
-                                        }
-                                      },
-                                      onLike: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-                                        // Console.log(
-                                        //     'Like Data',
-                                        //     _posts.value[index]
-                                        //         .toJson());
-                                        if (active.contains(index)) {
-                                          if (_savedPosts
-                                                  .value[index].post.isLiked ??
-                                              false) {
-                                            _savedPosts.value[index].post
-                                                .isLiked = false;
-                                            _savedPosts.value[index].post
-                                                .nLikes = (_savedPosts
-                                                        .value[index]
-                                                        .post
-                                                        .nLikes ??
-                                                    1) -
-                                                1;
-                                            globals.socialServiceBloc!
-                                                .add(UnlikePostEvent(
-                                              postId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          } else {
-                                            _savedPosts.value[index].post
-                                                .isLiked = true;
-                                            _savedPosts.value[index].post
-                                                .nLikes = (_savedPosts
-                                                        .value[index]
-                                                        .post
-                                                        .nLikes ??
-                                                    0) +
-                                                1;
-                                            globals.socialServiceBloc!.add(
-                                              LikePostEvent(
-                                                  postId: _savedPosts
-                                                      .value[index]
-                                                      .post
-                                                      .postId),
-                                            );
-                                          }
-                                        }
-                                      },
-                                      savedPostModel: _savedPosts.value[index],
-                                      onDelete: () {
-                                        handleTap(index);
-                                        if (active.contains(index)) {
+                                                      .nLikes ??
+                                                  0) +
+                                              1;
                                           globals.socialServiceBloc!.add(
-                                              DeleteSavedPostEvent(
-                                                  postId: _savedPosts
-                                                      .value[index]
-                                                      .post
-                                                      .postId));
+                                            LikePostEvent(
+                                                postId: _videoSavedPosts
+                                                    .value[index].post.postId),
+                                          );
                                         }
-                                      },
-                                    );
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
+                                      }
+                                    },
+                                    savedPostModel:
+                                        _videoSavedPosts.value[index],
+                                    onDelete: () {
+                                      handleTap(index);
+                                      if (active.contains(index)) {
+                                        globals.socialServiceBloc!.add(
+                                            DeleteSavedPostEvent(
+                                                postId: _videoSavedPosts
+                                                    .value[index].post.postId));
+                                      }
+                                    },
+                                  );
                                 },
                               ),
                       if (_isLoading)
                         const CircularLoader()
                       else
-                        _savedPosts.value.isEmpty
+                        _audioSavedPosts.value.isEmpty
                             ? ListView(
                                 padding: EdgeInsets.zero,
                                 shrinkWrap: true,
@@ -511,155 +519,301 @@ class _SavedPostScreenState extends State<SavedPostScreen> {
                                 ],
                               )
                             : ListView.builder(
-                                itemCount: _savedPosts.value.length,
+                                itemCount: _audioSavedPosts.value.length,
                                 itemBuilder: (context, index) {
-                                  if ((_savedPosts.value[index].post
-                                              .audioMediaItem ??
-                                          '')
-                                      .isNotEmpty) {
-                                    return AudioOnlySavedPostReacherCard(
-                                      likingPost: false,
-                                      isLiked: (_savedPosts
-                                                  .value[index].post.isLiked ??
-                                              false)
-                                          ? true
-                                          : false,
-                                      isVoted: (_savedPosts
-                                                  .value[index].post.isVoted ??
-                                              '')
-                                          .isNotEmpty,
-                                      voteType:
-                                          _savedPosts.value[index].post.isVoted,
-                                      onViewProfile: () {
-                                        viewProfile.value = true;
-                                        ProgressHUD.of(context)
-                                            ?.showWithText('Viewing Profile');
+                                  return AudioOnlySavedPostReacherCard(
+                                    likingPost: false,
+                                    isLiked: (_audioSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false)
+                                        ? true
+                                        : false,
+                                    isVoted: (_audioSavedPosts
+                                                .value[index].post.isVoted ??
+                                            '')
+                                        .isNotEmpty,
+                                    voteType: _audioSavedPosts
+                                        .value[index].post.isVoted,
+                                    onViewProfile: () {
+                                      viewProfile.value = true;
+                                      ProgressHUD.of(context)
+                                          ?.showWithText('Viewing Profile');
+                                      globals.userBloc!.add(
+                                          GetRecipientProfileEvent(
+                                              email: _audioSavedPosts
+                                                  .value[index]
+                                                  .post
+                                                  .postOwnerProfile!
+                                                  .authId));
+                                    },
+                                    onMessage: () {
+                                      HapticFeedback.mediumImpact();
+                                      reachDM.value = true;
+
+                                      handleTap(index);
+                                      if (active.contains(index)) {
                                         globals.userBloc!.add(
                                             GetRecipientProfileEvent(
-                                                email: _savedPosts
+                                                email: _audioSavedPosts
                                                     .value[index]
                                                     .post
                                                     .postOwnerProfile!
                                                     .authId));
-                                      },
-                                      onMessage: () {
-                                        HapticFeedback.mediumImpact();
-                                        reachDM.value = true;
+                                      }
+                                    },
+                                    onUpvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
 
-                                        handleTap(index);
-                                        if (active.contains(index)) {
-                                          globals.userBloc!.add(
-                                              GetRecipientProfileEvent(
-                                                  email: _savedPosts
+                                      if (active.contains(index)) {
+                                        if ((_audioSavedPosts
+                                                    .value[index].post.vote ??
+                                                [])
+                                            .isEmpty) {
+                                          globals.socialServiceBloc!
+                                              .add(VotePostEvent(
+                                            voteType: 'Upvote',
+                                            postId: _audioSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          globals.socialServiceBloc!
+                                              .add(DeletePostVoteEvent(
+                                            voteId: _audioSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        }
+                                      }
+                                    },
+                                    onDownvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      _currentPost.value =
+                                          _audioSavedPosts.value[index];
+                                      if (active.contains(index)) {
+                                        shoutingDown.value = true;
+                                        globals.userBloc!.add(
+                                            GetReachRelationshipEvent(
+                                                userIdToReach: _audioSavedPosts
+                                                    .value[index]
+                                                    .post
+                                                    .postOwnerProfile!
+                                                    .authId,
+                                                type: ReachRelationshipType
+                                                    .reacher));
+                                      }
+                                    },
+                                    onLike: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      // Console.log(
+                                      //     'Like Data',
+                                      //     _posts.value[index]
+                                      //         .toJson());
+                                      if (active.contains(index)) {
+                                        if (_audioSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false) {
+                                          _audioSavedPosts.value[index].post
+                                              .isLiked = false;
+                                          _audioSavedPosts.value[index].post
+                                              .nLikes = (_audioSavedPosts
                                                       .value[index]
                                                       .post
-                                                      .postOwnerProfile!
-                                                      .authId));
-                                        }
-                                      },
-                                      onUpvote: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-
-                                        if (active.contains(index)) {
-                                          if ((_savedPosts
-                                                      .value[index].post.vote ??
-                                                  [])
-                                              .isEmpty) {
-                                            globals.socialServiceBloc!
-                                                .add(VotePostEvent(
-                                              voteType: 'Upvote',
-                                              postId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          } else {
-                                            globals.socialServiceBloc!
-                                                .add(DeletePostVoteEvent(
-                                              voteId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          }
-                                        }
-                                      },
-                                      onDownvote: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-                                        _currentPost.value =
-                                            _savedPosts.value[index];
-                                        if (active.contains(index)) {
-                                          shoutingDown.value = true;
-                                          globals.userBloc!.add(
-                                              GetReachRelationshipEvent(
-                                                  userIdToReach: _savedPosts
+                                                      .nLikes ??
+                                                  1) -
+                                              1;
+                                          globals.socialServiceBloc!
+                                              .add(UnlikePostEvent(
+                                            postId: _audioSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          _audioSavedPosts
+                                              .value[index].post.isLiked = true;
+                                          _audioSavedPosts.value[index].post
+                                              .nLikes = (_audioSavedPosts
                                                       .value[index]
                                                       .post
-                                                      .postOwnerProfile!
-                                                      .authId,
-                                                  type: ReachRelationshipType
-                                                      .reacher));
-                                        }
-                                      },
-                                      onLike: () {
-                                        HapticFeedback.mediumImpact();
-                                        handleTap(index);
-                                        // Console.log(
-                                        //     'Like Data',
-                                        //     _posts.value[index]
-                                        //         .toJson());
-                                        if (active.contains(index)) {
-                                          if (_savedPosts
-                                                  .value[index].post.isLiked ??
-                                              false) {
-                                            _savedPosts.value[index].post
-                                                .isLiked = false;
-                                            _savedPosts.value[index].post
-                                                .nLikes = (_savedPosts
-                                                        .value[index]
-                                                        .post
-                                                        .nLikes ??
-                                                    1) -
-                                                1;
-                                            globals.socialServiceBloc!
-                                                .add(UnlikePostEvent(
-                                              postId: _savedPosts
-                                                  .value[index].post.postId,
-                                            ));
-                                          } else {
-                                            _savedPosts.value[index].post
-                                                .isLiked = true;
-                                            _savedPosts.value[index].post
-                                                .nLikes = (_savedPosts
-                                                        .value[index]
-                                                        .post
-                                                        .nLikes ??
-                                                    0) +
-                                                1;
-                                            globals.socialServiceBloc!.add(
-                                              LikePostEvent(
-                                                  postId: _savedPosts
-                                                      .value[index]
-                                                      .post
-                                                      .postId),
-                                            );
-                                          }
-                                        }
-                                      },
-                                      savedPostModel: _savedPosts.value[index],
-                                      onDelete: () {
-                                        handleTap(index);
-                                        if (active.contains(index)) {
+                                                      .nLikes ??
+                                                  0) +
+                                              1;
                                           globals.socialServiceBloc!.add(
-                                              DeleteSavedPostEvent(
-                                                  postId: _savedPosts
+                                            LikePostEvent(
+                                                postId: _audioSavedPosts
+                                                    .value[index].post.postId),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    savedPostModel:
+                                        _audioSavedPosts.value[index],
+                                    onDelete: () {
+                                      handleTap(index);
+                                      if (active.contains(index)) {
+                                        globals.socialServiceBloc!.add(
+                                            DeleteSavedPostEvent(
+                                                postId: _audioSavedPosts
+                                                    .value[index].post.postId));
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                      if (_isLoading)
+                        const CircularLoader()
+                      else
+                        _mediaSavedPosts.value.isEmpty
+                            ? ListView(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                children: const [
+                                  EmptyTabWidget(
+                                    title: "No media posts",
+                                    subtitle: "",
+                                  )
+                                ],
+                              )
+                            : ListView.builder(
+                                itemCount: _mediaSavedPosts.value.length,
+                                itemBuilder: (context, index) {
+                                  return SavedPostReacherCard(
+                                    likingPost: false,
+                                    isLiked: (_mediaSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false)
+                                        ? true
+                                        : false,
+                                    isVoted: (_mediaSavedPosts
+                                                .value[index].post.isVoted ??
+                                            '')
+                                        .isNotEmpty,
+                                    voteType: _mediaSavedPosts
+                                        .value[index].post.isVoted,
+                                    onViewProfile: () {
+                                      viewProfile.value = true;
+                                      ProgressHUD.of(context)
+                                          ?.showWithText('Viewing Profile');
+                                      globals.userBloc!.add(
+                                          GetRecipientProfileEvent(
+                                              email: _mediaSavedPosts
+                                                  .value[index]
+                                                  .post
+                                                  .postOwnerProfile!
+                                                  .authId));
+                                    },
+                                    onMessage: () {
+                                      HapticFeedback.mediumImpact();
+                                      reachDM.value = true;
+
+                                      handleTap(index);
+                                      if (active.contains(index)) {
+                                        globals.userBloc!.add(
+                                            GetRecipientProfileEvent(
+                                                email: _mediaSavedPosts
+                                                    .value[index]
+                                                    .post
+                                                    .postOwnerProfile!
+                                                    .authId));
+                                      }
+                                    },
+                                    onUpvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+
+                                      if (active.contains(index)) {
+                                        if ((_mediaSavedPosts
+                                                    .value[index].post.vote ??
+                                                [])
+                                            .isEmpty) {
+                                          globals.socialServiceBloc!
+                                              .add(VotePostEvent(
+                                            voteType: 'Upvote',
+                                            postId: _mediaSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          globals.socialServiceBloc!
+                                              .add(DeletePostVoteEvent(
+                                            voteId: _mediaSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        }
+                                      }
+                                    },
+                                    onDownvote: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      _currentPost.value =
+                                          _mediaSavedPosts.value[index];
+                                      if (active.contains(index)) {
+                                        shoutingDown.value = true;
+                                        globals.userBloc!.add(
+                                            GetReachRelationshipEvent(
+                                                userIdToReach: _mediaSavedPosts
+                                                    .value[index]
+                                                    .post
+                                                    .postOwnerProfile!
+                                                    .authId,
+                                                type: ReachRelationshipType
+                                                    .reacher));
+                                      }
+                                    },
+                                    onLike: () {
+                                      HapticFeedback.mediumImpact();
+                                      handleTap(index);
+                                      // Console.log(
+                                      //     'Like Data',
+                                      //     _posts.value[index]
+                                      //         .toJson());
+                                      if (active.contains(index)) {
+                                        if (_mediaSavedPosts
+                                                .value[index].post.isLiked ??
+                                            false) {
+                                          _mediaSavedPosts.value[index].post
+                                              .isLiked = false;
+                                          _mediaSavedPosts.value[index].post
+                                              .nLikes = (_mediaSavedPosts
                                                       .value[index]
                                                       .post
-                                                      .postId));
+                                                      .nLikes ??
+                                                  1) -
+                                              1;
+                                          globals.socialServiceBloc!
+                                              .add(UnlikePostEvent(
+                                            postId: _mediaSavedPosts
+                                                .value[index].post.postId,
+                                          ));
+                                        } else {
+                                          _mediaSavedPosts
+                                              .value[index].post.isLiked = true;
+                                          _mediaSavedPosts.value[index].post
+                                              .nLikes = (_mediaSavedPosts
+                                                      .value[index]
+                                                      .post
+                                                      .nLikes ??
+                                                  0) +
+                                              1;
+                                          globals.socialServiceBloc!.add(
+                                            LikePostEvent(
+                                                postId: _mediaSavedPosts
+                                                    .value[index].post.postId),
+                                          );
                                         }
-                                      },
-                                    );
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
+                                      }
+                                    },
+                                    savedPostModel:
+                                        _mediaSavedPosts.value[index],
+                                    onDelete: () {
+                                      handleTap(index);
+                                      if (active.contains(index)) {
+                                        globals.socialServiceBloc!.add(
+                                            DeleteSavedPostEvent(
+                                                postId: _mediaSavedPosts
+                                                    .value[index].post.postId));
+                                      }
+                                    },
+                                  );
                                 },
                               ),
                     ]),
@@ -931,9 +1085,8 @@ class SavedPostReacherCard extends HookWidget {
                   ? const SizedBox.shrink()
                   : ExpandableText(
                       "${savedPostModel!.post.content}",
-                      prefixText: savedPostModel!.post.edited!
-                          ? "(Reach Edited)"
-                          : null,
+                      prefixText:
+                          savedPostModel!.post.edited! ? "(edited)" : null,
                       prefixStyle: TextStyle(
                           fontSize: getScreenHeight(12),
                           fontFamily: 'Poppins',
@@ -1426,9 +1579,8 @@ class TextOnlySavedPostReacherCard extends HookWidget {
                   ? const SizedBox.shrink()
                   : ExpandableText(
                       "${savedPostModel!.post.content}",
-                      prefixText: savedPostModel!.post.edited!
-                          ? "(Reach Edited)"
-                          : null,
+                      prefixText:
+                          savedPostModel!.post.edited! ? "(edited)" : null,
                       prefixStyle: TextStyle(
                           fontSize: getScreenHeight(12),
                           fontFamily: 'Poppins',

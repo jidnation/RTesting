@@ -70,29 +70,357 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
     var size = MediaQuery.of(context).size;
     return Obx(() {
       bool foldMe = !timeLineController.isScrolling.value;
-      return Scaffold(
-        body: SizedBox(
-          height: SizeConfig.screenHeight,
-          width: SizeConfig.screenWidth,
-          child: Column(children: [
-            ///
-            /// test 1
-            /// fix the image issue
-            Visibility(
-              visible: foldMe,
-              child: Stack(
-                  alignment: Alignment.topCenter,
-                  fit: StackFit.passthrough,
-                  clipBehavior: Clip.none,
-                  children: <Widget>[
-                    ///
-                    /// Banner image
-                    ///
+      return SafeArea(
+        child: Scaffold(
+          body: SizedBox(
+            height: SizeConfig.screenHeight,
+            width: SizeConfig.screenWidth,
+            child: Column(children: [
+              Visibility(
+                visible: foldMe,
+                child: Stack(
+                    alignment: Alignment.topCenter,
+                    fit: StackFit.passthrough,
+                    clipBehavior: Clip.none,
+                    children: <Widget>[
+                      /// Banner image
+                      SizedBox(
+                        height: getScreenHeight(200),
+                        width: size.width,
+                        child: GestureDetector(
+                          child: const CoverPicture(),
+                          onTap: () {
+                            RouteNavigators.route(
+                                context,
+                                FullScreenWidget(
+                                  child: Stack(children: <Widget>[
+                                    Container(
+                                      color: AppColors
+                                          .black, // Your screen background color
+                                    ),
+                                    Column(children: <Widget>[
+                                      Container(height: getScreenHeight(100)),
+                                      const CoverPicture(),
+                                    ]),
+                                    Positioned(
+                                      top: 0.0,
+                                      left: 0.0,
+                                      right: 0.0,
+                                      child: AppBar(
+                                        title: const Text('Cover Photo'),
+                                        // You can add title here
+                                        leading: IconButton(
+                                          icon: const Icon(Icons.arrow_back,
+                                              color: AppColors.white),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
+                                        backgroundColor: AppColors.black,
+                                        //You can make this transparent
+                                        elevation: 0.0, //No shadow
+                                      ),
+                                    ),
+                                  ]),
+                                ));
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Visibility(
+                                visible:
+                                    timeLineController.currentPageIndex.value !=
+                                        4,
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: Container(
+                                    width: getScreenWidth(40),
+                                    height: getScreenHeight(40),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          AppColors.textColor2.withOpacity(0.5),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svgs/back.svg',
+                                      color: AppColors.white,
+                                      width: getScreenWidth(50),
+                                      height: getScreenHeight(50),
+                                    ),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Container(
+                                  width: getScreenWidth(40),
+                                  height: getScreenHeight(40),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        AppColors.textColor2.withOpacity(0.5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    'assets/svgs/pop-vertical.svg',
+                                    color: AppColors.white,
+                                    width: getScreenWidth(50),
+                                    height: getScreenHeight(50),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  await showProfileMenuBottomSheet(context,
+                                      user: globals.user!);
+                                },
+                                splashRadius: 20,
+                              )
+                            ]),
+                      ),
+                      Positioned(
+                        top: size.height * 0.2 - 20,
+                        child: AnimatedContainer(
+                            // width:
+                            // isGoingDown ? width : getScreenWidth(100),
+                            // height:
+                            // isGoingDown ? height : getScreenHeight(100),
+                            duration: const Duration(seconds: 1),
+                            child: GestureDetector(
+                              child: const ProfilePicture(height: 90),
+                              onTap: () {
+                                RouteNavigators.route(
+                                    context,
+                                    FullScreenWidget(
+                                      child: Stack(children: <Widget>[
+                                        Container(
+                                          color: AppColors
+                                              .black, // Your screen background color
+                                        ),
+                                        Column(children: <Widget>[
+                                          Container(
+                                              height: getScreenHeight(100)),
+                                          Image.network(
+                                            globals.user!.profilePicture!,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ]),
+                                        Positioned(
+                                          top: 0.0,
+                                          left: 0.0,
+                                          right: 0.0,
+                                          child: AppBar(
+                                            title:
+                                                const Text('Profile Picture'),
+                                            // You can add title here
+                                            leading: IconButton(
+                                              icon: const Icon(Icons.arrow_back,
+                                                  color: AppColors.white),
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                            ),
+                                            backgroundColor: AppColors.black,
+                                            //You can make this transparent
+                                            elevation: 0.0, //No shadow
+                                          ),
+                                        ),
+                                      ]),
+                                    ));
+                              },
+                            )),
+                      ),
+                    ]),
+              ),
+              Visibility(
+                visible: foldMe,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Column(children: [
+                    SizedBox(height: getScreenHeight(10)),
+                    Text(
+                        ('${globals.user!.firstName} ${globals.user!.lastName}')
+                            .toString()
+                            .toTitleCase(),
+                        style: TextStyle(
+                          fontSize: getScreenHeight(17),
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor2,
+                        )),
+                    Text('@${globals.user!.username ?? 'username'}',
+                        style: TextStyle(
+                          fontSize: getScreenHeight(13),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textColor2,
+                        )),
+                    SizedBox(height: getScreenHeight(15)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Row(
+                          children: [
+                            InkWell(
+                              onTap: () => RouteNavigators.route(
+                                  context, const AccountStatsInfo(index: 0)),
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      globals.user!.nReachers.toString(),
+                                      style: TextStyle(
+                                          fontSize: getScreenHeight(15),
+                                          color: AppColors.textColor2,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    SizedBox(width: getScreenWidth(5)),
+                                    Text(
+                                      'Reachers',
+                                      style: TextStyle(
+                                          fontSize: getScreenHeight(15),
+                                          color: AppColors.greyShade2,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ]),
+                            ),
+                            SizedBox(width: getScreenWidth(20)),
+                            InkWell(
+                              onTap: () => RouteNavigators.route(
+                                  context, const AccountStatsInfo(index: 1)),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    globals.user!.nReaching.toString(),
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.textColor2,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(width: getScreenWidth(5)),
+                                  Text(
+                                    'Reaching',
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.greyShade2,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: getScreenWidth(20)),
+                            InkWell(
+                              onTap: () => RouteNavigators.route(
+                                  context, const AccountStatsInfo(index: 2)),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    globals.user!.nStaring.toString(),
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.textColor2,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(width: getScreenWidth(5)),
+                                  Text(
+                                    'Star',
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.greyShade2,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: getScreenWidth(20)),
+                            InkWell(
+                              onTap: () => RouteNavigators.route(
+                                  context, const AccountStatsInfo(index: 3)),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    //nblock Variable here
+                                    globals.user!.nBlocked.toString(),
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.textColor2,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(width: getScreenWidth(5)),
+                                  Text(
+                                    'EX',
+                                    style: TextStyle(
+                                        fontSize: getScreenHeight(15),
+                                        color: AppColors.greyShade2,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    globals.user!.bio != null && globals.user!.bio != ''
+                        ? SizedBox(height: getScreenHeight(20))
+                        : const SizedBox.shrink(),
+                    SizedBox(
+                        width: getScreenWidth(290),
+                        child: Text(
+                          globals.user!.bio ?? '',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: getScreenHeight(13),
+                            color: AppColors.greyShade2,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        )),
+                    globals.user!.bio != null && globals.user!.bio != ''
+                        ? SizedBox(height: getScreenHeight(20))
+                        : const SizedBox.shrink(),
+                    SizedBox(
+                        width: getScreenWidth(145),
+                        height: getScreenHeight(45),
+                        child: CustomButton(
+                          label: 'Edit Profile',
+                          labelFontSize: getScreenHeight(14),
+                          color: AppColors.white,
+                          onPressed: () {
+                            RouteNavigators.route(
+                                context, const EditProfileScreen());
+                          },
+                          size: size,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 9,
+                            horizontal: 21,
+                          ),
+                          textColor: AppColors.textColor2,
+                          borderSide:
+                              const BorderSide(color: AppColors.greyShade5),
+                        )),
+                    SizedBox(height: getScreenHeight(15)),
+                  ]),
+                ),
+              ),
+              Visibility(
+                visible: !foldMe,
+                child: Container(
+                  height: getScreenHeight(170),
+                  width: SizeConfig.screenWidth,
+                  color: AppColors.textColor,
+                  child: Stack(children: [
                     SizedBox(
                       height: getScreenHeight(200),
                       width: size.width,
                       child: GestureDetector(
-                        child: Image.asset(globals.user!.coverPicture!),
+                        child: const CoverPicture(),
                         onTap: () {
                           RouteNavigators.route(
                               context,
@@ -102,10 +430,12 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                                     color: AppColors
                                         .black, // Your screen background color
                                   ),
-                                  Column(children: <Widget>[
-                                    Container(height: getScreenHeight(100)),
-                                    const CoverPicture(),
-                                  ]),
+                                  Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        const CoverPicture(),
+                                      ]),
                                   Positioned(
                                     top: 0.0,
                                     left: 0.0,
@@ -129,301 +459,13 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/back.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
-                              ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.user!);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]),
-                    ),
-                    Positioned(
-                      top: size.height * 0.2 - 20,
-                      child: AnimatedContainer(
-                          // width:
-                          // isGoingDown ? width : getScreenWidth(100),
-                          // height:
-                          // isGoingDown ? height : getScreenHeight(100),
-                          duration: const Duration(seconds: 1),
-                          child: GestureDetector(
-                            child: const ProfilePicture(height: 90),
-                            onTap: () {
-                              RouteNavigators.route(
-                                  context,
-                                  FullScreenWidget(
-                                    child: Stack(children: <Widget>[
-                                      Container(
-                                        color: AppColors
-                                            .black, // Your screen background color
-                                      ),
-                                      Column(children: <Widget>[
-                                        Container(height: getScreenHeight(100)),
-                                        Image.network(
-                                          globals.user!.profilePicture!,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ]),
-                                      Positioned(
-                                        top: 0.0,
-                                        left: 0.0,
-                                        right: 0.0,
-                                        child: AppBar(
-                                          title: const Text('Profile Picture'),
-                                          // You can add title here
-                                          leading: IconButton(
-                                            icon: const Icon(Icons.arrow_back,
-                                                color: AppColors.white),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                          ),
-                                          backgroundColor: AppColors.black,
-                                          //You can make this transparent
-                                          elevation: 0.0, //No shadow
-                                        ),
-                                      ),
-                                    ]),
-                                  ));
-                            },
-                          )),
-                    ),
-                  ]),
-            ),
-            Visibility(
-              visible: foldMe,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 50),
-                child: Column(children: [
-                  SizedBox(height: getScreenHeight(10)),
-                  Text(
-                      ('${globals.user!.firstName} ${globals.user!.lastName}')
-                          .toString()
-                          .toTitleCase(),
-                      style: TextStyle(
-                        fontSize: getScreenHeight(17),
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textColor2,
-                      )),
-                  Text('@${globals.user!.username ?? 'username'}',
-                      style: TextStyle(
-                        fontSize: getScreenHeight(13),
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textColor2,
-                      )),
-                  SizedBox(height: getScreenHeight(15)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Row(
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: () => RouteNavigators.route(
-                                context, const AccountStatsInfo(index: 0)),
-                            child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    globals.user!.nReachers.toString(),
-                                    style: TextStyle(
-                                        fontSize: getScreenHeight(15),
-                                        color: AppColors.textColor2,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(width: getScreenWidth(5)),
-                                  Text(
-                                    'Reachers',
-                                    style: TextStyle(
-                                        fontSize: getScreenHeight(15),
-                                        color: AppColors.greyShade2,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ]),
-                          ),
-                          SizedBox(width: getScreenWidth(20)),
-                          InkWell(
-                            onTap: () => RouteNavigators.route(
-                                context, const AccountStatsInfo(index: 1)),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  globals.user!.nReaching.toString(),
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.textColor2,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                SizedBox(width: getScreenWidth(5)),
-                                Text(
-                                  'Reaching',
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.greyShade2,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: getScreenWidth(20)),
-                          InkWell(
-                            onTap: () => RouteNavigators.route(
-                                context, const AccountStatsInfo(index: 2)),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  globals.user!.nStaring.toString(),
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.textColor2,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                SizedBox(width: getScreenWidth(5)),
-                                Text(
-                                  'Star',
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.greyShade2,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: getScreenWidth(20)),
-                          InkWell(
-                            onTap: () => RouteNavigators.route(
-                                context, const AccountStatsInfo(index: 3)),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  //nblock Variable here
-                                  globals.user!.nBlocked.toString(),
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.textColor2,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                SizedBox(width: getScreenWidth(5)),
-                                Text(
-                                  'EX',
-                                  style: TextStyle(
-                                      fontSize: getScreenHeight(15),
-                                      color: AppColors.greyShade2,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  globals.user!.bio != null && globals.user!.bio != ''
-                      ? SizedBox(height: getScreenHeight(20))
-                      : const SizedBox.shrink(),
-                  SizedBox(
-                      width: getScreenWidth(290),
-                      child: Text(
-                        globals.user!.bio ?? '',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: getScreenHeight(13),
-                          color: AppColors.greyShade2,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      )),
-                  globals.user!.bio != null && globals.user!.bio != ''
-                      ? SizedBox(height: getScreenHeight(20))
-                      : const SizedBox.shrink(),
-                  SizedBox(
-                      width: getScreenWidth(145),
-                      height: getScreenHeight(45),
-                      child: CustomButton(
-                        label: 'Edit Profile',
-                        labelFontSize: getScreenHeight(14),
-                        color: AppColors.white,
-                        onPressed: () {
-                          RouteNavigators.route(
-                              context, const EditProfileScreen());
-                        },
-                        size: size,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 9,
-                          horizontal: 21,
-                        ),
-                        textColor: AppColors.textColor2,
-                        borderSide:
-                            const BorderSide(color: AppColors.greyShade5),
-                      )),
-                  SizedBox(height: getScreenHeight(15)),
-                ]),
-              ),
-            ),
-
-            ///
-            /// test 2
-            ///center the image
-            Visibility(
-              visible: !foldMe,
-              child: Container(
-                height: 240,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                width: SizeConfig.screenWidth,
-                color: AppColors.textColor,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(height: 20),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
+                          Visibility(
+                            visible:
+                                timeLineController.currentPageIndex.value != 4,
+                            child: IconButton(
                               padding: EdgeInsets.zero,
                               icon: Container(
                                 width: getScreenWidth(40),
@@ -442,90 +484,101 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                               ),
                               onPressed: () => RouteNavigators.pop(context),
                             ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Container(
-                                width: getScreenWidth(40),
-                                height: getScreenHeight(40),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.textColor2.withOpacity(0.5),
-                                ),
-                                child: SvgPicture.asset(
-                                  'assets/svgs/pop-vertical.svg',
-                                  color: AppColors.white,
-                                  width: getScreenWidth(50),
-                                  height: getScreenHeight(50),
-                                ),
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Container(
+                              width: getScreenWidth(40),
+                              height: getScreenHeight(40),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.textColor2.withOpacity(0.5),
                               ),
-                              onPressed: () async {
-                                await showProfileMenuBottomSheet(context,
-                                    user: globals.user!);
-                              },
-                              splashRadius: 20,
-                            )
-                          ]),
-                      GestureDetector(
-                          onTap: () {
-                            RouteNavigators.route(
-                                context,
-                                FullScreenWidget(
-                                  child: Stack(children: <Widget>[
-                                    Container(
-                                      color: AppColors
-                                          .black, // Your screen background color
-                                    ),
-                                    Column(children: <Widget>[
-                                      Container(height: getScreenHeight(100)),
-                                      Image.network(
-                                        globals.user!.profilePicture!,
-                                        fit: BoxFit.contain,
+                              child: SvgPicture.asset(
+                                'assets/svgs/pop-vertical.svg',
+                                color: AppColors.white,
+                                width: getScreenWidth(50),
+                                height: getScreenHeight(50),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await showProfileMenuBottomSheet(context,
+                                  user: globals.user!);
+                            },
+                            splashRadius: 20,
+                          )
+                        ]),
+                    Positioned(
+                      bottom: 10,
+                      left: -10,
+                      child: Row(children: [
+                        GestureDetector(
+                            onTap: () {
+                              RouteNavigators.route(
+                                  context,
+                                  FullScreenWidget(
+                                    child: Stack(children: <Widget>[
+                                      Container(
+                                        color: AppColors
+                                            .black, // Your screen background color
+                                      ),
+                                      Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                                height: getScreenHeight(100)),
+                                            Image.network(
+                                              globals.user!.profilePicture!,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ]),
+                                      Positioned(
+                                        top: 0.0,
+                                        left: 0.0,
+                                        right: 0.0,
+                                        child: AppBar(
+                                          title: const Text(
+                                              'Profile Picture'), // You can add title here
+                                          leading: IconButton(
+                                            icon: const Icon(Icons.arrow_back,
+                                                color: AppColors.white),
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                          ),
+                                          backgroundColor: AppColors
+                                              .black, //You can make this transparent
+                                          elevation: 0.0, //No shadow
+                                        ),
                                       ),
                                     ]),
-                                    Positioned(
-                                      top: 0.0,
-                                      left: 0.0,
-                                      right: 0.0,
-                                      child: AppBar(
-                                        title: const Text(
-                                            'Profile Picture'), // You can add title here
-                                        leading: IconButton(
-                                          icon: const Icon(Icons.arrow_back,
-                                              color: AppColors.white),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                        ),
-                                        backgroundColor: AppColors
-                                            .black, //You can make this transparent
-                                        elevation: 0.0, //No shadow
-                                      ),
-                                    ),
-                                  ]),
-                                ));
-                          },
-                          child: const ProfilePicture(height: 90)),
-                      Column(children: [
-                        Text(
-                            ('${globals.user!.firstName} ${globals.user!.lastName}')
-                                .toString()
-                                .toTitleCase(),
-                            style: TextStyle(
-                              fontSize: getScreenHeight(17),
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            )),
-                        Text('@${globals.user!.username ?? 'username'}',
-                            style: TextStyle(
-                              fontSize: getScreenHeight(13),
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
-                            )),
-                      ])
-                    ]),
+                                  ));
+                            },
+                            child: const ProfilePicture(height: 50)),
+                        // Column(children: [
+                        //   Text(
+                        //       ('${globals.user!.firstName} ${globals.user!.lastName}')
+                        //           .toString()
+                        //           .toTitleCase(),
+                        //       style: TextStyle(
+                        //         fontSize: getScreenHeight(17),
+                        //         fontWeight: FontWeight.w500,
+                        //         color: Colors.white,
+                        //       )),
+                        //   Text('@${globals.user!.username ?? 'username'}',
+                        //       style: TextStyle(
+                        //         fontSize: getScreenHeight(13),
+                        //         fontWeight: FontWeight.w400,
+                        //         color: Colors.white,
+                        //       )),
+                        // ])
+                      ]),
+                    ),
+                  ]),
+                ),
               ),
-            ),
-            Container(
+              Container(
                 height: 60,
                 width: SizeConfig.screenWidth,
                 color: AppColors.backgroundShade4,
@@ -535,7 +588,6 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                     padEnds: false,
                     viewportFraction: 0.3,
                     height: 60,
-                    // aspectRatio: 0.3,
                     onPageChanged: (index, _) {
                       bodyCarouselController.animateToPage(index);
                       selectedTab.value = pageTab[index];
@@ -552,49 +604,33 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                             bodyCarouselController.animateToPage(index);
                             selectedTab.value = pageTab[index];
                           })),
-                )
-
-                // ListView.builder(
-                //     shrinkWrap: true,
-                //     controller: _controller,
-                //     itemCount: pageTab.length,
-                //     physics: const ScrollPhysics(),
-                //     padding: const EdgeInsets.only(left: 5),
-                //     scrollDirection: Axis.horizontal,
-                //     itemBuilder: (context, index) {
-                //       String value = pageTab[index];
-                //       return ProfileTab(
-                //           isSelected: selectedTab.value == value,
-                //           value: value,
-                //           onClick: () {
-                //             selectedTab.value = value;
-                //           });
-                //     }),
-                ),
-            Expanded(
-              child: SizedBox(
-                child: CarouselSlider(
-                  carouselController: bodyCarouselController,
-                  options: CarouselOptions(
-                    viewportFraction: 1,
-                    height: 580,
-                    onPageChanged: (index, _) {
-                      // checkMeOut(index);
-                      topCarouselController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInToLinear,
-                      );
-                      selectedTab.value = pageTab[index];
-                    },
-                    enableInfiniteScroll: false,
-                    scrollDirection: Axis.horizontal,
-                  ),
-                  items: profileTabs,
                 ),
               ),
-            ),
-          ]),
+              Expanded(
+                child: SizedBox(
+                  child: CarouselSlider(
+                    carouselController: bodyCarouselController,
+                    options: CarouselOptions(
+                      viewportFraction: 1,
+                      height: 580,
+                      onPageChanged: (index, _) {
+                        // checkMeOut(index);
+                        topCarouselController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInToLinear,
+                        );
+                        selectedTab.value = pageTab[index];
+                      },
+                      enableInfiniteScroll: false,
+                      scrollDirection: Axis.horizontal,
+                    ),
+                    items: profileTabs,
+                  ),
+                ),
+              ),
+            ]),
+          ),
         ),
       );
     });

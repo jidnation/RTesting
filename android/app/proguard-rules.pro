@@ -16,3 +16,6 @@
 -optimizations !method/inlining/
 -keepclasseswithmembers class * {*;}
 -dontwarn io.flutter.embedding.**
+-keepclassmembers class ai.deepar.ar.DeepAR { *; }
+-keepclassmembers class ai.deepar.ar.core.videotexture.VideoTextureAndroidJava { *; }
+-keep class ai.deepar.ar.core.videotexture.VideoTextureAndroidJava

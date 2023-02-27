@@ -96,6 +96,7 @@ class Moment {
     this.nComments,
     this.momentSlug,
     this.sound,
+    this.musicName,
     this.videoMediaItem,
     this.momentOwnerProfile,
   });
@@ -111,11 +112,12 @@ class Moment {
   int? nComments;
   String? momentSlug;
   String? sound;
+  String? musicName;
   String? videoMediaItem;
   final OwnerProfile? momentOwnerProfile;
 
   factory Moment.fromJson(Map<String, dynamic> json) => Moment(
-        momentId: json["momentId"].toString() ,
+        momentId: json["momentId"].toString(),
         caption: json["caption"] ?? '',
         authId: json["authId"] ?? '',
         mentionList: json["mentionList"] != null
@@ -132,6 +134,7 @@ class Moment {
         nComments: json["nComments"] ?? "",
         momentSlug: json["momentSlug"] ?? "",
         sound: json["sound"] ?? "",
+        musicName: json["musicName"] ?? "",
         videoMediaItem: json["videoMediaItem"] ?? "",
         momentOwnerProfile: json["momentOwnerProfile"] != null
             ? OwnerProfile.fromJson(json["momentOwnerProfile"])

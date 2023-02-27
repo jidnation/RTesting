@@ -46,6 +46,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from timeLineQuery:::: ${queryResult.data}");
       return PostFeedModel.fromJson(queryResult.data!).getPostFeed;
     } else {
       return null;
@@ -76,6 +77,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getPost:::: ${queryResult.data}");
       return Post.fromJson(queryResult.data!['getPost']);
     } else {
       return null;
@@ -106,6 +108,7 @@ class TimeLineQuery {
           ),
           variables: queryVariables),
     );
+    log('from my reach-getting-query::::: $queryResult');
     if (queryResult.data != null) {
       return queryResult.data!['getReachRelationship'] ?? false;
     } else {
@@ -134,6 +137,7 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
+    log(":::::: from likePost:::: ${queryResult.data}");
     return queryResult.data?['likePost']['authId'] != null;
   }
 
@@ -162,6 +166,7 @@ class TimeLineQuery {
       ),
       variables: timeLineVariables,
     ));
+    log(":::::: from votePost:::: ${queryResult.data}");
     return queryResult.data?['votePost'] ?? false;
   }
 
@@ -186,6 +191,7 @@ class TimeLineQuery {
       ),
       variables: momentVariables,
     ));
+    log(":::::: from deleteVotedPost:::: ${queryResult.data}");
     return queryResult.data?['deletePostVote'] ?? false;
   }
 
@@ -258,7 +264,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
@@ -274,6 +280,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getAllPost:::: ${queryResult.data}");
       return GetAllPostsModel.fromJson(queryResult.data!).getAllPosts;
     } else {
       return null;
@@ -295,7 +302,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 30,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
@@ -311,6 +318,7 @@ class TimeLineQuery {
           variables: queryVariables),
     );
     if (queryResult.data != null) {
+      log(":::::: from getAllComments:::: ${queryResult.data}");
       return GetMyCommentsModel.fromJson(queryResult.data!).getPersonalComments;
     } else {
       return null;
@@ -329,14 +337,13 @@ class TimeLineQuery {
       link: link,
       cache: GraphQLCache(),
     );
-
-    // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
     authIdToGet != null ? queryVariables.addAll({'authId': authIdToGet}) : null;
+
     QueryResult queryResult = await qlClient.query(
       // here it's get type so using query method
       QueryOptions(
@@ -348,8 +355,10 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from getLikedPosts:::: ${queryResult.data}");
       return GetLikedPosts.fromJson(queryResult.data!).getLikedPosts;
     } else {
+      log("::::::2 from getLikedPosts:::: ${queryResult.data}");
       return null;
     }
   }
@@ -369,7 +378,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1
     };
 
@@ -384,6 +393,7 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from savedPost:::: ${queryResult.data}");
       return GetAllSavedPosts.fromJson(queryResult.data!).getAllSavedPosts;
     } else {
       return null;
@@ -408,7 +418,7 @@ class TimeLineQuery {
 
     // ($pageLimit: int!, $pageNumber: int!, $authIdToGet: String)
     Map<String, dynamic> queryVariables = {
-      'pageLimit': pageLimit ?? 50,
+      'pageLimit': pageLimit ?? 20,
       'pageNumber': pageNumber ?? 1,
       "votingType": votingType
     };
@@ -426,6 +436,7 @@ class TimeLineQuery {
       ),
     );
     if (queryResult.data != null) {
+      log(":::::: from VotedPost:::: ${queryResult.data}");
       return GetVotedPosts.fromJson(queryResult.data!).getVotedPosts;
     } else {
       return null;
