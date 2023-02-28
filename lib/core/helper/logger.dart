@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 
-
 class Console {
   static void log(String tag, dynamic msg, {Object? error}) {
     // Application was compiled in debug mode?

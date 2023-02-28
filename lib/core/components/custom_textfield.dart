@@ -92,35 +92,34 @@ class CustomRoundTextField extends StatelessWidget {
   final FocusScope? focusScope;
   final FocusManager? focusManager;
 
-  const CustomRoundTextField(
-      {Key? key,
-      this.keyboardType,
-      this.hintText,
-      this.obscureText = false,
-      this.validator,
-      this.controller,
-        this.autoFocus,
-      this.prefixIcon,
-      this.enabledBorderSide = BorderSide.none,
-      this.focusedBorderSide = BorderSide.none,
-      this.suffixIcon,
-      this.isFilled = true,
-      this.borderRadius = 54,
-      this.verticalHeight,
-      this.minLines = 1,
-      this.maxLines = 5,
-      this.isDense = false,
-      this.onTap,
-      this.onChanged,
-      this.fillColor = const Color(0xFFF5F5F5),
-      this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
-      this.textStyle =
-          const TextStyle(color: AppColors.textColor2, fontSize: 15),
-      this.textCapitalization = TextCapitalization.none,
-      this.focusNode,
-      this.focusScope,
-      this.focusManager,})
-      : super(key: key);
+  const CustomRoundTextField({
+    Key? key,
+    this.keyboardType,
+    this.hintText,
+    this.obscureText = false,
+    this.validator,
+    this.controller,
+    this.autoFocus,
+    this.prefixIcon,
+    this.enabledBorderSide = BorderSide.none,
+    this.focusedBorderSide = BorderSide.none,
+    this.suffixIcon,
+    this.isFilled = true,
+    this.borderRadius = 54,
+    this.verticalHeight,
+    this.minLines = 1,
+    this.maxLines = 5,
+    this.isDense = false,
+    this.onTap,
+    this.onChanged,
+    this.fillColor = const Color(0xFFF5F5F5),
+    this.hintStyle = const TextStyle(color: Color(0xFF666666), fontSize: 13),
+    this.textStyle = const TextStyle(color: AppColors.textColor2, fontSize: 15),
+    this.textCapitalization = TextCapitalization.none,
+    this.focusNode,
+    this.focusScope,
+    this.focusManager,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

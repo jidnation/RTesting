@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_audio_cutter/audio_cutter.dart';
@@ -9,7 +9,6 @@ import 'package:flutter_audio_cutter/audio_cutter.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:http/http.dart' as http;
 // import 'package:image_cropper/image_cropper.dart';
-//import 'package:light_compressor/light_compressor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_compress/video_compress.dart' as vc;
 // import 'package:video_compress/video_compress.dart';
@@ -101,16 +100,16 @@ class MediaService {
         fileName: (file).path.split('/').last);
   }
 
-  Future<FileResult?> getFile() async {
-    FilePickerResult? result = await FilePicker.platform
-        .pickFiles(allowedExtensions: FileUtils.docExts, type: FileType.custom);
-    if (result == null) return null;
-    File? file = File(result.files.single.path!);
-    return FileResult(
-        path: file.path,
-        size: result.files.first.size / 1024,
-        fileName: (file).path.split('/').last);
-  }
+  // Future<FileResult?> getFile() async {
+  //   FilePickerResult? result = await FilePicker.platform
+  //       .pickFiles(allowedExtensions: FileUtils.docExts, type: FileType.custom);
+  //   if (result == null) return null;
+  //   File? file = File(result.files.single.path!);
+  //   return FileResult(
+  //       path: file.path,
+  //       size: result.files.first.size / 1024,
+  //       fileName: (file).path.split('/').last);
+  // }
 
   Future<FileResult?> getAudio({required BuildContext context}) async {
     final res = await AssetPicker.pickAssets(
@@ -250,28 +249,28 @@ class MediaService {
     return res!.path!;
   }
 
-  Future<PlatformFile?> getAudioFiles() async {
-    print('....function called....');
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.audio,
-        allowMultiple: false,
-        onFileLoading: (FilePickerStatus status) => print(status),
-      );
-      PlatformFile file = result!.files.first;
-      int fileSize = file.size;
-      print('....file size:::: $fileSize');
-      // String? audioUrl =
-      //     await FileConverter().convertMe(filePath: file.path!);
-      // return audioUrl;
-      return file;
-    } on PlatformException catch (e) {
-      print('Unsupported operation' + e.toString());
-    } catch (e) {
-      print(e.toString());
-    }
-    return null;
-  }
+  // Future<PlatformFile?> getAudioFiles() async {
+  //   print('....function called....');
+  //   try {
+  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //       type: FileType.audio,
+  //       allowMultiple: false,
+  //       onFileLoading: (FilePickerStatus status) => print(status),
+  //     );
+  //     PlatformFile file = result!.files.first;
+  //     int fileSize = file.size;
+  //     print('....file size:::: $fileSize');
+  //     // String? audioUrl =
+  //     //     await FileConverter().convertMe(filePath: file.path!);
+  //     // return audioUrl;
+  //     return file;
+  //   } on PlatformException catch (e) {
+  //     print('Unsupported operation' + e.toString());
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  //   return null;
+  // }
 
   Future<FileResult?> pickFromCamera(
       {required BuildContext context, bool? enableRecording}) async {

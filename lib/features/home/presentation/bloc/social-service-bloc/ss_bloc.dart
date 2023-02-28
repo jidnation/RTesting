@@ -14,11 +14,8 @@ import 'package:reach_me/features/home/data/models/status.model.dart';
 import 'package:reach_me/features/home/data/models/virtual_models.dart';
 import 'package:reach_me/features/home/data/repositories/social_service_repository.dart';
 import 'package:reach_me/features/home/data/repositories/user_repository.dart';
-import 'package:reach_me/features/home/presentation/views/post_reach.dart';
 
-import '../../../../timeline/timeline_feed.dart';
 import '../../../data/dtos/create.repost.input.dart';
-import '../../../data/models/notifications.dart';
 
 part 'ss_event.dart';
 part 'ss_state.dart';
@@ -27,7 +24,6 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
   final socialServiceRepository = SocialServiceRepository();
   final userRepository = UserRepository();
   SocialServiceBloc() : super(SocialServiceInitial()) {
-   
     on<CreatePostEvent>((event, emit) async {
       emit(CreatePostLoading());
       try {
@@ -43,7 +39,7 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         response.fold(
           (error) => emit(CreatePostError(error: error)),
           (post) {
-            timeLineFeedStore.initialize(isPosting: true, isRefreshing: true);
+            // timeLineFeedStore.initialize(isPosting: true, isRefreshing: true);
             Console.log('post data bloc', post.toJson());
             // emit(CreatePostSuccess(post: post));
           },
@@ -699,86 +695,6 @@ class SocialServiceBloc extends Bloc<SocialServiceEvent, SocialServiceState> {
         );
       } on GraphQLError catch (e) {
         emit(GetVotedPostsError(error: e.message));
-      }
-    });
-    on<UploadPostMediaEvent>((event, emit) async {
-      emit(UploadMediaLoading());
-      List<Map<String, dynamic>> mediaIds = [];
-      List<String> imageUrl = [];
-
-      try {
-        //GET SIGNED URLS FOR ALL FILES
-        Console.log('event.media length', event.media.length);
-        for (UploadFileDto media in event.media) {
-          final response = await userRepository.getSignedURl(file: media.file);
-          response.fold(
-            (error) => emit(UploadMediaError(error: error)),
-            (meta) => mediaIds.add(meta),
-          );
-        }
-
-        Console.log('media.id length', mediaIds.length);
-
-        var tempMap = <String, dynamic>{};
-
-        var tempArr = [];
-
-        for (var element in event.media) {
-          tempMap[element.id] = element.file;
-          Console.log('element in media', element);
-        }
-        Console.log('temp map', tempMap);
-        Console.log('temp map length', tempMap.length);
-
-        tempMap.forEach((key, value) {
-          tempArr.add({
-            'id': key,
-            'file': value,
-          });
-        });
-
-        Console.log('temp arr length', tempArr.length);
-
-        Console.log('temp arr', tempArr);
-
-        //merge mediaIds and tempArr to form a giant object
-        var newlist = mediaIds.toSet().toList().mapIndexed((index, element) {
-          Console.log('map index i', index);
-          Console.log('map index el', element);
-          return {
-            ...element,
-            ...tempArr.toSet().toList()[index],
-          };
-        });
-
-        Console.log('temp arr length', newlist.length);
-        Console.log('newlist first', newlist.first);
-        Console.log('newlist ', newlist);
-
-        for (var data in newlist.toSet().toList()) {
-          Console.log('data in newlist', data);
-          final response = await userRepository.uploadPhoto(
-            url: data['signedUrl'],
-            file: data['file'],
-          );
-          response.fold(
-            (error) => emit(UploadMediaError(error: error)),
-            (meta) => {
-              for (var data in newlist) {imageUrl.add(data['imageUrl'])}
-            },
-          );
-        }
-
-        Console.log('imageUrl list', imageUrl);
-        Console.log('imageUrl first', imageUrl.first);
-
-        if (imageUrl.isNotEmpty) {
-          emit(UploadMediaSuccess(data: imageUrl.toSet().toList()));
-        } else {
-          emit(UploadMediaError(error: 'No media uploaded'));
-        }
-      } on GraphQLError catch (e) {
-        emit(UploadMediaError(error: e.message));
       }
     });
     on<MediaUploadEvent>((event, emit) async {

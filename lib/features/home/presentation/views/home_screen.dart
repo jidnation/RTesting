@@ -9,13 +9,12 @@ import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/account/presentation/views/account.dart';
 import 'package:reach_me/features/home/presentation/bloc/user-bloc/user_bloc.dart';
 import 'package:reach_me/features/home/presentation/views/notification.dart';
-import 'package:reach_me/features/home/presentation/views/search.dart';
 import 'package:reach_me/features/home/presentation/widgets/app_drawer.dart';
 
-import '../../../moment/moment_feed.dart';
-import '../../../moment/user_posting.dart';
-import '../../../profile/new_account.dart';
+import '../../../chat/presentation/views/chats_list_screen.dart';
 import '../../../timeline/timeline_feed.dart';
+// import '../../../profile/new_account.dart';
+// import '../../../timeline/timeline_feed.dart';
 
 class HomeScreen extends StatefulHookWidget {
   static const String id = "home_screen";
@@ -28,8 +27,7 @@ class HomeScreen extends StatefulHookWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    momentFeedStore.initialize();
-    timeLineFeedStore.initialize(isRefreshing: true);
+    // timeLineFeedStore.initialize(isRefreshing: true);
     super.initState();
   }
 
@@ -39,18 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final _pageController = usePageController(initialPage: _currentIndex.value);
     final ValueNotifier<GlobalKey<ScaffoldState>> scaffoldKey =
         useState<GlobalKey<ScaffoldState>>(GlobalKey<ScaffoldState>());
-    momentCtrl.userBar(scaffoldKey.value);
-    momentCtrl.streakPageController(_pageController);
     ValueNotifier<GlobalKey<ScaffoldState>> data = scaffoldKey;
     final pages = [
       // TimelineScreen(scaffoldKey: scaffoldKey.value),
-      TimeLineFeed(scaffoldKey: scaffoldKey.value),
-      SearchScreen(scaffoldKey: scaffoldKey.value),
+      // TimeLineFeed(scaffoldKey: scaffoldKey.value),
+      const ChatsListScreen(),
+      // SearchScreen(scaffoldKey: scaffoldKey.value),
       // const VideoMomentScreen(),
       // TestingScreen(),
-      MomentFeed(pageController: _pageController),
+      // MomentFeed(pageController: _pageController),
       const NotificationsScreen(),
-      const NewAccountScreen(),
+      // const NewAccountScreen(),
     ];
     useEffect(() {
       globals.userBloc!.add(UpdateUserLastSeenEvent(userId: globals.userId!));
@@ -84,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      drawer: const AppDrawer(),
+      // drawer: const AppDrawer(),
       key: scaffoldKey.value,
       body: WillPopScope(
         onWillPop: () => Future.sync(onWillPop),
@@ -141,15 +138,15 @@ class BottomNavBar extends StatelessWidget {
       currentIndex: _currentIndex.value,
       onTap: (index) {
         _currentIndex.value = index;
-        timeLineController.currentPageIndex(index);
+        // timeLineController.currentPageIndex(index);
         pageController.jumpToPage(_currentIndex.value);
         //if (index != 2) {}
         //TODO: DECLARE THE VIDEO CONTROLLER HERE
 
         if (_currentIndex.value == 0) {
-          timeLineFeedStore.initialize(
-            isRefreshing: true,
-          );
+          // timeLineFeedStore.initialize(
+          //   isRefreshing: true,
+          // );
         }
       },
       selectedItemColor: AppColors.primaryColor,

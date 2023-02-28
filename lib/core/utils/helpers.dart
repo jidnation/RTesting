@@ -12,6 +12,8 @@ import 'package:reach_me/core/utils/dimensions.dart';
 import 'package:reach_me/features/account/presentation/widgets/image_placeholder.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 
+// import '../../features/auth/core/components/profile_picture.dart';
+
 class Helper {
   static String parseDate(DateTime? date) {
     String? day = '', month = '';
@@ -1207,5 +1209,4 @@ class Helper {
   //   //     );
   //   // }
   // }
-
 }

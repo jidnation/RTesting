@@ -9,7 +9,6 @@ class MediaCard extends StatelessWidget {
     this.width = 152,
     this.isPhoto = false,
     this.isVideo = true,
-   
     required this.size,
   }) : super(key: key);
 

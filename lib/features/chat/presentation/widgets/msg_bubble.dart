@@ -7,10 +7,10 @@ import 'package:reach_me/core/services/navigation/navigation_service.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/widgets/audio_player.dart';
-import 'package:reach_me/features/home/presentation/views/full_post.dart';
-import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
+// import 'package:reach_me/features/home/presentation/views/full_post.dart';
+// import 'package:reach_me/features/home/presentation/views/status/status_view_page.dart';
 
-import '../../../moment/moment_feed.dart';
+// import '../../../moment/moment_feed.dart';
 
 class MsgBubble extends StatelessWidget {
   const MsgBubble(
@@ -157,21 +157,22 @@ class MsgBubble extends StatelessWidget {
                   if (chat.quotedFromPost!) {
                     if (json.decode(chat.quotedData!)['username'] ==
                         "isStreak") {
-                      momentFeedStore.gotoFeed(
-                          momentId: json.decode(chat.quotedData!)['post']
-                              ['postId']);
+                      // momentFeedStore.gotoFeed(
+                      //     momentId: json.decode(chat.quotedData!)['post']
+                      //         ['postId']);
                     } else {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (builder) => FullPostScreen(
-                                postFeedModel: chat.quotedPost,
-                              )));
+                      // Navigator.of(context).push(
+                      //     MaterialPageRoute(
+                      // builder: (builder) => FullPostScreen(
+                      //       postFeedModel: chat.quotedPost,
+                      //     )));
                     }
                   } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => StatusViewPage(
-                              status: [chat.quotedStatus!],
-                              isMuted: false,
-                            )));
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //     builder: (builder) => StatusViewPage(
+                    //           status: [chat.quotedStatus!],
+                    //           isMuted: false,
+                    //         )));
                   }
                 },
                 child: Bubble(
@@ -281,12 +282,14 @@ class MsgBubble extends StatelessWidget {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: isMe ? AppColors.primaryColor : AppColors.white),
-              child: PlayAudio(
-                audioFile: label,
-                isMe: isMe,
-                timeStamp: timeStamp,
-                id: chat.id,
-              )));
+              child: SizedBox()
+              // PlayAudio(
+              //   audioFile: label,
+              //   isMe: isMe,
+              //   timeStamp: timeStamp,
+              //   id: chat.id,
+              // )
+              ));
     }
     return Column(
       children: [

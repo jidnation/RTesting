@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
+// import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -62,12 +62,12 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   bool isRecordingInit = false;
   bool isRecording = false;
   bool isPaused = false;
-  TimerController? timerController;
+  // TimerController? timerController;
   var pathy;
   bool showBox = false;
 
   //AUDIO_WAVEFORM RECORDER
-  RecorderController? recorderController;
+  // RecorderController? recorderController;
   File? audioFile;
   String? filePath;
 
@@ -75,7 +75,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
   void initState() {
     super.initState();
     _soundRecorder = FlutterSoundRecorder();
-    timerController = TimerController();
+    // timerController = TimerController();
     openAudio();
 
     focusNode.addListener(() {
@@ -129,25 +129,25 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
     return pathos;
   }
 
-  Future<File?> getImage(ImageSource source) async {
-    final _picker = ImagePicker();
-    try {
-      final imageFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 100,
-        // maxHeight: 900,
-        // maxWidth: 600,
-      );
-
-      if (imageFile != null) {
-        File image = File(imageFile.path);
-        return image;
-      }
-    } catch (e) {
-      // print(e);
-    }
-    return null;
-  }
+  // Future<File?> getImage(ImageSource source) async {
+  //   final _picker = ImagePicker();
+  //   try {
+  //     final imageFile = await _picker.pickImage(
+  //       source: source,
+  //       imageQuality: 100,
+  //       // maxHeight: 900,
+  //       // maxWidth: 600,
+  //     );
+  //
+  //     if (imageFile != null) {
+  //       File image = File(imageFile.path);
+  //       return image;
+  //     }
+  //   } catch (e) {
+  //     // print(e);
+  //   }
+  //   return null;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,13 +186,13 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
         ),
         title: InkWell(
           onTap: () {
-            RouteNavigators.route(
-                context,
-                RecipientAccountProfile(
-                  recipientEmail: widget.recipientUser!.email,
-                  recipientImageUrl: widget.recipientUser!.profilePicture,
-                  recipientId: widget.recipientUser!.id,
-                ));
+            // RouteNavigators.route(
+            //     context,
+            //     RecipientAccountProfile(
+            //       recipientEmail: widget.recipientUser!.email,
+            //       recipientImageUrl: widget.recipientUser!.profilePicture,
+            //       recipientId: widget.recipientUser!.id,
+            //     ));
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -446,17 +446,17 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                             label: 'View Profile',
                                             color: AppColors.white,
                                             onPressed: () {
-                                              RouteNavigators.route(
-                                                  context,
-                                                  RecipientAccountProfile(
-                                                    recipientEmail: widget
-                                                        .recipientUser!.email,
-                                                    recipientImageUrl: widget
-                                                        .recipientUser!
-                                                        .profilePicture,
-                                                    recipientId: widget
-                                                        .recipientUser!.id,
-                                                  ));
+                                              // RouteNavigators.route(
+                                              //     context,
+                                              // RecipientAccountProfile(
+                                              //   recipientEmail: widget
+                                              //       .recipientUser!.email,
+                                              //   recipientImageUrl: widget
+                                              //       .recipientUser!
+                                              //       .profilePicture,
+                                              //   recipientId: widget
+                                              //       .recipientUser!.id,
+                                              // ));
                                             },
                                             size: size,
                                             padding: const EdgeInsets.symmetric(
@@ -676,18 +676,18 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                                       'Camera'),
                                                                   onTap:
                                                                       () async {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    final image =
-                                                                        await getImage(
-                                                                            ImageSource.camera);
-                                                                    if (image !=
-                                                                        null) {
-                                                                      globals
-                                                                          .chatBloc!
-                                                                          .add(UploadImageFileEvent(
-                                                                              file: image));
-                                                                    }
+                                                                    // Navigator.pop(
+                                                                    //     context);
+                                                                    // final image =
+                                                                    //     await getImage(
+                                                                    //         ImageSource.camera);
+                                                                    // if (image !=
+                                                                    //     null) {
+                                                                    //   globals
+                                                                    //       .chatBloc!
+                                                                    //       .add(UploadImageFileEvent(
+                                                                    //           file: image));
+                                                                    // }
                                                                   },
                                                                 ),
                                                                 ListTile(
@@ -698,18 +698,18 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                                       'Gallery'),
                                                                   onTap:
                                                                       () async {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    final image =
-                                                                        await getImage(
-                                                                            ImageSource.gallery);
-                                                                    if (image !=
-                                                                        null) {
-                                                                      globals
-                                                                          .chatBloc!
-                                                                          .add(UploadImageFileEvent(
-                                                                              file: image));
-                                                                    }
+                                                                    // Navigator.pop(
+                                                                    //     context);
+                                                                    // final image =
+                                                                    //     await getImage(
+                                                                    //         ImageSource.gallery);
+                                                                    // if (image !=
+                                                                    //     null) {
+                                                                    //   globals
+                                                                    //       .chatBloc!
+                                                                    //       .add(UploadImageFileEvent(
+                                                                    //           file: image));
+                                                                    // }
                                                                   },
                                                                 ),
                                                               ]).paddingSymmetric(
@@ -746,8 +746,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                       setState(() {
                                                         isRecording = false;
                                                         showBox = false;
-                                                        timerController!
-                                                            .resetTimer();
+                                                        // timerController!
+                                                        //     .resetTimer();
                                                       });
                                                     },
                                                     child: const Icon(
@@ -772,9 +772,10 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                       const SizedBox(
                                                         height: 4,
                                                       ),
-                                                      TimerWidget(
-                                                          controller:
-                                                              timerController!),
+                                                      // TimerWidget(
+                                                      //     controller:
+                                                      //         timerController!
+                                                      // ),
                                                     ],
                                                   ),
                                                   GestureDetector(
@@ -786,8 +787,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                         await _soundRecorder!
                                                             .startRecorder(
                                                                 toFile: pathy);
-                                                        timerController!
-                                                            .startTimer();
+                                                        // timerController!
+                                                        //     .startTimer();
 
                                                         setState(() {
                                                           isRecording =
@@ -798,8 +799,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                         await _soundRecorder!
                                                             .pauseRecorder();
 
-                                                        timerController!
-                                                            .pauseTimer();
+                                                        // timerController!
+                                                        //     .pauseTimer();
 
                                                         setState(() {
                                                           isPaused = !isPaused;
@@ -809,8 +810,8 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                         await _soundRecorder!
                                                             .resumeRecorder();
 
-                                                        timerController!
-                                                            .startTimer();
+                                                        // timerController!
+                                                        //     .startTimer();
 
                                                         setState(() {
                                                           isPaused = !isPaused;
@@ -937,7 +938,7 @@ class _MsgChatInterfaceState extends State<MsgChatInterface> {
                                                       UploadImageFileEvent(
                                                           file: audioMessage));
 
-                                                  timerController!.resetTimer();
+                                                  // timerController!.resetTimer();
 
                                                   setState(() {
                                                     isRecording = !isRecording;

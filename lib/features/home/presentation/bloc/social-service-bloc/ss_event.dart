@@ -29,10 +29,10 @@ class EditContentEvent extends SocialServiceEvent {
   });
 }
 
-class UploadPostMediaEvent extends SocialServiceEvent {
-  final List<UploadFileDto> media;
-  UploadPostMediaEvent({required this.media});
-}
+// class UploadPostMediaEvent extends SocialServiceEvent {
+//   final List<UploadFileDto> media;
+//   UploadPostMediaEvent({required this.media});
+// }
 
 class MediaUploadEvent extends SocialServiceEvent {
   final File media;
@@ -374,6 +374,5 @@ class GetVotedPostsEvent extends SocialServiceEvent {
 }
 
 class SuggestUserEvent extends SocialServiceEvent {}
-
 
 // class ReachUserEvent extends

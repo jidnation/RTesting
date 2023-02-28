@@ -21,9 +21,6 @@ import 'package:reach_me/core/utils/bloc_observer.dart';
 import 'package:reach_me/core/utils/constants.dart';
 import 'package:reach_me/features/auth/presentation/views/splash_screen.dart';
 
-import 'core/services/moment/controller.dart';
-import 'features/timeline/timeline_controller.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
@@ -58,8 +55,8 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    Get.lazyPut(() => MomentController(), fenix: true);
-    Get.lazyPut(() => TimeLineController(), fenix: true);
+    // Get.lazyPut(() => MomentController(), fenix: true);
+    // Get.lazyPut(() => TimeLineController(), fenix: true);
     return GraphQLProvider(
       client: clientFor(),
       child: GraphQLProvider(

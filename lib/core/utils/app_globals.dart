@@ -1,4 +1,4 @@
-import 'package:better_player/better_player.dart';
+// import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:reach_me/core/models/user.dart';
@@ -8,7 +8,6 @@ import 'package:reach_me/features/auth/data/models/login_response.dart';
 import 'package:reach_me/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:reach_me/features/chat/data/models/chat.dart';
 import 'package:reach_me/features/chat/presentation/bloc/chat_bloc.dart';
-import 'package:reach_me/features/dictionary/dictionary_bloc/bloc/dictionary_bloc.dart';
 import 'package:reach_me/features/home/data/models/post_model.dart';
 import 'package:reach_me/features/home/data/models/stream_model.dart';
 import 'package:reach_me/features/home/presentation/bloc/social-service-bloc/ss_bloc.dart';
@@ -33,7 +32,6 @@ class AppGlobals {
 
   SocialServiceBloc? socialServiceBloc;
   NotificationsBloc? notificationsBloc;
-  DictionaryBloc? dictionaryBloc;
   String? token;
   String? email;
   String? fname;
@@ -52,7 +50,7 @@ class AppGlobals {
   LoginResponse? loginResponse;
   StreamResponse? streamLive;
   DialogAndSheetService? dialogAndSheetService;
-  BetterPlayerController? statusVideoController;
+  // BetterPlayerController? statusVideoController;
 
   void init() {
     user = User();
@@ -68,7 +66,6 @@ class AppGlobals {
     callBloc = CallBloc();
     notificationsBloc = NotificationsBloc();
     socialServiceBloc = SocialServiceBloc();
-    dictionaryBloc = DictionaryBloc();
     token = '';
     email = '';
     postCommentOption = '';
@@ -87,8 +84,7 @@ class AppGlobals {
     chatBloc!.close();
     callBloc!.close();
     socialServiceBloc!.close();
-    dictionaryBloc!.close();
-    statusVideoController?.dispose();
+    // statusVideoController?.dispose();
   }
 
   void showLoader(BuildContext context) {
